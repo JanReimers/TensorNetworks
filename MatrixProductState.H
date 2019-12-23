@@ -7,14 +7,17 @@
 class MatrixProductState
 {
     public:
+        typedef MatrixProductSite::MatrixT MatrixT;
 
         MatrixProductState(int L, int S2, int D);
         virtual ~MatrixProductState();
 
-        int GetL   () const {return itsL;}
-        int GetD   () const {return itsD;}
-        int Getp   () const {return itsp;}
-        double GetOverlap() const;
+        int     GetL      () const {return itsL;}
+        int     GetD      () const {return itsD;}
+        int     Getp      () const {return itsp;}
+
+        double  GetOverlap(        ) const;
+        MatrixT GetOverlap(int site) const;
 
         void InitializeWithProductState();
     protected:

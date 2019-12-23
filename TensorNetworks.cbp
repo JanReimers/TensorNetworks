@@ -48,9 +48,6 @@
 			<Option compilerVar="CPP" />
 		</Unit>
 		<Unit filename="MatrixProductState.H" />
-		<Unit filename="main.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />

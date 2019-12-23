@@ -8,6 +8,8 @@ int main(int argc, char **argv)
 
 #include "TensorNetworks/MatrixProductState.H"
 #include "oml/stream.h"
+#include "oml/random.h"
+#include <complex>
 
 class MatrixProductTesting : public ::testing::Test
 {
@@ -33,6 +35,7 @@ template <class Ob> std::string ToString(const Ob& result)
     res_stream << result;
     return res_stream.str();
 }
+
 
 
 TEST_F(MatrixProductTesting,Constructor)
@@ -84,3 +87,65 @@ TEST_F(MatrixProductTesting,GetOverlapS3D4)
     mps_local.InitializeWithProductState();
     EXPECT_EQ(mps_local.GetOverlap(),1048576.0);
 }
+
+TEST_F(MatrixProductTesting,MatrixOpMul)
+{
+    DMatrix<double> A(10,10),B(10,9);
+    FillRandom(A);
+    FillRandom(B);
+    A*=B;
+}
+
+//
+//  Evaluate overlap for site 0 for L=10,S=1/2,D=2
+//
+TEST_F(MatrixProductTesting,GetOverlapForSite0)
+{
+    mps.InitializeWithProductState();
+    MatrixT Sab1=mps.GetOverlap(0);
+    EXPECT_EQ(ToString(Sab1),"(1:2),(1:2) \n[ (512,0) (512,0) ]\n[ (512,0) (512,0) ]\n");
+}
+
+//
+//  Evaluate overlap for site 1 for L=10,S=1/2,D=2
+//
+TEST_F(MatrixProductTesting,GetOverlapForSite1)
+{
+    mps.InitializeWithProductState();
+    MatrixT Sab1=mps.GetOverlap(1);
+    EXPECT_EQ(ToString(Sab1),"(1:2),(1:2) \n[ (512,0) (512,0) ]\n[ (512,0) (512,0) ]\n");
+}
+
+//
+//  Evaluate overlap for site 8 for L=10,S=1/2,D=2
+//
+TEST_F(MatrixProductTesting,GetOverlapForSite8)
+{
+    mps.InitializeWithProductState();
+    MatrixT Sab1=mps.GetOverlap(8);
+    EXPECT_EQ(ToString(Sab1),"(1:2),(1:2) \n[ (512,0) (512,0) ]\n[ (512,0) (512,0) ]\n");
+}
+
+//
+//  Evaluate overlap for site 9 for L=10,S=1/2,D=2
+//
+TEST_F(MatrixProductTesting,GetOverlapForSite9)
+{
+    mps.InitializeWithProductState();
+    MatrixT Sab1=mps.GetOverlap(9);
+    EXPECT_EQ(ToString(Sab1),"(1:2),(1:2) \n[ (512,0) (512,0) ]\n[ (512,0) (512,0) ]\n");
+}
+
+//
+//  Evaluate overlap for site 1 for L=10,S=3/2,D=4
+//
+TEST_F(MatrixProductTesting,GetOverlapForSite1S3D3)
+{
+    MatrixProductState mps_local(10,3,4);
+    mps_local.InitializeWithProductState();
+    MatrixT Sab1=mps_local.GetOverlap(1);
+    EXPECT_EQ(ToString(Sab1.GetLimits()),"(1:4),(1:4) ");
+    EXPECT_EQ(Sab1(1,1),std::complex<double>(262144.0,0.0));
+}
+
+
