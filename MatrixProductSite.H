@@ -13,13 +13,16 @@ class MatrixProductSite
         MatrixProductSite(int p, int D1, int D2);
         virtual ~MatrixProductSite();
 
-        void InitializeWithProductState();
+        void InitializeWithProductState(int sgn);
 
-        MatrixT GetOverlapTransferMatrix() const;
+        const MatLimits GetLimits() const {return itsAs[0].GetLimits();}
+        MatrixT GetOverlapTransferMatrix() const; //For the left most site only
+        MatrixT GetOverlapTransferMatrix(const MatrixT& Em) const; //For interior sites
         MatrixT GetOverlapMatrix(const MatrixT& Eleft, const MatrixT Eright) const;
+        MatrixT GetLeftNorm() const;
+        MatrixT GetRightNorm() const;
 
     protected:
-        std::complex<double> GetOverlapMatrixElement(const MatrixT& Aa, const MatrixT& Ab, const MatrixT& Eleft, const MatrixT& Eright) const;
 
     private:
         friend class MatrixProductTesting;
@@ -28,6 +31,7 @@ class MatrixProductSite
         typedef pVectorT::const_iterator cpIterT;
 
         int itsp; //2*S+1
+        int itsD1,itsD2;
         pVectorT itsAs; //We need a separate matrix for eash of the p basis states on one site.
 };
 

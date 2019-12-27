@@ -2,6 +2,9 @@
 #include <iostream>
 #include <complex>
 
+using std::cout;
+using std::endl;
+
 MatrixProductState::MatrixProductState(int L, int S2, int D)
     : itsL(L)
     , itsS2(S2)
@@ -21,55 +24,87 @@ MatrixProductState::~MatrixProductState()
 
 void MatrixProductState::InitializeWithProductState()
 {
+    int sgn=1;
     for (SIter i=itsSites.begin();i!=itsSites.end();i++)
-        i->InitializeWithProductState();
+    {
+        i->InitializeWithProductState(sgn);
+        sgn*=-1;
+    }
 }
 
 double MatrixProductState::GetOverlap() const
 {
     cSIter i=itsSites.begin();
-    MatrixT E1=i->GetOverlapTransferMatrix();
-//    std::cout << "E1=" << E1 << std::endl;
+    MatrixT E=i->GetOverlapTransferMatrix();
     i++;
     for (;i!=itsSites.end();i++)
+        E=i->GetOverlapTransferMatrix(E);
+    assert(E.GetNumRows()==1);
+    assert(E.GetNumCols()==1);
+    assert(std::imag(E(1,1))==0.0);
+    return std::real(E(1,1));
+}
+
+    //--------------------------------------------------------
+    //
+    // Calc Eleft
+    // Handle left boundary cases
+    //
+MatrixProductState::MatrixT MatrixProductState::GetMLeft(int isite) const
+{
+   assert(isite<itsL);
+    MatrixT Eleft;
+    if (isite==0)
     {
-        E1*=i->GetOverlapTransferMatrix();
+        Eleft.SetLimits(1,1);
+        Fill(Eleft,std::complex<double>(1.0));
     }
-    assert(E1.GetNumRows()==1);
-    assert(E1.GetNumCols()==1);
-    assert(std::imag(E1(1,1))==0.0);
-    return std::real(E1(1,1));
+    else
+    {
+        Eleft=itsSites[0]->GetOverlapTransferMatrix();
+    }
+    //
+    //  Zip from left to right up to isite
+    //
+//    cout << "ELeft(0)=" << Eleft << endl;
+    for (int ia=1;ia<isite;ia++)
+    {
+            Eleft=itsSites[ia]->GetOverlapTransferMatrix(Eleft);
+ //       cout << "ELeft(" << ia << ")=" << Eleft << endl;
+            }
+    return Eleft;
+}
+   //--------------------------------------------------------
+    //
+    // Calc Eright
+    // Handle right boundary cases
+    //
+
+MatrixProductState::MatrixT MatrixProductState::GetMRight(int isite) const
+{
+    MatrixT Eright;
+    if (isite==itsL-1)
+    {
+        Eright.SetLimits(1,1);
+        Fill(Eright,std::complex<double>(1.0));
+    }
+    else
+    {
+        Eright=itsSites[itsL-1]->GetOverlapTransferMatrix();
+    }
+    // Zip right to left
+    for (int ia=itsL-2;ia>=isite+1;ia--)
+        Eright=itsSites[ia]->GetOverlapTransferMatrix(Eright);
+
+    return Eright;
 }
 
  MatrixProductState::MatrixT MatrixProductState::GetOverlap(int isite) const
  {
-    assert(isite<itsL);
-    MatrixT Eleft,Eright;
-    if (isite==0)
-    {
-        Eleft.SetLimits(1,1);
-        Eleft(1,1)=1.0;
-    }
-    if (isite==itsL-1)
-    {
-        Eright.SetLimits(1,1);
-        Eright(1,1)=1.0;
-    }
-    for (int ia=0;ia<isite;ia++)
-    {
-        if (ia==0)
-            Eleft=itsSites[ia]->GetOverlapTransferMatrix();
-        else
-            Eleft*=itsSites[ia]->GetOverlapTransferMatrix();
-    }
-    for (int ia=isite+1;ia<itsL;ia++)
-    {
-        if (ia==isite+1)
-            Eright=itsSites[ia]->GetOverlapTransferMatrix();
-        else
-            Eright*=itsSites[ia]->GetOverlapTransferMatrix();
-    }
+    MatrixT MLeft =GetMLeft (isite);
+    MatrixT MRight=GetMRight(isite);
+
     const MatrixProductSite* site=itsSites[isite];
-    MatrixT Sab=site->GetOverlapMatrix(Eleft,Eright);
+    MatrixT Sab=site->GetOverlapMatrix(MLeft,MRight);
     return Sab;
  }

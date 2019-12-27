@@ -16,6 +16,9 @@ class MatrixProductState
         int     GetD      () const {return itsD;}
         int     Getp      () const {return itsp;}
 
+        MatrixT GetMLeft (int isite) const;
+        MatrixT GetMRight(int isite) const;
+
         double  GetOverlap(        ) const;
         MatrixT GetOverlap(int site) const;
 
