@@ -44,6 +44,8 @@
 			<Add library="gtest" />
 			<Add library="pthread" />
 		</Linker>
+		<Unit filename="MPOTests.cpp" />
+		<Unit filename="MPSTests.cpp" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<code_completion />

@@ -40,6 +40,22 @@
 		<Compiler>
 			<Add directory="../" />
 		</Compiler>
+		<Unit filename="Hamiltonian.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Hamiltonian.H" />
+		<Unit filename="Hamiltonian_1D_NN_Heisenberg.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Hamiltonian_1D_NN_Heisenberg.H" />
+		<Unit filename="MPOSite.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MPOSite.H" />
+		<Unit filename="MatrixProductOperator.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MatrixProductOperator.H" />
 		<Unit filename="MatrixProductSite.C">
 			<Option compilerVar="CC" />
 		</Unit>
