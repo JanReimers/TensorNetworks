@@ -20,6 +20,7 @@ Hamiltonian_1D_NN_Heisenberg::~Hamiltonian_1D_NN_Heisenberg()
 
 Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int n) const
 {
+    MatrixT W;
     switch (lbr)
     {
 //
@@ -27,14 +28,14 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
 //
     case Left:
     {
-        MatrixT W(Dw,1);
+        W.SetLimits(Dw,1);
         W(1,1)=0.0;
         W(2,1)=itsJ/2.0*GetSminus(m,n);
         W(3,1)=itsJ/2.0*GetSplus (m,n);
         W(4,1)=itsJ/2.0*Get2Sz   (m,n); //The get return 2*Sz to avoid half integers
         W(5,1)=0.0;
-        return W;
     }
+    break;
 //      [ 1    0      0    0  0 ]
 //      [ S+   0      0    0  0 ]
 //  W = [ S-   0      0    0  0 ]
@@ -43,7 +44,7 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
 //
     case Bulk :
     {
-        MatrixT W(Dw,Dw);
+        W.SetLimits(Dw,Dw);
         Fill(W,ElementT(0.0));
         W(1,1)=1.0;
         W(2,1)=itsJ    *GetSplus (m,n);
@@ -54,9 +55,8 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
         W(5,3)=itsJ/2.0*GetSplus (m,n);
         W(5,4)=itsJ/2.0*Get2Sz   (m,n); //The get return 2*Sz to avoid half integers
         W(5,5)=1.0;
-
-        return W;
     }
+    break;
 //
 //      [ 1  ]
 //      [ S+ ]
@@ -67,15 +67,16 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
     case  Right :
     {
 
-        MatrixT W(1,Dw);
+        W.SetLimits(1,Dw);
         W(1,1)=1.0;
         W(1,2)=itsJ    *GetSplus (m,n);
         W(1,3)=itsJ    *GetSminus(m,n);
         W(1,4)=itsJ/2.0*Get2Sz   (m,n); //The get return 2*Sz to avoid half integers
         W(1,5)=1.0;
-        return W;
     }
+    break;
     }
+    return W;
 }
 
 //

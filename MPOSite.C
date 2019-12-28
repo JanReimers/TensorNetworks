@@ -7,6 +7,7 @@ MPOSite::MPOSite(const Hamiltonian* H,int p, int D1, int D2)
     : itsp(p)
     , itsD1(D1)
     , itsD2(D2)
+    , itsDw(H->GetDw())
     , itsWs(p,p)
 {
     Fill(itsWs,MatrixT(itsD1,itsD2));

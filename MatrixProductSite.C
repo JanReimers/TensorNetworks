@@ -1,4 +1,5 @@
 #include "MatrixProductSite.H"
+#include "MPOSite.H"
 #include "oml/minmax.h"
 #include <complex>
 #include <iostream>
@@ -133,3 +134,58 @@ GetOverlapMatrix(const MatrixT& Eleft, const MatrixT Eright) const
     }
     return Sab;
 }
+
+MatrixProductSite::MatrixT MatrixProductSite::GetE(const MPOSite* mpos) const
+{
+    int Dw=mpos->GetDw();
+    MatrixT E(Dw*itsD1*itsD1,Dw*itsD2*itsD2);
+
+    for (int m=0; m<itsp; m++)
+    {
+        MatrixT N=GetN(m,mpos);
+        int i3_1=1;
+        for (int k1=1;k1<=itsD1;k1++)
+            for (int i2_1=1;i2_1<=N.GetNumRows();i2_1++,i3_1++)
+            {
+                assert(i3_1=k1+itsD1*(i2_1-1));
+                int i3_2=1;
+                for (int k2=1;k2<=itsD2;k2++)
+                    for (int i2_2=1;i2_2<=N.GetNumCols();i2_2++,i3_2++)
+                    {
+                        assert(i3_2=k2+itsD2*(i2_2-1));
+                        E(i3_1,i3_2)+=conj(itsAs[m](k1,k2)*N(i2_1,i2_2));
+                    }
+            }
+
+    }
+    //cout << "MPS Elimits=" << E.GetLimits() << endl;
+    return E;
+}
+
+MatrixProductSite::MatrixT MatrixProductSite::GetN(int m,const MPOSite* mpos) const
+{
+    int Dw=mpos->GetDw();
+    MatrixT N(itsD1*Dw,itsD2*Dw);
+    Fill(N,std::complex<double>(0.0));
+    for (int n=0; n<itsp; n++)
+    {
+        const MatrixT W=mpos->GetW(n,m);
+        int i2_1=1;
+        for (int i1=1;i1<=W.GetNumRows();i1++)
+            for (int j1=1;j1<=itsD1;j1++,i2_1++)
+            {
+                assert(i2_1==j1+itsD1*(i1-1));
+                int i2_2=1;
+                for (int i2=1;i2<=W.GetNumCols();i2++)
+                    for (int j2=1;j2<=itsD2;j2++,i2_2++)
+                    {
+                        assert(i2_2==j2+itsD2*(i2-1));
+ //                       cout << i2_1 << " " << i2_2 << " " << i1 << " " << i2 << " " << j1 << " " << j2 << endl;
+                        N(i2_1,i2_2)+=W(i1,i2)*itsAs[n](j1,j2);
+                    }
+            }
+
+    }
+    return N;
+}
+

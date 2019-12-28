@@ -17,6 +17,7 @@ class Hamiltonian
         Hamiltonian();
         virtual ~Hamiltonian();
 
+        virtual int GetDw() const=0;
         //
         //  Generate MPO matrices.  m,n are quantum numbers for <m|Ha|n>
         //

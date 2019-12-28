@@ -4,6 +4,7 @@
 #include "oml/dmatrix.h"
 #include <vector>
 
+class MPOSite;
 
 class MatrixProductSite
 {
@@ -21,6 +22,10 @@ class MatrixProductSite
         MatrixT GetOverlapMatrix(const MatrixT& Eleft, const MatrixT Eright) const;
         MatrixT GetLeftNorm() const;
         MatrixT GetRightNorm() const;
+        // Hamiltion expectation
+        MatrixT GetE(       const MPOSite* mpos) const;
+        MatrixT GetN(int m, const MPOSite* mpos) const;
+
 
     protected:
 

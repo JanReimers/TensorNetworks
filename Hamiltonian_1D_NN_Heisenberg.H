@@ -12,6 +12,8 @@ class Hamiltonian_1D_NN_Heisenberg
         Hamiltonian_1D_NN_Heisenberg(int L, int S2, double J);
         virtual ~Hamiltonian_1D_NN_Heisenberg();
 
+        virtual int GetDw() const {return Dw;};
+
         //
         //  Generate MPO matrices.  m,n are quantum numbers for <m|Ha|n>
         //

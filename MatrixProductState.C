@@ -108,3 +108,9 @@ MatrixProductState::MatrixT MatrixProductState::GetMRight(int isite) const
     MatrixT Sab=site->GetOverlapMatrix(MLeft,MRight);
     return Sab;
  }
+
+MatrixProductState::MatrixT MatrixProductState::GetE(int isite, const MPOSite* mpos) const
+{
+    return itsSites[isite]->GetE(mpos);
+}
+

@@ -80,3 +80,10 @@ TEST_F(MPOTesting,CheckThatWsGotLoaded)
     EXPECT_EQ(ToString(GetW(1,0,0)),"(1:5),(1:5) \n[ (1,0) (0,0) (0,0) (0,0) (0,0) ]\n[ (0,0) (0,0) (0,0) (0,0) (0,0) ]\n[ (0,0) (0,0) (0,0) (0,0) (0,0) ]\n[ (-0.5,0) (0,0) (0,0) (0,0) (0,0) ]\n[ (0,0) (0,0) (0,0) (-0.5,0) (1,0) ]\n");
     EXPECT_EQ(ToString(GetW(1,0,1)),"(1:5),(1:5) \n[ (1,0) (0,0) (0,0) (0,0) (0,0) ]\n[ (0,0) (0,0) (0,0) (0,0) (0,0) ]\n[ (1,0) (0,0) (0,0) (0,0) (0,0) ]\n[ (0,0) (0,0) (0,0) (0,0) (0,0) ]\n[ (0,0) (0.5,0) (0,0) (0,0) (1,0) ]\n");
 }
+
+TEST_F(MPOTesting,DoHamiltionExpectation)
+{
+    itsMPS->InitializeWithProductState();
+    itsMPO->GetHamiltonianExpectation(itsMPS);
+    EXPECT_NEAR(itsMPO->GetHamiltonianExpectation(itsMPS),896.0,1e-11);
+}

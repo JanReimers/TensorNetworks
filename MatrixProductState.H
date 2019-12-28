@@ -22,6 +22,8 @@ class MatrixProductState
         double  GetOverlap(        ) const;
         MatrixT GetOverlap(int site) const;
 
+        // Hamiltion expectation
+        MatrixT GetE(int isite, const MPOSite* mpos) const;
         void InitializeWithProductState();
     protected:
 

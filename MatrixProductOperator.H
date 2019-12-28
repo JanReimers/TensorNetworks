@@ -26,6 +26,7 @@ class MatrixProductOperator
         typedef optr_vector<MPOSite*> SitesType;
         typedef SitesType::      iterator  SIter;
         typedef SitesType::const_iterator cSIter;
+        typedef MatrixProductSite::MatrixT MatrixT;
 
         int itsL;   //Number of lattice sites
         int itsD;   //Dimension of internal/virtual state space.
