@@ -2,11 +2,12 @@
 #define MPOSITE_H
 
 #include "TensorNetworks/MatrixProductSite.H"
+class Hamiltonian;
 
 class MPOSite
 {
     public:
-        MPOSite(int p, int D1, int D2);
+        MPOSite(const Hamiltonian* H,int p, int D1, int D2);
         virtual ~MPOSite();
 
     protected:

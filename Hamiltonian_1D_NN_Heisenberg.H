@@ -15,10 +15,7 @@ class Hamiltonian_1D_NN_Heisenberg
         //
         //  Generate MPO matrices.  m,n are quantum numbers for <m|Ha|n>
         //
-        virtual MatrixT GetLeftW (int m, int n) const;
-        virtual MatrixT GetBulkW (int m, int n) const;
-        virtual MatrixT GetRightW(int m, int n) const;
-
+        virtual MatrixT GetW (Position lbr,int m, int n) const;
         //
         //  Create operators and states
         //

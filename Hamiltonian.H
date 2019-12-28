@@ -12,6 +12,7 @@ class Hamiltonian
     public:
         typedef std::complex<double> ElementT;
         typedef DMatrix<ElementT> MatrixT;
+        enum Position {Left,Bulk,Right};
 
         Hamiltonian();
         virtual ~Hamiltonian();
@@ -19,10 +20,7 @@ class Hamiltonian
         //
         //  Generate MPO matrices.  m,n are quantum numbers for <m|Ha|n>
         //
-        virtual MatrixT GetLeftW (int m, int n) const=0;
-        virtual MatrixT GetBulkW (int m, int n) const=0;
-        virtual MatrixT GetRightW(int m, int n) const=0;
-
+        virtual MatrixT GetW (Position lbr,int m, int n) const=0;
         //
         //  Create operators and states
         //

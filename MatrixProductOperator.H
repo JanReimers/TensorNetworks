@@ -4,16 +4,19 @@
 #include "TensorNetworks/MatrixProductState.H"
 #include "TensorNetworks/MPOSite.H"
 
+class Hamiltonian;
+
 class MatrixProductOperator
 {
     public:
-        MatrixProductOperator(int L, int S2, int D);
+        MatrixProductOperator(const Hamiltonian* H, int L, int S2, int D);
         virtual ~MatrixProductOperator();
 
         int     GetL      () const {return itsL;}
         int     GetD      () const {return itsD;}
         int     Getp      () const {return itsp;}
 
+        double GetHamiltonianExpectation(const MatrixProductState *mps) const;
 
     protected:
 
@@ -31,8 +34,7 @@ class MatrixProductOperator
         // I think we only need to store 3 sites for OBC, left,bulk,right.
         //
         SitesType itsSites;
-
-
+        const Hamiltonian* itsHamiltonian;
 };
 
 #endif // MATRIXPRODUCTOPERATOR_H
