@@ -15,8 +15,6 @@
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add library="oml" />
-					<Add library="gfortran" />
 					<Add directory="../../Debug" />
 				</Linker>
 			</Target>
@@ -43,10 +41,11 @@
 		</Compiler>
 		<Linker>
 			<Add library="TensorNetworks" />
+			<Add library="oml" />
 			<Add library="gtest" />
+			<Add library="gfortran" />
 			<Add library="pthread" />
 		</Linker>
-		<Unit filename="../SVD.f" />
 		<Unit filename="MPOTests.cpp" />
 		<Unit filename="MPSTests.cpp" />
 		<Unit filename="SVDTesting.cpp" />

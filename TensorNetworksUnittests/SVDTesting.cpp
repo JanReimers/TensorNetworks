@@ -42,6 +42,8 @@ template <class Ob> std::string ToString(const Ob& result)
 template <class T,class T2>
 DMatrix<T2> contract(const DMatrix<T2> U, const Vector<T>& s, const DMatrix<T2>& V)
 {
+    assert(U.GetNumCols()==V.GetNumCols());
+    assert(U.GetNumCols()==s.GetHigh());
     int ni=U.GetNumRows();
     int nk=U.GetNumCols();
     int nj=V.GetNumRows();
@@ -57,18 +59,30 @@ DMatrix<T2> contract(const DMatrix<T2> U, const Vector<T>& s, const DMatrix<T2>&
 }
 
 template <class T,class T2>
-DMatrix<T2> ConstractsV(const Vector<T>& s, const DMatrix<T2>& V)
+DMatrix<T2> ConstractsVT(const Vector<T>& s, const DMatrix<T2>& VT)
 {
-    int ni=V.GetNumRows();
+    assert(VT.GetNumRows()==s.GetHigh());
     int nk=s.GetHigh();
-    int nj=V.GetNumRows();
-    DMatrix<T2> Vs(ni,nj);
-    for(int i=1;i<=ni;i++)
-        for(int j=1;j<=nj;j++)
-            for(int k=1;k<=nk;k++)
-                Vs(i,j)=s(i)*V(j,i);
+    int nj=VT.GetNumRows();
+    DMatrix<T2> Vs(nk,nj);
+    for(int j=1;j<=nj;j++)
+        for(int k=1;k<=nk;k++)
+            Vs(k,j)=s(k)*VT(j,k);
     return Vs;
 }
+template <class T,class T2>
+DMatrix<T2> ContractVstar(const Vector<T>& s, const DMatrix<T2>& Vstar)
+{
+    assert(Vstar.GetNumCols()==s.GetHigh());
+    int nk=s.GetHigh();
+    int nj=Vstar.GetNumRows();
+    DMatrix<T2> Vs(nk,nj);
+    for(int j=1;j<=nj;j++)
+        for(int k=1;k<=nk;k++)
+            Vs(k,j)=s(k)*Vstar(j,k);
+    return Vs;
+}
+
 
 TEST_F(SVDTesting,OML_SVDRandomSquareRealMatrix)
 {
@@ -79,13 +93,13 @@ TEST_F(SVDTesting,OML_SVDRandomSquareRealMatrix)
     FillRandom(M);
     Mtype Mcopy(M);
     Unit(UnitMatrix);
-    SVDecomp(M,s,VT);
-//    cout << "V=" << V;
+    SVDecomp(M,s,VT); //Solve M=U*s*VT
+    Mtype V=Transpose(VT);
     EXPECT_NEAR(Max(fabs(Transpose(M)*M-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(fabs(M*Transpose(M)-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(Transpose(VT)*VT-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(VT*Transpose(VT)-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(M*ConstractsV(s,VT)-Mcopy)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(V*VT-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(M*ConstractsVT(s,VT)-Mcopy)),0.0,eps);
 //    EXPECT_NEAR(Max(fabs(M*V-Mcopy)),0.0,eps);
 }
 
@@ -98,27 +112,29 @@ TEST_F(SVDTesting,OML_SVDRandomRectRealMatrix_10x5)
     FillRandom(M);
     Mtype Mcopy(M);
     Unit(UnitMatrix);
-    SVDecomp(M,s,VT);
+    SVDecomp(M,s,VT); //Solve M=U*s*VT
+    Mtype V=Transpose(VT);
     EXPECT_NEAR(Max(fabs(Transpose(M)*M-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(VT*Transpose(VT)-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(Transpose(VT)*VT-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(M*ConstractsV(s,VT)-Mcopy)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(V*VT-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(M*ConstractsVT(s,VT)-Mcopy)),0.0,eps);
 }
 
 
 TEST_F(SVDTesting,OML_SVDRandomRectRealMatrix_5x10)
 {
-    int N1=3,N2=5;
+    int N1=5,N2=10;
     typedef DMatrix<double> Mtype;
     Mtype M(N1,N2),VT(N2,N2),UnitMatrix(N1,N1);
     Vector<double>  s(N2);
     FillRandom(M);
     Mtype Mcopy(M);
     Unit(UnitMatrix);
-    SVDecomp(M,s,VT);
+    SVDecomp(M,s,VT); //Solve M=U*s*VT
+    Mtype V=Transpose(VT);
     EXPECT_NEAR(Max(fabs(Transpose(M)*M-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(VT*Transpose(VT)-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(M*ConstractsV(s,VT)-Mcopy)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(M*ConstractsVT(s,VT)-Mcopy)),0.0,eps);
 }
 
 
@@ -150,43 +166,50 @@ TEST_F(SVDTesting,SVDComplexSquare_N10)
     FillRandom(A);
     Mtype Mcopy(A);
     Unit(UnitMatrix);
+    CSVDecomp(A,s,V); //Solve A=U*s*conj(V)
+    Mtype Vdagger=Transpose(conj(V));
+    EXPECT_NEAR(Max(abs(Transpose(conj(A))*A-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(abs(V*Vdagger-UnitMatrix)),0.0,eps);
+    Mtype Vstar=conj(V);
+    EXPECT_NEAR(Max(abs(A*ContractVstar(s,Vstar)-Mcopy)),0.0,eps);
+    EXPECT_NEAR(Max(abs(contract(A,s,Vstar)-Mcopy)),0.0,eps);
+
+}
+
+TEST_F(SVDTesting,OML_SVDRandomRectComplexMatrix_10x5)
+{
+    int M=10,N=5;
+    typedef DMatrix<eType> Mtype;
+    Mtype A(M,N),V(N,N),UnitMatrix(N,N);
+    Vector<double>  s(N);
+    FillRandom(A);
+    Mtype Mcopy(A);
+    Unit(UnitMatrix);
     CSVDecomp(A,s,V);
     EXPECT_NEAR(Max(abs(Transpose(conj(A))*A-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(abs(V*Transpose(conj(V))-UnitMatrix)),0.0,eps);
     Mtype Vstar=conj(V);
-    EXPECT_NEAR(Max(abs(A*ConstractsV(s,Vstar)-Mcopy)),0.0,eps);
-
+    EXPECT_NEAR(Max(abs(contract(A,s,Vstar)-Mcopy)),0.0,eps);
+    EXPECT_NEAR(Max(abs(A*ContractVstar(s,Vstar)-Mcopy)),0.0,eps);
 }
 
-/*
-TEST_F(SVDTesting,OML_SVDRandomSquareComplexMatrix)
+
+TEST_F(SVDTesting,OML_SVDRandomRectComplexMatrix_5x10)
 {
-    int N=4;
-    typedef DMatrix<std::complex<double> > Mtype;
-    Mtype M(N,N),VT(N,N),UnitMatrix(N,N);
-    Vector<std::complex<double> >  s(N);
-    FillRandom(M);
-    Mtype Mcopy(M+Transpose(conj(M)));
-    M=Mcopy;
+    int M=5,N=10;
+    typedef DMatrix<eType> Mtype;
+    Mtype A(M,N),V(M,N),UnitMatrix(M,M);
+    Vector<double>  s(M);
+    FillRandom(A);
+    Mtype Mcopy(A);
     Unit(UnitMatrix);
-//    cout << "UnitMatrix=" << UnitMatrix;
-//    cout << "M=" << M;
-    SVDecomp(M,s,VT);
-
-    cout << "s=" << s;
-    cout << "U=" << M;
-     cout << "Ut*U=" << Mtype(Transpose(conj(M))*M);
-     cout << "U*Ut=" << Mtype(M*Transpose(conj(M)));
-
-
-    //EXPECT_NEAR(Max(abs(Transpose(conj(M))*M-UnitMatrix)),0.0,eps);
-    //EXPECT_NEAR(Max(abs(M*Transpose(conj(M))-UnitMatrix)),0.0,eps);
-    //EXPECT_NEAR(Max(abs(Transpose(conj(VT))*VT-UnitMatrix)),0.0,eps);
-    //EXPECT_NEAR(Max(abs(VT*Transpose(conj(VT))-UnitMatrix)),0.0,eps);
-//    EXPECT_NEAR(Max(abs(M*ConstractsV(s,VT)-Mcopy)),0.0,eps);
-//    EXPECT_NEAR(Max(fabs(M*V-Mcopy)),0.0,eps);
+    CSVDecomp(A,s,V);
+    Mtype Vstar=conj(V);
+    Mtype Vdagger=Transpose(Vstar);
+    EXPECT_NEAR(Max(abs(Transpose(conj(A))*A-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(abs(Vdagger*V-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(abs(contract(A,s,Vstar)-Mcopy)),0.0,eps);
+    EXPECT_NEAR(Max(abs(A*ContractVstar(s,Vstar)-Mcopy)),0.0,eps);
 }
-*/
-
 
 
