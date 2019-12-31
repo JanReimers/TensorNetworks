@@ -48,6 +48,7 @@
 		</Linker>
 		<Unit filename="MPOTests.cpp" />
 		<Unit filename="MPSTests.cpp" />
+		<Unit filename="SVDNormTests.cpp" />
 		<Unit filename="SVDTesting.cpp" />
 		<Unit filename="main.cpp" />
 		<Extensions>

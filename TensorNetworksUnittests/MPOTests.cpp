@@ -4,7 +4,12 @@
 #include "oml/stream.h"
 #include <complex>
 
-
+template <class Ob> std::string ToString(const Ob& result)
+{
+    std::stringstream res_stream;
+    res_stream << result;
+    return res_stream.str();
+}
 
 class MPOTesting : public ::testing::Test
 {
@@ -30,12 +35,7 @@ public:
     double eps;
 };
 
-template <class Ob> std::string ToString(const Ob& result)
-{
-    std::stringstream res_stream;
-    res_stream << result;
-    return res_stream.str();
-}
+
 
 
 

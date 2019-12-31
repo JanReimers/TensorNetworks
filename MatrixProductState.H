@@ -8,9 +8,14 @@ class MatrixProductState
 {
     public:
         typedef MatrixProductSite::MatrixT MatrixT;
+        typedef MatrixProductSite::VectorT VectorT;
 
         MatrixProductState(int L, int S2, int D);
         virtual ~MatrixProductState();
+
+        void InitializeWithProductState();
+        void InitializeWithRandomState();
+        void Normalize(MatrixProductSite::Position LR);
 
         int     GetL      () const {return itsL;}
         int     GetD      () const {return itsD;}
@@ -18,17 +23,19 @@ class MatrixProductState
 
         MatrixT GetMLeft (int isite) const;
         MatrixT GetMRight(int isite) const;
+        MatrixT GetLeftNorm(int isite) const {return itsSites[isite]->GetLeftNorm();}
 
         double  GetOverlap(        ) const;
         MatrixT GetOverlap(int site) const;
 
         // Hamiltion expectation
         MatrixT GetE(int isite, const MPOSite* mpos) const;
-        void InitializeWithProductState();
+
     protected:
 
     private:
         friend class MatrixProductTesting;
+ //       friend class MPSNormTesting;
 
         typedef optr_vector<MatrixProductSite*> SitesType;
         typedef SitesType::      iterator  SIter;

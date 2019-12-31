@@ -1,6 +1,9 @@
 #include "MatrixProductSite.H"
 #include "MPOSite.H"
 #include "oml/minmax.h"
+#include "oml/cnumeric.h"
+#include "oml/vector_io.h"
+#include "oml/random.h"
 #include <complex>
 #include <iostream>
 
@@ -24,6 +27,10 @@ MatrixProductSite::~MatrixProductSite()
     //dtor
 }
 
+MatrixProductSite::Position MatrixProductSite::WhereAreWe() const
+{
+    return itsAs[0].GetNumRows()==1 ? Left : (itsAs[0].GetNumCols()==1 ? Right : Bulk);
+}
 //
 //  This is a tricker than one might expect.  In particular I can't get the OBC vectors
 //  to be both left and right normalized
@@ -50,6 +57,111 @@ void MatrixProductSite::InitializeWithProductState(int sgn)
     }
 }
 
+void MatrixProductSite::InitializeWithRandomState()
+{
+        for (pIterT ip=itsAs.begin();ip!=itsAs.end();ip++)
+            FillRandom(*ip);
+}
+
+void MatrixProductSite::SVDNormalize(Position LR, VectorT& s, MatrixT& Vdagger)
+{
+    // Where are we in the lattice
+    Position lbr=WhereAreWe();
+    int N1=s.GetHigh();
+    if (N1>0 && N1<itsD1)
+    {
+        itsD1=N1;
+    }
+    if (lbr==Bulk)
+    {
+        for (int in=0; in<itsp; in++)
+        {   MatrixT temp=itsAs[in];
+            itsAs[in].SetLimits(0,0);
+            itsAs[in]=Contract(s,Vdagger,temp);
+        }
+    }
+    MatrixT A=Reshape();
+//    cout << "A reshape="<< A << endl;
+    int M=A.GetNumRows();
+    int N=Min(M,A.GetNumCols());
+    s.SetLimits(N);
+    MatrixT V(N,A.GetNumCols());
+//    cout << "Alim=" << A.GetLimits() << endl;
+//    cout << "slim=" << s.GetLimits() << endl;
+    CSVDecomp(A,s,V); //Solves A=U * s * V*  returns V not V*
+//    cout << "U =" << A << endl;
+//    cout << "s =" << s << endl;
+    Vdagger.SetLimits(0,0);
+    Vdagger=Transpose(conj(V));
+//    cout << "Vdagger =" << Vdagger << endl;
+//    cout << "Vdagger lim=" << Vdagger.GetLimits() << endl;
+    Reshape(A);
+//    for (int in=0; in<itsp; in++)
+//        cout << "A[" << in << "]"<< itsAs[in] << endl;
+}
+
+MatrixProductSite::MatrixT  MatrixProductSite::Reshape()
+{
+    MatrixT A(itsp*itsD1,itsD2);
+    int i2_1=1;
+    for (int in=0;in<itsp;in++)
+        for (int i1=1;i1<=itsD1;i1++,i2_1++)
+            for (int i2=1;i2<=itsD2;i2++)
+                A(i2_1,i2)=itsAs[in](i1,i2);
+    return A;
+}
+
+void MatrixProductSite::Reshape(const MatrixT& U)
+{
+    //  If U has less culumns than the As then we need to reshape the whole site.
+    //  Typically this will happen at the edges of the lattice.
+    int N2=U.GetNumCols();
+    if (N2<itsD2)
+    {
+        itsD2=U.GetNumCols();
+        for (int in=0; in<itsp; in++)
+            itsAs[in].SetLimits(itsD1,itsD2);
+    }
+    int i2_1=1;
+    for (int in=0; in<itsp; in++)
+        for (int i1=1; i1<=itsD1; i1++,i2_1++)
+        {
+            for (int i2=1; i2<=itsD2; i2++)
+                itsAs[in](i1,i2)=U(i2_1,i2);
+
+//            for (int i2=N2+1; i2<=itsD2; i2++) //Pad with zeros when U is small.
+//                itsAs[in](i1,i2)= (i1==i2 ? 1.0 : 0.0);
+        }
+}
+
+//
+//  Anew(j,i) =  s(j)*V(k,j)*Aold(k,i)
+//
+MatrixProductSite::MatrixT MatrixProductSite::Contract(const VectorT& s, const MatrixT& Vdagger, const MatrixT& Aold)
+{
+    //cout << "Contract S    lim=" << s.GetLimits() << endl;
+    //cout << "Contract Vdagger    lim=" << Vdagger.GetLimits() << endl;
+    //cout << "Contract Aold lim=" << Aold.GetLimits() << endl;
+
+    MatrixT VA=Vdagger*Aold;
+    //cout << "Contract Vdagger*A lim=" << VA.GetLimits() << endl;
+    //cout << "Contract Anew lim=" << Anew.GetLimits() << endl;
+    assert(VA.GetNumCols()==itsD2);
+    assert(s.GetHigh()==VA.GetNumRows());
+
+    MatrixT Anew(itsD1,itsD2);
+    for(int i2=1; i2<=itsD2; i2++)
+    {
+        for(int i1=1; i1<=itsD1; i1++)
+            Anew(i1,i2)=s(i1)*VA(i1,i2);
+        //for(int i1=N1+1; i1<=itsD1; i1++)
+          //  Anew(i1,i2)=0.0;
+    }
+
+    return Anew;
+}
+
+
 //
 //  Sum_ip A^t(ip) * A(ip)
 //
@@ -58,7 +170,9 @@ MatrixProductSite::MatrixT MatrixProductSite::GetLeftNorm() const
     MatrixT ret(itsD2,itsD2);
     Fill(ret,std::complex<double>(0.0));
     for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
+    {
         ret+=conj(Transpose((*ip)))*(*ip);
+    }
     return ret;
 }
 //

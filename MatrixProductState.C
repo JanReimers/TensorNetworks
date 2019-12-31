@@ -31,6 +31,24 @@ void MatrixProductState::InitializeWithProductState()
         sgn*=-1;
     }
 }
+void MatrixProductState::InitializeWithRandomState()
+{
+    for (SIter i=itsSites.begin();i!=itsSites.end();i++)
+        i->InitializeWithRandomState();
+}
+
+
+void MatrixProductState::Normalize(MatrixProductSite::Position LR)
+{
+    MatrixT Vdagger;
+    VectorT s;
+    for (SIter i=itsSites.begin();i!=itsSites.end();i++)
+    {
+        i->SVDNormalize(LR,s,Vdagger);
+    }
+
+}
+
 
 double MatrixProductState::GetOverlap() const
 {

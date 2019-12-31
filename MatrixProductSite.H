@@ -2,6 +2,7 @@
 #define MATRIXPRODUCTSITE_H
 
 #include "oml/dmatrix.h"
+#include "oml/vector.h"
 #include <vector>
 
 class MPOSite;
@@ -10,11 +11,15 @@ class MatrixProductSite
 {
     public:
         typedef DMatrix<std::complex<double> > MatrixT;
+        typedef Vector <double> VectorT;
+        enum Position {Left,Bulk,Right};
 
         MatrixProductSite(int p, int D1, int D2);
         virtual ~MatrixProductSite();
 
         void InitializeWithProductState(int sgn);
+        void InitializeWithRandomState();
+        void SVDNormalize(Position LR, VectorT& s, MatrixT& Vdagger);
 
         const MatLimits GetLimits() const {return itsAs[0].GetLimits();}
         MatrixT GetOverlapTransferMatrix() const; //For the left most site only
@@ -28,6 +33,10 @@ class MatrixProductSite
 
 
     protected:
+        Position WhereAreWe() const;
+        MatrixT  Reshape();
+        void     Reshape(const MatrixT& A);
+        MatrixT  Contract(const VectorT& s, const MatrixT& Vdagger, const MatrixT& Aold);
 
     private:
         friend class MatrixProductTesting;
