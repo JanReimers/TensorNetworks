@@ -56,6 +56,28 @@ void MatrixProductState::Normalize(MatrixProductSite::Position LR)
 
 }
 
+//
+//  Mixed canonical  A*A*A*A...A*M(isite)*B*B...B*B
+//
+void MatrixProductState::Normalize(int isite)
+{
+    {
+        VectorT s; // This get passed from one site to the next.
+        MatrixT Vdagger;// This get passed from one site to the next.
+        for (int ia=0; ia<isite; ia++)
+            itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
+        itsSites[isite]->ReshapeFromLeft(s.GetHigh());
+    }
+
+    {
+        VectorT s; // This get passed from one site to the next.
+        MatrixT U;// This get passed from one site to the next.
+        for (int ia=itsL-1; ia>isite; ia--)
+            itsSites[ia]->SVDRightNormalize(U,s);
+        itsSites[isite]->ReshapeFromRight(s.GetHigh());
+    }
+}
+
 
 double MatrixProductState::GetOverlap() const
 {
@@ -63,7 +85,7 @@ double MatrixProductState::GetOverlap() const
     MatrixT E=i->GetOverlapTransferMatrix();
     i++;
     for (;i!=itsSites.end();i++)
-        E=i->GetOverlapTransferMatrix(E);
+        E=i->GetOverlapTransferMatrixLeft(E);
     assert(E.GetNumRows()==1);
     assert(E.GetNumCols()==1);
     assert(fabs(std::imag(E(1,1)))<1.0e-14);
@@ -94,7 +116,7 @@ MatrixProductState::MatrixT MatrixProductState::GetMLeft(int isite) const
 //    cout << "ELeft(0)=" << Eleft << endl;
     for (int ia=1;ia<isite;ia++)
     {
-            Eleft=itsSites[ia]->GetOverlapTransferMatrix(Eleft);
+            Eleft=itsSites[ia]->GetOverlapTransferMatrixLeft(Eleft);
  //       cout << "ELeft(" << ia << ")=" << Eleft << endl;
             }
     return Eleft;
@@ -119,19 +141,17 @@ MatrixProductState::MatrixT MatrixProductState::GetMRight(int isite) const
     }
     // Zip right to left
     for (int ia=itsL-2;ia>=isite+1;ia--)
-        Eright=itsSites[ia]->GetOverlapTransferMatrix(Eright);
+        Eright=itsSites[ia]->GetOverlapTransferMatrixRight(Eright);
 
     return Eright;
 }
 
  MatrixProductState::MatrixT MatrixProductState::GetOverlap(int isite) const
  {
-    MatrixT MLeft =GetMLeft (isite);
-    MatrixT MRight=GetMRight(isite);
+//    MatrixT Eleft=GetMLeft(isite);
+//    MatrixT ERight=GetMRight(isite);
 
-    const MatrixProductSite* site=itsSites[isite];
-    MatrixT Sab=site->GetOverlapMatrix(MLeft,MRight);
-    return Sab;
+    return itsSites[isite]->GetOverlapMatrix(GetMLeft(isite),GetMRight(isite));
  }
 
 MatrixProductState::MatrixT MatrixProductState::GetE(int isite, const MPOSite* mpos) const

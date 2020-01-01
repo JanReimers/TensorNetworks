@@ -16,6 +16,7 @@ class MatrixProductState
         void InitializeWithProductState();
         void InitializeWithRandomState();
         void Normalize(MatrixProductSite::Position LR);
+        void Normalize(int isite); //Mixed Canonical normalization
 
         int     GetL      () const {return itsL;}
         int     GetD      () const {return itsD;}
@@ -23,7 +24,7 @@ class MatrixProductState
 
         MatrixT GetMLeft (int isite) const;
         MatrixT GetMRight(int isite) const;
-        MatrixT GetLeftNorm(int isite) const {return itsSites[isite]->GetLeftNorm();}
+        MatrixT GetLeftNorm (int isite) const {return itsSites[isite]->GetLeftNorm();}
         MatrixT GetRightNorm(int isite) const {return itsSites[isite]->GetRightNorm();}
 
         double  GetOverlap(        ) const;

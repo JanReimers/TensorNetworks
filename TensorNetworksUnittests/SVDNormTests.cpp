@@ -1,4 +1,5 @@
-#include "gtest/gtest.h"
+#include "Tests.H"
+
 #include "TensorNetworks/MatrixProductState.H"
 #include "oml/stream.h"
 #include "oml/random.h"
@@ -36,51 +37,27 @@ public:
 
 
 
-template <class Ob> std::string ToString(const Ob& result)
-{
-    std::stringstream res_stream;
-    res_stream << result;
-    return res_stream.str();
-}
 
 void MPSNormTesting::VerifyLeftNorm(const MatrixProductState* mps)
 {
     for (int i=0; i<mps->GetL(); i++)
     {
-        MatrixT Norm=mps->GetLeftNorm(i);
-        int D=Norm.GetNumRows();
- //       cout << "site " << i << " has D=" << D << endl;
-        MatrixT I(D,D);
-        Unit(I);
-        EXPECT_NEAR(Max(abs(real(Norm-I))),0.0,eps);
-        EXPECT_NEAR(Max(abs(imag(Norm  ))),0.0,eps);
-        std::string lim="(1:";
-        lim= lim + std::to_string(D) + "),(1:" + std::to_string(D) + ") ";
-        EXPECT_EQ(ToString(Norm.GetLimits()),lim.c_str());
+        VerifyUnit(mps->GetLeftNorm(i),eps);
+        VerifyUnit(mps->GetMLeft(i),eps);
     }
-
-
 }
 
 void MPSNormTesting::VerifyRightNorm(const MatrixProductState* mps)
 {
-
     for (int i=0; i<mps->GetL(); i++)
     {
-        MatrixT Norm=mps->GetRightNorm(i);
-        int D=Norm.GetNumRows();
-//        cout << "site " << i << " has D=" << D << endl;
-        MatrixT I(D,D);
-        Unit(I);
-        EXPECT_NEAR(Max(abs(real(Norm-I))),0.0,eps);
-        EXPECT_NEAR(Max(abs(imag(Norm  ))),0.0,eps);
-        std::string lim="(1:";
-        lim= lim + std::to_string(D) + "),(1:" + std::to_string(D) + ") ";
-        EXPECT_EQ(ToString(Norm.GetLimits()),lim.c_str());
+        VerifyUnit(mps->GetRightNorm(i),eps);
+        VerifyUnit(mps->GetMRight(i),eps);
     }
-
-
 }
+
+
+
 
 
 TEST_F(MPSNormTesting,LeftNormalMatriciesProductStateL10S3D2)
@@ -150,3 +127,77 @@ TEST_F(MPSNormTesting,RightNormalOverlapL10S3D30)
     mps1.Normalize(MatrixProductSite::Right);
     EXPECT_NEAR(mps1.GetOverlap(),1.0,eps);
 }
+
+
+TEST_F(MPSNormTesting,LeftNormalOverlapL10S1D4)
+{
+    MatrixProductState mps1(10,1,4);
+    mps1.InitializeWithRandomState();
+    mps1.Normalize(MatrixProductSite::Left);
+    EXPECT_NEAR(mps1.GetOverlap(),1.0,eps);
+}
+
+TEST_F(MPSNormTesting,RightNormalOverlapSite0L10S1D3)
+{
+    MatrixProductState mps1(10,1,3);
+    mps1.InitializeWithRandomState();
+    mps1.Normalize(MatrixProductSite::Right);
+    VerifyUnit(mps1.GetOverlap(0),eps);
+}
+TEST_F(MPSNormTesting,LeftNormalOverlapSiteLL10S1D3)
+{
+    MatrixProductState mps1(10,1,3);
+    mps1.InitializeWithRandomState();
+    mps1.Normalize(MatrixProductSite::Left);
+    VerifyUnit(mps1.GetOverlap(mps1.GetL()-1),eps);
+}
+
+TEST_F(MPSNormTesting,RightNormalOverlapSite0L10S5D2)
+{
+    MatrixProductState mps1(10,5,2);
+    mps1.InitializeWithRandomState();
+    mps1.Normalize(MatrixProductSite::Right);
+    VerifyUnit(mps1.GetOverlap(0),eps);
+}
+TEST_F(MPSNormTesting,LeftNormalOverlapSiteLL10S5D2)
+{
+    MatrixProductState mps1(10,5,2);
+    mps1.InitializeWithRandomState();
+    mps1.Normalize(MatrixProductSite::Left);
+    VerifyUnit(mps1.GetOverlap(mps1.GetL()-1),eps);
+}
+
+TEST_F(MPSNormTesting,MixedCanonicalL10S1D3)
+{
+    MatrixProductState mps1(10,1,3);
+    mps1.InitializeWithRandomState();
+    for (int ia=1;ia<mps1.GetL()-1;ia++)
+    {
+        mps1.Normalize(ia);
+        VerifyUnit(mps1.GetOverlap(ia),eps);
+    }
+}
+
+//  Slow test
+TEST_F(MPSNormTesting,MixedCanonicalL10S3D10)
+{
+    MatrixProductState mps1(10,3,10);
+    mps1.InitializeWithRandomState();
+    for (int ia=1;ia<mps1.GetL()-1;ia++)
+    {
+        mps1.Normalize(ia);
+        VerifyUnit(mps1.GetOverlap(ia),eps);
+    }
+}
+
+TEST_F(MPSNormTesting,MixedCanonicalL10S5D2)
+{
+    MatrixProductState mps1(10,5,2);
+    mps1.InitializeWithRandomState();
+    for (int ia=1;ia<mps1.GetL()-1;ia++)
+    {
+        mps1.Normalize(ia);
+        VerifyUnit(mps1.GetOverlap(ia),eps);
+    }
+}
+

@@ -1,4 +1,5 @@
-#include "gtest/gtest.h"
+#include "Tests.H"
+
 #include "TensorNetworks/MatrixProductState.H"
 #include "oml/stream.h"
 #include "oml/numeric.h"
@@ -32,12 +33,6 @@ public:
     double eps;
 };
 
-template <class Ob> std::string ToString(const Ob& result)
-{
-    std::stringstream res_stream;
-    res_stream << result;
-    return res_stream.str();
-}
 
 template <class T,class T2>
 DMatrix<T2> contract(const DMatrix<T2> U, const Vector<T>& s, const DMatrix<T2>& V)

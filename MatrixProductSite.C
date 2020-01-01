@@ -155,6 +155,7 @@ void MatrixProductSite::Reshape(int D1, int D2, bool saveData)
 {
     assert(D1>0);
     assert(D2>0);
+    if (itsD1==D1 && itsD2==D2) return;
     itsD1=D1;
     itsD2=D2;
     for (int in=0; in<itsp; in++)
@@ -281,7 +282,7 @@ MatrixProductSite::MatrixT MatrixProductSite::GetOverlapTransferMatrix() const
 //  N2(n;k,l)=Sum(i,A^t(n;i,k)*N1(n;i,l])
 //  E(a,k,l)=Sum{n,N2(n;k,l)}
 //
-MatrixProductSite::MatrixT MatrixProductSite::GetOverlapTransferMatrix(const MatrixT& Em) const
+MatrixProductSite::MatrixT MatrixProductSite::GetOverlapTransferMatrixLeft(const MatrixT& Em) const
 {
     int D=itsAs[0].GetNumCols();
     MatrixT Ea(D,D);
@@ -290,7 +291,9 @@ MatrixProductSite::MatrixT MatrixProductSite::GetOverlapTransferMatrix(const Mat
 //    cout << "Em lim" <<  Em.GetLimits() << endl;
     pVectorT N1s;
     for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
+    {
         N1s.push_back(Em*(*ip));
+        }
 
     cpIterT iN1=N1s.begin();
     for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++,iN1++)
@@ -298,15 +301,43 @@ MatrixProductSite::MatrixT MatrixProductSite::GetOverlapTransferMatrix(const Mat
 
     return Ea;
 }
+MatrixProductSite::MatrixT MatrixProductSite::GetOverlapTransferMatrixRight(const MatrixT& Em) const
+{
+    int D=itsAs[0].GetNumRows();
+    MatrixT Ea(D,D);
+    Fill(Ea,std::complex<double>(0.0));
+//    cout << "A lim" <<  itsAs[0].GetLimits() << endl;
+//    cout << "Em lim" <<  Em.GetLimits() << endl;
+    pVectorT N1s;
+    for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
+    {
+        N1s.push_back(Em*Transpose(conj(*ip)));
+        }
+
+    cpIterT iN1=N1s.begin();
+    for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++,iN1++)
+        Ea+=(*ip)*(*iN1);
+
+    return Ea;
+}
 
 MatrixProductSite::MatrixT MatrixProductSite::
 GetOverlapMatrix(const MatrixT& Eleft, const MatrixT Eright) const
 {
-    MatrixT Sab(GetLimits());
-    for (int ia=0;ia<itsp;ia++)
-    {
-        Sab+=Eleft*itsAs[ia]*Transpose(Eright);
-    }
+//    cout << "ELeft=" <<  Eleft << endl;
+//    cout << "Eright=" <<  Eright << endl;
+    MatrixT Sab(itsp*itsD1*itsD2,itsp*itsD1*itsD2);
+    int i2_1=1;
+    for (int im=0; im<itsp; im++)
+        for (int i1=1; i1<=itsD1; i1++)
+            for (int i2=1; i2<=itsD2; i2++,i2_1++)
+            {
+                int i2_2=1;
+                for (int in=0; in<itsp; in++)
+                    for (int j1=1; j1<=itsD1; j1++)
+                        for (int j2=1; j2<=itsD2; j2++, i2_2++)
+                            Sab(i2_1,i2_2)=im==in ? Eleft(i1,j1)*Eright(j2,i2) : 0.0;
+            }
     return Sab;
 }
 

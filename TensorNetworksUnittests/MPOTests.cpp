@@ -1,15 +1,9 @@
-#include "gtest/gtest.h"
+#include "Tests.H"
 #include "TensorNetworks/MatrixProductOperator.H"
 #include "TensorNetworks/Hamiltonian_1D_NN_Heisenberg.H"
 #include "oml/stream.h"
 #include <complex>
 
-template <class Ob> std::string ToString(const Ob& result)
-{
-    std::stringstream res_stream;
-    res_stream << result;
-    return res_stream.str();
-}
 
 class MPOTesting : public ::testing::Test
 {

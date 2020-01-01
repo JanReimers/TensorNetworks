@@ -19,12 +19,15 @@ class MatrixProductSite
 
         void InitializeWithProductState(int sgn);
         void InitializeWithRandomState();
+        void ReshapeFromLeft (int D1) {Reshape(   D1,itsD2,true);}
+        void ReshapeFromRight(int D2) {Reshape(itsD1,   D2,true);}
         void SVDLeft_Normalize(VectorT& s, MatrixT& Vdagger);
         void SVDRightNormalize(MatrixT& U, VectorT& s );
 
         const MatLimits GetLimits() const {return itsAs[0].GetLimits();}
         MatrixT GetOverlapTransferMatrix() const; //For the left most site only
-        MatrixT GetOverlapTransferMatrix(const MatrixT& Em) const; //For interior sites
+        MatrixT GetOverlapTransferMatrixLeft (const MatrixT& ELeft) const; //For interior sites
+        MatrixT GetOverlapTransferMatrixRight(const MatrixT& ERight) const; //For interior sites
         MatrixT GetOverlapMatrix(const MatrixT& Eleft, const MatrixT Eright) const;
         MatrixT GetLeftNorm() const;
         MatrixT GetRightNorm() const;
