@@ -62,45 +62,74 @@ void MatrixProductSite::InitializeWithRandomState()
         for (pIterT ip=itsAs.begin();ip!=itsAs.end();ip++)
             FillRandom(*ip);
 }
-
-void MatrixProductSite::SVDNormalize(Position LR, VectorT& s, MatrixT& Vdagger)
+void MatrixProductSite::SVDLeft_Normalize(VectorT& s, MatrixT& Vdagger)
 {
+    int N1=s.GetHigh(); //N1=0 on the first site.
+    if (N1>0 && N1<itsD1) itsD1=N1; //The contraction below will automatically reshape the As.
+
     // Where are we in the lattice
     Position lbr=WhereAreWe();
-    int N1=s.GetHigh();
-    if (N1>0 && N1<itsD1)
-    {
-        itsD1=N1;
-    }
     if (lbr==Bulk)
     {
         for (int in=0; in<itsp; in++)
-        {   MatrixT temp=itsAs[in];
+        {
+            MatrixT temp=Contract(s,Vdagger*itsAs[in]);
             itsAs[in].SetLimits(0,0);
-            itsAs[in]=Contract(s,Vdagger,temp);
+            itsAs[in]=temp; //Shallow copy
+            assert(itsAs[in].GetNumRows()==itsD1); //Verify shape is correct;
         }
     }
-    MatrixT A=Reshape();
-//    cout << "A reshape="<< A << endl;
-    int M=A.GetNumRows();
-    int N=Min(M,A.GetNumCols());
+    MatrixT A=ReshapeLeft();
+    //
+    //  Set up and do SVD
+    //
+    int N=Min(A.GetNumRows(),A.GetNumCols());
     s.SetLimits(N);
     MatrixT V(N,A.GetNumCols());
-//    cout << "Alim=" << A.GetLimits() << endl;
-//    cout << "slim=" << s.GetLimits() << endl;
-    CSVDecomp(A,s,V); //Solves A=U * s * V*  returns V not V*
-//    cout << "U =" << A << endl;
-//    cout << "s =" << s << endl;
-    Vdagger.SetLimits(0,0);
+    CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
+    Vdagger.SetLimits(0,0);  //Wipe out old data;
     Vdagger=Transpose(conj(V));
-//    cout << "Vdagger =" << Vdagger << endl;
-//    cout << "Vdagger lim=" << Vdagger.GetLimits() << endl;
-    Reshape(A);
-//    for (int in=0; in<itsp; in++)
-//        cout << "A[" << in << "]"<< itsAs[in] << endl;
+    //
+    //  Extract As from U
+    //
+    ReshapeLeft(A);  //A is now U
 }
 
-MatrixProductSite::MatrixT  MatrixProductSite::Reshape()
+void MatrixProductSite::SVDRightNormalize(MatrixT& U, VectorT& s)
+{
+    int N1=s.GetHigh(); //N1=0 on the first site.
+    if (N1>0 && N1<itsD2) itsD2=N1;
+
+    // Where are we in the lattice
+    Position lbr=WhereAreWe();
+    if (lbr==Bulk)
+    {
+        for (int in=0; in<itsp; in++)
+        {
+            MatrixT temp=Contract(itsAs[in]*U,s);
+            itsAs[in].SetLimits(0,0);
+            itsAs[in]=temp; //Shallow copy
+            assert(itsAs[in].GetNumCols()==itsD2); //Verify shape is correct;
+        }
+    }
+    MatrixT A=ReshapeRight();
+    //
+    //  Set up and do SVD
+    //
+    int N=Min(A.GetNumRows(),A.GetNumCols());
+    s.SetLimits(N);
+    MatrixT V(N,A.GetNumCols());
+    CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
+    U.SetLimits(0,0);  //Wipe out old data;
+    U=A;
+    //
+    //  Extract Bs from U
+    //
+   ReshapeRight(Transpose(conj(V)));  //A is now Vdagger
+
+}
+
+MatrixProductSite::MatrixT  MatrixProductSite::ReshapeLeft()
 {
     MatrixT A(itsp*itsD1,itsD2);
     int i2_1=1;
@@ -111,52 +140,83 @@ MatrixProductSite::MatrixT  MatrixProductSite::Reshape()
     return A;
 }
 
-void MatrixProductSite::Reshape(const MatrixT& U)
+MatrixProductSite::MatrixT  MatrixProductSite::ReshapeRight()
 {
-    //  If U has less culumns than the As then we need to reshape the whole site.
+    MatrixT A(itsD1,itsp*itsD2);
+    int i2_2=1;
+    for (int in=0; in<itsp; in++)
+        for (int i2=1; i2<=itsD2; i2++,i2_2++)
+            for (int i1=1; i1<=itsD1; i1++)
+                A(i1,i2_2)=itsAs[in](i1,i2);
+    return A;
+}
+
+void MatrixProductSite::Reshape(int D1, int D2, bool saveData)
+{
+    assert(D1>0);
+    assert(D2>0);
+    itsD1=D1;
+    itsD2=D2;
+    for (int in=0; in<itsp; in++)
+        itsAs[in].SetLimits(itsD1,itsD2,saveData);
+}
+void MatrixProductSite::ReshapeLeft(const MatrixT& U)
+{
+    //  If U has less columns than the As then we need to reshape the whole site.
     //  Typically this will happen at the edges of the lattice.
-    int N2=U.GetNumCols();
-    if (N2<itsD2)
-    {
-        itsD2=U.GetNumCols();
-        for (int in=0; in<itsp; in++)
-            itsAs[in].SetLimits(itsD1,itsD2);
-    }
+    //
+    if (U.GetNumCols()<itsD2) Reshape(itsD1,U.GetNumCols());//This throws away the old data
     int i2_1=1;
     for (int in=0; in<itsp; in++)
         for (int i1=1; i1<=itsD1; i1++,i2_1++)
-        {
             for (int i2=1; i2<=itsD2; i2++)
                 itsAs[in](i1,i2)=U(i2_1,i2);
 
-//            for (int i2=N2+1; i2<=itsD2; i2++) //Pad with zeros when U is small.
-//                itsAs[in](i1,i2)= (i1==i2 ? 1.0 : 0.0);
-        }
+}
+void MatrixProductSite::ReshapeRight(const MatrixT& Vdagger)
+{
+    //  If Vdagger has less row than the As then we need to reshape the whole site.
+    //  Typically this will happen at the edges of the lattice.
+    //
+    if (Vdagger.GetNumRows()<itsD1) Reshape(Vdagger.GetNumRows(),itsD2,false);//This throws away the old data
+    int i2_2=1;
+    for (int in=0; in<itsp; in++)
+        for (int i2=1; i2<=itsD2; i2++,i2_2++)
+            for (int i1=1; i1<=itsD1; i1++)
+                itsAs[in](i1,i2)=Vdagger(i1,i2_2);
+
 }
 
 //
-//  Anew(j,i) =  s(j)*V(k,j)*Aold(k,i)
+//  Anew(j,i) =  s(j)*VA(j,k)
 //
-MatrixProductSite::MatrixT MatrixProductSite::Contract(const VectorT& s, const MatrixT& Vdagger, const MatrixT& Aold)
+MatrixProductSite::MatrixT MatrixProductSite::Contract(const VectorT& s, const MatrixT& VA)
 {
-    //cout << "Contract S    lim=" << s.GetLimits() << endl;
-    //cout << "Contract Vdagger    lim=" << Vdagger.GetLimits() << endl;
-    //cout << "Contract Aold lim=" << Aold.GetLimits() << endl;
+    int N1=VA.GetNumRows();
+    int N2=VA.GetNumCols();
+    assert(s.GetHigh()==N1);
 
-    MatrixT VA=Vdagger*Aold;
-    //cout << "Contract Vdagger*A lim=" << VA.GetLimits() << endl;
-    //cout << "Contract Anew lim=" << Anew.GetLimits() << endl;
-    assert(VA.GetNumCols()==itsD2);
-    assert(s.GetHigh()==VA.GetNumRows());
-
-    MatrixT Anew(itsD1,itsD2);
-    for(int i2=1; i2<=itsD2; i2++)
-    {
-        for(int i1=1; i1<=itsD1; i1++)
+    MatrixT Anew(N1,N2);
+    for(int i2=1; i2<=N2; i2++)
+        for(int i1=1; i1<=N1; i1++)
             Anew(i1,i2)=s(i1)*VA(i1,i2);
-        //for(int i1=N1+1; i1<=itsD1; i1++)
-          //  Anew(i1,i2)=0.0;
-    }
+
+    return Anew;
+}
+
+//
+//  Anew(j,i) =  s(j)*VA(j,k)
+//
+MatrixProductSite::MatrixT MatrixProductSite::Contract(const MatrixT& AU,const VectorT& s)
+{
+    int N1=AU.GetNumRows();
+    int N2=AU.GetNumCols();
+    assert(s.GetHigh()==N2);
+
+    MatrixT Anew(N1,N2);
+    for(int i2=1; i2<=N2; i2++)
+        for(int i1=1; i1<=N1; i1++)
+            Anew(i1,i2)=AU(i1,i2)*s(i2);
 
     return Anew;
 }
@@ -226,7 +286,8 @@ MatrixProductSite::MatrixT MatrixProductSite::GetOverlapTransferMatrix(const Mat
     int D=itsAs[0].GetNumCols();
     MatrixT Ea(D,D);
     Fill(Ea,std::complex<double>(0.0));
-
+//    cout << "A lim" <<  itsAs[0].GetLimits() << endl;
+//    cout << "Em lim" <<  Em.GetLimits() << endl;
     pVectorT N1s;
     for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
         N1s.push_back(Em*(*ip));

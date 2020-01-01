@@ -40,11 +40,18 @@ void MatrixProductState::InitializeWithRandomState()
 
 void MatrixProductState::Normalize(MatrixProductSite::Position LR)
 {
-    MatrixT Vdagger;
-    VectorT s;
-    for (SIter i=itsSites.begin();i!=itsSites.end();i++)
+    VectorT s; // This get passed from one site to the next.
+    if (LR==MatrixProductSite::Left)
     {
-        i->SVDNormalize(LR,s,Vdagger);
+        MatrixT Vdagger;// This get passed from one site to the next.
+        for (SIter i=itsSites.begin(); i!=itsSites.end(); i++)
+            i->SVDLeft_Normalize(s,Vdagger);
+    }
+    else if (LR==MatrixProductSite::Right)
+    {
+        MatrixT U;// This get passed from one site to the next.
+        for (rSIter i=itsSites.rbegin(); i!=itsSites.rend(); i++)
+            i->SVDRightNormalize(U,s);
     }
 
 }
@@ -59,7 +66,7 @@ double MatrixProductState::GetOverlap() const
         E=i->GetOverlapTransferMatrix(E);
     assert(E.GetNumRows()==1);
     assert(E.GetNumCols()==1);
-    assert(std::imag(E(1,1))==0.0);
+    assert(fabs(std::imag(E(1,1)))<1.0e-14);
     return std::real(E(1,1));
 }
 

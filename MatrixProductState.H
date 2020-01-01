@@ -24,6 +24,7 @@ class MatrixProductState
         MatrixT GetMLeft (int isite) const;
         MatrixT GetMRight(int isite) const;
         MatrixT GetLeftNorm(int isite) const {return itsSites[isite]->GetLeftNorm();}
+        MatrixT GetRightNorm(int isite) const {return itsSites[isite]->GetRightNorm();}
 
         double  GetOverlap(        ) const;
         MatrixT GetOverlap(int site) const;
@@ -40,6 +41,8 @@ class MatrixProductState
         typedef optr_vector<MatrixProductSite*> SitesType;
         typedef SitesType::      iterator  SIter;
         typedef SitesType::const_iterator cSIter;
+        typedef SitesType::      reverse_iterator  rSIter;
+        typedef SitesType::const_reverse_iterator crSIter;
 
         int itsL;   //Number of lattice sites
         int itsS2;  //2*S, avoid storing floats for S=n/2

@@ -19,7 +19,8 @@ class MatrixProductSite
 
         void InitializeWithProductState(int sgn);
         void InitializeWithRandomState();
-        void SVDNormalize(Position LR, VectorT& s, MatrixT& Vdagger);
+        void SVDLeft_Normalize(VectorT& s, MatrixT& Vdagger);
+        void SVDRightNormalize(MatrixT& U, VectorT& s );
 
         const MatLimits GetLimits() const {return itsAs[0].GetLimits();}
         MatrixT GetOverlapTransferMatrix() const; //For the left most site only
@@ -34,9 +35,14 @@ class MatrixProductSite
 
     protected:
         Position WhereAreWe() const;
-        MatrixT  Reshape();
-        void     Reshape(const MatrixT& A);
-        MatrixT  Contract(const VectorT& s, const MatrixT& Vdagger, const MatrixT& Aold);
+
+        void     Reshape(int D1, int D2, bool saveData=false);
+        MatrixT  ReshapeLeft();
+        MatrixT  ReshapeRight();
+        void     ReshapeLeft (const MatrixT& U);
+        void     ReshapeRight(const MatrixT& Vdagger);
+        static MatrixT  Contract(const VectorT& s, const MatrixT& VA);
+        static MatrixT  Contract(const MatrixT& AU,const VectorT& s);
 
     private:
         friend class MatrixProductTesting;
