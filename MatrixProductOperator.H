@@ -9,11 +9,12 @@
 
 class MatrixProductOperator
 {
+    public:
        typedef MatrixProductSite::MatrixT MatrixT;
        typedef std::complex<double> eType;
        typedef Matrix6<eType> Matrix6T;
        typedef Matrix4<eType> Matrix4T;
-    public:
+
         MatrixProductOperator(const Hamiltonian* H, int L, int S2, int D);
         virtual ~MatrixProductOperator();
 

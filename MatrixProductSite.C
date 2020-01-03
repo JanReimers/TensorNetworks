@@ -349,7 +349,7 @@ MatrixProductSite::Matrix6T MatrixProductSite::GetE(const MPOSite* mpos) const
     ipairT Dw=mpos->GetDw();
     int Dw1=Dw.first;
     int Dw2=Dw.second;
-    Matrix6T E(Dw1,itsD1,Dw2,itsD2,1);
+    Matrix6T E(Dw1,itsD1,itsD1,Dw2,itsD2,itsD2,1);
 
     for (int m=0; m<itsp; m++)
     {
@@ -394,3 +394,20 @@ MatrixProductSite::Matrix4T MatrixProductSite::GetN(int m,const MPOSite* mpos) c
     return N;
 }
 
+double MatrixProductSite::ConstractHeff(const Matrix6T& Heff) const
+{
+    eType E(0.0);
+    for (int m=0; m<itsp; m++)
+        for (int n=0; n<itsp; n++)
+            for (int i1=1; i1<=itsD1; i1++)
+                for (int j1=1; j1<=itsD1; j1++)
+                    for (int i2=1; i2<=itsD2; i2++)
+                        for (int j2=1; j2<=itsD2; j2++)
+                        {
+                            E+=conj(itsAs[m](i1,i2))*Heff(m,i1,i2,n,j1,j2)*itsAs[n](j1,j2);
+                        }
+
+    //cout << "fabs(std::imag(E))" <<  fabs(std::imag(E)) << endl;
+    assert(fabs(std::imag(E))<1e-11);
+    return real(E);
+}

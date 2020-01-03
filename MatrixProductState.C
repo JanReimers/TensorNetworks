@@ -162,3 +162,9 @@ MatrixProductState::Matrix6T MatrixProductState::GetE(int isite, const MPOSite* 
     return itsSites[isite]->GetE(mpos);
 }
 
+double MatrixProductState::ConstractHeff(int isite,const Matrix6T& Heff) const
+{
+    return itsSites[isite]->ConstractHeff(Heff);
+}
+
+

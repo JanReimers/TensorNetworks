@@ -41,28 +41,28 @@ MatrixProductOperator::Matrix6T MatrixProductOperator::GetHeff(const MatrixProdu
 {
     Matrix6T NLeft =GetNLeft (mps,isite);
     Matrix6T NRight=GetNRight(mps,isite);
-    cout << "NLeft " << NLeft  << endl;
-    cout << "NRight" << NRight << endl;
+//    cout << "NLeft " << NLeft  << endl;
+//    cout << "NRight" << NRight << endl;
 //    assert(NLeft .GetNumRows()==1);
  //   assert(NRight.GetNumCols()==1);
-//    Subscriptor s=mps->GetSuperMatrixSubscriptor(isite);
 
-    const MPOSite* mops=itsSites[isite];
+    const MPOSite* mops=itsSites[GetPosition(isite)];
+    assert(mops);
     ipairT Ds=mps->GetDs(isite);
     int D1=Ds.first;
-    int D2=Ds.first;
+    int D2=Ds.second;
     int p=mps->Getp();
 
-    Matrix6<eType> Heff(p,D1,p,D2);
+    Matrix6<eType> Heff(p,D1,D2,p,D1,D2);
 
     for (int m=0; m<p; m++)
         for (int i1=1; i1<=D1; i1++)
-            for (int j1=1; j1<=D2; j1++)
+            for (int j1=1; j1<=D1; j1++)
             {
                 for (int n=0; n<p; n++)
                 {
                     MatrixT W=mops->GetW(m,n);
-                    for (int i2=1; i2<=D1; i2++)
+                    for (int i2=1; i2<=D2; i2++)
                         for (int j2=1; j2<=D2; j2++)
                         {
                             eType temp(0.0);
@@ -96,14 +96,14 @@ MatrixProductOperator::Matrix6T MatrixProductOperator::GetNRight(const MatrixPro
 {
     Matrix6T NRight(1,1);
     NRight.Fill(std::complex<double>(1.0));
-    for (int ia=itsL-1;ia>=isite;ia--)
+    for (int ia=itsL-1;ia>isite;ia--)
     { //loop over sites
         Hamiltonian::Position lbr = GetPosition(ia);
         Matrix6T temp=NRight;
         Matrix6T E=mps->GetE(ia,itsSites[lbr]);
 
-        cout << "NRight=" <<  NRight << endl;
-        cout << "E=" <<  E << endl;
+//        cout << "NRight=" <<  NRight << endl;
+//        cout << "E=" <<  E << endl;
 //        Matrix6T Et=E*temp;
 //        cout << "Et=" <<  Et << endl;
         NRight.ClearLimits();
@@ -116,7 +116,6 @@ MatrixProductOperator::Matrix6T MatrixProductOperator::GetNRight(const MatrixPro
 double MatrixProductOperator::GetHamiltonianExpectation(const MatrixProductState *mps) const
 {
     assert(mps);
-    int Dw=itsHamiltonian->GetDw();
     Matrix6T E(1,1);
     E.Fill(std::complex<double>(1.0));
 
@@ -124,13 +123,15 @@ double MatrixProductOperator::GetHamiltonianExpectation(const MatrixProductState
     for (int isite=0;isite<itsL;isite++)
     { //loop over sites
         Hamiltonian::Position lbr = GetPosition(isite);
-        cout << "E=" << E << endl;
-        cout << "GetE="<< mps->GetE(isite,itsSites[lbr]) << endl;
         E*=mps->GetE(isite,itsSites[lbr]);
 //        cout << "MPO Elimits=" << E.GetLimits() << " lbr=" << lbr << endl;
     }
     // at this point E is 1xDw so we need to dot it with a unit vector
-    cout << "E =" << E << endl;
+ //   Matrix6T Unit(itsp,1);
+   // Unit.Fill(std::complex<double>(1.0));
+   // E*=Unit;
+
+//    cout << "E =" << E << endl;
 //    assert(E.GetNumRows()==1);
 //    assert(E.GetNumCols()==1);
 //    cout << std::imag(E(1,1)) << endl;

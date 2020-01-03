@@ -47,7 +47,7 @@ class MatrixProductSite
         // Hamiltion expectation
         Matrix6T GetE(       const MPOSite* mpos) const;
         Matrix4T GetN(int m, const MPOSite* mpos) const;
-
+        double ConstractHeff(const Matrix6T& Heff) const;
 
     protected:
         Position WhereAreWe() const;

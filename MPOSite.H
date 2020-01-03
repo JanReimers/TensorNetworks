@@ -17,7 +17,10 @@ class MPOSite
         virtual ~MPOSite();
 
         ipairT GetDw() const {return ipairT(itsDw1,itsDw2);}
-        const MatrixT GetW(int m, int n) const {return itsWs(m+1,n+1);}
+        const MatrixT GetW(int m, int n) const
+        {
+            return itsWs(m+1,n+1);
+        }
 
     protected:
 

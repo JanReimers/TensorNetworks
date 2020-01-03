@@ -35,7 +35,7 @@ class MatrixProductState
 
         // Hamiltion expectation
         Matrix6T GetE(int isite, const MPOSite* mpos) const;
-
+        double ConstractHeff(int isite,const Matrix6T& Heff) const;
     protected:
 
     private:

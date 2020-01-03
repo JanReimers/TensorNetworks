@@ -1,10 +1,11 @@
 #include "Tests.H"
 #include "TensorNetworks/MatrixProductOperator.H"
 #include "TensorNetworks/Hamiltonian_1D_NN_Heisenberg.H"
+//#include "TensorNetworks/Matrix6.H"
 #include "oml/stream.h"
 #include <complex>
 
-
+typedef MatrixProductOperator::Matrix6T Matrix6T;
 class MPOTesting : public ::testing::Test
 {
 public:
@@ -56,19 +57,36 @@ TEST_F(MPOTesting,MPOMemebers)
 
 TEST_F(MPOTesting,HamiltonianGetLeftW00)
 {
-    EXPECT_EQ(ToString(itsH->GetW(Hamiltonian::Left,0,0)),"(1:5),(1:1) \n[ (0,0) ]\n[ (0,0) ]\n[ (0,0) ]\n[ (-0.5,0) ]\n[ (0,0) ]\n");
+    EXPECT_EQ(ToString(itsH->GetW(Hamiltonian::Left,0,0)),"(1:1),(1:5) \n[ (0,0) (0,0) (0,0) (-0.5,0) (0,0) ]\n");
+}
+
+TEST_F(MPOTesting,HamiltonianGetRightW00)
+{
+    EXPECT_EQ(ToString(itsH->GetW(Hamiltonian::Right,0,0)),"(1:5),(1:1) \n[ (1,0) ]\n[ (0,0) ]\n[ (0,0) ]\n[ (-0.5,0) ]\n[ (1,0) ]\n");
 }
 TEST_F(MPOTesting,HamiltonianGetLeftW10)
 {
-    EXPECT_EQ(ToString(itsH->GetW(Hamiltonian::Left,1,0)),"(1:5),(1:1) \n[ (0,0) ]\n[ (0,0) ]\n[ (0.5,0) ]\n[ (0,0) ]\n[ (0,0) ]\n");
+    EXPECT_EQ(ToString(itsH->GetW(Hamiltonian::Left,1,0)),"(1:1),(1:5) \n[ (0,0) (0,0) (0.5,0) (0,0) (0,0) ]\n");
+}
+TEST_F(MPOTesting,HamiltonianGetRightW10)
+{
+    EXPECT_EQ(ToString(itsH->GetW(Hamiltonian::Right,1,0)),"(1:5),(1:1) \n[ (1,0) ]\n[ (1,0) ]\n[ (0,0) ]\n[ (0,0) ]\n[ (1,0) ]\n");
 }
 TEST_F(MPOTesting,HamiltonianGetLeftW01)
 {
-    EXPECT_EQ(ToString(itsH->GetW(Hamiltonian::Left,0,1)),"(1:5),(1:1) \n[ (0,0) ]\n[ (0.5,0) ]\n[ (0,0) ]\n[ (0,0) ]\n[ (0,0) ]\n");
+    EXPECT_EQ(ToString(itsH->GetW(Hamiltonian::Left,0,1)),"(1:1),(1:5) \n[ (0,0) (0.5,0) (0,0) (0,0) (0,0) ]\n");
+}
+TEST_F(MPOTesting,HamiltonianGetRightW01)
+{
+    EXPECT_EQ(ToString(itsH->GetW(Hamiltonian::Right,0,1)),"(1:5),(1:1) \n[ (1,0) ]\n[ (0,0) ]\n[ (1,0) ]\n[ (0,0) ]\n[ (1,0) ]\n");
 }
 TEST_F(MPOTesting,HamiltonianGetLeftW11)
 {
-    EXPECT_EQ(ToString(itsH->GetW(Hamiltonian::Left,1,1)),"(1:5),(1:1) \n[ (0,0) ]\n[ (0,0) ]\n[ (0,0) ]\n[ (0.5,0) ]\n[ (0,0) ]\n");
+    EXPECT_EQ(ToString(itsH->GetW(Hamiltonian::Left,1,1)),"(1:1),(1:5) \n[ (0,0) (0,0) (0,0) (0.5,0) (0,0) ]\n");
+}
+TEST_F(MPOTesting,HamiltonianGetRightW11)
+{
+    EXPECT_EQ(ToString(itsH->GetW(Hamiltonian::Right,1,1)),"(1:5),(1:1) \n[ (1,0) ]\n[ (0,0) ]\n[ (0,0) ]\n[ (0.5,0) ]\n[ (1,0) ]\n");
 }
 
 TEST_F(MPOTesting,CheckThatWsGotLoaded)
@@ -84,11 +102,51 @@ TEST_F(MPOTesting,DoHamiltionExpectation)
     EXPECT_NEAR(itsMPO->GetHamiltonianExpectation(itsMPS),64.0,1e-11);
 }
 
-TEST_F(MPOTesting,GetHeffSite0)
+TEST_F(MPOTesting,LeftNormalizeThenDoHamiltionExpectation)
+{
+    itsMPS->InitializeWithProductState();
+    itsMPS->Normalize(MatrixProductSite::Left);
+    itsMPO->GetHamiltonianExpectation(itsMPS);
+    EXPECT_NEAR(itsMPO->GetHamiltonianExpectation(itsMPS),32.0,1e-11);
+}
+TEST_F(MPOTesting,RightNormalizeThenDoHamiltionExpectation)
+{
+    itsMPS->InitializeWithProductState();
+    itsMPS->Normalize(MatrixProductSite::Left);
+    itsMPO->GetHamiltonianExpectation(itsMPS);
+    EXPECT_NEAR(itsMPO->GetHamiltonianExpectation(itsMPS),32.0,1e-11);
+}
+
+TEST_F(MPOTesting,TestHeffWithProductState)
+{
+//    itsMPS->InitializeWithRandomState();
+    itsMPS->InitializeWithProductState();
+    for (int ia=0; ia<itsMPS->GetL(); ia++)
+    {
+        itsMPS->Normalize(ia);
+        Matrix6T Heff=itsMPO->GetHeff(itsMPS,ia);
+ //       cout << "E(" << ia << ")=" << itsMPS->ConstractHeff(ia,Heff) << endl;
+        EXPECT_NEAR(itsMPS->ConstractHeff(ia,Heff),64.0,1e-11);
+        MatrixT HeffF=Heff.Flatten();
+        //cout << "Heff=" << Heff << endl;
+        MatrixT d=HeffF-Transpose(conj(HeffF));
+        EXPECT_NEAR(Max(abs(d)),0.0,1e-11);
+
+//    cout << "d=" << d << endl;
+    }
+}
+TEST_F(MPOTesting,TestHeffWithRandomState)
 {
     itsMPS->InitializeWithRandomState();
-//    itsMPS->InitializeWithProductState();
-    itsMPS->Normalize(1);
-    cout << "Heff=" << itsMPO->GetHeff(itsMPS,1) << endl;
-//    EXPECT_NEAR(itsMPO->GetHamiltonianExpectation(itsMPS),896.0,1e-11);
+    for (int ia=0; ia<itsMPS->GetL(); ia++)
+    {
+        itsMPS->Normalize(ia);
+        Matrix6T Heff=itsMPO->GetHeff(itsMPS,ia);
+        double E=itsMPS->ConstractHeff(ia,Heff);
+        MatrixT HeffF=Heff.Flatten();
+        //cout << "Heff=" << Heff << endl;
+        MatrixT d=HeffF-Transpose(conj(HeffF));
+        //cout << "Max(abs(d))=" << Max(abs(d)) << endl;
+        EXPECT_NEAR(Max(abs(d)),0.0,1e-10);
+    }
 }

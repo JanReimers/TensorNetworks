@@ -22,7 +22,6 @@ MPOSite::MPOSite(const Hamiltonian* H,int p, int D1, int D2)
         for (int n=0;n<itsp;n++)
         {
             itsWs(m+1,n+1)=H->GetW(lbr,m,n);
-            cout << "lbr, Wmn=" << lbr << "  " << itsWs(m+1,n+1) << endl;
             assert(itsWs(m+1,n+1).GetNumRows()==itsDw1);
             assert(itsWs(m+1,n+1).GetNumCols()==itsDw2);
         }
