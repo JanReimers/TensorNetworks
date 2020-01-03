@@ -52,6 +52,8 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="MPOSite.H" />
+		<Unit filename="Matrix4.H" />
+		<Unit filename="Matrix6.H" />
 		<Unit filename="MatrixProductOperator.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -64,6 +66,7 @@
 			<Option compilerVar="CPP" />
 		</Unit>
 		<Unit filename="MatrixProductState.H" />
+		<Unit filename="Subscriptor.H" />
 		<Extensions>
 			<code_completion />
 			<debugger />

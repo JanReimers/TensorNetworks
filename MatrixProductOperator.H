@@ -3,11 +3,16 @@
 
 #include "TensorNetworks/MatrixProductState.H"
 #include "TensorNetworks/MPOSite.H"
+#include "TensorNetworks/Hamiltonian.H"
+#include "TensorNetworks/Matrix6.H"
 
-class Hamiltonian;
 
 class MatrixProductOperator
 {
+       typedef MatrixProductSite::MatrixT MatrixT;
+       typedef std::complex<double> eType;
+       typedef Matrix6<eType> Matrix6T;
+       typedef Matrix4<eType> Matrix4T;
     public:
         MatrixProductOperator(const Hamiltonian* H, int L, int S2, int D);
         virtual ~MatrixProductOperator();
@@ -16,8 +21,12 @@ class MatrixProductOperator
         int     GetD      () const {return itsD;}
         int     Getp      () const {return itsp;}
 
+        Matrix6T GetHeff  (const MatrixProductState *mps,int isite) const;
+        Matrix6T GetNLeft (const MatrixProductState *mps,int isite) const;
+        Matrix6T GetNRight(const MatrixProductState *mps,int isite) const;
         double GetHamiltonianExpectation(const MatrixProductState *mps) const;
 
+        Hamiltonian::Position GetPosition(int isite) const;
     protected:
 
     private:
@@ -26,7 +35,6 @@ class MatrixProductOperator
         typedef optr_vector<MPOSite*> SitesType;
         typedef SitesType::      iterator  SIter;
         typedef SitesType::const_iterator cSIter;
-        typedef MatrixProductSite::MatrixT MatrixT;
 
         int itsL;   //Number of lattice sites
         int itsD;   //Dimension of internal/virtual state space.

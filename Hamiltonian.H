@@ -27,6 +27,7 @@ class Hamiltonian
         //
         virtual MatrixProductOperator* CreateMPO() const=0;
         virtual MatrixProductState*    CreateMPS(int D) const=0;
+
 };
 
 

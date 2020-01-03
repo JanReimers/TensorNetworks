@@ -3,6 +3,11 @@
 
 #include "gtest/gtest.h"
 #include "TensorNetworks/MatrixProductState.H"
+#include <iostream>
+#include <string>
+
+using std::cout;
+using std::endl;
 
 
 template <class Ob> std::string ToString(const Ob& result)

@@ -4,11 +4,6 @@
 #include "oml/stream.h"
 #include "oml/random.h"
 #include <complex>
-#include <iostream>
-#include <string>
-
-using std::cout;
-using std::endl;
 
 
 class MPSNormTesting : public ::testing::Test

@@ -61,6 +61,7 @@ void MatrixProductState::Normalize(MatrixProductSite::Position LR)
 //
 void MatrixProductState::Normalize(int isite)
 {
+    if (isite>0)
     {
         VectorT s; // This get passed from one site to the next.
         MatrixT Vdagger;// This get passed from one site to the next.
@@ -69,6 +70,7 @@ void MatrixProductState::Normalize(int isite)
         itsSites[isite]->ReshapeFromLeft(s.GetHigh());
     }
 
+    if (isite<itsL-1)
     {
         VectorT s; // This get passed from one site to the next.
         MatrixT U;// This get passed from one site to the next.
@@ -154,7 +156,8 @@ MatrixProductState::MatrixT MatrixProductState::GetMRight(int isite) const
     return itsSites[isite]->GetOverlapMatrix(GetMLeft(isite),GetMRight(isite));
  }
 
-MatrixProductState::MatrixT MatrixProductState::GetE(int isite, const MPOSite* mpos) const
+
+MatrixProductState::Matrix6T MatrixProductState::GetE(int isite, const MPOSite* mpos) const
 {
     return itsSites[isite]->GetE(mpos);
 }

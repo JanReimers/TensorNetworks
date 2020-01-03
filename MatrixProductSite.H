@@ -1,16 +1,26 @@
 #ifndef MATRIXPRODUCTSITE_H
 #define MATRIXPRODUCTSITE_H
 
+#include "Matrix6.H"
+#include "Matrix4.H"
 #include "oml/dmatrix.h"
 #include "oml/vector.h"
 #include <vector>
+#include <utility>
+
+typedef std::pair<int,int> ipairT;
+
 
 class MPOSite;
 
 class MatrixProductSite
 {
     public:
-        typedef DMatrix<std::complex<double> > MatrixT;
+        typedef std::complex<double> eType;
+        typedef DMatrix<eType> MatrixT;
+        typedef Matrix6<eType> Matrix6T;
+        typedef Matrix4<eType> Matrix4T;
+
         typedef Vector <double> VectorT;
         enum Position {Left,Bulk,Right};
 
@@ -25,6 +35,9 @@ class MatrixProductSite
         void SVDRightNormalize(MatrixT& U, VectorT& s );
 
         const MatLimits GetLimits() const {return itsAs[0].GetLimits();}
+//        Subscriptor GetSuperMatrixSubscriptor() const {return Subscriptor(itsD1,itsD1);}
+        ipairT GetDs() const {return ipairT(itsD1,itsD2);}
+
         MatrixT GetOverlapTransferMatrix() const; //For the left most site only
         MatrixT GetOverlapTransferMatrixLeft (const MatrixT& ELeft) const; //For interior sites
         MatrixT GetOverlapTransferMatrixRight(const MatrixT& ERight) const; //For interior sites
@@ -32,8 +45,8 @@ class MatrixProductSite
         MatrixT GetLeftNorm() const;
         MatrixT GetRightNorm() const;
         // Hamiltion expectation
-        MatrixT GetE(       const MPOSite* mpos) const;
-        MatrixT GetN(int m, const MPOSite* mpos) const;
+        Matrix6T GetE(       const MPOSite* mpos) const;
+        Matrix4T GetN(int m, const MPOSite* mpos) const;
 
 
     protected:

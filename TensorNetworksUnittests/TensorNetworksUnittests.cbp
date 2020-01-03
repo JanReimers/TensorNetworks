@@ -51,6 +51,7 @@
 		<Unit filename="MPSTests.cpp" />
 		<Unit filename="SVDNormTests.cpp" />
 		<Unit filename="SVDTesting.cpp" />
+		<Unit filename="Tests.H" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<code_completion />

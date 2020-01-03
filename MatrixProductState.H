@@ -8,6 +8,7 @@ class MatrixProductState
 {
     public:
         typedef MatrixProductSite::MatrixT MatrixT;
+        typedef MatrixProductSite::Matrix6T Matrix6T;
         typedef MatrixProductSite::VectorT VectorT;
 
         MatrixProductState(int L, int S2, int D);
@@ -21,6 +22,8 @@ class MatrixProductState
         int     GetL      () const {return itsL;}
         int     GetD      () const {return itsD;}
         int     Getp      () const {return itsp;}
+        ipairT GetDs(int isite) const {return itsSites[isite]->GetDs();}
+//        Subscriptor  GetSuperMatrixSubscriptor (int isite) const;
 
         MatrixT GetMLeft (int isite) const;
         MatrixT GetMRight(int isite) const;
@@ -31,7 +34,7 @@ class MatrixProductState
         MatrixT GetOverlap(int site) const;
 
         // Hamiltion expectation
-        MatrixT GetE(int isite, const MPOSite* mpos) const;
+        Matrix6T GetE(int isite, const MPOSite* mpos) const;
 
     protected:
 

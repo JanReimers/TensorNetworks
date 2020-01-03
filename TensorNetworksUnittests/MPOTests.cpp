@@ -43,7 +43,7 @@ TEST_F(MPOTesting,MakeMatrixProductOperator)
 }
 TEST_F(MPOTesting,MakeMatrixState)
 {
-    itsMPS=itsH->CreateMPS(5);
+    itsMPS=itsH->CreateMPS(2);
     SetSites();
 }
 
@@ -81,5 +81,14 @@ TEST_F(MPOTesting,DoHamiltionExpectation)
 {
     itsMPS->InitializeWithProductState();
     itsMPO->GetHamiltonianExpectation(itsMPS);
-    EXPECT_NEAR(itsMPO->GetHamiltonianExpectation(itsMPS),896.0,1e-11);
+    EXPECT_NEAR(itsMPO->GetHamiltonianExpectation(itsMPS),64.0,1e-11);
+}
+
+TEST_F(MPOTesting,GetHeffSite0)
+{
+    itsMPS->InitializeWithRandomState();
+//    itsMPS->InitializeWithProductState();
+    itsMPS->Normalize(1);
+    cout << "Heff=" << itsMPO->GetHeff(itsMPS,1) << endl;
+//    EXPECT_NEAR(itsMPO->GetHamiltonianExpectation(itsMPS),896.0,1e-11);
 }
