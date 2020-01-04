@@ -4,6 +4,7 @@
 		<Project filename="TensorNetworks.cbp" />
 		<Project filename="TensorNetworksUnittests/TensorNetworksUnittests.cbp">
 			<Depends filename="TensorNetworks.cbp" />
+			<Depends filename="../oml/oml.cbp" />
 		</Project>
 		<Project filename="../oml/oml.cbp" />
 		<Project filename="../oml/omlUnitTests.cbp" />

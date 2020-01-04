@@ -207,4 +207,19 @@ TEST_F(SVDTesting,OML_SVDRandomRectComplexMatrix_5x10)
     EXPECT_NEAR(Max(abs(A*ContractVstar(s,Vstar)-Mcopy)),0.0,eps);
 }
 
-
+TEST_F(SVDTesting,OML_EigenSolverComplexHermitian)
+{
+    int N=50;
+    typedef DMatrix<eType> Mtype;
+    Mtype A(N,N);//,V(M,N),UnitMatrix(M,M);
+    Vector<double>  w(N);
+    FillRandom(A);
+    Mtype Ah=A+Transpose(conj(A)); //Make it hermitian
+    Mtype Mcopy(Ah);
+    int ierr=0;
+    ch(Ah, w ,true,ierr);
+    EXPECT_EQ(ierr,0);
+    Mtype diag=Transpose(conj(Ah))*Mcopy*Ah;
+    for (int i=1;i<=N;i++) diag(i,i)-=w(i);
+    EXPECT_NEAR(Max(abs(diag)),0.0,eps);
+}
