@@ -31,11 +31,11 @@ class MatrixProductState
         MatrixT GetRightNorm(int isite) const {return itsSites[isite]->GetRightNorm();}
 
         double  GetOverlap(        ) const;
-        MatrixT GetOverlap(int site) const;
+        MatrixT GetNeff   (int site) const;
 
         // Hamiltion expectation
-        Matrix6T GetE(int isite, const MPOSite* mpos) const;
-        double ConstractHeff(int isite,const Matrix6T& Heff) const;
+        Matrix6T GetEO(int isite, const MPOSite* mpos) const;
+        double ContractHeff(int isite,const Matrix6T& Heff) const;
     protected:
 
     private:

@@ -192,8 +192,7 @@ TEST_F(MatrixProductTesting,GetMLeft_Site_S2)
 TEST_F(MatrixProductTesting,GetOverlapForSite0)
 {
     mps.InitializeWithProductState();
-    VerifyUnit(mps.GetOverlap(0),eps);
-//    EXPECT_EQ(ToString(mps.GetOverlap(0)),"(1:1),(1:2) \n[ (1,0) (1,0) ]\n");
+    VerifyUnit(mps.GetNeff(0),eps);
 }
 
 //
@@ -202,8 +201,7 @@ TEST_F(MatrixProductTesting,GetOverlapForSite0)
 TEST_F(MatrixProductTesting,GetOverlapForSite1)
 {
     mps.InitializeWithProductState();
-    VerifyUnit(mps.GetOverlap(1),eps);
-//    EXPECT_EQ(ToString(mps.GetOverlap(1)),"(1:2),(1:2) \n[ (-1.41421,0) (0,0) ]\n[ (0,0) (-1.41421,0) ]\n");
+    VerifyUnit(mps.GetNeff(1),eps);
 }
 
 //
@@ -212,8 +210,7 @@ TEST_F(MatrixProductTesting,GetOverlapForSite1)
 TEST_F(MatrixProductTesting,GetOverlapForSite8)
 {
     mps.InitializeWithProductState();
-    VerifyUnit(mps.GetOverlap(8),eps);
-//    EXPECT_EQ(ToString(mps.GetOverlap(8)),"(1:2),(1:2) \n[ (1.41421,0) (0,0) ]\n[ (0,0) (1.41421,0) ]\n");
+    VerifyUnit(mps.GetNeff(8),eps);
 }
 
 //
@@ -222,7 +219,6 @@ TEST_F(MatrixProductTesting,GetOverlapForSite8)
 TEST_F(MatrixProductTesting,GetOverlapForSite9)
 {
     mps.InitializeWithProductState();
-    VerifyUnit(mps.GetOverlap(9),eps);
-//    EXPECT_EQ(ToString(mps.GetOverlap(9)),"(1:2),(1:1) \n[ (-1,0) ]\n[ (-1,0) ]\n");
+    VerifyUnit(mps.GetNeff(9),eps);
 }
 

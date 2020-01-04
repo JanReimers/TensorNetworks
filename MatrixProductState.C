@@ -84,10 +84,10 @@ void MatrixProductState::Normalize(int isite)
 double MatrixProductState::GetOverlap() const
 {
     cSIter i=itsSites.begin();
-    MatrixT E=i->GetOverlapTransferMatrix();
+    MatrixT E=i->GetE();
     i++;
     for (;i!=itsSites.end();i++)
-        E=i->GetOverlapTransferMatrixLeft(E);
+        E=i->GetELeft(E);
     assert(E.GetNumRows()==1);
     assert(E.GetNumCols()==1);
     assert(fabs(std::imag(E(1,1)))<1.0e-14);
@@ -110,7 +110,7 @@ MatrixProductState::MatrixT MatrixProductState::GetMLeft(int isite) const
     }
     else
     {
-        Eleft=itsSites[0]->GetOverlapTransferMatrix();
+        Eleft=itsSites[0]->GetE();
     }
     //
     //  Zip from left to right up to isite
@@ -118,7 +118,7 @@ MatrixProductState::MatrixT MatrixProductState::GetMLeft(int isite) const
 //    cout << "ELeft(0)=" << Eleft << endl;
     for (int ia=1;ia<isite;ia++)
     {
-            Eleft=itsSites[ia]->GetOverlapTransferMatrixLeft(Eleft);
+            Eleft=itsSites[ia]->GetELeft(Eleft);
  //       cout << "ELeft(" << ia << ")=" << Eleft << endl;
             }
     return Eleft;
@@ -139,32 +139,32 @@ MatrixProductState::MatrixT MatrixProductState::GetMRight(int isite) const
     }
     else
     {
-        Eright=itsSites[itsL-1]->GetOverlapTransferMatrix();
+        Eright=itsSites[itsL-1]->GetE();
     }
     // Zip right to left
     for (int ia=itsL-2;ia>=isite+1;ia--)
-        Eright=itsSites[ia]->GetOverlapTransferMatrixRight(Eright);
+        Eright=itsSites[ia]->GetERight(Eright);
 
     return Eright;
 }
 
- MatrixProductState::MatrixT MatrixProductState::GetOverlap(int isite) const
+ MatrixProductState::MatrixT MatrixProductState::GetNeff(int isite) const
  {
 //    MatrixT Eleft=GetMLeft(isite);
 //    MatrixT ERight=GetMRight(isite);
 
-    return itsSites[isite]->GetOverlapMatrix(GetMLeft(isite),GetMRight(isite));
+    return itsSites[isite]->GetNeff(GetMLeft(isite),GetMRight(isite));
  }
 
 
-MatrixProductState::Matrix6T MatrixProductState::GetE(int isite, const MPOSite* mpos) const
+MatrixProductState::Matrix6T MatrixProductState::GetEO(int isite, const MPOSite* mpos) const
 {
-    return itsSites[isite]->GetE(mpos);
+    return itsSites[isite]->GetEO(mpos);
 }
 
-double MatrixProductState::ConstractHeff(int isite,const Matrix6T& Heff) const
+double MatrixProductState::ContractHeff(int isite,const Matrix6T& Heff) const
 {
-    return itsSites[isite]->ConstractHeff(Heff);
+    return itsSites[isite]->ContractHeff(Heff);
 }
 
 

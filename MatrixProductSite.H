@@ -38,16 +38,17 @@ class MatrixProductSite
 //        Subscriptor GetSuperMatrixSubscriptor() const {return Subscriptor(itsD1,itsD1);}
         ipairT GetDs() const {return ipairT(itsD1,itsD2);}
 
-        MatrixT GetOverlapTransferMatrix() const; //For the left most site only
-        MatrixT GetOverlapTransferMatrixLeft (const MatrixT& ELeft) const; //For interior sites
-        MatrixT GetOverlapTransferMatrixRight(const MatrixT& ERight) const; //For interior sites
-        MatrixT GetOverlapMatrix(const MatrixT& Eleft, const MatrixT Eright) const;
+        MatrixT GetE() const; //For the left most site only
+        MatrixT GetELeft (const MatrixT& ELeft) const; //For interior sites
+        MatrixT GetERight(const MatrixT& ERight) const; //For interior sites
+
+        MatrixT GetNeff(const MatrixT& Eleft, const MatrixT Eright) const;
         MatrixT GetLeftNorm() const;
         MatrixT GetRightNorm() const;
         // Hamiltion expectation
-        Matrix6T GetE(       const MPOSite* mpos) const;
-        Matrix4T GetN(int m, const MPOSite* mpos) const;
-        double ConstractHeff(const Matrix6T& Heff) const;
+        Matrix6T GetEO(       const MPOSite* mpos) const;
+        Matrix4T GetNO(int m, const MPOSite* mpos) const;
+        double ContractHeff(const Matrix6T& Heff) const;
 
     protected:
         Position WhereAreWe() const;

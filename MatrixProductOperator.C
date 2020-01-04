@@ -39,8 +39,8 @@ MatrixProductOperator::~MatrixProductOperator()
 
 MatrixProductOperator::Matrix6T MatrixProductOperator::GetHeff(const MatrixProductState *mps,int isite) const
 {
-    Matrix6T NLeft =GetNLeft (mps,isite);
-    Matrix6T NRight=GetNRight(mps,isite);
+    Matrix6T NLeft =GetEOLeft (mps,isite);
+    Matrix6T NRight=GetEORight(mps,isite);
 //    cout << "NLeft " << NLeft  << endl;
 //    cout << "NRight" << NRight << endl;
 //    assert(NLeft .GetNumRows()==1);
@@ -79,20 +79,20 @@ MatrixProductOperator::Matrix6T MatrixProductOperator::GetHeff(const MatrixProdu
     return Heff;
 }
 
-MatrixProductOperator::Matrix6T MatrixProductOperator::GetNLeft(const MatrixProductState *mps,int isite) const
+MatrixProductOperator::Matrix6T MatrixProductOperator::GetEOLeft(const MatrixProductState *mps,int isite) const
 {
     Matrix6T NLeft(1,1);
     NLeft.Fill(std::complex<double>(1.0));
     for (int ia=0;ia<isite;ia++)
     { //loop over sites
         Hamiltonian::Position lbr = GetPosition(ia);
-        NLeft*=mps->GetE(ia,itsSites[lbr]);
+        NLeft*=mps->GetEO(ia,itsSites[lbr]);
 //        cout << "MPO Elimits=" << E.GetLimits() << " lbr=" << lbr << endl;
     }
     return NLeft;
 }
 
-MatrixProductOperator::Matrix6T MatrixProductOperator::GetNRight(const MatrixProductState *mps,int isite) const
+MatrixProductOperator::Matrix6T MatrixProductOperator::GetEORight(const MatrixProductState *mps,int isite) const
 {
     Matrix6T NRight(1,1);
     NRight.Fill(std::complex<double>(1.0));
@@ -100,7 +100,7 @@ MatrixProductOperator::Matrix6T MatrixProductOperator::GetNRight(const MatrixPro
     { //loop over sites
         Hamiltonian::Position lbr = GetPosition(ia);
         Matrix6T temp=NRight;
-        Matrix6T E=mps->GetE(ia,itsSites[lbr]);
+        Matrix6T E=mps->GetEO(ia,itsSites[lbr]);
 
 //        cout << "NRight=" <<  NRight << endl;
 //        cout << "E=" <<  E << endl;
@@ -113,7 +113,7 @@ MatrixProductOperator::Matrix6T MatrixProductOperator::GetNRight(const MatrixPro
     return NRight;
 }
 
-double MatrixProductOperator::GetHamiltonianExpectation(const MatrixProductState *mps) const
+double MatrixProductOperator::GetExpectation(const MatrixProductState *mps) const
 {
     assert(mps);
     Matrix6T E(1,1);
@@ -123,7 +123,7 @@ double MatrixProductOperator::GetHamiltonianExpectation(const MatrixProductState
     for (int isite=0;isite<itsL;isite++)
     { //loop over sites
         Hamiltonian::Position lbr = GetPosition(isite);
-        E*=mps->GetE(isite,itsSites[lbr]);
+        E*=mps->GetEO(isite,itsSites[lbr]);
 //        cout << "MPO Elimits=" << E.GetLimits() << " lbr=" << lbr << endl;
     }
     // at this point E is 1xDw so we need to dot it with a unit vector

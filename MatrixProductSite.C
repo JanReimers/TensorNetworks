@@ -251,30 +251,30 @@ MatrixProductSite::MatrixT MatrixProductSite::GetRightNorm() const
 //
 //  E(1,i,j)=Sum{n,A^t(n;1,i)*A(n;j,1)}=Sum{n,A^*(n;i,1)*A(n;j,1)}
 //
-MatrixProductSite::MatrixT MatrixProductSite::GetOverlapTransferMatrix() const
+MatrixProductSite::MatrixT MatrixProductSite::GetE() const
 {
     assert(GetLimits().GetNumRows()==1 || GetLimits().GetNumCols()==1);
 
     int D=GetLimits().GetNumRows()==1 ? GetLimits().GetNumCols() : GetLimits().GetNumRows();
-    MatrixT ret(D,D);
-    Fill(ret,std::complex<double>(0.0));
+    MatrixT E(D,D);
+    Fill(E,std::complex<double>(0.0));
 
     if (GetLimits().GetNumRows()==1)
     {
         //Left boundary
 
         for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
-            ret+=conj(Transpose(*ip))*(*ip);
+            E+=conj(Transpose(*ip))*(*ip);
     }
     if (GetLimits().GetNumCols()==1)
     {
         //Right boundary
         for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
-            ret+=(*ip)*conj(Transpose(*ip));
+            E+=(*ip)*conj(Transpose(*ip));
     }
 
-    //cout << "OverlapTransferMatrix=" << ret << endl;
-    return ret;
+    //cout << "OverlapTransferMatrix=" << E << endl;
+    return E;
 }
 
 //
@@ -282,7 +282,7 @@ MatrixProductSite::MatrixT MatrixProductSite::GetOverlapTransferMatrix() const
 //  N2(n;k,l)=Sum(i,A^t(n;i,k)*N1(n;i,l])
 //  E(a,k,l)=Sum{n,N2(n;k,l)}
 //
-MatrixProductSite::MatrixT MatrixProductSite::GetOverlapTransferMatrixLeft(const MatrixT& Em) const
+MatrixProductSite::MatrixT MatrixProductSite::GetELeft(const MatrixT& Em) const
 {
     int D=itsAs[0].GetNumCols();
     MatrixT Ea(D,D);
@@ -301,7 +301,7 @@ MatrixProductSite::MatrixT MatrixProductSite::GetOverlapTransferMatrixLeft(const
 
     return Ea;
 }
-MatrixProductSite::MatrixT MatrixProductSite::GetOverlapTransferMatrixRight(const MatrixT& Em) const
+MatrixProductSite::MatrixT MatrixProductSite::GetERight(const MatrixT& Em) const
 {
     int D=itsAs[0].GetNumRows();
     MatrixT Ea(D,D);
@@ -321,12 +321,13 @@ MatrixProductSite::MatrixT MatrixProductSite::GetOverlapTransferMatrixRight(cons
     return Ea;
 }
 
+// TODO (jan#1#): Use Matrix4 for the N
 MatrixProductSite::MatrixT MatrixProductSite::
-GetOverlapMatrix(const MatrixT& Eleft, const MatrixT Eright) const
+GetNeff(const MatrixT& Eleft, const MatrixT Eright) const
 {
 //    cout << "ELeft=" <<  Eleft << endl;
 //    cout << "Eright=" <<  Eright << endl;
-    MatrixT Sab(itsp*itsD1*itsD2,itsp*itsD1*itsD2);
+    MatrixT Neff(itsp*itsD1*itsD2,itsp*itsD1*itsD2);
     int i2_1=1;
     for (int im=0; im<itsp; im++)
         for (int i1=1; i1<=itsD1; i1++)
@@ -336,24 +337,23 @@ GetOverlapMatrix(const MatrixT& Eleft, const MatrixT Eright) const
                 for (int in=0; in<itsp; in++)
                     for (int j1=1; j1<=itsD1; j1++)
                         for (int j2=1; j2<=itsD2; j2++, i2_2++)
-                            Sab(i2_1,i2_2)=im==in ? Eleft(i1,j1)*Eright(j2,i2) : 0.0;
+                            Neff(i2_1,i2_2)=im==in ? Eleft(i1,j1)*Eright(j2,i2) : 0.0;
             }
-    return Sab;
+    return Neff;
 }
 //
-//  Flattened supermatrix indices should be
-//  E(i1,j1,k1,i2,j2,k2)=E(k1+D1*(j1+D1*(i1-1)-1),k2+D2*(j2+D2*(i2-1)-1))
+//  Operator transfer supermatrix
 //
-MatrixProductSite::Matrix6T MatrixProductSite::GetE(const MPOSite* mpos) const
+MatrixProductSite::Matrix6T MatrixProductSite::GetEO(const MPOSite* mpos) const
 {
     ipairT Dw=mpos->GetDw();
     int Dw1=Dw.first;
     int Dw2=Dw.second;
-    Matrix6T E(Dw1,itsD1,itsD1,Dw2,itsD2,itsD2,1);
+    Matrix6T EO(Dw1,itsD1,itsD1,Dw2,itsD2,itsD2,1);
 
     for (int m=0; m<itsp; m++)
     {
-        Matrix4T N=GetN(m,mpos);
+        Matrix4T NO=GetNO(m,mpos);
         for (int i1=1;i1<=itsD1;i1++)
             for (int j1=1;j1<=itsD1;j1++)
             for (int w1=1;w1<=Dw1;w1++)
@@ -362,22 +362,22 @@ MatrixProductSite::Matrix6T MatrixProductSite::GetE(const MPOSite* mpos) const
                 for (int j2=1;j2<=itsD2;j2++)
                     for (int w2=1;w2<=Dw2;w2++)
                     {
-                        E(w1,i1,j1,w2,i2,j2)+=conj(itsAs[m](i1,i2))*N(w1,j1,w2,j2);
+                        EO(w1,i1,j1,w2,i2,j2)+=conj(itsAs[m](i1,i2))*NO(w1,j1,w2,j2);
                     }
             }
 
     }
     //cout << "MPS Elimits=" << E.GetLimits() << endl;
-    return E;
+    return EO;
 }
 
-MatrixProductSite::Matrix4T MatrixProductSite::GetN(int m,const MPOSite* mpos) const
+MatrixProductSite::Matrix4T MatrixProductSite::GetNO(int m,const MPOSite* mpos) const
 {
     ipairT Dw=mpos->GetDw();
     int Dw1=Dw.first;
     int Dw2=Dw.second;
-    Matrix4T N(Dw1,itsD1,Dw2,itsD2);
-    N.Fill(std::complex<double>(0.0));
+    Matrix4T NO(Dw1,itsD1,Dw2,itsD2);
+    NO.Fill(std::complex<double>(0.0));
     for (int n=0; n<itsp; n++)
     {
         const MatrixT W=mpos->GetW(n,m);
@@ -387,14 +387,14 @@ MatrixProductSite::Matrix4T MatrixProductSite::GetN(int m,const MPOSite* mpos) c
                     for (int i2=1;i2<=itsD2;i2++)
                     {
  //                       cout << i2_1 << " " << i2_2 << " " << i1 << " " << i2 << " " << j1 << " " << j2 << endl;
-                        N(w1,i1,w2,i2)+=W(w1,w2)*itsAs[n](i1,i2);
+                        NO(w1,i1,w2,i2)+=W(w1,w2)*itsAs[n](i1,i2);
                     }
 
     }
-    return N;
+    return NO;
 }
 
-double MatrixProductSite::ConstractHeff(const Matrix6T& Heff) const
+double MatrixProductSite::ContractHeff(const Matrix6T& Heff) const
 {
     eType E(0.0);
     for (int m=0; m<itsp; m++)

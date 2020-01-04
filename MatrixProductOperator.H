@@ -23,9 +23,9 @@ class MatrixProductOperator
         int     Getp      () const {return itsp;}
 
         Matrix6T GetHeff  (const MatrixProductState *mps,int isite) const;
-        Matrix6T GetNLeft (const MatrixProductState *mps,int isite) const;
-        Matrix6T GetNRight(const MatrixProductState *mps,int isite) const;
-        double GetHamiltonianExpectation(const MatrixProductState *mps) const;
+        Matrix6T GetEOLeft (const MatrixProductState *mps,int isite) const;
+        Matrix6T GetEORight(const MatrixProductState *mps,int isite) const;
+        double GetExpectation(const MatrixProductState *mps) const;
 
         Hamiltonian::Position GetPosition(int isite) const;
     protected:

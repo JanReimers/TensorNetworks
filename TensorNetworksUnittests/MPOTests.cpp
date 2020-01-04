@@ -98,23 +98,23 @@ TEST_F(MPOTesting,CheckThatWsGotLoaded)
 TEST_F(MPOTesting,DoHamiltionExpectation)
 {
     itsMPS->InitializeWithProductState();
-    itsMPO->GetHamiltonianExpectation(itsMPS);
-    EXPECT_NEAR(itsMPO->GetHamiltonianExpectation(itsMPS),64.0,1e-11);
+    itsMPO->GetExpectation(itsMPS);
+    EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),64.0,1e-11);
 }
 
 TEST_F(MPOTesting,LeftNormalizeThenDoHamiltionExpectation)
 {
     itsMPS->InitializeWithProductState();
     itsMPS->Normalize(MatrixProductSite::Left);
-    itsMPO->GetHamiltonianExpectation(itsMPS);
-    EXPECT_NEAR(itsMPO->GetHamiltonianExpectation(itsMPS),32.0,1e-11);
+    itsMPO->GetExpectation(itsMPS);
+    EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),32.0,1e-11);
 }
 TEST_F(MPOTesting,RightNormalizeThenDoHamiltionExpectation)
 {
     itsMPS->InitializeWithProductState();
     itsMPS->Normalize(MatrixProductSite::Left);
-    itsMPO->GetHamiltonianExpectation(itsMPS);
-    EXPECT_NEAR(itsMPO->GetHamiltonianExpectation(itsMPS),32.0,1e-11);
+    itsMPO->GetExpectation(itsMPS);
+    EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),32.0,1e-11);
 }
 
 TEST_F(MPOTesting,TestHeffWithProductState)
@@ -126,7 +126,7 @@ TEST_F(MPOTesting,TestHeffWithProductState)
         itsMPS->Normalize(ia);
         Matrix6T Heff=itsMPO->GetHeff(itsMPS,ia);
  //       cout << "E(" << ia << ")=" << itsMPS->ConstractHeff(ia,Heff) << endl;
-        EXPECT_NEAR(itsMPS->ConstractHeff(ia,Heff),64.0,1e-11);
+        EXPECT_NEAR(itsMPS->ContractHeff(ia,Heff),64.0,1e-11);
         MatrixT HeffF=Heff.Flatten();
         //cout << "Heff=" << Heff << endl;
         MatrixT d=HeffF-Transpose(conj(HeffF));
@@ -142,7 +142,7 @@ TEST_F(MPOTesting,TestHeffWithRandomState)
     {
         itsMPS->Normalize(ia);
         Matrix6T Heff=itsMPO->GetHeff(itsMPS,ia);
-        double E=itsMPS->ConstractHeff(ia,Heff);
+        itsMPS->ContractHeff(ia,Heff);
         MatrixT HeffF=Heff.Flatten();
         //cout << "Heff=" << Heff << endl;
         MatrixT d=HeffF-Transpose(conj(HeffF));
