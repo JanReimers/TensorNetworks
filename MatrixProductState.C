@@ -1,4 +1,5 @@
 #include "MatrixProductState.H"
+#include "MatrixProductOperator.H"
 #include <iostream>
 #include <complex>
 
@@ -44,14 +45,22 @@ void MatrixProductState::Normalize(MatrixProductSite::Position LR)
     if (LR==MatrixProductSite::Left)
     {
         MatrixT Vdagger;// This get passed from one site to the next.
-        for (SIter i=itsSites.begin(); i!=itsSites.end(); i++)
-            i->SVDLeft_Normalize(s,Vdagger);
+        for (int ia=0;ia<itsL-1;ia++)
+        {
+            itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
+            itsSites[ia+1]->Contract(s,Vdagger);
+        }
+        itsSites[itsL-1]->ReshapeFromLeft(s.GetHigh());
     }
     else if (LR==MatrixProductSite::Right)
     {
         MatrixT U;// This get passed from one site to the next.
-        for (rSIter i=itsSites.rbegin(); i!=itsSites.rend(); i++)
-            i->SVDRightNormalize(U,s);
+        for (int ia=itsL-1;ia>0;ia--)
+        {
+            itsSites[ia]->SVDRightNormalize(U,s);
+            itsSites[ia-1]->Contract(U,s);
+        }
+        itsSites[0]->ReshapeFromRight(s.GetHigh());
     }
 
 }
@@ -66,7 +75,10 @@ void MatrixProductState::Normalize(int isite)
         VectorT s; // This get passed from one site to the next.
         MatrixT Vdagger;// This get passed from one site to the next.
         for (int ia=0; ia<isite; ia++)
+        {
             itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
+            itsSites[ia+1]->Contract(s,Vdagger);
+        }
         itsSites[isite]->ReshapeFromLeft(s.GetHigh());
     }
 
@@ -75,7 +87,10 @@ void MatrixProductState::Normalize(int isite)
         VectorT s; // This get passed from one site to the next.
         MatrixT U;// This get passed from one site to the next.
         for (int ia=itsL-1; ia>isite; ia--)
+        {
             itsSites[ia]->SVDRightNormalize(U,s);
+            itsSites[ia-1]->Contract(U,s);
+        }
         itsSites[isite]->ReshapeFromRight(s.GetHigh());
     }
 }
@@ -90,7 +105,9 @@ double MatrixProductState::GetOverlap() const
         E=i->GetELeft(E);
     assert(E.GetNumRows()==1);
     assert(E.GetNumCols()==1);
-    assert(fabs(std::imag(E(1,1)))<1.0e-14);
+    double iE=fabs(std::imag(E(1,1)));
+    if (iE>1e-12)
+        cout << "Warning MatrixProductState::GetOverlap imag(E)=" << iE << endl;
     return std::real(E(1,1));
 }
 
@@ -156,6 +173,19 @@ MatrixProductState::MatrixT MatrixProductState::GetMRight(int isite) const
     return itsSites[isite]->GetNeff(GetMLeft(isite),GetMRight(isite));
  }
 
+bool MatrixProductState::CheckNormalized(int isite,double eps) const
+{
+    MatrixT Neff=GetNeff(isite);
+    int N=Neff.GetNumRows();
+    MatrixT I(N,N);
+    Unit(I);
+    double error=Max(abs(Neff-I));
+    if (error>1e-12)
+        cout << "Warning: Normalization site=" << isite << "  Neff-I error " << error << endl;
+    return error<eps;
+}
+
+
 
 MatrixProductState::Matrix6T MatrixProductState::GetEO(int isite, const MPOSite* mpos) const
 {
@@ -167,4 +197,45 @@ double MatrixProductState::ContractHeff(int isite,const Matrix6T& Heff) const
     return itsSites[isite]->ContractHeff(Heff);
 }
 
+void MatrixProductState::SweepRight(const MatrixProductOperator* mpo)
+{
+    for (int ia=0; ia<itsL-1; ia++)
+    {
+        VectorCT Anew=mpo->Refine(this,ia);
+
+        VectorT s;
+        MatrixT Vdagger;
+        itsSites[ia]->Update(Anew);
+        itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
+        itsSites[ia+1]->Contract(s,Vdagger);
+
+
+        double E=mpo->GetExpectation(this)/itsL;
+        double o=GetOverlap();
+        cout << "After Refine1 E(" << ia << ")=" << E << "  Overlap=" << o << endl;
+//        itsMPS->Normalize(ia+1);
+//        cout << "After Refine2 E=" << E << endl;
+    }
+}
+
+void MatrixProductState::SweepLeft(const MatrixProductOperator* mpo)
+{
+    for (int ia=itsL-1; ia>0; ia--)
+    {
+        VectorCT Anew=mpo->Refine(this,ia);
+
+        VectorT s;
+        MatrixT U;
+        itsSites[ia]->Update(Anew);
+        itsSites[ia]->SVDRightNormalize(U,s);
+        itsSites[ia-1]->Contract(U,s);
+
+
+        double E=mpo->GetExpectation(this)/itsL;
+        double o=GetOverlap();
+        cout << "After Refine1 E(" << ia << ")=" << E << "  Overlap=" << o << endl;
+//        itsMPS->Normalize(ia+1);
+//        cout << "After Refine2 E=" << E << endl;
+    }
+}
 

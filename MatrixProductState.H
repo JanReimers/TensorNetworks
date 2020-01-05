@@ -4,20 +4,25 @@
 #include "Misc/ptr_vector.h"
 #include "TensorNetworks/MatrixProductSite.H"
 
+class MatrixProductOperator;
+
 class MatrixProductState
 {
     public:
-        typedef MatrixProductSite::MatrixT MatrixT;
+        typedef MatrixProductSite::MatrixT  MatrixT;
         typedef MatrixProductSite::Matrix6T Matrix6T;
-        typedef MatrixProductSite::VectorT VectorT;
+        typedef MatrixProductSite::VectorT  VectorT;
+        typedef MatrixProductSite::VectorCT VectorCT;
 
         MatrixProductState(int L, int S2, int D);
         virtual ~MatrixProductState();
 
         void InitializeWithProductState();
         void InitializeWithRandomState();
+
         void Normalize(MatrixProductSite::Position LR);
         void Normalize(int isite); //Mixed Canonical normalization
+
 
         int     GetL      () const {return itsL;}
         int     GetD      () const {return itsD;}
@@ -29,9 +34,13 @@ class MatrixProductState
         MatrixT GetMRight(int isite) const;
         MatrixT GetLeftNorm (int isite) const {return itsSites[isite]->GetLeftNorm();}
         MatrixT GetRightNorm(int isite) const {return itsSites[isite]->GetRightNorm();}
+        bool    CheckNormalized(int isite,double eps) const;
+
+        void SweepRight(const MatrixProductOperator* mpo);
+        void SweepLeft (const MatrixProductOperator* mpo);
 
         double  GetOverlap(        ) const;
-        MatrixT GetNeff   (int site) const;
+        MatrixT GetNeff   (int isite) const;
 
         // Hamiltion expectation
         Matrix6T GetEO(int isite, const MPOSite* mpos) const;

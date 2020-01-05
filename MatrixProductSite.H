@@ -22,6 +22,8 @@ class MatrixProductSite
         typedef Matrix4<eType> Matrix4T;
 
         typedef Vector <double> VectorT;
+        typedef Vector <eType > VectorCT;
+
         enum Position {Left,Bulk,Right};
 
         MatrixProductSite(int p, int D1, int D2);
@@ -45,10 +47,14 @@ class MatrixProductSite
         MatrixT GetNeff(const MatrixT& Eleft, const MatrixT Eright) const;
         MatrixT GetLeftNorm() const;
         MatrixT GetRightNorm() const;
+
         // Hamiltion expectation
         Matrix6T GetEO(       const MPOSite* mpos) const;
         Matrix4T GetNO(int m, const MPOSite* mpos) const;
         double ContractHeff(const Matrix6T& Heff) const;
+        void    Update(const VectorCT& newAs);
+        void    Contract(const VectorT& s, const MatrixT& Vdagger);
+        void    Contract(const MatrixT& U, const VectorT& s);
 
     protected:
         Position WhereAreWe() const;
@@ -58,8 +64,8 @@ class MatrixProductSite
         MatrixT  ReshapeRight();
         void     ReshapeLeft (const MatrixT& U);
         void     ReshapeRight(const MatrixT& Vdagger);
-        static MatrixT  Contract(const VectorT& s, const MatrixT& VA);
-        static MatrixT  Contract(const MatrixT& AU,const VectorT& s);
+        static MatrixT  Contract1(const VectorT& s, const MatrixT& VA);
+        static MatrixT  Contract1(const MatrixT& AU,const VectorT& s);
 
     private:
         friend class MatrixProductTesting;

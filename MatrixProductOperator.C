@@ -1,6 +1,8 @@
 #include "MatrixProductOperator.H"
 #include "Hamiltonian.H"
 #include "Matrix6.H"
+#include "oml/cnumeric.h"
+#include "oml/vector_io.h"
 #include <iostream>
 
 using std::cout;
@@ -134,7 +136,27 @@ double MatrixProductOperator::GetExpectation(const MatrixProductState *mps) cons
 //    cout << "E =" << E << endl;
 //    assert(E.GetNumRows()==1);
 //    assert(E.GetNumCols()==1);
-//    cout << std::imag(E(1,1)) << endl;
-    assert(std::imag(E(1,1,1,1,1,1))==0.0);
+    double iE=std::imag(E(1,1,1,1,1,1));
+    if (fabs(iE)>1e-10)
+        cout << "Warning: MatrixProductOperator::GetExpectation Imag(E)=" << std::imag(E(1,1,1,1,1,1)) << endl;
+
     return std::real(E(1,1,1,1,1,1));
+}
+
+MatrixProductOperator::VectorCT MatrixProductOperator::Refine(MatrixProductState *mps,int isite) const
+{
+    assert(mps->CheckNormalized(isite,1e-11));
+    Matrix6T Heff6=GetHeff(mps,isite);
+    MatrixT Heff=Heff6.Flatten();
+    assert(Heff.GetNumRows()==Heff.GetNumCols());
+    int N=Heff.GetNumRows();
+    Vector<double>  eigenValues(N);
+    int ierr=0;
+    ch(Heff, eigenValues ,true,ierr);
+    assert(ierr==0);
+
+    //cout << "eigenValues=" <<  eigenValues << endl;
+    //cout << "eigenVector(1)=" <<  Heff.GetColumn(1) << endl;
+
+    return Heff.GetColumn(1);
 }

@@ -47,6 +47,7 @@
 			<Add library="gfortran" />
 			<Add library="pthread" />
 		</Linker>
+		<Unit filename="GroundStataeTests.cpp" />
 		<Unit filename="MPOTests.cpp" />
 		<Unit filename="MPSTests.cpp" />
 		<Unit filename="SVDNormTests.cpp" />

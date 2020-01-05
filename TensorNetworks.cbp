@@ -67,6 +67,7 @@
 		</Unit>
 		<Unit filename="MatrixProductState.H" />
 		<Unit filename="Subscriptor.H" />
+		<Unit filename="Vector3.H" />
 		<Extensions>
 			<code_completion />
 			<debugger />

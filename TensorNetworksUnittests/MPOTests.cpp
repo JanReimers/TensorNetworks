@@ -107,14 +107,14 @@ TEST_F(MPOTesting,LeftNormalizeThenDoHamiltionExpectation)
     itsMPS->InitializeWithProductState();
     itsMPS->Normalize(MatrixProductSite::Left);
     itsMPO->GetExpectation(itsMPS);
-    EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),32.0,1e-11);
+    EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),64.0,1e-11);
 }
 TEST_F(MPOTesting,RightNormalizeThenDoHamiltionExpectation)
 {
     itsMPS->InitializeWithProductState();
     itsMPS->Normalize(MatrixProductSite::Left);
     itsMPO->GetExpectation(itsMPS);
-    EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),32.0,1e-11);
+    EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),64.0,1e-11);
 }
 
 TEST_F(MPOTesting,TestHeffWithProductState)

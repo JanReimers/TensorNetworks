@@ -1,5 +1,6 @@
 #include "MatrixProductSite.H"
 #include "MPOSite.H"
+#include "Vector3.H"
 #include "oml/minmax.h"
 #include "oml/cnumeric.h"
 #include "oml/vector_io.h"
@@ -64,21 +65,7 @@ void MatrixProductSite::InitializeWithRandomState()
 }
 void MatrixProductSite::SVDLeft_Normalize(VectorT& s, MatrixT& Vdagger)
 {
-    int N1=s.GetHigh(); //N1=0 on the first site.
-    if (N1>0 && N1<itsD1) itsD1=N1; //The contraction below will automatically reshape the As.
 
-    // Where are we in the lattice
-    Position lbr=WhereAreWe();
-    if (lbr==Bulk)
-    {
-        for (int in=0; in<itsp; in++)
-        {
-            MatrixT temp=Contract(s,Vdagger*itsAs[in]);
-            itsAs[in].SetLimits(0,0);
-            itsAs[in]=temp; //Shallow copy
-            assert(itsAs[in].GetNumRows()==itsD1); //Verify shape is correct;
-        }
-    }
     MatrixT A=ReshapeLeft();
     //
     //  Set up and do SVD
@@ -97,25 +84,7 @@ void MatrixProductSite::SVDLeft_Normalize(VectorT& s, MatrixT& Vdagger)
 
 void MatrixProductSite::SVDRightNormalize(MatrixT& U, VectorT& s)
 {
-    int N1=s.GetHigh(); //N1=0 on the first site.
-    if (N1>0 && N1<itsD2) itsD2=N1;
-
-    // Where are we in the lattice
-    Position lbr=WhereAreWe();
-    if (lbr==Bulk)
-    {
-        for (int in=0; in<itsp; in++)
-        {
-            MatrixT temp=Contract(itsAs[in]*U,s);
-            itsAs[in].SetLimits(0,0);
-            itsAs[in]=temp; //Shallow copy
-            assert(itsAs[in].GetNumCols()==itsD2); //Verify shape is correct;
-        }
-    }
     MatrixT A=ReshapeRight();
-    //
-    //  Set up and do SVD
-    //
     int N=Min(A.GetNumRows(),A.GetNumCols());
     s.SetLimits(N);
     MatrixT V(N,A.GetNumCols());
@@ -191,7 +160,7 @@ void MatrixProductSite::ReshapeRight(const MatrixT& Vdagger)
 //
 //  Anew(j,i) =  s(j)*VA(j,k)
 //
-MatrixProductSite::MatrixT MatrixProductSite::Contract(const VectorT& s, const MatrixT& VA)
+MatrixProductSite::MatrixT MatrixProductSite::Contract1(const VectorT& s, const MatrixT& VA)
 {
     int N1=VA.GetNumRows();
     int N2=VA.GetNumCols();
@@ -208,7 +177,7 @@ MatrixProductSite::MatrixT MatrixProductSite::Contract(const VectorT& s, const M
 //
 //  Anew(j,i) =  s(j)*VA(j,k)
 //
-MatrixProductSite::MatrixT MatrixProductSite::Contract(const MatrixT& AU,const VectorT& s)
+MatrixProductSite::MatrixT MatrixProductSite::Contract1(const MatrixT& AU,const VectorT& s)
 {
     int N1=AU.GetNumRows();
     int N2=AU.GetNumCols();
@@ -408,6 +377,53 @@ double MatrixProductSite::ContractHeff(const Matrix6T& Heff) const
                         }
 
     //cout << "fabs(std::imag(E))" <<  fabs(std::imag(E)) << endl;
-    assert(fabs(std::imag(E))<1e-11);
+    double iE=fabs(std::imag(E));
+    if (iE>1e-8)
+        cout << "Warning ContractHeff imag(E)=" << iE << endl;
     return real(E);
+}
+
+void MatrixProductSite::Update(const VectorCT& newAs)
+{
+    Vector3<eType> As(itsp,itsD1,itsD2,newAs); //Unflatten
+    for (int m=0; m<itsp; m++)
+    {
+ //       cout << "before A[" << m << "]=" << itsAs[m] << endl;
+        for (int i1=1; i1<=itsD1; i1++)
+            for (int i2=1; i2<=itsD2; i2++)
+                itsAs[m](i1,i2)=As(m,i1,i2);
+//       cout << "after  A[" << m << "]=" << itsAs[m] << endl;
+    }
+
+}
+
+
+
+void MatrixProductSite::Contract(const VectorT& s, const MatrixT& Vdagger)
+{
+    int N1=s.GetHigh(); //N1=0 on the first site.
+    if (N1>0 && N1<itsD1) itsD1=N1; //The contraction below will automatically reshape the As.
+
+    for (int in=0; in<itsp; in++)
+    {
+        MatrixT temp=Contract1(s,Vdagger*itsAs[in]);
+        itsAs[in].SetLimits(0,0);
+        itsAs[in]=temp; //Shallow copy
+//        cout << "A[" << in << "]=" << itsAs[in] << endl;
+        assert(itsAs[in].GetNumRows()==itsD1); //Verify shape is correct;
+    }
+}
+
+void MatrixProductSite::Contract(const MatrixT& U, const VectorT& s)
+{
+    int N1=s.GetHigh(); //N1=0 on the first site.
+    if (N1>0 && N1<itsD2)
+        itsD2=N1; //The contraction below will automatically reshape the As.
+    for (int in=0; in<itsp; in++)
+    {
+        MatrixT temp=Contract1(itsAs[in]*U,s);
+        itsAs[in].SetLimits(0,0);
+        itsAs[in]=temp; //Shallow copy
+        assert(itsAs[in].GetNumCols()==itsD2); //Verify shape is correct;
+    }
 }

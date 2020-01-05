@@ -10,7 +10,9 @@
 class MatrixProductOperator
 {
     public:
-       typedef MatrixProductSite::MatrixT MatrixT;
+       typedef MatrixProductSite::MatrixT  MatrixT;
+       typedef MatrixProductSite::VectorT  VectorT;
+       typedef MatrixProductSite::VectorCT VectorCT;
        typedef std::complex<double> eType;
        typedef Matrix6<eType> Matrix6T;
        typedef Matrix4<eType> Matrix4T;
@@ -22,11 +24,12 @@ class MatrixProductOperator
         int     GetD      () const {return itsD;}
         int     Getp      () const {return itsp;}
 
-        Matrix6T GetHeff  (const MatrixProductState *mps,int isite) const;
-        Matrix6T GetEOLeft (const MatrixProductState *mps,int isite) const;
-        Matrix6T GetEORight(const MatrixProductState *mps,int isite) const;
-        double GetExpectation(const MatrixProductState *mps) const;
-
+        Matrix6T GetHeff       (const MatrixProductState *mps,int isite) const;
+        Matrix6T GetEOLeft     (const MatrixProductState *mps,int isite) const;
+        Matrix6T GetEORight    (const MatrixProductState *mps,int isite) const;
+        double   GetExpectation(const MatrixProductState *mps) const;
+        VectorCT Refine        (      MatrixProductState *mps,int isite) const; //Minimize energy WRT the Ms in one site.
+        void     SweepRight    (      MatrixProductState *mps) const;
         Hamiltonian::Position GetPosition(int isite) const;
     protected:
 
