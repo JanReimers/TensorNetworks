@@ -31,10 +31,11 @@ class MatrixProductSite
 
         void InitializeWithProductState(int sgn);
         void InitializeWithRandomState();
-        void ReshapeFromLeft (int D1) {Reshape(   D1,itsD2,true);}
-        void ReshapeFromRight(int D2) {Reshape(itsD1,   D2,true);}
+        void ReshapeFromLeft (int D1);
+        void ReshapeFromRight(int D2);
         void SVDLeft_Normalize(VectorT& s, MatrixT& Vdagger);
         void SVDRightNormalize(MatrixT& U, VectorT& s );
+        void Rescale(double norm);
 
         const MatLimits GetLimits() const {return itsAs[0].GetLimits();}
 //        Subscriptor GetSuperMatrixSubscriptor() const {return Subscriptor(itsD1,itsD1);}

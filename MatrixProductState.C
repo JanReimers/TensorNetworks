@@ -51,6 +51,8 @@ void MatrixProductState::Normalize(MatrixProductSite::Position LR)
             itsSites[ia+1]->Contract(s,Vdagger);
         }
         itsSites[itsL-1]->ReshapeFromLeft(s.GetHigh());
+        double norm=std::real(itsSites[itsL-1]->GetLeftNorm()(1,1));
+        itsSites[itsL-1]->Rescale(sqrt(norm));
     }
     else if (LR==MatrixProductSite::Right)
     {
@@ -61,6 +63,8 @@ void MatrixProductState::Normalize(MatrixProductSite::Position LR)
             itsSites[ia-1]->Contract(U,s);
         }
         itsSites[0]->ReshapeFromRight(s.GetHigh());
+        double norm=std::real(itsSites[0]->GetRightNorm()(1,1));
+        itsSites[0]->Rescale(sqrt(norm));
     }
 
 }

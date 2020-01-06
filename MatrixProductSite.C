@@ -98,6 +98,21 @@ void MatrixProductSite::SVDRightNormalize(MatrixT& U, VectorT& s)
 
 }
 
+void MatrixProductSite::ReshapeFromLeft (int D1)
+{
+    Reshape(   D1,itsD2,true);
+}
+
+void MatrixProductSite::ReshapeFromRight(int D2)
+{
+    Reshape(itsD1,   D2,true);
+}
+
+void MatrixProductSite::Rescale(double norm)
+{
+    for (int n=0;n<itsp;n++) itsAs[n]/=norm;
+}
+
 MatrixProductSite::MatrixT  MatrixProductSite::ReshapeLeft()
 {
     MatrixT A(itsp*itsD1,itsD2);
