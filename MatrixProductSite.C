@@ -36,33 +36,61 @@ MatrixProductSite::Position MatrixProductSite::WhereAreWe() const
 //  This is a tricker than one might expect.  In particular I can't get the OBC vectors
 //  to be both left and right normalized
 //
-void MatrixProductSite::InitializeWithProductState(int sgn)
+void MatrixProductSite::InitializeWith(State state,int sgn)
 {
-    if (itsAs[0].GetNumRows()==1)
+    switch (state)
     {
-        int i=1;
-        for (pIterT ip=itsAs.begin();ip!=itsAs.end();ip++,i++)
-            if (i<=itsD2) (*ip)(1,i)=std::complex<double>(sgn); //Left normalized
-    }
-    else if (itsAs[0].GetNumCols()==1)
-    {
-        int i=1;
-        for (pIterT ip=itsAs.begin();ip!=itsAs.end();ip++,i++)
-            if (i<=itsD1)(*ip)(i,1)=std::complex<double>(sgn);  //Left normalized
-    }
-    else
-    {
-        for (pIterT ip=itsAs.begin();ip!=itsAs.end();ip++)
-            for (int i=1;i<=Min(itsD1,itsD2);i++)
-                (*ip)(i,i)=std::complex<double>(sgn/sqrt(itsp));
+    case Product :
+        {
+            Position lbr=WhereAreWe();
+            switch(lbr)
+            {
+            case  Left :
+                {
+                    int i=1;
+                    for (pIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++,i++)
+                        if (i<=itsD2)
+                            (*ip)(1,i)=std::complex<double>(sgn); //Left normalized
+                    break;
+                }
+            case Right :
+                {
+                    int i=1;
+                    for (pIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++,i++)
+                        if (i<=itsD1)
+                            (*ip)(i,1)=std::complex<double>(sgn);  //Left normalized
+                    break;
+                }
+            case Bulk :
+                {
+                    for (pIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
+                        for (int i=1; i<=Min(itsD1,itsD2); i++)
+                            (*ip)(i,i)=std::complex<double>(sgn/sqrt(itsp));
+                    break;
+                }
+            }
+            break;
+        }
+    case Random :
+        {
+            for (pIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
+                FillRandom(*ip);
+            break;
+        }
+    case Neel :
+        {
+            for (pIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
+                Fill(*ip,eType(0.0));
+            if (sgn== 1)
+                itsAs[0     ](1,1)=1.0;
+            if (sgn==-1)
+                itsAs[itsp-1](1,1)=1.0;
+
+            break;
+        }
     }
 }
 
-void MatrixProductSite::InitializeWithRandomState()
-{
-        for (pIterT ip=itsAs.begin();ip!=itsAs.end();ip++)
-            FillRandom(*ip);
-}
 void MatrixProductSite::SVDLeft_Normalize(VectorT& s, MatrixT& Vdagger)
 {
 
@@ -336,8 +364,11 @@ MatrixProductSite::Matrix6T MatrixProductSite::GetEO(const MPOSite* mpos) const
     Matrix6T EO(Dw1,itsD1,itsD1,Dw2,itsD2,itsD2,1);
 
     for (int m=0; m<itsp; m++)
+    for (int n=0; n<itsp; n++)
     {
-        Matrix4T NO=GetNO(m,mpos);
+        const MatrixT W=mpos->GetW(m,n);
+ //       cout << "W(" << m << "," << n << ")=" << W << endl;
+//        Matrix4T NO=GetNO(m,mpos);
         for (int i1=1;i1<=itsD1;i1++)
             for (int j1=1;j1<=itsD1;j1++)
             for (int w1=1;w1<=Dw1;w1++)
@@ -346,7 +377,7 @@ MatrixProductSite::Matrix6T MatrixProductSite::GetEO(const MPOSite* mpos) const
                 for (int j2=1;j2<=itsD2;j2++)
                     for (int w2=1;w2<=Dw2;w2++)
                     {
-                        EO(w1,i1,j1,w2,i2,j2)+=conj(itsAs[m](i1,i2))*NO(w1,j1,w2,j2);
+                        EO(w1,i1,j1,w2,i2,j2)+=conj(itsAs[m](i1,i2))*W(w1,w2)*itsAs[n](j1,j2);
                     }
             }
 

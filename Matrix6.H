@@ -81,6 +81,17 @@ template <class T> class Matrix6
 
         friend std::ostream& operator<<(std::ostream& os,const Matrix6& m) {return os << m.itsData;}
 
+        void Dump(std::ostream& os) const
+        {
+        for (int w1=1-itsmnLow; w1<=M1-itsmnLow; w1++)
+            for (int w2=1-itsmnLow; w2<=N1-itsmnLow; w2++)
+                for (int i1=1; i1<=M2; i1++)
+                    for (int j1=1; j1<=M3; j1++)
+                        for (int i2=1; i2<=N2; i2++)
+                            for (int j2=1; j2<=N3; j2++)
+                                os << "   [" << w1 << ","  << i1 << ","  << j1 << ","  << w2 << ","  << i2 << "," << j2 << "]=" << (*this)(w1,i1,j1,w2,i2,j2) << endl;
+        }
+
     protected:
         int index1(int m, int i1, int i2) const {return m+itsmnLow+M1*(i1-1+M2*(i2-1));}
         int index2(int n, int j1, int j2) const {return n+itsmnLow+N1*(j1-1+N2*(j2-1));}

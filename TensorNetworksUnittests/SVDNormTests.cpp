@@ -61,7 +61,7 @@ void MPSNormTesting::VerifyRightNorm(const MatrixProductState* mps)
 
 TEST_F(MPSNormTesting,LeftNormalMatriciesProductStateL10S3D2)
 {
-    mps.InitializeWithProductState();
+    mps.InitializeWith(MatrixProductSite::Product);
     mps.Normalize(MatrixProductSite::Left);
     VerifyLeftNorm(&mps);
 }
@@ -69,7 +69,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesProductStateL10S3D2)
 
 TEST_F(MPSNormTesting,RightNormalMatriciesProductStateL100S3D2)
 {
-    mps.InitializeWithProductState();
+    mps.InitializeWith(MatrixProductSite::Product);
     mps.Normalize(MatrixProductSite::Right);
     VerifyRightNorm(&mps);
 }
@@ -77,14 +77,14 @@ TEST_F(MPSNormTesting,RightNormalMatriciesProductStateL100S3D2)
 
 TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D2)
 {
-    mps.InitializeWithRandomState();
+    mps.InitializeWith(MatrixProductSite::Random);
     mps.Normalize(MatrixProductSite::Left);
     VerifyLeftNorm(&mps);
 }
 
 TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL100S3D2)
 {
-    mps.InitializeWithRandomState();
+    mps.InitializeWith(MatrixProductSite::Random);
     mps.Normalize(MatrixProductSite::Right);
     VerifyRightNorm(&mps);
 }
@@ -92,7 +92,7 @@ TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL100S3D2)
 TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D3)
 {
     MatrixProductState mps1(10,3,3);
-    mps1.InitializeWithRandomState();
+    mps1.InitializeWith(MatrixProductSite::Random);
     mps1.Normalize(MatrixProductSite::Left);
     VerifyLeftNorm(&mps1);
 }
@@ -101,7 +101,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D3)
 TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D10)
 {
     MatrixProductState mps1(10,1,10);
-    mps1.InitializeWithRandomState();
+    mps1.InitializeWith(MatrixProductSite::Random);
     mps1.Normalize(MatrixProductSite::Left);
     VerifyLeftNorm(&mps1);
 }
@@ -109,7 +109,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D10)
 TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S3D10)
 {
     MatrixProductState mps1(10,3,10);
-    mps1.InitializeWithRandomState();
+    mps1.InitializeWith(MatrixProductSite::Random);
     mps1.Normalize(MatrixProductSite::Right);
     VerifyRightNorm(&mps1);
 }
@@ -117,7 +117,7 @@ TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S3D10)
 TEST_F(MPSNormTesting,LeftNormalOverlapL10S1D2)
 {
     MatrixProductState mps1(10,1,2);
-    mps1.InitializeWithRandomState();
+    mps1.InitializeWith(MatrixProductSite::Random);
     mps1.Normalize(MatrixProductSite::Left);
     EXPECT_NEAR(mps1.GetOverlap(),1.0,eps);
 }
@@ -125,7 +125,7 @@ TEST_F(MPSNormTesting,LeftNormalOverlapL10S1D2)
 TEST_F(MPSNormTesting,RightNormalOverlapL10S2D2)
 {
     MatrixProductState mps1(10,3,2);
-    mps1.InitializeWithRandomState();
+    mps1.InitializeWith(MatrixProductSite::Random);
     mps1.Normalize(MatrixProductSite::Right);
     EXPECT_NEAR(mps1.GetOverlap(),1.0,eps);
 }
@@ -133,14 +133,14 @@ TEST_F(MPSNormTesting,RightNormalOverlapL10S2D2)
 TEST_F(MPSNormTesting,RightNormalOverlapSite0L10S1D3)
 {
     MatrixProductState mps1(10,1,3);
-    mps1.InitializeWithRandomState();
+    mps1.InitializeWith(MatrixProductSite::Random);
     mps1.Normalize(MatrixProductSite::Right);
     VerifyUnit(mps1.GetNeff(0),eps);
 }
 TEST_F(MPSNormTesting,LeftNormalOverlapSiteLL10S1D3)
 {
     MatrixProductState mps1(10,1,3);
-    mps1.InitializeWithRandomState();
+    mps1.InitializeWith(MatrixProductSite::Random);
     mps1.Normalize(MatrixProductSite::Left);
     VerifyUnit(mps1.GetNeff(mps1.GetL()-1),eps);
 }
@@ -148,14 +148,14 @@ TEST_F(MPSNormTesting,LeftNormalOverlapSiteLL10S1D3)
 TEST_F(MPSNormTesting,RightNormalOverlapSite0L10S5D2)
 {
     MatrixProductState mps1(10,5,2);
-    mps1.InitializeWithRandomState();
+    mps1.InitializeWith(MatrixProductSite::Random);
     mps1.Normalize(MatrixProductSite::Right);
     VerifyUnit(mps1.GetNeff(0),eps);
 }
 TEST_F(MPSNormTesting,LeftNormalOverlapSiteLL10S5D2)
 {
     MatrixProductState mps1(10,5,2);
-    mps1.InitializeWithRandomState();
+    mps1.InitializeWith(MatrixProductSite::Random);
     mps1.Normalize(MatrixProductSite::Left);
     VerifyUnit(mps1.GetNeff(mps1.GetL()-1),eps);
 }
@@ -163,7 +163,7 @@ TEST_F(MPSNormTesting,LeftNormalOverlapSiteLL10S5D2)
 TEST_F(MPSNormTesting,MixedCanonicalL10S1D3)
 {
     MatrixProductState mps1(10,1,3);
-    mps1.InitializeWithRandomState();
+    mps1.InitializeWith(MatrixProductSite::Random);
     for (int ia=1;ia<mps1.GetL()-1;ia++)
     {
         mps1.Normalize(ia);
@@ -175,7 +175,7 @@ TEST_F(MPSNormTesting,MixedCanonicalL10S1D3)
 TEST_F(MPSNormTesting,MixedCanonicalL10S3D10)
 {
     MatrixProductState mps1(10,3,10);
-    mps1.InitializeWithRandomState();
+    mps1.InitializeWith(MatrixProductSite::Random);
     for (int ia=1;ia<mps1.GetL()-1;ia++)
     {
         mps1.Normalize(ia);
@@ -186,7 +186,7 @@ TEST_F(MPSNormTesting,MixedCanonicalL10S3D10)
 TEST_F(MPSNormTesting,MixedCanonicalL10S5D2)
 {
     MatrixProductState mps1(10,5,2);
-    mps1.InitializeWithRandomState();
+    mps1.InitializeWith(MatrixProductSite::Random);
     for (int ia=1;ia<mps1.GetL()-1;ia++)
     {
         mps1.Normalize(ia);

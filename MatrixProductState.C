@@ -23,19 +23,15 @@ MatrixProductState::~MatrixProductState()
     //dtor
 }
 
-void MatrixProductState::InitializeWithProductState()
+void MatrixProductState::InitializeWith(MatrixProductSite::State state)
 {
     int sgn=1;
     for (SIter i=itsSites.begin();i!=itsSites.end();i++)
     {
-        i->InitializeWithProductState(sgn);
+        i->InitializeWith(state,sgn);
         sgn*=-1;
     }
-}
-void MatrixProductState::InitializeWithRandomState()
-{
-    for (SIter i=itsSites.begin();i!=itsSites.end();i++)
-        i->InitializeWithRandomState();
+
 }
 
 

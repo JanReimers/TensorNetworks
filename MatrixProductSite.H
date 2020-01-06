@@ -29,8 +29,9 @@ class MatrixProductSite
         MatrixProductSite(int p, int D1, int D2);
         virtual ~MatrixProductSite();
 
-        void InitializeWithProductState(int sgn);
-        void InitializeWithRandomState();
+        enum State {Product,Random,Neel};
+        void InitializeWith(State,int sgn);
+
         void ReshapeFromLeft (int D1);
         void ReshapeFromRight(int D2);
         void SVDLeft_Normalize(VectorT& s, MatrixT& Vdagger);

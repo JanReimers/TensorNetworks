@@ -125,7 +125,10 @@ double MatrixProductOperator::GetExpectation(const MatrixProductState *mps) cons
     for (int isite=0;isite<itsL;isite++)
     { //loop over sites
         Hamiltonian::Position lbr = GetPosition(isite);
+//        Matrix6T temp=mps->GetEO(isite,itsSites[lbr]);
         E*=mps->GetEO(isite,itsSites[lbr]);
+//        cout << "E[" << isite << "]=" << endl;
+//        E.Dump(cout);
 //        cout << "MPO Elimits=" << E.GetLimits() << " lbr=" << lbr << endl;
     }
     // at this point E is 1xDw so we need to dot it with a unit vector

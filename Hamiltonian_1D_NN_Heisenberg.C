@@ -33,7 +33,7 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
         W(1,2)=itsJ/2.0*GetSminus(m,n);
         W(1,3)=itsJ/2.0*GetSplus (m,n);
         W(1,4)=itsJ/2.0*Get2Sz   (m,n); //The get return 2*Sz to avoid half integers
-        W(1,5)=0.0;
+        W(1,5)=1.0;
     }
     break;
 //      [ 1    0      0    0  0 ]
@@ -72,7 +72,7 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
         W(2,1)=itsJ    *GetSplus (m,n);
         W(3,1)=itsJ    *GetSminus(m,n);
         W(4,1)=itsJ/2.0*Get2Sz   (m,n); //The get return 2*Sz to avoid half integers
-        W(5,1)=1.0;
+        W(5,1)=0.0;
     }
     break;
     }

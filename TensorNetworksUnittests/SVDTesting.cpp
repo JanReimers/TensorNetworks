@@ -23,7 +23,7 @@ public:
     , eps(1.0e-13)
     {
         StreamableObject::SetToPretty();
-        mps.InitializeWithProductState();
+        mps.InitializeWith(MatrixProductSite::Product);
     }
  //   const MatrixT& GetA(int i,int ip) const {return itsSites[i]->itsAs[ip]; }
 

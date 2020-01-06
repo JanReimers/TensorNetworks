@@ -17,8 +17,7 @@ class MatrixProductState
         MatrixProductState(int L, int S2, int D);
         virtual ~MatrixProductState();
 
-        void InitializeWithProductState();
-        void InitializeWithRandomState();
+        void InitializeWith(MatrixProductSite::State);
 
         void Normalize(MatrixProductSite::Position LR);
         void Normalize(int isite); //Mixed Canonical normalization
