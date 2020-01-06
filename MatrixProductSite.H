@@ -54,6 +54,7 @@ class MatrixProductSite
         Matrix6T GetEO(       const MPOSite* mpos) const;
         Matrix4T GetNO(int m, const MPOSite* mpos) const;
         double ContractHeff(const Matrix6T& Heff) const;
+        double ContractHeff(const MatrixT & Heff) const;
         void    Update(const VectorCT& newAs);
         void    Contract(const VectorT& s, const MatrixT& Vdagger);
         void    Contract(const MatrixT& U, const VectorT& s);

@@ -138,15 +138,19 @@ TEST_F(MPOTesting,TestHeffWithProductState)
 TEST_F(MPOTesting,TestHeffWithRandomState)
 {
     itsMPS->InitializeWith(MatrixProductSite::Random);
+    itsMPS->Normalize(MatrixProductSite::Right);
+    double E1=itsMPO->GetExpectation(itsMPS);
     for (int ia=0; ia<itsMPS->GetL(); ia++)
     {
         itsMPS->Normalize(ia);
         Matrix6T Heff=itsMPO->GetHeff(itsMPS,ia);
-        itsMPS->ContractHeff(ia,Heff);
+        double E2=itsMPS->ContractHeff(ia,Heff);
+        EXPECT_NEAR(E1,E2,100*eps);
+        double E3=itsMPS->ContractHeff(ia,Heff.Flatten());
+        EXPECT_NEAR(E1,E3,100*eps);
+
         MatrixT HeffF=Heff.Flatten();
-        //cout << "Heff=" << Heff << endl;
         MatrixT d=HeffF-Transpose(conj(HeffF));
-        //cout << "Max(abs(d))=" << Max(abs(d)) << endl;
-        EXPECT_NEAR(Max(abs(d)),0.0,1e-10);
+        EXPECT_NEAR(Max(abs(d)),0.0,100*eps);
     }
 }

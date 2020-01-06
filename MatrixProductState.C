@@ -203,6 +203,10 @@ double MatrixProductState::ContractHeff(int isite,const Matrix6T& Heff) const
 {
     return itsSites[isite]->ContractHeff(Heff);
 }
+double MatrixProductState::ContractHeff(int isite,const MatrixT& Heff) const
+{
+    return itsSites[isite]->ContractHeff(Heff);
+}
 
 void MatrixProductState::SweepRight(const MatrixProductOperator* mpo)
 {

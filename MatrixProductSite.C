@@ -111,7 +111,7 @@ void MatrixProductSite::SVDLeft_Normalize(VectorT& s, MatrixT& Vdagger)
     //
     ReshapeLeft(A);  //A is now U
     itsBondEntropy=CalcBondEntropy(s);
-    cout << "Bond S=" << itsBondEntropy << endl;
+//    cout << "Bond S=" << itsBondEntropy << endl;
 }
 
 void MatrixProductSite::SVDRightNormalize(MatrixT& U, VectorT& s)
@@ -128,7 +128,7 @@ void MatrixProductSite::SVDRightNormalize(MatrixT& U, VectorT& s)
     //
     ReshapeRight(Transpose(conj(V)));  //A is now Vdagger
     itsBondEntropy=CalcBondEntropy(s);
-    cout << "Bond S=" << itsBondEntropy << endl;
+//    cout << "Bond S=" << itsBondEntropy << endl;
 }
 
 void MatrixProductSite::ReshapeFromLeft (int D1)
@@ -471,6 +471,21 @@ double MatrixProductSite::ContractHeff(const Matrix6T& Heff) const
     double iE=fabs(std::imag(E));
     if (iE>1e-8)
         cout << "Warning ContractHeff imag(E)=" << iE << endl;
+    return real(E);
+}
+double MatrixProductSite::ContractHeff(const MatrixT& Heff) const
+{
+    Vector3<eType> As(itsp,itsD1,itsD2);
+    for (int m=0; m<itsp; m++)
+        for (int i1=1; i1<=itsD1; i1++)
+            for (int i2=1; i2<=itsD2; i2++)
+                As(m,i1,i2)=itsAs[m](i1,i2);
+
+    VectorCT AsFlat=As.Flatten();
+    eType E=conj(AsFlat)*Heff*AsFlat;
+    double iE=fabs(std::imag(E));
+    if (iE>1e-8)
+        cout << "Warning ContractFlattenedHeff imag(E)=" << iE << endl;
     return real(E);
 }
 

@@ -44,6 +44,7 @@ class MatrixProductState
         // Hamiltion expectation
         Matrix6T GetEO(int isite, const MPOSite* mpos) const;
         double ContractHeff(int isite,const Matrix6T& Heff) const;
+        double ContractHeff(int isite,const MatrixT& Heff) const;
     protected:
 
     private:
