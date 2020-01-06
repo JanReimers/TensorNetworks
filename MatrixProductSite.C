@@ -15,6 +15,8 @@ MatrixProductSite::MatrixProductSite(int p, int D1, int D2)
     : itsp(p)
     , itsD1(D1)
     , itsD2(D2)
+    , itsNumUpdates(0)
+    , itsBondEntropy(0.0)
 {
     for (int ip=0;ip<itsp;ip++)
     {
@@ -108,6 +110,8 @@ void MatrixProductSite::SVDLeft_Normalize(VectorT& s, MatrixT& Vdagger)
     //  Extract As from U
     //
     ReshapeLeft(A);  //A is now U
+    itsBondEntropy=CalcBondEntropy(s);
+    cout << "Bond S=" << itsBondEntropy << endl;
 }
 
 void MatrixProductSite::SVDRightNormalize(MatrixT& U, VectorT& s)
@@ -122,8 +126,9 @@ void MatrixProductSite::SVDRightNormalize(MatrixT& U, VectorT& s)
     //
     //  Extract Bs from U
     //
-   ReshapeRight(Transpose(conj(V)));  //A is now Vdagger
-
+    ReshapeRight(Transpose(conj(V)));  //A is now Vdagger
+    itsBondEntropy=CalcBondEntropy(s);
+    cout << "Bond S=" << itsBondEntropy << endl;
 }
 
 void MatrixProductSite::ReshapeFromLeft (int D1)
@@ -245,6 +250,46 @@ MatrixProductSite::MatrixT MatrixProductSite::GetLeftNorm() const
     for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
     {
         ret+=conj(Transpose((*ip)))*(*ip);
+    }
+    return ret;
+}
+
+std::string MatrixProductSite::GetNormStatus() const
+{
+    std::string ret;
+    if (IsLeftNormalized()) ret="A";
+    else if (IsRightNormalized()) ret="B";
+    else ret="M";
+    ret+=std::to_string(itsNumUpdates);
+    return ret;
+}
+
+bool MatrixProductSite::IsLeftNormalized() const
+{
+    return IsUnit(GetLeftNorm(),1e-12);
+}
+bool MatrixProductSite::IsRightNormalized() const
+{
+    return IsUnit(GetRightNorm(),1e-12);
+}
+
+bool MatrixProductSite::IsUnit(const MatrixT& m,double eps)
+{
+    assert(m.GetNumRows()==m.GetNumCols());
+    int N=m.GetNumRows();
+    MatrixT I(N,N);
+    Unit(I);
+    return Max(abs(m-I))<eps;
+}
+
+double MatrixProductSite::CalcBondEntropy(const VectorT& s)
+{
+    int N=s.size();
+    double ret=0.0;
+    for (int i=1;i<=N;i++)
+    {
+        double s2=s(i)*s(i);
+        if (s2>0.0) ret-=s2*log(s2);
     }
     return ret;
 }
@@ -440,7 +485,7 @@ void MatrixProductSite::Update(const VectorCT& newAs)
                 itsAs[m](i1,i2)=As(m,i1,i2);
 //       cout << "after  A[" << m << "]=" << itsAs[m] << endl;
     }
-
+    itsNumUpdates++;
 }
 
 

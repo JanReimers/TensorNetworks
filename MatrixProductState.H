@@ -21,7 +21,7 @@ class MatrixProductState
 
         void Normalize(MatrixProductSite::Position LR);
         void Normalize(int isite); //Mixed Canonical normalization
-
+        std::string GetNormStatus() const;
 
         int     GetL      () const {return itsL;}
         int     GetD      () const {return itsD;}

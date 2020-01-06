@@ -57,14 +57,16 @@ TEST_F(GroundStateTesting,TestNeelState)
     double E=itsMPO->GetExpectation(itsMPS);
     double o=itsMPS->GetOverlap();
     cout << "Before Normalize Neel E=" << E << "  Overlap=" << o << endl;
+    cout << "Norm Status=" << itsMPS->GetNormStatus() << endl;
     itsMPS->Normalize(MatrixProductSite::Right);
      E=itsMPO->GetExpectation(itsMPS);
      o=itsMPS->GetOverlap();
     cout << "After NormalizeNeel E=" << E << "  Overlap=" << o << endl;
+    cout << "Norm Status=" << itsMPS->GetNormStatus() << endl;
     itsMPS->SweepRight(itsMPO);
     itsMPS->SweepLeft (itsMPO);
-    itsMPS->SweepRight(itsMPO);
-    itsMPS->SweepLeft (itsMPO);
-    itsMPS->SweepRight(itsMPO);
-    itsMPS->SweepLeft (itsMPO);
+//    itsMPS->SweepRight(itsMPO);
+//    itsMPS->SweepLeft (itsMPO);
+//    itsMPS->SweepRight(itsMPO);
+//    itsMPS->SweepLeft (itsMPO);
 }

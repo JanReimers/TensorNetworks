@@ -57,7 +57,9 @@ class MatrixProductSite
         void    Update(const VectorCT& newAs);
         void    Contract(const VectorT& s, const MatrixT& Vdagger);
         void    Contract(const MatrixT& U, const VectorT& s);
-
+        std::string GetNormStatus() const;
+        bool IsLeftNormalized() const;
+        bool IsRightNormalized() const;
     protected:
         Position WhereAreWe() const;
 
@@ -68,7 +70,8 @@ class MatrixProductSite
         void     ReshapeRight(const MatrixT& Vdagger);
         static MatrixT  Contract1(const VectorT& s, const MatrixT& VA);
         static MatrixT  Contract1(const MatrixT& AU,const VectorT& s);
-
+        static bool     IsUnit(const MatrixT& m,double eps);
+        static double   CalcBondEntropy(const VectorT& s);
     private:
         friend class MatrixProductTesting;
         typedef std::vector<MatrixT> pVectorT;
@@ -78,6 +81,8 @@ class MatrixProductSite
         int itsp; //2*S+1
         int itsD1,itsD2;
         pVectorT itsAs; //We need a separate matrix for eash of the p basis states on one site.
+        int itsNumUpdates;
+        double itsBondEntropy;
 };
 
 #endif // MATRIXPRODUCTSITE_H
