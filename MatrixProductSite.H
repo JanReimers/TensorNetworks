@@ -28,7 +28,7 @@ class MatrixProductSite
 
         enum Position {Left,Bulk,Right};
 
-        MatrixProductSite(int p, int D1, int D2);
+        MatrixProductSite(Position lbr, int p, int D1, int D2);
         virtual ~MatrixProductSite();
 
         enum State {Product,Random,Neel};
@@ -76,7 +76,7 @@ class MatrixProductSite
         bool IsLeftNormalized() const;
         bool IsRightNormalized() const;
     protected:
-        Position WhereAreWe() const;
+        Position WhereAreWe() const {return itsPosition;}
 
         void     Reshape(int D1, int D2, bool saveData=false);
         MatrixT  ReshapeLeft();
@@ -98,6 +98,7 @@ class MatrixProductSite
         pVectorT itsAs; //We need a separate matrix for eash of the p basis states on one site.
         int itsNumUpdates;
         double itsBondEntropy;
+        Position itsPosition; //Left Bulk or Right
 };
 
 #endif // MATRIXPRODUCTSITE_H

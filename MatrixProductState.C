@@ -12,10 +12,10 @@ MatrixProductState::MatrixProductState(int L, int S2, int D)
     , itsD(D)
     , itsp(itsS2+1)
 {
-    itsSites.push_back(new MatrixProductSite(itsp,1,itsD));
+    itsSites.push_back(new MatrixProductSite(MatrixProductSite::Left,itsp,1,itsD));
     for (int i=1;i<itsL-1;i++)
-        itsSites.push_back(new MatrixProductSite(itsp,itsD,itsD));
-    itsSites.push_back(new MatrixProductSite(itsp,itsD,1));
+        itsSites.push_back(new MatrixProductSite(MatrixProductSite::Bulk,itsp,itsD,itsD));
+    itsSites.push_back(new MatrixProductSite(MatrixProductSite::Right,itsp,itsD,1));
 }
 
 MatrixProductState::~MatrixProductState()

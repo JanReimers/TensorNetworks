@@ -101,12 +101,26 @@ TEST_F(MPOTesting,CheckThatWsGotLoaded)
     EXPECT_EQ(ToString(GetW(1,0,1)),"(1:5),(1:5) \n[ (1,0) (0,0) (0,0) (0,0) (0,0) ]\n[ (0,0) (0,0) (0,0) (0,0) (0,0) ]\n[ (1,0) (0,0) (0,0) (0,0) (0,0) ]\n[ (0,0) (0,0) (0,0) (0,0) (0,0) ]\n[ (0,0) (0.5,0) (0,0) (0,0) (1,0) ]\n");
 }
 
-TEST_F(MPOTesting,DoHamiltionExpectation)
+TEST_F(MPOTesting,DoHamiltionExpectationL10S1D2)
 {
     Setup(10,1,2);
     itsMPS->InitializeWith(MatrixProductSite::Product);
     itsMPO->GetExpectation(itsMPS);
     EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),576.0,1e-11);
+}
+TEST_F(MPOTesting,DoHamiltionExpectationProductL10S1D1)
+{
+    Setup(10,1,1);
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPO->GetExpectation(itsMPS);
+    EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),112.0,1e-11);
+}
+TEST_F(MPOTesting,DoHamiltionExpectationNeelL10S1D1)
+{
+    Setup(10,1,1);
+    itsMPS->InitializeWith(MatrixProductSite::Neel);
+    itsMPO->GetExpectation(itsMPS);
+    EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),-2.25,1e-11);
 }
 
 TEST_F(MPOTesting,LeftNormalizeThenDoHamiltionExpectation)
@@ -145,7 +159,8 @@ TEST_F(MPOTesting,TestHeffWithProductState)
 //    cout << "d=" << d << endl;
     }
 }
-TEST_F(MPOTesting,TestHeffWithRandomState)
+
+TEST_F(MPOTesting,TestHeffWithRandomStateL10S1D2)
 {
     Setup(10,1,2);
     itsMPS->InitializeWith(MatrixProductSite::Random);
@@ -166,12 +181,68 @@ TEST_F(MPOTesting,TestHeffWithRandomState)
     }
 }
 
+TEST_F(MPOTesting,TestHeffWithRandomStateL10S1D1)
+{
+    Setup(10,1,1);
+    itsMPS->InitializeWith(MatrixProductSite::Random);
+    itsMPS->Normalize(MatrixProductSite::Right);
+    double E1=itsMPO->GetExpectation(itsMPS);
+    for (int ia=0; ia<itsMPS->GetL(); ia++)
+    {
+        itsMPS->Normalize(ia);
+        Matrix6T Heff=itsMPO->GetHeff(itsMPS,ia);
+        double E2=itsMPS->ContractHeff(ia,Heff);
+        EXPECT_NEAR(E1,E2,100*eps);
+        double E3=itsMPS->ContractHeff(ia,Heff.Flatten());
+        EXPECT_NEAR(E1,E3,100*eps);
+
+        MatrixT HeffF=Heff.Flatten();
+        MatrixT d=HeffF-Transpose(conj(HeffF));
+        EXPECT_NEAR(Max(abs(d)),0.0,100*eps);
+    }
+}
+
+TEST_F(MPOTesting,TestHeffWithRandomStateL10S5D1)
+{
+    Setup(10,5,1);
+    itsMPS->InitializeWith(MatrixProductSite::Random);
+    itsMPS->Normalize(MatrixProductSite::Right);
+    double E1=itsMPO->GetExpectation(itsMPS);
+    for (int ia=0; ia<itsMPS->GetL(); ia++)
+    {
+        itsMPS->Normalize(ia);
+        Matrix6T Heff=itsMPO->GetHeff(itsMPS,ia);
+        double E2=itsMPS->ContractHeff(ia,Heff);
+        EXPECT_NEAR(E1,E2,100000*eps);
+        double E3=itsMPS->ContractHeff(ia,Heff.Flatten());
+        EXPECT_NEAR(E1,E3,100000*eps);
+
+        MatrixT HeffF=Heff.Flatten();
+        MatrixT d=HeffF-Transpose(conj(HeffF));
+        EXPECT_NEAR(Max(abs(d)),0.0,100000*eps);
+    }
+}
 
 
 TEST_F(MPOTesting,TestGetLRIterateL10S1D2)
 {
     int L=10;
     Setup(L,1,2);
+    itsMPS->InitializeWith(MatrixProductSite::Random);
+    itsMPS->Normalize(MatrixProductSite::Right);
+    Vector3T L3=itsMPS->GetEOLeft_Iterate(itsMPO,L);
+    eType EL=L3(1,1,1);
+    Vector3T R3=itsMPS->GetEORightIterate(itsMPO,-1);
+    eType ER=R3(1,1,1);
+    EXPECT_NEAR(std::imag(EL),0.0,eps);
+    EXPECT_NEAR(std::imag(ER),0.0,eps);
+    EXPECT_NEAR(std::real(ER),std::real(EL),10*eps);
+}
+
+TEST_F(MPOTesting,TestGetLRIterateL10S1D1)
+{
+    int L=10;
+    Setup(L,1,1);
     itsMPS->InitializeWith(MatrixProductSite::Random);
     itsMPS->Normalize(MatrixProductSite::Right);
     Vector3T L3=itsMPS->GetEOLeft_Iterate(itsMPO,L);

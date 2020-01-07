@@ -11,12 +11,13 @@
 using std::cout;
 using std::endl;
 
-MatrixProductSite::MatrixProductSite(int p, int D1, int D2)
+MatrixProductSite::MatrixProductSite(Position lbr, int p, int D1, int D2)
     : itsp(p)
     , itsD1(D1)
     , itsD2(D2)
     , itsNumUpdates(0)
     , itsBondEntropy(0.0)
+    , itsPosition(lbr)
 {
     for (int ip=0;ip<itsp;ip++)
     {
@@ -30,10 +31,6 @@ MatrixProductSite::~MatrixProductSite()
     //dtor
 }
 
-MatrixProductSite::Position MatrixProductSite::WhereAreWe() const
-{
-    return itsAs[0].GetNumRows()==1 ? Left : (itsAs[0].GetNumCols()==1 ? Right : Bulk);
-}
 //
 //  This is a tricker than one might expect.  In particular I can't get the OBC vectors
 //  to be both left and right normalized
@@ -310,27 +307,21 @@ MatrixProductSite::MatrixT MatrixProductSite::GetRightNorm() const
 //
 MatrixProductSite::MatrixT MatrixProductSite::GetE() const
 {
-    assert(GetLimits().GetNumRows()==1 || GetLimits().GetNumCols()==1);
-
-    int D=GetLimits().GetNumRows()==1 ? GetLimits().GetNumCols() : GetLimits().GetNumRows();
+    assert(WhereAreWe()!=Bulk);
+    int D= (WhereAreWe()==Left) ? GetLimits().GetNumCols() : GetLimits().GetNumRows();
     MatrixT E(D,D);
     Fill(E,std::complex<double>(0.0));
 
-    if (GetLimits().GetNumRows()==1)
+    if (WhereAreWe()==Left)
     {
-        //Left boundary
-
         for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
             E+=conj(Transpose(*ip))*(*ip);
     }
-    if (GetLimits().GetNumCols()==1)
+    if (WhereAreWe()==Right)
     {
-        //Right boundary
         for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
             E+=(*ip)*conj(Transpose(*ip));
     }
-
-    //cout << "OverlapTransferMatrix=" << E << endl;
     return E;
 }
 

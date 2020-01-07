@@ -116,6 +116,13 @@ TEST_F(MatrixProductTesting,GetOverlapS3D4)
     ASSERT_NEAR(mps_local.GetOverlap(),4.0,eps);
 }
 
+TEST_F(MatrixProductTesting,GetOverlapS1D1)
+{
+    MatrixProductState mps_local(10,1,1);
+    mps_local.InitializeWith(MatrixProductSite::Product);
+    ASSERT_NEAR(mps_local.GetOverlap(),1.0,eps);
+}
+
 
 
 TEST_F(MatrixProductTesting,GetMLeft_Site_1)

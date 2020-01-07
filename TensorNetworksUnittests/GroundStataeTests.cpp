@@ -29,8 +29,8 @@ public:
     MatrixProductState*    itsMPS;
     double eps;
 };
-/*
-TEST_F(GroundStateTesting,TestOptimitizeSite0)
+
+TEST_F(GroundStateTesting,TestSweepL10S1D2)
 {
     Setup(10,1,2);
     itsMPS->InitializeWith(MatrixProductSite::Random);
@@ -41,14 +41,21 @@ TEST_F(GroundStateTesting,TestOptimitizeSite0)
     itsMPS->Normalize(MatrixProductSite::Right);
     itsMPS->SweepRight(itsMPO);
     itsMPS->SweepLeft (itsMPO);
-    itsMPS->SweepRight(itsMPO);
-    itsMPS->SweepLeft (itsMPO);
-    itsMPS->SweepRight(itsMPO);
-    itsMPS->SweepLeft (itsMPO);
-
-
 }
-*/
+TEST_F(GroundStateTesting,TestSweepL10S1D1)
+{
+    Setup(10,1,1);
+    itsMPS->InitializeWith(MatrixProductSite::Random);
+    //    itsMPS->InitializeWith(MatrixProductSite::Product);
+    double E=itsMPO->GetExpectation(itsMPS);
+    double o=itsMPS->GetOverlap();
+    cout << "Before Refine1 E=" << E << "  Overlap=" << o << endl;
+    itsMPS->Normalize(MatrixProductSite::Right);
+    itsMPS->SweepRight(itsMPO);
+    itsMPS->SweepLeft (itsMPO);
+}
+
+
 TEST_F(GroundStateTesting,TestNeelState)
 {
     Setup(10,1,3);
