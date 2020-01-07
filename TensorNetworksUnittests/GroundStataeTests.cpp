@@ -34,46 +34,66 @@ TEST_F(GroundStateTesting,TestSweepL10S1D2)
 {
     Setup(10,1,2);
     itsMPS->InitializeWith(MatrixProductSite::Random);
-    //    itsMPS->InitializeWith(MatrixProductSite::Product);
-    double E=itsMPO->GetExpectation(itsMPS);
-    double o=itsMPS->GetOverlap();
-    cout << "Before Refine1 E=" << E << "  Overlap=" << o << endl;
     itsMPS->Normalize(MatrixProductSite::Right);
     itsMPS->SweepRight(itsMPO);
     itsMPS->SweepLeft (itsMPO);
+    double E=itsMPO->GetExpectation(itsMPS);
+    double o=itsMPS->GetOverlap();
+    cout << "After 2 sweeps E=" << E << "  Overlap=" << o << endl;
 }
 TEST_F(GroundStateTesting,TestSweepL10S1D1)
 {
     Setup(10,1,1);
     itsMPS->InitializeWith(MatrixProductSite::Random);
-    //    itsMPS->InitializeWith(MatrixProductSite::Product);
-    double E=itsMPO->GetExpectation(itsMPS);
-    double o=itsMPS->GetOverlap();
-    cout << "Before Refine1 E=" << E << "  Overlap=" << o << endl;
     itsMPS->Normalize(MatrixProductSite::Right);
     itsMPS->SweepRight(itsMPO);
     itsMPS->SweepLeft (itsMPO);
+    double E=itsMPO->GetExpectation(itsMPS);
+    double o=itsMPS->GetOverlap();
+    cout << "After 2 sweeps E=" << E << "  Overlap=" << o << endl;
 }
 
 
-TEST_F(GroundStateTesting,TestNeelState)
+TEST_F(GroundStateTesting,TestNeelStateL10S1D2)
 {
     Setup(10,1,3);
     itsMPS->InitializeWith(MatrixProductSite::Random);
-    //    itsMPS->InitializeWith(MatrixProductSite::Product);
-    double E=itsMPO->GetExpectation(itsMPS);
-    double o=itsMPS->GetOverlap();
-    cout << "Before Normalize Neel E=" << E << "  Overlap=" << o << endl;
-    cout << "Norm Status=" << itsMPS->GetNormStatus() << endl;
     itsMPS->Normalize(MatrixProductSite::Right);
-     E=itsMPO->GetExpectation(itsMPS);
-     o=itsMPS->GetOverlap();
-    cout << "After NormalizeNeel E=" << E << "  Overlap=" << o << endl;
-    cout << "Norm Status=" << itsMPS->GetNormStatus() << endl;
     itsMPS->SweepRight(itsMPO);
     itsMPS->SweepLeft (itsMPO);
-//    itsMPS->SweepRight(itsMPO);
-//    itsMPS->SweepLeft (itsMPO);
-//    itsMPS->SweepRight(itsMPO);
-//    itsMPS->SweepLeft (itsMPO);
+    double E=itsMPO->GetExpectation(itsMPS);
+    double o=itsMPS->GetOverlap();
+    cout << "After 2 sweeps E=" << E << "  Overlap=" << o << endl;
+}
+
+TEST_F(GroundStateTesting,TestLandD_DependenceS1)
+{
+    for (int D=1;D<=5;D++)
+    for (int L=4;L<=12;L++)
+    {
+        Setup(L,1,D);
+        itsMPS->InitializeWith(MatrixProductSite::Random);
+        itsMPS->Normalize(MatrixProductSite::Right);
+        itsMPS->SweepRight(itsMPO);
+        itsMPS->SweepLeft (itsMPO);
+        double E=itsMPO->GetExpectation(itsMPS);
+        EXPECT_NEAR(itsMPS->GetOverlap(),1.0,eps);
+        cout << "D,L=" << D << "," << L << "  After 2 sweeps E=" << E << "  E/L=" << E/L << "E/2^L=" << E/pow(2,L) << endl;
+    }
+}
+
+TEST_F(GroundStateTesting,TestLandD_DependenceS2)
+{
+    for (int D=1;D<=3;D++)
+    for (int L=4;L<=12;L++)
+    {
+        Setup(L,2,D);
+        itsMPS->InitializeWith(MatrixProductSite::Random);
+        itsMPS->Normalize(MatrixProductSite::Right);
+        itsMPS->SweepRight(itsMPO);
+        itsMPS->SweepLeft (itsMPO);
+        double E=itsMPO->GetExpectation(itsMPS);
+        EXPECT_NEAR(itsMPS->GetOverlap(),1.0,eps);
+        cout << "D,L=" << D << "," << L << "  After 2 sweeps E=" << E << "  E/L=" << E/L << "E/3^L=" << E/pow(3,L) << endl;
+    }
 }

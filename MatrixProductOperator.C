@@ -149,7 +149,9 @@ double MatrixProductOperator::GetExpectation(const MatrixProductState *mps) cons
 MatrixProductOperator::VectorCT MatrixProductOperator::Refine(MatrixProductState *mps,int isite) const
 {
     assert(mps->CheckNormalized(isite,1e-11));
-    Matrix6T Heff6=GetHeff(mps,isite);
+    //Matrix6T Heff6=GetHeff(mps,isite); Old version
+    Matrix6T Heff6=mps->GetHeffIterate(this,isite); //New iterative version
+
     MatrixT Heff=Heff6.Flatten();
     assert(Heff.GetNumRows()==Heff.GetNumCols());
     int N=Heff.GetNumRows();

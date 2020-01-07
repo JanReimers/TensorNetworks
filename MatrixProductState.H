@@ -37,8 +37,8 @@ class MatrixProductState
         MatrixT GetRightNorm(int isite) const {return itsSites[isite]->GetRightNorm();}
         bool    CheckNormalized(int isite,double eps) const;
 
-        void SweepRight(const MatrixProductOperator* mpo);
-        void SweepLeft (const MatrixProductOperator* mpo);
+        void SweepRight(const MatrixProductOperator* mpo,bool quiet=true);
+        void SweepLeft (const MatrixProductOperator* mpo,bool quiet=true);
 
         double  GetOverlap(        ) const;
         MatrixT GetNeff   (int isite) const;
@@ -48,6 +48,7 @@ class MatrixProductState
         Vector3T GetEOLeft_Iterate(const MatrixProductOperator* mpo,int isite) const;
         Vector3T GetEORightIterate(const MatrixProductOperator* mpo,int isite) const;
         Matrix6T GetHeffIterate   (const MatrixProductOperator* mpo,int isite) const;
+        double   GetExpectation   (const MatrixProductOperator* mpo) const;
 
         double ContractHeff(int isite,const Matrix6T& Heff) const;
         double ContractHeff(int isite,const MatrixT& Heff) const;

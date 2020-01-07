@@ -208,8 +208,9 @@ double MatrixProductState::ContractHeff(int isite,const MatrixT& Heff) const
     return itsSites[isite]->ContractHeff(Heff);
 }
 
-void MatrixProductState::SweepRight(const MatrixProductOperator* mpo)
+void MatrixProductState::SweepRight(const MatrixProductOperator* mpo,bool quiet)
 {
+    if (!quiet)
         cout << "SweepRight entry Norm Status         =" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
     for (int ia=0; ia<itsL-1; ia++)
     {
@@ -218,24 +219,16 @@ void MatrixProductState::SweepRight(const MatrixProductOperator* mpo)
         VectorT s;
         MatrixT Vdagger;
         itsSites[ia]->Update(Anew);
-//        cout << "SweepRight post update Norm Status   =" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
         itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
-//        cout << "SweepRight post SVD Norm Status      =" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
         itsSites[ia+1]->Contract(s,Vdagger);
-        cout << "SweepRight post constract Norm Status=" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
-
-
-//        double E=mpo->GetExpectation(this)/itsL;
-//        double o=GetOverlap();
-//        cout << "After Refine1 E(" << ia << ")=" << E << "  Overlap=" << o << endl;
-//        itsMPS->Normalize(ia+1);
-//        cout << "After Refine2 E=" << E << endl;
+        if (!quiet) cout << "SweepRight post constract Norm Status=" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
     }
 }
 
-void MatrixProductState::SweepLeft(const MatrixProductOperator* mpo)
+void MatrixProductState::SweepLeft(const MatrixProductOperator* mpo,bool quiet)
 {
-        cout << "SweepLeft  entry Norm Status         =" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
+    if (!quiet)
+       cout << "SweepLeft  entry Norm Status         =" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
     for (int ia=itsL-1; ia>0; ia--)
     {
         VectorCT Anew=mpo->Refine(this,ia);
@@ -243,18 +236,11 @@ void MatrixProductState::SweepLeft(const MatrixProductOperator* mpo)
         VectorT s;
         MatrixT U;
         itsSites[ia]->Update(Anew);
-//        cout << "SweepLeft  post update Norm Status   =" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
         itsSites[ia]->SVDRightNormalize(U,s);
-//        cout << "SweepLeft  post SVD Norm Status      =" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
         itsSites[ia-1]->Contract(U,s);
-        cout << "SweepLeft  post constract Norm Status=" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
+        if (!quiet)
+            cout << "SweepLeft  post constract Norm Status=" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
 
-
-//        double E=mpo->GetExpectation(this)/itsL;
-//        double o=GetOverlap();
-//        cout << "After Refine1 E(" << ia << ")=" << E << "  Overlap=" << o << endl;
-//        itsMPS->Normalize(ia+1);
-//        cout << "After Refine2 E=" << E << endl;
     }
 }
 
@@ -310,6 +296,20 @@ MatrixProductState::Vector3T MatrixProductState::GetEORightIterate(const MatrixP
     for (int ia=itsL-1; ia>isite; ia--)
         F=itsSites[ia]->IterateRightF(mpo->GetSite(ia),F);
     return F;
+}
+
+double   MatrixProductState::GetExpectation   (const MatrixProductOperator* mpo) const
+{
+    Vector3T F(1,1,1,1);
+    F(1,1,1)=eType(1.0);
+    for (int ia=0; ia<itsL; ia++)
+        F=itsSites[ia]->IterateLeft_F(mpo->GetSite(ia),F);
+
+    double iE=std::imag(F(1,1,1));
+    if (fabs(iE)>1e-10)
+        cout << "Warning: MatrixProductState::GetExpectation Imag(E)=" << std::imag(F(1,1,1)) << endl;
+
+    return std::real(F(1,1,1));
 }
 
 

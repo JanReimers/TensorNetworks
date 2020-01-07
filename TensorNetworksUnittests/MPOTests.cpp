@@ -283,7 +283,7 @@ TEST_F(MPOTesting,TestGetLRIterateL10S5D2)
     EXPECT_NEAR(std::real(ER),std::real(EL),100000*eps);
 }
 
-TEST_F(MPOTesting,TestEold)
+TEST_F(MPOTesting,TestEoldEnew)
 {
     int L=10;
     Setup(L,1,2);
@@ -293,11 +293,11 @@ TEST_F(MPOTesting,TestEold)
     eType EL=L3(1,1,1);
     Vector3T R3=itsMPS->GetEORightIterate(itsMPO,-1);
     eType ER=R3(1,1,1);
+    double Enew=itsMPS->GetExpectation(itsMPO);
     double Eold=itsMPO->GetExpectation(itsMPS);
     EXPECT_NEAR(std::real(ER),Eold,100*eps);
     EXPECT_NEAR(std::real(EL),Eold,100*eps);
-//    Matrix6T Heff=itsMPS->GetHeffIterate(itsMPO,1);
-//    cout << "Heff=" << Heff <<endl;
+    EXPECT_NEAR(Enew,Eold,100*eps);
 }
 
 TEST_F(MPOTesting,TestHeff)
