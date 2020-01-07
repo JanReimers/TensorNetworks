@@ -3,6 +3,7 @@
 
 #include "Matrix6.H"
 #include "Matrix4.H"
+#include "Vector3.H"
 #include "oml/dmatrix.h"
 #include "oml/vector.h"
 #include <vector>
@@ -20,6 +21,7 @@ class MatrixProductSite
         typedef DMatrix<eType> MatrixT;
         typedef Matrix6<eType> Matrix6T;
         typedef Matrix4<eType> Matrix4T;
+        typedef Vector3<eType> Vector3T;
 
         typedef Vector <double> VectorT;
         typedef Vector <eType > VectorCT;
@@ -53,6 +55,18 @@ class MatrixProductSite
         // Hamiltion expectation
         Matrix6T GetEO(       const MPOSite* mpos) const;
         Matrix4T GetNO(int m, const MPOSite* mpos) const;
+
+        Vector3T IterateLeft_F(const MPOSite* mpos, const Vector3T& Fam1);
+        eType    ContractAWFA (int w2, int i2, int j2,         const MPOSite* mpos, const Vector3T& Fam1);
+        eType    ContractWFA  (int m , int w2, int i1, int j2, const MPOSite* mpos, const Vector3T& Fam1);
+        eType    ContractFA   (int n , int w1, int i1, int j2,                      const Vector3T& Fam1);
+        Vector3T IterateRightF(const MPOSite* mpos, const Vector3T& Fam1);
+        eType    ContractBWFB (int w1, int i1, int j1,         const MPOSite* mpos, const Vector3T& Fap1);
+        eType    ContractWFB  (int m , int w1, int i2, int j1, const MPOSite* mpos, const Vector3T& Fap1);
+        eType    ContractFB   (int n , int w2, int i2, int j1,                      const Vector3T& Fap1);
+
+
+
         double ContractHeff(const Matrix6T& Heff) const;
         double ContractHeff(const MatrixT & Heff) const;
         void    Update(const VectorCT& newAs);

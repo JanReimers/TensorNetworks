@@ -27,7 +27,7 @@ class Hamiltonian_1D_NN_Heisenberg
     private:
         int    GetSminus(int m, int n) const {return m==n-1 && n>0       ? 1 : 0;}
         int    GetSplus (int m, int n) const {return m==n+1 && n<itsS2+1 ? 1 : 0;}
-        int    Get2Sz   (int m, int n) const {return m==n                ? 2*n-itsS2 : 0;}
+        double GetSz    (int m, int n) const {return m==n                ? (n==0 ? -0.5 : 0.5) : 0;}
 
 
         static const int Dw=5;

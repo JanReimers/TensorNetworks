@@ -210,7 +210,7 @@ double MatrixProductState::ContractHeff(int isite,const MatrixT& Heff) const
 
 void MatrixProductState::SweepRight(const MatrixProductOperator* mpo)
 {
-        cout << "SweepRight entry Norm Status         =" << GetNormStatus() << endl;
+        cout << "SweepRight entry Norm Status         =" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
     for (int ia=0; ia<itsL-1; ia++)
     {
         VectorCT Anew=mpo->Refine(this,ia);
@@ -218,11 +218,11 @@ void MatrixProductState::SweepRight(const MatrixProductOperator* mpo)
         VectorT s;
         MatrixT Vdagger;
         itsSites[ia]->Update(Anew);
-        cout << "SweepRight post update Norm Status   =" << GetNormStatus() << endl;
+//        cout << "SweepRight post update Norm Status   =" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
         itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
-        cout << "SweepRight post SVD Norm Status      =" << GetNormStatus() << endl;
+//        cout << "SweepRight post SVD Norm Status      =" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
         itsSites[ia+1]->Contract(s,Vdagger);
-        cout << "SweepRight post constract Norm Status=" << GetNormStatus() << endl;
+        cout << "SweepRight post constract Norm Status=" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
 
 
 //        double E=mpo->GetExpectation(this)/itsL;
@@ -235,7 +235,7 @@ void MatrixProductState::SweepRight(const MatrixProductOperator* mpo)
 
 void MatrixProductState::SweepLeft(const MatrixProductOperator* mpo)
 {
-        cout << "SweepLeft  entry Norm Status         =" << GetNormStatus() << endl;
+        cout << "SweepLeft  entry Norm Status         =" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
     for (int ia=itsL-1; ia>0; ia--)
     {
         VectorCT Anew=mpo->Refine(this,ia);
@@ -243,11 +243,11 @@ void MatrixProductState::SweepLeft(const MatrixProductOperator* mpo)
         VectorT s;
         MatrixT U;
         itsSites[ia]->Update(Anew);
-        cout << "SweepLeft  post update Norm Status   =" << GetNormStatus() << endl;
+//        cout << "SweepLeft  post update Norm Status   =" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
         itsSites[ia]->SVDRightNormalize(U,s);
-        cout << "SweepLeft  post SVD Norm Status      =" << GetNormStatus() << endl;
+//        cout << "SweepLeft  post SVD Norm Status      =" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
         itsSites[ia-1]->Contract(U,s);
-        cout << "SweepLeft  post constract Norm Status=" << GetNormStatus() << endl;
+        cout << "SweepLeft  post constract Norm Status=" << GetNormStatus() << "  E=" << mpo->GetExpectation(this) << endl;
 
 
 //        double E=mpo->GetExpectation(this)/itsL;
@@ -257,4 +257,59 @@ void MatrixProductState::SweepLeft(const MatrixProductOperator* mpo)
 //        cout << "After Refine2 E=" << E << endl;
     }
 }
+
+MatrixProductState::Matrix6T MatrixProductState::GetHeffIterate   (const MatrixProductOperator* mpo,int isite) const
+{
+    Vector3T L=GetEOLeft_Iterate(mpo,isite);
+    Vector3T R=GetEORightIterate(mpo,isite);
+    const MPOSite* mops=mpo->GetSite(isite);
+    assert(mops);
+    ipairT Ds=GetDs(isite);
+    int D1=Ds.first;
+    int D2=Ds.second;
+
+    Matrix6<eType> Heff(itsp,D1,D2,itsp,D1,D2);
+
+    for (int m=0; m<itsp; m++)
+        for (int i1=1; i1<=D1; i1++)
+            for (int j1=1; j1<=D1; j1++)
+            {
+                for (int n=0; n<itsp; n++)
+                {
+                    MatrixT W=mops->GetW(m,n);
+                    for (int i2=1; i2<=D2; i2++)
+                        for (int j2=1; j2<=D2; j2++)
+                        {
+                            eType temp(0.0);
+                            for (int w1=1; w1<=W.GetNumRows(); w1++)
+                                for (int w2=1; w2<=W.GetNumCols(); w2++)
+                                {
+                                    temp+=L(w1,i1,j1)*W(w1,w2)*R(w2,i2,j2);
+                                }
+
+                            Heff(m,i1,i2,n,j1,j2)=temp;
+                        }
+                }
+            }
+    return Heff;
+
+}
+
+MatrixProductState::Vector3T MatrixProductState::GetEOLeft_Iterate(const MatrixProductOperator* mpo,int isite) const
+{
+    Vector3T F(1,1,1,1);
+    F(1,1,1)=eType(1.0);
+    for (int ia=0; ia<isite; ia++)
+        F=itsSites[ia]->IterateLeft_F(mpo->GetSite(ia),F);
+    return F;
+}
+MatrixProductState::Vector3T MatrixProductState::GetEORightIterate(const MatrixProductOperator* mpo,int isite) const
+{
+    Vector3T F(1,1,1,1);
+    F(1,1,1)=eType(1.0);
+    for (int ia=itsL-1; ia>isite; ia--)
+        F=itsSites[ia]->IterateRightF(mpo->GetSite(ia),F);
+    return F;
+}
+
 

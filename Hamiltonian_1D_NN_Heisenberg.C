@@ -24,7 +24,7 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
     switch (lbr)
     {
 //
-//  Implement W=[ 0, 1/2*S-, 1/2*S+, Sz, 1 ]
+//  Implement W=[ 0, J/2*S-, J/2*S+, JSz, 1 ]
 //
     case Left:
     {
@@ -32,28 +32,28 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
         W(1,1)=0.0;
         W(1,2)=itsJ/2.0*GetSminus(m,n);
         W(1,3)=itsJ/2.0*GetSplus (m,n);
-        W(1,4)=itsJ/2.0*Get2Sz   (m,n); //The get return 2*Sz to avoid half integers
+        W(1,4)=itsJ    *GetSz    (m,n);
         W(1,5)=1.0;
     }
     break;
-//      [ 1    0      0    0  0 ]
-//      [ S+   0      0    0  0 ]
-//  W = [ S-   0      0    0  0 ]
-//      [ Sz   0      0    0  0 ]
-//      [ 0  1/2*S- 1/2*S+ Sz 1 ]
+//      [ 1    0      0    0   0 ]
+//      [ S+   0      0    0   0 ]
+//  W = [ S-   0      0    0   0 ]
+//      [ Sz   0      0    0   0 ]
+//      [ 0  J/2*S- J/2*S+ JSz 1 ]
 //
     case Bulk :
     {
         W.SetLimits(Dw,Dw);
         Fill(W,ElementT(0.0));
         W(1,1)=1.0;
-        W(2,1)=itsJ    *GetSplus (m,n);
-        W(3,1)=itsJ    *GetSminus(m,n);
-        W(4,1)=itsJ/2.0*Get2Sz   (m,n); //The get return 2*Sz to avoid half integers
+        W(2,1)=GetSplus (m,n);
+        W(3,1)=GetSminus(m,n);
+        W(4,1)=GetSz    (m,n);
         //W(5,1)=0.0;
         W(5,2)=itsJ/2.0*GetSminus(m,n);
         W(5,3)=itsJ/2.0*GetSplus (m,n);
-        W(5,4)=itsJ/2.0*Get2Sz   (m,n); //The get return 2*Sz to avoid half integers
+        W(5,4)=itsJ    *GetSz    (m,n); //The get return 2*Sz to avoid half integers
         W(5,5)=1.0;
     }
     break;
@@ -69,9 +69,9 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
 
         W.SetLimits(Dw,1);
         W(1,1)=1.0;
-        W(2,1)=itsJ    *GetSplus (m,n);
-        W(3,1)=itsJ    *GetSminus(m,n);
-        W(4,1)=itsJ/2.0*Get2Sz   (m,n); //The get return 2*Sz to avoid half integers
+        W(2,1)=GetSplus (m,n);
+        W(3,1)=GetSminus(m,n);
+        W(4,1)=GetSz    (m,n); //The get return 2*Sz to avoid half integers
         W(5,1)=0.0;
     }
     break;

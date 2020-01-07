@@ -11,8 +11,10 @@ class MatrixProductState
     public:
         typedef MatrixProductSite::MatrixT  MatrixT;
         typedef MatrixProductSite::Matrix6T Matrix6T;
+        typedef MatrixProductSite::Vector3T Vector3T;
         typedef MatrixProductSite::VectorT  VectorT;
         typedef MatrixProductSite::VectorCT VectorCT;
+        typedef MatrixProductSite::eType    eType;
 
         MatrixProductState(int L, int S2, int D);
         virtual ~MatrixProductState();
@@ -43,6 +45,10 @@ class MatrixProductState
 
         // Hamiltion expectation
         Matrix6T GetEO(int isite, const MPOSite* mpos) const;
+        Vector3T GetEOLeft_Iterate(const MatrixProductOperator* mpo,int isite) const;
+        Vector3T GetEORightIterate(const MatrixProductOperator* mpo,int isite) const;
+        Matrix6T GetHeffIterate   (const MatrixProductOperator* mpo,int isite) const;
+
         double ContractHeff(int isite,const Matrix6T& Heff) const;
         double ContractHeff(int isite,const MatrixT& Heff) const;
     protected:

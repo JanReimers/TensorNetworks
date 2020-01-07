@@ -31,6 +31,7 @@ class MatrixProductOperator
         VectorCT Refine        (      MatrixProductState *mps,int isite) const; //Minimize energy WRT the Ms in one site.
         void     SweepRight    (      MatrixProductState *mps) const;
         Hamiltonian::Position GetPosition(int isite) const;
+        const MPOSite* GetSite(int isite) const {return itsSites[GetPosition(isite)];};
     protected:
 
     private:

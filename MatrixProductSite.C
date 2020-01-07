@@ -454,6 +454,93 @@ MatrixProductSite::Matrix4T MatrixProductSite::GetNO(int m,const MPOSite* mpos) 
     return NO;
 }
 
+MatrixProductSite::Vector3T MatrixProductSite::IterateLeft_F(const MPOSite* mpos, const Vector3T& Fam1)
+{
+    ipairT Dw=mpos->GetDw();
+    int Dw2=Dw.second;
+    Vector3T F(Dw2,itsD2,itsD2,1);
+    for (int w2=1;w2<=Dw2;w2++)
+        for (int i2=1;i2<=itsD2;i2++)
+            for (int j2=1;j2<=itsD2;j2++)
+                F(w2,i2,j2)=ContractAWFA(w2,i2,j2,mpos,Fam1);
+    return F;
+}
+
+MatrixProductSite::eType MatrixProductSite::ContractAWFA(int w2, int i2, int j2, const MPOSite* mpos, const Vector3T& Fam1)
+{
+    eType awfa(0.0);
+     for (int m=0; m<itsp; m++)
+        for (int i1=1;i1<=itsD1;i1++)
+            awfa+=conj(itsAs[m](i1,i2))*ContractWFA(m,w2,i1,j2,mpos,Fam1);
+
+    return awfa;
+}
+
+MatrixProductSite::eType MatrixProductSite::ContractWFA(int m, int w2, int i1, int j2, const MPOSite* mpos, const Vector3T& Fam1)
+{
+    eType wfa(0.0);
+     for (int n=0; n<itsp; n++)
+     {
+        MatrixT Wmn=mpos->GetW(m,n);
+        int Dw1=Wmn.GetNumRows();
+        for (int w1=1;w1<=Dw1;w1++)
+            wfa+=Wmn(w1,w2)*ContractFA(n,w1,i1,j2,Fam1);
+    }
+    return wfa;
+}
+
+MatrixProductSite::eType MatrixProductSite::ContractFA(int n, int w1, int i1, int j2, const Vector3T& Fam1)
+{
+    eType fa(0.0);
+    for (int j1=1;j1<=itsD1;j1++)
+        fa+=Fam1(w1,i1,j1)*itsAs[n](j1,j2);
+    return fa;
+}
+
+MatrixProductSite::Vector3T MatrixProductSite::IterateRightF(const MPOSite* mpos, const Vector3T& Fap1)
+{
+    ipairT Dw=mpos->GetDw();
+    int Dw1=Dw.first;
+    Vector3T F(Dw1,itsD1,itsD1,1);
+    for (int w1=1;w1<=Dw1;w1++)
+        for (int i1=1;i1<=itsD1;i1++)
+            for (int j1=1;j1<=itsD1;j1++)
+                F(w1,i1,j1)=ContractBWFB(w1,i1,j1,mpos,Fap1);
+    return F;
+}
+
+MatrixProductSite::eType MatrixProductSite::ContractBWFB(int w1, int i1, int j1, const MPOSite* mpos, const Vector3T& Fap1)
+{
+    eType bwfb(0.0);
+     for (int m=0; m<itsp; m++)
+        for (int i2=1;i2<=itsD2;i2++)
+            bwfb+=conj(itsAs[m](i1,i2))*ContractWFB(m,w1,i2,j1,mpos,Fap1);
+
+    return bwfb;
+}
+
+MatrixProductSite::eType MatrixProductSite::ContractWFB(int m, int w1, int i2, int j1, const MPOSite* mpos, const Vector3T& Fap1)
+{
+    eType wfb(0.0);
+     for (int n=0; n<itsp; n++)
+     {
+        MatrixT Wmn=mpos->GetW(m,n);
+        int Dw2=Wmn.GetNumCols();
+        for (int w2=1;w2<=Dw2;w2++)
+            wfb+=Wmn(w1,w2)*ContractFB(n,w2,i2,j1,Fap1);
+    }
+    return wfb;
+}
+
+MatrixProductSite::eType MatrixProductSite::ContractFB(int n, int w2, int i2, int j1, const Vector3T& Fap1)
+{
+    eType fb(0.0);
+    for (int j2=1;j2<=itsD2;j2++)
+        fb+=Fap1(w2,i2,j2)*itsAs[n](j1,j2);
+    return fb;
+}
+
+
 double MatrixProductSite::ContractHeff(const Matrix6T& Heff) const
 {
     eType E(0.0);
