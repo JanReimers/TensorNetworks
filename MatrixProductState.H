@@ -24,6 +24,7 @@ class MatrixProductState
         void Normalize(MatrixProductSite::Position LR);
         void Normalize(int isite); //Mixed Canonical normalization
         std::string GetNormStatus() const;
+        void Report(std::ostream&) const;
 
         int     GetL      () const {return itsL;}
         int     GetD      () const {return itsD;}
@@ -37,7 +38,13 @@ class MatrixProductState
         MatrixT GetRightNorm(int isite) const {return itsSites[isite]->GetRightNorm();}
         bool    CheckNormalized(int isite,double eps) const;
 
-        void SweepRight(const MatrixProductOperator* mpo,bool quiet=true);
+        Matrix6T GetHeff       (const MatrixProductOperator *mpo,int isite) const;
+        Matrix6T GetEOLeft     (const MatrixProductOperator *mpo,int isite) const;
+        Matrix6T GetEORight    (const MatrixProductOperator *mpo,int isite) const;
+        double   GetExpectation(const MatrixProductOperator *mpo) const;
+        VectorCT Refine        (const MatrixProductOperator *mpo,int isite) const; //Minimize energy WRT the Ms in one site.
+
+         void SweepRight(const MatrixProductOperator* mpo,bool quiet=true);
         void SweepLeft (const MatrixProductOperator* mpo,bool quiet=true);
 
         double  GetOverlap(        ) const;
@@ -48,7 +55,7 @@ class MatrixProductState
         Vector3T GetEOLeft_Iterate(const MatrixProductOperator* mpo,int isite) const;
         Vector3T GetEORightIterate(const MatrixProductOperator* mpo,int isite) const;
         Matrix6T GetHeffIterate   (const MatrixProductOperator* mpo,int isite) const;
-        double   GetExpectation   (const MatrixProductOperator* mpo) const;
+        double   GetExpectationIterate   (const MatrixProductOperator* mpo) const;
 
         double ContractHeff(int isite,const Matrix6T& Heff) const;
         double ContractHeff(int isite,const MatrixT& Heff) const;

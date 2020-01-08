@@ -3,6 +3,22 @@
 #include "MatrixProductState.H"
 #include <iostream>
 
+
+int disp[2][4] = {
+    {10, 11, 12, 13},
+    {14, 15, 16, 17}
+};
+
+double I[2][2]={{1,0},
+                {0,1}};
+double Sm[2][2]={{0,1},
+                 {0,0}};
+double Sp[2][2]={{0,0},
+                 {1,0}};
+double Sz[2][2]={{0.5, 0.0},
+                 {0.0,-0.5}};
+
+
 using std::cout;
 using std::endl;
 Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, int S2, double J)
@@ -21,6 +37,9 @@ Hamiltonian_1D_NN_Heisenberg::~Hamiltonian_1D_NN_Heisenberg()
 Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int n) const
 {
     MatrixT W;
+    assert(Sm[2][1]=1);
+    assert(Sm[1][2]=0);
+
     switch (lbr)
     {
 //
@@ -30,10 +49,10 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
     {
         W.SetLimits(1,Dw);
         W(1,1)=0.0;
-        W(1,2)=itsJ/2.0*GetSminus(m,n);
-        W(1,3)=itsJ/2.0*GetSplus (m,n);
-        W(1,4)=itsJ    *GetSz    (m,n);
-        W(1,5)=1.0;
+        W(1,2)=itsJ/2.0*Sm[m][n];
+        W(1,3)=itsJ/2.0*Sp[m][n];
+        W(1,4)=itsJ    *Sz[m][n];
+        W(1,5)=I[m][n];
     }
     break;
 //      [ 1    0      0    0   0 ]
@@ -46,15 +65,15 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
     {
         W.SetLimits(Dw,Dw);
         Fill(W,ElementT(0.0));
-        W(1,1)=1.0;
-        W(2,1)=GetSplus (m,n);
-        W(3,1)=GetSminus(m,n);
-        W(4,1)=GetSz    (m,n);
+        W(1,1)=I[m][n];
+        W(2,1)=Sp[m][n];
+        W(3,1)=Sm[m][n];
+        W(4,1)=Sz[m][n];
         //W(5,1)=0.0;
-        W(5,2)=itsJ/2.0*GetSminus(m,n);
-        W(5,3)=itsJ/2.0*GetSplus (m,n);
-        W(5,4)=itsJ    *GetSz    (m,n); //The get return 2*Sz to avoid half integers
-        W(5,5)=1.0;
+        W(5,2)=itsJ/2.0*Sm[m][n];
+        W(5,3)=itsJ/2.0*Sp[m][n];
+        W(5,4)=itsJ    *Sz    [m][n]; //The get return 2*Sz to avoid half integers
+        W(5,5)=I[m][n];
     }
     break;
 //
@@ -68,10 +87,10 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
     {
 
         W.SetLimits(Dw,1);
-        W(1,1)=1.0;
-        W(2,1)=GetSplus (m,n);
-        W(3,1)=GetSminus(m,n);
-        W(4,1)=GetSz    (m,n); //The get return 2*Sz to avoid half integers
+        W(1,1)=I[m][n];
+        W(2,1)=Sp[m][n];
+        W(3,1)=Sm[m][n];
+        W(4,1)=Sz    [m][n]; //The get return 2*Sz to avoid half integers
         W(5,1)=0.0;
     }
     break;

@@ -45,13 +45,6 @@ TEST_F(MPOTesting,MakeHamiltonian)
 }
 
 
-TEST_F(MPOTesting,MPOMemebers)
-{
-    EXPECT_EQ(itsMPO->GetL(),10);
-    EXPECT_EQ(itsMPO->GetD(),5);
-    EXPECT_EQ(itsMPO->Getp(),2);
-}
-
 TEST_F(MPOTesting,HamiltonianGetLeftW00)
 {
     Setup(10,1,2);
@@ -105,22 +98,22 @@ TEST_F(MPOTesting,DoHamiltionExpectationL10S1D2)
 {
     Setup(10,1,2);
     itsMPS->InitializeWith(MatrixProductSite::Product);
-    itsMPO->GetExpectation(itsMPS);
-    EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),576.0,1e-11);
+    itsMPS->GetExpectation(itsMPO);
+    EXPECT_NEAR(itsMPS->GetExpectation(itsMPO),576.0,1e-11);
 }
 TEST_F(MPOTesting,DoHamiltionExpectationProductL10S1D1)
 {
     Setup(10,1,1);
     itsMPS->InitializeWith(MatrixProductSite::Product);
-    itsMPO->GetExpectation(itsMPS);
-    EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),112.0,1e-11);
+    itsMPS->GetExpectation(itsMPO);
+    EXPECT_NEAR(itsMPS->GetExpectation(itsMPO),112.0,1e-11);
 }
 TEST_F(MPOTesting,DoHamiltionExpectationNeelL10S1D1)
 {
     Setup(10,1,1);
     itsMPS->InitializeWith(MatrixProductSite::Neel);
-    itsMPO->GetExpectation(itsMPS);
-    EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),-2.25,1e-11);
+    itsMPS->GetExpectation(itsMPO);
+    EXPECT_NEAR(itsMPS->GetExpectation(itsMPO),-2.25,1e-11);
 }
 
 TEST_F(MPOTesting,LeftNormalizeThenDoHamiltionExpectation)
@@ -128,16 +121,16 @@ TEST_F(MPOTesting,LeftNormalizeThenDoHamiltionExpectation)
     Setup(10,1,2);
     itsMPS->InitializeWith(MatrixProductSite::Product);
     itsMPS->Normalize(MatrixProductSite::Left);
-    itsMPO->GetExpectation(itsMPS);
-    EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),288.0,1e-11);
+    itsMPS->GetExpectation(itsMPO);
+    EXPECT_NEAR(itsMPS->GetExpectation(itsMPO),288.0,1e-11);
 }
 TEST_F(MPOTesting,RightNormalizeThenDoHamiltionExpectation)
 {
     Setup(10,1,2);
     itsMPS->InitializeWith(MatrixProductSite::Product);
     itsMPS->Normalize(MatrixProductSite::Left);
-    itsMPO->GetExpectation(itsMPS);
-    EXPECT_NEAR(itsMPO->GetExpectation(itsMPS),288.0,1e-11);
+    itsMPS->GetExpectation(itsMPO);
+    EXPECT_NEAR(itsMPS->GetExpectation(itsMPO),288.0,1e-11);
 }
 
 TEST_F(MPOTesting,TestHeffWithProductState)
@@ -148,7 +141,7 @@ TEST_F(MPOTesting,TestHeffWithProductState)
     for (int ia=0; ia<itsMPS->GetL(); ia++)
     {
         itsMPS->Normalize(ia);
-        Matrix6T Heff=itsMPO->GetHeff(itsMPS,ia);
+        Matrix6T Heff=itsMPS->GetHeff(itsMPO,ia);
  //       cout << "E(" << ia << ")=" << itsMPS->ConstractHeff(ia,Heff) << endl;
         EXPECT_NEAR(itsMPS->ContractHeff(ia,Heff),576.0,1e-11);
         MatrixT HeffF=Heff.Flatten();
@@ -165,11 +158,11 @@ TEST_F(MPOTesting,TestHeffWithRandomStateL10S1D2)
     Setup(10,1,2);
     itsMPS->InitializeWith(MatrixProductSite::Random);
     itsMPS->Normalize(MatrixProductSite::Right);
-    double E1=itsMPO->GetExpectation(itsMPS);
+    double E1=itsMPS->GetExpectation(itsMPO);
     for (int ia=0; ia<itsMPS->GetL(); ia++)
     {
         itsMPS->Normalize(ia);
-        Matrix6T Heff=itsMPO->GetHeff(itsMPS,ia);
+        Matrix6T Heff=itsMPS->GetHeff(itsMPO,ia);
         double E2=itsMPS->ContractHeff(ia,Heff);
         EXPECT_NEAR(E1,E2,100*eps);
         double E3=itsMPS->ContractHeff(ia,Heff.Flatten());
@@ -186,11 +179,11 @@ TEST_F(MPOTesting,TestHeffWithRandomStateL10S1D1)
     Setup(10,1,1);
     itsMPS->InitializeWith(MatrixProductSite::Random);
     itsMPS->Normalize(MatrixProductSite::Right);
-    double E1=itsMPO->GetExpectation(itsMPS);
+    double E1=itsMPS->GetExpectation(itsMPO);
     for (int ia=0; ia<itsMPS->GetL(); ia++)
     {
         itsMPS->Normalize(ia);
-        Matrix6T Heff=itsMPO->GetHeff(itsMPS,ia);
+        Matrix6T Heff=itsMPS->GetHeff(itsMPO,ia);
         double E2=itsMPS->ContractHeff(ia,Heff);
         EXPECT_NEAR(E1,E2,100*eps);
         double E3=itsMPS->ContractHeff(ia,Heff.Flatten());
@@ -207,11 +200,11 @@ TEST_F(MPOTesting,TestHeffWithRandomStateL10S5D1)
     Setup(10,5,1);
     itsMPS->InitializeWith(MatrixProductSite::Random);
     itsMPS->Normalize(MatrixProductSite::Right);
-    double E1=itsMPO->GetExpectation(itsMPS);
+    double E1=itsMPS->GetExpectation(itsMPO);
     for (int ia=0; ia<itsMPS->GetL(); ia++)
     {
         itsMPS->Normalize(ia);
-        Matrix6T Heff=itsMPO->GetHeff(itsMPS,ia);
+        Matrix6T Heff=itsMPS->GetHeff(itsMPO,ia);
         double E2=itsMPS->ContractHeff(ia,Heff);
         EXPECT_NEAR(E1,E2,100000*eps);
         double E3=itsMPS->ContractHeff(ia,Heff.Flatten());
@@ -294,7 +287,7 @@ TEST_F(MPOTesting,TestEoldEnew)
     Vector3T R3=itsMPS->GetEORightIterate(itsMPO,-1);
     eType ER=R3(1,1,1);
     double Enew=itsMPS->GetExpectation(itsMPO);
-    double Eold=itsMPO->GetExpectation(itsMPS);
+    double Eold=itsMPS->GetExpectation(itsMPO);
     EXPECT_NEAR(std::real(ER),Eold,100*eps);
     EXPECT_NEAR(std::real(EL),Eold,100*eps);
     EXPECT_NEAR(Enew,Eold,100*eps);
@@ -310,7 +303,7 @@ TEST_F(MPOTesting,TestHeff)
     {
         Matrix6T HeffI=itsMPS->GetHeffIterate(itsMPO,ia);
     //    cout << "HeffI=" << HeffI <<endl;
-        Matrix6T HeffO=itsMPO->GetHeff(itsMPS,ia);
+        Matrix6T HeffO=itsMPS->GetHeff(itsMPO,ia);
     //    cout << "HeffO=" << HeffO <<endl;
         double error=Max(abs(HeffI.Flatten()-HeffO.Flatten()));
         EXPECT_NEAR(error,0,10*eps);

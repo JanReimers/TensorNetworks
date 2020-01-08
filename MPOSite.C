@@ -3,7 +3,7 @@
 #include <complex>
 
 
-MPOSite::MPOSite(const Hamiltonian* H,int p, int D1, int D2)
+MPOSite::MPOSite(const Operator* H,int p, int D1, int D2)
     : itsp(p)
     , itsD1(D1)
     , itsD2(D2)
@@ -12,11 +12,11 @@ MPOSite::MPOSite(const Hamiltonian* H,int p, int D1, int D2)
     , itsWs(p,p)
 {
     Fill(itsWs,MatrixT(itsD1,itsD2));
-    Hamiltonian::Position lbr =
-        itsD1==1 ? Hamiltonian::Left :
-            itsD2==1 ? Hamiltonian::Right : Hamiltonian::Bulk;
-    if (lbr==Hamiltonian::Left ) itsDw1=1;
-    if (lbr==Hamiltonian::Right) itsDw2=1;
+    Operator::Position lbr =
+        itsD1==1 ? Operator::Left :
+            itsD2==1 ? Operator::Right : Operator::Bulk;
+    if (lbr==Operator::Left ) itsDw1=1;
+    if (lbr==Operator::Right) itsDw2=1;
 
     for (int m=0;m<itsp;m++)
         for (int n=0;n<itsp;n++)

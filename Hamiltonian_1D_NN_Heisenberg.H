@@ -27,8 +27,11 @@ class Hamiltonian_1D_NN_Heisenberg
     private:
         int    GetSminus(int m, int n) const {return m==n-1 && n>0       ? 1 : 0;}
         int    GetSplus (int m, int n) const {return m==n+1 && n<itsS2+1 ? 1 : 0;}
-        double GetSz    (int m, int n) const {return m==n                ? (n==0 ? -0.5 : 0.5) : 0;}
-
+        double GetSz    (int m, int n) const
+        {
+            if (m!=n) return 0.0;
+            return n-0.5*itsS2;
+        }
 
         static const int Dw=5;
         int itsL; //Number of lattice sites

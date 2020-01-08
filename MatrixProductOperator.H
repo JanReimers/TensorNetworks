@@ -17,20 +17,16 @@ class MatrixProductOperator
        typedef Matrix6<eType> Matrix6T;
        typedef Matrix4<eType> Matrix4T;
 
-        MatrixProductOperator(const Hamiltonian* H, int L, int S2, int D);
+//        MatrixProductOperator(const Hamiltonian* H, int L, int S2, int D);
+        MatrixProductOperator(const Operator* O, int L, int S2, int D);
         virtual ~MatrixProductOperator();
 
-        int     GetL      () const {return itsL;}
-        int     GetD      () const {return itsD;}
-        int     Getp      () const {return itsp;}
+ //       int     GetL      () const {return itsL;}
+ //       int     GetD      () const {return itsD;}
+ //       int     Getp      () const {return itsp;}
 
-        Matrix6T GetHeff       (const MatrixProductState *mps,int isite) const;
-        Matrix6T GetEOLeft     (const MatrixProductState *mps,int isite) const;
-        Matrix6T GetEORight    (const MatrixProductState *mps,int isite) const;
-        double   GetExpectation(const MatrixProductState *mps) const;
-        VectorCT Refine        (      MatrixProductState *mps,int isite) const; //Minimize energy WRT the Ms in one site.
-        void     SweepRight    (      MatrixProductState *mps) const;
-        Hamiltonian::Position GetPosition(int isite) const;
+
+        Operator::Position GetPosition(int isite) const;
         const MPOSite* GetSite(int isite) const {return itsSites[GetPosition(isite)];};
     protected:
 
@@ -48,7 +44,7 @@ class MatrixProductOperator
         // I think we only need to store 3 sites for OBC, left,bulk,right.
         //
         SitesType itsSites;
-        const Hamiltonian* itsHamiltonian;
+        const Operator* itsOperator;
 };
 
 #endif // MATRIXPRODUCTOPERATOR_H

@@ -73,6 +73,8 @@ class MatrixProductSite
         void    Contract(const VectorT& s, const MatrixT& Vdagger);
         void    Contract(const MatrixT& U, const VectorT& s);
         std::string GetNormStatus() const;
+        void        Report(std::ostream&) const;
+
         bool IsLeftNormalized() const;
         bool IsRightNormalized() const;
     protected:
@@ -86,7 +88,8 @@ class MatrixProductSite
         static MatrixT  Contract1(const VectorT& s, const MatrixT& VA);
         static MatrixT  Contract1(const MatrixT& AU,const VectorT& s);
         static bool     IsUnit(const MatrixT& m,double eps);
-        static double   CalcBondEntropy(const VectorT& s);
+         double   CalcBondEntropy(const VectorT& s);
+        double GetMaxAmplitude() const;
     private:
         friend class MatrixProductTesting;
         typedef std::vector<MatrixT> pVectorT;
@@ -98,6 +101,7 @@ class MatrixProductSite
         pVectorT itsAs; //We need a separate matrix for eash of the p basis states on one site.
         int itsNumUpdates;
         double itsBondEntropy;
+        int itsRank;
         Position itsPosition; //Left Bulk or Right
 };
 

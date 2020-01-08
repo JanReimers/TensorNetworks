@@ -7,13 +7,13 @@
 typedef std::pair<int,int> ipairT;
 
 
-class Hamiltonian;
+class Operator;
 
 class MPOSite
 {
         typedef MatrixProductSite::MatrixT MatrixT;
     public:
-        MPOSite(const Hamiltonian* H,int p, int D1, int D2);
+        MPOSite(const Operator* O,int p, int D1, int D2);
         virtual ~MPOSite();
 
         ipairT GetDw() const {return ipairT(itsDw1,itsDw2);}

@@ -17,6 +17,7 @@ MatrixProductSite::MatrixProductSite(Position lbr, int p, int D1, int D2)
     , itsD2(D2)
     , itsNumUpdates(0)
     , itsBondEntropy(0.0)
+    , itsRank(0)
     , itsPosition(lbr)
 {
     for (int ip=0;ip<itsp;ip++)
@@ -261,6 +262,28 @@ std::string MatrixProductSite::GetNormStatus() const
     return ret;
 }
 
+void MatrixProductSite::Report(std::ostream& os) const
+{
+    os
+    << std::setw(4) << itsD1
+    << std::setw(4)  << itsD2
+    << std::setw(11)  << itsBondEntropy << "    "
+    << std::setw(5)  << itsNumUpdates << "      "
+    << std::setw(3)  << itsRank
+    ;
+}
+
+double MatrixProductSite::GetMaxAmplitude() const
+{
+    double ret=0.0;
+    for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
+    {
+        double aa=Max(abs(*ip));
+        if (aa>ret) ret=aa;
+    }
+    return ret;
+}
+
 bool MatrixProductSite::IsLeftNormalized() const
 {
     return IsUnit(GetLeftNorm(),1e-12);
@@ -282,11 +305,13 @@ bool MatrixProductSite::IsUnit(const MatrixT& m,double eps)
 double MatrixProductSite::CalcBondEntropy(const VectorT& s)
 {
     int N=s.size();
+    itsRank=N;
     double ret=0.0;
     for (int i=1;i<=N;i++)
     {
         double s2=s(i)*s(i);
         if (s2>0.0) ret-=s2*log(s2);
+        if (fabs(s(i))<1e-12) itsRank--;
     }
     return ret;
 }

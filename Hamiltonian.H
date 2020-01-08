@@ -1,27 +1,19 @@
 #ifndef HAMILTONIAN_H
 #define HAMILTONIAN_H
 
+#include "Operator.H"
+
 class MatrixProductOperator;
 class MatrixProductState;
 
-#include <oml/dmatrix.h>
-#include <complex>
 
-class Hamiltonian
+class Hamiltonian : public virtual Operator
 {
     public:
-        typedef std::complex<double> ElementT;
-        typedef DMatrix<ElementT> MatrixT;
-        enum Position {Left,Bulk,Right};
+
 
         Hamiltonian();
         virtual ~Hamiltonian();
-
-        virtual int GetDw() const=0;
-        //
-        //  Generate MPO matrices.  m,n are quantum numbers for <m|Ha|n>
-        //
-        virtual MatrixT GetW (Position lbr,int m, int n) const=0;
         //
         //  Create operators and states
         //
