@@ -199,7 +199,7 @@ void MatrixProductState::Report(std::ostream& os) const
 {
     os.precision(3);
     os << "Matrix product state for " << itsL << " lattice sites." << endl;
-    os << "  Site  D1  D2  Bond Entropy   #updates  Rank" << endl;
+    os << "  Site  D1  D2  Bond Entropy   #updates  Rank  Heff Density" << endl;
     for (int ia=0; ia<itsL; ia++)
     {
         os << std::setw(3) << ia << "  ";
@@ -447,6 +447,7 @@ MatrixProductState::VectorCT MatrixProductState::Refine(const MatrixProductOpera
     Matrix6T Heff6=GetHeffIterate(mpo,isite); //New iterative version
 
     MatrixT Heff=Heff6.Flatten();
+    itsSites[isite]->Analyze(Heff); //Record % non zero elements
     assert(Heff.GetNumRows()==Heff.GetNumCols());
     int N=Heff.GetNumRows();
     Vector<double>  eigenValues(N);

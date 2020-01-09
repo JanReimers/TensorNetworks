@@ -28,8 +28,9 @@
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
 				<Compiler>
-					<Add option="-Wall" />
 					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DNDEBUG" />
 					<Add directory="./" />
 				</Compiler>
 				<Linker>
@@ -48,6 +49,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Hamiltonian_1D_NN_Heisenberg.H" />
+		<Unit filename="IdentityOperator.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="IdentityOperator.H" />
 		<Unit filename="MPOSite.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -66,7 +71,13 @@
 			<Option compilerVar="CPP" />
 		</Unit>
 		<Unit filename="MatrixProductState.H" />
+		<Unit filename="Operator.H" />
+		<Unit filename="SparseMatrix.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="SparseMatrix.H" />
 		<Unit filename="Subscriptor.H" />
+		<Unit filename="TODO_List" />
 		<Unit filename="Vector3.H" />
 		<Extensions>
 			<code_completion />

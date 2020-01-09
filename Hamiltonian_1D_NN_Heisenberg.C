@@ -11,10 +11,10 @@ int disp[2][4] = {
 
 double I[2][2]={{1,0},
                 {0,1}};
-double Sm[2][2]={{0,1},
-                 {0,0}};
-double Sp[2][2]={{0,0},
+double Sm[2][2]={{0,0},
                  {1,0}};
+double Sp[2][2]={{0,1},
+                 {0,0}};
 double Sz[2][2]={{0.5, 0.0},
                  {0.0,-0.5}};
 
@@ -37,8 +37,12 @@ Hamiltonian_1D_NN_Heisenberg::~Hamiltonian_1D_NN_Heisenberg()
 Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int n) const
 {
     MatrixT W;
-    assert(Sm[2][1]=1);
-    assert(Sm[1][2]=0);
+//    cout << "Sm[0][0]" << Sm[0][0]  << endl;
+//    cout << "Sm[1][0]" << Sm[1][0] << endl;
+//    cout << "Sm[0][1]" << Sm[0][1]  << endl;
+//    cout << "Sm[1][1]" << Sm[1][1]  << endl;
+    assert(Sm[1][0]==1);
+    assert(Sm[0][1]==0);
 
     switch (lbr)
     {

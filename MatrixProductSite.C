@@ -18,6 +18,7 @@ MatrixProductSite::MatrixProductSite(Position lbr, int p, int D1, int D2)
     , itsNumUpdates(0)
     , itsBondEntropy(0.0)
     , itsRank(0)
+    , itsHeffDensity(0)
     , itsPosition(lbr)
 {
     for (int ip=0;ip<itsp;ip++)
@@ -269,7 +270,8 @@ void MatrixProductSite::Report(std::ostream& os) const
     << std::setw(4)  << itsD2
     << std::setw(11)  << itsBondEntropy << "    "
     << std::setw(5)  << itsNumUpdates << "      "
-    << std::setw(3)  << itsRank
+    << std::setw(3)  << itsRank << " "
+    << std::setw(5)  << itsHeffDensity
     ;
 }
 
@@ -635,4 +637,17 @@ void MatrixProductSite::Contract(const MatrixT& U, const VectorT& s)
         itsAs[in]=temp; //Shallow copy
         assert(itsAs[in].GetNumCols()==itsD2); //Verify shape is correct;
     }
+}
+
+void  MatrixProductSite::Analyze(const MatrixT& Heff)
+{
+    double eps=1e-12;
+    int N=Heff.GetNumCols();
+    assert(N==Heff.GetNumRows());
+    int NnonZero=0;
+    for (int i=1; i<=N; i++)
+        for (int j=1; j<=N; j++)
+            if (abs(Heff(i,j))>eps) NnonZero++;
+
+    itsHeffDensity=100.0*static_cast<double>(NnonZero)/(N*N);
 }

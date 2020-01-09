@@ -44,6 +44,9 @@
 			<Add library="TensorNetworks" />
 			<Add library="oml" />
 			<Add library="gtest" />
+			<Add library="primme" />
+			<Add library="lapack" />
+			<Add library="blas" />
 			<Add library="gfortran" />
 			<Add library="pthread" />
 		</Linker>

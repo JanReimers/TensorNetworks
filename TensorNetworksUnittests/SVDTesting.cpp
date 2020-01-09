@@ -34,6 +34,7 @@ public:
 };
 
 
+
 template <class T,class T2>
 DMatrix<T2> contract(const DMatrix<T2> U, const Vector<T>& s, const DMatrix<T2>& V)
 {
@@ -133,25 +134,6 @@ TEST_F(SVDTesting,OML_SVDRandomRectRealMatrix_5x10)
 }
 
 
-
-//The eigen header file 'lib' is another option for later.  It takes a long time to complile.
-/*#include <Eigen/Dense>
-#include "oml/random.h"
-
-TEST_F(SVDTesting,OML_SVDRandomSquareComplexMatrix)
-{
-    using namespace Eigen;
-    int N=5;
-    MatrixXd m(N,N);
-    for (int i=0;i<N;i++)
-        for (int j=0;i<N;i++)
-            m(i,j)=OMLRandPos<double>();
-    BDCSVD< MatrixXd > svd(m);
-    std::cout << m << std::endl;
-}
-*/
-
-
 TEST_F(SVDTesting,SVDComplexSquare_N10)
 {
     int N=10;
@@ -223,3 +205,49 @@ TEST_F(SVDTesting,OML_EigenSolverComplexHermitian)
     for (int i=1;i<=N;i++) diag(i,i)-=w(i);
     EXPECT_NEAR(Max(abs(diag)),0.0,eps);
 }
+
+
+#include "TensorNetworks/SparseMatrix.H"
+
+TEST_F(SVDTesting,SparseMatrixClass)
+{
+    int N=20;
+    typedef DMatrix<eType> Mtype;
+    Mtype A(N,N);
+    FillRandom(A);
+    for (int i=0;i<N*N;i++)
+    {
+        int ir=static_cast<int>(OMLRand<float>()*N)+1;
+        int ic=static_cast<int>(OMLRand<float>()*N)+1;
+        A(ir,ic)=0.0;
+    }
+    SparseMatrix<eType> sm(A,1e-12);
+    cout << "Sparsisty=" << sm.GetSparsisty() << "%" << endl;
+}
+
+#include "TensorNetworks/PrimeEigenSolver.H"
+
+TEST_F(SVDTesting,Prime_EigenSolverComplexHermitian200x200)
+{
+    int N=200,Ne=10;
+    typedef DMatrix<eType> Mtype;
+    Mtype A(N,N);
+    FillRandom(A);
+    for (int i=0;i<N*N;i++)
+    {
+        int ir=static_cast<int>(OMLRand<float>()*N)+1;
+        int ic=static_cast<int>(OMLRand<float>()*N)+1;
+        A(ir,ic)=0.0;
+    }
+    Mtype Ah=A+Transpose(conj(A)); //Make it hermitian
+    SparseMatrix<eType> sparseAh(Ah,eps);
+
+    PrimeEigenSolver<eType> solver(sparseAh,eps);
+    solver.Solve(Ne);
+
+    Mtype diag=Transpose(conj(solver.GetEigenVectors()))*Ah*solver.GetEigenVectors();
+    Vector<double> evals=solver.GetEigenValues();
+    for (int i=1;i<=Ne;i++) diag(i,i)-=evals(i);
+    EXPECT_NEAR(Max(abs(diag)),0.0,100*eps);
+}
+

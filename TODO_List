@@ -1,0 +1,37 @@
+
+-Mega classes MPState MPSite are too big, how split up responsibilities?
+-S>1/2 in Hamiltonian.  SPeed is irrelevant here.
+-Keep intermediates when iterating L&R tensors for Heff.
+-Iterate function with delta(E) convergence
+-  Improve with <H^2>-<H>^2 convergence
+-Calc <Sx> <Sy> <Sz>
+-Correlation functions <Sa*Sa+n>-<Sa>*<Sa+n>
+-Why optimize site 1, just leave it a |up> and take out global SU(2) invariance
+-Show density (# non zero elements) in H_eff for each site.
+-Profile, where are we spending the most time?
+-Valgrind, any memeory leaks?
+-Start using sparse eigen solver.  Options:
+    Hand code Lanczos
+    Hand code Davidson
+    ARPAC
+-Imag time evolution
+-Periodic boundary conditions
+-GUI using wxPython
+    -What to show in screen?
+        Lattice
+        Vectors (Sx,Sy,Sz) project to 2D.
+        Colours
+            Site energy
+            Bond entropy
+            Normalization A,B,M
+        Live Graphs
+            E vs iter#
+            Sigma(E)  vs iter#
+            Bond entropy vs site#
+            <S^2> vs site#
+            <E> vs site#
+            Rank & D vs site#
+            Heff degeneracy vs site # (might be harder with lowest eigen value solvers)
+
+
+

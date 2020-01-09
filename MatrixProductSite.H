@@ -74,7 +74,7 @@ class MatrixProductSite
         void    Contract(const MatrixT& U, const VectorT& s);
         std::string GetNormStatus() const;
         void        Report(std::ostream&) const;
-
+        void  Analyze(const MatrixT& Heff);
         bool IsLeftNormalized() const;
         bool IsRightNormalized() const;
     protected:
@@ -102,6 +102,7 @@ class MatrixProductSite
         int itsNumUpdates;
         double itsBondEntropy;
         int itsRank;
+        double itsHeffDensity;
         Position itsPosition; //Left Bulk or Right
 };
 
