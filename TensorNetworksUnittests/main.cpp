@@ -13,11 +13,11 @@ int main(int argc, char **argv)
     return RUN_ALL_TESTS();
 }
 
-void VerifyUnit(const MatrixProductSite::MatrixT& Norm, double eps)
+void VerifyUnit(const MatrixProductSite::MatrixCT& Norm, double eps)
 {
         int D=Norm.GetNumRows();
  //       cout << "site " << i << " has D=" << D << endl;
-        MatrixProductSite::MatrixT I(D,D);
+        MatrixProductSite::MatrixCT I(D,D);
         Unit(I);
         EXPECT_NEAR(Max(abs(real(Norm-I))),0.0,eps);
         EXPECT_NEAR(Max(abs(imag(Norm  ))),0.0,eps);

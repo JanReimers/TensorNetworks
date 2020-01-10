@@ -44,7 +44,7 @@ void MatrixProductState::Normalize(MatrixProductSite::Position LR)
     VectorT s; // This get passed from one site to the next.
     if (LR==MatrixProductSite::Left)
     {
-        MatrixT Vdagger;// This get passed from one site to the next.
+        MatrixCT Vdagger;// This get passed from one site to the next.
         for (int ia=0;ia<itsL-1;ia++)
         {
             itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
@@ -56,7 +56,7 @@ void MatrixProductState::Normalize(MatrixProductSite::Position LR)
     }
     else if (LR==MatrixProductSite::Right)
     {
-        MatrixT U;// This get passed from one site to the next.
+        MatrixCT U;// This get passed from one site to the next.
         for (int ia=itsL-1;ia>0;ia--)
         {
             itsSites[ia]->SVDRightNormalize(U,s);
@@ -77,7 +77,7 @@ void MatrixProductState::Normalize(int isite)
     if (isite>0)
     {
         VectorT s; // This get passed from one site to the next.
-        MatrixT Vdagger;// This get passed from one site to the next.
+        MatrixCT Vdagger;// This get passed from one site to the next.
         for (int ia=0; ia<isite; ia++)
         {
             itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
@@ -89,7 +89,7 @@ void MatrixProductState::Normalize(int isite)
     if (isite<itsL-1)
     {
         VectorT s; // This get passed from one site to the next.
-        MatrixT U;// This get passed from one site to the next.
+        MatrixCT U;// This get passed from one site to the next.
         for (int ia=itsL-1; ia>isite; ia--)
         {
             itsSites[ia]->SVDRightNormalize(U,s);
@@ -103,7 +103,7 @@ void MatrixProductState::Normalize(int isite)
 double MatrixProductState::GetOverlap() const
 {
     cSIter i=itsSites.begin();
-    MatrixT E=i->GetE();
+    MatrixCT E=i->GetE();
     i++;
     for (;i!=itsSites.end();i++)
         E=i->GetELeft(E);
@@ -120,10 +120,10 @@ double MatrixProductState::GetOverlap() const
     // Calc Eleft
     // Handle left boundary cases
     //
-MatrixProductState::MatrixT MatrixProductState::GetMLeft(int isite) const
+MatrixProductState::MatrixCT MatrixProductState::GetMLeft(int isite) const
 {
    assert(isite<itsL);
-    MatrixT Eleft;
+    MatrixCT Eleft;
     if (isite==0)
     {
         Eleft.SetLimits(1,1);
@@ -150,9 +150,9 @@ MatrixProductState::MatrixT MatrixProductState::GetMLeft(int isite) const
     // Handle right boundary cases
     //
 
-MatrixProductState::MatrixT MatrixProductState::GetMRight(int isite) const
+MatrixProductState::MatrixCT MatrixProductState::GetMRight(int isite) const
 {
-    MatrixT Eright;
+    MatrixCT Eright;
     if (isite==itsL-1)
     {
         Eright.SetLimits(1,1);
@@ -169,19 +169,16 @@ MatrixProductState::MatrixT MatrixProductState::GetMRight(int isite) const
     return Eright;
 }
 
- MatrixProductState::MatrixT MatrixProductState::GetNeff(int isite) const
+ MatrixProductState::MatrixCT MatrixProductState::GetNeff(int isite) const
  {
-//    MatrixT Eleft=GetMLeft(isite);
-//    MatrixT ERight=GetMRight(isite);
-
     return itsSites[isite]->GetNeff(GetMLeft(isite),GetMRight(isite));
  }
 
 bool MatrixProductState::CheckNormalized(int isite,double eps) const
 {
-    MatrixT Neff=GetNeff(isite);
+    MatrixCT Neff=GetNeff(isite);
     int N=Neff.GetNumRows();
-    MatrixT I(N,N);
+    MatrixCT I(N,N);
     Unit(I);
     double error=Max(abs(Neff-I));
     if (error>1e-12)
@@ -220,7 +217,7 @@ double MatrixProductState::ContractHeff(int isite,const Matrix6T& Heff) const
 {
     return itsSites[isite]->ContractHeff(Heff);
 }
-double MatrixProductState::ContractHeff(int isite,const MatrixT& Heff) const
+double MatrixProductState::ContractHeff(int isite,const MatrixCT& Heff) const
 {
     return itsSites[isite]->ContractHeff(Heff);
 }
@@ -237,7 +234,7 @@ void MatrixProductState::SweepRight(const MatrixProductOperator* mpo,bool quiet)
         VectorCT Anew=Refine(mpo,ia);
 
         VectorT s;
-        MatrixT Vdagger;
+        MatrixCT Vdagger;
         itsSites[ia]->Update(Anew);
         itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
         itsSites[ia+1]->Contract(s,Vdagger);
@@ -258,7 +255,7 @@ void MatrixProductState::SweepLeft(const MatrixProductOperator* mpo,bool quiet)
         VectorCT Anew=Refine(mpo,ia);
 
         VectorT s;
-        MatrixT U;
+        MatrixCT U;
         itsSites[ia]->Update(Anew);
         itsSites[ia]->SVDRightNormalize(U,s);
         itsSites[ia-1]->Contract(U,s);
@@ -497,7 +494,7 @@ MatrixProductState::VectorCT MatrixProductState::Refine(const MatrixProductOpera
     //Matrix6T Heff6=GetHeff(mps,isite); Old version
     Matrix6T Heff6=GetHeffIterate(mpo,isite); //New iterative version
 
-    MatrixT Heff=Heff6.Flatten();
+    MatrixCT Heff=Heff6.Flatten();
     itsSites[isite]->Analyze(Heff); //Record % non zero elements
     assert(Heff.GetNumRows()==Heff.GetNumCols());
     int N=Heff.GetNumRows();

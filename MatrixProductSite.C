@@ -27,7 +27,7 @@ MatrixProductSite::MatrixProductSite(Position lbr, int p, int D1, int D2)
 {
     for (int ip=0;ip<itsp;ip++)
     {
-        itsAs.push_back(MatrixT(D1,D2));
+        itsAs.push_back(MatrixCT(D1,D2));
         Fill(itsAs.back(),std::complex<double>(0.0));
     }
     itsHLeft_Cache(1,1,1)=1.0;
@@ -98,16 +98,16 @@ void MatrixProductSite::InitializeWith(State state,int sgn)
     }
 }
 
-void MatrixProductSite::SVDLeft_Normalize(VectorT& s, MatrixT& Vdagger)
+void MatrixProductSite::SVDLeft_Normalize(VectorT& s, MatrixCT& Vdagger)
 {
 
-    MatrixT A=ReshapeLeft();
+    MatrixCT A=ReshapeLeft();
     //
     //  Set up and do SVD
     //
     int N=Min(A.GetNumRows(),A.GetNumCols());
     s.SetLimits(N);
-    MatrixT V(N,A.GetNumCols());
+    MatrixCT V(N,A.GetNumCols());
     CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
     Vdagger.SetLimits(0,0);  //Wipe out old data;
     Vdagger=Transpose(conj(V));
@@ -119,12 +119,12 @@ void MatrixProductSite::SVDLeft_Normalize(VectorT& s, MatrixT& Vdagger)
 //    cout << "Bond S=" << itsBondEntropy << endl;
 }
 
-void MatrixProductSite::SVDRightNormalize(MatrixT& U, VectorT& s)
+void MatrixProductSite::SVDRightNormalize(MatrixCT& U, VectorT& s)
 {
-    MatrixT A=ReshapeRight();
+    MatrixCT A=ReshapeRight();
     int N=Min(A.GetNumRows(),A.GetNumCols());
     s.SetLimits(N);
-    MatrixT V(N,A.GetNumCols());
+    MatrixCT V(N,A.GetNumCols());
     CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
     U.SetLimits(0,0);  //Wipe out old data;
     U=A;
@@ -151,9 +151,9 @@ void MatrixProductSite::Rescale(double norm)
     for (int n=0;n<itsp;n++) itsAs[n]/=norm;
 }
 
-MatrixProductSite::MatrixT  MatrixProductSite::ReshapeLeft()
+MatrixProductSite::MatrixCT  MatrixProductSite::ReshapeLeft()
 {
-    MatrixT A(itsp*itsD1,itsD2);
+    MatrixCT A(itsp*itsD1,itsD2);
     int i2_1=1;
     for (int in=0;in<itsp;in++)
         for (int i1=1;i1<=itsD1;i1++,i2_1++)
@@ -162,9 +162,9 @@ MatrixProductSite::MatrixT  MatrixProductSite::ReshapeLeft()
     return A;
 }
 
-MatrixProductSite::MatrixT  MatrixProductSite::ReshapeRight()
+MatrixProductSite::MatrixCT  MatrixProductSite::ReshapeRight()
 {
-    MatrixT A(itsD1,itsp*itsD2);
+    MatrixCT A(itsD1,itsp*itsD2);
     int i2_2=1;
     for (int in=0; in<itsp; in++)
         for (int i2=1; i2<=itsD2; i2++,i2_2++)
@@ -183,7 +183,7 @@ void MatrixProductSite::Reshape(int D1, int D2, bool saveData)
     for (int in=0; in<itsp; in++)
         itsAs[in].SetLimits(itsD1,itsD2,saveData);
 }
-void MatrixProductSite::ReshapeLeft(const MatrixT& U)
+void MatrixProductSite::ReshapeLeft(const MatrixCT& U)
 {
     //  If U has less columns than the As then we need to reshape the whole site.
     //  Typically this will happen at the edges of the lattice.
@@ -196,7 +196,7 @@ void MatrixProductSite::ReshapeLeft(const MatrixT& U)
                 itsAs[in](i1,i2)=U(i2_1,i2);
 
 }
-void MatrixProductSite::ReshapeRight(const MatrixT& Vdagger)
+void MatrixProductSite::ReshapeRight(const MatrixCT& Vdagger)
 {
     //  If Vdagger has less row than the As then we need to reshape the whole site.
     //  Typically this will happen at the edges of the lattice.
@@ -213,13 +213,13 @@ void MatrixProductSite::ReshapeRight(const MatrixT& Vdagger)
 //
 //  Anew(j,i) =  s(j)*VA(j,k)
 //
-MatrixProductSite::MatrixT MatrixProductSite::Contract1(const VectorT& s, const MatrixT& VA)
+MatrixProductSite::MatrixCT MatrixProductSite::Contract1(const VectorT& s, const MatrixCT& VA)
 {
     int N1=VA.GetNumRows();
     int N2=VA.GetNumCols();
     assert(s.GetHigh()==N1);
 
-    MatrixT Anew(N1,N2);
+    MatrixCT Anew(N1,N2);
     for(int i2=1; i2<=N2; i2++)
         for(int i1=1; i1<=N1; i1++)
             Anew(i1,i2)=s(i1)*VA(i1,i2);
@@ -230,13 +230,13 @@ MatrixProductSite::MatrixT MatrixProductSite::Contract1(const VectorT& s, const 
 //
 //  Anew(j,i) =  s(j)*VA(j,k)
 //
-MatrixProductSite::MatrixT MatrixProductSite::Contract1(const MatrixT& AU,const VectorT& s)
+MatrixProductSite::MatrixCT MatrixProductSite::Contract1(const MatrixCT& AU,const VectorT& s)
 {
     int N1=AU.GetNumRows();
     int N2=AU.GetNumCols();
     assert(s.GetHigh()==N2);
 
-    MatrixT Anew(N1,N2);
+    MatrixCT Anew(N1,N2);
     for(int i2=1; i2<=N2; i2++)
         for(int i1=1; i1<=N1; i1++)
             Anew(i1,i2)=AU(i1,i2)*s(i2);
@@ -248,9 +248,9 @@ MatrixProductSite::MatrixT MatrixProductSite::Contract1(const MatrixT& AU,const 
 //
 //  Sum_ip A^t(ip) * A(ip)
 //
-MatrixProductSite::MatrixT MatrixProductSite::GetLeftNorm() const
+MatrixProductSite::MatrixCT MatrixProductSite::GetLeftNorm() const
 {
-    MatrixT ret(itsD2,itsD2);
+    MatrixCT ret(itsD2,itsD2);
     Fill(ret,std::complex<double>(0.0));
     for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
     {
@@ -303,11 +303,11 @@ bool MatrixProductSite::IsRightNormalized() const
     return IsUnit(GetRightNorm(),1e-12);
 }
 
-bool MatrixProductSite::IsUnit(const MatrixT& m,double eps)
+bool MatrixProductSite::IsUnit(const MatrixCT& m,double eps)
 {
     assert(m.GetNumRows()==m.GetNumCols());
     int N=m.GetNumRows();
-    MatrixT I(N,N);
+    MatrixCT I(N,N);
     Unit(I);
     return Max(abs(m-I))<eps;
 }
@@ -328,9 +328,9 @@ double MatrixProductSite::CalcBondEntropy(const VectorT& s)
 //
 //  Sum_ip A(ip)*A^t(ip)
 //
-MatrixProductSite::MatrixT MatrixProductSite::GetRightNorm() const
+MatrixProductSite::MatrixCT MatrixProductSite::GetRightNorm() const
 {
-    MatrixT ret(itsD1,itsD1);
+    MatrixCT ret(itsD1,itsD1);
     Fill(ret,std::complex<double>(0.0));
     for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
         ret+=(*ip)*conj(Transpose((*ip)));
@@ -340,11 +340,11 @@ MatrixProductSite::MatrixT MatrixProductSite::GetRightNorm() const
 //
 //  E(1,i,j)=Sum{n,A^t(n;1,i)*A(n;j,1)}=Sum{n,A^*(n;i,1)*A(n;j,1)}
 //
-MatrixProductSite::MatrixT MatrixProductSite::GetE() const
+MatrixProductSite::MatrixCT MatrixProductSite::GetE() const
 {
     assert(WhereAreWe()!=Bulk);
     int D= (WhereAreWe()==Left) ? GetLimits().GetNumCols() : GetLimits().GetNumRows();
-    MatrixT E(D,D);
+    MatrixCT E(D,D);
     Fill(E,std::complex<double>(0.0));
 
     if (WhereAreWe()==Left)
@@ -365,10 +365,10 @@ MatrixProductSite::MatrixT MatrixProductSite::GetE() const
 //  N2(n;k,l)=Sum(i,A^t(n;i,k)*N1(n;i,l])
 //  E(a,k,l)=Sum{n,N2(n;k,l)}
 //
-MatrixProductSite::MatrixT MatrixProductSite::GetELeft(const MatrixT& Em) const
+MatrixProductSite::MatrixCT MatrixProductSite::GetELeft(const MatrixCT& Em) const
 {
     int D=itsAs[0].GetNumCols();
-    MatrixT Ea(D,D);
+    MatrixCT Ea(D,D);
     Fill(Ea,std::complex<double>(0.0));
 //    cout << "A lim" <<  itsAs[0].GetLimits() << endl;
 //    cout << "Em lim" <<  Em.GetLimits() << endl;
@@ -384,10 +384,10 @@ MatrixProductSite::MatrixT MatrixProductSite::GetELeft(const MatrixT& Em) const
 
     return Ea;
 }
-MatrixProductSite::MatrixT MatrixProductSite::GetERight(const MatrixT& Em) const
+MatrixProductSite::MatrixCT MatrixProductSite::GetERight(const MatrixCT& Em) const
 {
     int D=itsAs[0].GetNumRows();
-    MatrixT Ea(D,D);
+    MatrixCT Ea(D,D);
     Fill(Ea,std::complex<double>(0.0));
 //    cout << "A lim" <<  itsAs[0].GetLimits() << endl;
 //    cout << "Em lim" <<  Em.GetLimits() << endl;
@@ -405,12 +405,12 @@ MatrixProductSite::MatrixT MatrixProductSite::GetERight(const MatrixT& Em) const
 }
 
 // TODO (jan#1#): Use Matrix4 for the N
-MatrixProductSite::MatrixT MatrixProductSite::
-GetNeff(const MatrixT& Eleft, const MatrixT Eright) const
+MatrixProductSite::MatrixCT MatrixProductSite::
+GetNeff(const MatrixCT& Eleft, const MatrixCT Eright) const
 {
 //    cout << "ELeft=" <<  Eleft << endl;
 //    cout << "Eright=" <<  Eright << endl;
-    MatrixT Neff(itsp*itsD1*itsD2,itsp*itsD1*itsD2);
+    MatrixCT Neff(itsp*itsD1*itsD2,itsp*itsD1*itsD2);
     int i2_1=1;
     for (int im=0; im<itsp; im++)
         for (int i1=1; i1<=itsD1; i1++)
@@ -592,7 +592,7 @@ double MatrixProductSite::ContractHeff(const Matrix6T& Heff) const
         cout << "Warning ContractHeff imag(E)=" << iE << endl;
     return real(E);
 }
-double MatrixProductSite::ContractHeff(const MatrixT& Heff) const
+double MatrixProductSite::ContractHeff(const MatrixCT& Heff) const
 {
     Vector3<eType> As(itsp,itsD1,itsD2);
     for (int m=0; m<itsp; m++)
@@ -630,14 +630,14 @@ void MatrixProductSite::UpdateCache(const MPOSite* mpos, const Vector3T& HLeft, 
 }
 
 
-void MatrixProductSite::Contract(const VectorT& s, const MatrixT& Vdagger)
+void MatrixProductSite::Contract(const VectorT& s, const MatrixCT& Vdagger)
 {
     int N1=s.GetHigh(); //N1=0 on the first site.
     if (N1>0 && N1<itsD1) itsD1=N1; //The contraction below will automatically reshape the As.
 
     for (int in=0; in<itsp; in++)
     {
-        MatrixT temp=Contract1(s,Vdagger*itsAs[in]);
+        MatrixCT temp=Contract1(s,Vdagger*itsAs[in]);
         itsAs[in].SetLimits(0,0);
         itsAs[in]=temp; //Shallow copy
 //        cout << "A[" << in << "]=" << itsAs[in] << endl;
@@ -645,21 +645,21 @@ void MatrixProductSite::Contract(const VectorT& s, const MatrixT& Vdagger)
     }
 }
 
-void MatrixProductSite::Contract(const MatrixT& U, const VectorT& s)
+void MatrixProductSite::Contract(const MatrixCT& U, const VectorT& s)
 {
     int N1=s.GetHigh(); //N1=0 on the first site.
     if (N1>0 && N1<itsD2)
         itsD2=N1; //The contraction below will automatically reshape the As.
     for (int in=0; in<itsp; in++)
     {
-        MatrixT temp=Contract1(itsAs[in]*U,s);
+        MatrixCT temp=Contract1(itsAs[in]*U,s);
         itsAs[in].SetLimits(0,0);
         itsAs[in]=temp; //Shallow copy
         assert(itsAs[in].GetNumCols()==itsD2); //Verify shape is correct;
     }
 }
 
-void  MatrixProductSite::Analyze(const MatrixT& Heff)
+void  MatrixProductSite::Analyze(const MatrixCT& Heff)
 {
     double eps=1e-12;
     int N=Heff.GetNumCols();

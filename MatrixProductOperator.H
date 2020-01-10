@@ -10,7 +10,7 @@
 class MatrixProductOperator
 {
     public:
-       typedef MatrixProductSite::MatrixT  MatrixT;
+       typedef MatrixProductSite::MatrixCT MatrixCT;
        typedef MatrixProductSite::VectorT  VectorT;
        typedef MatrixProductSite::VectorCT VectorCT;
        typedef std::complex<double> eType;

@@ -9,7 +9,7 @@ typedef MatrixProductOperator::Matrix6T Matrix6T;
 class GroundStateTesting : public ::testing::Test
 {
 public:
-    typedef MatrixProductSite::MatrixT MatrixT;
+    typedef MatrixProductSite::MatrixCT MatrixCT;
     GroundStateTesting()
     : eps(1.0e-13)
     {
@@ -76,7 +76,7 @@ TEST_F(GroundStateTesting,TestNeelStateL10S1D2)
     itsMPS->Report(cout);
     double E=itsMPS->GetExpectationIterate(itsMPO);
     double o=itsMPS->GetOverlap();
-    cout << "After 2 sweeps E=" << E/(L-1) << "  Overlap=" << o << endl;
+    cout << "After 2 sweeps E=" << std::setprecision(9) <<  E/(L-1) << "  Overlap=" << o << endl;
 }
 
 /*

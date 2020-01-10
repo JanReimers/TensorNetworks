@@ -17,7 +17,7 @@ template <class Ob> std::string ToString(const Ob& result)
     return res_stream.str();
 }
 
-void VerifyUnit(const MatrixProductSite::MatrixT& Norm, double eps);
+void VerifyUnit(const MatrixProductSite::MatrixCT& Norm, double eps);
 
 
 

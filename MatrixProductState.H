@@ -10,6 +10,7 @@ class MatrixProductState
 {
     public:
         typedef MatrixProductSite::MatrixT  MatrixT;
+        typedef MatrixProductSite::MatrixCT MatrixCT;
         typedef MatrixProductSite::Matrix6T Matrix6T;
         typedef MatrixProductSite::Vector3T Vector3T;
         typedef MatrixProductSite::VectorT  VectorT;
@@ -32,10 +33,10 @@ class MatrixProductState
         ipairT GetDs(int isite) const {return itsSites[isite]->GetDs();}
 //        Subscriptor  GetSuperMatrixSubscriptor (int isite) const;
 
-        MatrixT GetMLeft (int isite) const;
-        MatrixT GetMRight(int isite) const;
-        MatrixT GetLeftNorm (int isite) const {return itsSites[isite]->GetLeftNorm();}
-        MatrixT GetRightNorm(int isite) const {return itsSites[isite]->GetRightNorm();}
+        MatrixCT GetMLeft (int isite) const;
+        MatrixCT GetMRight(int isite) const;
+        MatrixCT GetLeftNorm (int isite) const {return itsSites[isite]->GetLeftNorm();}
+        MatrixCT GetRightNorm(int isite) const {return itsSites[isite]->GetRightNorm();}
         bool    CheckNormalized(int isite,double eps) const;
 
         Matrix6T GetHeff       (const MatrixProductOperator *mpo,int isite) const;
@@ -48,7 +49,7 @@ class MatrixProductState
         void SweepLeft (const MatrixProductOperator* mpo,bool quiet=true);
 
         double  GetOverlap(        ) const;
-        MatrixT GetNeff   (int isite) const;
+        MatrixCT GetNeff   (int isite) const;
 
         // Hamiltion expectation
         Matrix6T GetEO(int isite, const MPOSite* mpos) const;
@@ -59,7 +60,7 @@ class MatrixProductState
         double   GetExpectationIterate   (const MatrixProductOperator* mpo) const;
 
         double ContractHeff(int isite,const Matrix6T& Heff) const;
-        double ContractHeff(int isite,const MatrixT& Heff) const;
+        double ContractHeff(int isite,const MatrixCT& Heff) const;
         Vector3T GetHLeft_Cache(int isite) const;
         Vector3T GetHRightCache(int isite) const;
     protected:

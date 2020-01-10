@@ -16,7 +16,7 @@ using std::endl;
 class SVDTesting : public ::testing::Test
 {
 public:
-    typedef MatrixProductSite::MatrixT MatrixT;
+    typedef MatrixProductSite::MatrixCT MatrixT;
     SVDTesting()
     : mps(10,1,2)
   //  , itsSites(mps.itsSites)

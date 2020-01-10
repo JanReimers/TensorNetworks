@@ -18,7 +18,7 @@ public:
         std::cout.precision(5);
         cout << std::fixed;
     }
-    typedef MatrixProductSite::MatrixT MatrixT;
+    typedef MatrixProductSite::MatrixCT MatrixT;
 
     void VerifyLeftNorm(const MatrixProductState*);
     void VerifyRightNorm(const MatrixProductState*);

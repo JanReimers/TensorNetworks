@@ -16,7 +16,7 @@ public:
     {
         StreamableObject::SetToPretty();
     }
-    typedef MatrixProductSite::MatrixT MatrixT;
+    typedef MatrixProductSite::MatrixCT MatrixT;
 
     const MatrixT& GetA(int i,int ip) const {return itsSites[i]->itsAs[ip]; }
     const MatrixT& GetA3(int i,int ip) const {return mps3.itsSites[i]->itsAs[ip]; }

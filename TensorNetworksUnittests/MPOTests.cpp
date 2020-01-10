@@ -10,7 +10,8 @@ typedef MatrixProductOperator::Matrix6T Matrix6T;
 class MPOTesting : public ::testing::Test
 {
 public:
-    typedef MatrixProductSite::MatrixT MatrixT;
+    typedef MatrixProductSite::MatrixT  MatrixT;
+    typedef MatrixProductSite::MatrixCT MatrixCT;
     typedef MatrixProductSite::Vector3T Vector3T;
     typedef MatrixProductSite::eType eType;
     MPOTesting()
@@ -155,9 +156,9 @@ TEST_F(MPOTesting,TestHeffWithProductState)
         Matrix6T Heff=itsMPS->GetHeff(itsMPO,ia);
  //       cout << "E(" << ia << ")=" << itsMPS->ConstractHeff(ia,Heff) << endl;
         EXPECT_NEAR(itsMPS->ContractHeff(ia,Heff),-2.25,1e-11);
-        MatrixT HeffF=Heff.Flatten();
+        MatrixCT HeffF=Heff.Flatten();
         //cout << "Heff=" << Heff << endl;
-        MatrixT d=HeffF-Transpose(conj(HeffF));
+        MatrixCT d=HeffF-Transpose(conj(HeffF));
         EXPECT_NEAR(Max(abs(d)),0.0,1e-11);
 
 //    cout << "d=" << d << endl;
@@ -179,8 +180,8 @@ TEST_F(MPOTesting,TestHeffWithRandomStateL10S1D2)
         double E3=itsMPS->ContractHeff(ia,Heff.Flatten());
         EXPECT_NEAR(E1,E3,100*eps);
 
-        MatrixT HeffF=Heff.Flatten();
-        MatrixT d=HeffF-Transpose(conj(HeffF));
+        MatrixCT HeffF=Heff.Flatten();
+        MatrixCT d=HeffF-Transpose(conj(HeffF));
         EXPECT_NEAR(Max(abs(d)),0.0,100*eps);
     }
 }
@@ -200,8 +201,8 @@ TEST_F(MPOTesting,TestHeffWithRandomStateL10S1D1)
         double E3=itsMPS->ContractHeff(ia,Heff.Flatten());
         EXPECT_NEAR(E1,E3,100*eps);
 
-        MatrixT HeffF=Heff.Flatten();
-        MatrixT d=HeffF-Transpose(conj(HeffF));
+        MatrixCT HeffF=Heff.Flatten();
+        MatrixCT d=HeffF-Transpose(conj(HeffF));
         EXPECT_NEAR(Max(abs(d)),0.0,100*eps);
     }
 }
@@ -221,8 +222,8 @@ TEST_F(MPOTesting,TestHeffWithRandomStateL10S5D1)
         double E3=itsMPS->ContractHeff(ia,Heff.Flatten());
         EXPECT_NEAR(E1,E3,100000*eps);
 
-        MatrixT HeffF=Heff.Flatten();
-        MatrixT d=HeffF-Transpose(conj(HeffF));
+        MatrixCT HeffF=Heff.Flatten();
+        MatrixCT d=HeffF-Transpose(conj(HeffF));
         EXPECT_NEAR(Max(abs(d)),0.0,100000*eps);
     }
 }

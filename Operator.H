@@ -7,7 +7,7 @@
 class Operator
 {
     public:
-        typedef std::complex<double> ElementT;
+        typedef double ElementT;
         typedef DMatrix<ElementT> MatrixT;
         enum Position {Left,Bulk,Right};
 

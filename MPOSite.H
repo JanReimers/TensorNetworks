@@ -12,6 +12,7 @@ class Operator;
 class MPOSite
 {
         typedef MatrixProductSite::MatrixT MatrixT;
+        typedef MatrixProductSite::MatrixCT MatrixCT;
     public:
         MPOSite(const Operator* O,int p, int D1, int D2);
         virtual ~MPOSite();

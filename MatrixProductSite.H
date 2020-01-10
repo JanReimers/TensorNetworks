@@ -18,10 +18,11 @@ class MatrixProductSite
 {
     public:
         typedef std::complex<double> eType;
-        typedef DMatrix<eType> MatrixT;
-        typedef Matrix6<eType> Matrix6T;
-        typedef Matrix4<eType> Matrix4T;
-        typedef Vector3<eType> Vector3T;
+        typedef DMatrix<double> MatrixT;
+        typedef DMatrix<eType>  MatrixCT;
+        typedef Matrix6<eType>  Matrix6T;
+        typedef Matrix4<eType>  Matrix4T;
+        typedef Vector3<eType>  Vector3T;
 
         typedef Vector <double> VectorT;
         typedef Vector <eType > VectorCT;
@@ -36,21 +37,21 @@ class MatrixProductSite
 
         void ReshapeFromLeft (int D1);
         void ReshapeFromRight(int D2);
-        void SVDLeft_Normalize(VectorT& s, MatrixT& Vdagger);
-        void SVDRightNormalize(MatrixT& U, VectorT& s );
+        void SVDLeft_Normalize(VectorT& s, MatrixCT& Vdagger);
+        void SVDRightNormalize(MatrixCT& U, VectorT& s );
         void Rescale(double norm);
 
         const MatLimits GetLimits() const {return itsAs[0].GetLimits();}
 //        Subscriptor GetSuperMatrixSubscriptor() const {return Subscriptor(itsD1,itsD1);}
         ipairT GetDs() const {return ipairT(itsD1,itsD2);}
 
-        MatrixT GetE() const; //For the left most site only
-        MatrixT GetELeft (const MatrixT& ELeft) const; //For interior sites
-        MatrixT GetERight(const MatrixT& ERight) const; //For interior sites
+        MatrixCT GetE() const; //For the left most site only
+        MatrixCT GetELeft (const MatrixCT& ELeft) const; //For interior sites
+        MatrixCT GetERight(const MatrixCT& ERight) const; //For interior sites
 
-        MatrixT GetNeff(const MatrixT& Eleft, const MatrixT Eright) const;
-        MatrixT GetLeftNorm() const;
-        MatrixT GetRightNorm() const;
+        MatrixCT GetNeff(const MatrixCT& Eleft, const MatrixCT Eright) const;
+        MatrixCT GetLeftNorm() const;
+        MatrixCT GetRightNorm() const;
 
         // Hamiltion expectation
         Matrix6T GetEO(       const MPOSite* mpos) const;
@@ -71,14 +72,14 @@ class MatrixProductSite
 
 
         double ContractHeff(const Matrix6T& Heff) const;
-        double ContractHeff(const MatrixT & Heff) const;
+        double ContractHeff(const MatrixCT & Heff) const;
         void    Update(const VectorCT& newAs);
         void    UpdateCache(const MPOSite* mpos, const Vector3T& HLeft, const Vector3T& HRight);
-        void    Contract(const VectorT& s, const MatrixT& Vdagger);
-        void    Contract(const MatrixT& U, const VectorT& s);
+        void    Contract(const VectorT& s, const MatrixCT& Vdagger);
+        void    Contract(const MatrixCT& U, const VectorT& s);
         std::string GetNormStatus() const;
         void        Report(std::ostream&) const;
-        void  Analyze(const MatrixT& Heff);
+        void  Analyze(const MatrixCT& Heff);
         void  SetEnergies(double E, double DeltaE);
         bool IsLeftNormalized() const;
         bool IsRightNormalized() const;
@@ -86,18 +87,18 @@ class MatrixProductSite
         Position WhereAreWe() const {return itsPosition;}
 
         void     Reshape(int D1, int D2, bool saveData=false);
-        MatrixT  ReshapeLeft();
-        MatrixT  ReshapeRight();
-        void     ReshapeLeft (const MatrixT& U);
-        void     ReshapeRight(const MatrixT& Vdagger);
-        static MatrixT  Contract1(const VectorT& s, const MatrixT& VA);
-        static MatrixT  Contract1(const MatrixT& AU,const VectorT& s);
-        static bool     IsUnit(const MatrixT& m,double eps);
+        MatrixCT  ReshapeLeft();
+        MatrixCT  ReshapeRight();
+        void     ReshapeLeft (const MatrixCT& U);
+        void     ReshapeRight(const MatrixCT& Vdagger);
+        static MatrixCT  Contract1(const VectorT& s, const MatrixCT& VA);
+        static MatrixCT  Contract1(const MatrixCT& AU,const VectorT& s);
+        static bool     IsUnit(const MatrixCT& m,double eps);
          double   CalcBondEntropy(const VectorT& s);
         double GetMaxAmplitude() const;
     private:
         friend class MatrixProductTesting;
-        typedef std::vector<MatrixT> pVectorT;
+        typedef std::vector<MatrixCT> pVectorT;
         typedef pVectorT::      iterator  pIterT;
         typedef pVectorT::const_iterator cpIterT;
 
