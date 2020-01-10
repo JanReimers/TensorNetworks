@@ -56,11 +56,14 @@ class MatrixProductSite
         Matrix6T GetEO(       const MPOSite* mpos) const;
         Matrix4T GetNO(int m, const MPOSite* mpos) const;
 
-        Vector3T IterateLeft_F(const MPOSite* mpos, const Vector3T& Fam1);
+        const Vector3T& GetHLeft_Cache() const {return itsHLeft_Cache;}
+        const Vector3T& GetHRightCache() const {return itsHRightCache;}
+
+        Vector3T IterateLeft_F(const MPOSite* mpos, const Vector3T& Fam1,bool cache=true);
         eType    ContractAWFA (int w2, int i2, int j2,         const MPOSite* mpos, const Vector3T& Fam1);
         eType    ContractWFA  (int m , int w2, int i1, int j2, const MPOSite* mpos, const Vector3T& Fam1);
         eType    ContractFA   (int n , int w1, int i1, int j2,                      const Vector3T& Fam1);
-        Vector3T IterateRightF(const MPOSite* mpos, const Vector3T& Fam1);
+        Vector3T IterateRightF(const MPOSite* mpos, const Vector3T& Fam1,bool cache=true);
         eType    ContractBWFB (int w1, int i1, int j1,         const MPOSite* mpos, const Vector3T& Fap1);
         eType    ContractWFB  (int m , int w1, int i2, int j1, const MPOSite* mpos, const Vector3T& Fap1);
         eType    ContractFB   (int n , int w2, int i2, int j1,                      const Vector3T& Fap1);
@@ -70,6 +73,7 @@ class MatrixProductSite
         double ContractHeff(const Matrix6T& Heff) const;
         double ContractHeff(const MatrixT & Heff) const;
         void    Update(const VectorCT& newAs);
+        void    UpdateCache(const MPOSite* mpos, const Vector3T& HLeft, const Vector3T& HRight);
         void    Contract(const VectorT& s, const MatrixT& Vdagger);
         void    Contract(const MatrixT& U, const VectorT& s);
         std::string GetNormStatus() const;
@@ -100,6 +104,9 @@ class MatrixProductSite
         int itsp; //2*S+1
         int itsD1,itsD2;
         pVectorT itsAs; //We need a separate matrix for eash of the p basis states on one site.
+        Vector3T itsHLeft_Cache;
+        Vector3T itsHRightCache;
+
         int itsNumUpdates;
         double itsBondEntropy;
         int itsRank;

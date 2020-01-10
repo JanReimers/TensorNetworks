@@ -30,11 +30,12 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-pg" />
 					<Add option="-DNDEBUG" />
 					<Add directory="./" />
 				</Compiler>
 				<Linker>
-					<Add option="-s" />
+					<Add option="-pg" />
 				</Linker>
 			</Target>
 		</Build>
@@ -72,6 +73,10 @@
 		</Unit>
 		<Unit filename="MatrixProductState.H" />
 		<Unit filename="Operator.H" />
+		<Unit filename="PrimeEigenSolver.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="PrimeEigenSolver.H" />
 		<Unit filename="SparseMatrix.C">
 			<Option compilerVar="CC" />
 		</Unit>

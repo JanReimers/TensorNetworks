@@ -44,7 +44,7 @@ class MatrixProductState
         double   GetExpectation(const MatrixProductOperator *mpo) const;
         VectorCT Refine        (const MatrixProductOperator *mpo,int isite) const; //Minimize energy WRT the Ms in one site.
 
-         void SweepRight(const MatrixProductOperator* mpo,bool quiet=true);
+        void SweepRight(const MatrixProductOperator* mpo,bool quiet=true);
         void SweepLeft (const MatrixProductOperator* mpo,bool quiet=true);
 
         double  GetOverlap(        ) const;
@@ -52,13 +52,16 @@ class MatrixProductState
 
         // Hamiltion expectation
         Matrix6T GetEO(int isite, const MPOSite* mpos) const;
-        Vector3T GetEOLeft_Iterate(const MatrixProductOperator* mpo,int isite) const;
-        Vector3T GetEORightIterate(const MatrixProductOperator* mpo,int isite) const;
+        void     LoadHeffCaches   (const MatrixProductOperator* mpo);
+        Vector3T GetEOLeft_Iterate(const MatrixProductOperator* mpo,int isite,bool cache=false) const;
+        Vector3T GetEORightIterate(const MatrixProductOperator* mpo,int isite,bool cache=false) const;
         Matrix6T GetHeffIterate   (const MatrixProductOperator* mpo,int isite) const;
         double   GetExpectationIterate   (const MatrixProductOperator* mpo) const;
 
         double ContractHeff(int isite,const Matrix6T& Heff) const;
         double ContractHeff(int isite,const MatrixT& Heff) const;
+        Vector3T GetHLeft_Cache(int isite) const;
+        Vector3T GetHRightCache(int isite) const;
     protected:
 
     private:

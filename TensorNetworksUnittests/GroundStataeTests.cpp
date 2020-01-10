@@ -60,18 +60,19 @@ TEST_F(GroundStateTesting,TestSweepL10S1D1)
 
 TEST_F(GroundStateTesting,TestNeelStateL10S1D2)
 {
-    int L=9;
+    int L=19;
     Setup(L,2,16);
     itsMPS->InitializeWith(MatrixProductSite::Random);
     itsMPS->Normalize(MatrixProductSite::Right);
     itsMPS->Report(cout);
-    itsMPS->SweepRight(itsMPO,false);
+    itsMPS->LoadHeffCaches(itsMPO);
+    itsMPS->SweepRight(itsMPO,true);
     itsMPS->Report(cout);
-    itsMPS->SweepLeft (itsMPO,false);
+    itsMPS->SweepLeft (itsMPO,true);
     itsMPS->Report(cout);
-    itsMPS->SweepRight(itsMPO,false);
+    itsMPS->SweepRight(itsMPO,true);
     itsMPS->Report(cout);
-    itsMPS->SweepLeft (itsMPO,false);
+    itsMPS->SweepLeft (itsMPO,true);
     itsMPS->Report(cout);
     double E=itsMPS->GetExpectationIterate(itsMPO);
     double o=itsMPS->GetOverlap();

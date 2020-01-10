@@ -15,6 +15,8 @@ MatrixProductSite::MatrixProductSite(Position lbr, int p, int D1, int D2)
     : itsp(p)
     , itsD1(D1)
     , itsD2(D2)
+    , itsHLeft_Cache(1,1,1,1)
+    , itsHRightCache(1,1,1,1)
     , itsNumUpdates(0)
     , itsBondEntropy(0.0)
     , itsRank(0)
@@ -28,6 +30,8 @@ MatrixProductSite::MatrixProductSite(Position lbr, int p, int D1, int D2)
         itsAs.push_back(MatrixT(D1,D2));
         Fill(itsAs.back(),std::complex<double>(0.0));
     }
+    itsHLeft_Cache(1,1,1)=1.0;
+    itsHRightCache(1,1,1)=1.0;
 }
 
 MatrixProductSite::~MatrixProductSite()
@@ -476,7 +480,7 @@ MatrixProductSite::Matrix4T MatrixProductSite::GetNO(int m,const MPOSite* mpos) 
     return NO;
 }
 
-MatrixProductSite::Vector3T MatrixProductSite::IterateLeft_F(const MPOSite* mpos, const Vector3T& Fam1)
+MatrixProductSite::Vector3T MatrixProductSite::IterateLeft_F(const MPOSite* mpos, const Vector3T& Fam1,bool cache)
 {
     ipairT Dw=mpos->GetDw();
     int Dw2=Dw.second;
@@ -485,6 +489,7 @@ MatrixProductSite::Vector3T MatrixProductSite::IterateLeft_F(const MPOSite* mpos
         for (int i2=1;i2<=itsD2;i2++)
             for (int j2=1;j2<=itsD2;j2++)
                 F(w2,i2,j2)=ContractAWFA(w2,i2,j2,mpos,Fam1);
+    if (cache) itsHLeft_Cache=F;
     return F;
 }
 
@@ -519,7 +524,7 @@ MatrixProductSite::eType MatrixProductSite::ContractFA(int n, int w1, int i1, in
     return fa;
 }
 
-MatrixProductSite::Vector3T MatrixProductSite::IterateRightF(const MPOSite* mpos, const Vector3T& Fap1)
+MatrixProductSite::Vector3T MatrixProductSite::IterateRightF(const MPOSite* mpos, const Vector3T& Fap1, bool cache)
 {
     ipairT Dw=mpos->GetDw();
     int Dw1=Dw.first;
@@ -528,6 +533,11 @@ MatrixProductSite::Vector3T MatrixProductSite::IterateRightF(const MPOSite* mpos
         for (int i1=1;i1<=itsD1;i1++)
             for (int j1=1;j1<=itsD1;j1++)
                 F(w1,i1,j1)=ContractBWFB(w1,i1,j1,mpos,Fap1);
+    if (cache)
+    {
+        itsHRightCache=F;
+//        cout << "Caching right F=" << itsHRightCache << endl << endl;
+    }
     return F;
 }
 
@@ -609,9 +619,15 @@ void MatrixProductSite::Update(const VectorCT& newAs)
                 itsAs[m](i1,i2)=As(m,i1,i2);
 //       cout << "after  A[" << m << "]=" << itsAs[m] << endl;
     }
+
     itsNumUpdates++;
 }
 
+void MatrixProductSite::UpdateCache(const MPOSite* mpos, const Vector3T& HLeft, const Vector3T& HRight)
+{
+    itsHLeft_Cache=IterateLeft_F(mpos,HLeft);
+    itsHRightCache=IterateRightF(mpos,HRight);
+}
 
 
 void MatrixProductSite::Contract(const VectorT& s, const MatrixT& Vdagger)

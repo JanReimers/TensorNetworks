@@ -1,5 +1,6 @@
 #include "PrimeEigenSolver.H"
 #include <primme.h>
+#include "oml/vector_io.h"
 
 using std::cout;
 using std::endl;
@@ -18,7 +19,7 @@ template <class T> PrimeEigenSolver<T>::PrimeEigenSolver(const DMatrix<T>& m, do
 {
     assert(&m);
     assert(m.GetNumRows()==m.GetNumCols());
-    cout << "Sparsisty=" << itsSparsem.GetSparsisty() << "%" << endl;
+    //cout << "Sparsisty=" << itsSparsem.GetSparsisty() << "%" << endl;
     if (itsSparsem.GetSparsisty()<60)
     {
         theSparseMatrix=&itsSparsem;
@@ -67,7 +68,8 @@ template <class T> void PrimeEigenSolver<T>::SolveSparse(int NumEigenValues)
     assert(ret==0);
     (void)ret; //avoid compiler warning in release mode
 //    std::cout << "Max(abs(rnorms))=" <<  Max(abs(rnorms)) << " " << itsEps << std::endl;
-    assert(Max(abs(rnorms))<100*itsEps);
+    if (Max(abs(rnorms))>100*itsEps)
+        cout << "Warning high rnorms in PrimeEigenSolver::SolveSparse rnorma=" << std::scientific << rnorms << endl;
 
     primme_free(&primme);
 
@@ -93,7 +95,8 @@ template <class T> void PrimeEigenSolver<T>::SolveDense(int NumEigenValues)
     assert(ret==0);
     (void)ret; //avoid compiler warning in release mode
 //    std::cout << "Max(abs(rnorms))=" <<  Max(abs(rnorms)) << " " << itsEps << std::endl;
-    assert(Max(abs(rnorms))<100*itsEps);
+    if (Max(abs(rnorms))>100*itsEps)
+        cout << "Warning high rnorms in PrimeEigenSolver::SolveDense rnorma=" << std::scientific << rnorms << endl;
 
     primme_free(&primme);
 
@@ -115,7 +118,7 @@ template <class T> Vector<T>  PrimeEigenSolver<T>::GetEigenVector(int index) con
 void SparseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_blockSize, primme_params *primme, int *ierr)
 {
     typedef PrimeEigenSolver<std::complex<double> > primmeT;
-    assert(primmeT::theMatrix);
+    assert(primmeT::theSparseMatrix);
     long int& ldx(*_ldx);
     long int& ldy(*_ldy);
     int& blockSize(*_blockSize);

@@ -12,6 +12,11 @@ template <class T> class Vector3
 {
     typedef Vector<T> VectorT;
     public:
+        Vector3()
+         : M1(0),M2(0),M3(0), itsmnLow(1)
+         , itsData(0)
+        {}
+
         Vector3(int _M1,int _M2,int _M3, const VectorT& v, int mnLow=0)
          : M1(_M1),M2(_M2),M3(_M3), itsmnLow(1-mnLow)
          , itsData(v)
@@ -22,6 +27,7 @@ template <class T> class Vector3
             assert(itsmnLow>=0);
             assert(itsData.size()==M1*M2*M3);
         }
+
         Vector3(int _M1,int _M2,int _M3, int mnLow=0)
          : M1(_M1),M2(_M2),M3(_M3), itsmnLow(1-mnLow)
          , itsData(M1*M2*M3)

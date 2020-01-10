@@ -1,6 +1,7 @@
 #include "MatrixProductState.H"
 #include "MatrixProductOperator.H"
 #include "oml/cnumeric.h"
+#include "oml/vector_io.h"
 #include "TensorNetworks/PrimeEigenSolver.H"
 #include <iostream>
 #include <iomanip>
@@ -229,7 +230,7 @@ void MatrixProductState::SweepRight(const MatrixProductOperator* mpo,bool quiet)
     if (!quiet)
     {
         cout.precision(10);
-        cout << "SweepRight entry Norm Status         =" << GetNormStatus() << "  E=" << GetExpectation(mpo)/(itsL-1) << endl;
+        cout << "SweepRight entry Norm Status         =" << GetNormStatus() << "  E=" << GetExpectationIterate(mpo)/(itsL-1) << endl;
     }
     for (int ia=0; ia<itsL-1; ia++)
     {
@@ -240,7 +241,8 @@ void MatrixProductState::SweepRight(const MatrixProductOperator* mpo,bool quiet)
         itsSites[ia]->Update(Anew);
         itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
         itsSites[ia+1]->Contract(s,Vdagger);
-        if (!quiet) cout << "SweepRight post constract Norm Status=" << GetNormStatus() << "  E=" << GetExpectation(mpo)/(itsL-1) << endl;
+        itsSites[ia]->UpdateCache(mpo->GetSite(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
+        if (!quiet) cout << "SweepRight post constract Norm Status=" << GetNormStatus() << "  E=" << GetExpectationIterate(mpo)/(itsL-1) << endl;
     }
 }
 
@@ -249,7 +251,7 @@ void MatrixProductState::SweepLeft(const MatrixProductOperator* mpo,bool quiet)
     if (!quiet)
     {
         cout.precision(10);
-        cout << "SweepLeft  entry Norm Status         =" << GetNormStatus() << "  E=" << GetExpectation(mpo)/(itsL-1) << endl;
+        cout << "SweepLeft  entry Norm Status         =" << GetNormStatus() << "  E=" << GetExpectationIterate(mpo)/(itsL-1) << endl;
     }
     for (int ia=itsL-1; ia>0; ia--)
     {
@@ -260,16 +262,54 @@ void MatrixProductState::SweepLeft(const MatrixProductOperator* mpo,bool quiet)
         itsSites[ia]->Update(Anew);
         itsSites[ia]->SVDRightNormalize(U,s);
         itsSites[ia-1]->Contract(U,s);
+        itsSites[ia]->UpdateCache(mpo->GetSite(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
         if (!quiet)
-            cout << "SweepLeft  post constract Norm Status=" << GetNormStatus() << "  E=" << GetExpectation(mpo)/(itsL-1) << endl;
+            cout << "SweepLeft  post constract Norm Status=" << GetNormStatus() << "  E=" << GetExpectationIterate(mpo)/(itsL-1) << endl;
 
     }
 }
 
+MatrixProductState::Vector3T MatrixProductState::GetHLeft_Cache (int isite) const
+{
+    Vector3T HLeft(1,1,1,1);
+    HLeft(1,1,1)=eType(1.0);
+    if (isite>=0)  HLeft=itsSites[isite]->GetHLeft_Cache();
+    return HLeft;
+}
+MatrixProductState::Vector3T MatrixProductState::GetHRightCache(int isite) const
+{
+    Vector3T HRight(1,1,1,1);
+    HRight(1,1,1)=eType(1.0);
+    if (isite<itsL)  HRight=itsSites[isite]->GetHRightCache();
+    return HRight;
+}
+
+
 MatrixProductState::Matrix6T MatrixProductState::GetHeffIterate   (const MatrixProductOperator* mpo,int isite) const
 {
-    Vector3T L=GetEOLeft_Iterate(mpo,isite);
-    Vector3T R=GetEORightIterate(mpo,isite);
+    Vector3T Lcache=GetHLeft_Cache(isite-1);
+    Vector3T Rcache=GetHRightCache(isite+1);
+#ifdef DEBUG
+    Vector3T L=GetEOLeft_Iterate(mpo,isite,false);
+    Vector3T R=GetEORightIterate(mpo,isite,false);
+    double errorL=Max(abs(L.Flatten()-Lcache.Flatten()));
+    double errorR=Max(abs(R.Flatten()-Rcache.Flatten()));
+    double eps=1e-12;
+    if (errorL>eps || errorR>eps)
+    {
+        cout << "Warning Heff errors Left,Rigt=" << std::scientific << errorL << " " << errorR << endl;
+        cout << "L=" << L  << endl;
+        cout << "Lcache(ia-1)=" << Lcache  << endl;
+        cout << "Lcache(ia  )=" << GetHLeft_Cache(isite)  << endl;
+        cout << "R=" << R  << endl;
+        cout << "Rcache(ia+1)=" << Rcache  << endl;
+    }
+    assert(errorL<eps);
+    assert(errorR<eps);
+
+#endif
+
+
     const MPOSite* mops=mpo->GetSite(isite);
     assert(mops);
     ipairT Ds=GetDs(isite);
@@ -292,7 +332,7 @@ MatrixProductState::Matrix6T MatrixProductState::GetHeffIterate   (const MatrixP
                             for (int w1=1; w1<=W.GetNumRows(); w1++)
                                 for (int w2=1; w2<=W.GetNumCols(); w2++)
                                 {
-                                    temp+=L(w1,i1,j1)*W(w1,w2)*R(w2,i2,j2);
+                                    temp+=Lcache(w1,i1,j1)*W(w1,w2)*Rcache(w2,i2,j2);
                                 }
 
                             Heff(m,i1,i2,n,j1,j2)=temp;
@@ -303,21 +343,30 @@ MatrixProductState::Matrix6T MatrixProductState::GetHeffIterate   (const MatrixP
 
 }
 
-MatrixProductState::Vector3T MatrixProductState::GetEOLeft_Iterate(const MatrixProductOperator* mpo,int isite) const
+MatrixProductState::Vector3T MatrixProductState::GetEOLeft_Iterate(const MatrixProductOperator* mpo,int isite, bool cache) const
 {
     Vector3T F(1,1,1,1);
     F(1,1,1)=eType(1.0);
     for (int ia=0; ia<isite; ia++)
-        F=itsSites[ia]->IterateLeft_F(mpo->GetSite(ia),F);
+        F=itsSites[ia]->IterateLeft_F(mpo->GetSite(ia),F,cache);
     return F;
 }
-MatrixProductState::Vector3T MatrixProductState::GetEORightIterate(const MatrixProductOperator* mpo,int isite) const
+MatrixProductState::Vector3T MatrixProductState::GetEORightIterate(const MatrixProductOperator* mpo,int isite, bool cache) const
 {
     Vector3T F(1,1,1,1);
     F(1,1,1)=eType(1.0);
     for (int ia=itsL-1; ia>isite; ia--)
-        F=itsSites[ia]->IterateRightF(mpo->GetSite(ia),F);
+    {
+//        cout << "ia=" << ia << "   ";
+        F=itsSites[ia]->IterateRightF(mpo->GetSite(ia),F,cache);
+    }
     return F;
+}
+
+void MatrixProductState::LoadHeffCaches(const MatrixProductOperator* mpo)
+{
+    GetEOLeft_Iterate(mpo,0,true);
+    GetEORightIterate(mpo,0,true);
 }
 
 double   MatrixProductState::GetExpectationIterate   (const MatrixProductOperator* mpo) const
