@@ -19,6 +19,8 @@ MatrixProductSite::MatrixProductSite(Position lbr, int p, int D1, int D2)
     , itsBondEntropy(0.0)
     , itsRank(0)
     , itsHeffDensity(0)
+    , itsEmin(0.0)
+    , itsDeltaE(0.0)
     , itsPosition(lbr)
 {
     for (int ip=0;ip<itsp;ip++)
@@ -265,13 +267,15 @@ std::string MatrixProductSite::GetNormStatus() const
 
 void MatrixProductSite::Report(std::ostream& os) const
 {
-    os
+    os << std::setprecision(3)
     << std::setw(4) << itsD1
     << std::setw(4)  << itsD2
     << std::setw(11)  << itsBondEntropy << "    "
     << std::setw(5)  << itsNumUpdates << "      "
-    << std::setw(3)  << itsRank << " "
-    << std::setw(5)  << itsHeffDensity
+    << std::setw(3)  << itsRank << "       "
+    << std::setw(5)  << itsHeffDensity << "   " << std::setprecision(7)
+    << std::setw(9)  << itsEmin << "     " << std::setprecision(4)
+    << std::setw(5)  << itsDeltaE << "   "
     ;
 }
 
@@ -651,3 +655,9 @@ void  MatrixProductSite::Analyze(const MatrixT& Heff)
 
     itsHeffDensity=100.0*static_cast<double>(NnonZero)/(N*N);
 }
+
+ void  MatrixProductSite::SetEnergies(double E, double DeltaE)
+ {
+    itsEmin=E;
+    itsDeltaE=DeltaE;
+ }

@@ -61,7 +61,7 @@ TEST_F(GroundStateTesting,TestSweepL10S1D1)
 TEST_F(GroundStateTesting,TestNeelStateL10S1D2)
 {
     int L=9;
-    Setup(L,1,2);
+    Setup(L,2,16);
     itsMPS->InitializeWith(MatrixProductSite::Random);
     itsMPS->Normalize(MatrixProductSite::Right);
     itsMPS->Report(cout);

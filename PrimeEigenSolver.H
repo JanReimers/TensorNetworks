@@ -8,7 +8,7 @@
 template <class T> class PrimeEigenSolver
 {
     public:
-        PrimeEigenSolver(const SparseMatrix<T>&, double eps);
+        PrimeEigenSolver(const DMatrix<T>&, double eps);
         ~PrimeEigenSolver();
 
         // Get lowest N eigen values and vectors with no initial guess
@@ -20,14 +20,20 @@ template <class T> class PrimeEigenSolver
         DMatrix<T> GetEigenVectors() const {return itsEigenVectors;}
         Vector <double> GetEigenValues () const {return itsEigenValues;}
 
-        static const SparseMatrix<T>* theMatrix;
+        static const SparseMatrix<T>* theSparseMatrix;
+        static const      DMatrix<T>* theDenseMatrix;
 
     protected:
+        void SolveSparse(int NumEigenValues);
+        void SolveDense(int NumEigenValues);
+
 
     private:
-        Vector<double> itsEigenValues;
-        DMatrix<T>     itsEigenVectors;
-        double          itsEps;  //Convergence criteria
+        Vector<double>   itsEigenValues;
+        DMatrix<T>       itsEigenVectors;
+        double           itsEps;  //Convergence criteria
+        bool             itsChooseSparse;
+        SparseMatrix<T>  itsSparsem;
 };
 
 #endif // PRIMEEIGENSOLVER_H

@@ -1,6 +1,7 @@
 #include "MatrixProductState.H"
 #include "MatrixProductOperator.H"
 #include "oml/cnumeric.h"
+#include "TensorNetworks/PrimeEigenSolver.H"
 #include <iostream>
 #include <iomanip>
 #include <complex>
@@ -199,7 +200,7 @@ void MatrixProductState::Report(std::ostream& os) const
 {
     os.precision(3);
     os << "Matrix product state for " << itsL << " lattice sites." << endl;
-    os << "  Site  D1  D2  Bond Entropy   #updates  Rank  Heff Density" << endl;
+    os << "  Site  D1  D2  Bond Entropy   #updates  Rank  Sparsisty     Emin      Egap" << endl;
     for (int ia=0; ia<itsL; ia++)
     {
         os << std::setw(3) << ia << "  ";
@@ -442,6 +443,7 @@ double MatrixProductState::GetExpectation(const MatrixProductOperator *mpo) cons
 
 MatrixProductState::VectorCT MatrixProductState::Refine(const MatrixProductOperator *mpo,int isite) const
 {
+    double itsEps=1e-12;
     assert(CheckNormalized(isite,1e-11));
     //Matrix6T Heff6=GetHeff(mps,isite); Old version
     Matrix6T Heff6=GetHeffIterate(mpo,isite); //New iterative version
@@ -451,12 +453,18 @@ MatrixProductState::VectorCT MatrixProductState::Refine(const MatrixProductOpera
     assert(Heff.GetNumRows()==Heff.GetNumCols());
     int N=Heff.GetNumRows();
     Vector<double>  eigenValues(N);
-    int ierr=0;
-    ch(Heff, eigenValues ,true,ierr);
-    assert(ierr==0);
+//    int ierr=0;
+//    ch(Heff, eigenValues ,true,ierr);
+//    assert(ierr==0);
 
+    PrimeEigenSolver<eType> solver(Heff,itsEps);
+    solver.Solve(2); //Get lowest two eigen values/states
+    eigenValues=solver.GetEigenValues();
+
+
+    itsSites[isite]->SetEnergies(eigenValues(1),eigenValues(2)-eigenValues(1));
     //cout << "eigenValues=" <<  eigenValues << endl;
     //cout << "eigenVector(1)=" <<  Heff.GetColumn(1) << endl;
 
-    return Heff.GetColumn(1);
+    return solver.GetEigenVector(1);
 }

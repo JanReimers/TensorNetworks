@@ -75,6 +75,7 @@ class MatrixProductSite
         std::string GetNormStatus() const;
         void        Report(std::ostream&) const;
         void  Analyze(const MatrixT& Heff);
+        void  SetEnergies(double E, double DeltaE);
         bool IsLeftNormalized() const;
         bool IsRightNormalized() const;
     protected:
@@ -103,6 +104,8 @@ class MatrixProductSite
         double itsBondEntropy;
         int itsRank;
         double itsHeffDensity;
+        double itsEmin;
+        double itsDeltaE;  //Gap to the next excited state.
         Position itsPosition; //Left Bulk or Right
 };
 

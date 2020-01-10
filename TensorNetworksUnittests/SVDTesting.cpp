@@ -233,16 +233,15 @@ TEST_F(SVDTesting,Prime_EigenSolverComplexHermitian200x200)
     typedef DMatrix<eType> Mtype;
     Mtype A(N,N);
     FillRandom(A);
-    for (int i=0;i<N*N;i++)
+    for (int i=0;i<0.5*N*N;i++)
     {
         int ir=static_cast<int>(OMLRand<float>()*N)+1;
         int ic=static_cast<int>(OMLRand<float>()*N)+1;
         A(ir,ic)=0.0;
     }
     Mtype Ah=A+Transpose(conj(A)); //Make it hermitian
-    SparseMatrix<eType> sparseAh(Ah,eps);
 
-    PrimeEigenSolver<eType> solver(sparseAh,eps);
+    PrimeEigenSolver<eType> solver(Ah,eps);
     solver.Solve(Ne);
 
     Mtype diag=Transpose(conj(solver.GetEigenVectors()))*Ah*solver.GetEigenVectors();
