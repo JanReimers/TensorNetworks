@@ -83,6 +83,7 @@ class MatrixProductSite
         void  SetEnergies(double E, double DeltaE);
         bool IsLeftNormalized() const;
         bool IsRightNormalized() const;
+        double GetIterDE() const {return itsIterDE;}
     protected:
         Position WhereAreWe() const {return itsPosition;}
 
@@ -113,7 +114,8 @@ class MatrixProductSite
         int itsRank;
         double itsHeffDensity;
         double itsEmin;
-        double itsDeltaE;  //Gap to the next excited state.
+        double itsGapE;  //Gap to the next excited state.
+        double itsIterDE;
         Position itsPosition; //Left Bulk or Right
 };
 

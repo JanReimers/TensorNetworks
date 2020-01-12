@@ -198,7 +198,7 @@ void MatrixProductState::Report(std::ostream& os) const
 {
     os.precision(3);
     os << "Matrix product state for " << itsL << " lattice sites." << endl;
-    os << "  Site  D1  D2  Bond Entropy   #updates  Rank  Sparsisty     Emin      Egap" << endl;
+    os << "  Site  D1  D2  Bond Entropy   #updates  Rank  Sparsisty     Emin      Egap    dA" << endl;
     for (int ia=0; ia<itsL; ia++)
     {
         os << std::setw(3) << ia << "  ";
@@ -513,4 +513,32 @@ MatrixProductState::VectorCT MatrixProductState::Refine(const MatrixProductOpera
     //cout << "eigenVector(1)=" <<  Heff.GetColumn(1) << endl;
 
     return solver.GetEigenVector(1);
+}
+
+double  MatrixProductState::GetMaxDeltaE() const
+{
+    double MaxDeltaE=0.0;
+    for (int ia=0; ia<itsL; ia++)
+    {
+        double de=fabs(itsSites[ia]->GetIterDE());
+        if (de>MaxDeltaE) MaxDeltaE=de;
+    }
+    return MaxDeltaE;
+}
+
+
+int   MatrixProductState::FindGroundState(const MatrixProductOperator *HamiltonianMPO,int maxIter, double eps)
+{
+    Normalize(MatrixProductSite::Right);
+    LoadHeffCaches(HamiltonianMPO);
+
+    int nSweep=0;
+    for (int in=0; in<maxIter; in++)
+    {
+        SweepRight(HamiltonianMPO,true);
+        SweepLeft (HamiltonianMPO,true);
+        nSweep++;
+        if (GetMaxDeltaE()<eps) break;
+    }
+    return nSweep;
 }

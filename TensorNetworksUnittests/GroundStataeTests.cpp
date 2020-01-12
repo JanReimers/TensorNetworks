@@ -5,6 +5,8 @@
 #include "oml/stream.h"
 #include <complex>
 
+using std::setw;
+
 typedef MatrixProductOperator::Matrix6T Matrix6T;
 class GroundStateTesting : public ::testing::Test
 {
@@ -20,98 +22,86 @@ public:
     void Setup(int L, int S2, int D)
     {
         itsH=new Hamiltonian_1D_NN_Heisenberg(L,S2,1.0);
-        itsMPO=itsH->CreateMPO();
+        itsHamiltonianMPO=itsH->CreateMPO();
         itsMPS=itsH->CreateMPS(D);
     }
 
 
     Hamiltonian* itsH;
-    MatrixProductOperator* itsMPO;
+    MatrixProductOperator* itsHamiltonianMPO;
     MatrixProductState*    itsMPS;
     double eps;
 };
 
-/*
-TEST_F(GroundStateTesting,TestSweepL10S1D2)
+
+TEST_F(GroundStateTesting,TestSweepL9S1D2)
 {
-    Setup(10,1,2);
+    int L=9,S2=1,D=2,maxIter=100;
+    Setup(L,S2,D);
     itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Right);
-    itsMPS->SweepRight(itsMPO);
-    itsMPS->SweepLeft (itsMPO);
-    double E=itsMPS->GetExpectation(itsMPO);
+    int nSweep=itsMPS->FindGroundState(itsHamiltonianMPO,maxIter,1e-9);
+
+    double E=itsMPS->GetExpectationIterate(itsHamiltonianMPO);
     double o=itsMPS->GetOverlap();
-    cout << "After 2 sweeps E=" << E << "  Overlap=" << o << endl;
+    EXPECT_NEAR(o,1.0,eps);
+    EXPECT_NEAR(E/(L-1),-0.45317425,1e-7);
+    EXPECT_LT(nSweep,maxIter);
 }
 
-
-TEST_F(GroundStateTesting,TestSweepL10S1D1)
+TEST_F(GroundStateTesting,TestSweepL9S1D8)
 {
-    Setup(10,1,1);
+    int L=9,S2=1,D=8,maxIter=100;
+    Setup(L,S2,D);
     itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Right);
-    itsMPS->SweepRight(itsMPO);
-    itsMPS->SweepLeft (itsMPO);
-    double E=itsMPS->GetExpectation(itsMPO);
+    int nSweep=itsMPS->FindGroundState(itsHamiltonianMPO,maxIter,1e-9);
+
+    double E=itsMPS->GetExpectationIterate(itsHamiltonianMPO);
     double o=itsMPS->GetOverlap();
-    cout << "After 2 sweeps E=" << E << "  Overlap=" << o << endl;
+    EXPECT_NEAR(o,1.0,eps);
+    EXPECT_NEAR(E/(L-1),-0.46703753,1e-7);
+    EXPECT_LT(nSweep,maxIter);
 }
-*/
 
-TEST_F(GroundStateTesting,TestNeelStateL10S1D2)
+TEST_F(GroundStateTesting,TestSweepL9S5D2)
 {
-    int L=19;
-    Setup(L,2,16);
+    int L=9,S2=5,D=2,maxIter=100;
+    Setup(L,S2,D);
     itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Right);
-    itsMPS->Report(cout);
-    itsMPS->LoadHeffCaches(itsMPO);
-    itsMPS->SweepRight(itsMPO,true);
-    itsMPS->Report(cout);
-    itsMPS->SweepLeft (itsMPO,true);
-    itsMPS->Report(cout);
-    itsMPS->SweepRight(itsMPO,true);
-    itsMPS->Report(cout);
-    itsMPS->SweepLeft (itsMPO,true);
-    itsMPS->Report(cout);
-    double E=itsMPS->GetExpectationIterate(itsMPO);
+    int nSweep=itsMPS->FindGroundState(itsHamiltonianMPO,maxIter,1e-9);
+
+    double E=itsMPS->GetExpectationIterate(itsHamiltonianMPO);
     double o=itsMPS->GetOverlap();
-    cout << "After 2 sweeps E=" << std::setprecision(9) <<  E/(L-1) << "  Overlap=" << o << endl;
+    EXPECT_NEAR(o,1.0,eps);
+    EXPECT_NEAR(E/(L-1),-7.025661 ,1e-7);
+    EXPECT_LT(nSweep,maxIter);
 }
 
 /*
-TEST_F(GroundStateTesting,TestLandD_DependenceS1)
+TEST_F(GroundStateTesting,TestNeelStateSurvey)
 {
-    for (int D=1;D<=5;D++)
-    for (int L=4;L<=12;L++)
-    {
-        Setup(L,1,D);
-        itsMPS->InitializeWith(MatrixProductSite::Random);
-        itsMPS->Normalize(MatrixProductSite::Left);
-        //itsMPS->SweepRight(itsMPO);
-        //itsMPS->SweepLeft (itsMPO);
-        double E=itsMPS->GetExpectation(itsMPO);
-//        EXPECT_NEAR(itsMPS->GetOverlap(),1.0,eps);
-        cout << "D,L=" << D << "," << L << "  After 2 sweeps E=" << E << "  E/L=" << E/L << "  E/2^L=" << E/pow(2,L) << endl;
-    }
-}
+    cout << " NSweep  L  S  D     E/L    E/(LS^2) " << endl;
 
-TEST_F(GroundStateTesting,TestLandD_DependenceS2)
-{
-    for (int D=1;D<=3;D++)
-    for (int L=4;L<=12;L++)
-    {
-        Setup(L,2,D);
-        itsMPS->InitializeWith(MatrixProductSite::Random);
-        itsMPS->Normalize(MatrixProductSite::Left);
-//        itsMPS->SweepRight(itsMPO);
-//        itsMPS->SweepLeft (itsMPO);
-        double E=itsMPS->GetExpectation(itsMPO);
-//        EXPECT_NEAR(itsMPS->GetOverlap(),1.0,eps);
-        cout << "D,L=" << D << "," << L << "  After 2 sweeps E=" << E << "  E/L=" << E/L << "  E/3^L=" << E/pow(3,L) << endl;
-    }
+    for (int S2=1; S2<=5; S2++)
+        for (int L=3; L<=19; L++)
+            for (int D=1; D<=8; D*=2)
+            {
+                Setup(L,S2,D);
+                itsMPS->InitializeWith(MatrixProductSite::Random);
+                int nSweep=itsMPS->FindGroundState(itsHamiltonianMPO,100,1e-8);
+                double E=itsMPS->GetExpectationIterate(itsHamiltonianMPO);
+
+                cout
+                << setw(4) << nSweep << " "
+                << setw(2) << L << " "
+                << setw(2) << S2 << "/2 "
+                << setw(2) << D << " " << std::fixed
+                << setw(12) << std::setprecision(6) << E/(L-1)
+                << setw(12) << std::setprecision(6) << E/((L-1)*0.25*S2*S2)
+                << endl;
+            }
 }
 */
+
 TEST_F(GroundStateTesting,TestIdentityOperator)
 {
     Setup(10,1,2);
@@ -121,7 +111,7 @@ TEST_F(GroundStateTesting,TestIdentityOperator)
     MatrixProductOperator* mpoi=new MatrixProductOperator(IO,10,1,2);
 
     double S=itsMPS->GetExpectation(mpoi);
-    cout << "Identity=" << S << endl;
+    EXPECT_NEAR(S,1.0,eps);
 
 }
 

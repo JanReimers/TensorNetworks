@@ -22,7 +22,8 @@ MatrixProductSite::MatrixProductSite(Position lbr, int p, int D1, int D2)
     , itsRank(0)
     , itsHeffDensity(0)
     , itsEmin(0.0)
-    , itsDeltaE(0.0)
+    , itsGapE(0.0)
+    , itsIterDE(0.0)
     , itsPosition(lbr)
 {
     for (int ip=0;ip<itsp;ip++)
@@ -273,13 +274,14 @@ void MatrixProductSite::Report(std::ostream& os) const
 {
     os << std::setprecision(3)
     << std::setw(4) << itsD1
-    << std::setw(4)  << itsD2
+    << std::setw(4)  << itsD2 << std::fixed
     << std::setw(11)  << itsBondEntropy << "    "
     << std::setw(5)  << itsNumUpdates << "      "
     << std::setw(3)  << itsRank << "       "
     << std::setw(5)  << itsHeffDensity << "   " << std::setprecision(7)
     << std::setw(9)  << itsEmin << "     " << std::setprecision(4)
-    << std::setw(5)  << itsDeltaE << "   "
+    << std::setw(5)  << itsGapE << "   " << std::scientific
+    << std::setw(5)  << itsIterDE << "  "
     ;
 }
 
@@ -612,13 +614,9 @@ void MatrixProductSite::Update(const VectorCT& newAs)
 {
     Vector3<eType> As(itsp,itsD1,itsD2,newAs); //Unflatten
     for (int m=0; m<itsp; m++)
-    {
- //       cout << "before A[" << m << "]=" << itsAs[m] << endl;
         for (int i1=1; i1<=itsD1; i1++)
             for (int i2=1; i2<=itsD2; i2++)
                 itsAs[m](i1,i2)=As(m,i1,i2);
-//       cout << "after  A[" << m << "]=" << itsAs[m] << endl;
-    }
 
     itsNumUpdates++;
 }
@@ -674,6 +672,7 @@ void  MatrixProductSite::Analyze(const MatrixCT& Heff)
 
  void  MatrixProductSite::SetEnergies(double E, double DeltaE)
  {
+    itsIterDE=E-itsEmin;
     itsEmin=E;
-    itsDeltaE=DeltaE;
+    itsGapE=DeltaE;
  }

@@ -44,6 +44,7 @@ class MatrixProductState
         Matrix6T GetEORight    (const MatrixProductOperator *mpo,int isite) const;
         double   GetExpectation(const MatrixProductOperator *mpo) const;
         VectorCT Refine        (const MatrixProductOperator *mpo,int isite) const; //Minimize energy WRT the Ms in one site.
+        int      FindGroundState(const MatrixProductOperator *mpo,int maxIter, double eps);
 
         void SweepRight(const MatrixProductOperator* mpo,bool quiet=true);
         void SweepLeft (const MatrixProductOperator* mpo,bool quiet=true);
@@ -63,6 +64,7 @@ class MatrixProductState
         double ContractHeff(int isite,const MatrixCT& Heff) const;
         Vector3T GetHLeft_Cache(int isite) const;
         Vector3T GetHRightCache(int isite) const;
+        double  GetMaxDeltaE() const;
     protected:
 
     private:
