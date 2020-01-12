@@ -286,10 +286,14 @@ MatrixProductState::Matrix6T MatrixProductState::GetHeffIterate   (const MatrixP
 {
     Vector3T Lcache=GetHLeft_Cache(isite-1);
     Vector3T Rcache=GetHRightCache(isite+1);
-#ifdef DEBUG
+#ifdef DEBUG3
     Vector3T L=GetEOLeft_Iterate(mpo,isite,false);
     Vector3T R=GetEORightIterate(mpo,isite,false);
+    cout << "L.Flatten()     =" << L.Flatten()<< endl;
+    cout << "Lcache.Flatten()=" << Lcache.Flatten()<< endl;
     double errorL=Max(abs(L.Flatten()-Lcache.Flatten()));
+//    cout << "R.Flatten()     =" << R.Flatten()<< endl;
+//    cout << "Rcache.Flatten()=" << Rcache.Flatten()<< endl;
     double errorR=Max(abs(R.Flatten()-Rcache.Flatten()));
     double eps=1e-12;
     if (errorL>eps || errorR>eps)

@@ -48,6 +48,7 @@ TEST_F(GroundStateTesting,TestSweepL9S1D2)
     EXPECT_LT(nSweep,maxIter);
 }
 
+#ifndef DEBUG
 TEST_F(GroundStateTesting,TestSweepL9S1D8)
 {
     int L=9,S2=1,D=8,maxIter=100;
@@ -61,6 +62,7 @@ TEST_F(GroundStateTesting,TestSweepL9S1D8)
     EXPECT_NEAR(E/(L-1),-0.46703753,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }
+#endif
 
 TEST_F(GroundStateTesting,TestSweepL9S5D2)
 {
