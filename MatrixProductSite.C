@@ -1,6 +1,8 @@
 #include "MatrixProductSite.H"
 #include "MPOSite.H"
 #include "Vector3.H"
+#include "Vector4.H"
+#include "TensorNetworks/PrimeEigenSolver.H"
 #include "oml/minmax.h"
 #include "oml/cnumeric.h"
 #include "oml/vector_io.h"
@@ -482,6 +484,130 @@ MatrixProductSite::Matrix4T MatrixProductSite::GetNO(int m,const MPOSite* mpos) 
     return NO;
 }
 
+MatrixProductSite::Matrix6T MatrixProductSite::
+GetHeff(const MPOSite* mops,const Vector3T& L,const Vector3T& R) const
+{
+
+#ifdef DEBUG3
+    Vector3T L=GetEOLeft_Iterate(mpo,isite,false);
+    Vector3T R=GetEORightIterate(mpo,isite,false);
+    cout << "L.Flatten()     =" << L.Flatten()<< endl;
+    cout << "Lcache.Flatten()=" << Lcache.Flatten()<< endl;
+    double errorL=Max(abs(L.Flatten()-Lcache.Flatten()));
+//    cout << "R.Flatten()     =" << R.Flatten()<< endl;
+//    cout << "Rcache.Flatten()=" << Rcache.Flatten()<< endl;
+    double errorR=Max(abs(R.Flatten()-Rcache.Flatten()));
+    double eps=1e-12;
+    if (errorL>eps || errorR>eps)
+    {
+        cout << "Warning Heff errors Left,Rigt=" << std::scientific << errorL << " " << errorR << endl;
+        cout << "L=" << L  << endl;
+        cout << "Lcache(ia-1)=" << Lcache  << endl;
+        cout << "Lcache(ia  )=" << GetHLeft_Cache(isite)  << endl;
+        cout << "R=" << R  << endl;
+        cout << "Rcache(ia+1)=" << Rcache  << endl;
+    }
+    assert(errorL<eps);
+    assert(errorR<eps);
+
+#endif
+    assert(mops);
+    Matrix6<eType> Heff(itsp,itsD1,itsD2,itsp,itsD1,itsD2);
+
+    for (int m=0; m<itsp; m++)
+        for (int n=0; n<itsp; n++)
+        {
+            MatrixT W=mops->GetW(m,n);
+            Vector3T WR(W.GetNumRows(),itsD2,itsD2,1);
+            for (int w1=1; w1<=W.GetNumRows(); w1++)
+                for (int i2=1; i2<=itsD2; i2++)
+                    for (int j2=1; j2<=itsD2; j2++)
+                        WR(w1,i2,j2)=ContractWR(w1,i2,j2,W,R);
+
+            for (int i1=1; i1<=itsD1; i1++)
+                for (int j1=1; j1<=itsD1; j1++)
+                    for (int i2=1; i2<=itsD2; i2++)
+                        for (int j2=1; j2<=itsD2; j2++)
+                        {
+                            eType LWR(0.0);
+                            for (int w1=1; w1<=W.GetNumRows(); w1++)
+                                LWR+=L(w1,i1,j1)*WR(w1,i2,j2);
+                            Heff(m,i1,i2,n,j1,j2)=LWR;
+                        }
+        }
+
+    return Heff;
+
+}
+
+eType MatrixProductSite::
+ContractWR(int w1, int i2, int j2,const MatrixT& W, const Vector3T& R) const
+{
+    eType WR(0.0);
+    for (int w2=1; w2<=W.GetNumCols(); w2++)
+        WR+=W(w1,w2)*R(w2,i2,j2);
+    return WR;
+}
+
+
+MatrixProductSite::Matrix6T MatrixProductSite::
+GetHeff(const MPOSite* mops,const Matrix6T& L,const Matrix6T& R) const
+{
+    assert(mops);
+    Matrix6<eType> Heff(itsp,itsD1,itsD2,itsp,itsD1,itsD2);
+
+    for (int m=0; m<itsp; m++)
+        for (int i1=1; i1<=itsD1; i1++)
+            for (int j1=1; j1<=itsD1; j1++)
+            {
+                for (int n=0; n<itsp; n++)
+                {
+                    MatrixT W=mops->GetW(m,n);
+                    for (int i2=1; i2<=itsD2; i2++)
+                        for (int j2=1; j2<=itsD2; j2++)
+                        {
+                            eType temp(0.0);
+                            for (int w1=1; w1<=W.GetNumRows(); w1++)
+                                for (int w2=1; w2<=W.GetNumCols(); w2++)
+                                {
+                                    temp+=L(1,1,1,w1,i1,j1)*W(w1,w2)*R(w2,i2,j2,1,1,1);
+                                }
+
+                            Heff(m,i1,i2,n,j1,j2)=temp;
+                        }
+                }
+            }
+    return Heff;
+
+}
+
+void MatrixProductSite::Refine(const MatrixCT& Heff)
+{
+    double itsEps=1e-12;
+
+    Analyze(Heff); //Record % non zero elements
+    assert(Heff.GetNumRows()==Heff.GetNumCols());
+    int N=Heff.GetNumRows();
+    Vector<double>  eigenValues(N);
+    PrimeEigenSolver<eType> solver(Heff,itsEps);
+    solver.Solve(2); //Get lowest two eigen values/states
+    eigenValues=solver.GetEigenValues();
+
+    itsIterDE=eigenValues(1)-itsEmin;
+    itsEmin=eigenValues(1);
+    itsGapE=eigenValues(2)-eigenValues(1);
+    Update(solver.GetEigenVector(1));
+
+    //cout << "eigenValues=" <<  eigenValues << endl;
+    //cout << "eigenVector(1)=" <<  Heff.GetColumn(1) << endl;
+
+
+    //    int ierr=0;
+//    ch(Heff, eigenValues ,true,ierr);
+//    assert(ierr==0);
+;
+}
+
 MatrixProductSite::Vector3T MatrixProductSite::IterateLeft_F(const MPOSite* mpos, const Vector3T& Fam1,bool cache)
 {
     ipairT Dw=mpos->GetDw();
@@ -495,7 +621,22 @@ MatrixProductSite::Vector3T MatrixProductSite::IterateLeft_F(const MPOSite* mpos
     return F;
 }
 
-MatrixProductSite::eType MatrixProductSite::ContractAWFA(int w2, int i2, int j2, const MPOSite* mpos, const Vector3T& Fam1)
+MatrixProductSite::Vector4T MatrixProductSite::IterateLeft_F(const MPOSite* mpos1, const MPOSite* mpos2, const Vector4T& Fam1) const
+{
+    ipairT Dw1=mpos1->GetDw();
+    int Dw12=Dw1.second;
+    ipairT Dw2=mpos2->GetDw();
+    int Dw22=Dw2.second;
+    Vector4T F(Dw12,Dw22,itsD2,itsD2,1);
+    for (int w2=1;w2<=Dw12;w2++)
+    for (int v2=1;v2<=Dw22;v2++)
+        for (int i2=1;i2<=itsD2;i2++)
+            for (int j2=1;j2<=itsD2;j2++)
+                F(w2,v2,i2,j2)=ContractAWWFA(w2,v2,i2,j2,mpos1,mpos2,Fam1);
+    return F;
+}
+
+MatrixProductSite::eType MatrixProductSite::ContractAWFA(int w2, int i2, int j2, const MPOSite* mpos, const Vector3T& Fam1) const
 {
     eType awfa(0.0);
      for (int m=0; m<itsp; m++)
@@ -505,7 +646,54 @@ MatrixProductSite::eType MatrixProductSite::ContractAWFA(int w2, int i2, int j2,
     return awfa;
 }
 
-MatrixProductSite::eType MatrixProductSite::ContractWFA(int m, int w2, int i1, int j2, const MPOSite* mpos, const Vector3T& Fam1)
+MatrixProductSite::eType MatrixProductSite::
+ContractAWWFA(int w2, int v2, int i2, int j2, const MPOSite* mpos1, const MPOSite* mpos2,const Vector4T& Fam1) const
+{
+    eType awwfa(0.0);
+     for (int m=0; m<itsp; m++)
+        for (int i1=1;i1<=itsD1;i1++)
+            awwfa+=conj(itsAs[m](i1,i2))*ContractWWFA(m,w2,v2,i1,j2,mpos1,mpos2,Fam1);
+
+    return awwfa;
+}
+
+MatrixProductSite::eType MatrixProductSite::ContractWWFA(int m, int w2, int v2, int i1, int j2, const MPOSite* mpos1, const MPOSite* mpos2, const Vector4T& Fam1) const
+{
+    eType wwfa(0.0);
+     for (int o=0; o<itsp; o++)
+     {
+        MatrixT Wmo=mpos1->GetW(m,o);
+        int Dw1=Wmo.GetNumRows();
+        for (int w1=1;w1<=Dw1;w1++)
+            wwfa+=Wmo(w1,w2)*ContractWFA(o,w1,v2,i1,j2,mpos2,Fam1);
+    }
+    return wwfa;
+}
+
+MatrixProductSite::eType MatrixProductSite::ContractWFA(int o, int w1, int v2, int i1, int j2, const MPOSite* mpos, const Vector4T& Fam1) const
+{
+    eType wfa(0.0);
+     for (int n=0; n<itsp; n++)
+     {
+        MatrixT Won=mpos->GetW(o,n);
+        int Dw1=Won.GetNumRows();
+        for (int v1=1;v1<=Dw1;v1++)
+            wfa+=Won(v1,v2)*ContractFA(n,w1,v1,i1,j2,Fam1);
+    }
+    return wfa;
+}
+
+MatrixProductSite::eType MatrixProductSite::ContractFA(int n, int w1, int v1, int i1, int j2, const Vector4T& Fam1) const
+{
+    eType fa(0.0);
+    for (int j1=1;j1<=itsD1;j1++)
+        fa+=Fam1(w1,v1,i1,j1)*itsAs[n](j1,j2);
+    return fa;
+}
+
+
+
+MatrixProductSite::eType MatrixProductSite::ContractWFA(int m, int w2, int i1, int j2, const MPOSite* mpos, const Vector3T& Fam1) const
 {
     eType wfa(0.0);
      for (int n=0; n<itsp; n++)
@@ -518,7 +706,7 @@ MatrixProductSite::eType MatrixProductSite::ContractWFA(int m, int w2, int i1, i
     return wfa;
 }
 
-MatrixProductSite::eType MatrixProductSite::ContractFA(int n, int w1, int i1, int j2, const Vector3T& Fam1)
+MatrixProductSite::eType MatrixProductSite::ContractFA(int n, int w1, int i1, int j2, const Vector3T& Fam1) const
 {
     eType fa(0.0);
     for (int j1=1;j1<=itsD1;j1++)
@@ -543,7 +731,7 @@ MatrixProductSite::Vector3T MatrixProductSite::IterateRightF(const MPOSite* mpos
     return F;
 }
 
-MatrixProductSite::eType MatrixProductSite::ContractBWFB(int w1, int i1, int j1, const MPOSite* mpos, const Vector3T& Fap1)
+MatrixProductSite::eType MatrixProductSite::ContractBWFB(int w1, int i1, int j1, const MPOSite* mpos, const Vector3T& Fap1) const
 {
     eType bwfb(0.0);
      for (int m=0; m<itsp; m++)
@@ -553,7 +741,7 @@ MatrixProductSite::eType MatrixProductSite::ContractBWFB(int w1, int i1, int j1,
     return bwfb;
 }
 
-MatrixProductSite::eType MatrixProductSite::ContractWFB(int m, int w1, int i2, int j1, const MPOSite* mpos, const Vector3T& Fap1)
+MatrixProductSite::eType MatrixProductSite::ContractWFB(int m, int w1, int i2, int j1, const MPOSite* mpos, const Vector3T& Fap1) const
 {
     eType wfb(0.0);
      for (int n=0; n<itsp; n++)
@@ -566,7 +754,7 @@ MatrixProductSite::eType MatrixProductSite::ContractWFB(int m, int w1, int i2, i
     return wfb;
 }
 
-MatrixProductSite::eType MatrixProductSite::ContractFB(int n, int w2, int i2, int j1, const Vector3T& Fap1)
+MatrixProductSite::eType MatrixProductSite::ContractFB(int n, int w2, int i2, int j1, const Vector3T& Fap1) const
 {
     eType fb(0.0);
     for (int j2=1;j2<=itsD2;j2++)
@@ -670,9 +858,3 @@ void  MatrixProductSite::Analyze(const MatrixCT& Heff)
     itsHeffDensity=100.0*static_cast<double>(NnonZero)/(N*N);
 }
 
- void  MatrixProductSite::SetEnergies(double E, double DeltaE)
- {
-    itsIterDE=E-itsEmin;
-    itsEmin=E;
-    itsGapE=DeltaE;
- }

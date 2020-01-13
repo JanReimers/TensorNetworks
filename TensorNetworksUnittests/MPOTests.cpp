@@ -1,7 +1,7 @@
 #include "Tests.H"
 #include "TensorNetworks/MatrixProductOperator.H"
 #include "TensorNetworks/Hamiltonian_1D_NN_Heisenberg.H"
-//#include "TensorNetworks/Matrix6.H"
+#include "TensorNetworks/IdentityOperator.H"
 #include "oml/stream.h"
 #include "oml/vector_io.h"
 #include <complex>
@@ -27,7 +27,13 @@ public:
         itsMPS=itsH->CreateMPS(D);
     }
     double ENeel(int S2) const;
-
+    Matrix6T GetHeff(int isite) const {return itsMPS->GetHeff(itsMPO,isite);}
+    Matrix6T GetHeffIterate(int isite) const {return itsMPS->GetHeffIterate(itsMPO,isite);}
+    double ContractHeff(int isite,const Matrix6T& Heff) const{return itsMPS->itsSites[isite]->ContractHeff(Heff);}
+    double ContractHeff(int isite,const MatrixCT& Heff) const{return itsMPS->itsSites[isite]->ContractHeff(Heff);}
+    Vector3T GetEOLeft_Iterate(int isite,bool cache=false) const {return itsMPS->GetEOLeft_Iterate(itsMPO,isite,cache);}
+    Vector3T GetEORightIterate(int isite,bool cache=false) const {return itsMPS->GetEORightIterate(itsMPO,isite,cache);}
+    void LoadHeffCaches() {itsMPS->LoadHeffCaches(itsMPO);}
 
     MatrixT GetW(int isite, int m, int n) {return itsMPO->GetSite(isite)->GetW(m,n);}
 
@@ -153,9 +159,9 @@ TEST_F(MPOTesting,TestHeffWithProductState)
     for (int ia=0; ia<itsMPS->GetL(); ia++)
     {
         itsMPS->Normalize(ia);
-        Matrix6T Heff=itsMPS->GetHeff(itsMPO,ia);
+        Matrix6T Heff=GetHeff(ia);
  //       cout << "E(" << ia << ")=" << itsMPS->ConstractHeff(ia,Heff) << endl;
-        EXPECT_NEAR(itsMPS->ContractHeff(ia,Heff),-2.25,1e-11);
+        EXPECT_NEAR(ContractHeff(ia,Heff),-2.25,1e-11);
         MatrixCT HeffF=Heff.Flatten();
         //cout << "Heff=" << Heff << endl;
         MatrixCT d=HeffF-Transpose(conj(HeffF));
@@ -174,10 +180,10 @@ TEST_F(MPOTesting,TestHeffWithRandomStateL10S1D2)
     for (int ia=0; ia<itsMPS->GetL(); ia++)
     {
         itsMPS->Normalize(ia);
-        Matrix6T Heff=itsMPS->GetHeff(itsMPO,ia);
-        double E2=itsMPS->ContractHeff(ia,Heff);
+        Matrix6T Heff=GetHeff(ia);
+        double E2=ContractHeff(ia,Heff);
         EXPECT_NEAR(E1,E2,100*eps);
-        double E3=itsMPS->ContractHeff(ia,Heff.Flatten());
+        double E3=ContractHeff(ia,Heff.Flatten());
         EXPECT_NEAR(E1,E3,100*eps);
 
         MatrixCT HeffF=Heff.Flatten();
@@ -195,10 +201,10 @@ TEST_F(MPOTesting,TestHeffWithRandomStateL10S1D1)
     for (int ia=0; ia<itsMPS->GetL(); ia++)
     {
         itsMPS->Normalize(ia);
-        Matrix6T Heff=itsMPS->GetHeff(itsMPO,ia);
-        double E2=itsMPS->ContractHeff(ia,Heff);
+        Matrix6T Heff=GetHeff(ia);
+        double E2=ContractHeff(ia,Heff);
         EXPECT_NEAR(E1,E2,100*eps);
-        double E3=itsMPS->ContractHeff(ia,Heff.Flatten());
+        double E3=ContractHeff(ia,Heff.Flatten());
         EXPECT_NEAR(E1,E3,100*eps);
 
         MatrixCT HeffF=Heff.Flatten();
@@ -216,10 +222,10 @@ TEST_F(MPOTesting,TestHeffWithRandomStateL10S5D1)
     for (int ia=0; ia<itsMPS->GetL(); ia++)
     {
         itsMPS->Normalize(ia);
-        Matrix6T Heff=itsMPS->GetHeff(itsMPO,ia);
-        double E2=itsMPS->ContractHeff(ia,Heff);
+        Matrix6T Heff=GetHeff(ia);
+        double E2=ContractHeff(ia,Heff);
         EXPECT_NEAR(E1,E2,100000*eps);
-        double E3=itsMPS->ContractHeff(ia,Heff.Flatten());
+        double E3=ContractHeff(ia,Heff.Flatten());
         EXPECT_NEAR(E1,E3,100000*eps);
 
         MatrixCT HeffF=Heff.Flatten();
@@ -235,9 +241,9 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D2)
     Setup(L,1,2);
     itsMPS->InitializeWith(MatrixProductSite::Random);
     itsMPS->Normalize(MatrixProductSite::Right);
-    Vector3T L3=itsMPS->GetEOLeft_Iterate(itsMPO,L);
+    Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
-    Vector3T R3=itsMPS->GetEORightIterate(itsMPO,-1);
+    Vector3T R3=GetEORightIterate(-1);
     eType ER=R3(1,1,1);
     EXPECT_NEAR(std::imag(EL),0.0,eps);
     EXPECT_NEAR(std::imag(ER),0.0,eps);
@@ -250,9 +256,9 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D1)
     Setup(L,1,1);
     itsMPS->InitializeWith(MatrixProductSite::Random);
     itsMPS->Normalize(MatrixProductSite::Right);
-    Vector3T L3=itsMPS->GetEOLeft_Iterate(itsMPO,L);
+    Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
-    Vector3T R3=itsMPS->GetEORightIterate(itsMPO,-1);
+    Vector3T R3=GetEORightIterate(-1);
     eType ER=R3(1,1,1);
     EXPECT_NEAR(std::imag(EL),0.0,eps);
     EXPECT_NEAR(std::imag(ER),0.0,eps);
@@ -265,9 +271,9 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D6)
     Setup(L,1,6);
     itsMPS->InitializeWith(MatrixProductSite::Random);
     itsMPS->Normalize(MatrixProductSite::Right);
-    Vector3T L3=itsMPS->GetEOLeft_Iterate(itsMPO,L);
+    Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
-    Vector3T R3=itsMPS->GetEORightIterate(itsMPO,-1);
+    Vector3T R3=GetEORightIterate(-1);
     eType ER=R3(1,1,1);
     EXPECT_NEAR(std::imag(EL),0.0,10*eps);
     EXPECT_NEAR(std::imag(ER),0.0,10*eps);
@@ -279,9 +285,9 @@ TEST_F(MPOTesting,TestGetLRIterateL10S5D2)
     Setup(L,5,2);
     itsMPS->InitializeWith(MatrixProductSite::Random);
     itsMPS->Normalize(MatrixProductSite::Right);
-    Vector3T L3=itsMPS->GetEOLeft_Iterate(itsMPO,L);
+    Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
-    Vector3T R3=itsMPS->GetEORightIterate(itsMPO,-1);
+    Vector3T R3=GetEORightIterate(-1);
     eType ER=R3(1,1,1);
     EXPECT_NEAR(std::imag(EL),0.0,100000*eps);
     EXPECT_NEAR(std::imag(ER),0.0,100000*eps);
@@ -294,9 +300,9 @@ TEST_F(MPOTesting,TestEoldEnew)
     Setup(L,1,2);
     itsMPS->InitializeWith(MatrixProductSite::Random);
     itsMPS->Normalize(MatrixProductSite::Right);
-    Vector3T L3=itsMPS->GetEOLeft_Iterate(itsMPO,L);
+    Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
-    Vector3T R3=itsMPS->GetEORightIterate(itsMPO,-1);
+    Vector3T R3=GetEORightIterate(-1);
     eType ER=R3(1,1,1);
     double Enew=itsMPS->GetExpectation(itsMPO);
     double Eold=itsMPS->GetExpectation(itsMPO);
@@ -311,14 +317,37 @@ TEST_F(MPOTesting,TestHeff)
     Setup(L,1,2);
     itsMPS->InitializeWith(MatrixProductSite::Random);
     itsMPS->Normalize(MatrixProductSite::Right);
-    itsMPS->LoadHeffCaches(itsMPO);
+    LoadHeffCaches();
     // This only work for site 0 since the Left cache only gets updates by the SweepRight routine.
     int ia=0;
-        Matrix6T HeffI=itsMPS->GetHeffIterate(itsMPO,ia);
+        Matrix6T HeffI=GetHeffIterate(ia);
 //        cout << "HeffI=" << HeffI <<endl;
-        Matrix6T HeffO=itsMPS->GetHeff(itsMPO,ia);
+        Matrix6T HeffO=GetHeff(ia);
 //        cout << "HeffO=" << HeffO <<endl;
         double error=Max(abs(HeffI.Flatten()-HeffO.Flatten()));
         EXPECT_NEAR(error,0,10*eps);
 }
+
+TEST_F(MPOTesting,TestGetExpectation2_I_I)
+{
+    int L=10,S2=1,D=2;
+    Setup(L,S2,D);
+    itsMPS->InitializeWith(MatrixProductSite::Random);
+    itsMPS->Normalize(MatrixProductSite::Right);
+    Operator* IO=new IdentityOperator();
+    MatrixProductOperator* mpoi=new MatrixProductOperator(IO,L,S2,D);
+
+    double E1=itsMPS->GetExpectation(itsMPO);
+    double I1=itsMPS->GetExpectation(mpoi);
+    double II=itsMPS->GetExpectation(mpoi,mpoi);
+    double IE=itsMPS->GetExpectation(mpoi,itsMPO);
+    double EI=itsMPS->GetExpectation(itsMPO,mpoi);
+    double EE=itsMPS->GetExpectation(itsMPO,itsMPO);
+    EXPECT_NEAR(I1,1.0,eps);
+    EXPECT_NEAR(II,1.0,eps);
+    EXPECT_NEAR(IE,E1,eps);
+    EXPECT_NEAR(EI,E1,eps);
+    (void)EE; //Nothing to test this agains right now
+}
+
 

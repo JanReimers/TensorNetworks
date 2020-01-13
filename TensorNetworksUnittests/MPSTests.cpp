@@ -8,23 +8,30 @@ class MatrixProductTesting : public ::testing::Test
 {
 public:
     MatrixProductTesting()
-    : mps(10,1,2)
-    , mps3(10,2,3)
-    , itsSites(mps.itsSites)
-    , itsSites3(mps3.itsSites)
+    : itsMPS(0)
     , eps(1.0e-10)
     {
+        Setup(10,1,2);
         StreamableObject::SetToPretty();
     }
-    typedef MatrixProductSite::MatrixCT MatrixT;
+    ~MatrixProductTesting() {delete itsMPS;}
 
-    const MatrixT& GetA(int i,int ip) const {return itsSites[i]->itsAs[ip]; }
-    const MatrixT& GetA3(int i,int ip) const {return mps3.itsSites[i]->itsAs[ip]; }
+    void Setup(int L, int S2, int D)
+    {
+        delete itsMPS;
+        itsMPS=new MatrixProductState(L,S2,D);
+    }
 
-    MatrixProductState mps;
-    MatrixProductState mps3;
-    MatrixProductState::SitesType& itsSites;
-    MatrixProductState::SitesType& itsSites3;
+
+    typedef MatrixProductSite::MatrixCT MatrixCT;
+
+    MatrixCT GetA(int i,int ip) const {return GetSite(i)->itsAs[ip]; }
+    MatrixCT GetMLeft(int isite) const {return itsMPS->GetMLeft(isite);}
+    MatrixCT GetMRight(int isite) const {return itsMPS->GetMRight(isite);}
+    MatrixCT GetNeff   (int isite) const {return itsMPS->GetNeff(isite);}
+    const MatrixProductSite* GetSite(int isite) const {return itsMPS->itsSites[isite];}
+
+    MatrixProductState* itsMPS;
     double eps;
 };
 
@@ -34,10 +41,9 @@ public:
 
 TEST_F(MatrixProductTesting,Constructor)
 {
-    EXPECT_EQ(itsSites.size(),10);
-    EXPECT_EQ(mps.GetL(),10);
-    EXPECT_EQ(mps.GetD(),2);
-    EXPECT_EQ(mps.Getp(),2);
+    EXPECT_EQ(itsMPS->GetL(),10);
+    EXPECT_EQ(itsMPS->GetD(),2);
+    EXPECT_EQ(itsMPS->Getp(),2);
 }
 
 TEST_F(MatrixProductTesting,MatrixOpMul)
@@ -51,39 +57,41 @@ TEST_F(MatrixProductTesting,MatrixOpMul)
 
 TEST_F(MatrixProductTesting,LeftNormalMatricies)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(itsSites[0]->GetLeftNorm(),eps);
-    VerifyUnit(itsSites[1]->GetLeftNorm(),eps);
-    VerifyUnit(itsSites[8]->GetLeftNorm(),eps);
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetSite(0)->GetLeftNorm(),eps);
+    VerifyUnit(GetSite(1)->GetLeftNorm(),eps);
+    VerifyUnit(GetSite(8)->GetLeftNorm(),eps);
 }
 
 
 TEST_F(MatrixProductTesting,RightNormalMatricies)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(MatrixProductSite::Product);
     // The first site will not be right normalized
-    EXPECT_EQ(ToString(itsSites[0]->GetRightNorm()),"(1:1),(1:1) \n[ (2,0) ]\n");
-    VerifyUnit(itsSites[1]->GetRightNorm(),eps);
-    VerifyUnit(itsSites[8]->GetRightNorm(),eps);
-    VerifyUnit(itsSites[9]->GetRightNorm(),eps);
+    EXPECT_EQ(ToString(GetSite(0)->GetRightNorm()),"(1:1),(1:1) \n[ (2,0) ]\n");
+    VerifyUnit(GetSite(1)->GetRightNorm(),eps);
+    VerifyUnit(GetSite(8)->GetRightNorm(),eps);
+    VerifyUnit(GetSite(9)->GetRightNorm(),eps);
 }
 
 
 TEST_F(MatrixProductTesting,LeftNormalMatricies_S2)
 {
-    mps3.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(itsSites3[0]->GetLeftNorm(),eps);
-    VerifyUnit(itsSites3[1]->GetLeftNorm(),eps);
-    VerifyUnit(itsSites3[8]->GetLeftNorm(),eps);
+    Setup(10,3,2);
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetSite(0)->GetLeftNorm(),eps);
+    VerifyUnit(GetSite(1)->GetLeftNorm(),eps);
+    VerifyUnit(GetSite(8)->GetLeftNorm(),eps);
 }
 
 TEST_F(MatrixProductTesting,RightNormalMatricies_S2)
 {
-    mps3.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(itsSites3[1]->GetRightNorm(),eps);
-    VerifyUnit(itsSites3[8]->GetRightNorm(),eps);
-    VerifyUnit(itsSites3[9]->GetRightNorm(),eps);
-    EXPECT_EQ(ToString(itsSites3[0]->GetRightNorm()),"(1:1),(1:1) \n[ (3,0) ]\n");
+    Setup(10,3,3);
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetSite(1)->GetRightNorm(),eps);
+    VerifyUnit(GetSite(8)->GetRightNorm(),eps);
+    VerifyUnit(GetSite(9)->GetRightNorm(),eps);
+    EXPECT_EQ(ToString(GetSite(0)->GetRightNorm()),"(1:1),(1:1) \n[ (3,0) ]\n");
 }
 
 
@@ -92,8 +100,8 @@ TEST_F(MatrixProductTesting,RightNormalMatricies_S2)
 //
 TEST_F(MatrixProductTesting,GetOverlap)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    ASSERT_NEAR(mps.GetOverlap(),2.0,eps);
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    ASSERT_NEAR(itsMPS->GetOverlap(),2.0,eps);
 }
 
 //
@@ -127,68 +135,69 @@ TEST_F(MatrixProductTesting,GetOverlapS1D1)
 
 TEST_F(MatrixProductTesting,GetMLeft_Site_1)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(mps.GetMLeft(1),eps);
-    EXPECT_EQ(ToString(mps.GetMLeft(1)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetMLeft(1),eps);
+    EXPECT_EQ(ToString(GetMLeft(1)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
 }
 TEST_F(MatrixProductTesting,GetMLeft_Site_2)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(mps.GetMLeft(2),eps);
-    EXPECT_EQ(ToString(mps.GetMLeft(2)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetMLeft(2),eps);
+    EXPECT_EQ(ToString(GetMLeft(2)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
 }
 TEST_F(MatrixProductTesting,GetMLeft_Site_8)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(mps.GetMLeft(8),eps);
-    EXPECT_EQ(ToString(mps.GetMLeft(8)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetMLeft(8),eps);
+    EXPECT_EQ(ToString(GetMLeft(8)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
 }
 
 TEST_F(MatrixProductTesting,GetMLeft_Site_9)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(mps.GetMLeft(9),eps);
-    EXPECT_EQ(ToString(mps.GetMLeft(9)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetMLeft(9),eps);
+    EXPECT_EQ(ToString(GetMLeft(9)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
 }
 
 TEST_F(MatrixProductTesting,GetMLeft_Site_0)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    EXPECT_EQ(ToString(mps.GetMLeft(0)),"(1:1),(1:1) \n[ (1,0) ]\n");
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    EXPECT_EQ(ToString(GetMLeft(0)),"(1:1),(1:1) \n[ (1,0) ]\n");
 }
 
 TEST_F(MatrixProductTesting,GetMRight_Site_8)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(mps.GetMRight(8),eps);
-    EXPECT_EQ(ToString(mps.GetMRight(8)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetMRight(8),eps);
+    EXPECT_EQ(ToString(GetMRight(8)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
 }
 
 TEST_F(MatrixProductTesting,GetMRight_Site_9)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    EXPECT_EQ(ToString(mps.GetMRight(9)),"(1:1),(1:1) \n[ (1,0) ]\n");
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    EXPECT_EQ(ToString(GetMRight(9)),"(1:1),(1:1) \n[ (1,0) ]\n");
 }
 
 TEST_F(MatrixProductTesting,GetMRight_Site_0)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(mps.GetMRight(0),eps);
-    EXPECT_EQ(ToString(mps.GetMRight(0)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetMRight(0),eps);
+    EXPECT_EQ(ToString(GetMRight(0)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
 }
 TEST_F(MatrixProductTesting,GetMRight_Site_1)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(mps.GetMRight(1),eps);
-    EXPECT_EQ(ToString(mps.GetMRight(1)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetMRight(1),eps);
+    EXPECT_EQ(ToString(GetMRight(1)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
 }
 
 
 TEST_F(MatrixProductTesting,GetMLeft_Site_S2)
 {
-    mps3.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(mps3.GetMLeft(1),eps);
-    EXPECT_EQ(ToString(mps3.GetMLeft(1)),"(1:3),(1:3) \n[ (1,0) (0,0) (0,0) ]\n[ (0,0) (1,0) (0,0) ]\n[ (0,0) (0,0) (1,0) ]\n");
+    Setup(10,2,3);
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetMLeft(1),eps);
+    EXPECT_EQ(ToString(GetMLeft(1)),"(1:3),(1:3) \n[ (1,0) (0,0) (0,0) ]\n[ (0,0) (1,0) (0,0) ]\n[ (0,0) (0,0) (1,0) ]\n");
 }
 
 
@@ -198,8 +207,8 @@ TEST_F(MatrixProductTesting,GetMLeft_Site_S2)
 
 TEST_F(MatrixProductTesting,GetOverlapForSite0)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(mps.GetNeff(0),eps);
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetNeff(0),eps);
 }
 
 //
@@ -207,8 +216,8 @@ TEST_F(MatrixProductTesting,GetOverlapForSite0)
 //
 TEST_F(MatrixProductTesting,GetOverlapForSite1)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(mps.GetNeff(1),eps);
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetNeff(1),eps);
 }
 
 //
@@ -216,8 +225,8 @@ TEST_F(MatrixProductTesting,GetOverlapForSite1)
 //
 TEST_F(MatrixProductTesting,GetOverlapForSite8)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(mps.GetNeff(8),eps);
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetNeff(8),eps);
 }
 
 //
@@ -225,7 +234,7 @@ TEST_F(MatrixProductTesting,GetOverlapForSite8)
 //
 TEST_F(MatrixProductTesting,GetOverlapForSite9)
 {
-    mps.InitializeWith(MatrixProductSite::Product);
-    VerifyUnit(mps.GetNeff(9),eps);
+    itsMPS->InitializeWith(MatrixProductSite::Product);
+    VerifyUnit(GetNeff(9),eps);
 }
 
