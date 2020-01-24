@@ -42,48 +42,13 @@
 		<Compiler>
 			<Add directory="../" />
 		</Compiler>
-		<Unit filename="Hamiltonian.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Hamiltonian.H" />
-		<Unit filename="Hamiltonian_1D_NN_Heisenberg.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Hamiltonian_1D_NN_Heisenberg.H" />
-		<Unit filename="IdentityOperator.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="IdentityOperator.H" />
-		<Unit filename="MPOSite.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="MPOSite.H" />
-		<Unit filename="Matrix4.H" />
-		<Unit filename="Matrix6.H" />
-		<Unit filename="MatrixProductOperator.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="MatrixProductOperator.H" />
-		<Unit filename="MatrixProductSite.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="MatrixProductSite.H" />
-		<Unit filename="MatrixProductState.C">
-			<Option compilerVar="CPP" />
-		</Unit>
-		<Unit filename="MatrixProductState.H" />
-		<Unit filename="Operator.H" />
-		<Unit filename="PrimeEigenSolver.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="PrimeEigenSolver.H" />
-		<Unit filename="SparseMatrix.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="SparseMatrix.H" />
-		<Unit filename="Subscriptor.H" />
-		<Unit filename="TODO_List" />
-		<Unit filename="Vector3.H" />
+		<Unit filename="TensorNetworks/Enums.H" />
+		<Unit filename="TensorNetworks/Hamiltonian.H" />
+		<Unit filename="TensorNetworks/MatrixProductState.H" />
+		<Unit filename="TensorNetworks/Operator.H" />
+		<Unit filename="TensorNetworks/OperatorWRepresentation.H" />
+		<Unit filename="TensorNetworks/SiteOperator.H" />
+		<Unit filename="TensorNetworks/Typedefs.H" />
 		<Extensions>
 			<code_completion />
 			<debugger />

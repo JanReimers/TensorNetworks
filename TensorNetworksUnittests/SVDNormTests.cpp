@@ -1,6 +1,6 @@
 #include "Tests.H"
 
-#include "TensorNetworks/MatrixProductState.H"
+#include "TensorNetworksImp/MatrixProductStateImp.H"
 #include "oml/stream.h"
 #include "oml/random.h"
 #include <complex>
@@ -24,10 +24,10 @@ public:
     void Setup(int L, int S2, int D)
     {
         delete itsMPS;
-        itsMPS=new MatrixProductState(L,S2,D);
+        itsMPS=new MatrixProductStateImp(L,S2,D);
     }
 
-    typedef MatrixProductSite::MatrixCT MatrixCT;
+    typedef TensorNetworks::MatrixCT MatrixCT;
     MatrixCT GetNeff   (int isite) const {return itsMPS->GetNeff(isite);}
 
     void VerifyLeftNorm();
@@ -35,7 +35,7 @@ public:
 
 //    const MatrixT& GetA(int i,int ip) const {return itsSites[i]->itsAs[ip]; }
 
-    MatrixProductState* itsMPS;
+    MatrixProductStateImp* itsMPS;
 //    MatrixProductState::SitesType& itsSites;
     double eps;
 };
@@ -79,39 +79,39 @@ std::string ExpectedNorm(int isite,int L)
 
 TEST_F(MPSNormTesting,LeftNormalMatriciesProductStateL10S3D2)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
-    itsMPS->Normalize(MatrixProductSite::Left);
+    itsMPS->InitializeWith(TensorNetworks::Product);
+    itsMPS->Normalize(TensorNetworks::Left);
     VerifyLeftNorm();
 }
 
 
 TEST_F(MPSNormTesting,RightNormalMatriciesProductStateL100S3D2)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
-    itsMPS->Normalize(MatrixProductSite::Right);
+    itsMPS->InitializeWith(TensorNetworks::Product);
+    itsMPS->Normalize(TensorNetworks::Right);
     VerifyRightNorm();
 }
 
 
 TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D2)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Left);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Left);
     VerifyLeftNorm();
 }
 
 TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL100S3D2)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Right);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Right);
     VerifyRightNorm();
 }
 
 TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D3)
 {
     Setup(10,3,3);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Left);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Left);
     VerifyLeftNorm();
 }
 
@@ -119,94 +119,94 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S1D1)
 {
     int L=10;
     Setup(L,1,1);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Left);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Left);
     VerifyLeftNorm();
 }
 TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S5D1)
 {
     int L=10;
     Setup(L,5,1);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Left);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Left);
     VerifyLeftNorm();
 }
 TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S1D1)
 {
     int L=10;
     Setup(L,1,1);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Right);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Right);
     VerifyLeftNorm();
 }
 TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S5D1)
 {
     int L=10;
     Setup(L,5,1);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Right);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Right);
     VerifyLeftNorm();
 }
 
 TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D10)
 {
     Setup(10,1,10);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Left);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Left);
     VerifyLeftNorm();
 }
 
 TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S3D10)
 {
     Setup(10,3,10);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Right);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Right);
     VerifyRightNorm();
 }
 
 TEST_F(MPSNormTesting,LeftNormalOverlapL10S1D2)
 {
     Setup(10,1,2);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Left);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Left);
     EXPECT_NEAR(itsMPS->GetOverlap(),1.0,eps);
 }
 
 TEST_F(MPSNormTesting,RightNormalOverlapL10S2D2)
 {
     Setup(10,3,2);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Right);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Right);
     EXPECT_NEAR(itsMPS->GetOverlap(),1.0,eps);
 }
 
 TEST_F(MPSNormTesting,RightNormalOverlapSite0L10S1D3)
 {
     Setup(10,1,3);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Right);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Right);
     VerifyUnit(GetNeff(0),eps);
 }
 TEST_F(MPSNormTesting,LeftNormalOverlapSiteLL10S1D3)
 {
     Setup(10,1,3);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Left);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Left);
     VerifyUnit(GetNeff(itsMPS->GetL()-1),eps);
 }
 
 TEST_F(MPSNormTesting,RightNormalOverlapSite0L10S5D2)
 {
     Setup(10,5,2);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Right);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Right);
     VerifyUnit(GetNeff(0),eps);
 }
 TEST_F(MPSNormTesting,LeftNormalOverlapSiteLL10S5D2)
 {
     Setup(10,5,2);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Left);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Left);
     VerifyUnit(GetNeff(itsMPS->GetL()-1),eps);
 }
 
@@ -214,7 +214,7 @@ TEST_F(MPSNormTesting,MixedCanonicalL10S1D3)
 {
     int L=10;
     Setup(L,1,3);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
+    itsMPS->InitializeWith(TensorNetworks::Random);
     for (int ia=0;ia<itsMPS->GetL();ia++)
     {
         itsMPS->Normalize(ia);
@@ -228,7 +228,7 @@ TEST_F(MPSNormTesting,MixedCanonicalL10S3D10)
 {
     int L=10;
     Setup(L,3,10);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
+    itsMPS->InitializeWith(TensorNetworks::Random);
     for (int ia=0;ia<itsMPS->GetL();ia++)
     {
         itsMPS->Normalize(ia);
@@ -242,7 +242,7 @@ TEST_F(MPSNormTesting,MixedCanonicalL10S5D2)
 {
     int L=10;
     Setup(L,5,2);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
+    itsMPS->InitializeWith(TensorNetworks::Random);
     for (int ia=0;ia<itsMPS->GetL();ia++)
     {
         itsMPS->Normalize(ia);
@@ -255,7 +255,7 @@ TEST_F(MPSNormTesting,MixedCanonicalL10S5D1)
 {
     int L=10;
     Setup(L,5,1);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
+    itsMPS->InitializeWith(TensorNetworks::Random);
     for (int ia=0;ia<itsMPS->GetL();ia++)
     {
         itsMPS->Normalize(ia);

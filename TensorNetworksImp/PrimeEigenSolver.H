@@ -1,7 +1,7 @@
 #ifndef PRIMEEIGENSOLVER_H
 #define PRIMEEIGENSOLVER_H
 
-#include "SparseMatrix.H"
+#include "Containers/SparseMatrix.H"
 //
 //  Solve sparse eigen systems using the PRIMME library
 //

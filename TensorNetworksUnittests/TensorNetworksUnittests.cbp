@@ -39,7 +39,6 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 			<Add directory="../../" />
-			<Add directory="/usr/include/eigen3" />
 		</Compiler>
 		<Linker>
 			<Add library="TensorNetworks" />

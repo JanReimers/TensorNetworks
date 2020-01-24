@@ -19,7 +19,7 @@ public:
     void Setup(int L, int S2, int D)
     {
         delete itsMPS;
-        itsMPS=new MatrixProductState(L,S2,D);
+        itsMPS=new MatrixProductStateImp(L,S2,D);
     }
 
 
@@ -31,7 +31,7 @@ public:
     MatrixCT GetNeff   (int isite) const {return itsMPS->GetNeff(isite);}
     const MatrixProductSite* GetSite(int isite) const {return itsMPS->itsSites[isite];}
 
-    MatrixProductState* itsMPS;
+    MatrixProductStateImp* itsMPS;
     double eps;
 };
 
@@ -57,7 +57,7 @@ TEST_F(MatrixProductTesting,MatrixOpMul)
 
 TEST_F(MatrixProductTesting,LeftNormalMatricies)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetSite(0)->GetLeftNorm(),eps);
     VerifyUnit(GetSite(1)->GetLeftNorm(),eps);
     VerifyUnit(GetSite(8)->GetLeftNorm(),eps);
@@ -66,7 +66,7 @@ TEST_F(MatrixProductTesting,LeftNormalMatricies)
 
 TEST_F(MatrixProductTesting,RightNormalMatricies)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     // The first site will not be right normalized
     EXPECT_EQ(ToString(GetSite(0)->GetRightNorm()),"(1:1),(1:1) \n[ (2,0) ]\n");
     VerifyUnit(GetSite(1)->GetRightNorm(),eps);
@@ -78,7 +78,7 @@ TEST_F(MatrixProductTesting,RightNormalMatricies)
 TEST_F(MatrixProductTesting,LeftNormalMatricies_S2)
 {
     Setup(10,3,2);
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetSite(0)->GetLeftNorm(),eps);
     VerifyUnit(GetSite(1)->GetLeftNorm(),eps);
     VerifyUnit(GetSite(8)->GetLeftNorm(),eps);
@@ -87,7 +87,7 @@ TEST_F(MatrixProductTesting,LeftNormalMatricies_S2)
 TEST_F(MatrixProductTesting,RightNormalMatricies_S2)
 {
     Setup(10,3,3);
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetSite(1)->GetRightNorm(),eps);
     VerifyUnit(GetSite(8)->GetRightNorm(),eps);
     VerifyUnit(GetSite(9)->GetRightNorm(),eps);
@@ -100,7 +100,7 @@ TEST_F(MatrixProductTesting,RightNormalMatricies_S2)
 //
 TEST_F(MatrixProductTesting,GetOverlap)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     ASSERT_NEAR(itsMPS->GetOverlap(),2.0,eps);
 }
 
@@ -109,8 +109,8 @@ TEST_F(MatrixProductTesting,GetOverlap)
 //
 TEST_F(MatrixProductTesting,GetOverlapS2D3)
 {
-    MatrixProductState mps_local(10,2,3);
-    mps_local.InitializeWith(MatrixProductSite::Product);
+    MatrixProductStateImp mps_local(10,2,3);
+    mps_local.InitializeWith(TensorNetworks::Product);
     ASSERT_NEAR(mps_local.GetOverlap(),3.0,eps);
 }
 
@@ -119,15 +119,15 @@ TEST_F(MatrixProductTesting,GetOverlapS2D3)
 //
 TEST_F(MatrixProductTesting,GetOverlapS3D4)
 {
-    MatrixProductState mps_local(10,3,4);
-    mps_local.InitializeWith(MatrixProductSite::Product);
+    MatrixProductStateImp mps_local(10,3,4);
+    mps_local.InitializeWith(TensorNetworks::Product);
     ASSERT_NEAR(mps_local.GetOverlap(),4.0,eps);
 }
 
 TEST_F(MatrixProductTesting,GetOverlapS1D1)
 {
-    MatrixProductState mps_local(10,1,1);
-    mps_local.InitializeWith(MatrixProductSite::Product);
+    MatrixProductStateImp mps_local(10,1,1);
+    mps_local.InitializeWith(TensorNetworks::Product);
     ASSERT_NEAR(mps_local.GetOverlap(),1.0,eps);
 }
 
@@ -135,58 +135,58 @@ TEST_F(MatrixProductTesting,GetOverlapS1D1)
 
 TEST_F(MatrixProductTesting,GetMLeft_Site_1)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetMLeft(1),eps);
     EXPECT_EQ(ToString(GetMLeft(1)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
 }
 TEST_F(MatrixProductTesting,GetMLeft_Site_2)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetMLeft(2),eps);
     EXPECT_EQ(ToString(GetMLeft(2)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
 }
 TEST_F(MatrixProductTesting,GetMLeft_Site_8)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetMLeft(8),eps);
     EXPECT_EQ(ToString(GetMLeft(8)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
 }
 
 TEST_F(MatrixProductTesting,GetMLeft_Site_9)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetMLeft(9),eps);
     EXPECT_EQ(ToString(GetMLeft(9)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
 }
 
 TEST_F(MatrixProductTesting,GetMLeft_Site_0)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     EXPECT_EQ(ToString(GetMLeft(0)),"(1:1),(1:1) \n[ (1,0) ]\n");
 }
 
 TEST_F(MatrixProductTesting,GetMRight_Site_8)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetMRight(8),eps);
     EXPECT_EQ(ToString(GetMRight(8)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
 }
 
 TEST_F(MatrixProductTesting,GetMRight_Site_9)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     EXPECT_EQ(ToString(GetMRight(9)),"(1:1),(1:1) \n[ (1,0) ]\n");
 }
 
 TEST_F(MatrixProductTesting,GetMRight_Site_0)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetMRight(0),eps);
     EXPECT_EQ(ToString(GetMRight(0)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
 }
 TEST_F(MatrixProductTesting,GetMRight_Site_1)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetMRight(1),eps);
     EXPECT_EQ(ToString(GetMRight(1)),"(1:2),(1:2) \n[ (1,0) (0,0) ]\n[ (0,0) (1,0) ]\n");
 }
@@ -195,7 +195,7 @@ TEST_F(MatrixProductTesting,GetMRight_Site_1)
 TEST_F(MatrixProductTesting,GetMLeft_Site_S2)
 {
     Setup(10,2,3);
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetMLeft(1),eps);
     EXPECT_EQ(ToString(GetMLeft(1)),"(1:3),(1:3) \n[ (1,0) (0,0) (0,0) ]\n[ (0,0) (1,0) (0,0) ]\n[ (0,0) (0,0) (1,0) ]\n");
 }
@@ -207,7 +207,7 @@ TEST_F(MatrixProductTesting,GetMLeft_Site_S2)
 
 TEST_F(MatrixProductTesting,GetOverlapForSite0)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetNeff(0),eps);
 }
 
@@ -216,7 +216,7 @@ TEST_F(MatrixProductTesting,GetOverlapForSite0)
 //
 TEST_F(MatrixProductTesting,GetOverlapForSite1)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetNeff(1),eps);
 }
 
@@ -225,7 +225,7 @@ TEST_F(MatrixProductTesting,GetOverlapForSite1)
 //
 TEST_F(MatrixProductTesting,GetOverlapForSite8)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetNeff(8),eps);
 }
 
@@ -234,7 +234,7 @@ TEST_F(MatrixProductTesting,GetOverlapForSite8)
 //
 TEST_F(MatrixProductTesting,GetOverlapForSite9)
 {
-    itsMPS->InitializeWith(MatrixProductSite::Product);
+    itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetNeff(9),eps);
 }
 

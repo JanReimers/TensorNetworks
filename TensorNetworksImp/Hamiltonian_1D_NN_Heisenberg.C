@@ -1,18 +1,17 @@
-#include "Hamiltonian_1D_NN_Heisenberg.H"
-#include "MatrixProductOperator.H"
-#include "MatrixProductState.H"
+#include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
+#include "TensorNetworksImp/MatrixProductStateImp.H"
 #include <iostream>
-
-
 
 using std::cout;
 using std::endl;
+
 Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, int S2, double J)
-    : itsL(L)
+    : MatrixProductOperator(L,S2)
+    , itsL(L)
     , itsS(0.5*S2)
     , itsJ(J)
 {
-    //ctor
+    Init(this);
 }
 
 Hamiltonian_1D_NN_Heisenberg::~Hamiltonian_1D_NN_Heisenberg()
@@ -86,16 +85,16 @@ double Hamiltonian_1D_NN_Heisenberg::GetSz    (int m, int n) const
 
 
 
-Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int n) const
+TensorNetworks::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Position lbr,int m, int n) const
 {
-    MatrixT W;
+    TensorNetworks::MatrixT W;
 
     switch (lbr)
     {
 //
 //  Implement W=[ 0, J/2*S-, J/2*S+, JSz, 1 ]
 //
-    case Left:
+    case TensorNetworks::Left:
     {
         W.SetLimits(1,Dw);
         W(1,1)=0.0;
@@ -111,7 +110,7 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
 //      [ Sz   0      0    0   0 ]
 //      [ 0  J/2*S- J/2*S+ JSz 1 ]
 //
-    case Bulk :
+    case TensorNetworks::Bulk :
     {
         W.SetLimits(Dw,Dw);
         Fill(W,ElementT(0.0));
@@ -133,7 +132,7 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
 //      [ Sz ]
 //      [ 0  ]
 //
-    case  Right :
+    case  TensorNetworks::Right :
     {
 
         W.SetLimits(Dw,1);
@@ -148,15 +147,29 @@ Hamiltonian::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int
     return W;
 }
 
+TensorNetworks::ipairT  Hamiltonian_1D_NN_Heisenberg::GetDw(TensorNetworks::Position lbr) const
+{
+    TensorNetworks::ipairT ret;
+    switch (lbr)
+    {
+        case TensorNetworks::Left:
+            ret=TensorNetworks::ipairT(1,5);
+            break;
+        case TensorNetworks::Bulk:
+            ret=TensorNetworks::ipairT(5,5);
+            break;
+        case TensorNetworks::Right:
+            ret=TensorNetworks::ipairT(5,1);
+            break;
+    }
+    return ret;
+}
+
 //
-//  Create operators and states.  Why are these here?  Because the Hamiltonian is the
+//  Create states.  Why are these here?  Because the Hamiltonian is the
 //  only thing that knows L,S,Dw
 //
-MatrixProductOperator* Hamiltonian_1D_NN_Heisenberg::CreateMPO() const
-{
-    return new MatrixProductOperator(this,itsL,2*itsS,Dw);
-}
 MatrixProductState*    Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D) const
 {
-    return new MatrixProductState(itsL,2*itsS,D);
+    return new MatrixProductStateImp(itsL,2*itsS,D);
 }

@@ -1,6 +1,6 @@
 #include "Tests.H"
 
-#include "TensorNetworks/MatrixProductState.H"
+#include "TensorNetworksImp/MatrixProductStateImp.H"
 #include "oml/stream.h"
 #include "oml/numeric.h"
 #include "oml/cnumeric.h"
@@ -16,19 +16,19 @@ using std::endl;
 class SVDTesting : public ::testing::Test
 {
 public:
-    typedef MatrixProductSite::MatrixCT MatrixT;
+    typedef TensorNetworks::MatrixCT MatrixT;
     SVDTesting()
     : mps(10,1,2)
   //  , itsSites(mps.itsSites)
     , eps(1.0e-13)
     {
         StreamableObject::SetToPretty();
-        mps.InitializeWith(MatrixProductSite::Product);
+        mps.InitializeWith(TensorNetworks::Product);
     }
  //   const MatrixT& GetA(int i,int ip) const {return itsSites[i]->itsAs[ip]; }
 
 
-    MatrixProductState mps;
+    MatrixProductStateImp mps;
 //    MatrixProductState::SitesType& itsSites;
     double eps;
 };
@@ -207,7 +207,7 @@ TEST_F(SVDTesting,OML_EigenSolverComplexHermitian)
 }
 
 
-#include "TensorNetworks/SparseMatrix.H"
+#include "Containers/SparseMatrix.H"
 
 TEST_F(SVDTesting,SparseMatrixClass)
 {
@@ -225,7 +225,7 @@ TEST_F(SVDTesting,SparseMatrixClass)
     cout << "Sparsisty=" << sm.GetSparsisty() << "%" << endl;
 }
 
-#include "TensorNetworks/PrimeEigenSolver.H"
+#include "TensorNetworksImp/PrimeEigenSolver.H"
 
 TEST_F(SVDTesting,Prime_EigenSolverComplexHermitian200x200)
 {

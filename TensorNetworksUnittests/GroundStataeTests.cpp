@@ -1,17 +1,17 @@
 #include "Tests.H"
-#include "TensorNetworks/MatrixProductOperator.H"
-#include "TensorNetworks/IdentityOperator.H"
-#include "TensorNetworks/Hamiltonian_1D_NN_Heisenberg.H"
+#include "TensorNetworksImp/MatrixProductOperator.H"
+#include "TensorNetworksImp/IdentityOperator.H"
+#include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
 #include "oml/stream.h"
 #include <complex>
 
 using std::setw;
 
-typedef MatrixProductOperator::Matrix6T Matrix6T;
+typedef TensorNetworks::Matrix6T Matrix6T;
 class GroundStateTesting : public ::testing::Test
 {
 public:
-    typedef MatrixProductSite::MatrixCT MatrixCT;
+    typedef TensorNetworks::MatrixCT MatrixCT;
     GroundStateTesting()
     : eps(1.0e-13)
     {
@@ -22,14 +22,12 @@ public:
     void Setup(int L, int S2, int D)
     {
         itsH=new Hamiltonian_1D_NN_Heisenberg(L,S2,1.0);
-        itsHamiltonianMPO=itsH->CreateMPO();
         itsMPS=itsH->CreateMPS(D);
     }
 
 
-    Hamiltonian* itsH;
-    MatrixProductOperator* itsHamiltonianMPO;
-    MatrixProductState*    itsMPS;
+    Hamiltonian*         itsH;
+    MatrixProductState*  itsMPS;
     double eps;
 };
 
@@ -38,10 +36,10 @@ TEST_F(GroundStateTesting,TestSweepL9S1D2)
 {
     int L=9,S2=1,D=2,maxIter=100;
     Setup(L,S2,D);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    int nSweep=itsMPS->FindGroundState(itsHamiltonianMPO,maxIter,1e-9);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9);
 
-    double E=itsMPS->GetExpectationIterate(itsHamiltonianMPO);
+    double E=itsMPS->GetExpectationIterate(itsH);
     double o=itsMPS->GetOverlap();
     EXPECT_NEAR(o,1.0,eps);
     EXPECT_NEAR(E/(L-1),-0.45317425,1e-7);
@@ -53,30 +51,30 @@ TEST_F(GroundStateTesting,TestSweepL9S1D8)
 {
     int L=9,S2=1,D=8,maxIter=100;
     Setup(L,S2,D);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    int nSweep=itsMPS->FindGroundState(itsHamiltonianMPO,maxIter,1e-9);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9);
 
-    double E=itsMPS->GetExpectationIterate(itsHamiltonianMPO);
+    double E=itsMPS->GetExpectationIterate(itsH);
     double o=itsMPS->GetOverlap();
     EXPECT_NEAR(o,1.0,eps);
     EXPECT_NEAR(E/(L-1),-0.46703753,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }
-#endif
 
 TEST_F(GroundStateTesting,TestSweepL9S5D2)
 {
     int L=9,S2=5,D=2,maxIter=100;
     Setup(L,S2,D);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    int nSweep=itsMPS->FindGroundState(itsHamiltonianMPO,maxIter,1e-9);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9);
 
-    double E=itsMPS->GetExpectationIterate(itsHamiltonianMPO);
+    double E=itsMPS->GetExpectationIterate(itsH);
     double o=itsMPS->GetOverlap();
     EXPECT_NEAR(o,1.0,eps);
     EXPECT_NEAR(E/(L-1),-7.025661 ,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }
+#endif
 
 /*
 TEST_F(GroundStateTesting,TestNeelStateSurvey)
@@ -107,10 +105,10 @@ TEST_F(GroundStateTesting,TestNeelStateSurvey)
 TEST_F(GroundStateTesting,TestIdentityOperator)
 {
     Setup(10,1,2);
-    itsMPS->InitializeWith(MatrixProductSite::Random);
-    itsMPS->Normalize(MatrixProductSite::Left);
-    Operator* IO=new IdentityOperator();
-    MatrixProductOperator* mpoi=new MatrixProductOperator(IO,10,1,2);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Left);
+    OperatorWRepresentation* IO=new IdentityOperator();
+    MatrixProductOperator* mpoi=new MatrixProductOperator(IO,10,1);
 
     double S=itsMPS->GetExpectation(mpoi);
     EXPECT_NEAR(S,1.0,eps);
