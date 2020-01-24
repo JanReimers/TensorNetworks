@@ -18,6 +18,8 @@
 					<Add option="-g" />
 					<Add option="-DDEBUG" />
 					<Add directory="./" />
+					<Add directory="TensorNetworks" />
+					<Add directory="TensorNetworksImp" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -33,6 +35,8 @@
 					<Add option="-pg" />
 					<Add option="-DNDEBUG" />
 					<Add directory="./" />
+					<Add directory="TensorNetworks" />
+					<Add directory="TensorNetworksImp" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />
@@ -42,13 +46,55 @@
 		<Compiler>
 			<Add directory="../" />
 		</Compiler>
+		<Unit filename="Containers/Matrix4.H" />
+		<Unit filename="Containers/Matrix6.H" />
+		<Unit filename="Containers/SparseMatrix.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Containers/SparseMatrix.H" />
+		<Unit filename="Containers/Vector3.H" />
+		<Unit filename="Containers/Vector4.H" />
 		<Unit filename="TensorNetworks/Enums.H" />
+		<Unit filename="TensorNetworks/Factory.H" />
 		<Unit filename="TensorNetworks/Hamiltonian.H" />
 		<Unit filename="TensorNetworks/MatrixProductState.H" />
 		<Unit filename="TensorNetworks/Operator.H" />
 		<Unit filename="TensorNetworks/OperatorWRepresentation.H" />
 		<Unit filename="TensorNetworks/SiteOperator.H" />
 		<Unit filename="TensorNetworks/Typedefs.H" />
+		<Unit filename="TensorNetworksImp/FactoryImp.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/FactoryImp.H" />
+		<Unit filename="TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H" />
+		<Unit filename="TensorNetworksImp/IdentityOperator.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/IdentityOperator.H" />
+		<Unit filename="TensorNetworksImp/MatrixProductOperator.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/MatrixProductOperator.H" />
+		<Unit filename="TensorNetworksImp/MatrixProductSite.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/MatrixProductSite.H" />
+		<Unit filename="TensorNetworksImp/MatrixProductStateImp.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/MatrixProductStateImp.H" />
+		<Unit filename="TensorNetworksImp/PrimeEigenSolver.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/PrimeEigenSolver.H" />
+		<Unit filename="TensorNetworksImp/SiteOperatorImp.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/SiteOperatorImp.H" />
+		<Unit filename="TensorNetworksImp/Typedefs.H" />
 		<Extensions>
 			<code_completion />
 			<debugger />

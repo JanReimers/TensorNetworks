@@ -3,7 +3,7 @@
 
 #include "TensorNetworks/Operator.H"
 
-class MatrixProductOperator;
+class OperatorWRepresentation;
 class MatrixProductState;
 
 
@@ -14,11 +14,9 @@ class Hamiltonian : public virtual Operator
         virtual ~Hamiltonian() {}
         virtual int GetL() const=0;
         virtual int Getp() const=0;
-        //
-        //  Create operators and states
-        //
-        virtual MatrixProductState*    CreateMPS(int D) const=0;
-
+        //  Creates an MPS or operators with the correct lattice size and spin space.
+        virtual MatrixProductState* CreateMPS     (int D) const=0;
+        virtual Operator*           CreateOperator(const OperatorWRepresentation*) const=0;
 };
 
-#endif // HAMILTONIAN_H
+#endif //HAMILTONIAN_H

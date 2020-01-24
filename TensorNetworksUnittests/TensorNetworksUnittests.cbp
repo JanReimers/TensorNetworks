@@ -38,6 +38,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add directory="../" />
 			<Add directory="../../" />
 		</Compiler>
 		<Linker>

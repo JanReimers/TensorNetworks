@@ -1,31 +1,32 @@
 #include "Tests.H"
-#include "TensorNetworksImp/MatrixProductOperator.H"
+#include "TensorNetworks/Hamiltonian.H"
+#include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworks/SiteOperator.H"
-#include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
-#include "TensorNetworksImp/IdentityOperator.H"
+#include "TensorNetworks/Factory.H"
 #include "oml/stream.h"
 #include "oml/vector_io.h"
 #include <complex>
 
-typedef TensorNetworks::Matrix6T Matrix6T;
 class MPOTesting : public ::testing::Test
 {
 public:
+    typedef TensorNetworks::Matrix6T Matrix6T;
     typedef TensorNetworks::MatrixT  MatrixT;
     typedef TensorNetworks::MatrixCT MatrixCT;
     typedef TensorNetworks::Vector3T Vector3T;
     typedef TensorNetworks::eType eType;
     MPOTesting()
     : eps(1.0e-13)
+    , itsFactory(TensorNetworks::Factory::GetFactory())
     {
+        assert(itsFactory);
         StreamableObject::SetToPretty();
 
     }
     void Setup(int L, int S2, int D)
     {
-        Hamiltonian_1D_NN_Heisenberg* HH=new Hamiltonian_1D_NN_Heisenberg(L,S2,1.0);
-        itsH=HH;
-        itsWRep=HH;
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S2,1.0,1.0,1.0,0.0);
+        itsWRep=dynamic_cast<OperatorWRepresentation*>(itsH);
         itsMPS=itsH->CreateMPS(D);
     }
     double ENeel(int S2) const;
@@ -42,10 +43,11 @@ public:
           MatrixProductStateImp* GetMPSImp()       {return dynamic_cast<      MatrixProductStateImp*>(itsMPS);}
     const MatrixProductStateImp* GetMPSImp() const {return dynamic_cast<const MatrixProductStateImp*>(itsMPS);}
 
+    double eps;
+    const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
     Hamiltonian* itsH;
     OperatorWRepresentation* itsWRep;
     MatrixProductState*    itsMPS;
-    double eps;
 };
 
 
@@ -339,14 +341,14 @@ TEST_F(MPOTesting,TestGetExpectation2_I_I)
     Setup(L,S2,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::Right);
-    OperatorWRepresentation* IO=new IdentityOperator();
-    MatrixProductOperator* mpoi=new MatrixProductOperator(IO,L,S2);
+    OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
+    Operator* IO=itsH->CreateOperator(IWO);
 
     double E1=itsMPS->GetExpectation(itsH);
-    double I1=itsMPS->GetExpectation(mpoi);
-    double II=itsMPS->GetExpectation(mpoi,mpoi);
-    double IE=itsMPS->GetExpectation(mpoi,itsH);
-    double EI=itsMPS->GetExpectation(itsH,mpoi);
+    double I1=itsMPS->GetExpectation(IO);
+    double II=itsMPS->GetExpectation(IO,IO);
+    double IE=itsMPS->GetExpectation(IO,itsH);
+    double EI=itsMPS->GetExpectation(itsH,IO);
     double EE=itsMPS->GetExpectation(itsH,itsH);
     EXPECT_NEAR(I1,1.0,eps);
     EXPECT_NEAR(II,1.0,eps);

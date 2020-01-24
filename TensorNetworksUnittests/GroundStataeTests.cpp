@@ -1,19 +1,21 @@
 #include "Tests.H"
-#include "TensorNetworksImp/MatrixProductOperator.H"
-#include "TensorNetworksImp/IdentityOperator.H"
-#include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
+#include "TensorNetworks/Hamiltonian.H"
+#include "TensorNetworks/OperatorWRepresentation.H"
+#include "TensorNetworks/SiteOperator.H"
+#include "TensorNetworks/Factory.H"
 #include "oml/stream.h"
 #include <complex>
 
 using std::setw;
 
-typedef TensorNetworks::Matrix6T Matrix6T;
 class GroundStateTesting : public ::testing::Test
 {
 public:
+    typedef TensorNetworks::Matrix6T Matrix6T;
     typedef TensorNetworks::MatrixCT MatrixCT;
     GroundStateTesting()
     : eps(1.0e-13)
+    , itsFactory(TensorNetworks::Factory::GetFactory())
     {
         StreamableObject::SetToPretty();
 
@@ -21,14 +23,15 @@ public:
 
     void Setup(int L, int S2, int D)
     {
-        itsH=new Hamiltonian_1D_NN_Heisenberg(L,S2,1.0);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S2,1.0,1.0,1.0,0.0);
         itsMPS=itsH->CreateMPS(D);
     }
 
 
+    double eps;
+    const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
     Hamiltonian*         itsH;
     MatrixProductState*  itsMPS;
-    double eps;
 };
 
 
@@ -107,10 +110,9 @@ TEST_F(GroundStateTesting,TestIdentityOperator)
     Setup(10,1,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::Left);
-    OperatorWRepresentation* IO=new IdentityOperator();
-    MatrixProductOperator* mpoi=new MatrixProductOperator(IO,10,1);
-
-    double S=itsMPS->GetExpectation(mpoi);
+    OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
+    Operator* IO=itsH->CreateOperator(IWO);
+    double S=itsMPS->GetExpectation(IO);
     EXPECT_NEAR(S,1.0,eps);
 
 }

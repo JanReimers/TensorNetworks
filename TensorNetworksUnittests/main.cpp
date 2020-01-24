@@ -1,5 +1,8 @@
 #include "Tests.H"
+#include "TensorNetworks/Factory.H"
 #include <complex>
+
+TensorNetworks::FactoryMain fMain;
 
 int main(int argc, char **argv)
 {
