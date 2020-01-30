@@ -1,5 +1,11 @@
 #include "TensorNetworksImp/MatrixProductStateImp.H"
 #include "TensorNetworks/Hamiltonian.H"
+#include "TensorNetworks/LRPSupervisor.H"
+#include "Functions/Mesh/PlotableMesh.H"
+#include "Plotting/CurveUnits.H"
+#include "Plotting/Factory.H"
+#include "Plotting/MultiGraph.H"
+#include "Misc/Dimension.H"
 #include "oml/cnumeric.h"
 #include "oml/vector_io.h"
 #include <iostream>
@@ -7,6 +13,7 @@
 
 using std::cout;
 using std::endl;
+using Dimensions::PureNumber;
 
 //-------------------------------------------------------------------------------
 //
@@ -17,16 +24,60 @@ MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D)
     , itsS2(S2)
     , itsD(D)
     , itsp(itsS2+1)
+    , itsSitesMesh(0)
+    , itsBondsMesh(0)
 {
     itsSites.push_back(new MatrixProductSite(TensorNetworks::Left,itsp,1,itsD));
     for (int i=1;i<itsL-1;i++)
         itsSites.push_back(new MatrixProductSite(TensorNetworks::Bulk,itsp,itsD,itsD));
     itsSites.push_back(new MatrixProductSite(TensorNetworks::Right,itsp,itsD,1));
+
+    Range rsites(1.0,itsL);
+    itsSitesMesh=new UniformMesh(rsites,1.0);
+    itsBondsMesh=new Mesh(itsSitesMesh->CenterPoints());
+
+    itsSitesPMesh = new PlotableMesh(*itsSitesMesh,"none");
+    itsBondsPMesh = new PlotableMesh(*itsBondsMesh,"none");
+
+    itsSiteEnergies .SetSize(itsL);
+    itsSiteEGaps    .SetSize(itsL);
+    itsBondEntropies.SetSize(itsL-1);
+    itsBondMinSVs   .SetSize(itsL-1);
+    Fill(itsSiteEnergies ,0.0);
+    Fill(itsSiteEGaps    ,0.0);
+    Fill(itsBondEntropies,0.0);
+    Fill(itsBondMinSVs   ,0.0);
+
+    NamedUnit EJ("none","Site E/J");
+    itsSitesPMesh->Insert
+    (
+        new TPlotableMeshClient<PureNumber,Array<double> >
+        (*itsSitesPMesh,"Site E/J","E/J",EJ,PureNumber(1.0),itsSiteEnergies, Plotting::Green)
+    );
+    itsSitesPMesh->Insert
+    (
+        new TPlotableMeshClient<PureNumber,Array<double> >
+        (*itsSitesPMesh,"Site Egap/J","Egap/J",NamedUnit("none","Egap/J"),PureNumber(1.0),itsSiteEGaps, Plotting::Green)
+    );
+    itsBondsPMesh->Insert
+    (
+        new TPlotableMeshClient<PureNumber,Array<double> >
+        (*itsBondsPMesh,"Site Bond Entropy","Entropy",NamedUnit("none","Entropy"),PureNumber(1.0),itsBondEntropies, Plotting::Green)
+    );
+    itsBondsPMesh->Insert
+    (
+        new TPlotableMeshClient<PureNumber,Array<double> >
+        (*itsBondsPMesh,"Site Min(s)","Min(s)",NamedUnit("none","Min(s)"),PureNumber(1.0),itsBondMinSVs, Plotting::Green)
+    );
+
 }
 
 MatrixProductStateImp::~MatrixProductStateImp()
 {
-    //dtor
+    delete itsBondsPMesh;
+    delete itsSitesPMesh;
+    delete itsBondsMesh;
+    delete itsSitesMesh;
 }
 
 void MatrixProductStateImp::InitializeWith(TensorNetworks::State state)
@@ -116,14 +167,64 @@ bool MatrixProductStateImp::CheckNormalized(int isite,double eps) const
     return error<eps;
 }
 
+GraphDefinition MatrixProductStateImp::theGraphs[]=
+{
+    {"Site E/J"         ,"none"     ,"none"  ,"Sites"},
+    {"Site Egap/J"      ,"none"     ,"none"  ,"Sites"},
+    {"Site Bond Entropy","none"     ,"none"  ,"Sites"},
+    {"Site Min(s)"      ,"none"     ,"none"  ,"Sites"},
+    {"Iter E/J"         ,"none"     ,"none"  ,"Iterations"},
+    {"Iter dE/J"        ,"none"     ,"none"  ,"Iterations"},
+    {"Iter sigE/J"      ,"none"     ,"none"  ,"Iterations"},
+};
+
+const int MatrixProductStateImp::n_graphs=sizeof(MatrixProductStateImp::theGraphs)/sizeof(GraphDefinition);
+
+
+void MatrixProductStateImp::MakeAllGraphs()
+{
+    InsertLine("Iter E/J"  ,"E/J"     ,Plotting::CurveUnits("none","none"),Plotting::Black  );
+    InsertLine("Iter dE/J"  ,"dE/J"   ,Plotting::CurveUnits("none","none"),Plotting::Black  );
+    InsertLine("Iter sigE/J"  ,"(<E^2>-<E>^2)/J"   ,Plotting::CurveUnits("none","none"),Plotting::Black  );
+    MultiPlotableImp::Insert(itsSitesPMesh);
+    MultiPlotableImp::Insert(itsBondsPMesh);
+
+    Plotting::Graph* g=0;
+    for (int i=0; i<n_graphs; i++)
+    {
+        const GraphDefinition& gd=theGraphs[i];
+        NamedUnit x(gd.Xunits);
+        NamedUnit y(gd.Yunits,gd.Title);
+        g=Plotting::Factory::GetFactory()->MakeGraph(gd.Title,Plotting::CurveUnits(x,y));
+        g->SetVerbose();
+        MultiPlotableImp::Insert(g,gd.Layer);
+    }
+}
+
+void MatrixProductStateImp::UpdateSiteData()
+{
+    for (int ia=0; ia<itsL; ia++)
+    {
+        itsSiteEnergies[ia]=itsSites[ia]->GetSiteEnergy();
+        itsSiteEGaps   [ia]=itsSites[ia]->GetEGap();
+    }
+    for (int ia=0; ia<itsL-1; ia++)
+    {
+        itsBondEntropies[ia]=itsSites[ia]->GetBondEntropy();
+        itsBondMinSVs   [ia]=itsSites[ia]->GetMinSV();
+    }
+
+}
 
 //--------------------------------------------------------------------------------------
 //
 // Find ground state
 //
-int   MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int maxIter, double eps)
+int   MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int maxIter, double eps,LRPSupervisor* Supervisor)
 {
+    Supervisor->ReadyToStart();
     Normalize(TensorNetworks::Right);
+    Supervisor->DoneOneStep(0);
     LoadHeffCaches(hamiltonian);
 
     int nSweep=0;
@@ -132,7 +233,18 @@ int   MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int
         SweepRight(hamiltonian,true);
         SweepLeft (hamiltonian,true);
         nSweep++;
-        cout << "<E^2>-<E>^2=" << GetSigmaE(hamiltonian) << endl;
+
+        double E1=GetExpectationIterate(hamiltonian);
+        double E2=GetExpectation(hamiltonian,hamiltonian);
+        double dE=GetMaxDeltaE();
+        if (weHaveGraphs())
+        {
+            AddPoint("Iter E/J",Plotting::Point(nSweep,E1));
+            AddPoint("Iter dE/J",Plotting::Point(nSweep,dE));
+            AddPoint("Iter sigE/J",Plotting::Point(nSweep,E2-E1*E1));
+        }
+        UpdateSiteData();
+        Supervisor->DoneOneStep(0); //Supervisor will update the graphs
         if (GetMaxDeltaE()<eps) break;
     }
     return nSweep;
@@ -144,7 +256,7 @@ void MatrixProductStateImp::SweepRight(const Hamiltonian* h,bool quiet)
     if (!quiet)
     {
         cout.precision(10);
-        cout << "SweepRight entry Norm Status         =" << GetNormStatus() << "  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
+        cout << "SweepRight  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
     }
     for (int ia=0; ia<itsL-1; ia++)
     {
@@ -155,7 +267,7 @@ void MatrixProductStateImp::SweepRight(const Hamiltonian* h,bool quiet)
         itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
         itsSites[ia+1]->Contract(s,Vdagger);
         itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
-        if (!quiet) cout << "SweepRight post constract Norm Status=" << GetNormStatus() << "  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
+        if (!quiet) cout << "SweepRight post constract  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
     }
 }
 
@@ -164,7 +276,7 @@ void MatrixProductStateImp::SweepLeft(const Hamiltonian* h,bool quiet)
     if (!quiet)
     {
         cout.precision(10);
-        cout << "SweepLeft  entry Norm Status         =" << GetNormStatus() << "  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
+        cout << "SweepLeft  entry  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
     }
     for (int ia=itsL-1; ia>0; ia--)
     {
@@ -176,7 +288,7 @@ void MatrixProductStateImp::SweepLeft(const Hamiltonian* h,bool quiet)
         itsSites[ia-1]->Contract(U,s);
         itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
         if (!quiet)
-            cout << "SweepLeft  post constract Norm Status=" << GetNormStatus() << "  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
+            cout << "SweepLeft  post contract  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
 
     }
 }
@@ -216,14 +328,6 @@ void MatrixProductStateImp::LoadHeffCaches(const Hamiltonian* h)
     GetEORightIterate(h,0,true);
 }
 
-double  MatrixProductStateImp::GetSigmaE(const Hamiltonian* h) const
-{
-    double E1=GetExpectationIterate(h);
-    double E2=GetExpectation(h,h);
-    return E2-E1*E1;
-}
-
-
 double  MatrixProductStateImp::GetMaxDeltaE() const
 {
     double MaxDeltaE=0.0;
@@ -235,6 +339,13 @@ double  MatrixProductStateImp::GetMaxDeltaE() const
     return MaxDeltaE;
 }
 
+
+void MatrixProductStateImp::Insert(Plotting::MultiGraph* graphs)
+{
+    graphs->InsertLayer("Sites");
+    graphs->InsertLayer("Iterations");
+    MultiPlotableImp::Insert(graphs);
+}
 
 
 
@@ -332,11 +443,11 @@ void MatrixProductStateImp::Report(std::ostream& os) const
     }
 }
 
-std::string MatrixProductStateImp::GetNormStatus() const
+std::vector<std::string> MatrixProductStateImp::GetNormStatus() const
 {
-    std::string ret;
+    std::vector<std::string> ret;
     for (cSIter i=itsSites.begin(); i!=itsSites.end(); i++)
-        ret+=i->GetNormStatus();
+        ret.push_back(i->GetNormStatus());
     return ret;
 }
 

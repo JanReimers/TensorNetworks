@@ -78,7 +78,7 @@
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\mathcal{\hat{H}}=\sum_{\left\langle ij\right\rangle }\left(J_{x}\hat{S}_{i}^{x}\hat{S}_{j}^{x}+J_{y}\hat{S}_{i}^{y}\hat{S}_{j}^{y}+J_{z}\hat{S}_{i}^{z}\hat{S}_{j}^{z}\right)+h_{z}\sum_{i}\hat{S}_{i}^{z}
+\mathcal{\hat{H}}=\sum_{i=1}^{L=1}J_{xy}\left(\hat{S}_{i}^{x}\hat{S}_{i+1}^{x}+\hat{S}_{i}^{y}\hat{S}_{i+1}^{y}\right)+J_{z}\hat{S}_{i}^{z}\hat{S}_{i+1}^{z}+h_{z}\sum_{i}\hat{S}_{i}^{z}
 \]
 
 \end_inset

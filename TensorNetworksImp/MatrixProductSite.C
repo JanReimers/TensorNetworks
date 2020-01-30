@@ -116,6 +116,7 @@ void MatrixProductSite::SVDLeft_Normalize(VectorT& s, MatrixCT& Vdagger)
     //
     ReshapeLeft(A);  //A is now U
     itsBondEntropy=CalcBondEntropy(s);
+    itsMinSV=s(N);
 //    cout << "Bond S=" << itsBondEntropy << endl;
 }
 

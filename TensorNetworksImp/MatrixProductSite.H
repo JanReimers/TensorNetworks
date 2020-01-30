@@ -32,6 +32,10 @@ class MatrixProductSite
 //  Access to information
 //
         const MatLimits GetLimits() const {return itsAs[0].GetLimits();}
+        double GetSiteEnergy()  {return itsEmin;}
+        double GetEGap()        {return itsGapE;}
+        double GetBondEntropy() {return itsBondEntropy;}
+        double GetMinSV()       {return itsMinSV;}
 
 //---------------------------------------------------------------------------------
 //
@@ -146,6 +150,7 @@ private:
 
         int itsNumUpdates;
         double itsBondEntropy;
+        double itsMinSV;
         int itsRank;
         double itsHeffDensity;
         double itsEmin;

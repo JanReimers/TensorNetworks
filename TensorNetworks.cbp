@@ -21,6 +21,9 @@
 					<Add directory="TensorNetworks" />
 					<Add directory="TensorNetworksImp" />
 				</Compiler>
+				<Linker>
+					<Add directory="../Debug" />
+				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="../Release/TensorNetworks" prefix_auto="1" extension_auto="1" />
@@ -44,8 +47,19 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-fPIC" />
+			<Add option="-DHAVE_CONFIG_H" />
 			<Add directory="../" />
+			<Add directory="../Plotting" />
 		</Compiler>
+		<Linker>
+			<Add library="Plotting" />
+			<Add library="Misc" />
+			<Add library="oml" />
+			<Add library="primme" />
+			<Add library="lapack" />
+			<Add library="blas" />
+		</Linker>
 		<Unit filename="Containers/Matrix4.H" />
 		<Unit filename="Containers/Matrix6.H" />
 		<Unit filename="Containers/SparseMatrix.C">
@@ -57,7 +71,9 @@
 		<Unit filename="TensorNetworks/Enums.H" />
 		<Unit filename="TensorNetworks/Factory.H" />
 		<Unit filename="TensorNetworks/Hamiltonian.H" />
+		<Unit filename="TensorNetworks/LRPSupervisor.H" />
 		<Unit filename="TensorNetworks/MatrixProductState.H" />
+		<Unit filename="TensorNetworks/MultiPlotable.H" />
 		<Unit filename="TensorNetworks/Operator.H" />
 		<Unit filename="TensorNetworks/OperatorWRepresentation.H" />
 		<Unit filename="TensorNetworks/SiteOperator.H" />
@@ -86,6 +102,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/MatrixProductStateImp.H" />
+		<Unit filename="TensorNetworksImp/MultiPlotableImp.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/MultiPlotableImp.H" />
 		<Unit filename="TensorNetworksImp/PrimeEigenSolver.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -95,6 +115,8 @@
 		</Unit>
 		<Unit filename="TensorNetworksImp/SiteOperatorImp.H" />
 		<Unit filename="TensorNetworksImp/Typedefs.H" />
+		<Unit filename="wx/wxMPS.py" />
+		<Unit filename="wx/wxMPSFrame.py" />
 		<Extensions>
 			<code_completion />
 			<debugger />

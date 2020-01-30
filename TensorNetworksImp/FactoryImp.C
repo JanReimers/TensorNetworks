@@ -2,25 +2,15 @@
 #include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
 #include "TensorNetworksImp/IdentityOperator.H"
 
-TensorNetworks::Factory* TensorNetworks::FactoryMain::thierFactory=0;
-
-TensorNetworks::FactoryMain::FactoryMain()
+const TensorNetworks::Factory* TensorNetworks::Factory::GetFactory()
 {
-  if (!thierFactory) thierFactory=new TensorNetworks::FactoryImp;
+    return new TensorNetworks::FactoryImp;
 }
-
-TensorNetworks::FactoryMain::~FactoryMain()
-{
-  delete thierFactory;
-}
-
-template <> TensorNetworks::Factory* TFactoryBase<TensorNetworks::Factory>::thierFactory=0;
-
 
 Hamiltonian* TensorNetworks::FactoryImp::
-Make1D_NN_HeisenbergHamiltonian(int L, int S2, double Jx, double Jy, double Jz, double hz) const
+Make1D_NN_HeisenbergHamiltonian(int L, double S, double Jxy, double Jz, double hz) const
 {
-    return new Hamiltonian_1D_NN_Heisenberg(L,S2,Jz);
+    return new Hamiltonian_1D_NN_Heisenberg(L,S,Jxy,Jz,hz);
 }
 
 Operator* TensorNetworks::FactoryImp::MakeOperator(const OperatorWRepresentation* Wrep, int L, int S2) const

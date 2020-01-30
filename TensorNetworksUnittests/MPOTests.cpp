@@ -5,7 +5,6 @@
 #include "TensorNetworks/Factory.H"
 #include "oml/stream.h"
 #include "oml/vector_io.h"
-#include <complex>
 
 class MPOTesting : public ::testing::Test
 {
@@ -25,7 +24,7 @@ public:
     }
     void Setup(int L, int S2, int D)
     {
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S2,1.0,1.0,1.0,0.0);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S2/2.0,1.0,1.0,0.0);
         itsWRep=dynamic_cast<OperatorWRepresentation*>(itsH);
         itsMPS=itsH->CreateMPS(D);
     }
@@ -63,13 +62,13 @@ TEST_F(MPOTesting,MakeHamiltonian)
 TEST_F(MPOTesting,HamiltonianGetLeftW00)
 {
     Setup(10,1,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::Left,0,0)),"(1:1),(1:5) \n[ 0 0 0 -0.5 1 ]\n");
+    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::Left,0,0)),"(1:1),(1:5) \n[ -0 0 0 -0.5 1 ]\n");
 }
 
 TEST_F(MPOTesting,HamiltonianGetRightW00)
 {
     Setup(10,1,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::Right,0,0)),"(1:5),(1:1) \n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ -0.5 ]\n[ 0 ]\n");
+    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::Right,0,0)),"(1:5),(1:1) \n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ -0.5 ]\n[ -0 ]\n");
 }
 TEST_F(MPOTesting,HamiltonianGetLeftW10)
 {
@@ -105,7 +104,7 @@ TEST_F(MPOTesting,HamiltonianGetRightW11)
 TEST_F(MPOTesting,CheckThatWsGotLoaded)
 {
     Setup(10,1,2);
-    EXPECT_EQ(ToString(GetW(1,0,0)),"(1:5),(1:5) \n[ 1 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ -0.5 0 0 0 0 ]\n[ 0 0 0 -0.5 1 ]\n");
+    EXPECT_EQ(ToString(GetW(1,0,0)),"(1:5),(1:5) \n[ 1 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ -0.5 0 0 0 0 ]\n[ -0 0 0 -0.5 1 ]\n");
     EXPECT_EQ(ToString(GetW(1,0,1)),"(1:5),(1:5) \n[ 0 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 1 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 0 0.5 0 0 0 ]\n");
 }
 

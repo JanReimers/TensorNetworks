@@ -13,13 +13,13 @@ class Hamiltonian_1D_NN_Heisenberg
     , public MatrixProductOperator
 {
     public:
-        Hamiltonian_1D_NN_Heisenberg(int L, int S2, double J);
+        Hamiltonian_1D_NN_Heisenberg(int L, double S, double Jxy,double Jz, double hz);
         virtual ~Hamiltonian_1D_NN_Heisenberg();
         //
         //  Hamiltonian interface
         //
         virtual int GetL () const {return itsL;}
-        virtual int Getp () const {return itsS+1;}
+        virtual int Getp () const {return 2*itsS+1;}
         virtual MatrixProductState* CreateMPS(int D) const;
         virtual Operator*           CreateOperator(const OperatorWRepresentation*) const;
 
@@ -37,8 +37,8 @@ class Hamiltonian_1D_NN_Heisenberg
         double I    (int m, int n) const;
         static const int Dw=5;
         int    itsL; //Number of lattice sites
-        double itsS; // 2S avoid storing half intergers
-        double itsJ; //NN coupling constant
+        double itsS; //
+        double itsJxy,itsJz,itshz; //NN coupling constants and external field
 };
 
 #endif // HAMILTONIAN_1D_NN_HEISENBERG_H

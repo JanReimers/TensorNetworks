@@ -6,12 +6,22 @@
 using std::cout;
 using std::endl;
 
-Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, int S2, double J)
-    : MatrixProductOperator(L,S2)
+Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, double Jxy,double Jz, double hz)
+    : MatrixProductOperator(L,2*S)
     , itsL(L)
-    , itsS(0.5*S2)
-    , itsJ(J)
+    , itsS(S)
+    , itsJxy(Jxy)
+    , itsJz(Jz)
+    , itshz(hz)
 {
+    assert(itsL>=1);
+    assert(itsS>=0.5);
+    assert(fabs(itsJxy)+fabs(Jz)>0.0);
+    //cout << "L=" << L << endl;
+    //cout << "S=" << S << endl;
+    //cout << "Jxy=" << Jxy << endl;
+    //cout << "Jz=" << Jz << endl;
+    //cout << "hz=" << hz << endl;
     Init(this);
 }
 
@@ -93,23 +103,23 @@ TensorNetworks::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Posi
     switch (lbr)
     {
 //
-//  Implement W=[ 0, J/2*S-, J/2*S+, JSz, 1 ]
+//  Implement W=[ 0, Jxy/2*S-, Jxy/2*S+, JzSz, 1 ]
 //
     case TensorNetworks::Left:
     {
         W.SetLimits(1,Dw);
-        W(1,1)=0.0;
-        W(1,2)=itsJ/2.0*GetSm(m,n);
-        W(1,3)=itsJ/2.0*GetSp(m,n);
-        W(1,4)=itsJ    *GetSz(m,n);
+        W(1,1)=itshz*GetSz(m,n);
+        W(1,2)=itsJxy/2.0*GetSm(m,n);
+        W(1,3)=itsJxy/2.0*GetSp(m,n);
+        W(1,4)=itsJz     *GetSz(m,n);
         W(1,5)=I(m,n);
     }
     break;
-//      [ 1    0      0    0   0 ]
-//      [ S+   0      0    0   0 ]
-//  W = [ S-   0      0    0   0 ]
-//      [ Sz   0      0    0   0 ]
-//      [ 0  J/2*S- J/2*S+ JSz 1 ]
+//      [ 1       0        0      0    0 ]
+//      [ S+      0        0      0    0 ]
+//  W = [ S-      0        0      0    0 ]
+//      [ Sz      0        0      0    0 ]
+//      [ hzSz  Jxy/2*S- Jxy/2*S+ JzSz 1 ]
 //
     case TensorNetworks::Bulk :
     {
@@ -119,10 +129,10 @@ TensorNetworks::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Posi
         W(2,1)=GetSp(m,n);
         W(3,1)=GetSm(m,n);
         W(4,1)=GetSz(m,n);
-        //W(5,1)=0.0;
-        W(5,2)=itsJ/2.0*GetSm(m,n);
-        W(5,3)=itsJ/2.0*GetSp(m,n);
-        W(5,4)=itsJ    *GetSz(m,n); //The get return 2*Sz to avoid half integers
+        W(5,1)=itshz*GetSz(m,n);
+        W(5,2)=itsJxy/2.0*GetSm(m,n);
+        W(5,3)=itsJxy/2.0*GetSp(m,n);
+        W(5,4)=itsJz     *GetSz(m,n); //The get return 2*Sz to avoid half integers
         W(5,5)=I(m,n);
     }
     break;
@@ -141,7 +151,7 @@ TensorNetworks::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Posi
         W(2,1)=GetSp(m,n);
         W(3,1)=GetSm(m,n);
         W(4,1)=GetSz(m,n); //The get return 2*Sz to avoid half integers
-        W(5,1)=0.0;
+        W(5,1)=itshz*GetSz(m,n);
     }
     break;
     }

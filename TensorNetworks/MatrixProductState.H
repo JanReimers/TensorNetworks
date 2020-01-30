@@ -2,13 +2,16 @@
 #define MATRIXPRODUCTSTATE_H
 
 #include "TensorNetworks/Enums.H"
+#include "TensorNetworks/MultiPlotable.H"
 #include <string>
+#include <vector>
 #include <iostream>
 
 class Operator;
 class Hamiltonian;
+class LRPSupervisor;
 
-class MatrixProductState
+class MatrixProductState : public virtual MultiPlotable
 {
     public:
         MatrixProductState() {}
@@ -25,7 +28,7 @@ class MatrixProductState
 //
 // Find ground state
 //
-        virtual int FindGroundState(const Hamiltonian* H,int maxIter, double eps)=0;
+        virtual int FindGroundState(const Hamiltonian* H,int maxIter, double eps,LRPSupervisor*)=0;
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions
@@ -38,10 +41,8 @@ class MatrixProductState
 //
 //    Reporting
 //
-        virtual std::string GetNormStatus() const=0;
+        virtual std::vector<std::string> GetNormStatus() const=0;
         virtual void Report(std::ostream&) const=0;
-
-
 };
 
 #endif // MATRIXPRODUCTSTATE_H

@@ -3,16 +3,15 @@
 #include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
+#include "TensorNetworks/LRPSupervisor.H"
+
 #include "oml/stream.h"
-#include <complex>
 
 using std::setw;
 
 class GroundStateTesting : public ::testing::Test
 {
 public:
-    typedef TensorNetworks::Matrix6T Matrix6T;
-    typedef TensorNetworks::MatrixCT MatrixCT;
     GroundStateTesting()
     : eps(1.0e-13)
     , itsFactory(TensorNetworks::Factory::GetFactory())
@@ -23,7 +22,7 @@ public:
 
     void Setup(int L, int S2, int D)
     {
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S2,1.0,1.0,1.0,0.0);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S2/2.0,1.0,1.0,0.0);
         itsMPS=itsH->CreateMPS(D);
     }
 
@@ -40,7 +39,7 @@ TEST_F(GroundStateTesting,TestSweepL9S1D2)
     int L=9,S2=1,D=2,maxIter=100;
     Setup(L,S2,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9);
+    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
 
     double E=itsMPS->GetExpectationIterate(itsH);
     double o=itsMPS->GetOverlap();

@@ -1,0 +1,19 @@
+# Specify sip v5 as the build system for the package.
+[build-system]
+requires = ["sip >=5, <6"]
+build-backend = "sipbuild.api"
+[tool.sip.project]
+minimum-glibc-version='2.5'
+sip-include-dirs = ["/home/jan/wxPython-4.1/sip/gen/","/home/jan/wxPython-4.1/src"]
+
+# Specify the PEP 566 metadata for the project.
+[tool.sip.metadata]
+name = "PyPlotting"
+
+# Configure the building of the fib bindings.
+[tool.sip.bindings.PyPlotting]
+headers = ["Plotting/Graph.H","Plotting/Line.H"]
+include-dirs = ["../","../../","/home/jan/wxPython-4.1/sip/siplib/","/usr/lib/x86_64-linux-gnu/wx/include/gtk3-unicode-3.0","/usr/include/wx-3.0"]
+libraries = ["PyPlotting"]
+library-dirs = ["../bin/Debug"]
+define-macros = ["HAVE_CONFIG_H","_FILE_OFFSET_BITS=64","WXUSINGDLL","__WXGTK__"]

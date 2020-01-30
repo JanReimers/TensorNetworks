@@ -3,12 +3,16 @@
 
 #include "TensorNetworks/MatrixProductState.H"
 #include "TensorNetworksImp/MatrixProductSite.H"
+#include "TensorNetworksImp/MultiPlotableImp.H"
+#include "Functions/Mesh/TMesh.H"
 #include "Misc/ptr_vector.h"
 
-//class MatrixProductOperator;
+class PlotableMesh;
 
 class MatrixProductStateImp
 : public virtual MatrixProductState
+, public virtual MultiPlotable
+, private MultiPlotableImp
 {
     public:
 //--------------------------------------------------------------------------------------
@@ -52,7 +56,7 @@ public:
 //
 // Find ground state
 //
-        virtual int      FindGroundState(const Hamiltonian* H,int maxIter, double eps);
+        virtual int      FindGroundState(const Hamiltonian* H,int maxIter, double eps,LRPSupervisor*);
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions
@@ -67,9 +71,14 @@ public:
 //
 //    Reporting
 //
-        virtual std::string GetNormStatus() const;
+        virtual std::vector<std::string> GetNormStatus() const;
         virtual void Report(std::ostream&) const;
-
+//--------------------------------------------------------------------------------------
+//
+//      Multi Plotting interace
+//
+        virtual void MakeAllGraphs();
+        virtual void Insert(Plotting::MultiGraph* graphs);
 //--------------------------------------------------------------------------------------
 //
 //  Allows unit test classes inside.
@@ -89,8 +98,8 @@ private:
         Vector3T GetHLeft_Cache(int isite) const;
         Vector3T GetHRightCache(int isite) const;
         double   GetMaxDeltaE  () const;
-        double   GetSigmaE     (const Hamiltonian* h) const;
         Matrix6T GetHeffIterate(const Hamiltonian* h,int isite) const;
+        void     UpdateSiteData();
 
 //--------------------------------------------------------------------------------------
 //
@@ -129,6 +138,20 @@ private:
         int itsD;   //Dimension of internal/virtual state space.
         int itsp;   //Number ot states for the spin on each site = 2S+1
         SitesType itsSites;
+
+        UniformMesh*  itsSitesMesh;
+        Mesh*  itsBondsMesh;
+        PlotableMesh* itsSitesPMesh;
+        PlotableMesh* itsBondsPMesh;
+
+        Array<double> itsSiteEnergies;  //Minimum eigen value of Heff on each site.
+        Array<double> itsSiteEGaps;     //Gap to second eigen value on each site.
+        Array<double> itsBondEntropies; // Sum(s^2*ln(s^2)) for each bond
+        Array<double> itsBondMinSVs;    // smallest singluar value for each bond
+
+        static GraphDefinition theGraphs[];
+        static const int n_graphs;
+
 };
 
 #endif // MATRIXPRODUCTSTATEIMP_H

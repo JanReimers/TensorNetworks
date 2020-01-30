@@ -12,7 +12,7 @@ public:
     FactoryImp() {}
     virtual ~FactoryImp() {}
 
-    virtual Hamiltonian*             Make1D_NN_HeisenbergHamiltonian(int L, int S2, double Jx, double Jy, double Jz, double hz) const;
+    virtual Hamiltonian*             Make1D_NN_HeisenbergHamiltonian(int L, double S, double Jxy, double Jz, double hz) const;
     virtual Operator*                MakeOperator(const OperatorWRepresentation*, int L, int S2) const;
     virtual OperatorWRepresentation* MakeIdentityOperator() const;
 };

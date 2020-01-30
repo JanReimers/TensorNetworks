@@ -2,49 +2,49 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="TensorNetworksUnittests" />
+		<Option title="wxMPSUnitTests" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/TensorNetworksUnittests" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/wxMPSUnitTests" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add option="-DDEBUG" />
 				</Compiler>
 				<Linker>
-					<Add directory="../../Debug" />
+					<Add directory="../Debug" />
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/TensorNetworksUnittests" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/wxMPSUnitTests" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add option="-pg" />
 				</Compiler>
 				<Linker>
-					<Add option="-pg" />
-					<Add library="oml" />
-					<Add directory="../../Release" />
+					<Add option="-s" />
+					<Add directory="../Release" />
 				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add option="$(#wx.cflags)" />
+			<Add directory="./" />
+			<Add directory="../Plotting" />
 			<Add directory="../" />
-			<Add directory="../../" />
-			<Add directory="../../Plotting" />
 		</Compiler>
 		<Linker>
+			<Add option="$(#wx.lflags)" />
 			<Add library="TensorNetworks" />
-			<Add library="Functions" />
+			<Add library="wxPlotting" />
+			<Add library="wxMisc" />
 			<Add library="Plotting" />
 			<Add library="Misc" />
 			<Add library="oml" />
@@ -55,13 +55,9 @@
 			<Add library="gfortran" />
 			<Add library="pthread" />
 		</Linker>
-		<Unit filename="GroundStataeTests.cpp" />
-		<Unit filename="MPOTests.cpp" />
-		<Unit filename="MPSTests.cpp" />
-		<Unit filename="SVDNormTests.cpp" />
-		<Unit filename="SVDTesting.cpp" />
-		<Unit filename="Tests.H" />
-		<Unit filename="main.cpp" />
+		<Unit filename="TensorNetworksUnittests/wxMain.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />

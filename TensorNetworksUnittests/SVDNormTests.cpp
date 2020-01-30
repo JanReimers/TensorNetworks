@@ -73,6 +73,13 @@ std::string ExpectedNorm(int isite,int L)
     for (int ia=isite+1;ia<L;ia++) ret+="B0";
     return ret;
 }
+std::string Compress(std::vector<std::string> vs)
+{
+    std::string ret;
+    for (long unsigned int ib=0; ib<vs.size(); ib++)
+        ret+=vs[ib];
+    return ret;
+}
 
 
 
@@ -210,6 +217,7 @@ TEST_F(MPSNormTesting,LeftNormalOverlapSiteLL10S5D2)
     VerifyUnit(GetNeff(itsMPS->GetL()-1),eps);
 }
 
+
 TEST_F(MPSNormTesting,MixedCanonicalL10S1D3)
 {
     int L=10;
@@ -219,7 +227,7 @@ TEST_F(MPSNormTesting,MixedCanonicalL10S1D3)
     {
         itsMPS->Normalize(ia);
         VerifyUnit(GetNeff(ia),eps);
-        EXPECT_EQ(itsMPS->GetNormStatus(),ExpectedNorm(ia,L));
+        EXPECT_EQ(Compress(itsMPS->GetNormStatus()),ExpectedNorm(ia,L));
     }
 }
 
@@ -233,7 +241,7 @@ TEST_F(MPSNormTesting,MixedCanonicalL10S3D10)
     {
         itsMPS->Normalize(ia);
         VerifyUnit(GetNeff(ia),eps);
-        EXPECT_EQ(itsMPS->GetNormStatus(),ExpectedNorm(ia,L));
+        EXPECT_EQ(Compress(itsMPS->GetNormStatus()),ExpectedNorm(ia,L));
    }
 }
 
@@ -247,7 +255,7 @@ TEST_F(MPSNormTesting,MixedCanonicalL10S5D2)
     {
         itsMPS->Normalize(ia);
         VerifyUnit(GetNeff(ia),eps);
-        EXPECT_EQ(itsMPS->GetNormStatus(),ExpectedNorm(ia,L));
+        EXPECT_EQ(Compress(itsMPS->GetNormStatus()),ExpectedNorm(ia,L));
     }
 }
 
