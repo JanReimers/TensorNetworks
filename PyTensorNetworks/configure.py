@@ -32,7 +32,7 @@ makefile.extra_defines=["HAVE_CONFIG_H","_FILE_OFFSET_BITS=64","WXUSINGDLL","__W
 #  You will see that these are sent to the linker with -rpath, which should set the runtime path as well.
 #  This may be important because its easy to wxWidget .so's sprinkled in various places in a linux dist.
 #
-makefile.extra_lib_dirs=["../../Debug","/home/jan/.local/lib/python3.7/site-packages/wx"]
+makefile.extra_lib_dirs=["../../Release","/home/jan/.local/lib/python3.7/site-packages/wx"]
 # Add the library we are wrapping.  The name doesn't include any platform
 # specific prefixes or extensions (e.g. the "lib" prefix on UNIX, or the
 # ".dll" extension on Windows).

@@ -38,6 +38,7 @@
 		</ExtraCommands>
 		<Unit filename="PyTensorNetworks.sip" />
 		<Unit filename="StdString.sip" />
+		<Unit filename="StdVector.sip" />
 		<Unit filename="configure.py" />
 		<Extensions>
 			<code_completion />

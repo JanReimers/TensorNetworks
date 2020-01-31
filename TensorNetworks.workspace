@@ -18,6 +18,12 @@
 			<Depends filename="../oml/oml.cbp" />
 		</Project>
 		<Project filename="PyTensorNetworks/PyTensorNetworks.cbp">
+			<Depends filename="../oml/oml.cbp" />
+			<Depends filename="../Misc/Misc.cbp" />
+			<Depends filename="../Misc/wxMisc.cbp" />
+			<Depends filename="../Plotting/Plotting.cbp" />
+			<Depends filename="../Plotting/wxPlotting.cbp" />
+			<Depends filename="../Functions/Functions.cbp" />
 			<Depends filename="TensorNetworks.cbp" />
 		</Project>
 		<Project filename="wxMPSUnitTests.cbp">

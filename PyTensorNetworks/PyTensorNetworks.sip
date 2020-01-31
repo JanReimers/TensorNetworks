@@ -15,7 +15,7 @@
 
 
 %Include StdString.sip
-%Include StdVector.sip
+//%Include StdVector.sip
 
 
 %HideNamespace(name = TensorNetworks)
@@ -53,7 +53,7 @@ class LRPSupervisor
         virtual ~LRPSupervisor();
 
         virtual void ReadyToStart();
-        virtual void DoneOneStep(int level);
+        virtual void DoneOneStep(int level,int site=-1);
 
 };
 
@@ -73,7 +73,7 @@ public:
     virtual double   GetExpectation       (const Operator *o) const=0;
     virtual double   GetExpectation       (const Operator* o1,const Operator* o2) const=0;
 
-    virtual std::vector<std::string> GetNormStatus() const=0;
+    virtual std::string GetNormStatus(int isite) const=0;
     virtual void Report(std::ostream&) const=0;
 };
 

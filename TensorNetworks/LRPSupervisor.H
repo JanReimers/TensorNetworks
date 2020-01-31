@@ -15,7 +15,7 @@ class LRPSupervisor
         virtual ~LRPSupervisor() {};
 
         virtual void ReadyToStart() {};
-        virtual void DoneOneStep(int /*level*/) {};
+        virtual void DoneOneStep(int /*level*/,int isite=-1) {(void)isite;} //comment name to avoid warning
 
 //    protected:
 //        virtual void Start() {};

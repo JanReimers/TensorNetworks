@@ -49,7 +49,7 @@ public:
 //
 //  Normalization members
 //
-        virtual void Normalize(TensorNetworks::Position LR);
+        virtual void Normalize(TensorNetworks::Position LR,LRPSupervisor*);
         virtual void Normalize(int isite); //Mixed Canonical normalization
         virtual bool CheckNormalized(int isite,double eps) const;
 //--------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ public:
 //
 //    Reporting
 //
-        virtual std::vector<std::string> GetNormStatus() const;
+        virtual std::string GetNormStatus(int isite) const;
         virtual void Report(std::ostream&) const;
 //--------------------------------------------------------------------------------------
 //
@@ -91,8 +91,8 @@ private:
 //
 //  For groound state search
 //
-        void     SweepRight    (const Hamiltonian* h,bool quiet=true);
-        void     SweepLeft     (const Hamiltonian* h,bool quiet=true);
+        void     SweepRight    (const Hamiltonian* h,LRPSupervisor*,bool quiet=true);
+        void     SweepLeft     (const Hamiltonian* h,LRPSupervisor*,bool quiet=true);
         void     Refine        (const Hamiltonian *h,int isite) const; //Minimize energy WRT the Ms in one site.
         void     LoadHeffCaches(const Hamiltonian* h);
         Vector3T GetHLeft_Cache(int isite) const;

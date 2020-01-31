@@ -262,10 +262,23 @@ MatrixProductSite::MatrixCT MatrixProductSite::GetLeftNorm() const
 
 std::string MatrixProductSite::GetNormStatus() const
 {
+//    StreamableObject::SetToPretty();
+//    for (int ip=0;ip<itsp; ip++)
+//        cout << "A[" << ip << "]=" << itsAs[ip] << endl;
     std::string ret;
-    if (IsLeftNormalized()) ret="A";
-    else if (IsRightNormalized()) ret="B";
-    else ret="M";
+    if (IsLeftNormalized())
+    {
+        if (IsRightNormalized())
+            ret="I"; //This should be rare
+        else
+            ret="A";
+    }
+    else
+        if (IsRightNormalized())
+            ret="B";
+        else
+            ret="M";
+
     ret+=std::to_string(itsNumUpdates);
     return ret;
 }

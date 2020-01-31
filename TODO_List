@@ -1,5 +1,11 @@
-
--Mega classes MPState MPSite are too big, how split up responsibilities?
+-GUI
+    Separate norm status widgets for each site, update singles
+    E/J plot for each sote doesn't really work since the y range gets so tiny
+    Play/Pause in one button.  Use icons?
+    Get restart working
+    Stop shoud kill the thread
+    Split the classes into separate files wxMPSFrame.py is getting to big.
+-Done Mega classes MPState MPSite are too big, how split up responsibilities?
     Partially DONE.  Made more stuff private at least.
 -Calc <Sx> <Sy> <Sz>
 -Correlation functions <Sa*Sa+n>-<Sa>*<Sa+n>
@@ -7,7 +13,8 @@
 -Valgrind, any memeory leaks?
 -Give Lanczos an initial guess from previous iteration.
 -Imag time evolution
--Periodic boundary conditions
+-Periodic boundary conditions.  This is less usefule than iMPS
+-iMPS, iDMRG
 -GUI using wxPython
     -What to show in screen?
         Lattice
@@ -16,7 +23,7 @@
             Site energy
             Bond entropy
             Normalization A,B,M
-        Live Graphs
+Done    Live Graphs
             E vs iter#
             Sigma(E)  vs iter#
             Bond entropy vs site#

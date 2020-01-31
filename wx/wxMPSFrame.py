@@ -2,14 +2,14 @@ import wx
 import wx.html
 import PyPlotting
 import PyTensorNetworks
-import _thread
+import threading
 import time
 
 class GUIHandler:
     def __init__(self):
         pass
 
-    def Update(level):
+    def Update(level,isite):
         pass
 
 class MPSSupervisor(PyTensorNetworks.LRPSupervisor):
@@ -20,21 +20,33 @@ class MPSSupervisor(PyTensorNetworks.LRPSupervisor):
         self.Pause=True
         self.Started=False
         self.Step=0
+
     def ReadyToStart(self):
         self.Started=True
 
-    def DoneOneStep(self,level):
-        wx.CallAfter(self.GUIhandler.Update,(level))
-        print("Enter DoOneStep")
+    def DoneOneStep(self,level,isite=-1):
+        #print("Enter DoOneStep isite=",isite)
+        wx.CallAfter(self.GUIhandler.Update,level,isite)
+        wx.YieldIfNeeded() #this is supposed to give the GUI a time slice but it's NOT working!!  Same for wxYield
+        time.sleep(0.1) #this is kludge to give the GUI a time slice.
+        #el=wx.EventLoopBase.GetActive()
+        #if not el==None:
+        #    print ("Pending=",el.Pending())
+        #    while el.Pending():
+        #        time.sleep(0.01)
+
+
         if self.Started and self.Step>0 :
             self.Step=self.Step-1
             if self.Step==0:
                 self.Pause=True
         while (self.Pause):
             time.sleep(0.1)
-        print("Exit  DoOneStep")
+
+        #print("Exit  DoOneStep")
 
     def OnPlay(self,e):
+        print("OnPlay")
         self.Started=True
         self.Pause=False
 
@@ -57,10 +69,12 @@ class wxHamiltonianPanel(wx.Panel):
 
         sizer=wx.BoxSizer(wx.VERTICAL)
 
-        Hexpression = wx.Image(name='HeisenbergHamiltonian0x.png',type=wx.BITMAP_TYPE_PNG)
-        HexpressionBM = wx.Bitmap(Hexpression)
-        HexpressionSBM = wx.StaticBitmap(self, wx.ID_ANY, HexpressionBM)
-        sizer.Add(HexpressionSBM,border=10,flag=wx.ALL)
+        Hexpression0 = wx.Image(name='HeisenbergHamiltonian0x.png',type=wx.BITMAP_TYPE_PNG)
+        HexpressionSBM0 = wx.StaticBitmap(self, wx.ID_ANY, wx.Bitmap(Hexpression0))
+        sizer.Add(HexpressionSBM0,border=10,flag=wx.ALL)
+        Hexpression1 = wx.Image(name='HeisenbergHamiltonian1x.png',type=wx.BITMAP_TYPE_PNG)
+        HexpressionSBM1 = wx.StaticBitmap(self, wx.ID_ANY, wx.Bitmap(Hexpression1))
+        sizer.Add(HexpressionSBM1,border=10,flag=wx.ALL)
 
         fgsizer=wx.FlexGridSizer(2,5,5)
         self.lattice=wx.SpinCtrl(self,min=2,max=10000,initial=9)
@@ -102,11 +116,12 @@ class wxHamiltonianPanel(wx.Panel):
 class wxMPSApproximationsPanel(wx.Panel):
     def __init__(self,parent):
         super().__init__(parent)
-        self.DControl=wx.SpinCtrl(self,min=1,max=10000,initial=2)
-        self.EnergyConvergenceControl=wx.SpinCtrl(self,min=-16,max=0,initial=-12)
-        self. EigenConvergenceControl=wx.SpinCtrl(self,min=-16,max=0,initial=-12)
-        self. NormVerificationControl=wx.SpinCtrl(self,min=-16,max=0,initial=-12)
-        self.          SVDRankControl=wx.SpinCtrl(self,min=-16,max=0,initial=-12)
+        dx=120
+        self.DControl=wx.SpinCtrl(self,min=1,max=10000,initial=4,size=(dx,-1))
+        self.EnergyConvergenceControl=wx.SpinCtrl(self,min=-16,max=0,initial=-12,size=(dx,-1))
+        self. EigenConvergenceControl=wx.SpinCtrl(self,min=-16,max=0,initial=-12,size=(dx,-1))
+        self. NormVerificationControl=wx.SpinCtrl(self,min=-16,max=0,initial=-12,size=(dx,-1))
+        self.          SVDRankControl=wx.SpinCtrl(self,min=-16,max=0,initial=-12,size=(dx,-1))
 
         fgsizer=wx.FlexGridSizer(2,5,5)
         fgsizer.Add(wx.StaticText(self,label='Bond Dimension D:'))
@@ -131,23 +146,41 @@ class wxMPSStatusPanel(wx.Panel):
         super().__init__(parent)
 
         self.colours={"A":wx.BLUE,"B":wx.RED, "M":wx.BLACK, "I":wx.LIGHT_GREY }
-        self.text=wx.TextCtrl(self,style=wx.TE_MULTILINE,size=(180,-1))
+        self.text=wx.TextCtrl(self,style=wx.TE_MULTILINE,size=(400,-1))
+        self.L=0
+
+    def NewLattice(self,L):
+        self.L=L
+        fgsizer=wx.FlexGridSizer(L+1,2,0) #2 rows, L+1 columns, gap=5
+        fgsizer.Add(wx.StaticText(self,label='Site #:'),flag=wx.ALIGN_RIGHT)
+        for i in range(1,L+1):
+            fgsizer.Add(wx.StaticText(self,label=str(i)),flag=wx.ALIGN_CENTER)
+        fgsizer.Add(wx.StaticText(self,label='Norm Status:'))
+        self.NormTextControls=[]
+        for i in range(1,L+1):
+            #We don't actually want multiline, but that is only way to get colours t work!!??
+            tc=wx.TextCtrl(self,style=wx.TE_MULTILINE|wx.TE_CENTRE|wx.BORDER_NONE,size=(30,20))
+            tc.AppendText("   ")
+            self.NormTextControls.append(tc)
+            fgsizer.Add(tc)
+        fgsizer.SetSizeHints(self)
+        self.SetSizer(fgsizer)
+
+    def UpdateSite(self,MPS,isite):
+        status=MPS.GetNormStatus(isite)
+        tc=self.NormTextControls[isite]
+        tc.Clear()
+        letter=status[0]
+        colour=self.colours[letter]
+        tc.SetDefaultStyle(wx.TextAttr(colour))
+        tc.AppendText(status)
 
     def Update(self,MPS):
-        status=MPS.GetNormStatus()
-        print(status)
-        L=len(status)
-        #self.text=wx.TextCtrl(self,style=wx.TE_MULTILINE,size=(20*L,-1))
-        #self.text.SetSize((20*L,-1))
-        self.text.Clear()
-        for i in range(0,L-1):
-            letters=status[i]
-            letter=letters[0]
-            colour=self.colours[letter]
-            self.text.SetDefaultStyle(wx.TextAttr(colour))
-            self.text.AppendText(letters)
+        for isite in range(0,self.L):
+            self.UpdateSite(MPS,isite)
 
-ID_PLAY   =wx.NewIdRef()
+ID_START   =wx.NewIdRef()
+ID_PLAY    =wx.NewIdRef()
 ID_PAUSE   =wx.NewIdRef()
 ID_STEP    =wx.NewIdRef()
 ID_STOP    =wx.NewIdRef()
@@ -156,12 +189,14 @@ ID_RESTART =wx.NewIdRef()
 class wxMPSControlsPanel(wx.Panel):
     def __init__(self,parent,supervisor):
         super().__init__(parent)
+        b0=wx.Button(self,ID_PLAY   ,"Start")
         b1=wx.Button(self,ID_PLAY   ,"Play")
         b2=wx.Button(self,ID_PAUSE  ,"Pause")
         b3=wx.Button(self,ID_STEP   ,"Step")
         b4=wx.Button(self,ID_STOP   ,"Stop")
         b5=wx.Button(self,ID_RESTART,"Restart")
         sizer=wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(b0)
         sizer.Add(b1)
         sizer.Add(b2)
         sizer.Add(b3)
@@ -170,6 +205,7 @@ class wxMPSControlsPanel(wx.Panel):
         self.SetSizer(sizer)
         self.Layout()
 
+        b0.Bind(wx.EVT_BUTTON,parent.OnStart)
         b1.Bind(wx.EVT_BUTTON,supervisor.OnPlay)
         b2.Bind(wx.EVT_BUTTON,supervisor.OnPause)
         b3.Bind(wx.EVT_BUTTON,supervisor.OnStep)
@@ -185,17 +221,19 @@ class MPSFrame(wx.Frame,GUIHandler):
 
         self.BuildMenus()
 
-        self.supervisor=MPSSupervisor(self)
+        self.supervisor=MPSSupervisor(self) #conrol panel needs this
 
         self.BuildLayout()
 
-        #self.Hamiltonian=self.TNFactory.Make1D_NN_HeisenbergHamiltonian(9,1,1.0,1.0,1.0,0)
         self.Hamiltonian=self.HamiltonianPanel.MakeHamiltonian(self.TNFactory)
         self.MPS=self.ApproximationsPanel.CreateMPS(self.Hamiltonian)
+        self.MPS.InitializeWith(PyTensorNetworks.Random)
         self.MPS.Insert(self.graphs) #Tell the MPS where to plot data
+        self.statusPanel.NewLattice(self.Hamiltonian.GetL())
         self.statusPanel.Update(self.MPS)
-        #self.Bind(wx.EVT_BUTTON,self.ReplotActiveGraph,id=PyPlotting.ID_ReplotActiveGraph)
-        _thread.start_new_thread(self.FindGroundState,())
+
+        self.inUpdate=False
+
 
 
     def BuildMenus(self):
@@ -243,6 +281,10 @@ class MPSFrame(wx.Frame,GUIHandler):
     def OnQuit(self, e):
         self.Close()
 
+    def OnStart(self,e):
+        x = threading.Thread(target=self.FindGroundState, args=(), daemon=True)
+        x.start()
+        self.supervisor.OnPlay(e)
 
     def FindGroundState(self):
         n=self.MPS.FindGroundState(self.Hamiltonian,20,1e-8,self.supervisor)
@@ -254,9 +296,20 @@ class MPSFrame(wx.Frame,GUIHandler):
     def OnRestart(self,e):
         print("Restart")
 
-    def Update(self,level):
-        print("Update level=",level)
-        self.statusPanel.Update(self.MPS)
-        self.graphs.ReplotActiveGraph()
+    def Update(self,level,isite):
+        if (not self.inUpdate):
+            self.inUpdate=True
+            #print("Update level=",level)
+            if level==0: #end of each sweep
+                self.graphs.ReplotActiveGraph()
+            #if level=1: #finished refine on one site
+
+            if level==2: #individual steps on one site
+                self.statusPanel.UpdateSite(self.MPS,isite)
+
+            self.inUpdate=False
+        else:
+            print("Update clash")
+
 
 

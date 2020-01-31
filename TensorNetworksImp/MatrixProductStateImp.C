@@ -95,7 +95,7 @@ void MatrixProductStateImp::InitializeWith(TensorNetworks::State state)
 //
 //   Normalization routines
 //
-void MatrixProductStateImp::Normalize(TensorNetworks::Position LR)
+void MatrixProductStateImp::Normalize(TensorNetworks::Position LR,LRPSupervisor* Supervisor)
 {
     VectorT s; // This get passed from one site to the next.
     if (LR==TensorNetworks::Left)
@@ -104,7 +104,9 @@ void MatrixProductStateImp::Normalize(TensorNetworks::Position LR)
         for (int ia=0;ia<itsL-1;ia++)
         {
             itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
+            Supervisor->DoneOneStep(2,ia);
             itsSites[ia+1]->Contract(s,Vdagger);
+            Supervisor->DoneOneStep(2,ia);
         }
         itsSites[itsL-1]->ReshapeFromLeft(s.GetHigh());
         double norm=std::real(itsSites[itsL-1]->GetLeftNorm()(1,1));
@@ -116,7 +118,9 @@ void MatrixProductStateImp::Normalize(TensorNetworks::Position LR)
         for (int ia=itsL-1;ia>0;ia--)
         {
             itsSites[ia]->SVDRightNormalize(U,s);
+            Supervisor->DoneOneStep(2,ia);
             itsSites[ia-1]->Contract(U,s);
+            Supervisor->DoneOneStep(2,ia);
         }
         itsSites[0]->ReshapeFromRight(s.GetHigh());
         double norm=std::real(itsSites[0]->GetRightNorm()(1,1));
@@ -223,15 +227,15 @@ void MatrixProductStateImp::UpdateSiteData()
 int   MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int maxIter, double eps,LRPSupervisor* Supervisor)
 {
     Supervisor->ReadyToStart();
-    Normalize(TensorNetworks::Right);
+    Normalize(TensorNetworks::Right,Supervisor);
     Supervisor->DoneOneStep(0);
     LoadHeffCaches(hamiltonian);
 
     int nSweep=0;
     for (int in=0; in<maxIter; in++)
     {
-        SweepRight(hamiltonian,true);
-        SweepLeft (hamiltonian,true);
+        SweepRight(hamiltonian,Supervisor,true);
+        SweepLeft (hamiltonian,Supervisor,true);
         nSweep++;
 
         double E1=GetExpectationIterate(hamiltonian);
@@ -251,7 +255,7 @@ int   MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int
 }
 
 
-void MatrixProductStateImp::SweepRight(const Hamiltonian* h,bool quiet)
+void MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Supervisor,bool quiet)
 {
     if (!quiet)
     {
@@ -261,17 +265,20 @@ void MatrixProductStateImp::SweepRight(const Hamiltonian* h,bool quiet)
     for (int ia=0; ia<itsL-1; ia++)
     {
         Refine(h,ia);
+        Supervisor->DoneOneStep(1);
 
         VectorT s;
         MatrixCT Vdagger;
         itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
+        Supervisor->DoneOneStep(2,ia);
         itsSites[ia+1]->Contract(s,Vdagger);
+        Supervisor->DoneOneStep(2,ia);
         itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
         if (!quiet) cout << "SweepRight post constract  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
     }
 }
 
-void MatrixProductStateImp::SweepLeft(const Hamiltonian* h,bool quiet)
+void MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supervisor,bool quiet)
 {
     if (!quiet)
     {
@@ -281,11 +288,14 @@ void MatrixProductStateImp::SweepLeft(const Hamiltonian* h,bool quiet)
     for (int ia=itsL-1; ia>0; ia--)
     {
         Refine(h,ia);
+        Supervisor->DoneOneStep(1);
 
         VectorT s;
         MatrixCT U;
         itsSites[ia]->SVDRightNormalize(U,s);
+        Supervisor->DoneOneStep(2,ia);
         itsSites[ia-1]->Contract(U,s);
+        Supervisor->DoneOneStep(2,ia);
         itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
         if (!quiet)
             cout << "SweepLeft  post contract  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
@@ -443,12 +453,9 @@ void MatrixProductStateImp::Report(std::ostream& os) const
     }
 }
 
-std::vector<std::string> MatrixProductStateImp::GetNormStatus() const
+std::string MatrixProductStateImp::GetNormStatus(int isite) const
 {
-    std::vector<std::string> ret;
-    for (cSIter i=itsSites.begin(); i!=itsSites.end(); i++)
-        ret.push_back(i->GetNormStatus());
-    return ret;
+    return itsSites[isite]->GetNormStatus();
 }
 
 //--------------------------------------------------------------------------------------

@@ -21,7 +21,7 @@ class MatrixProductState : public virtual MultiPlotable
 //
 //  Normalization members
 //
-        virtual void Normalize(TensorNetworks::Position LR)=0;
+        virtual void Normalize(TensorNetworks::Position LR,LRPSupervisor*)=0;
         virtual void Normalize(int isite)=0; //Mixed Canonical normalization
         virtual bool CheckNormalized(int isite,double eps) const=0;
 //--------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ class MatrixProductState : public virtual MultiPlotable
 //
 //    Reporting
 //
-        virtual std::vector<std::string> GetNormStatus() const=0;
+        virtual std::string GetNormStatus(int isite) const=0;
         virtual void Report(std::ostream&) const=0;
 };
 
