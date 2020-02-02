@@ -4,13 +4,14 @@
         Done Fix some plots, plot dE vs site# on log scale
         Plot points instead of lines
         Does wxDrivet support log scales?
-        Rank vs. site#
+        Done Rank vs. site#
+        Fix axis code to avoid scientific unless ymin=0 or ymax=0
     Play/Pause in one button.  Use icons?
     Get restart working(have restart do what start does now, get rid of start, play nad step will start it)
     Done Stop shoud kill the thread
-    Split the classes into separate files wxMPSFrame.py is getting too big.
+    Done Split the classes into separate files wxMPSFrame.py is getting too big.
     Status bar. ModelName (from H), L,S, D, iter#, E, CPU & meminfo (use psutils)
-    Done On startup Step should start the run
+    On startup Step should start the run
     Done Create Bond objects between sites.  Each site can see its left and right bond objects.
     Fix alignments on Ham tab
     Use eps values.
@@ -19,8 +20,12 @@
 -Done Mega classes MPState MPSite are too big, how split up responsibilities?
     Move some stuff into bond objects
     Partially DONE.  Made more stuff private at least.
+    separate out contraction functions into a separate .C file.  SHould they be non-members?
 -Calc <Sx> <Sy> <Sz>
+    Could start by calculating one density matrices.  Then ops are easy
 -Correlation functions <Sa*Sa+n>-<Sa>*<Sa+n>
+    Extend to pair density matricies.  It would interesting to see the eigen values of distant
+    pair DMs.  Do the lowest two EVs drop with distance, indicating decrreasing entanglement?
 -Why optimize site 1, just leave it a |up> and take out global SU(2) invariance
 -Valgrind, any memeory leaks?
 -Give Lanczos an initial guess from previous iteration.
