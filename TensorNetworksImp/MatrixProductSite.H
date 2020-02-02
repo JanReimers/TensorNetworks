@@ -6,6 +6,7 @@
 #include <vector>
 
 class SiteOperator;
+class Bond;
 
 class MatrixProductSite
 {
@@ -23,7 +24,7 @@ class MatrixProductSite
 //
 //  Conctruction and initialization zone
 //
-        MatrixProductSite(TensorNetworks::Position lbr, int p, int D1, int D2);
+        MatrixProductSite(TensorNetworks::Position lbr,Bond* leftBond, Bond* rightBond, int p, int D1, int D2);
         virtual ~MatrixProductSite();
         void InitializeWith(TensorNetworks::State,int sgn);
 
@@ -32,10 +33,9 @@ class MatrixProductSite
 //  Access to information
 //
         const MatLimits GetLimits() const {return itsAs[0].GetLimits();}
-        double GetSiteEnergy()  {return itsEmin;}
-        double GetEGap()        {return itsGapE;}
-        double GetBondEntropy() {return itsBondEntropy;}
-        double GetMinSV()       {return itsMinSV;}
+        double GetSiteEnergy () {return itsEmin;}
+        double GetEGap       () {return itsGapE;}
+        double GetIterDE     () {return itsIterDE;}
 
 //---------------------------------------------------------------------------------
 //
@@ -113,7 +113,6 @@ private:
     static MatrixCT  Contract1(const VectorT& s, const MatrixCT& VA);
     static MatrixCT  Contract1(const MatrixCT& AU,const VectorT& s);
     static bool     IsUnit(const MatrixCT& m,double eps);
-    double   CalcBondEntropy(const VectorT& s);
     double GetMaxAmplitude() const;
 private:
         void   Update(const VectorCT& newAs);
@@ -142,6 +141,8 @@ private:
         typedef pVectorT::      iterator  pIterT;
         typedef pVectorT::const_iterator cpIterT;
 
+        Bond* itsLeft_Bond;
+        Bond* itsRightBond;
         int itsp; //2*S+1
         int itsD1,itsD2;
         pVectorT itsAs; //We need a separate matrix for eash of the p basis states on one site.
@@ -149,9 +150,6 @@ private:
         Vector3T itsHRightCache;
 
         int itsNumUpdates;
-        double itsBondEntropy;
-        double itsMinSV;
-        int itsRank;
         double itsHeffDensity;
         double itsEmin;
         double itsGapE;  //Gap to the next excited state.

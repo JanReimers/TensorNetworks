@@ -1,4 +1,5 @@
 #include "TensorNetworksImp/MatrixProductSite.H"
+#include "TensorNetworksImp/Bond.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworksImp/PrimeEigenSolver.H"
 #include "oml/minmax.h"
@@ -10,21 +11,30 @@
 using std::cout;
 using std::endl;
 
-MatrixProductSite::MatrixProductSite(TensorNetworks::Position lbr, int p, int D1, int D2)
-    : itsp(p)
+MatrixProductSite::MatrixProductSite(TensorNetworks::Position lbr, Bond* leftBond, Bond* rightBond,int p, int D1, int D2)
+    : itsLeft_Bond(leftBond)
+    , itsRightBond(rightBond)
+    , itsp(p)
     , itsD1(D1)
     , itsD2(D2)
     , itsHLeft_Cache(1,1,1,1)
     , itsHRightCache(1,1,1,1)
     , itsNumUpdates(0)
-    , itsBondEntropy(0.0)
-    , itsRank(0)
     , itsHeffDensity(0)
     , itsEmin(0.0)
     , itsGapE(0.0)
     , itsIterDE(0.0)
     , itsPosition(lbr)
 {
+    if (lbr==TensorNetworks::Left)
+    {
+        assert(itsRightBond);
+    }
+    if (lbr==TensorNetworks::Right)
+    {
+        assert(itsLeft_Bond);
+    }
+
     for (int ip=0;ip<itsp;ip++)
     {
         itsAs.push_back(MatrixCT(D1,D2));
@@ -115,9 +125,7 @@ void MatrixProductSite::SVDLeft_Normalize(VectorT& s, MatrixCT& Vdagger)
     //  Extract As from U
     //
     ReshapeLeft(A);  //A is now U
-    itsBondEntropy=CalcBondEntropy(s);
-    itsMinSV=s(N);
-//    cout << "Bond S=" << itsBondEntropy << endl;
+    if (itsRightBond) itsRightBond->SetSingularValues(s);
 }
 
 void MatrixProductSite::SVDRightNormalize(MatrixCT& U, VectorT& s)
@@ -133,8 +141,8 @@ void MatrixProductSite::SVDRightNormalize(MatrixCT& U, VectorT& s)
     //  Extract Bs from U
     //
     ReshapeRight(Transpose(conj(V)));  //A is now Vdagger
-    itsBondEntropy=CalcBondEntropy(s);
-//    cout << "Bond S=" << itsBondEntropy << endl;
+    assert(itsLeft_Bond);
+    if (itsLeft_Bond) itsLeft_Bond->SetSingularValues(s);
 }
 
 void MatrixProductSite::ReshapeFromLeft (int D1)
@@ -288,9 +296,7 @@ void MatrixProductSite::Report(std::ostream& os) const
     os << std::setprecision(3)
     << std::setw(4) << itsD1
     << std::setw(4)  << itsD2 << std::fixed
-    << std::setw(11)  << itsBondEntropy << "    "
     << std::setw(5)  << itsNumUpdates << "      "
-    << std::setw(3)  << itsRank << "       "
     << std::setw(5)  << itsHeffDensity << "   " << std::setprecision(7)
     << std::setw(9)  << itsEmin << "     " << std::setprecision(4)
     << std::setw(5)  << itsGapE << "   " << std::scientific
@@ -327,19 +333,6 @@ bool MatrixProductSite::IsUnit(const MatrixCT& m,double eps)
     return Max(abs(m-I))<eps;
 }
 
-double MatrixProductSite::CalcBondEntropy(const VectorT& s)
-{
-    int N=s.size();
-    itsRank=N;
-    double ret=0.0;
-    for (int i=1;i<=N;i++)
-    {
-        double s2=s(i)*s(i);
-        if (s2>0.0) ret-=s2*log(s2);
-        if (fabs(s(i))<1e-12) itsRank--;
-    }
-    return ret;
-}
 //
 //  Sum_ip A(ip)*A^t(ip)
 //

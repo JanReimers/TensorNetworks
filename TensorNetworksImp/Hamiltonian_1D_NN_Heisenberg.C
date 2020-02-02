@@ -27,7 +27,7 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
 
 Hamiltonian_1D_NN_Heisenberg::~Hamiltonian_1D_NN_Heisenberg()
 {
-    //dtor
+     cout << "Hamiltonian_1D_NN_Heisenberg destructor." << endl;
 }
 
 double Hamiltonian_1D_NN_Heisenberg::ConvertToSpin(int n) const

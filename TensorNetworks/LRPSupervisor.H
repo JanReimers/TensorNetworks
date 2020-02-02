@@ -1,6 +1,7 @@
 #ifndef LRPSUPERVISOR_H
 #define LRPSUPERVISOR_H
 
+#include "Misc/c_str.H"
 //
 //  Supervisor for a long running process (LRP).  The public interface is for use by
 //  the LRP, it simply calls ReadyToStart at the begining and then
@@ -15,7 +16,7 @@ class LRPSupervisor
         virtual ~LRPSupervisor() {};
 
         virtual void ReadyToStart() {};
-        virtual void DoneOneStep(int /*level*/,int isite=-1) {(void)isite;} //comment name to avoid warning
+        virtual void DoneOneStep(int /*level*/,c_str /*lastOperation*/, int isite=-1) {(void)isite;} //comment name to avoid warning
 
 //    protected:
 //        virtual void Start() {};

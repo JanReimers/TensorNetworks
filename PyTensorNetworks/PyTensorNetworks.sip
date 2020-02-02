@@ -53,7 +53,7 @@ class LRPSupervisor
         virtual ~LRPSupervisor();
 
         virtual void ReadyToStart();
-        virtual void DoneOneStep(int level,int site=-1);
+        virtual void DoneOneStep(int level,c_str lastOperation,int site=-1);
 
 };
 

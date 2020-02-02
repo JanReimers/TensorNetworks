@@ -93,13 +93,13 @@ private:
 //
         void     SweepRight    (const Hamiltonian* h,LRPSupervisor*,bool quiet=true);
         void     SweepLeft     (const Hamiltonian* h,LRPSupervisor*,bool quiet=true);
-        void     Refine        (const Hamiltonian *h,int isite) const; //Minimize energy WRT the Ms in one site.
+        void     Refine        (const Hamiltonian *h,int isite); //Minimize energy WRT the Ms in one site.
         void     LoadHeffCaches(const Hamiltonian* h);
         Vector3T GetHLeft_Cache(int isite) const;
         Vector3T GetHRightCache(int isite) const;
         double   GetMaxDeltaE  () const;
         Matrix6T GetHeffIterate(const Hamiltonian* h,int isite) const;
-        void     UpdateSiteData();
+        void     UpdateBondData(int isite);
 
 //--------------------------------------------------------------------------------------
 //
@@ -123,6 +123,7 @@ private:
 //  Iterator Typedefs
 //
         typedef optr_vector<MatrixProductSite*> SitesType;
+        typedef optr_vector<Bond*>              BondsType;
         typedef SitesType::      iterator  SIter;
         typedef SitesType::const_iterator cSIter;
         typedef SitesType::      reverse_iterator  rSIter;
@@ -137,10 +138,11 @@ private:
         int itsS2;  //2*S, avoid storing floats for S=n/2
         int itsD;   //Dimension of internal/virtual state space.
         int itsp;   //Number ot states for the spin on each site = 2S+1
+        BondsType itsBonds;
         SitesType itsSites;
 
         UniformMesh*  itsSitesMesh;
-        Mesh*  itsBondsMesh;
+        Mesh*         itsBondsMesh;
         PlotableMesh* itsSitesPMesh;
         PlotableMesh* itsBondsPMesh;
 
@@ -148,6 +150,7 @@ private:
         Array<double> itsSiteEGaps;     //Gap to second eigen value on each site.
         Array<double> itsBondEntropies; // Sum(s^2*ln(s^2)) for each bond
         Array<double> itsBondMinSVs;    // smallest singluar value for each bond
+        Array<double> itsBondRanks;    // Effective rank based on non zero singular values
 
         static GraphDefinition theGraphs[];
         static const int n_graphs;

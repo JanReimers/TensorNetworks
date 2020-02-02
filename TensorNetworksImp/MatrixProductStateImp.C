@@ -1,4 +1,5 @@
 #include "TensorNetworksImp/MatrixProductStateImp.H"
+#include "TensorNetworksImp/Bond.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/LRPSupervisor.H"
 #include "Functions/Mesh/PlotableMesh.H"
@@ -27,10 +28,18 @@ MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D)
     , itsSitesMesh(0)
     , itsBondsMesh(0)
 {
-    itsSites.push_back(new MatrixProductSite(TensorNetworks::Left,itsp,1,itsD));
+    //
+    //  Create bond objects
+    //
+    for (int i=0;i<itsL-1;i++)
+        itsBonds.push_back(new Bond(1e-12));
+    //
+    //  Create Sites
+    //
+    itsSites.push_back(new MatrixProductSite(TensorNetworks::Left,NULL,itsBonds[0],itsp,1,itsD));
     for (int i=1;i<itsL-1;i++)
-        itsSites.push_back(new MatrixProductSite(TensorNetworks::Bulk,itsp,itsD,itsD));
-    itsSites.push_back(new MatrixProductSite(TensorNetworks::Right,itsp,itsD,1));
+        itsSites.push_back(new MatrixProductSite(TensorNetworks::Bulk,itsBonds[i-1],itsBonds[i],itsp,itsD,itsD));
+    itsSites.push_back(new MatrixProductSite(TensorNetworks::Right,itsBonds[L-2],NULL,itsp,itsD,1));
 
     Range rsites(1.0,itsL);
     itsSitesMesh=new UniformMesh(rsites,1.0);
@@ -43,10 +52,12 @@ MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D)
     itsSiteEGaps    .SetSize(itsL);
     itsBondEntropies.SetSize(itsL-1);
     itsBondMinSVs   .SetSize(itsL-1);
+    itsBondRanks    .SetSize(itsL-1);
     Fill(itsSiteEnergies ,0.0);
     Fill(itsSiteEGaps    ,0.0);
     Fill(itsBondEntropies,0.0);
     Fill(itsBondMinSVs   ,0.0);
+    Fill(itsBondRanks    ,0.0);
 
     NamedUnit EJ("none","Site E/J");
     itsSitesPMesh->Insert
@@ -62,18 +73,24 @@ MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D)
     itsBondsPMesh->Insert
     (
         new TPlotableMeshClient<PureNumber,Array<double> >
-        (*itsBondsPMesh,"Site Bond Entropy","Entropy",NamedUnit("none","Entropy"),PureNumber(1.0),itsBondEntropies, Plotting::Green)
+        (*itsBondsPMesh,"Bond Entropy","Entropy",NamedUnit("none","Entropy"),PureNumber(1.0),itsBondEntropies, Plotting::Green)
     );
     itsBondsPMesh->Insert
     (
         new TPlotableMeshClient<PureNumber,Array<double> >
-        (*itsBondsPMesh,"Site Min(s)","Min(s)",NamedUnit("none","Min(s)"),PureNumber(1.0),itsBondMinSVs, Plotting::Green)
+        (*itsBondsPMesh,"Bond Min(s)","Min(s)",NamedUnit("none","Min(s)"),PureNumber(1.0),itsBondMinSVs, Plotting::Green)
+    );
+    itsBondsPMesh->Insert
+    (
+        new TPlotableMeshClient<PureNumber,Array<double> >
+        (*itsBondsPMesh,"Bond Rank","Rank",NamedUnit("none","Rank"),PureNumber(1.0),itsBondRanks, Plotting::Green)
     );
 
 }
 
 MatrixProductStateImp::~MatrixProductStateImp()
 {
+    cout << "MatrixProductStateImp destructor." << endl;
     delete itsBondsPMesh;
     delete itsSitesPMesh;
     delete itsBondsMesh;
@@ -91,6 +108,12 @@ void MatrixProductStateImp::InitializeWith(TensorNetworks::State state)
 
 }
 
+c_str SiteMessage(c_str message,int site)
+{
+    static std::string ret;
+    ret=message+std::to_string(site+1); //user sees 1 based site number as opposed to zero based in code
+    return ret.c_str();
+}
 //-------------------------------------------------------------------------------
 //
 //   Normalization routines
@@ -104,13 +127,16 @@ void MatrixProductStateImp::Normalize(TensorNetworks::Position LR,LRPSupervisor*
         for (int ia=0;ia<itsL-1;ia++)
         {
             itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
-            Supervisor->DoneOneStep(2,ia);
+            UpdateBondData(ia);
+            Supervisor->DoneOneStep(2,SiteMessage("SVD Left Normalize site ",ia),ia);
             itsSites[ia+1]->Contract(s,Vdagger);
-            Supervisor->DoneOneStep(2,ia);
+            Supervisor->DoneOneStep(2,SiteMessage("Transfer M=s*V_dagger*M on site",ia+1),ia+1);
         }
         itsSites[itsL-1]->ReshapeFromLeft(s.GetHigh());
         double norm=std::real(itsSites[itsL-1]->GetLeftNorm()(1,1));
         itsSites[itsL-1]->Rescale(sqrt(norm));
+        UpdateBondData(itsL-1);
+        Supervisor->DoneOneStep(2,SiteMessage("Rescale site ",itsL-1),itsL-1);
     }
     else if (LR==TensorNetworks::Right)
     {
@@ -118,13 +144,16 @@ void MatrixProductStateImp::Normalize(TensorNetworks::Position LR,LRPSupervisor*
         for (int ia=itsL-1;ia>0;ia--)
         {
             itsSites[ia]->SVDRightNormalize(U,s);
-            Supervisor->DoneOneStep(2,ia);
+            UpdateBondData(ia-1);
+            Supervisor->DoneOneStep(2,SiteMessage("SVD Right Normalize site ",ia),ia);
             itsSites[ia-1]->Contract(U,s);
-            Supervisor->DoneOneStep(2,ia);
+            Supervisor->DoneOneStep(2,SiteMessage("Transfer M=M*U*s on site ",ia-1),ia-1);
         }
         itsSites[0]->ReshapeFromRight(s.GetHigh());
         double norm=std::real(itsSites[0]->GetRightNorm()(1,1));
         itsSites[0]->Rescale(sqrt(norm));
+        UpdateBondData(0);
+        Supervisor->DoneOneStep(2,SiteMessage("Rescale site ",0),0);
     }
 
 }
@@ -175,10 +204,11 @@ GraphDefinition MatrixProductStateImp::theGraphs[]=
 {
     {"Site E/J"         ,"none"     ,"none"  ,"Sites"},
     {"Site Egap/J"      ,"none"     ,"none"  ,"Sites"},
-    {"Site Bond Entropy","none"     ,"none"  ,"Sites"},
-    {"Site Min(s)"      ,"none"     ,"none"  ,"Sites"},
+    {"Bond Entropy"     ,"none"     ,"none"  ,"Sites"},
+    {"Bond Min(s)"      ,"none"     ,"none"  ,"Sites"},
+    {"Bond Rank"        ,"none"     ,"none"  ,"Sites"},
     {"Iter E/J"         ,"none"     ,"none"  ,"Iterations"},
-    {"Iter dE/J"        ,"none"     ,"none"  ,"Iterations"},
+    {"Iter log(dE/J)"   ,"none"     ,"none"  ,"Iterations"},
     {"Iter sigE/J"      ,"none"     ,"none"  ,"Iterations"},
 };
 
@@ -188,7 +218,7 @@ const int MatrixProductStateImp::n_graphs=sizeof(MatrixProductStateImp::theGraph
 void MatrixProductStateImp::MakeAllGraphs()
 {
     InsertLine("Iter E/J"  ,"E/J"     ,Plotting::CurveUnits("none","none"),Plotting::Black  );
-    InsertLine("Iter dE/J"  ,"dE/J"   ,Plotting::CurveUnits("none","none"),Plotting::Black  );
+    InsertLine("Iter log(dE/J)"  ,"log(dE/J)"   ,Plotting::CurveUnits("none","none"),Plotting::Black  );
     InsertLine("Iter sigE/J"  ,"(<E^2>-<E>^2)/J"   ,Plotting::CurveUnits("none","none"),Plotting::Black  );
     MultiPlotableImp::Insert(itsSitesPMesh);
     MultiPlotableImp::Insert(itsBondsPMesh);
@@ -205,19 +235,11 @@ void MatrixProductStateImp::MakeAllGraphs()
     }
 }
 
-void MatrixProductStateImp::UpdateSiteData()
+void MatrixProductStateImp::UpdateBondData(int isite)
 {
-    for (int ia=0; ia<itsL; ia++)
-    {
-        itsSiteEnergies[ia]=itsSites[ia]->GetSiteEnergy();
-        itsSiteEGaps   [ia]=itsSites[ia]->GetEGap();
-    }
-    for (int ia=0; ia<itsL-1; ia++)
-    {
-        itsBondEntropies[ia]=itsSites[ia]->GetBondEntropy();
-        itsBondMinSVs   [ia]=itsSites[ia]->GetMinSV();
-    }
-
+    itsBondEntropies[isite]=itsBonds[isite]->GetBondEntropy();
+    itsBondMinSVs   [isite]=itsBonds[isite]->GetMinSV();
+    itsBondRanks    [isite]=itsBonds[isite]->GetRank();
 }
 
 //--------------------------------------------------------------------------------------
@@ -228,7 +250,7 @@ int   MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int
 {
     Supervisor->ReadyToStart();
     Normalize(TensorNetworks::Right,Supervisor);
-    Supervisor->DoneOneStep(0);
+    Supervisor->DoneOneStep(0,"Right normalize lattice done");
     LoadHeffCaches(hamiltonian);
 
     int nSweep=0;
@@ -238,17 +260,18 @@ int   MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int
         SweepLeft (hamiltonian,Supervisor,true);
         nSweep++;
 
+
+        Supervisor->DoneOneStep(0,"Calculating Expectations <E> and <E^2>"); //Supervisor will update the graphs
         double E1=GetExpectationIterate(hamiltonian);
         double E2=GetExpectation(hamiltonian,hamiltonian);
         double dE=GetMaxDeltaE();
         if (weHaveGraphs())
         {
             AddPoint("Iter E/J",Plotting::Point(nSweep,E1));
-            AddPoint("Iter dE/J",Plotting::Point(nSweep,dE));
+            AddPoint("Iter log(dE/J)",Plotting::Point(nSweep,log10(dE)));
             AddPoint("Iter sigE/J",Plotting::Point(nSweep,E2-E1*E1));
         }
-        UpdateSiteData();
-        Supervisor->DoneOneStep(0); //Supervisor will update the graphs
+        Supervisor->DoneOneStep(0,"Full bi-directional sweep done"); //Supervisor will update the graphs
         if (GetMaxDeltaE()<eps) break;
     }
     return nSweep;
@@ -265,14 +288,15 @@ void MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Super
     for (int ia=0; ia<itsL-1; ia++)
     {
         Refine(h,ia);
-        Supervisor->DoneOneStep(1);
+        Supervisor->DoneOneStep(1,SiteMessage("Solve Heff eigen system for site ",ia),ia);
 
         VectorT s;
         MatrixCT Vdagger;
         itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
-        Supervisor->DoneOneStep(2,ia);
+        UpdateBondData(ia);
+        Supervisor->DoneOneStep(2,SiteMessage("SVD Left Normalize site ",ia),ia);
         itsSites[ia+1]->Contract(s,Vdagger);
-        Supervisor->DoneOneStep(2,ia);
+        Supervisor->DoneOneStep(2,SiteMessage("Transfer M=s*V_dagger*M on site ",ia+1),ia+1);
         itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
         if (!quiet) cout << "SweepRight post constract  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
     }
@@ -288,25 +312,29 @@ void MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Superv
     for (int ia=itsL-1; ia>0; ia--)
     {
         Refine(h,ia);
-        Supervisor->DoneOneStep(1);
+        Supervisor->DoneOneStep(1,SiteMessage("Solve Heff eigen system for site ",ia),ia);
 
         VectorT s;
         MatrixCT U;
         itsSites[ia]->SVDRightNormalize(U,s);
-        Supervisor->DoneOneStep(2,ia);
+        UpdateBondData(ia-1);
+        Supervisor->DoneOneStep(2,SiteMessage("SVD Rigft Normalize site ",ia),ia);
         itsSites[ia-1]->Contract(U,s);
-        Supervisor->DoneOneStep(2,ia);
+        Supervisor->DoneOneStep(2,SiteMessage("Transfer M=M*U*s on site ",ia-1),ia-1);
         itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
         if (!quiet)
             cout << "SweepLeft  post contract  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
 
     }
 }
-void MatrixProductStateImp::Refine(const Hamiltonian *h,int isite) const
+void MatrixProductStateImp::Refine(const Hamiltonian *h,int isite)
 {
     assert(CheckNormalized(isite,1e-11));
     Matrix6T Heff6=GetHeffIterate(h,isite); //New iterative version
     itsSites[isite]->Refine(Heff6.Flatten());
+    itsSiteEnergies[isite]=itsSites[isite]->GetSiteEnergy();
+    itsSiteEGaps   [isite]=itsSites[isite]->GetEGap      ();
+
 }
 
 

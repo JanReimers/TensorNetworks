@@ -4,12 +4,16 @@ import PyPlotting
 import PyTensorNetworks
 import threading
 import time
+import ctypes
 
 class GUIHandler:
     def __init__(self):
         pass
 
-    def Update(level,isite):
+    def Update(level,lastOperation,isite):
+        pass
+
+    def OnStop():
         pass
 
 class MPSSupervisor(PyTensorNetworks.LRPSupervisor):
@@ -24,9 +28,9 @@ class MPSSupervisor(PyTensorNetworks.LRPSupervisor):
     def ReadyToStart(self):
         self.Started=True
 
-    def DoneOneStep(self,level,isite=-1):
+    def DoneOneStep(self,level,lastOperation,isite=-1):
         #print("Enter DoOneStep isite=",isite)
-        wx.CallAfter(self.GUIhandler.Update,level,isite)
+        wx.CallAfter(self.GUIhandler.Update,level,lastOperation,isite)
         wx.YieldIfNeeded() #this is supposed to give the GUI a time slice but it's NOT working!!  Same for wxYield
         time.sleep(0.1) #this is kludge to give the GUI a time slice.
         #el=wx.EventLoopBase.GetActive()
@@ -45,6 +49,23 @@ class MPSSupervisor(PyTensorNetworks.LRPSupervisor):
 
         #print("Exit  DoOneStep")
 
+    def get_id(self):
+        # returns id of the respective thread
+        if hasattr(self, '_thread_id'):
+            return self._thread_id
+        for id, thread in threading._active.items():
+            if thread is self:
+                return id
+
+    def raise_exception(self):
+        #killing threads is tough, one way is to raise and excpetion
+        thread_id = self.get_id()
+        res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id,
+              ctypes.py_object(SystemExit))
+        if res > 1:
+            ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0)
+            print('Exception raise failure')
+
     def OnPlay(self,e):
         print("OnPlay")
         self.Started=True
@@ -60,8 +81,11 @@ class MPSSupervisor(PyTensorNetworks.LRPSupervisor):
     def OnStop(self,e):
         self.Pause=True
         self.Started=False
+        self.raise_exception()
+        self.GUIhandler.OnStop(e)
 
 
+EVT_NEW_HAMILTONIAN = wx.PyEventBinder(wx.NewEventType(), 1) # the 1 is number of expected IDs for the __call__ interface
 
 class wxHamiltonianPanel(wx.Panel):
     def __init__(self,parent):
@@ -95,6 +119,13 @@ class wxHamiltonianPanel(wx.Panel):
         sizer.SetSizeHints(self)
         self.SetSizer(sizer)
 
+        self.Bind(wx.EVT_SPINCTRL,self.OnChange) #this should capture changes from any of spin controls
+        self.Bind(wx.EVT_SPINCTRLDOUBLE,self.OnChange) #this should capture changes from any of spin controls
+
+    def OnChange(self,e):
+        event = wx.PyCommandEvent(EVT_NEW_HAMILTONIAN.typeId, self.GetId())
+        self.GetEventHandler().ProcessEvent(event)
+
     def JxAddrow(self,text,initialValue,sizer):
         Jexchange=wx.SpinCtrlDouble(parent=self,min=-10,max=10,initial=initialValue,inc=0.1)
         W,H=Jexchange.GetSize()
@@ -112,6 +143,8 @@ class wxHamiltonianPanel(wx.Panel):
         hz =self.hz .GetValue()
         return TNfactory.Make1D_NN_HeisenbergHamiltonian(L,S,Jxy,Jz,hz)
 
+EVT_NEW_MPS = wx.PyEventBinder(wx.NewEventType(), 1)
+EVT_NEW_EPS = wx.PyEventBinder(wx.NewEventType(), 1)
 
 class wxMPSApproximationsPanel(wx.Panel):
     def __init__(self,parent):
@@ -137,6 +170,12 @@ class wxMPSApproximationsPanel(wx.Panel):
         fgsizer.SetSizeHints(self)
         self.SetSizer(fgsizer)
 
+        self.DControl.Bind(wx.EVT_SPINCTRL,self.OnChange) #this should capture changes from only the D spin control
+
+    def OnChange(self,e):
+        event = wx.PyCommandEvent(EVT_NEW_MPS.typeId, self.GetId())
+        self.GetEventHandler().ProcessEvent(event)
+
     def CreateMPS(self,Hamiltonian):
         D=self.DControl.GetValue()
         return Hamiltonian.CreateMPS(D)
@@ -146,15 +185,15 @@ class wxMPSStatusPanel(wx.Panel):
         super().__init__(parent)
 
         self.colours={"A":wx.BLUE,"B":wx.RED, "M":wx.BLACK, "I":wx.LIGHT_GREY }
-        self.text=wx.TextCtrl(self,style=wx.TE_MULTILINE,size=(400,-1))
         self.L=0
 
     def NewLattice(self,L):
         self.L=L
-        fgsizer=wx.FlexGridSizer(L+1,2,0) #2 rows, L+1 columns, gap=5
+        fgsizer=wx.FlexGridSizer(L+1,3,0) #2 rows, L+2 columns, gap=5
         fgsizer.Add(wx.StaticText(self,label='Site #:'),flag=wx.ALIGN_RIGHT)
         for i in range(1,L+1):
             fgsizer.Add(wx.StaticText(self,label=str(i)),flag=wx.ALIGN_CENTER)
+
         fgsizer.Add(wx.StaticText(self,label='Norm Status:'))
         self.NormTextControls=[]
         for i in range(1,L+1):
@@ -163,8 +202,20 @@ class wxMPSStatusPanel(wx.Panel):
             tc.AppendText("   ")
             self.NormTextControls.append(tc)
             fgsizer.Add(tc)
-        fgsizer.SetSizeHints(self)
-        self.SetSizer(fgsizer)
+
+        #fgsizer.SetSizeHints(self)
+
+        hsizer=wx.BoxSizer(wx.HORIZONTAL)
+        hsizer.Add(wx.StaticText(self,label='Last Operation:'))
+        self.LastOperationTextControl=wx.TextCtrl(self,style=wx.TE_MULTILINE|wx.TE_LEFT,size=(400,20))
+        hsizer.Add(self.LastOperationTextControl,flag=wx.EXPAND)
+
+        vsizer=wx.BoxSizer(wx.VERTICAL)
+        vsizer.Add(fgsizer)
+        vsizer.Add(hsizer,flag=wx.EXPAND)
+
+        self.SetSizer(vsizer)
+        self.GetParent().Layout()
 
     def UpdateSite(self,MPS,isite):
         status=MPS.GetNormStatus(isite)
@@ -178,6 +229,10 @@ class wxMPSStatusPanel(wx.Panel):
     def Update(self,MPS):
         for isite in range(0,self.L):
             self.UpdateSite(MPS,isite)
+
+    def UpdateLastOperation(self,lastOP):
+        self.LastOperationTextControl.SetValue(lastOP)
+
 
 ID_START   =wx.NewIdRef()
 ID_PLAY    =wx.NewIdRef()
@@ -225,14 +280,11 @@ class MPSFrame(wx.Frame,GUIHandler):
 
         self.BuildLayout()
 
-        self.Hamiltonian=self.HamiltonianPanel.MakeHamiltonian(self.TNFactory)
-        self.MPS=self.ApproximationsPanel.CreateMPS(self.Hamiltonian)
-        self.MPS.InitializeWith(PyTensorNetworks.Random)
-        self.MPS.Insert(self.graphs) #Tell the MPS where to plot data
-        self.statusPanel.NewLattice(self.Hamiltonian.GetL())
-        self.statusPanel.Update(self.MPS)
+        self.Bind(EVT_NEW_HAMILTONIAN, self.OnNewHamiltonian)
+        self.Bind(EVT_NEW_MPS        , self.OnNewMPS)
 
         self.inUpdate=False
+        self.OnNewHamiltonian(None)
 
 
 
@@ -281,28 +333,51 @@ class MPSFrame(wx.Frame,GUIHandler):
     def OnQuit(self, e):
         self.Close()
 
+    def OnNewHamiltonian(self,e):
+        self.Hamiltonian=self.HamiltonianPanel.MakeHamiltonian(self.TNFactory)
+        self.statusPanel.NewLattice(self.Hamiltonian.GetL())
+        self.OnNewMPS(e)
+
+    def OnNewMPS(self,e):
+        self.MPS=self.ApproximationsPanel.CreateMPS(self.Hamiltonian)
+        self.MPS.InitializeWith(PyTensorNetworks.Random)
+        self.graphs.Clear()
+        self.MPS.Insert(self.graphs) #Tell the MPS where to plot data
+        self.graphs.ReplotActiveGraph()
+        self.statusPanel.Update(self.MPS)
+
     def OnStart(self,e):
-        x = threading.Thread(target=self.FindGroundState, args=(), daemon=True)
-        x.start()
+
+        self.crunchThread = threading.Thread(target=self.FindGroundState, args=(), daemon=True)
+        self.crunchThread.start()
         self.supervisor.OnPlay(e)
+
+    def OnStop(self,e):
+        #self.crunchThread.join()
+        print("Crunch thread stopped")
+        del self.MPS
+        self.OnNewMPS(e)
 
     def FindGroundState(self):
         n=self.MPS.FindGroundState(self.Hamiltonian,20,1e-8,self.supervisor)
-        print("FindGroundState nsweeps=",n)
-        #wx.CallAfter(self.graphs.ReplotActiveGraph)
+        print("FindGroundState finished, nsweeps=",n)
+
 
 
 
     def OnRestart(self,e):
         print("Restart")
 
-    def Update(self,level,isite):
+    def Update(self,level,lastOperation,isite):
         if (not self.inUpdate):
             self.inUpdate=True
-            #print("Update level=",level)
-            if level==0: #end of each sweep
-                self.graphs.ReplotActiveGraph()
-            #if level=1: #finished refine on one site
+            #print("Update level=",level," last op=",lastOperation)
+            self.statusPanel.UpdateLastOperation(lastOperation)
+            self.graphs.ReplotActiveGraph()
+            #if level==0: #end of each sweep
+            #    self.graphs.ReplotActiveGraph()
+            #if level==1: #finished refine on one site
+            #    self.graphs.ReplotActiveGraph()
 
             if level==2: #individual steps on one site
                 self.statusPanel.UpdateSite(self.MPS,isite)

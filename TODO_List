@@ -1,19 +1,32 @@
 -GUI
-    Separate norm status widgets for each site, update singles
-    E/J plot for each sote doesn't really work since the y range gets so tiny
+    Done Separate norm status widgets for each site, update singles
+    E/J plot for each site doesn't really work since the y range gets so tiny
+        Done Fix some plots, plot dE vs site# on log scale
+        Plot points instead of lines
+        Does wxDrivet support log scales?
+        Rank vs. site#
     Play/Pause in one button.  Use icons?
-    Get restart working
-    Stop shoud kill the thread
-    Split the classes into separate files wxMPSFrame.py is getting to big.
+    Get restart working(have restart do what start does now, get rid of start, play nad step will start it)
+    Done Stop shoud kill the thread
+    Split the classes into separate files wxMPSFrame.py is getting too big.
+    Status bar. ModelName (from H), L,S, D, iter#, E, CPU & meminfo (use psutils)
+    Done On startup Step should start the run
+    Done Create Bond objects between sites.  Each site can see its left and right bond objects.
+    Fix alignments on Ham tab
+    Use eps values.
+    Fresh check and build.
+
 -Done Mega classes MPState MPSite are too big, how split up responsibilities?
+    Move some stuff into bond objects
     Partially DONE.  Made more stuff private at least.
 -Calc <Sx> <Sy> <Sz>
 -Correlation functions <Sa*Sa+n>-<Sa>*<Sa+n>
 -Why optimize site 1, just leave it a |up> and take out global SU(2) invariance
 -Valgrind, any memeory leaks?
 -Give Lanczos an initial guess from previous iteration.
+-Speed up <E^2> contractions, take advantage of W shapes.  Make Dw2 a function of w1.
 -Imag time evolution
--Periodic boundary conditions.  This is less usefule than iMPS
+-Periodic boundary conditions.  This is less useful than iMPS
 -iMPS, iDMRG
 -GUI using wxPython
     -What to show in screen?
