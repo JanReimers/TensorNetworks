@@ -24,20 +24,31 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
     //cout << "Jxy=" << Jxy << endl;
     //cout << "Jz=" << Jz << endl;
     //cout << "hz=" << hz << endl;
+
+    Vector<int> w1_first_1x5(5);
+    Fill(w1_first_1x5,1);
+    Vector<int> w2_last_1x5(1);
+    w2_last_1x5(1)=5;
+
+    Vector<int> w1_first_5x5(5);
+    Fill(w1_first_5x5,5);
+    w1_first_5x5(1)=1;
+    Vector<int> w2_last_5x5(5);
+    Fill(w2_last_5x5,1);
+    w2_last_5x5(5)=5;
+
+    Vector<int> w1_first_5x1(1);
+    w1_first_5x1(1)=1;
+    Vector<int> w2_last_5x1(5);
+    Fill(w2_last_5x1,1);
+
+
+
+    itsDw12s[TensorNetworks::Left ]=new Dw12(1,5,w1_first_1x5,w2_last_1x5);
+    itsDw12s[TensorNetworks::Bulk ]=new Dw12(5,5,w1_first_5x5,w2_last_5x5);
+    itsDw12s[TensorNetworks::Right]=new Dw12(5,1,w1_first_5x1,w2_last_5x1);
+
     Init(this);
-
-    Vector<int> Dw2_left(1);
-    Dw2_left(1)=5;
-    Vector<int> Dw2_bulk(5);
-    Fill(Dw2_bulk,1);
-    Dw2_bulk(5)=5;
-    Vector<int> Dw2_right(5);
-    Fill(Dw2_right,1);
-
-
-    itsDw12s[TensorNetworks::Left ]=new Dw12(1,Dw2_left);
-    itsDw12s[TensorNetworks::Bulk ]=new Dw12(5,Dw2_bulk);
-    itsDw12s[TensorNetworks::Right]=new Dw12(5,Dw2_right);
 
 }
 
@@ -199,6 +210,7 @@ const Dw12* Hamiltonian_1D_NN_Heisenberg::GetDw12(TensorNetworks::Position lbr) 
 {
     assert(lbr>=0);
     assert(lbr<3);
+    assert(itsDw12s[lbr]);
     return itsDw12s[lbr];
 }
 

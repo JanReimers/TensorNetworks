@@ -1,6 +1,7 @@
 #include "TensorNetworksImp/MatrixProductSite.H"
 #include "TensorNetworksImp/Bond.H"
 #include "TensorNetworks/SiteOperator.H"
+#include "TensorNetworks/Dw12.H"
 #include "TensorNetworksImp/PrimeEigenSolver.H"
 #include "oml/minmax.h"
 #include "oml/cnumeric.h"
@@ -627,13 +628,12 @@ MatrixProductSite::Vector3T MatrixProductSite::IterateLeft_F(const SiteOperator*
 
 MatrixProductSite::Vector4T MatrixProductSite::IterateLeft_F(const SiteOperator* so1, const SiteOperator* so2, const Vector4T& Fam1) const
 {
-    TensorNetworks::ipairT Dw1=so1->GetDw();
-    int Dw12=Dw1.second;
-    TensorNetworks::ipairT Dw2=so2->GetDw();
-    int Dw22=Dw2.second;
-    Vector4T F(Dw12,Dw22,itsD2,itsD2,1);
-    for (int w2=1;w2<=Dw12;w2++)
-    for (int v2=1;v2<=Dw22;v2++)
+    const Dw12& Dws1=so1->GetDw12();
+    const Dw12& Dws2=so2->GetDw12();
+
+    Vector4T F(Dws1.Dw2,Dws2.Dw2,itsD2,itsD2,1);
+    for (int w2=1;w2<=Dws1.Dw2;w2++)
+    for (int v2=1;v2<=Dws2.Dw2;v2++)
         for (int i2=1;i2<=itsD2;i2++)
             for (int j2=1;j2<=itsD2;j2++)
                 F(w2,v2,i2,j2)=ContractAWWFA(w2,v2,i2,j2,so1,so2,Fam1);
@@ -663,12 +663,15 @@ ContractAWWFA(int w2, int v2, int i2, int j2, const SiteOperator* so1, const Sit
 
 MatrixProductSite::eType MatrixProductSite::ContractWWFA(int m, int w2, int v2, int i1, int j2, const SiteOperator* so1, const SiteOperator* so2, const Vector4T& Fam1) const
 {
+    const Dw12& Dws1=so1->GetDw12();
     eType wwfa(0.0);
-     for (int o=0; o<itsp; o++)
-     {
-        MatrixT Wmo=so1->GetW(m,o);
-        int Dw1=Wmo.GetNumRows();
-        for (int w1=1;w1<=Dw1;w1++)
+    for (int o=0; o<itsp; o++)
+    {
+        const MatrixT& Wmo=so1->GetW(m,o);
+        assert(Wmo.GetNumRows()==Dws1.Dw1);
+        for (int w1=1;w1<Dws1.w1_first(w2);w1++)
+            assert(Wmo(w1,w2)==0);
+        for (int w1=Dws1.w1_first(w2);w1<=Dws1.Dw1;w1++)
             wwfa+=Wmo(w1,w2)*ContractWFA(o,w1,v2,i1,j2,so2,Fam1);
     }
     return wwfa;
@@ -676,12 +679,15 @@ MatrixProductSite::eType MatrixProductSite::ContractWWFA(int m, int w2, int v2, 
 
 MatrixProductSite::eType MatrixProductSite::ContractWFA(int o, int w1, int v2, int i1, int j2, const SiteOperator* so, const Vector4T& Fam1) const
 {
+    const Dw12& Dvs1=so->GetDw12();
     eType wfa(0.0);
-     for (int n=0; n<itsp; n++)
-     {
-        MatrixT Won=so->GetW(o,n);
-        int Dw1=Won.GetNumRows();
-        for (int v1=1;v1<=Dw1;v1++)
+    for (int n=0; n<itsp; n++)
+    {
+        const MatrixT& Won=so->GetW(o,n);
+        assert(Won.GetNumRows()==Dvs1.Dw1);
+        for (int v1=1;v1<Dvs1.w1_first(v2);v1++)
+            assert(Won(v1,v2)==0);
+        for (int v1=Dvs1.w1_first(v2);v1<=Dvs1.Dw1;v1++)
             wfa+=Won(v1,v2)*ContractFA(n,w1,v1,i1,j2,Fam1);
     }
     return wfa;
@@ -699,12 +705,15 @@ MatrixProductSite::eType MatrixProductSite::ContractFA(int n, int w1, int v1, in
 
 MatrixProductSite::eType MatrixProductSite::ContractWFA(int m, int w2, int i1, int j2, const SiteOperator* so, const Vector3T& Fam1) const
 {
+    const Dw12& Dws1=so->GetDw12();
     eType wfa(0.0);
-     for (int n=0; n<itsp; n++)
-     {
-        MatrixT Wmn=so->GetW(m,n);
-        int Dw1=Wmn.GetNumRows();
-        for (int w1=1;w1<=Dw1;w1++)
+    for (int n=0; n<itsp; n++)
+    {
+        const MatrixT& Wmn=so->GetW(m,n);
+        assert(Wmn.GetNumRows()==Dws1.Dw1);
+        for (int w1=1;w1<Dws1.w1_first(w2);w1++)
+            assert(Wmn(w1,w2)==0);
+        for (int w1=Dws1.w1_first(w2); w1<=Dws1.Dw1; w1++)
             wfa+=Wmn(w1,w2)*ContractFA(n,w1,i1,j2,Fam1);
     }
     return wfa;
@@ -750,7 +759,7 @@ MatrixProductSite::eType MatrixProductSite::ContractWFB(int m, int w1, int i2, i
     eType wfb(0.0);
      for (int n=0; n<itsp; n++)
      {
-        MatrixT Wmn=so->GetW(m,n);
+        const MatrixT& Wmn=so->GetW(m,n);
         int Dw2=Wmn.GetNumCols();
         for (int w2=1;w2<=Dw2;w2++)
             wfb+=Wmn(w1,w2)*ContractFB(n,w2,i2,j1,Fap1);

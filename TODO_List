@@ -33,6 +33,14 @@
     Before Implementation:
         <E^2> contraction for L=10, S=2.5, D=4 took 10.6321 seconds.
         <E^2> contraction for L=10, S=0.5, D=16 took 28.8432 seconds.
+    After implementation:
+        <E^2> contraction for L=10, S=2.5, D=4 took 2.66917 seconds.
+        <E^2> contraction for L=10, S=0.5, D=16 took 6.41037 seconds.
+    Further reduced by return referneces in GetW calls
+        <E^2> contraction for L=10, S=2.5, D=4 took 0.916441 seconds.
+        <E^2> contraction for L=10, S=0.5, D=16 took 3.01753 seconds.
+
+
 -Imag time evolution
 -Periodic boundary conditions.  This is less useful than iMPS
 -iMPS, iDMRG

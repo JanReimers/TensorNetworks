@@ -5,9 +5,10 @@
 SiteOperatorImp::SiteOperatorImp(TensorNetworks::Position lbr, const OperatorWRepresentation* H,int p)
     : itsp(p)
     , itsDws(H->GetDw(lbr))
-    , itsDW12(H->GetDw12(lbr))
+    , itsDw12(H->GetDw12(lbr))
     , itsWs(p,p)
 {
+    assert(itsDw12);
     for (int m=0;m<itsp;m++)
         for (int n=0;n<itsp;n++)
         {

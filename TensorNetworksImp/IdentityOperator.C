@@ -4,10 +4,11 @@
 
 IdentityOperator::IdentityOperator()
 {
-    Vector<int> Dw2(1);
-    Dw2(1)=1;
+    Vector<int> Dw1s(1),Dw2s(1);
+    Dw1s(1)=1;
+    Dw2s(1)=1;
 
-    itsDw12=new Dw12(1,Dw2);
+    itsDw12=new Dw12(1,1,Dw1s,Dw2s);
 }
 
 IdentityOperator::~IdentityOperator()

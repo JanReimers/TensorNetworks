@@ -14,8 +14,8 @@ class SiteOperatorImp : public virtual SiteOperator
         virtual ~SiteOperatorImp();
 
         virtual TensorNetworks::ipairT GetDw  () const {return itsDws;}
-        virtual const Dw12*            GetDw12() const {return itsDW12;}
-        virtual const TensorNetworks::MatrixT GetW(int m, int n) const
+        virtual const Dw12&            GetDw12() const {return *itsDw12;}
+        virtual const TensorNetworks::MatrixT& GetW(int m, int n) const
         {
             return itsWs(m+1,n+1);
         }
@@ -28,7 +28,7 @@ class SiteOperatorImp : public virtual SiteOperator
 
         int itsp; //2*S+1
         TensorNetworks::ipairT itsDws;
-        const Dw12* itsDW12;
+        const Dw12* itsDw12;
 
         TensorT itsWs;
 };

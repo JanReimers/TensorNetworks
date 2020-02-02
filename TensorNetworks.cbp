@@ -69,6 +69,7 @@
 		<Unit filename="Containers/Vector3.H" />
 		<Unit filename="Containers/Vector4.H" />
 		<Unit filename="TODO_List" />
+		<Unit filename="TensorNetworks/Dw12.H" />
 		<Unit filename="TensorNetworks/Enums.H" />
 		<Unit filename="TensorNetworks/Factory.H" />
 		<Unit filename="TensorNetworks/Hamiltonian.H" />
@@ -120,8 +121,11 @@
 		</Unit>
 		<Unit filename="TensorNetworksImp/SiteOperatorImp.H" />
 		<Unit filename="TensorNetworksImp/Typedefs.H" />
+		<Unit filename="wx/wxHamiltonianPanel.py" />
 		<Unit filename="wx/wxMPS.py" />
+		<Unit filename="wx/wxMPSApproximationsPanel.py" />
 		<Unit filename="wx/wxMPSFrame.py" />
+		<Unit filename="wx/wxMPSStatusPanel.py" />
 		<Extensions>
 			<code_completion />
 			<debugger />
