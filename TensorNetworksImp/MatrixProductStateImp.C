@@ -90,7 +90,7 @@ MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D)
 
 MatrixProductStateImp::~MatrixProductStateImp()
 {
-    cout << "MatrixProductStateImp destructor." << endl;
+    //cout << "MatrixProductStateImp destructor." << endl;
     delete itsBondsPMesh;
     delete itsSitesPMesh;
     delete itsBondsMesh;
@@ -135,7 +135,7 @@ void MatrixProductStateImp::Normalize(TensorNetworks::Position LR,LRPSupervisor*
         itsSites[itsL-1]->ReshapeFromLeft(s.GetHigh());
         double norm=std::real(itsSites[itsL-1]->GetLeftNorm()(1,1));
         itsSites[itsL-1]->Rescale(sqrt(norm));
-        UpdateBondData(itsL-1);
+        UpdateBondData(itsL-2);
         Supervisor->DoneOneStep(2,SiteMessage("Rescale site ",itsL-1),itsL-1);
     }
     else if (LR==TensorNetworks::Right)

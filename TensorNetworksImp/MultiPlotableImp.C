@@ -21,7 +21,7 @@ MultiPlotableImp::MultiPlotableImp()
 
 MultiPlotableImp::~MultiPlotableImp()
 {
-     std::cout << "MultiPlotableImp destructor." << std::endl;
+     //std::cout << "MultiPlotableImp destructor." << std::endl;
 }
 
 void MultiPlotableImp::Insert(Plotting::Graph* g, c_str layer)

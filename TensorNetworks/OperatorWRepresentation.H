@@ -4,6 +4,7 @@
 #include "TensorNetworks/Enums.H"
 #include "TensorNetworks/Typedefs.H"
 
+class Dw12;
 //
 //  The implementation of this class calculates the <m|W|n> matrix elements
 //  directly so don't use this in hot loops.  Use SiteOperator instead, which caches
@@ -16,8 +17,9 @@ class OperatorWRepresentation
         OperatorWRepresentation() {}
         virtual ~OperatorWRepresentation() {}
 
-        virtual TensorNetworks::MatrixT GetW (TensorNetworks::Position,int m, int n) const=0;
-        virtual TensorNetworks::ipairT  GetDw(TensorNetworks::Position) const=0;
+        virtual TensorNetworks::MatrixT GetW   (TensorNetworks::Position,int m, int n) const=0;
+        virtual TensorNetworks::ipairT  GetDw  (TensorNetworks::Position) const=0;
+        virtual const Dw12*             GetDw12(TensorNetworks::Position) const=0;
 };
 
 #endif // OPERATORWREPRESENTATION_H

@@ -1,6 +1,8 @@
 #include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
 #include "TensorNetworksImp/MatrixProductStateImp.H"
 #include "TensorNetworksImp/MatrixProductOperator.H"
+#include "TensorNetworks/Dw12.H"
+
 #include <iostream>
 
 using std::cout;
@@ -23,11 +25,28 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
     //cout << "Jz=" << Jz << endl;
     //cout << "hz=" << hz << endl;
     Init(this);
+
+    Vector<int> Dw2_left(1);
+    Dw2_left(1)=5;
+    Vector<int> Dw2_bulk(5);
+    Fill(Dw2_bulk,1);
+    Dw2_bulk(5)=5;
+    Vector<int> Dw2_right(5);
+    Fill(Dw2_right,1);
+
+
+    itsDw12s[TensorNetworks::Left ]=new Dw12(1,Dw2_left);
+    itsDw12s[TensorNetworks::Bulk ]=new Dw12(5,Dw2_bulk);
+    itsDw12s[TensorNetworks::Right]=new Dw12(5,Dw2_right);
+
 }
 
 Hamiltonian_1D_NN_Heisenberg::~Hamiltonian_1D_NN_Heisenberg()
 {
      cout << "Hamiltonian_1D_NN_Heisenberg destructor." << endl;
+     delete itsDw12s[TensorNetworks::Left ];
+     delete itsDw12s[TensorNetworks::Bulk ];
+     delete itsDw12s[TensorNetworks::Right];
 }
 
 double Hamiltonian_1D_NN_Heisenberg::ConvertToSpin(int n) const
@@ -174,6 +193,13 @@ TensorNetworks::ipairT  Hamiltonian_1D_NN_Heisenberg::GetDw(TensorNetworks::Posi
             break;
     }
     return ret;
+}
+
+const Dw12* Hamiltonian_1D_NN_Heisenberg::GetDw12(TensorNetworks::Position lbr) const
+{
+    assert(lbr>=0);
+    assert(lbr<3);
+    return itsDw12s[lbr];
 }
 
 //

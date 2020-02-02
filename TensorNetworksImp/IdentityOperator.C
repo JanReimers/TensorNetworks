@@ -1,13 +1,18 @@
 #include "TensorNetworksImp/IdentityOperator.H"
+#include "TensorNetworks/Dw12.H"
+
 
 IdentityOperator::IdentityOperator()
 {
-    //ctor
+    Vector<int> Dw2(1);
+    Dw2(1)=1;
+
+    itsDw12=new Dw12(1,Dw2);
 }
 
 IdentityOperator::~IdentityOperator()
 {
-    //dtor
+    delete itsDw12;
 }
 
 TensorNetworks::ipairT  IdentityOperator::GetDw(TensorNetworks::Position) const

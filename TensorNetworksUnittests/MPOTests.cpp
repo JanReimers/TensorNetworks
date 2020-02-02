@@ -3,8 +3,10 @@
 #include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
+#include "TensorNetworks/LRPSupervisor.H"
 #include "oml/stream.h"
 #include "oml/vector_io.h"
+#include "oml/stopw.h"
 
 class MPOTesting : public ::testing::Test
 {
@@ -15,8 +17,10 @@ public:
     typedef TensorNetworks::Vector3T Vector3T;
     typedef TensorNetworks::eType eType;
     MPOTesting()
-    : eps(1.0e-13)
-    , itsFactory(TensorNetworks::Factory::GetFactory())
+        : eps(1.0e-13)
+        , itsFactory(TensorNetworks::Factory::GetFactory())
+        , itsSupervisor( new LRPSupervisor())
+
     {
         assert(itsFactory);
         StreamableObject::SetToPretty();
@@ -47,6 +51,7 @@ public:
     Hamiltonian* itsH;
     OperatorWRepresentation* itsWRep;
     MatrixProductState*    itsMPS;
+    LRPSupervisor* itsSupervisor;
 };
 
 
@@ -144,7 +149,7 @@ TEST_F(MPOTesting,LeftNormalizeThenDoHamiltionExpectation)
 {
     Setup(10,1,2);
     itsMPS->InitializeWith(TensorNetworks::Neel);
-    itsMPS->Normalize(TensorNetworks::Left);
+    itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
     itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
 }
@@ -152,7 +157,7 @@ TEST_F(MPOTesting,RightNormalizeThenDoHamiltionExpectation)
 {
     Setup(10,1,2);
     itsMPS->InitializeWith(TensorNetworks::Neel);
-    itsMPS->Normalize(TensorNetworks::Left);
+    itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
     itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
 }
@@ -181,7 +186,7 @@ TEST_F(MPOTesting,TestHeffWithRandomStateL10S1D2)
 {
     Setup(10,1,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right);
+    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
     double E1=itsMPS->GetExpectation(itsH);
     for (int ia=0; ia<itsH->GetL(); ia++)
     {
@@ -202,7 +207,7 @@ TEST_F(MPOTesting,TestHeffWithRandomStateL10S1D1)
 {
     Setup(10,1,1);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right);
+    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
     double E1=itsMPS->GetExpectation(itsH);
     for (int ia=0; ia<itsH->GetL(); ia++)
     {
@@ -223,7 +228,7 @@ TEST_F(MPOTesting,TestHeffWithRandomStateL10S5D1)
 {
     Setup(10,5,1);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right);
+    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
     double E1=itsMPS->GetExpectation(itsH);
     for (int ia=0; ia<itsH->GetL(); ia++)
     {
@@ -246,7 +251,7 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D2)
     int L=10;
     Setup(L,1,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right);
+    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
     Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
     Vector3T R3=GetEORightIterate(-1);
@@ -261,7 +266,7 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D1)
     int L=10;
     Setup(L,1,1);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right);
+    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
     Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
     Vector3T R3=GetEORightIterate(-1);
@@ -276,7 +281,7 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D6)
     int L=10;
     Setup(L,1,6);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right);
+    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
     Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
     Vector3T R3=GetEORightIterate(-1);
@@ -290,7 +295,7 @@ TEST_F(MPOTesting,TestGetLRIterateL10S5D2)
     int L=10;
     Setup(L,5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right);
+    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
     Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
     Vector3T R3=GetEORightIterate(-1);
@@ -305,7 +310,7 @@ TEST_F(MPOTesting,TestEoldEnew)
     int L=10;
     Setup(L,1,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right);
+    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
     Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
     Vector3T R3=GetEORightIterate(-1);
@@ -322,7 +327,7 @@ TEST_F(MPOTesting,TestHeff)
     int L=10;
     Setup(L,1,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right);
+    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
     LoadHeffCaches();
     // This only work for site 0 since the Left cache only gets updates by the SweepRight routine.
     int ia=0;
@@ -339,7 +344,7 @@ TEST_F(MPOTesting,TestGetExpectation2_I_I)
     int L=10,S2=1,D=2;
     Setup(L,S2,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right);
+    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
     OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
     Operator* IO=itsH->CreateOperator(IWO);
 
@@ -355,5 +360,36 @@ TEST_F(MPOTesting,TestGetExpectation2_I_I)
     EXPECT_NEAR(EI,E1,eps);
     (void)EE; //Nothing to test this agains right now
 }
+
+#ifndef DEBUG
+
+TEST_F(MPOTesting,TestTimingE2_S5D4)
+{
+    int L=10,S2=5,D=4;
+    Setup(L,S2,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
+    StopWatch sw;
+    sw.Start();
+    double EE=itsMPS->GetExpectation(itsH,itsH);
+    sw.Stop();
+    cout << "<E^2> contraction for L=" << L << ", S=" << S2/2.0 << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
+    (void)EE; //Avoid warning
+}
+TEST_F(MPOTesting,TestTimingE2_S1D16)
+{
+    int L=10,S2=1,D=16;
+    Setup(L,S2,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
+    StopWatch sw;
+    sw.Start();
+    double EE=itsMPS->GetExpectation(itsH,itsH);
+    sw.Stop();
+    cout << "<E^2> contraction for L=" << L << ", S=" << S2/2.0 << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
+    (void)EE; //Avoid warning
+}
+#endif
+
 
 

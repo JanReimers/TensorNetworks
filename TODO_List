@@ -30,6 +30,9 @@
 -Valgrind, any memeory leaks?
 -Give Lanczos an initial guess from previous iteration.
 -Speed up <E^2> contractions, take advantage of W shapes.  Make Dw2 a function of w1.
+    Before Implementation:
+        <E^2> contraction for L=10, S=2.5, D=4 took 10.6321 seconds.
+        <E^2> contraction for L=10, S=0.5, D=16 took 28.8432 seconds.
 -Imag time evolution
 -Periodic boundary conditions.  This is less useful than iMPS
 -iMPS, iDMRG

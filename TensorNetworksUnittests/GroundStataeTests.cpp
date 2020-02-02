@@ -54,7 +54,7 @@ TEST_F(GroundStateTesting,TestSweepL9S1D8)
     int L=9,S2=1,D=8,maxIter=100;
     Setup(L,S2,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9);
+    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
 
     double E=itsMPS->GetExpectationIterate(itsH);
     double o=itsMPS->GetOverlap();
@@ -68,7 +68,7 @@ TEST_F(GroundStateTesting,TestSweepL9S5D2)
     int L=9,S2=5,D=2,maxIter=100;
     Setup(L,S2,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9);
+    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
 
     double E=itsMPS->GetExpectationIterate(itsH);
     double o=itsMPS->GetOverlap();
@@ -108,7 +108,7 @@ TEST_F(GroundStateTesting,TestIdentityOperator)
 {
     Setup(10,1,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Left);
+    itsMPS->Normalize(TensorNetworks::Left,new LRPSupervisor());
     OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
     Operator* IO=itsH->CreateOperator(IWO);
     double S=itsMPS->GetExpectation(IO);

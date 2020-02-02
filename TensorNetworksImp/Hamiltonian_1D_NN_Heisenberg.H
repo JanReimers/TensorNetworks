@@ -26,8 +26,9 @@ class Hamiltonian_1D_NN_Heisenberg
         //
         //  OperatorWRepresentation interface
         //
-        virtual TensorNetworks::MatrixT GetW (TensorNetworks::Position,int m, int n) const;
-        virtual TensorNetworks::ipairT  GetDw(TensorNetworks::Position) const;
+        virtual TensorNetworks::MatrixT GetW   (TensorNetworks::Position,int m, int n) const;
+        virtual TensorNetworks::ipairT  GetDw  (TensorNetworks::Position) const;
+        virtual const Dw12*             GetDw12(TensorNetworks::Position lbr) const;
 
     private:
         double ConvertToSpin(int n) const;
@@ -39,6 +40,7 @@ class Hamiltonian_1D_NN_Heisenberg
         int    itsL; //Number of lattice sites
         double itsS; //
         double itsJxy,itsJz,itshz; //NN coupling constants and external field
+        Dw12* itsDw12s[3]; //Dw2[w1] for left bulk and right
 };
 
 #endif // HAMILTONIAN_1D_NN_HEISENBERG_H
