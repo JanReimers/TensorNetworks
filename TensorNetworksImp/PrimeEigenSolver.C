@@ -1,3 +1,4 @@
+#include "TensorNetworks/Epsilons.H"
 #include "PrimeEigenSolver.H"
 #include <primme.h>
 #include "oml/vector_io.h"
@@ -6,15 +7,14 @@ using std::cout;
 using std::endl;
 
 
-void DenseMatvec(void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *blockSize, primme_params *primme, int *ierr);
+void  DenseMatvec(void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *blockSize, primme_params *primme, int *ierr);
 void SparseMatvec(void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *blockSize, primme_params *primme, int *ierr);
 
 template<class T> const SparseMatrix<T>* PrimeEigenSolver<T>::theSparseMatrix = 0;
 template<class T> const      DMatrix<T>* PrimeEigenSolver<T>::theDenseMatrix = 0;
 
 template <class T> PrimeEigenSolver<T>::PrimeEigenSolver(double eps)
-: itsEps(eps)
-, itsNumGuesses(0)
+: itsNumGuesses(0)
 {
 
 }
@@ -26,25 +26,25 @@ template <class T> PrimeEigenSolver<T>::~PrimeEigenSolver()
 }
 
 #include <iostream>
-template <class T> void PrimeEigenSolver<T>::Solve(const DMatrix<T>& m, int NumEigenValues)
+template <class T> void PrimeEigenSolver<T>::Solve(const DMatrix<T>& m, int NumEigenValues,const Epsilons& eps)
 {
     assert(&m);
     assert(m.GetNumRows()==m.GetNumCols());
-    SparseMatrix<T> sparsem(m,itsEps);
+    SparseMatrix<T> sparsem(m,eps.itsSparseMatrixEpsilon);
     //cout << "Density=" << sparsem.GetDensity() << "%" << endl;
     if (sparsem.GetDensity()<80)
     {
         theSparseMatrix=&sparsem;
-        SolveSparse(NumEigenValues);
+        SolveSparse(NumEigenValues,eps.itsEigenConvergenceEpsilon);
     }
     else
     {
         theDenseMatrix=&m;
-        SolveDense(NumEigenValues);
+        SolveDense(NumEigenValues,eps.itsEigenConvergenceEpsilon);
     }
 }
 
-template <class T> void PrimeEigenSolver<T>::SolveSparse(int NumEigenValues)
+template <class T> void PrimeEigenSolver<T>::SolveSparse(int NumEigenValues,double eps)
 {
     assert(theSparseMatrix);
     assert(theSparseMatrix->GetNumRows()==theSparseMatrix->GetNumCols());
@@ -54,7 +54,7 @@ template <class T> void PrimeEigenSolver<T>::SolveSparse(int NumEigenValues)
     primme.matrixMatvec = SparseMatvec;
     primme.n = N; /* set problem dimension */
     primme.numEvals = NumEigenValues;   /* Number of wanted eigenpairs */
-    primme.eps = itsEps;      /* ||r|| <= eps * ||matrix|| */
+    primme.eps = eps;      /* ||r|| <= eps * ||matrix|| */
     primme.target = primme_smallest; /* Wanted the smallest eigenvalues */
 
     primme.initSize=itsNumGuesses;
@@ -67,7 +67,7 @@ template <class T> void PrimeEigenSolver<T>::SolveSparse(int NumEigenValues)
     assert(ret==0);
     (void)ret; //avoid compiler warning in release mode
 //    std::cout << "Max(abs(rnorms))=" <<  Max(abs(rnorms)) << " " << itsEps << std::endl;
-    if (Max(abs(rnorms))>1000*itsEps)
+    if (Max(abs(rnorms))>1000*eps)
         cout << "Warning high rnorms in PrimeEigenSolver::SolveSparse rnorma=" << std::scientific << rnorms << endl;
     //int niter=primme.stats.numOuterIterations;
     //std::cout << "Primme niter=" << niter << std::endl;
@@ -75,7 +75,7 @@ template <class T> void PrimeEigenSolver<T>::SolveSparse(int NumEigenValues)
     itsNumGuesses=NumEigenValues; //Set up using guesses for next time around
 
 }
-template <class T> void PrimeEigenSolver<T>::SolveDense(int NumEigenValues)
+template <class T> void PrimeEigenSolver<T>::SolveDense(int NumEigenValues,double eps)
 {
     assert(theDenseMatrix);
     assert(theDenseMatrix->GetNumRows()==theDenseMatrix->GetNumCols());
@@ -85,7 +85,7 @@ template <class T> void PrimeEigenSolver<T>::SolveDense(int NumEigenValues)
     primme.matrixMatvec = DenseMatvec;
     primme.n = N; /* set problem dimension */
     primme.numEvals = NumEigenValues;   /* Number of wanted eigenpairs */
-    primme.eps = itsEps;      /* ||r|| <= eps * ||matrix|| */
+    primme.eps = eps;      /* ||r|| <= eps * ||matrix|| */
     primme.target = primme_smallest; /* Wanted the smallest eigenvalues */
     primme.initSize=itsNumGuesses;
     primme_set_method(PRIMME_DYNAMIC, &primme);
@@ -97,7 +97,7 @@ template <class T> void PrimeEigenSolver<T>::SolveDense(int NumEigenValues)
     assert(ret==0);
     (void)ret; //avoid compiler warning in release mode
 //    std::cout << "Max(abs(rnorms))=" <<  Max(abs(rnorms)) << " " << itsEps << std::endl;
-    if (Max(abs(rnorms))>1000*itsEps)
+    if (Max(abs(rnorms))>1000*eps)
         cout << "Warning high rnorms in PrimeEigenSolver::SolveDense rnorma=" << std::scientific << rnorms << endl;
     //int niter=primme.stats.numOuterIterations;
     //std::cout << "Primme niter=" << niter << std::endl;

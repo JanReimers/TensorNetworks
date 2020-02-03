@@ -269,21 +269,21 @@ MatrixProductSite::MatrixCT MatrixProductSite::GetLeftNorm() const
     return ret;
 }
 
-std::string MatrixProductSite::GetNormStatus() const
+std::string MatrixProductSite::GetNormStatus(double eps) const
 {
 //    StreamableObject::SetToPretty();
 //    for (int ip=0;ip<itsp; ip++)
 //        cout << "A[" << ip << "]=" << itsAs[ip] << endl;
     std::string ret;
-    if (IsLeftNormalized())
+    if (IsLeftNormalized(eps))
     {
-        if (IsRightNormalized())
+        if (IsRightNormalized(eps))
             ret="I"; //This should be rare
         else
             ret="A";
     }
     else
-        if (IsRightNormalized())
+        if (IsRightNormalized(eps))
             ret="B";
         else
             ret="M";
@@ -316,13 +316,13 @@ double MatrixProductSite::GetMaxAmplitude() const
     return ret;
 }
 
-bool MatrixProductSite::IsLeftNormalized() const
+bool MatrixProductSite::IsLeftNormalized(double eps) const
 {
-    return IsUnit(GetLeftNorm(),1e-12);
+    return IsUnit(GetLeftNorm(),eps);
 }
-bool MatrixProductSite::IsRightNormalized() const
+bool MatrixProductSite::IsRightNormalized(double eps) const
 {
-    return IsUnit(GetRightNorm(),1e-12);
+    return IsUnit(GetRightNorm(),eps);
 }
 
 bool MatrixProductSite::IsUnit(const MatrixCT& m,double eps)
@@ -502,7 +502,6 @@ GetHeff(const SiteOperator* mops,const Vector3T& L,const Vector3T& R) const
 //    cout << "R.Flatten()     =" << R.Flatten()<< endl;
 //    cout << "Rcache.Flatten()=" << Rcache.Flatten()<< endl;
     double errorR=Max(abs(R.Flatten()-Rcache.Flatten()));
-    double eps=1e-12;
     if (errorL>eps || errorR>eps)
     {
         cout << "Warning Heff errors Left,Rigt=" << std::scientific << errorL << " " << errorR << endl;
@@ -590,13 +589,12 @@ GetHeff(const SiteOperator* mops,const Matrix6T& L,const Matrix6T& R) const
 
 }
 
-void MatrixProductSite::Refine(const MatrixCT& Heff)
+void MatrixProductSite::Refine(const MatrixCT& Heff,const Epsilons& eps)
 {
-    Analyze(Heff); //Record % non zero elements
     assert(Heff.GetNumRows()==Heff.GetNumCols());
     int N=Heff.GetNumRows();
     Vector<double>  eigenValues(N);
-    itsEigenSolver.Solve(Heff,2); //Get lowest two eigen values/states
+    itsEigenSolver.Solve(Heff,2,eps); //Get lowest two eigen values/states
 
     eigenValues=itsEigenSolver.GetEigenValues();
 
@@ -877,16 +875,4 @@ void MatrixProductSite::Contract(const MatrixCT& U, const VectorT& s)
     }
 }
 
-void  MatrixProductSite::Analyze(const MatrixCT& Heff)
-{
-    double eps=1e-12;
-    int N=Heff.GetNumCols();
-    assert(N==Heff.GetNumRows());
-    int NnonZero=0;
-    for (int i=1; i<=N; i++)
-        for (int j=1; j<=N; j++)
-            if (abs(Heff(i,j))>eps) NnonZero++;
-
-    itsHeffDensity=100.0*static_cast<double>(NnonZero)/(N*N);
-}
 

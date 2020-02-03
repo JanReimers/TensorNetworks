@@ -2,6 +2,7 @@
 #define PRIMEEIGENSOLVER_H
 
 #include "Containers/SparseMatrix.H"
+class Epsilons;
 //
 //  Solve sparse eigen systems using the PRIMME library
 //  For efficiency client code should keep and instance of PrimeEigenSolver alive
@@ -14,7 +15,7 @@ template <class T> class PrimeEigenSolver
         ~PrimeEigenSolver();
 
         // Get lowest N eigen values and vectors with no initial guess
-        void Solve(const DMatrix<T>&, int NumEigenValues);
+        void Solve(const DMatrix<T>&, int NumEigenValues,const Epsilons& eps);
 
         Vector <T> GetEigenVector (int index) const;
         DMatrix<T> GetEigenVectors() const {return itsEigenVectors;}
@@ -22,17 +23,14 @@ template <class T> class PrimeEigenSolver
 
         static const SparseMatrix<T>* theSparseMatrix;
         static const      DMatrix<T>* theDenseMatrix;
-
-        void NewEps(double eps) {itsEps=eps;}
     protected:
-        void SolveSparse(int NumEigenValues);
-        void SolveDense (int NumEigenValues);
+        void SolveSparse(int NumEigenValues,double eps);
+        void SolveDense (int NumEigenValues,double eps);
 
 
     private:
         Vector<double>   itsEigenValues;
         DMatrix<T>       itsEigenVectors;
-        double           itsEps;  //Convergence criteria
         int              itsNumGuesses;
 };
 

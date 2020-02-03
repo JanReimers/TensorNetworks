@@ -42,7 +42,7 @@ class MatrixProductSite
 //
 //  Required for ground state calculations
 //
-        void   Refine (const MatrixCT& Heff);
+        void   Refine (const MatrixCT& Heff,const Epsilons& eps);
         Matrix6T GetHeff(const SiteOperator* so,const Vector3T& L,const Vector3T& R) const;
         Matrix6T GetHeff(const SiteOperator* so,const Matrix6T& L,const Matrix6T& R) const;
         const  Vector3T& GetHLeft_Cache() const {return itsHLeft_Cache;}
@@ -63,8 +63,8 @@ public:
         void SVDLeft_Normalize(VectorT& s, MatrixCT& Vdagger);
         void SVDRightNormalize(MatrixCT& U, VectorT& s );
         void Rescale(double norm);
-        bool IsLeftNormalized() const;
-        bool IsRightNormalized() const;
+        bool IsLeftNormalized(double eps) const;
+        bool IsRightNormalized(double eps) const;
         void    Contract(const VectorT& s, const MatrixCT& Vdagger);
         void    Contract(const MatrixCT& U, const VectorT& s);
 
@@ -89,7 +89,7 @@ public:
 private:
 public:
 
-        std::string GetNormStatus() const;
+        std::string GetNormStatus(double eps) const;
         void        Report(std::ostream&) const;
 
 //-----------------------------------------------------------------------------------
@@ -117,7 +117,6 @@ private:
     double GetMaxAmplitude() const;
 private:
         void   Update(const VectorCT& newAs);
-        void   Analyze(const MatrixCT& Heff);
 private:
 //-----------------------------------------------------------------------------------
 //

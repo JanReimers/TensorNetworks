@@ -11,6 +11,7 @@
 #include "TensorNetworks/Operator.H"
 #include "TensorNetworks/MatrixProductState.H"
 #include "TensorNetworks/LRPSupervisor.H"
+#include "TensorNetworks/Epsilons.H"
 %End
 
 
@@ -57,6 +58,16 @@ class LRPSupervisor
 
 };
 
+struct Epsilons
+{
+    Epsilons();
+    double itsEnergyConvergenceEpsilon;         //Keep sweeping until |dE|<eps
+    double itsEigenConvergenceEpsilon;          //Used by eigen solver
+    double itsEnergyVarienceConvergenceEpsilon; //increase D until <E^2>-<E>^2<eps
+    double itsNormalizationEpsilon;             //Is normalized if max|A-I|<eps
+    double itsSingularValueZeroEpsilon;         //s is deemed to be zero if s<eps
+    double itsSparseMatrixEpsilon;              //matrix element A_ij is deemed to be zero if A_ij <eps
+};
 
 class MatrixProductState :public MultiPlotable /Abstract/
 {
@@ -66,7 +77,7 @@ public:
     virtual void InitializeWith(TensorNetworks::State)=0;
 
     virtual void   Normalize(TensorNetworks::Position LR,LRPSupervisor*)=0;
-    virtual double FindGroundState(const Hamiltonian* H,int maxIter, double eps,LRPSupervisor*)=0;
+    virtual double FindGroundState(const Hamiltonian* H,int maxIter, const Epsilons& eps,LRPSupervisor*)=0;
 
     virtual double   GetOverlap           () const=0;
     virtual double   GetExpectationIterate(const Operator* o) const=0;
@@ -87,7 +98,7 @@ class Hamiltonian : public Operator /Abstract/
         virtual int GetL() const=0;
         virtual int Getp() const=0;
         //  Creates an MPS or operators with the correct lattice size and spin space.
-        virtual MatrixProductState* CreateMPS     (int D) const=0;
+        virtual MatrixProductState* CreateMPS     (int D,const Epsilons&) const=0;
         //virtual Operator*           CreateOperator(const OperatorWRepresentation*) const=0;
 };
 

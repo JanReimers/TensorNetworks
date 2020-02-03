@@ -4,6 +4,7 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworksImp/MatrixProductOperator.H"
+
 //
 //  H=Sum(a=1..L,J*Sa*Sa+1) where Sa spin S operator on site a
 //
@@ -20,7 +21,7 @@ class Hamiltonian_1D_NN_Heisenberg
         //
         virtual int GetL () const {return itsL;}
         virtual int Getp () const {return 2*itsS+1;}
-        virtual MatrixProductState* CreateMPS(int D) const;
+        virtual MatrixProductState* CreateMPS(int D,const Epsilons&) const;
         virtual Operator*           CreateOperator(const OperatorWRepresentation*) const;
 
         //

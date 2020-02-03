@@ -218,9 +218,9 @@ const Dw12* Hamiltonian_1D_NN_Heisenberg::GetDw12(TensorNetworks::Position lbr) 
 //  Create states.  Why are these here?  Because the Hamiltonian is the
 //  only thing that knows L,S,Dw
 //
-MatrixProductState* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D) const
+MatrixProductState* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,const Epsilons& eps) const
 {
-    return new MatrixProductStateImp(itsL,2*itsS,D);
+    return new MatrixProductStateImp(itsL,2*itsS,D,eps);
 }
 
  Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(const OperatorWRepresentation* Wrep) const

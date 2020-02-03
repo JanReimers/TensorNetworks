@@ -39,6 +39,7 @@ class wxMPSStatusPanel(wx.Panel):
         self.GetParent().Layout()
 
     def UpdateSite(self,MPS,isite):
+        #print ("Update site ",isite)
         status=MPS.GetNormStatus(isite)
         tc=self.NormTextControls[isite]
         tc.Clear()

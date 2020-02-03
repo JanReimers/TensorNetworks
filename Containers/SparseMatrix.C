@@ -3,7 +3,7 @@
 using std::cout;
 using std::endl;
 
-template <class T>  SparseMatrix<T>::SparseMatrix(const DMatrix<T>& denseMatrix,double eps)\
+template <class T>  SparseMatrix<T>::SparseMatrix(const DMatrix<T>& denseMatrix,double eps)
  : itsNr(denseMatrix.GetNumRows())
  , itsNc(denseMatrix.GetNumCols())
  ,itsTotalNumElements(0)

@@ -10,6 +10,7 @@
 class Operator;
 class Hamiltonian;
 class LRPSupervisor;
+class Epsilons;
 
 class MatrixProductState : public virtual MultiPlotable
 {
@@ -28,7 +29,7 @@ class MatrixProductState : public virtual MultiPlotable
 //
 // Find ground state.  Return <E^2>-<E>^2
 //
-        virtual double FindGroundState(const Hamiltonian* H,int maxIter, double eps,LRPSupervisor*)=0;
+        virtual double FindGroundState(const Hamiltonian* H,int maxIter, const Epsilons& eps,LRPSupervisor*)=0;
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions

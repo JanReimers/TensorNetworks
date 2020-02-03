@@ -21,12 +21,13 @@ using Dimensions::PureNumber;
 //
 //  Init/construction zone
 //
-MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D)
+MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D,const Epsilons& eps)
     : itsL(L)
     , itsS2(S2)
     , itsD(D)
     , itsp(itsS2+1)
     , itsNSweep(0)
+    , itsEpsilons(eps)
     , itsSitesMesh(0)
     , itsBondsMesh(0)
 {
@@ -34,7 +35,7 @@ MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D)
     //  Create bond objects
     //
     for (int i=0;i<itsL-1;i++)
-        itsBonds.push_back(new Bond(1e-12));
+        itsBonds.push_back(new Bond(eps.itsSingularValueZeroEpsilon));
     //
     //  Create Sites
     //
@@ -263,7 +264,7 @@ void MatrixProductStateImp::UpdateBondData(int isite)
 //
 // Find ground state
 //
-double MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int maxIter, double eps,LRPSupervisor* Supervisor)
+double MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int maxIter, const Epsilons& eps,LRPSupervisor* Supervisor)
 {
     Supervisor->ReadyToStart("Right normalize");
     Normalize(TensorNetworks::Right,Supervisor);
@@ -274,10 +275,10 @@ double MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, in
     for (int in=0; in<maxIter; in++)
     {
         Supervisor->DoneOneStep(0,"Sweep Right");
-        E1=SweepRight(hamiltonian,Supervisor,true);
+        E1=SweepRight(hamiltonian,Supervisor,eps,true);
         Supervisor->DoneOneStep(0,"Sweep Left");
-        E1=SweepLeft (hamiltonian,Supervisor,true);
-        if (GetMaxDeltaE()<eps) break;
+        E1=SweepLeft (hamiltonian,Supervisor,eps,true);
+        if (GetMaxDeltaE()<eps.itsEnergyConvergenceEpsilon) break;
     }
     Supervisor->DoneOneStep(0,"Contracting <E^2>"); //Supervisor will update the graphs
     double E2=GetExpectation(hamiltonian,hamiltonian);
@@ -285,7 +286,7 @@ double MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, in
 }
 
 
-double MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Supervisor,bool quiet)
+double MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Supervisor,const Epsilons& eps,bool quiet)
 {
     if (!quiet)
     {
@@ -295,7 +296,7 @@ double MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Sup
     double diter=itsNSweep; //Fractional iter count for log(dE) plot
     for (int ia=0; ia<itsL-1; ia++)
     {
-        Refine(h,Supervisor,ia);
+        Refine(h,Supervisor,eps,ia);
 
         VectorT s;
         MatrixCT Vdagger;
@@ -326,7 +327,7 @@ double MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Sup
     return E1;
 }
 
-double MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supervisor,bool quiet)
+double MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supervisor,const Epsilons& eps,bool quiet)
 {
     if (!quiet)
     {
@@ -336,7 +337,7 @@ double MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supe
     double diter=itsNSweep; //Fractional iter count for log(dE) plot
     for (int ia=itsL-1; ia>0; ia--)
     {
-        Refine(h,Supervisor,ia);
+        Refine(h,Supervisor,eps,ia);
 
         VectorT s;
         MatrixCT U;
@@ -369,13 +370,13 @@ double MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supe
     return E1;
 }
 
-void MatrixProductStateImp::Refine(const Hamiltonian *h,LRPSupervisor* Supervisor,int isite)
+void MatrixProductStateImp::Refine(const Hamiltonian *h,LRPSupervisor* Supervisor,const Epsilons& eps,int isite)
 {
-    assert(CheckNormalized(isite,1e-11));
+    assert(CheckNormalized(isite,eps.itsNormalizationEpsilon));
     Supervisor->DoneOneStep(2,"Calculating Heff",isite); //Supervisor will update the graphs
     Matrix6T Heff6=GetHeffIterate(h,isite); //New iterative version
     Supervisor->DoneOneStep(2,"Running eigen solver",isite); //Supervisor will update the graphs
-    itsSites[isite]->Refine(Heff6.Flatten());
+    itsSites[isite]->Refine(Heff6.Flatten(),eps);
     itsSiteEnergies[isite]=itsSites[isite]->GetSiteEnergy();
     itsSiteEGaps   [isite]=itsSites[isite]->GetEGap      ();
 
@@ -528,7 +529,7 @@ void MatrixProductStateImp::Report(std::ostream& os) const
 
 std::string MatrixProductStateImp::GetNormStatus(int isite) const
 {
-    return itsSites[isite]->GetNormStatus();
+    return itsSites[isite]->GetNormStatus(itsEpsilons.itsNormalizationEpsilon);
 }
 
 //--------------------------------------------------------------------------------------

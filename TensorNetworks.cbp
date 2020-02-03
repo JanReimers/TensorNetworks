@@ -74,6 +74,10 @@
 		</Unit>
 		<Unit filename="TensorNetworks/Dw12.H" />
 		<Unit filename="TensorNetworks/Enums.H" />
+		<Unit filename="TensorNetworks/Epsilons.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworks/Epsilons.H" />
 		<Unit filename="TensorNetworks/Factory.H" />
 		<Unit filename="TensorNetworks/Hamiltonian.H" />
 		<Unit filename="TensorNetworks/LRPSupervisor.H" />

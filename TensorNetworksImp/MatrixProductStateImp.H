@@ -2,6 +2,7 @@
 #define MATRIXPRODUCTSTATEIMP_H
 
 #include "TensorNetworks/MatrixProductState.H"
+#include "TensorNetworks/Epsilons.H"
 #include "TensorNetworksImp/MatrixProductSite.H"
 #include "TensorNetworksImp/MultiPlotableImp.H"
 #include "Functions/Mesh/TMesh.H"
@@ -33,7 +34,7 @@ private:
 //  Conctruction and initialization zone
 //
 public:
-        MatrixProductStateImp(int L, int S2, int D);
+        MatrixProductStateImp(int L, int S2, int D,const Epsilons& eps);
         virtual ~MatrixProductStateImp();
 
         virtual void InitializeWith(TensorNetworks::State);
@@ -56,7 +57,7 @@ public:
 //
 // Find ground state
 //
-        virtual double   FindGroundState(const Hamiltonian* H,int maxIter, double eps,LRPSupervisor*);
+        virtual double   FindGroundState(const Hamiltonian* H,int maxIter, const Epsilons& eps,LRPSupervisor*);
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions
@@ -91,9 +92,9 @@ private:
 //
 //  For groound state search
 //
-        double   SweepRight    (const Hamiltonian* h,LRPSupervisor*,bool quiet=true);
-        double   SweepLeft     (const Hamiltonian* h,LRPSupervisor*,bool quiet=true);
-        void     Refine        (const Hamiltonian *h,LRPSupervisor*,int isite); //Minimize energy WRT the Ms in one site.
+        double   SweepRight    (const Hamiltonian* h,LRPSupervisor*,const Epsilons& eps,bool quiet=true);
+        double   SweepLeft     (const Hamiltonian* h,LRPSupervisor*,const Epsilons& eps,bool quiet=true);
+        void     Refine        (const Hamiltonian *h,LRPSupervisor*,const Epsilons& eps,int isite); //Minimize energy WRT the Ms in one site.
         void     LoadHeffCaches(const Hamiltonian* h,LRPSupervisor*);
         Vector3T GetHLeft_Cache(int isite) const;
         Vector3T GetHRightCache(int isite) const;
@@ -139,6 +140,7 @@ private:
         int itsD;   //Dimension of internal/virtual state space.
         int itsp;   //Number ot states for the spin on each site = 2S+1
         int itsNSweep;
+        Epsilons itsEpsilons;
         BondsType itsBonds;
         SitesType itsSites;
 

@@ -6,16 +6,20 @@
         Does wxDrivet support log scales?
         Done Rank vs. site#
         Done Fix axis code to avoid scientific unless ymin=0 or ymax=0
-    Play/Pause in one button.  Use icons?
-    Get restart working(have restart do what start does now, get rid of start, play nad step will start it)
+    Control panel
+        Play/Pause in one button.  Use icons?
+        Done Get restart working(have restart do what start does now, get rid of start, play nad step will start it)
+        Done On startup Step should start the run
     Done Stop shoud kill the thread
     Done Split the classes into separate files wxMPSFrame.py is getting too big.
     Status bar. ModelName (from H), L,S, D, iter#, E, CPU & meminfo (use psutils)
-    On startup Step should start the run
     Done Create Bond objects between sites.  Each site can see its left and right bond objects.
-    Fix alignments on Ham tab
-    Use eps values.
+    Done Fix alignments on Ham tab
+    Done Use eps values.
     Fresh checkout and build.
+    Ham->CreateMPS should be a /Factory/ sp py knows to delete it.
+    Convergence schedule,  increase D, drop epsilons
+    Dynamically add lattice site, pseudo DMRG
 
 -Done Mega classes MPState MPSite are too big, how split up responsibilities?
     Move some stuff into bond objects
