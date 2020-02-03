@@ -222,12 +222,43 @@ TEST_F(SVDTesting,SparseMatrixClass)
         A(ir,ic)=0.0;
     }
     SparseMatrix<eType> sm(A,1e-12);
-    cout << "Sparsisty=" << sm.GetSparsisty() << "%" << endl;
+    cout << "Density=" << sm.GetDensity() << "%" << endl;
 }
 
 #include "TensorNetworksImp/PrimeEigenSolver.H"
 
-TEST_F(SVDTesting,Prime_EigenSolverComplexHermitian200x200)
+TEST_F(SVDTesting,Prime_EigenSolverSparseComplexHermitian200x200)
+{
+    int N=200,Ne=10;
+    typedef DMatrix<eType> Mtype;
+    Mtype A(N,N);
+    FillRandom(A);
+    for (int i=0;i<1.0*N*N;i++)
+    {
+        int ir=static_cast<int>(OMLRand<float>()*N)+1;
+        int ic=static_cast<int>(OMLRand<float>()*N)+1;
+        A(ir,ic)=0.0;
+    }
+    Mtype Ah=A+Transpose(conj(A)); //Make it hermitian
+
+    PrimeEigenSolver<eType> solver(1e-5);
+    solver.Solve(Ah,Ne);
+    solver.NewEps(1e-9);
+    solver.Solve(Ah,Ne);
+    solver.NewEps(1e-12);
+    solver.Solve(Ah,Ne);
+    solver.NewEps(1e-13);
+    solver.Solve(Ah,Ne);
+    solver.NewEps(1e-14);
+    solver.Solve(Ah,Ne);
+
+    Mtype diag=Transpose(conj(solver.GetEigenVectors()))*Ah*solver.GetEigenVectors();
+    Vector<double> evals=solver.GetEigenValues();
+    for (int i=1;i<=Ne;i++) diag(i,i)-=evals(i);
+    EXPECT_NEAR(Max(abs(diag)),0.0,100*eps);
+}
+
+TEST_F(SVDTesting,Prime_EigenSolverDenseComplexHermitian200x200)
 {
     int N=200,Ne=10;
     typedef DMatrix<eType> Mtype;

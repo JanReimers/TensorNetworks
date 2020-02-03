@@ -31,8 +31,8 @@ template <class T> void PrimeEigenSolver<T>::Solve(const DMatrix<T>& m, int NumE
     assert(&m);
     assert(m.GetNumRows()==m.GetNumCols());
     SparseMatrix<T> sparsem(m,itsEps);
-       //cout << "Sparsisty=" << itsSparsem.GetSparsisty() << "%" << endl;
-    if (sparsem.GetSparsisty()<60)
+    //cout << "Density=" << sparsem.GetDensity() << "%" << endl;
+    if (sparsem.GetDensity()<80)
     {
         theSparseMatrix=&sparsem;
         SolveSparse(NumEigenValues);
@@ -69,7 +69,8 @@ template <class T> void PrimeEigenSolver<T>::SolveSparse(int NumEigenValues)
 //    std::cout << "Max(abs(rnorms))=" <<  Max(abs(rnorms)) << " " << itsEps << std::endl;
     if (Max(abs(rnorms))>1000*itsEps)
         cout << "Warning high rnorms in PrimeEigenSolver::SolveSparse rnorma=" << std::scientific << rnorms << endl;
-
+    //int niter=primme.stats.numOuterIterations;
+    //std::cout << "Primme niter=" << niter << std::endl;
     primme_free(&primme);
     itsNumGuesses=NumEigenValues; //Set up using guesses for next time around
 
@@ -86,6 +87,7 @@ template <class T> void PrimeEigenSolver<T>::SolveDense(int NumEigenValues)
     primme.numEvals = NumEigenValues;   /* Number of wanted eigenpairs */
     primme.eps = itsEps;      /* ||r|| <= eps * ||matrix|| */
     primme.target = primme_smallest; /* Wanted the smallest eigenvalues */
+    primme.initSize=itsNumGuesses;
     primme_set_method(PRIMME_DYNAMIC, &primme);
 
     itsEigenValues.SetLimits(NumEigenValues);
@@ -95,10 +97,13 @@ template <class T> void PrimeEigenSolver<T>::SolveDense(int NumEigenValues)
     assert(ret==0);
     (void)ret; //avoid compiler warning in release mode
 //    std::cout << "Max(abs(rnorms))=" <<  Max(abs(rnorms)) << " " << itsEps << std::endl;
-    if (Max(abs(rnorms))>100*itsEps)
+    if (Max(abs(rnorms))>1000*itsEps)
         cout << "Warning high rnorms in PrimeEigenSolver::SolveDense rnorma=" << std::scientific << rnorms << endl;
+    //int niter=primme.stats.numOuterIterations;
+    //std::cout << "Primme niter=" << niter << std::endl;
 
     primme_free(&primme);
+    itsNumGuesses=NumEigenValues; //Set up using guesses for next time around
 
 }
 

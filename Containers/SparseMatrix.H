@@ -20,7 +20,7 @@ template <class T> class SparseMatrix
         void DoMVMultiplication(int N, T* xvec,T* yvec) const;
         int GetNumRows() const {return itsNr;}
         int GetNumCols() const {return itsNc;}
-        double GetSparsisty() const {return (100.0*itsTotalNumElements)/(itsNr*itsNc);}
+        double GetDensity() const {return (100.0*itsTotalNumElements)/(itsNr*itsNc);}
     protected:
         void Dump(std::ostream& os) const;
 

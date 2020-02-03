@@ -110,7 +110,7 @@ TEST_F(GroundStateTesting,TestSweepL19S5D4)
     double E=itsMPS->GetExpectationIterate(itsH);
     double o=itsMPS->GetOverlap();
     EXPECT_NEAR(o,1.0,eps);
-    EXPECT_NEAR(E/(L-1),-7.17616 ,1e-5);
+    EXPECT_NEAR(E/(L-1),-7.1766766 ,1e-5);
     EXPECT_LT(nSweep,maxIter);
 }
 
