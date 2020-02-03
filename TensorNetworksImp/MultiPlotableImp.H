@@ -14,10 +14,11 @@
 
 struct GraphDefinition
 {
-  c_str Title;
+  c_str Title;  //graph title and y-axis title
   c_str Xunits;
   c_str Yunits;
   c_str Layer;
+  c_str Xtitle;
 };
 
 class MultiPlotableImp
@@ -54,7 +55,7 @@ protected:
   //     where possibly all graphs and lines will have no units.
   //  We may need to make a new rule if CoordUnits=(none,none) then the key must GraphName-LineName.
   //
-  void InsertLine(c_str key, c_str title,Plotting::CurveUnits,Plotting::Colour=Plotting::Black);
+  Plotting::Line* InsertLine(c_str key, c_str title,Plotting::CurveUnits,Plotting::Colour=Plotting::Black);
   void DrawLineOn(c_str key,Plotting::Plotter*); //Do we need this?
   void AddPoint  (c_str key,Plotting::Point);
   void Clear     (c_str key);

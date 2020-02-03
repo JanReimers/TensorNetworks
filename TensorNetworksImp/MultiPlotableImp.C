@@ -41,7 +41,7 @@ void MultiPlotableImp::Insert(Plotting::Graph* g, c_str layer)
 }
 
 
-void MultiPlotableImp::InsertLine(c_str key, c_str title,Plotting::CurveUnits u,Plotting::Colour c)
+Plotting::Line* MultiPlotableImp::InsertLine(c_str key, c_str title,Plotting::CurveUnits u,Plotting::Colour c)
 {
   assert(key);
   assert(title);
@@ -50,6 +50,7 @@ void MultiPlotableImp::InsertLine(c_str key, c_str title,Plotting::CurveUnits u,
   assert(l);
   l->SetLineColour(c);
   itsLines[key]=l;
+  return l;
 }
 
 void MultiPlotableImp::Insert(const Plotting::Plotable* p)
