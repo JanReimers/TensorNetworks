@@ -39,6 +39,13 @@
     Further reduced by return referneces in GetW calls
         <E^2> contraction for L=10, S=2.5, D=4 took 0.916441 seconds.
         <E^2> contraction for L=10, S=0.5, D=16 took 3.01753 seconds.
+    Put gates in to check for the more zero elements in W
+        <E^2> contraction for L=10, S=2.5, D=4 took 0.076742 seconds.
+        <E^2> contraction for L=10, S=0.5, D=16 took 0.660434 seconds.
+
+    Cleaned up the last few W(n,m) multiplictions and ranges.  Now this is the hot loop
+    SparseMatrix<std::complex<double> >::DoMVMultiplication
+
 -Done Give eigen solver a good starting wavevector.
 
 -Imag time evolution

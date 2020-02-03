@@ -34,6 +34,7 @@ public:
     MatrixProductState*  itsMPS;
 };
 
+
 TEST_F(GroundStateTesting,TestIdentityOperator)
 {
     Setup(10,1,2);
@@ -61,7 +62,9 @@ TEST_F(GroundStateTesting,TestSweepL9S1D2)
     EXPECT_LT(nSweep,maxIter);
 }
 
-#ifndef DEBUG
+
+
+
 TEST_F(GroundStateTesting,TestSweepL9S1D8)
 {
     int L=9,S2=1,D=8,maxIter=100;
@@ -90,6 +93,8 @@ TEST_F(GroundStateTesting,TestSweepL9S5D2)
     EXPECT_LT(nSweep,maxIter);
 }
 
+#ifndef DEBUG
+
 
 TEST_F(GroundStateTesting,TestSweepL19S5D4)
 {
@@ -98,14 +103,14 @@ TEST_F(GroundStateTesting,TestSweepL19S5D4)
     itsMPS->InitializeWith(TensorNetworks::Random);
     StopWatch sw;
     sw.Start();
-    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
+    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-11,new LRPSupervisor());
     sw.Stop();
     cout << "FindGroundState for L=" << L << ", S=" << S2/2.0 << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
 
     double E=itsMPS->GetExpectationIterate(itsH);
     double o=itsMPS->GetOverlap();
     EXPECT_NEAR(o,1.0,eps);
-    EXPECT_NEAR(E/(L-1),-7.1756109379735795 ,1e-7);
+    EXPECT_NEAR(E/(L-1),-7.17616 ,1e-5);
     EXPECT_LT(nSweep,maxIter);
 }
 

@@ -553,7 +553,8 @@ ContractWR(int w1, int i2, int j2,const MatrixT& W, int Dw2,const Vector3T& R) c
 {
     eType WR(0.0);
     for (int w2=1; w2<=Dw2; w2++)
-        WR+=W(w1,w2)*R(w2,i2,j2);
+        if (W(w1,w2)!=0.0)
+            WR+=W(w1,w2)*R(w2,i2,j2);
     return WR;
 }
 
@@ -673,7 +674,11 @@ MatrixProductSite::eType MatrixProductSite::ContractWWFA(int m, int w2, int v2, 
         for (int w1=1;w1<Dws1.w1_first(w2);w1++)
             assert(Wmo(w1,w2)==0);
         for (int w1=Dws1.w1_first(w2);w1<=Dws1.Dw1;w1++)
-            wwfa+=Wmo(w1,w2)*ContractWFA(o,w1,v2,i1,j2,so2,Fam1);
+            if (Wmo(w1,w2)!=0.0)
+            {
+                assert(fabs(Wmo(w1,w2))>0.0); //Make sure -0 doesn't slip through the gate
+                wwfa+=Wmo(w1,w2)*ContractWFA(o,w1,v2,i1,j2,so2,Fam1);
+            }
     }
     return wwfa;
 }
@@ -689,7 +694,11 @@ MatrixProductSite::eType MatrixProductSite::ContractWFA(int o, int w1, int v2, i
         for (int v1=1;v1<Dvs1.w1_first(v2);v1++)
             assert(Won(v1,v2)==0);
         for (int v1=Dvs1.w1_first(v2);v1<=Dvs1.Dw1;v1++)
-            wfa+=Won(v1,v2)*ContractFA(n,w1,v1,i1,j2,Fam1);
+            if (Won(v1,v2)!=0.0)
+            {
+                assert(fabs(Won(v1,v2))>0.0); //Make sure -0 doesn't slip through the gate
+                wfa+=Won(v1,v2)*ContractFA(n,w1,v1,i1,j2,Fam1);
+            }
     }
     return wfa;
 }
@@ -715,7 +724,11 @@ MatrixProductSite::eType MatrixProductSite::ContractWFA(int m, int w2, int i1, i
         for (int w1=1;w1<Dws1.w1_first(w2);w1++)
             assert(Wmn(w1,w2)==0);
         for (int w1=Dws1.w1_first(w2); w1<=Dws1.Dw1; w1++)
-            wfa+=Wmn(w1,w2)*ContractFA(n,w1,i1,j2,Fam1);
+            if (Wmn(w1,w2)!=0.0)
+            {
+                assert(fabs(Wmn(w1,w2))>0.0);
+                wfa+=Wmn(w1,w2)*ContractFA(n,w1,i1,j2,Fam1);
+            }
     }
     return wfa;
 }
@@ -757,13 +770,18 @@ MatrixProductSite::eType MatrixProductSite::ContractBWFB(int w1, int i1, int j1,
 
 MatrixProductSite::eType MatrixProductSite::ContractWFB(int m, int w1, int i2, int j1, const SiteOperator* so, const Vector3T& Fap1) const
 {
+    const Dw12& Dws=so->GetDw12();
     eType wfb(0.0);
      for (int n=0; n<itsp; n++)
      {
         const MatrixT& Wmn=so->GetW(m,n);
-        int Dw2=Wmn.GetNumCols();
-        for (int w2=1;w2<=Dw2;w2++)
-            wfb+=Wmn(w1,w2)*ContractFB(n,w2,i2,j1,Fap1);
+        assert(Wmn.GetNumCols()==Dws.Dw2);
+        for (int w2=1;w2<=Dws.w2_last(w1);w2++)
+            if (Wmn(w1,w2)!=0.0)
+            {
+                assert(fabs(Wmn(w1,w2))>0.0);
+                wfb+=Wmn(w1,w2)*ContractFB(n,w2,i2,j1,Fap1);
+            }
     }
     return wfb;
 }
