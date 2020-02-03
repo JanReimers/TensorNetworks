@@ -246,6 +246,8 @@ void MatrixProductStateImp::MakeAllGraphs()
         g->SetVerbose();
         if (std::string(gd.Title)=="Bond Entropy")
             g->SetLimits(0.0,1.0,y,Plotting::yAxis);
+        if (std::string(gd.Xtitle)=="Lattice Site #")
+            g->SetLimits(1.0,itsL,y,Plotting::xAxis);
         MultiPlotableImp::Insert(g,gd.Layer);
     }
 }
@@ -290,6 +292,7 @@ double MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Sup
         cout.precision(10);
         cout << "SweepRight  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
     }
+    double diter=itsNSweep; //Fractional iter count for log(dE) plot
     for (int ia=0; ia<itsL-1; ia++)
     {
         Refine(h,Supervisor,ia);
@@ -303,16 +306,22 @@ double MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Sup
         itsSites[ia+1]->Contract(s,Vdagger);
         Supervisor->DoneOneStep(1,SiteMessage("Update L&R caches for site ",ia));
         itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
+        if (weHaveGraphs()&&itsNSweep>=1)
+        {
+            double de=fabs(itsSites[ia]->GetIterDE());
+            //cout << "ia,diter,de=" << ia << " " << diter << " " << de << endl;
+            if (de>0.0)
+                AddPoint("Iter log(dE/J)",Plotting::Point(diter,log10(de)));
+        }
+        diter+=1.0/itsL;
         if (!quiet) cout << "SweepRight post constract  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
     }
     itsNSweep++;
     Supervisor->DoneOneStep(0,"Calculating Expectation <E>"); //Supervisor will update the graphs
     double E1=GetExpectationIterate(h);
-    double dE=GetMaxDeltaE();
     if (weHaveGraphs())
     {
         AddPoint("Iter E/J",Plotting::Point(itsNSweep,E1));
-        AddPoint("Iter log(dE/J)",Plotting::Point(itsNSweep,log10(dE)));
     }
     return E1;
 }
@@ -324,6 +333,7 @@ double MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supe
         cout.precision(10);
         cout << "SweepLeft  entry  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
     }
+    double diter=itsNSweep; //Fractional iter count for log(dE) plot
     for (int ia=itsL-1; ia>0; ia--)
     {
         Refine(h,Supervisor,ia);
@@ -337,6 +347,14 @@ double MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supe
         itsSites[ia-1]->Contract(U,s);
         Supervisor->DoneOneStep(1,SiteMessage("Update L&R caches for site ",ia));
         itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
+        if (weHaveGraphs()&&itsNSweep>=1)
+        {
+            double de=fabs(itsSites[ia]->GetIterDE());
+            //cout << "ia,diter,de=" << ia << " " << diter << " " << de << endl;
+            if (de>0.0)
+                AddPoint("Iter log(dE/J)",Plotting::Point(diter,log10(de)));
+        }
+        diter+=1.0/itsL;
         if (!quiet)
             cout << "SweepLeft  post contract  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
 
@@ -344,11 +362,9 @@ double MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supe
     itsNSweep++;
     Supervisor->DoneOneStep(0,"Calculating Expectation <E>"); //Supervisor will update the graphs
     double E1=GetExpectationIterate(h);
-    double dE=GetMaxDeltaE();
     if (weHaveGraphs())
     {
         AddPoint("Iter E/J",Plotting::Point(itsNSweep,E1));
-        AddPoint("Iter log(dE/J)",Plotting::Point(itsNSweep,log10(dE)));
     }
     return E1;
 }

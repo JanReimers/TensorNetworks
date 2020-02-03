@@ -24,7 +24,7 @@ MatrixProductSite::MatrixProductSite(TensorNetworks::Position lbr, Bond* leftBon
     , itsHeffDensity(0)
     , itsEmin(0.0)
     , itsGapE(0.0)
-    , itsIterDE(0.0)
+    , itsIterDE(1.0)
     , itsPosition(lbr)
 {
     if (lbr==TensorNetworks::Left)
