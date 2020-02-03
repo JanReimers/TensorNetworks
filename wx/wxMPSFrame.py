@@ -212,8 +212,8 @@ class MPSFrame(wx.Frame,GUIHandler):
         self.OnNewMPS(e)
 
     def FindGroundState(self):
-        n=self.MPS.FindGroundState(self.Hamiltonian,20,1e-8,self.supervisor)
-        print("FindGroundState finished, nsweeps=",n)
+        dE=self.MPS.FindGroundState(self.Hamiltonian,20,1e-8,self.supervisor)
+        print("FindGroundState finished, <E^2>-<E>^2=",dE)
 
 
 

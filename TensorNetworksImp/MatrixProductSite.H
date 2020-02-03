@@ -98,8 +98,8 @@ public:
 private:
         friend class MPOTesting;
         double ContractHeff(const Matrix6T& Heff) const;
-        double ContractHeff(const MatrixCT & Heff) const;
-        eType  ContractWR(int w1, int i2, int j2,const MatrixT& W, const Vector3T& R) const;
+        double ContractHeff(const MatrixCT& Heff) const;
+        eType  ContractWR(int w1, int i2, int j2,const MatrixT& W, int Dw2, const Vector3T& R) const;
 
 
     protected:

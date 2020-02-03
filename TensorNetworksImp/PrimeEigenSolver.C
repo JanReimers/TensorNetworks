@@ -68,7 +68,7 @@ template <class T> void PrimeEigenSolver<T>::SolveSparse(int NumEigenValues)
     assert(ret==0);
     (void)ret; //avoid compiler warning in release mode
 //    std::cout << "Max(abs(rnorms))=" <<  Max(abs(rnorms)) << " " << itsEps << std::endl;
-    if (Max(abs(rnorms))>100*itsEps)
+    if (Max(abs(rnorms))>1000*itsEps)
         cout << "Warning high rnorms in PrimeEigenSolver::SolveSparse rnorma=" << std::scientific << rnorms << endl;
 
     primme_free(&primme);

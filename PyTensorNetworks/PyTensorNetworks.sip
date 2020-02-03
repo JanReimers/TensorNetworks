@@ -65,8 +65,8 @@ public:
     virtual ~MatrixProductState();
     virtual void InitializeWith(TensorNetworks::State)=0;
 
-    virtual void Normalize(TensorNetworks::Position LR)=0;
-    virtual int FindGroundState(const Hamiltonian* H,int maxIter, double eps,LRPSupervisor*)=0;
+    virtual void   Normalize(TensorNetworks::Position LR,LRPSupervisor*)=0;
+    virtual double FindGroundState(const Hamiltonian* H,int maxIter, double eps,LRPSupervisor*)=0;
 
     virtual double   GetOverlap           () const=0;
     virtual double   GetExpectationIterate(const Operator* o) const=0;

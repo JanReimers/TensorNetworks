@@ -26,9 +26,9 @@ class MatrixProductState : public virtual MultiPlotable
         virtual bool CheckNormalized(int isite,double eps) const=0;
 //--------------------------------------------------------------------------------------
 //
-// Find ground state
+// Find ground state.  Return <E^2>-<E>^2
 //
-        virtual int FindGroundState(const Hamiltonian* H,int maxIter, double eps,LRPSupervisor*)=0;
+        virtual double FindGroundState(const Hamiltonian* H,int maxIter, double eps,LRPSupervisor*)=0;
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions

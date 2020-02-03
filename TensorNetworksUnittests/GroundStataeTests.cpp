@@ -6,6 +6,7 @@
 #include "TensorNetworks/LRPSupervisor.H"
 
 #include "oml/stream.h"
+#include "oml/stopw.h"
 
 using std::setw;
 
@@ -32,6 +33,18 @@ public:
     Hamiltonian*         itsH;
     MatrixProductState*  itsMPS;
 };
+
+TEST_F(GroundStateTesting,TestIdentityOperator)
+{
+    Setup(10,1,2);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::Left,new LRPSupervisor());
+    OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
+    Operator* IO=itsH->CreateOperator(IWO);
+    double S=itsMPS->GetExpectation(IO);
+    EXPECT_NEAR(S,1.0,eps);
+
+}
 
 
 TEST_F(GroundStateTesting,TestSweepL9S1D2)
@@ -76,8 +89,46 @@ TEST_F(GroundStateTesting,TestSweepL9S5D2)
     EXPECT_NEAR(E/(L-1),-7.025661 ,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }
-#endif
 
+
+TEST_F(GroundStateTesting,TestSweepL19S5D4)
+{
+    int L=19,S2=5,D=4,maxIter=100;
+    Setup(L,S2,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    StopWatch sw;
+    sw.Start();
+    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
+    sw.Stop();
+    cout << "FindGroundState for L=" << L << ", S=" << S2/2.0 << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
+
+    double E=itsMPS->GetExpectationIterate(itsH);
+    double o=itsMPS->GetOverlap();
+    EXPECT_NEAR(o,1.0,eps);
+    EXPECT_NEAR(E/(L-1),-7.1756109379735795 ,1e-7);
+    EXPECT_LT(nSweep,maxIter);
+}
+
+TEST_F(GroundStateTesting,TestSweepL19S1D8)
+{
+    int L=19,S2=1,D=8,maxIter=100;
+    Setup(L,S2,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    StopWatch sw;
+    sw.Start();
+    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
+    sw.Stop();
+    cout << "FindGroundState for L=" << L << ", S=" << S2/2.0 << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
+
+    double E=itsMPS->GetExpectationIterate(itsH);
+    double o=itsMPS->GetOverlap();
+    EXPECT_NEAR(o,1.0,eps);
+    EXPECT_NEAR(E/(L-1),-0.45535447609272839,1e-7);
+    EXPECT_LT(nSweep,maxIter);
+}
+
+
+#endif
 /*
 TEST_F(GroundStateTesting,TestNeelStateSurvey)
 {
@@ -104,16 +155,6 @@ TEST_F(GroundStateTesting,TestNeelStateSurvey)
 }
 */
 
-TEST_F(GroundStateTesting,TestIdentityOperator)
-{
-    Setup(10,1,2);
-    itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Left,new LRPSupervisor());
-    OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
-    Operator* IO=itsH->CreateOperator(IWO);
-    double S=itsMPS->GetExpectation(IO);
-    EXPECT_NEAR(S,1.0,eps);
 
-}
 
 

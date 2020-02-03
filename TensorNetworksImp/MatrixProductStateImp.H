@@ -56,7 +56,7 @@ public:
 //
 // Find ground state
 //
-        virtual int      FindGroundState(const Hamiltonian* H,int maxIter, double eps,LRPSupervisor*);
+        virtual double   FindGroundState(const Hamiltonian* H,int maxIter, double eps,LRPSupervisor*);
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions

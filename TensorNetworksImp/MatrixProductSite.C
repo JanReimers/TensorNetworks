@@ -446,7 +446,7 @@ MatrixProductSite::Matrix6T MatrixProductSite::GetEO(const SiteOperator* so) con
     for (int m=0; m<itsp; m++)
     for (int n=0; n<itsp; n++)
     {
-        const MatrixT W=so->GetW(m,n);
+        const MatrixT& W=so->GetW(m,n);
  //       cout << "W(" << m << "," << n << ")=" << W << endl;
 //        Matrix4T NO=GetNO(m,so);
         for (int i1=1;i1<=itsD1;i1++)
@@ -475,7 +475,7 @@ MatrixProductSite::Matrix4T MatrixProductSite::GetNO(int m,const SiteOperator* s
     NO.Fill(std::complex<double>(0.0));
     for (int n=0; n<itsp; n++)
     {
-        const MatrixT W=so->GetW(n,m);
+        const MatrixT& W=so->GetW(n,m);
         for (int w1=1;w1<=Dw1;w1++)
             for (int i1=1;i1<=itsD1;i1++)
                 for (int w2=1;w2<=Dw2;w2++)
@@ -516,18 +516,21 @@ GetHeff(const SiteOperator* mops,const Vector3T& L,const Vector3T& R) const
     assert(errorR<eps);
 
 #endif
+
     assert(mops);
     Matrix6<eType> Heff(itsp,itsD1,itsD2,itsp,itsD1,itsD2);
+    const Dw12& Dws=mops->GetDw12();
 
     for (int m=0; m<itsp; m++)
         for (int n=0; n<itsp; n++)
         {
-            MatrixT W=mops->GetW(m,n);
-            Vector3T WR(W.GetNumRows(),itsD2,itsD2,1);
-            for (int w1=1; w1<=W.GetNumRows(); w1++)
+            const MatrixT& W=mops->GetW(m,n);
+            assert(W.GetNumRows()==Dws.Dw1);
+            Vector3T WR(Dws.Dw1,itsD2,itsD2,1);
+            for (int w1=1; w1<=Dws.Dw1; w1++)
                 for (int i2=1; i2<=itsD2; i2++)
                     for (int j2=1; j2<=itsD2; j2++)
-                        WR(w1,i2,j2)=ContractWR(w1,i2,j2,W,R);
+                        WR(w1,i2,j2)=ContractWR(w1,i2,j2,W,Dws.w2_last(w1),R);
 
             for (int i1=1; i1<=itsD1; i1++)
                 for (int j1=1; j1<=itsD1; j1++)
@@ -546,10 +549,10 @@ GetHeff(const SiteOperator* mops,const Vector3T& L,const Vector3T& R) const
 }
 
 eType MatrixProductSite::
-ContractWR(int w1, int i2, int j2,const MatrixT& W, const Vector3T& R) const
+ContractWR(int w1, int i2, int j2,const MatrixT& W, int Dw2,const Vector3T& R) const
 {
     eType WR(0.0);
-    for (int w2=1; w2<=W.GetNumCols(); w2++)
+    for (int w2=1; w2<=Dw2; w2++)
         WR+=W(w1,w2)*R(w2,i2,j2);
     return WR;
 }
@@ -567,7 +570,7 @@ GetHeff(const SiteOperator* mops,const Matrix6T& L,const Matrix6T& R) const
             {
                 for (int n=0; n<itsp; n++)
                 {
-                    MatrixT W=mops->GetW(m,n);
+                    const MatrixT& W=mops->GetW(m,n);
                     for (int i2=1; i2<=itsD2; i2++)
                         for (int j2=1; j2<=itsD2; j2++)
                         {

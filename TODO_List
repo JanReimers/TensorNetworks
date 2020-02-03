@@ -29,7 +29,7 @@
 -Why optimize site 1, just leave it a |up> and take out global SU(2) invariance
 -Valgrind, any memeory leaks?
 -Give Lanczos an initial guess from previous iteration.
--Speed up <E^2> contractions, take advantage of W shapes.  Make Dw2 a function of w1.
+-Done Speed up <E^2> contractions, take advantage of W shapes.  Make Dw2 a function of w1.
     Before Implementation:
         <E^2> contraction for L=10, S=2.5, D=4 took 10.6321 seconds.
         <E^2> contraction for L=10, S=0.5, D=16 took 28.8432 seconds.
@@ -39,7 +39,7 @@
     Further reduced by return referneces in GetW calls
         <E^2> contraction for L=10, S=2.5, D=4 took 0.916441 seconds.
         <E^2> contraction for L=10, S=0.5, D=16 took 3.01753 seconds.
-
+-GiVe eigen solver a good starting wavevector.
 
 -Imag time evolution
 -Periodic boundary conditions.  This is less useful than iMPS

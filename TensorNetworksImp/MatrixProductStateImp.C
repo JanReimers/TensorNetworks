@@ -246,7 +246,7 @@ void MatrixProductStateImp::UpdateBondData(int isite)
 //
 // Find ground state
 //
-int   MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int maxIter, double eps,LRPSupervisor* Supervisor)
+double MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int maxIter, double eps,LRPSupervisor* Supervisor)
 {
     Supervisor->ReadyToStart();
     Normalize(TensorNetworks::Right,Supervisor);
@@ -254,6 +254,7 @@ int   MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int
     LoadHeffCaches(hamiltonian);
 
     int nSweep=0;
+    double E1=0;
     for (int in=0; in<maxIter; in++)
     {
         SweepRight(hamiltonian,Supervisor,true);
@@ -262,19 +263,19 @@ int   MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int
 
 
         Supervisor->DoneOneStep(0,"Calculating Expectations <E> and <E^2>"); //Supervisor will update the graphs
-        double E1=GetExpectationIterate(hamiltonian);
-        double E2=GetExpectation(hamiltonian,hamiltonian);
+        E1=GetExpectationIterate(hamiltonian);
         double dE=GetMaxDeltaE();
         if (weHaveGraphs())
         {
             AddPoint("Iter E/J",Plotting::Point(nSweep,E1));
             AddPoint("Iter log(dE/J)",Plotting::Point(nSweep,log10(dE)));
-            AddPoint("Iter sigE/J",Plotting::Point(nSweep,E2-E1*E1));
         }
         Supervisor->DoneOneStep(0,"Full bi-directional sweep done"); //Supervisor will update the graphs
         if (GetMaxDeltaE()<eps) break;
     }
-    return nSweep;
+    double E2=GetExpectation(hamiltonian,hamiltonian);
+    Supervisor->DoneOneStep(0,"GS iterations done"); //Supervisor will update the graphs
+    return E2-E1*E1;
 }
 
 
