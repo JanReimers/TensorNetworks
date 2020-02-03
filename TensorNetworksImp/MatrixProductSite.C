@@ -2,7 +2,6 @@
 #include "TensorNetworksImp/Bond.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
-#include "TensorNetworksImp/PrimeEigenSolver.H"
 #include "oml/minmax.h"
 #include "oml/cnumeric.h"
 #include "oml/vector_io.h"
@@ -20,6 +19,7 @@ MatrixProductSite::MatrixProductSite(TensorNetworks::Position lbr, Bond* leftBon
     , itsD2(D2)
     , itsHLeft_Cache(1,1,1,1)
     , itsHRightCache(1,1,1,1)
+    , itsEigenSolver(1e-12)
     , itsNumUpdates(0)
     , itsHeffDensity(0)
     , itsEmin(0.0)
@@ -591,20 +591,18 @@ GetHeff(const SiteOperator* mops,const Matrix6T& L,const Matrix6T& R) const
 
 void MatrixProductSite::Refine(const MatrixCT& Heff)
 {
-    double itsEps=1e-12;
-
     Analyze(Heff); //Record % non zero elements
     assert(Heff.GetNumRows()==Heff.GetNumCols());
     int N=Heff.GetNumRows();
     Vector<double>  eigenValues(N);
-    PrimeEigenSolver<eType> solver(Heff,itsEps);
-    solver.Solve(2); //Get lowest two eigen values/states
-    eigenValues=solver.GetEigenValues();
+    itsEigenSolver.Solve(Heff,2); //Get lowest two eigen values/states
+
+    eigenValues=itsEigenSolver.GetEigenValues();
 
     itsIterDE=eigenValues(1)-itsEmin;
     itsEmin=eigenValues(1);
     itsGapE=eigenValues(2)-eigenValues(1);
-    Update(solver.GetEigenVector(1));
+    Update(itsEigenSolver.GetEigenVector(1));
 
     //cout << "eigenValues=" <<  eigenValues << endl;
     //cout << "eigenVector(1)=" <<  Heff.GetColumn(1) << endl;

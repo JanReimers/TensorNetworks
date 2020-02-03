@@ -3,6 +3,7 @@
 
 #include "TensorNetworks/Enums.H"
 #include "TensorNetworksImp/Typedefs.H"
+#include "TensorNetworksImp/PrimeEigenSolver.H"
 #include <vector>
 
 class SiteOperator;
@@ -148,6 +149,7 @@ private:
         pVectorT itsAs; //We need a separate matrix for eash of the p basis states on one site.
         Vector3T itsHLeft_Cache;
         Vector3T itsHRightCache;
+        PrimeEigenSolver<eType> itsEigenSolver;
 
         int itsNumUpdates;
         double itsHeffDensity;

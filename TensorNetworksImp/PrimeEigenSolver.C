@@ -12,24 +12,11 @@ void SparseMatvec(void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *block
 template<class T> const SparseMatrix<T>* PrimeEigenSolver<T>::theSparseMatrix = 0;
 template<class T> const      DMatrix<T>* PrimeEigenSolver<T>::theDenseMatrix = 0;
 
-template <class T> PrimeEigenSolver<T>::PrimeEigenSolver(const DMatrix<T>& m, double eps)
+template <class T> PrimeEigenSolver<T>::PrimeEigenSolver(double eps)
 : itsEps(eps)
-, itsChooseSparse(false)
-, itsSparsem(m,itsEps)
+, itsNumGuesses(0)
 {
-    assert(&m);
-    assert(m.GetNumRows()==m.GetNumCols());
-    //cout << "Sparsisty=" << itsSparsem.GetSparsisty() << "%" << endl;
-    if (itsSparsem.GetSparsisty()<60)
-    {
-        theSparseMatrix=&itsSparsem;
-        itsChooseSparse=true;
-    }
-    else
-    {
-        theDenseMatrix=&m;
-        itsChooseSparse=false;
-    }
+
 }
 
 template <class T> PrimeEigenSolver<T>::~PrimeEigenSolver()
@@ -39,12 +26,22 @@ template <class T> PrimeEigenSolver<T>::~PrimeEigenSolver()
 }
 
 #include <iostream>
-template <class T> void PrimeEigenSolver<T>::Solve(int NumEigenValues)
+template <class T> void PrimeEigenSolver<T>::Solve(const DMatrix<T>& m, int NumEigenValues)
 {
-    if (itsChooseSparse)
+    assert(&m);
+    assert(m.GetNumRows()==m.GetNumCols());
+    SparseMatrix<T> sparsem(m,itsEps);
+       //cout << "Sparsisty=" << itsSparsem.GetSparsisty() << "%" << endl;
+    if (sparsem.GetSparsisty()<60)
+    {
+        theSparseMatrix=&sparsem;
         SolveSparse(NumEigenValues);
+    }
     else
+    {
+        theDenseMatrix=&m;
         SolveDense(NumEigenValues);
+    }
 }
 
 template <class T> void PrimeEigenSolver<T>::SolveSparse(int NumEigenValues)
@@ -59,6 +56,8 @@ template <class T> void PrimeEigenSolver<T>::SolveSparse(int NumEigenValues)
     primme.numEvals = NumEigenValues;   /* Number of wanted eigenpairs */
     primme.eps = itsEps;      /* ||r|| <= eps * ||matrix|| */
     primme.target = primme_smallest; /* Wanted the smallest eigenvalues */
+
+    primme.initSize=itsNumGuesses;
     primme_set_method(PRIMME_DYNAMIC, &primme);
 
     itsEigenValues.SetLimits(NumEigenValues);
@@ -72,6 +71,7 @@ template <class T> void PrimeEigenSolver<T>::SolveSparse(int NumEigenValues)
         cout << "Warning high rnorms in PrimeEigenSolver::SolveSparse rnorma=" << std::scientific << rnorms << endl;
 
     primme_free(&primme);
+    itsNumGuesses=NumEigenValues; //Set up using guesses for next time around
 
 }
 template <class T> void PrimeEigenSolver<T>::SolveDense(int NumEigenValues)

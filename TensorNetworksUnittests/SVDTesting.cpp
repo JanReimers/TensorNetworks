@@ -241,8 +241,16 @@ TEST_F(SVDTesting,Prime_EigenSolverComplexHermitian200x200)
     }
     Mtype Ah=A+Transpose(conj(A)); //Make it hermitian
 
-    PrimeEigenSolver<eType> solver(Ah,eps);
-    solver.Solve(Ne);
+    PrimeEigenSolver<eType> solver(1e-5);
+    solver.Solve(Ah,Ne);
+    solver.NewEps(1e-9);
+    solver.Solve(Ah,Ne);
+    solver.NewEps(1e-12);
+    solver.Solve(Ah,Ne);
+    solver.NewEps(1e-13);
+    solver.Solve(Ah,Ne);
+    solver.NewEps(1e-14);
+    solver.Solve(Ah,Ne);
 
     Mtype diag=Transpose(conj(solver.GetEigenVectors()))*Ah*solver.GetEigenVectors();
     Vector<double> evals=solver.GetEigenValues();
