@@ -37,9 +37,9 @@ public:
     Matrix6T GetHeffIterate(int isite) const {return GetMPSImp()->GetHeffIterate(itsH,isite);}
     double ContractHeff(int isite,const Matrix6T& Heff) const{return GetMPSImp()->itsSites[isite]->ContractHeff(Heff);}
     double ContractHeff(int isite,const MatrixCT& Heff) const{return GetMPSImp()->itsSites[isite]->ContractHeff(Heff);}
-    Vector3T GetEOLeft_Iterate(int isite,bool cache=false) const {return GetMPSImp()->GetEOLeft_Iterate(itsH,isite,cache);}
-    Vector3T GetEORightIterate(int isite,bool cache=false) const {return GetMPSImp()->GetEORightIterate(itsH,isite,cache);}
-    void LoadHeffCaches() {GetMPSImp()->LoadHeffCaches(itsH);}
+    Vector3T GetEOLeft_Iterate(int isite,bool cache=false) const {return GetMPSImp()->GetEOLeft_Iterate(itsH,itsSupervisor,isite,cache);}
+    Vector3T GetEORightIterate(int isite,bool cache=false) const {return GetMPSImp()->GetEORightIterate(itsH,itsSupervisor,isite,cache);}
+    void LoadHeffCaches() {GetMPSImp()->LoadHeffCaches(itsH,itsSupervisor);}
 
     MatrixT GetW(int isite, int m, int n) {return itsH->GetSiteOperator(isite)->GetW(m,n);}
 

@@ -13,7 +13,7 @@ class GUIHandler:
     def __init__(self):
         pass
 
-    def Update(level,lastOperation,isite):
+    def Update(level,currentOperation,isite):
         pass
 
     def OnStop():
@@ -31,9 +31,9 @@ class MPSSupervisor(PyTensorNetworks.LRPSupervisor):
     def ReadyToStart(self):
         self.Started=True
 
-    def DoneOneStep(self,level,lastOperation,isite=-1):
+    def DoneOneStep(self,level,currentOperation,isite=-1):
         #print("Enter DoOneStep isite=",isite)
-        wx.CallAfter(self.GUIhandler.Update,level,lastOperation,isite)
+        wx.CallAfter(self.GUIhandler.Update,level,currentOperation,isite)
         wx.YieldIfNeeded() #this is supposed to give the GUI a time slice but it's NOT working!!  Same for wxYield
         time.sleep(0.1) #this is kludge to give the GUI a time slice.
         #el=wx.EventLoopBase.GetActive()
@@ -221,11 +221,11 @@ class MPSFrame(wx.Frame,GUIHandler):
     def OnRestart(self,e):
         print("Restart")
 
-    def Update(self,level,lastOperation,isite):
+    def Update(self,level,currentOperation,isite):
         if (not self.inUpdate):
             self.inUpdate=True
-            #print("Update level=",level," last op=",lastOperation)
-            self.statusPanel.UpdateLastOperation(lastOperation)
+            #print("Update level=",level," current op=",currentOperation)
+            self.statusPanel.UpdateCurrentOperation(currentOperation)
             self.graphs.ReplotActiveGraph()
             #if level==0: #end of each sweep
             #    self.graphs.ReplotActiveGraph()

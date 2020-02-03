@@ -25,6 +25,7 @@ MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D)
     , itsS2(S2)
     , itsD(D)
     , itsp(itsS2+1)
+    , itsNSweep(0)
     , itsSitesMesh(0)
     , itsBondsMesh(0)
 {
@@ -248,38 +249,27 @@ void MatrixProductStateImp::UpdateBondData(int isite)
 //
 double MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int maxIter, double eps,LRPSupervisor* Supervisor)
 {
-    Supervisor->ReadyToStart();
+    Supervisor->ReadyToStart("Right normalize");
     Normalize(TensorNetworks::Right,Supervisor);
-    Supervisor->DoneOneStep(0,"Right normalize lattice done");
-    LoadHeffCaches(hamiltonian);
+    Supervisor->DoneOneStep(0,"Load L&R caches");
+    LoadHeffCaches(hamiltonian,Supervisor);
 
-    int nSweep=0;
     double E1=0;
     for (int in=0; in<maxIter; in++)
     {
-        SweepRight(hamiltonian,Supervisor,true);
-        SweepLeft (hamiltonian,Supervisor,true);
-        nSweep++;
-
-
-        Supervisor->DoneOneStep(0,"Calculating Expectations <E> and <E^2>"); //Supervisor will update the graphs
-        E1=GetExpectationIterate(hamiltonian);
-        double dE=GetMaxDeltaE();
-        if (weHaveGraphs())
-        {
-            AddPoint("Iter E/J",Plotting::Point(nSweep,E1));
-            AddPoint("Iter log(dE/J)",Plotting::Point(nSweep,log10(dE)));
-        }
-        Supervisor->DoneOneStep(0,"Full bi-directional sweep done"); //Supervisor will update the graphs
+        Supervisor->DoneOneStep(0,"Sweep Right");
+        E1=SweepRight(hamiltonian,Supervisor,true);
+        Supervisor->DoneOneStep(0,"Sweep Left");
+        E1=SweepLeft (hamiltonian,Supervisor,true);
         if (GetMaxDeltaE()<eps) break;
     }
+    Supervisor->DoneOneStep(0,"Contracting <E^2>"); //Supervisor will update the graphs
     double E2=GetExpectation(hamiltonian,hamiltonian);
-    Supervisor->DoneOneStep(0,"GS iterations done"); //Supervisor will update the graphs
     return E2-E1*E1;
 }
 
 
-void MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Supervisor,bool quiet)
+double MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Supervisor,bool quiet)
 {
     if (!quiet)
     {
@@ -288,22 +278,32 @@ void MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Super
     }
     for (int ia=0; ia<itsL-1; ia++)
     {
-        Refine(h,ia);
-        Supervisor->DoneOneStep(1,SiteMessage("Solve Heff eigen system for site ",ia),ia);
+        Refine(h,Supervisor,ia);
 
         VectorT s;
         MatrixCT Vdagger;
+        Supervisor->DoneOneStep(2,SiteMessage("SVD Left Normalize site ",ia),ia);
         itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
         UpdateBondData(ia);
-        Supervisor->DoneOneStep(2,SiteMessage("SVD Left Normalize site ",ia),ia);
+        Supervisor->DoneOneStep(2,SiteMessage("Transfer M=s*V_dagger*M on site ",ia+1),ia);
         itsSites[ia+1]->Contract(s,Vdagger);
-        Supervisor->DoneOneStep(2,SiteMessage("Transfer M=s*V_dagger*M on site ",ia+1),ia+1);
+        Supervisor->DoneOneStep(1,SiteMessage("Update L&R caches for site ",ia));
         itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
         if (!quiet) cout << "SweepRight post constract  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
     }
+    itsNSweep++;
+    Supervisor->DoneOneStep(0,"Calculating Expectation <E>"); //Supervisor will update the graphs
+    double E1=GetExpectationIterate(h);
+    double dE=GetMaxDeltaE();
+    if (weHaveGraphs())
+    {
+        AddPoint("Iter E/J",Plotting::Point(itsNSweep,E1));
+        AddPoint("Iter log(dE/J)",Plotting::Point(itsNSweep,log10(dE)));
+    }
+    return E1;
 }
 
-void MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supervisor,bool quiet)
+double MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supervisor,bool quiet)
 {
     if (!quiet)
     {
@@ -312,26 +312,39 @@ void MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Superv
     }
     for (int ia=itsL-1; ia>0; ia--)
     {
-        Refine(h,ia);
-        Supervisor->DoneOneStep(1,SiteMessage("Solve Heff eigen system for site ",ia),ia);
+        Refine(h,Supervisor,ia);
 
         VectorT s;
         MatrixCT U;
+        Supervisor->DoneOneStep(2,SiteMessage("SVD Rigft Normalize site ",ia),ia);
         itsSites[ia]->SVDRightNormalize(U,s);
         UpdateBondData(ia-1);
-        Supervisor->DoneOneStep(2,SiteMessage("SVD Rigft Normalize site ",ia),ia);
+        Supervisor->DoneOneStep(2,SiteMessage("Transfer M=M*U*s on site ",ia-1),ia);
         itsSites[ia-1]->Contract(U,s);
-        Supervisor->DoneOneStep(2,SiteMessage("Transfer M=M*U*s on site ",ia-1),ia-1);
+        Supervisor->DoneOneStep(1,SiteMessage("Update L&R caches for site ",ia));
         itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
         if (!quiet)
             cout << "SweepLeft  post contract  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
 
     }
+    itsNSweep++;
+    Supervisor->DoneOneStep(0,"Calculating Expectation <E>"); //Supervisor will update the graphs
+    double E1=GetExpectationIterate(h);
+    double dE=GetMaxDeltaE();
+    if (weHaveGraphs())
+    {
+        AddPoint("Iter E/J",Plotting::Point(itsNSweep,E1));
+        AddPoint("Iter log(dE/J)",Plotting::Point(itsNSweep,log10(dE)));
+    }
+    return E1;
 }
-void MatrixProductStateImp::Refine(const Hamiltonian *h,int isite)
+
+void MatrixProductStateImp::Refine(const Hamiltonian *h,LRPSupervisor* Supervisor,int isite)
 {
     assert(CheckNormalized(isite,1e-11));
+    Supervisor->DoneOneStep(2,"Calculating Heff",isite); //Supervisor will update the graphs
     Matrix6T Heff6=GetHeffIterate(h,isite); //New iterative version
+    Supervisor->DoneOneStep(2,"Running eigen solver",isite); //Supervisor will update the graphs
     itsSites[isite]->Refine(Heff6.Flatten());
     itsSiteEnergies[isite]=itsSites[isite]->GetSiteEnergy();
     itsSiteEGaps   [isite]=itsSites[isite]->GetEGap      ();
@@ -361,10 +374,11 @@ MatrixProductStateImp::Matrix6T MatrixProductStateImp::GetHeffIterate   (const H
     Vector3T Rcache=GetHRightCache(isite+1);
     return itsSites[isite]->GetHeff(h->GetSiteOperator(isite),Lcache,Rcache);
 }
-void MatrixProductStateImp::LoadHeffCaches(const Hamiltonian* h)
+void MatrixProductStateImp::LoadHeffCaches(const Hamiltonian* h,LRPSupervisor* supervisor)
 {
-    GetEOLeft_Iterate(h,0,true);
-    GetEORightIterate(h,0,true);
+    assert(supervisor);
+    GetEOLeft_Iterate(h,supervisor,0,true);
+    GetEORightIterate(h,supervisor,0,true);
 }
 
 double  MatrixProductStateImp::GetMaxDeltaE() const
@@ -542,21 +556,26 @@ MatrixProductStateImp::MatrixCT MatrixProductStateImp::GetMRight(int isite) cons
  }
 
 
-MatrixProductStateImp::Vector3T MatrixProductStateImp::GetEOLeft_Iterate(const Operator* o,int isite, bool cache) const
+MatrixProductStateImp::Vector3T MatrixProductStateImp::GetEOLeft_Iterate(const Operator* o,LRPSupervisor* supervisor,int isite, bool cache) const
 {
+    assert(supervisor);
     Vector3T F(1,1,1,1);
     F(1,1,1)=eType(1.0);
     for (int ia=0; ia<isite; ia++)
+    {
+        supervisor->DoneOneStep(1,SiteMessage("Calculating L cache for site ",ia));
         F=itsSites[ia]->IterateLeft_F(o->GetSiteOperator(ia),F,cache);
+    }
     return F;
 }
-MatrixProductStateImp::Vector3T MatrixProductStateImp::GetEORightIterate(const Operator* o,int isite, bool cache) const
+MatrixProductStateImp::Vector3T MatrixProductStateImp::GetEORightIterate(const Operator* o,LRPSupervisor* supervisor,int isite, bool cache) const
 {
+    assert(supervisor);
     Vector3T F(1,1,1,1);
     F(1,1,1)=eType(1.0);
     for (int ia=itsL-1; ia>isite; ia--)
     {
-//        cout << "ia=" << ia << "   ";
+        supervisor->DoneOneStep(1,SiteMessage("Calculating R cache for site ",ia));
         F=itsSites[ia]->IterateRightF(o->GetSiteOperator(ia),F,cache);
     }
     return F;

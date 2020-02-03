@@ -27,9 +27,9 @@ class wxMPSStatusPanel(wx.Panel):
         #fgsizer.SetSizeHints(self)
 
         hsizer=wx.BoxSizer(wx.HORIZONTAL)
-        hsizer.Add(wx.StaticText(self,label='Last Operation:'))
-        self.LastOperationTextControl=wx.TextCtrl(self,style=wx.TE_MULTILINE|wx.TE_LEFT,size=(400,20))
-        hsizer.Add(self.LastOperationTextControl,flag=wx.EXPAND)
+        hsizer.Add(wx.StaticText(self,label='Current Operation:'))
+        self.CurrentOperationTextControl=wx.TextCtrl(self,style=wx.TE_MULTILINE|wx.TE_LEFT,size=(400,20))
+        hsizer.Add(self.CurrentOperationTextControl,flag=wx.EXPAND)
 
         vsizer=wx.BoxSizer(wx.VERTICAL)
         vsizer.Add(fgsizer)
@@ -51,6 +51,6 @@ class wxMPSStatusPanel(wx.Panel):
         for isite in range(0,self.L):
             self.UpdateSite(MPS,isite)
 
-    def UpdateLastOperation(self,lastOP):
-        self.LastOperationTextControl.SetValue(lastOP)
+    def UpdateCurrentOperation(self,currentOP):
+        self.CurrentOperationTextControl.SetValue(currentOP)
 

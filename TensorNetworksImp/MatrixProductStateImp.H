@@ -91,10 +91,10 @@ private:
 //
 //  For groound state search
 //
-        void     SweepRight    (const Hamiltonian* h,LRPSupervisor*,bool quiet=true);
-        void     SweepLeft     (const Hamiltonian* h,LRPSupervisor*,bool quiet=true);
-        void     Refine        (const Hamiltonian *h,int isite); //Minimize energy WRT the Ms in one site.
-        void     LoadHeffCaches(const Hamiltonian* h);
+        double   SweepRight    (const Hamiltonian* h,LRPSupervisor*,bool quiet=true);
+        double   SweepLeft     (const Hamiltonian* h,LRPSupervisor*,bool quiet=true);
+        void     Refine        (const Hamiltonian *h,LRPSupervisor*,int isite); //Minimize energy WRT the Ms in one site.
+        void     LoadHeffCaches(const Hamiltonian* h,LRPSupervisor*);
         Vector3T GetHLeft_Cache(int isite) const;
         Vector3T GetHRightCache(int isite) const;
         double   GetMaxDeltaE  () const;
@@ -115,8 +115,8 @@ private:
         MatrixCT GetNeff   (int isite) const;
 
  //       Matrix6T GetEO(int isite, const MPOSite* mpos) const;
-        Vector3T GetEOLeft_Iterate(const Operator* o,int isite,bool cache=false) const;
-        Vector3T GetEORightIterate(const Operator* o,int isite,bool cache=false) const;
+        Vector3T GetEOLeft_Iterate(const Operator* o,LRPSupervisor*,int isite,bool cache=false) const;
+        Vector3T GetEORightIterate(const Operator* o,LRPSupervisor*,int isite,bool cache=false) const;
 
 //--------------------------------------------------------------------------------------
 //
@@ -138,6 +138,7 @@ private:
         int itsS2;  //2*S, avoid storing floats for S=n/2
         int itsD;   //Dimension of internal/virtual state space.
         int itsp;   //Number ot states for the spin on each site = 2S+1
+        int itsNSweep;
         BondsType itsBonds;
         SitesType itsSites;
 
