@@ -1,0 +1,3544 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Tensor Networks and Matrix Product States
+\end_layout
+
+\begin_layout Author
+Jan Reimers
+\end_layout
+
+\begin_layout Date
+Dec 2019
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Section
+Spin Operators
+\end_layout
+
+\begin_layout Standard
+In a Hilbert space for spin 
+\begin_inset Formula $\frac{1}{2}$
+\end_inset
+
+ with spin up 
+\begin_inset Formula $\left|\uparrow_{z}\right\rangle $
+\end_inset
+
+ and spin down 
+\begin_inset Formula $\left|\downarrow_{z}\right\rangle $
+\end_inset
+
+ states in the 
+\begin_inset Formula $z$
+\end_inset
+
+ direction, we can use the Pauli matrices 
+\begin_inset Formula 
+\[
+\hat{S}_{x}=\frac{1}{2}\sigma_{x}=\begin{pmatrix}0 & \frac{1}{2}\\
+\frac{1}{2} & 0
+\end{pmatrix},\;\hat{S}_{y}=\frac{1}{2}\sigma_{y}=\begin{pmatrix}0 & -\frac{i}{2}\\
+\frac{i}{2} & 0
+\end{pmatrix},\;\hat{S}_{z}=\frac{1}{2}\sigma_{z}=\begin{pmatrix}\frac{1}{2} & 0\\
+0 & -\frac{1}{2}
+\end{pmatrix}
+\]
+
+\end_inset
+
+We can also define raising a lowering operators
+\begin_inset Formula 
+\[
+\hat{S}_{+}=\begin{pmatrix}0 & 1\\
+0 & 0
+\end{pmatrix},\;\hat{S}_{-}=\begin{pmatrix}0 & 0\\
+1 & 0
+\end{pmatrix}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\hat{S}_{+}\left|\uparrow_{z}\right\rangle =0
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{S}_{-}\left|\uparrow_{z}\right\rangle =\left|\downarrow_{z}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{S}_{-}\left|\downarrow_{z}\right\rangle =0
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{S}_{+}\left|\downarrow_{z}\right\rangle =\left|\uparrow_{z}\right\rangle 
+\]
+
+\end_inset
+
+We can also see that 
+\begin_inset Formula 
+\[
+\hat{S}_{x}=\frac{1}{2}\left(\hat{S}_{+}+\hat{S}_{-}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{S}_{y}=-\frac{i}{2}\left(\hat{S}_{+}-\hat{S}_{-}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Heisenberg exchange
+\end_layout
+
+\begin_layout Standard
+A standard exchange interaction between two sites looks like
+\begin_inset Formula 
+\[
+\hat{\mathcal{H}}_{12}=\vec{S_{1}}\cdot\vec{S_{2}}=\hat{S}_{x1}\hat{S}_{x2}+\hat{S}_{y1}\hat{S}_{y2}+\hat{S}_{z1}\hat{S}_{z2}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\frac{1}{2}\left(\hat{S}_{+1}+\hat{S}_{-1}\right)\frac{1}{2}\left(\hat{S}_{+2}+\hat{S}_{-2}\right)+\frac{i}{2}\left(\hat{S}_{+1}-\hat{S}_{-1}\right)\frac{i}{2}\left(\hat{S}_{+2}-\hat{S}_{-2}\right)+\hat{S}_{z1}\hat{S}_{z2}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\frac{1}{4}\left(\hat{S}_{+1}\hat{S}_{+2}+\hat{S}_{+1}\hat{S}_{-2}+\hat{S}_{-1}\hat{S}_{+2}+\hat{S}_{-1}\hat{S}_{-2}-\hat{S}_{+1}\hat{S}_{+2}+\hat{S}_{+1}\hat{S}_{-2}+\hat{S}_{-1}\hat{S}_{+2}-\hat{S}_{-1}\hat{S}_{-2}\right)+\hat{S}_{z1}\hat{S}_{z2}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\frac{1}{2}\left(\hat{S}_{+1}\hat{S}_{-2}+\hat{S}_{-1}\hat{S}_{+2}\right)+\hat{S}_{z1}\hat{S}_{z2}
+\]
+
+\end_inset
+
+In this form it is much easier to evaluate matrix elements in the 
+\begin_inset Formula $z$
+\end_inset
+
+ basis
+\begin_inset Formula 
+\[
+\mathcal{H}_{12}\left|\uparrow\uparrow\right\rangle =\frac{1}{2}\left(\hat{S}_{+1}\hat{S}_{-2}\left|\uparrow\uparrow\right\rangle +\hat{S}_{-1}\hat{S}_{+2}\left|\uparrow\uparrow\right\rangle \right)+\hat{S}_{z1}\hat{S}_{z2}\left|\uparrow\uparrow\right\rangle =\frac{1}{4}\left|\uparrow\uparrow\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathcal{H}_{12}\left|\downarrow\downarrow\right\rangle =\frac{1}{2}\left(\hat{S}_{+1}\hat{S}_{-2}\left|\downarrow\downarrow\right\rangle +\hat{S}_{-1}\hat{S}_{+2}\left|\downarrow\downarrow\right\rangle \right)+\hat{S}_{z1}\hat{S}_{z2}\left|\downarrow\downarrow\right\rangle =\frac{1}{4}\left|\downarrow\downarrow\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathcal{H}_{12}\left|\downarrow\uparrow\right\rangle =\frac{1}{2}\left(\hat{S}_{+1}\hat{S}_{-2}\left|\downarrow\uparrow\right\rangle +\hat{S}_{-1}\hat{S}_{+2}\left|\downarrow\uparrow\right\rangle \right)+\hat{S}_{z1}\hat{S}_{z2}\left|\downarrow\uparrow\right\rangle =\frac{1}{2}\left|\uparrow\downarrow\right\rangle -\frac{1}{4}\left|\downarrow\uparrow\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathcal{H}_{12}\left|\uparrow\downarrow\right\rangle =\frac{1}{2}\left(\hat{S}_{+1}\hat{S}_{-2}\left|\uparrow\downarrow\right\rangle +\hat{S}_{-1}\hat{S}_{+2}\left|\uparrow\downarrow\right\rangle \right)+\hat{S}_{z1}\hat{S}_{z2}\left|\uparrow\downarrow\right\rangle =\frac{1}{2}\left|\downarrow\uparrow\right\rangle -\frac{1}{4}\left|\uparrow\downarrow\right\rangle 
+\]
+
+\end_inset
+
+Now we easily write the whole matrix in the 
+\begin_inset Formula $\left\{ \left|\uparrow\uparrow\right\rangle ,\left|\downarrow\downarrow\right\rangle ,\left|\downarrow\uparrow\right\rangle ,\left|\uparrow\downarrow\right\rangle \right\} $
+\end_inset
+
+ basis
+\begin_inset Formula 
+\[
+\mathcal{H}_{12}=\begin{pmatrix}\frac{1}{4} & 0 & 0 & 0\\
+0 & \frac{1}{4} & 0 & 0\\
+0 & 0 & -\frac{1}{4} & \frac{1}{2}\\
+0 & 0 & \frac{1}{2} & -\frac{1}{4}
+\end{pmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left(-\frac{1}{4}-\lambda\right)^{2}=\frac{1}{4}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+-\frac{1}{4}-\lambda=\pm\frac{1}{2}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\lambda=\pm\frac{1}{2}-\frac{1}{4}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\lambda=-\frac{3}{4},\frac{1}{4}
+\]
+
+\end_inset
+
+So we can standard triplet-singlet breakdown of the eigen states 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\psi$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{1}{4}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\left|\uparrow\uparrow\right\rangle $
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{1}{4}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\left|\downarrow\downarrow\right\rangle $
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{1}{4}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{1}{\sqrt{2}}\left(\left|\downarrow\uparrow\right\rangle +\left|\uparrow\downarrow\right\rangle \right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $-\frac{3}{4}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{1}{\sqrt{2}}\left(\left|\downarrow\uparrow\right\rangle -\left|\uparrow\downarrow\right\rangle \right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Eigen states for two interacting spins
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Matrix Product States
+\end_layout
+
+\begin_layout Standard
+It turns out that quantum states encountered in nature and in particular
+ ground and low lying states only sample an exponentially tiny fraction
+ of the available 
+\begin_inset Formula $2^{N}$
+\end_inset
+
+ Hilbert space.
+ So in principle we could save ourselves a lot of work if there was a way
+ of restricting the wave function to the relevant part of Hilbert space.
+ In fact we do this all the time with mean field methods like the Hartree-Fock
+ approximation.
+ In this form we just assume that the wave function is a product of single
+ particle state functions.
+ But this goes to far, we need a way of constraining the wave function in
+ a tuneable way.
+ Over the last twenty years this has been essentially solved for 
+\begin_inset Formula $1D$
+\end_inset
+
+ systems with Matrix Product States (MPS) and with tensor networks (really
+ Tensor Product States) for higher dimensional systems.
+ These ideas grew out of White and Wilson's Density Matrix Renormalization
+ Group methods.
+\end_layout
+
+\begin_layout Subsection
+Toy Example
+\end_layout
+
+\begin_layout Standard
+We will be counting degress of freedom below and it is good to clarify that
+ I will not substract of one complex degree of freedom for normalization
+ and phase of the wave function.
+\end_layout
+
+\begin_layout Standard
+As usual I need examples, and again a 
+\begin_inset Formula $2$
+\end_inset
+
+ spin system is too small to demonstrate the idea, so lets do a 
+\begin_inset Formula $3$
+\end_inset
+
+ spin chain with open boundaries.
+\begin_inset Formula 
+\[
+\left|\psi\right\rangle =\sum_{n_{1}n_{2}n_{3}=\pm1}a_{n_{1}n_{2}n_{2}}\left|n_{1}n_{2}n_{2}\right\rangle 
+\]
+
+\end_inset
+
+We can think of the amplitudes 
+\begin_inset Formula $a_{n_{1}n_{2}n_{2}}$
+\end_inset
+
+ as a rank 
+\begin_inset Formula $3$
+\end_inset
+
+ or 
+\begin_inset Formula $2\times2\times2$
+\end_inset
+
+ tensor.
+ As such these is 8 degrees of freedom in the wave function.
+ We can write this as a product of matrices
+\begin_inset Formula 
+\[
+a_{n_{1}n_{2}n_{3}}=\sum_{ij=1}^{D}A_{i}^{n_{1}}A_{ij}^{n_{2}}A_{j}^{n_{3}}.
+\]
+
+\end_inset
+
+In this representation we can chose 
+\begin_inset Formula $D=1,2,3$
+\end_inset
+
+.
+ For the case 
+\begin_inset Formula $D=1$
+\end_inset
+
+ we get
+\begin_inset Formula 
+\[
+a_{n_{1}n_{2}n_{3}}=A^{n_{1}}A^{n_{2}}A^{n_{3}}
+\]
+
+\end_inset
+
+which is mean field theory,or a simple product wave function with 
+\begin_inset Formula $6$
+\end_inset
+
+ complex degrees of freedom, two for each 
+\begin_inset Formula $A$
+\end_inset
+
+.
+ For 
+\begin_inset Formula $D=3$
+\end_inset
+
+ we get
+\begin_inset Formula 
+\[
+a_{n_{1}n_{2}n_{3}}=\begin{bmatrix}A_{1}^{n_{1}} & A_{2}^{n_{1}} & A_{3}^{n_{1}}\end{bmatrix}\begin{bmatrix}A_{11}^{n_{2}} & A_{12}^{n_{2}} & A_{13}^{n_{2}}\\
+A_{21}^{n_{2}} & A_{22}^{n_{2}} & A_{23}^{n_{2}}\\
+A_{31}^{n_{2}} & A_{32}^{n_{2}} & A_{33}^{n_{2}}
+\end{bmatrix}\begin{bmatrix}A_{1}^{n_{3}}\\
+A_{2}^{n_{3}}\\
+A_{3}^{n_{3}}
+\end{bmatrix}
+\]
+
+\end_inset
+
+and has 
+\begin_inset Formula $2\left(3+9+3\right)=36$
+\end_inset
+
+ complex degrees of freedom which is way more than the 
+\begin_inset Formula $8$
+\end_inset
+
+ degrees of freedom in the Hilbert space.
+ Now lets look at 
+\begin_inset Formula $D=2$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+a_{n_{1}n_{2}n_{2}}=\begin{bmatrix}A_{1}^{n_{1}} & A_{2}^{n_{1}}\end{bmatrix}\begin{bmatrix}A_{11}^{n_{2}} & A_{12}^{n_{2}}\\
+A_{21}^{n_{2}} & A_{22}^{n_{2}}
+\end{bmatrix}\begin{bmatrix}A_{1}^{n_{3}}\\
+A_{2}^{n_{3}}
+\end{bmatrix}
+\]
+
+\end_inset
+
+this has 
+\begin_inset Formula $8$
+\end_inset
+
+ degrees of freedom and is able to represent the wave function exactly.
+ The mix of vectors and matrices is simply a consequence of the open boundary
+ conditions.
+ For periodic boundaries we would get a product of 
+\begin_inset Formula $3$
+\end_inset
+
+ 
+\begin_inset Formula $D\times D$
+\end_inset
+
+ matrices.
+ These states allow direct entanglement between neighbouring spins and indirect
+ entanglement between further neightbours.
+ The key idea here is that in this way we can tailor the product state to
+ suit any particular lattice.
+\end_layout
+
+\begin_layout Standard
+If we suppress the internal indices we can write the amplitude as a product
+ of matrices
+\begin_inset Formula 
+\[
+a_{n_{1}n_{2}\cdots n_{N}}=\mathcal{\boldsymbol{A}}^{n_{1}}\mathcal{\boldsymbol{A}}^{n_{2}}\ldots\mathcal{\boldsymbol{A}}^{n_{N}}
+\]
+
+\end_inset
+
+Now in between any pair of these matrices we can insert the identity matrix,
+ and expend that identity as a product
+\begin_inset Formula 
+\[
+\text{𝕀}=\boldsymbol{X}\boldsymbol{X}^{-1}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+a_{n_{1}n_{2}\cdots n_{N}}=\mathcal{\boldsymbol{A}}^{n_{1}}\boldsymbol{X}\boldsymbol{X}^{-1}\mathcal{\boldsymbol{A}}^{n_{2}}\ldots\mathcal{\boldsymbol{A}}^{n_{N}}
+\]
+
+\end_inset
+
+and so on for any insertion.
+ Apparently this is important For calculations ...
+ but why?
+\end_layout
+
+\begin_layout Standard
+We can alway SVD for example the 
+\begin_inset Formula $\boldsymbol{A}^{n_{a}}$
+\end_inset
+
+ matrix
+\begin_inset Formula 
+\[
+\boldsymbol{A}^{n_{a}}=\boldsymbol{U}^{n_{a}}\boldsymbol{s}^{n_{a}}\boldsymbol{V}^{\dagger n_{a}}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\boldsymbol{U}^{\dagger}\boldsymbol{U}=\text{𝕀}
+\]
+
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula 
+\[
+\boldsymbol{V}\boldsymbol{V}^{\dagger}=\text{𝕀}
+\]
+
+\end_inset
+
+and 
+\begin_inset Formula $\boldsymbol{s}$
+\end_inset
+
+ is diagonal with 
+\begin_inset Formula $r$
+\end_inset
+
+ non zero eigen values.
+ Now
+\begin_inset Formula 
+\[
+\boldsymbol{A}^{n_{a-1}}\boldsymbol{A}^{n_{a}}\boldsymbol{A}^{n_{a+1}}=\boldsymbol{U}^{n_{a-1}}\boldsymbol{s}^{n_{a-1}}\boldsymbol{V}^{\dagger n_{a-1}}\boldsymbol{U}^{n_{a}}\boldsymbol{s}^{n_{a}}\boldsymbol{V}^{\dagger n_{a}}\boldsymbol{U}^{n_{a+1}}\boldsymbol{s}^{n_{a+1}}\boldsymbol{V}^{\dagger n_{a+1}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Ulrich Schollwöck Notation
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="8" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+This Document
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Schollwöck
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+State of site 
+\begin_inset Formula $i$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $n_{i}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sigma_{i}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Amplitude
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $a_{n_{1}n_{2}\cdots n_{N}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $c_{\sigma_{1}\sigma_{2}\cdots\sigma_{N}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Matrix
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\boldsymbol{A}^{n_{i}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\boldsymbol{A}^{\sigma_{i}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Internal Index
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $ij$
+\end_inset
+
+ in 
+\begin_inset Formula $A_{ij}^{n_{i}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $a_{l-1}a_{l}$
+\end_inset
+
+in 
+\begin_inset Formula $A_{a_{l-1}a_{l}}^{\sigma_{i}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Unit/idenitity Matrix
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\text{𝕀}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\text{𝕀}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Right normalized matrix
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\boldsymbol{B}^{n_{i}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\boldsymbol{B}^{n_{i}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Unnormalized Matrix
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\boldsymbol{A}^{n_{i}}\frownie$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\boldsymbol{M}^{n_{i}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Conversions
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Normalized States
+\end_layout
+
+\begin_layout Standard
+Matrices that statisfy
+\begin_inset Formula 
+\begin{equation}
+\sum_{n}\boldsymbol{A}^{n^{\dagger}}\boldsymbol{A}^{n}=𝕀\label{eq:Left norm}
+\end{equation}
+
+\end_inset
+
+or with internal indices written out
+\begin_inset Formula 
+\[
+\sum_{n}\sum_{j}A_{ij}^{n^{\dagger}}A_{jk}^{n}=\delta_{ik}
+\]
+
+\end_inset
+
+are called 
+\emph on
+left normailzed
+\emph default
+.
+ Right normailzed is just
+\begin_inset Formula 
+\begin{equation}
+\sum_{n}\boldsymbol{B}^{n}\boldsymbol{B}^{n^{\dagger}}=\mathbb{I}\label{eq:Right norm}
+\end{equation}
+
+\end_inset
+
+Sometimes it is useful to write a state in the form
+\begin_inset Formula 
+\[
+\left|\psi\right\rangle =\sum_{\left\{ n\right\} }\boldsymbol{A}^{1}\cdots\boldsymbol{A}^{l}\boldsymbol{B}^{l+1}\cdots\boldsymbol{B}^{L}\left|n_{1}n_{2}\cdots n_{L}\right\rangle 
+\]
+
+\end_inset
+
+which can split into left and right halfs
+\begin_inset Formula 
+\[
+\left|\psi\right\rangle =\sum_{i}\left|i\right\rangle _{A}\left|i\right\rangle _{B}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\left|i\right\rangle _{A}=\sum_{\left\{ n_{1}\cdots n_{l}\right\} }\left(\boldsymbol{A}^{1}\cdots\boldsymbol{A}^{l}\right)_{1,i}\left|n_{1}\cdots n_{l}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|i\right\rangle _{B}=\sum_{\left\{ n_{l+1}\cdots n_{L}\right\} }\boldsymbol{B}^{l+1}\cdots\boldsymbol{B}^{L}\left|n_{l+1}\cdots n_{L}\right\rangle 
+\]
+
+\end_inset
+
+are two sets of orthonrmal bases.
+ This is used a lot in DMRG.
+ From now on I try and follow Schollwöcks conventions 
+\begin_inset Formula $\boldsymbol{A}$
+\end_inset
+
+ is left normalizedm 
+\begin_inset Formula $\boldsymbol{B}$
+\end_inset
+
+ is right normalized and 
+\begin_inset Formula $\boldsymbol{M}$
+\end_inset
+
+ is un normalized.
+\end_layout
+
+\begin_layout Subsubsection
+Procedure for Left Normalization
+\end_layout
+
+\begin_layout Standard
+Given an MPS expressed in terms of un-normalized matrices
+\begin_inset Formula 
+\[
+\left|\psi\right\rangle =\sum_{\left\{ n\right\} }\boldsymbol{M}^{n_{1}}\boldsymbol{M}^{n_{2}}\ldots\boldsymbol{M}^{n_{N}}\left|n_{1}n_{2}\cdots n_{L}\right\rangle 
+\]
+
+\end_inset
+
+how do we go about left normalizing it? We start on on the left with 
+\begin_inset Formula $\boldsymbol{M}^{n_{1}}$
+\end_inset
+
+ which is a group of 
+\begin_inset Formula $p$
+\end_inset
+
+ row vectors, and re-shape in as
+\begin_inset Formula 
+\[
+M_{1i_{1}}^{n_{1}}\rightarrow M_{(1,n_{1})I_{1}}=\begin{bmatrix}\boldsymbol{M}^{0}\\
+\boldsymbol{M}^{1}\\
+\vdots\\
+\boldsymbol{M}^{p}
+\end{bmatrix}=\begin{bmatrix}M_{11}^{0} & M_{12}^{0} & \cdots & M_{1D}^{0}\\
+M_{11}^{1} & M_{12}^{1} & \cdots & M_{1D}^{1}\\
+\vdots & \vdots & \ddots & \vdots\\
+M_{11}^{p} & M_{12}^{p} & \cdots & M_{1D}^{p}
+\end{bmatrix}
+\]
+
+\end_inset
+
+Now we an SVD decomposition
+\begin_inset Formula 
+\[
+M_{(1,n_{1})I_{1}}=\boldsymbol{U}^{1}\boldsymbol{s}^{1}\boldsymbol{V}^{1\dagger}=\sum_{j_{1}=1}^{min\left\{ p,D_{1}\right\} }U_{n_{1}j_{1}}^{1}s_{j_{1}j_{1}}^{1}V_{j_{1}i_{1}}^{1\dagger}
+\]
+
+\end_inset
+
+where the matrix dimensions are
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Matrix
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Rows
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Columns
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $M_{(1,n_{1})I_{1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $p$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $D_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\boldsymbol{U}^{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $p$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $p$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\boldsymbol{s}^{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $p$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $p$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\boldsymbol{V}^{1\dagger}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $p$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $D_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $p>=D_{1}$
+\end_inset
+
+ then we can define
+\begin_inset Formula 
+\[
+A_{1j_{1}}^{n_{1}}=U_{n_{1}j_{1}}^{1}
+\]
+
+\end_inset
+
+which satifies the left norm condition eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Left norm"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ But what happens if 
+\begin_inset Formula $p<D_{1}$
+\end_inset
+
+? Then 
+\begin_inset Formula $U$
+\end_inset
+
+matrix is only 
+\begin_inset Formula $pxp$
+\end_inset
+
+ does than mean
+\end_layout
+
+\begin_layout Enumerate
+we dynamically reduce 
+\begin_inset Formula $D_{1}=p$
+\end_inset
+
+?
+\end_layout
+
+\begin_layout Enumerate
+Or just pad 
+\begin_inset Formula $A$
+\end_inset
+
+with zeros for the extra columns?
+\end_layout
+
+\begin_layout Standard
+It turns out that option 1 is correct, you end up with 
+\begin_inset Formula $D$
+\end_inset
+
+ increasing left to right as 
+\begin_inset Formula $\left\{ 1,2,4,8,\cdots\right\} $
+\end_inset
+
+ until it hits the indended 
+\begin_inset Formula $D$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Now the product state looks like
+\begin_inset Formula 
+\[
+\left|\psi\right\rangle =\sum_{\left\{ n\right\} }\boldsymbol{A}^{n_{1}}\boldsymbol{s}^{1}\boldsymbol{V}^{1\dagger}\boldsymbol{M}^{n_{2}}\ldots\boldsymbol{M}^{n_{N}}\left|n_{1}n_{2}\cdots n_{L}\right\rangle 
+\]
+
+\end_inset
+
+and we will absorb 
+\begin_inset Formula $\boldsymbol{s}^{1}\boldsymbol{V}^{1}$
+\end_inset
+
+ into 
+\begin_inset Formula $\boldsymbol{M}^{n_{2}}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\tilde{\boldsymbol{M}}^{n_{2}}=\boldsymbol{s}^{1}\boldsymbol{V}^{1\dagger}\boldsymbol{M}^{n_{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\tilde{M}_{i_{1}i_{2}}^{n_{2}}=\sum_{j}^{N}s_{i_{1}j}^{1}\left(\sum_{k}^{D_{1}}V_{jk}^{1\dagger}M_{ki_{2}}^{n_{2}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{j}^{N}s_{j}^{1}\delta_{ji_{1}}\left(\sum_{k}^{D_{1}}V_{jk}^{1\dagger}M_{ki_{2}}^{n_{2}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=s_{i_{1}}^{1}\left(\sum_{k}^{D_{1}}V_{i_{1}k}^{1\dagger}M_{ki_{2}}^{n_{2}}\right)
+\]
+
+\end_inset
+
+Next we reshape 
+\begin_inset Formula $\tilde{\boldsymbol{M}}^{n_{2}}$
+\end_inset
+
+ as
+\begin_inset Formula 
+\[
+\tilde{M}_{j_{1}i_{2}}^{n_{2}}\rightarrow\tilde{M}_{\left(j_{1},n_{2}\right)i_{2}}
+\]
+
+\end_inset
+
+ and SVD that
+\begin_inset Formula 
+\[
+\tilde{M}_{\left(j_{1},n_{2}\right)i_{2}}=\sum_{j_{2}}U_{\left(j_{1},n_{2}\right)j_{2}}^{2}s_{j_{2}j_{2}}^{2}V_{j_{2}i_{2}}^{2}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+A_{j_{1}j_{2}}^{n_{2}}=U_{\left(j_{1},n_{2}\right)j_{2}}^{2}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\tilde{M}_{j_{2}i_{3}}^{n_{3}}=s_{j_{2}j_{2}}^{2}\sum_{i_{2}}V_{j_{2}i_{2}}^{2}M_{i_{2}i_{3}}^{n_{3}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left|\psi\right\rangle =\sum_{\left\{ n\right\} }\boldsymbol{A}^{n_{1}}\boldsymbol{A}^{n_{2}}\boldsymbol{s}^{2}\boldsymbol{V}^{2}\boldsymbol{M}^{n_{3}}\ldots\boldsymbol{M}^{n_{N}}\left|n_{1}n_{2}\cdots n_{L}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ n\right\} }\boldsymbol{A}^{n_{1}}\boldsymbol{A}^{n_{2}}\boldsymbol{\tilde{M}}^{n_{3}}\ldots\boldsymbol{M}^{n_{N}}\left|n_{1}n_{2}\cdots n_{L}\right\rangle 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Right Normalization
+\end_layout
+
+\begin_layout Standard
+We start at the last site and do
+\begin_inset Formula 
+\[
+\left|\psi\right\rangle =\sum_{\left\{ n\right\} }\boldsymbol{M}^{n_{1}}\boldsymbol{M}^{n_{2}}\ldots\boldsymbol{M}^{n_{N}}\left|n_{1}n_{2}\cdots n_{L}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{\left\{ n\right\} }\boldsymbol{M}^{n_{1}}\boldsymbol{M}^{n_{2}}\ldots\boldsymbol{M}^{n_{L-1}}\boldsymbol{U}^{L}\boldsymbol{s}^{L}\boldsymbol{B}^{n_{L}}
+\]
+
+\end_inset
+
+where
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+M_{i_{L}(1,n_{L})}=\boldsymbol{U}^{L}\boldsymbol{s}^{L}\boldsymbol{V}^{L\dagger}=\sum_{j_{L}=1}^{min\left\{ p,D_{L}\right\} }U_{i_{L}j_{L}}^{L}s_{j_{L}j_{L}}^{L}V_{j_{L}n_{L}}^{L\dagger}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+B_{j_{L},1}^{n_{L}}=V_{j_{L}n_{L}}^{L\dagger}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\tilde{M}_{i_{L-1}i_{L}}^{n_{L-1}}=\sum_{k}M_{i_{L-1}k}^{n_{L-1}}U_{ki_{L}}^{L}s_{i_{L}i_{L}}^{L}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Initial states
+\end_layout
+
+\begin_layout Standard
+If want to start a simulation in for example a left normalized state then
+ the normalization requirement
+\begin_inset Formula 
+\[
+\sum_{n}\boldsymbol{A}^{n^{\dagger}}\boldsymbol{A}^{n}=𝕀
+\]
+
+\end_inset
+
+forces us to use the full bond dimension 
+\begin_inset Formula $D$
+\end_inset
+
+ in initial state.
+ For example an 
+\begin_inset Formula $S=\frac{1}{2}$
+\end_inset
+
+ normalized product state 
+\begin_inset Formula $\left|\psi_{a}\right\rangle =c_{1}\left|\uparrow\right\rangle +c_{2}\left|\downarrow\right\rangle $
+\end_inset
+
+ for 
+\begin_inset Formula $D=2$
+\end_inset
+
+ would look like
+\begin_inset Formula 
+\[
+\boldsymbol{A}^{\uparrow}=\begin{bmatrix}c_{1} & 0\\
+0 & 0
+\end{bmatrix},\;\boldsymbol{A}^{\downarrow}=\begin{bmatrix}c_{2} & 0\\
+0 & 0
+\end{bmatrix}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\sum_{n}\boldsymbol{A}^{n^{\dagger}}\boldsymbol{A}^{n}=\begin{bmatrix}\left|c_{1}\right|^{2}+\left|c_{2}\right|^{2} & 0\\
+0 & 0
+\end{bmatrix}=\begin{bmatrix}1 & 0\\
+0 & 0
+\end{bmatrix}\neq\text{𝕀}
+\]
+
+\end_inset
+
+So do we need to do something like
+\begin_inset Formula 
+\[
+\boldsymbol{A}^{\uparrow}=\begin{bmatrix}c_{1} & 0\\
+0 & c_{1}
+\end{bmatrix},\;\boldsymbol{A}^{\downarrow}=\begin{bmatrix}c_{2} & 0\\
+0 & c_{2}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Schmidt Decomposition
+\end_layout
+
+\begin_layout Standard
+Starting with 
+\begin_inset Formula 
+\[
+\left|\psi\right\rangle =\sum_{\left\{ n\right\} }\boldsymbol{M}^{n_{1}}\boldsymbol{M}^{n_{2}}\ldots\boldsymbol{M}^{n_{N}}\left|n_{1}n_{2}\cdots n_{L}\right\rangle 
+\]
+
+\end_inset
+
+we can single out and arbitrary site 
+\begin_inset Formula $a$
+\end_inset
+
+ and split the wave function
+\begin_inset Formula 
+\[
+\left|\psi\right\rangle =\sum_{\left\{ n^{A}\right\} }\sum_{\left\{ n^{B}\right\} }\left(\boldsymbol{M}^{n_{1}}\ldots\boldsymbol{M}^{n_{a-1}}\right)\left(\boldsymbol{M}^{n_{a}}\ldots\boldsymbol{M}^{n_{L}}\right)\left|n_{1}\cdots n_{a}\right\rangle \left|n_{a+1}\cdots n_{L}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ n^{A}\right\} }\sum_{\left\{ n^{B}\right\} }\boldsymbol{M}^{A}\boldsymbol{M}^{B}\left|n_{1}\cdots n_{a}\right\rangle \left|n_{a+1}\cdots n_{L}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ n^{A}\right\} }\boldsymbol{M}^{A}\left|n_{1}\cdots n_{a}\right\rangle \sum_{\left\{ n^{B}\right\} }\boldsymbol{M}^{B}
+\]
+
+\end_inset
+
+We need think of this in the following form
+\begin_inset Formula 
+\[
+\left|\psi\right\rangle =\sum_{ij}\psi_{ij}\left|i\right\rangle _{A}\left|j\right\rangle _{B}
+\]
+
+\end_inset
+
+from which we can see
+\begin_inset Formula 
+\[
+i=\left\{ n^{A}\right\} ,\:j=\left\{ n^{B}\right\} 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|i\right\rangle _{A}=\left|n_{1}\cdots n_{a}\right\rangle ,\:\left|j\right\rangle _{B}=\left|n_{a+1}\cdots n_{L}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\psi_{ij}=???
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Function overlap
+\end_layout
+
+\begin_layout Standard
+The normalization condition looks like this
+\begin_inset Formula 
+\[
+\left\langle \psi\left|\right.\psi\right\rangle =\sum_{n_{1}n_{2}\cdots n_{N}}\left|a_{n_{1}n_{2}\cdots n_{N}}\right|^{2}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|a_{n_{1}n_{2}\cdots n_{N}}\right|^{2}=\left(\sum_{mn=1}^{D}M_{m}^{n_{1}}M_{mn}^{n_{2}}M_{no}^{n_{3}}\cdots\right)^{\dagger}\left(\sum_{ij=1}^{D}M_{i}^{n_{1}}M_{ij}^{n_{2}}M_{jk}^{n_{3}}\cdots\right)
+\]
+
+\end_inset
+
+Switching to matrix multipplication to suppress the internal indices, reverising
+ the order of multiplication for the transpose we have:
+\begin_inset Formula 
+\[
+=\boldsymbol{M}^{n_{L}^{\dagger}}\cdots\boldsymbol{M}^{n_{3}^{\dagger}}\boldsymbol{M}^{n_{2}^{\dagger}}\boldsymbol{M}^{n_{1}^{\dagger}}\boldsymbol{M}^{n_{1}}\boldsymbol{M}^{n_{2}}\boldsymbol{M}^{n_{3}}\cdots\boldsymbol{M}^{n_{L}}
+\]
+
+\end_inset
+
+The secret sauce here is to now perform the sum of states 
+\begin_inset Formula $n_{i}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left\langle \psi\left|\right.\psi\right\rangle =\sum_{n_{1}n_{2}\cdots n_{N}=\pm1}\left|a_{n_{1}n_{2}\cdots n_{N}}\right|^{2}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{n_{L}=1}^{p}\boldsymbol{M}^{n_{L}^{\dagger}}\cdots\left\{ \sum_{n_{3}=1}^{p}\boldsymbol{M}^{n_{3}^{\dagger}}\left[\sum_{n_{2}=1}^{p}\boldsymbol{M}^{n_{2}^{\dagger}}\left(\sum_{n_{1}=1}^{p}\boldsymbol{M}^{n_{1}^{\dagger}}\boldsymbol{M}^{n_{1}}\right)\boldsymbol{M}^{n_{2}}\right]\boldsymbol{M}^{n_{3}}\right\} \cdots\boldsymbol{M}^{n_{L}}
+\]
+
+\end_inset
+
+If we define the so called transfer matrix for site 1 as
+\begin_inset Formula 
+\[
+E_{ij}^{1}=\sum_{n_{1}=1}^{p}M_{i}^{n_{1}^{\dagger}}M_{j}^{n_{1}}
+\]
+
+\end_inset
+
+If the state is alreaady left normalized then
+\begin_inset Formula 
+\[
+E_{ij}^{1}=\sum_{n_{1}=1}^{p}M_{i}^{n_{1}^{\dagger}}M_{j}^{n_{1}}=\sum_{n_{1}=1}^{p}A_{i}^{n_{1}^{\dagger}}A_{j}^{n_{1}}=\delta_{ij}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+we now have
+\begin_inset Formula 
+\[
+\left\langle \psi\left|\right.\psi\right\rangle ==\sum_{n_{L}=1}^{p}\boldsymbol{M}^{n_{L}^{\dagger}}\cdots\left\{ \sum_{n_{3}=1}^{p}\boldsymbol{M}^{n_{3}^{\dagger}}\left[\sum_{n_{2}=1}^{p}\boldsymbol{M}^{n_{2}^{\dagger}}\boldsymbol{E}^{1}\boldsymbol{M}^{n_{2}}\right]\boldsymbol{M}^{n_{3}}\right\} \cdots\boldsymbol{M}^{n_{L}}
+\]
+
+\end_inset
+
+And now can define a two index transfer matrix for sites 1 and 
+\begin_inset Formula $2$
+\end_inset
+
+ as
+\begin_inset Formula 
+\[
+E_{kl}^{2}=\sum_{ij=1}^{D}\sum_{n_{2}=1}^{p}M_{ki}^{n_{2}^{\dagger}}E_{ij}^{1}M_{jl}^{n_{2}}
+\]
+
+\end_inset
+
+Again if the state is already left normalized
+\begin_inset Formula 
+\[
+E_{kl}^{2}=\sum_{ij=1}^{D}\sum_{n_{2}=1}^{p}M_{ki}^{n_{2}^{\dagger}}E_{ij}^{1}M_{jl}^{n_{2}}=\sum_{ij=1}^{D}\sum_{n_{2}=1}^{p}M_{ki}^{n_{2}^{\dagger}}\delta_{ij}M_{jl}^{n_{2}}=\delta_{kl}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can reorder this for efficiency
+\begin_inset Formula 
+\[
+E_{kl}^{2}=\sum_{n_{2}=1}^{p}\sum_{i=1}^{D}M_{ik}^{n_{2}^{*}}\left(\sum_{j=1}^{D}E_{ij}^{1}M_{jl}^{n_{2}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boldsymbol{E}^{2}=\sum_{n_{2}=1}^{p}\boldsymbol{M}^{n_{2}^{\dagger}}\left(\boldsymbol{E}^{1}\boldsymbol{M}^{n_{2}}\right)
+\]
+
+\end_inset
+
+in general
+\begin_inset Formula 
+\[
+\boldsymbol{E}^{a}=\sum_{n_{a}=1}^{p}\boldsymbol{M}^{n_{a}^{\dagger}}\left(\boldsymbol{E}^{a-1}\boldsymbol{M}^{n_{a}}\right)
+\]
+
+\end_inset
+
+The number of operations here is 
+\begin_inset Formula $D^{3}$
+\end_inset
+
+ for each matrix multiplication so in total we have 
+\begin_inset Formula $2pD^{3}$
+\end_inset
+
+ operations.
+ Zipping up the contractions over all 
+\begin_inset Formula $L$
+\end_inset
+
+ sites, in this order, gives a total number of 
+\begin_inset Formula $2LpD^{3}$
+\end_inset
+
+ operations, instead of 
+\begin_inset Formula $p^{L}D^{L}$
+\end_inset
+
+, which is a huge gain.
+\end_layout
+
+\begin_layout Standard
+For energy optimization we need to express the overlap in a way that keeps
+ one site labeled 
+\begin_inset Formula $a$
+\end_inset
+
+ explicit, and ultimatly not summed over
+\begin_inset Formula 
+\[
+\left\langle \psi\left|\right.\psi\right\rangle =\sum_{\left\{ n\right\} }\boldsymbol{M}^{n_{L}^{\dagger}}\cdots\boldsymbol{M}^{n_{a+1}^{\dagger}}\boldsymbol{M}^{n_{a}^{\dagger}}\boldsymbol{M}^{n_{a-1}^{\dagger}}\cdots\boldsymbol{M}^{n_{1}^{\dagger}}\boldsymbol{M}^{n_{1}}\cdots\boldsymbol{M}^{n_{a-1}}\boldsymbol{M}^{n_{a}}\boldsymbol{M}^{n_{a+1}}\cdots\boldsymbol{M}^{n_{L}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ n_{a}\cdots n_{L}\right\} }\boldsymbol{M}^{n_{L}^{\dagger}}\cdots\boldsymbol{M}^{n_{a+1}^{\dagger}}\boldsymbol{M}^{n_{a}^{\dagger}}\left(\sum_{\left\{ n_{1}\cdots n_{a-1}\right\} }\boldsymbol{M}^{n_{a-1}^{\dagger}}\cdots\boldsymbol{M}^{n_{1}^{\dagger}}\boldsymbol{M}^{n_{1}}\cdots\boldsymbol{M}^{n_{a-1}}\right)\boldsymbol{M}^{n_{a}}\boldsymbol{M}^{n_{a+1}}\cdots\boldsymbol{M}^{n_{L}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ n_{a}\cdots n_{L}\right\} }\boldsymbol{M}^{n_{L}^{\dagger}}\cdots\boldsymbol{M}^{n_{a+1}^{\dagger}}\boldsymbol{M}^{n_{a}^{\dagger}}\boldsymbol{M}^{-}\boldsymbol{M}^{n_{a}}\boldsymbol{M}^{n_{a+1}}\cdots\boldsymbol{M}^{n_{L}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ n_{a}\cdots n_{L}\right\} }\left(\boldsymbol{M}^{n_{L}^{\dagger}}\cdots\boldsymbol{M}^{n_{a+1}^{\dagger}}\right)\left(\boldsymbol{M}^{n_{a}^{\dagger}}\boldsymbol{M}^{-}\boldsymbol{M}^{n_{a}}\right)\left(\boldsymbol{M}^{n_{a+1}}\cdots\boldsymbol{M}^{n_{L}}\right)
+\]
+
+\end_inset
+
+Somehow Schollwöck transforms this to
+\begin_inset Formula 
+\[
+=\sum_{\left\{ n_{a}\cdots n_{L}\right\} }\left(\boldsymbol{M}^{n_{a}^{\dagger}}\boldsymbol{M}^{-}\boldsymbol{M}^{n_{a}}\right)\left(\boldsymbol{M}^{n_{a+1}}\cdots\boldsymbol{M}^{n_{L}}\boldsymbol{M}^{n_{L}^{\dagger}}\cdots\boldsymbol{M}^{n_{a+1}^{\dagger}}\right)^{T}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{n_{a}}\boldsymbol{M}^{n_{a}^{\dagger}}\boldsymbol{M}^{-}\boldsymbol{M}^{n_{a}}\boldsymbol{M}^{+^{T}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left\langle \psi\left|\right.\psi\right\rangle =\sum_{n_{a}}\sum_{ijkl}M_{ji}^{n_{a}^{*}}M_{jk}^{-}M_{kl}^{n_{a}}M_{il}^{+}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boldsymbol{M}^{+}=\sum_{\left\{ n_{a}\cdots n_{L}\right\} }\boldsymbol{M}^{n_{a+1}}\cdots\boldsymbol{M}^{n_{L}}\boldsymbol{M}^{n_{L}^{\dagger}}\cdots\boldsymbol{M}^{n_{a+1}^{\dagger}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ n_{a}\cdots n_{L-1}\right\} }\boldsymbol{M}^{n_{a+1}}\cdots\left(\sum_{n_{L}}\boldsymbol{M}^{n_{L}}\boldsymbol{M}^{n_{L}^{\dagger}}\right)\cdots\boldsymbol{M}^{n_{a+1}^{\dagger}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ n_{a}\cdots n_{L-1}\right\} }\boldsymbol{M}^{n_{a+1}}\cdots\sum_{n_{L-1}}\left(\boldsymbol{M}^{n_{L-1}}\boldsymbol{E}^{L}\boldsymbol{M}^{n_{L-1}^{\dagger}}\right)\cdots\boldsymbol{M}^{n_{a+1}^{\dagger}}
+\]
+
+\end_inset
+
+now we differentiate WRT 
+\begin_inset Formula $M_{ji}^{n_{a}^{*}}$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\left\langle \psi\left|\right.\psi\right\rangle }{\partial M_{ji}^{n_{a}^{*}}}=\sum_{kl}M_{jk}^{-}M_{il}^{+}M_{kl}^{n_{a}}=\sum_{kl}N_{ijkl}M_{kl}^{n_{a}}\label{eq:NeffJR}
+\end{equation}
+
+\end_inset
+
+Evenentually we will flatten 
+\begin_inset Formula $N$
+\end_inset
+
+ into a 
+\begin_inset Formula $D^{2}\times D^{2}$
+\end_inset
+
+ matrix and the 
+\begin_inset Formula $M_{kl}^{n_{a}}$
+\end_inset
+
+ into a 
+\begin_inset Formula $D^{2}$
+\end_inset
+
+ length column vector.
+ This is how Schollwöck writes this (RHS of eq 209) expression
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\left\langle \psi\left|\right.\psi\right\rangle }{\partial M_{a_{l-1}a_{l}}^{\sigma_{l}^{*}}}=\sum_{a'_{l-1}a'_{l}}\Psi_{a_{l-1}a'_{l-1}}^{A}\Psi_{a_{l}a'_{l}}^{B}M_{a'_{l-1}a'_{l}}^{\sigma_{l}}\label{eq:NeffSchollwöck}
+\end{equation}
+
+\end_inset
+
+Substitue 
+\begin_inset Formula $\Psi^{A}\rightarrow M^{-}$
+\end_inset
+
+, 
+\begin_inset Formula $\Psi^{B}\rightarrow M^{+}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{\partial\left\langle \psi\left|\right.\psi\right\rangle }{\partial M_{a_{l-1}a_{l}}^{\sigma_{l}^{*}}}=\sum_{a'_{l-1}a'_{l}}M_{a_{l-1}a'_{l-1}}^{-}M_{a_{l}a'_{l}}^{+}M_{a'_{l-1}a'_{l}}^{\sigma_{l}}
+\]
+
+\end_inset
+
+Subtitute 
+\begin_inset Formula $a'_{l-1}\rightarrow k$
+\end_inset
+
+, 
+\begin_inset Formula $a'_{l}\rightarrow l$
+\end_inset
+
+, 
+\begin_inset Formula $\sigma_{l}\rightarrow n_{a}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{\partial\left\langle \psi\left|\right.\psi\right\rangle }{\partial M_{a_{l-1}a_{l}}^{n_{a}^{*}}}=\sum_{kl}M_{a_{l-1}k}^{-}M_{a_{l}l}^{+}M_{kl}^{n_{a}}
+\]
+
+\end_inset
+
+Subtitute 
+\begin_inset Formula $a_{l-1}\rightarrow j$
+\end_inset
+
+, 
+\begin_inset Formula $a_{l}\rightarrow i$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{\partial\left\langle \psi\left|\right.\psi\right\rangle }{\partial M_{ji}^{n_{a}^{*}}}=\sum_{kl}M_{jk}^{-}M_{il}^{+}M_{kl}^{n_{a}}
+\]
+
+\end_inset
+
+which seems to agree with 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:NeffJR"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The overlap super matrix for site 
+\begin_inset Formula $a$
+\end_inset
+
+ is
+\begin_inset Formula 
+\[
+N_{\left(mi_{1}i_{2}\right)\left(nj_{1}j_{2}\right)}=M_{i_{1}j_{1}}^{a-}M_{j_{2}i_{2}}^{a+}\delta_{mn}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Matrix Product Operators
+\end_layout
+
+\begin_layout Standard
+We can project out a single wave function amplitute as
+\begin_inset Formula 
+\[
+\left\langle n_{1}n_{2}\cdots n_{L}\right|\left.\psi\right\rangle =\boldsymbol{M}^{n_{1}}\boldsymbol{M}^{n_{2}}\ldots\boldsymbol{M}^{n_{N}}
+\]
+
+\end_inset
+
+in an analogous manner we can write the expection of any operator 
+\begin_inset Formula $\mathcal{\hat{O}}$
+\end_inset
+
+ as
+\begin_inset Formula 
+\[
+\left\langle n_{1}n_{2}\cdots n_{L}\right|\hat{O}\left|m_{1}m_{2}\cdots m_{L}\right\rangle =\boldsymbol{W}^{n_{1}m_{1}}\boldsymbol{W}^{n_{2}m_{2}}\cdots\boldsymbol{W}^{n_{L}m_{L}}
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+\hat{O}=\sum_{\left\{ nm\right\} }\boldsymbol{W}^{n_{1}m_{1}}\boldsymbol{W}^{n_{2}m_{2}}\cdots\boldsymbol{W}^{n_{L}m_{L}}\left|n_{1}\cdots n_{L}\right\rangle \left\langle m_{1}\cdots m_{L}\right|
+\]
+
+\end_inset
+
+The 
+\begin_inset Formula $\boldsymbol{W}^{n_{a}m_{a}}$
+\end_inset
+
+ matrices are analogous to the 
+\begin_inset Formula $\boldsymbol{A}^{n_{a}}$
+\end_inset
+
+ matrices in the state expansion with the exception that the 
+\begin_inset Formula $W's$
+\end_inset
+
+ have two physical indices.
+ So the big question how do we go from a Hamiltonian expression to the 
+\begin_inset Formula $W's$
+\end_inset
+
+? We can also write this in terms of operator valued matrices
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{W}^{a}}=\sum_{n_{a}m_{a}}\boldsymbol{W}^{n_{a}m_{a}}\left|n_{a}\right\rangle \left\langle m_{a}\right|\label{eq:OpValuedMatrix}
+\end{equation}
+
+\end_inset
+
+now
+\begin_inset Formula 
+\[
+\hat{O}=\hat{\boldsymbol{W}^{1}}\hat{\boldsymbol{W}^{2}}\cdots\hat{\boldsymbol{W}^{L}}
+\]
+
+\end_inset
+
+In this representation each 
+\begin_inset Formula $\hat{\boldsymbol{W}^{a}}$
+\end_inset
+
+ acts on one site
+\end_layout
+
+\begin_layout Subsection
+Representing the Hamiltonian as an MPO
+\end_layout
+
+\begin_layout Standard
+For a simple Heisenberg hamiltonian
+\begin_inset Formula 
+\[
+\mathcal{\hat{H}}=\sum_{a=1}^{L-1}\vec{S}_{a}\cdot\vec{S}_{a+1}=\sum_{a=1}^{L-1}\hat{\mathcal{H}}_{a}
+\]
+
+\end_inset
+
+we need realize that this is a compact way of expressing
+\begin_inset Formula 
+\[
+\mathcal{\hat{H}}=\hat{\mathcal{H}}_{1}\otimes\mathbb{I}_{3}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}+\mathbb{I}_{1}\otimes\hat{\mathcal{H}}_{2}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}+\cdots+\mathbb{I}_{1}\otimes\mathbb{I}_{2}\otimes\mathbb{I}_{3}\cdots\otimes\hat{\mathcal{H}}_{L-1}
+\]
+
+\end_inset
+
+where the 
+\begin_inset Formula $\mathbb{I}_{a}'s$
+\end_inset
+
+ are 
+\begin_inset Formula $p\times p$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\mathcal{H}}_{a}'s$
+\end_inset
+
+ are
+\begin_inset Formula $p^{2}\times p^{2}$
+\end_inset
+
+ since they couple two neighbouring sites.
+ We can break this down even further using
+\begin_inset Formula 
+\[
+\hat{\mathcal{H}}_{a}=\frac{1}{2}\left(\hat{S}_{+}^{a}\hat{S}_{-}^{a+1}+\hat{S}_{-}^{a}\hat{S}_{+}^{a+1}\right)+\hat{S}_{z}^{a}\hat{S}_{z}^{a+1}
+\]
+
+\end_inset
+
+now
+\begin_inset Formula 
+\[
+\mathcal{\hat{H}}=\frac{1}{2}\hat{S}_{+}^{1}\otimes\hat{S}_{-}^{2}\otimes\mathbb{I}_{3}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}+\frac{1}{2}\hat{S}_{-}^{1}\otimes\hat{S}_{+}^{2}\otimes\mathbb{I}_{3}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}+\hat{S}_{z}^{1}\otimes\hat{S}_{z}^{2}\otimes\mathbb{I}_{3}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
++\mathbb{I}_{1}\otimes\frac{1}{2}\hat{S}_{+}^{2}\otimes\hat{S}_{-}^{3}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}+\mathbb{I}_{1}\otimes\frac{1}{2}\hat{S}_{-}^{2}\otimes\hat{S}_{+}^{3}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}+\mathbb{I}_{1}\otimes\hat{S}_{z}^{2}\otimes\hat{S}_{z}^{3}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}+\cdots\label{eq:HamitonianTensorProduct}
+\end{equation}
+
+\end_inset
+
+This may look tedious but I need to write these tensor product out explicitly
+ until I gain experience working with these ideas.
+ So how do map the first term in eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:HamitonianTensorProduct"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ as something like eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:OpValuedMatrix"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+? We apparently need 
+\begin_inset Formula $D_{W}=3+2=2$
+\end_inset
+
+ becuase we have three non-comuting terms.
+\end_layout
+
+\begin_layout Standard
+It turns out we can write
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{W}^{1}=\begin{bmatrix}0, & \frac{1}{2}\hat{S}_{-}^{1} & \frac{1}{2}\hat{S}_{+}^{1}, & \hat{S}_{z}^{1}, & \mathbb{I}^{1}\end{bmatrix}\label{eq:W1forH}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{W}^{2}=\begin{bmatrix}\mathbb{I}^{2} & 0 & 0 & 0 & 0\\
+\hat{S}_{+}^{2} & 0 & 0 & 0 & 0\\
+\hat{S}_{-}^{2} & 0 & 0 & 0 & 0\\
+\hat{S}_{z}^{2} & 0 & 0 & 0 & 0\\
+0 & \frac{1}{2}\hat{S}_{-}^{2} & \frac{1}{2}\hat{S}_{+}^{2} & \hat{S}_{z}^{2} & \mathbb{I}^{2}
+\end{bmatrix}\label{eq:W2forH}
+\end{equation}
+
+\end_inset
+
+ Now
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{W}^{1}}\hat{\boldsymbol{W}^{2}}=\begin{bmatrix}\frac{1}{2}\hat{S}_{-}^{1}\otimes\hat{S}_{+}^{2}+\frac{1}{2}\hat{S}_{+}^{1}\otimes\hat{S}_{-}^{2}+\hat{S}_{z}^{1}\otimes\hat{S}_{z}^{2}, & \mathbb{I}^{1}\otimes\frac{1}{2}\hat{S}_{-}^{2}, & \mathbb{I}^{1}\otimes\frac{1}{2}\hat{S}_{+}^{2}, & \mathbb{I}^{1}\otimes & \hat{S}_{z}^{2}, & \mathbb{I}^{1}\otimes\mathbb{I}^{2}\end{bmatrix}
+\]
+
+\end_inset
+
+We can now right multiply the row vector by 
+\begin_inset Formula $\hat{\boldsymbol{W}^{3}}$
+\end_inset
+
+ and get three more terms in the first element for the interactions between
+ sites 
+\begin_inset Formula $2$
+\end_inset
+
+ and 
+\begin_inset Formula $3$
+\end_inset
+
+.
+ Finally with 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{W}^{L}=\begin{bmatrix}\mathbb{I}^{L}\\
+\hat{S}_{+}^{L}\\
+\hat{S}_{-}^{L}\\
+\hat{S}_{z}^{L}\\
+0
+\end{bmatrix}\label{eq:W4forH}
+\end{equation}
+
+\end_inset
+
+the whole thing zips up to a scalar which is the Hamiltonian.
+\end_layout
+
+\begin_layout Subsection
+MPO operating on MPS
+\end_layout
+
+\begin_layout Standard
+We can now try and contract
+\begin_inset Formula 
+\[
+\hat{O}\left|\psi\right\rangle =\hat{\boldsymbol{W}^{1}}\hat{\boldsymbol{W}^{2}}\cdots\hat{\boldsymbol{W}^{L}}\sum_{\left\{ n\right\} }\boldsymbol{M}^{n_{1}}\boldsymbol{M}^{n_{2}}\ldots\boldsymbol{M}^{n_{N}}\left|n_{1}n_{2}\cdots n_{L}\right\rangle 
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{W}^{a}}=\sum_{m_{a}n_{a}}\boldsymbol{W}^{m_{a}n_{a}}\left|m_{a}\right\rangle \left\langle n_{a}\right|
+\]
+
+\end_inset
+
+are the local matrix valued operators.
+ For eace overlap
+\begin_inset Formula 
+\[
+\left\langle m_{a}\right|\left.n_{b}\right\rangle =\delta_{ab}\delta_{m_{a}n_{b}}
+\]
+
+\end_inset
+
+so we get
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{O}\left|\psi\right\rangle =\sum_{\left\{ nm\right\} }\boldsymbol{W}^{m_{1}n_{1}}\cdots\boldsymbol{W}^{m_{L}n_{L}}\boldsymbol{M}^{n_{1}}\ldots\boldsymbol{M}^{n_{N}}\left|m_{1}m_{2}\cdots m_{L}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ nm\right\} }\sum_{\left\{ w\right\} =1}^{D_{w}}\sum_{\left\{ i\right\} =1}^{D}W_{1w_{1}}^{m_{1}n_{1}}W_{w_{1}w_{2}}^{m_{2}n_{2}}\cdots W_{w_{L-1}1}^{m_{L}n_{L}}M_{1i_{2}}^{n_{1}}M_{i_{2}i_{3}}^{n_{2}}\cdots M_{i_{L}1}^{n_{L}}\left|m_{1}m_{2}\cdots m_{L}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ nm\right\} }\sum_{\left\{ w\right\} =1}^{D_{w}}\sum_{\left\{ i\right\} =1}^{D}\left(W_{1w_{1}}^{m_{1}n_{1}}M_{1i_{2}}^{n_{1}}\right)\left(W_{w_{1}w_{2}}^{m_{2}n_{2}}M_{i_{2}i_{3}}^{n_{2}}\right)\cdots\left(W_{w_{L-1}1}^{m_{L}n_{L}}M_{i_{L}1}^{n_{L}}\right)\left|m_{1}m_{2}\cdots m_{L}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ m\right\} }^{p}\sum_{\left\{ w\right\} =1}^{D_{w}}\sum_{\left\{ i\right\} =1}^{D}\left(\sum_{n_{1}=0}^{p-1}W_{1w_{1}}^{m_{1}n_{1}}M_{1i_{2}}^{n_{1}}\right)\left(\sum_{n_{2}=0}^{p-1}W_{w_{1}w_{2}}^{m_{2}n_{2}}M_{i_{2}i_{3}}^{n_{2}}\right)\cdots\left(\sum_{n_{L}=0}^{p-1}W_{w_{L-1}1}^{m_{L}n_{L}}M_{i_{L}1}^{n_{L}}\right)\left|m_{1}m_{2}\cdots m_{L}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ m\right\} }^{p}\sum_{\left\{ w\right\} =1}^{D_{w}}\sum_{\left\{ i\right\} =1}^{D}NO_{\left(1w_{1}\right)\left(1i_{2}\right)}^{m_{1}}NO_{\left(w_{1}w_{2}\right)\left(i_{2}i_{3}\right)}^{m_{2}}\cdots NO_{\left(w_{L-1}1\right)\left(i_{L}1\right)}^{m_{L}}\left|m_{1}m_{2}\cdots m_{L}\right\rangle 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Energy Expectation
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left\langle \psi\right|\hat{O}\left|\psi\right\rangle =\sum_{\left\{ m\right\} }\left(\boldsymbol{M}^{m_{1}}\boldsymbol{M}^{m_{2}}\ldots\boldsymbol{M}^{m_{L}}\right)^{\dagger}\left\langle m_{1}m_{2}\cdots m_{L}\right|\left(\hat{\boldsymbol{W}^{1}}\hat{\boldsymbol{W}^{2}}\cdots\hat{\boldsymbol{W}^{L}}\right)\sum_{\left\{ n\right\} }\boldsymbol{M}^{n_{1}}\boldsymbol{M}^{n_{2}}\ldots\boldsymbol{M}^{n_{N}}\left|n_{1}n_{2}\cdots n_{L}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ mn\right\} }\left(\boldsymbol{M}^{m_{1}}\ldots\boldsymbol{M}^{m_{L}}\right)^{\dagger}\left\langle m_{1}m_{2}\cdots m_{L}\right|\left(\prod_{a=1}^{L}\sum_{m'_{a}n'_{a}}\boldsymbol{W}^{m'_{a}n'_{a}}\left|m'_{a}\right\rangle \left\langle n'_{a}\right|\right)\boldsymbol{M}^{n_{1}}\ldots\boldsymbol{M}^{n_{N}}\left|n_{1}n_{2}\cdots n_{L}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ mn\right\} }\left(\boldsymbol{M}^{\dagger m_{L}}\cdots\boldsymbol{M}^{\dagger m_{2}}\boldsymbol{M}^{\dagger m_{1}}\right)\left(\prod_{a=1}^{L}\boldsymbol{W}^{m_{a}n_{a}}\right)\boldsymbol{M}^{n_{1}}\ldots\boldsymbol{M}^{n_{N}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ mn\right\} }\left(\sum_{\left\{ i\right\} }M_{1i_{L-1}}^{\dagger m_{L}}\cdots M_{i_{2}i_{1}}^{\dagger m_{2}}M_{i_{1}1}^{\dagger m_{1}}\right)\left(\sum_{\left\{ w\right\} }W_{1w_{1}}^{m_{1}n_{1}}W_{w_{1}w_{2}}^{m_{2}n_{2}}\cdots W_{w_{L-1}1}^{m_{L}n_{L}}\right)\left(\sum_{\left\{ j\right\} }M_{1j_{1}}^{n_{1}}M_{j_{1}j_{2}}^{n_{2}}\cdots M_{j_{L-1}1}^{n_{L}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ mn\right\} }\sum_{\left\{ ij\right\} }\sum_{\left\{ w\right\} }M_{1i_{L-1}}^{\dagger m_{L}}\cdots M_{i_{2}i_{1}}^{\dagger m_{2}}M_{i_{1}1}^{\dagger m_{1}}W_{1w_{1}}^{m_{1}n_{1}}W_{w_{1}w_{2}}^{m_{2}n_{2}}\cdots W_{w_{L-1}1}^{m_{L}n_{L}}M_{1j_{1}}^{n_{1}}M_{j_{1}j_{2}}^{n_{2}}\cdots M_{j_{L-1}1}^{n_{L}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ mn\right\} }\sum_{\left\{ ij\right\} }\sum_{\left\{ w\right\} }M_{i_{L-1}1}^{*m_{L}}\cdots M_{i_{1}i_{2}}^{*m_{2}}M_{1i_{1}}^{*m_{1}}W_{1w_{1}}^{m_{1}n_{1}}W_{w_{1}w_{2}}^{m_{2}n_{2}}\cdots W_{w_{L-1}1}^{m_{L}n_{L}}M_{1j_{1}}^{n_{1}}M_{j_{1}j_{2}}^{n_{2}}\cdots M_{j_{L-1}1}^{n_{L}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ mn\right\} }\sum_{\left\{ ij\right\} }\sum_{\left\{ w\right\} }M_{i_{L-1}1}^{*m_{L}}\cdots\left[M_{i_{1}i_{2}}^{*m_{2}}\left(M_{1i_{1}}^{*m_{1}}W_{1w_{1}}^{m_{1}n_{1}}M_{1j_{1}}^{n_{1}}\right)W_{w_{1}w_{2}}^{m_{2}n_{2}}M_{j_{1}j_{2}}^{n_{2}}\right]\cdots W_{w_{L-1}1}^{m_{L}n_{L}}\cdots M_{j_{L-1}1}^{n_{L}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ ij\right\} }\sum_{\left\{ w\right\} }\sum_{m_{L}n_{L}}M_{i_{L-1}1}^{*m_{L}}\cdots\left[\sum_{m_{2}n_{2}}M_{i_{1}i_{2}}^{*m_{2}}\left(\sum_{m_{1}n_{1}}M_{1i_{1}}^{*m_{1}}W_{1w_{1}}^{m_{1}n_{1}}M_{1j_{1}}^{n_{1}}\right)W_{w_{1}w_{2}}^{m_{2}n_{2}}M_{j_{1}j_{2}}^{n_{2}}\right]\cdots W_{w_{L-1}1}^{m_{L}n_{L}}\cdots M_{j_{L-1}1}^{n_{L}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ ij\right\} }\sum_{\left\{ w\right\} }\sum_{m_{L}n_{L}}M_{i_{L-1}1}^{*m_{L}}\cdots\left[\sum_{m_{2}n_{2}}M_{i_{1}i_{2}}^{*m_{2}}EO_{\left(111\right)\left(w_{1}i_{1}j_{1}\right)}^{1}W_{w_{1}w_{2}}^{m_{2}n_{2}}M_{j_{1}j_{2}}^{n_{2}}\right]\cdots W_{w_{L-1}1}^{m_{L}n_{L}}\cdots M_{j_{L-1}1}^{n_{L}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ ij\right\} }\sum_{\left\{ w\right\} }\sum_{m_{L}n_{L}}M_{i_{L-1}1}^{*m_{L}}\cdots\left[EO_{\left(111\right)\left(w_{1}i_{1}j_{1}\right)}^{1}EO_{\left(w_{1}i_{1}j_{1}\right)\left(w_{2}i_{2}j_{2}\right)}^{2}\right]\cdots W_{w_{L-1}1}^{m_{L}n_{L}}\cdots M_{j_{L-1}1}^{n_{L}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+=\sum_{\left\{ w\right\} =1}^{D_{w}}\sum_{\left\{ ij\right\} =1}^{D}EO_{\left(111\right)\left(w_{1}i_{1}j_{1}\right)}^{1}EO_{\left(w_{1}i_{1}j_{1}\right)\left(w_{2}i_{2}j_{2}\right)}^{2}\cdots EO_{\left(w_{L-1}i_{L-1}j_{L-1}\right)\left(111\right)}^{L}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+EO_{\left(w_{a-1}i_{a-1}j_{a-1}\right)\left(w_{a}i_{a}j_{a}\right)}^{a}=\sum_{m_{a}n_{a}=0}^{p}M_{i_{a-1}i_{a}}^{*m_{a}}W_{w_{a-1}w_{a}}^{m_{a}n_{a}}M_{j_{a-1}j_{a}}^{n_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+=\sum_{m_{a}=0}^{p}M_{i_{a-1}i_{a}}^{*m_{a}}\left(\sum_{n_{a}=0}^{p}W_{w_{a-1}w_{a}}^{m_{a}n_{a}}M_{j_{a-1}j_{a}}^{n_{a}}\right)\label{eq:EaSuperMatrix}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{m_{a}=0}^{p}M_{i_{a-1}i_{a}}^{*m_{a}}NO_{\left(w_{a-1}j_{a-1}\right)\left(w_{a}j_{a}\right)}^{m_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+NO_{\left(w_{a-1}j_{a-1}\right)\left(w_{a}j_{a}\right)}^{m_{a}}=\sum_{n_{a}=0}^{p}W_{w_{a-1}w_{a}}^{m_{a}n_{a}}M_{j_{a-1}j_{a}}^{n_{a}}
+\]
+
+\end_inset
+
+removing the lattice index 
+\begin_inset Formula $a$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+EO_{\left(w_{1}i_{1}j_{1}\right)\left(w_{2}i_{2}j_{2}\right)}=\sum_{mn=0}^{p-1}M_{i_{1}i_{2}}^{*m}W_{w_{1}w_{2}}^{mn}M_{j_{1}j_{2}}^{n}=\sum_{m=0}^{p-1}M_{i_{1}i_{2}}^{*m}NO_{\left(w_{1}j_{1}\right)\left(w_{2}j_{2}\right)}^{m}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+NO_{\left(w_{1}j_{1}\right)\left(w_{2}j_{2}\right)}^{m}=\sum_{n=0}^{p-1}W_{w_{1}w_{2}}^{mn}M_{j_{1}j_{2}}^{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Organization in code
+\end_layout
+
+\begin_layout Standard
+Four and six index tensors 
+\begin_inset Formula $NO_{\left(w_{1}j_{1}\right)\left(w_{2}j_{2}\right)}^{m}$
+\end_inset
+
+ and 
+\begin_inset Formula $EO_{\left(w_{1}i_{1}j_{1}\right)\left(w_{2}i_{2}j_{2}\right)}$
+\end_inset
+
+ are stored in code using the 
+\noun on
+Matrix4<T>
+\noun default
+ and 
+\noun on
+Matrix6<T>
+\noun default
+ classes respectively.
+ Each can be flattened into a rank 2 tensor (matrix) for matrix multipliction.
+ The contraction loops can be organized as follows
+\end_layout
+
+\begin_layout Enumerate
+Create and zero 
+\begin_inset Formula $EO_{\left(w_{1}i_{1}j_{1}\right)\left(w_{2}i_{2}j_{2}\right)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Loop over 
+\begin_inset Formula $m$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Create and zero 
+\begin_inset Formula $NO_{\left(w_{1}j_{1}\right)\left(w_{2}j_{2}\right)}^{m}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Loop over 
+\begin_inset Formula $n$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Retrieve 
+\begin_inset Formula $\boldsymbol{W}^{mn}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Loop over 
+\begin_inset Formula $w_{1}w_{2}=1\cdots D_{w}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Loop over 
+\begin_inset Formula $j_{1}=1\cdots D_{1},\:j_{2}=1\cdots D_{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+\begin_inset Formula $NO_{\left(w_{1}j_{1}\right)\left(w_{2}j_{2}\right)}^{m}+=W_{w_{1}w_{2}}^{mn}M_{j_{1}j_{2}}^{n}$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Enumerate
+Loop over 
+\begin_inset Formula $i_{1}=1\cdots D_{1},\:i_{2}=1\cdots D_{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Loop over 
+\begin_inset Formula $w_{1}w_{2}=1\cdots D_{w},i_{1}i_{2}j_{1}j_{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+\begin_inset Formula $E_{\left(w_{1}i_{1}j_{1}\right)\left(w_{2}i_{2}j_{2}\right)}+=M_{i_{1}i_{2}}^{*m}NO_{\left(w_{1}j_{1}\right)\left(w_{2}j_{2}\right)}^{m}$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\end_deeper
+\end_deeper
+\begin_layout Standard
+Steps 2a and 2b can be isloated into a subroutine for calculating 
+\begin_inset Formula $N$
+\end_inset
+
+ as this will be reused for the extremum calcultion below.
+\end_layout
+
+\begin_layout Subsubsection
+Extremum WRT one site
+\end_layout
+
+\begin_layout Standard
+Again we can ask what is
+\begin_inset Formula 
+\[
+\frac{\partial\left\langle \psi\right|\hat{O}\left|\psi\right\rangle }{\partial M_{j_{a-1}j_{a}}^{*n_{a}}}
+\]
+
+\end_inset
+
+We need an unflattened version of 
+\begin_inset Formula $\left\langle \psi\right|\hat{O}\left|\psi\right\rangle $
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left\langle \psi\right|\hat{O}\left|\psi\right\rangle =\sum_{\left\{ i\right\} =1}^{D}\sum_{\left\{ j\right\} =1}^{D}\sum_{\left\{ w\right\} =1}^{D_{w}}\left(\sum_{m_{1}n_{1}}M_{1i_{1}}^{*m_{1}}W_{1w_{1}}^{m_{1}n_{1}}M_{1j_{1}}^{n_{1}}\right)\left(\sum_{m_{2}n_{2}}M_{i_{1}i_{2}}^{*m_{2}}W_{w_{1}w_{2}}^{m_{2}n_{2}}M_{j_{1}j_{2}}^{n_{2}}\right)\cdots\left(\sum_{m_{L}n_{L}}M_{i_{L-1}1}^{*m_{L}}W_{w_{L-1}1}^{m_{L}n_{L}}M_{j_{L-1}1}^{n_{L}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ i\right\} =1}^{D}\sum_{\left\{ j\right\} =1}^{D}\sum_{\left\{ w\right\} =1}^{D_{w}}EO_{\left(111\right)\left(w_{1}i_{1}j_{1}\right)}^{1}EO_{\left(w_{1}i_{1}j_{1}\right)\left(w_{2}i_{2}j_{2}\right)}^{2}\cdots EO_{\left(w_{L-1}i_{L-1}j_{_{L-1}}\right)\left(111\right)}^{L}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{\partial EO_{\left(w_{a-1}i_{a-1}j_{a-1}\right)\left(w_{a}i_{a}j_{a}\right)}^{a}}{\partial M_{i_{a-1}i_{a}}^{*m_{a}}}=\frac{\partial}{\partial M_{k_{a-1}k_{a}}^{*m_{a}}}\sum_{m_{a}n_{a}}M_{i_{a-1}i_{a}}^{*m_{a}}W_{w_{a-1}w_{a}}^{m_{a}n_{a}}M_{j_{a-1}j_{a}}^{n_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{n_{a}}W_{w_{a-1}w_{a}}^{m_{a}n_{a}}M_{j_{a-1}j_{a}}^{n_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathcal{H}_{i_{a-1}i_{1}}^{m_{a}}=\frac{\partial\left\langle \psi\right|\hat{O}\left|\psi\right\rangle }{\partial M_{i_{a-1}i_{a}}^{*m_{a}}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+=\sum_{w_{a-1}w_{a}=1}^{D_{w}}\sum_{j_{a-1}j_{a}=1}^{D}EO_{\left(111\right)\left(w_{a-1}i_{a-1}j_{a-1}\right)}^{left}\left(\sum_{n_{a}}^{p}W_{w_{a-1}w_{a}}^{m_{a}n_{a}}M_{j_{a-1}j_{a}}^{n_{a}}\right)EO_{\left(w_{a}i_{a}j_{a}\right)\left(111\right)}^{right}\label{eq:HeffJR}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{n_{a}j_{a-1}j_{a}}H_{\left(m_{a}i_{a-1}i_{a}\right)\left(n_{a}j_{a-1}j_{a}\right)}^{eff}M_{\left(n_{a}j_{a-1}j_{a}\right)}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+H_{\left(m_{a}i_{a-1}i_{a}\right)\left(n_{a}j_{a-1}j_{a}\right)}^{eff}=\sum_{w_{a-1}w_{a}=1}^{D_{w}}EO_{\left(111\right)\left(w_{a-1}i_{a-1}j_{a-1}\right)}^{left}W_{w_{a-1}w_{a}}^{m_{a}n_{a}}EO_{\left(w_{a}i_{a}j_{a}\right)\left(111\right)}^{right}
+\]
+
+\end_inset
+
+removing the 
+\begin_inset Formula $a$
+\end_inset
+
+ index for coding
+\begin_inset Formula 
+\[
+H_{\left(mi_{1}i_{2}\right)\left(nj_{1}j_{2}\right)}^{eff}=\sum_{w_{1}w_{2}=1}EO_{\left(111\right)\left(w_{1}i_{1}j_{1}\right)}^{left}W_{w_{1}w_{2}}^{mn}EO_{\left(w_{2}j_{2}i_{2}\right)\left(111\right)}^{right}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is how Schollwöck writes this (LHS of eq 209) expression
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\left\langle \psi\right|\hat{O}\left|\psi\right\rangle }{\partial M_{a_{l-1}a_{l}}^{*\sigma_{l}}}=\sum_{\sigma'_{l}}^{p}\sum_{a'_{l-1}a'_{l}}^{D}\sum_{b_{l-1}b_{l}}^{D_{w}}L_{b_{l-1}}^{a_{l-1}a'_{l-1}}W_{b_{l-1}b_{l}}^{\sigma_{l}\sigma'_{l}}R_{b_{l}}^{a_{l}a'_{l}}M_{a'_{l-1}a'_{l}}^{\sigma'_{l}}\label{eq:HeffSchollwock}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{b_{l-1}b_{l}}^{D_{w}}\sum_{a'_{l-1}a'_{l}}^{D}L_{b_{l-1}}^{a_{l-1}a'_{l-1}}\left(\sum_{\sigma'_{l}}^{p}W_{b_{l-1}b_{l}}^{\sigma_{l}\sigma'_{l}}M_{a'_{l-1}a'_{l}}^{\sigma'_{l}}\right)R_{b_{l}}^{a_{l}a'_{l}}
+\]
+
+\end_inset
+
+Substitute 
+\begin_inset Formula $b_{l-1}\rightarrow w_{a-1}$
+\end_inset
+
+, 
+\begin_inset Formula $b_{l}\rightarrow w_{a}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{i_{a-1}i_{a}}^{D_{w}}\sum_{a'_{l-1}a'_{l}}^{D}L_{w_{a-1}}^{a_{l-1}a'_{l-1}}\left(\sum_{\sigma'_{l}}^{p}W_{w_{a-1}w_{a}}^{\sigma_{l}\sigma'_{l}}M_{a'_{l-1}a'_{l}}^{\sigma'_{l}}\right)R_{w_{a}}^{a_{l}a'_{l}}
+\]
+
+\end_inset
+
+Substitute 
+\begin_inset Formula $a'_{l-1}\rightarrow j_{a-1}$
+\end_inset
+
+, 
+\begin_inset Formula $a'_{l}\rightarrow j_{a}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{w_{a-1}w_{a}}^{D_{w}}\sum_{j_{a-1}j{}_{a}}^{D}L_{w_{a-1}}^{a_{l-1}j{}_{a-1}}\left(\sum_{\sigma'_{l}}^{p}W_{w_{a-1}w_{a}}^{\sigma_{l}\sigma'_{l}}M_{w_{a-1}j{}_{a}}^{\sigma'_{l}}\right)R_{i_{a}}^{a_{l}j{}_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\sigma'_{l}}^{p}\sum_{w_{a-1}w_{a}}^{D_{w}}\sum_{j_{a-1}j{}_{a}}^{D}L_{w_{a-1}}^{a_{l-1}j{}_{a-1}}W_{w_{a-1}w_{a}}^{\sigma_{l}\sigma'_{l}}R_{w_{a}}^{a_{l}j{}_{a}}M_{j_{a-1}j{}_{a}}^{\sigma'_{l}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{n}^{p}\sum_{w_{1}w_{2}}^{D_{w}}\sum_{j_{1}j{}_{2}}^{D}L_{w_{1}}^{i_{1}j{}_{1}}W_{w_{1}w_{2}}^{mn}R_{w_{2}}^{i_{2}j{}_{2}}M_{j_{1}j{}_{2}}^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=H_{\left(mi_{1}i_{2}\right)\left(nj_{1}j_{2}\right)}^{eff}M_{j_{a-1}j{}_{a}}^{n}
+\]
+
+\end_inset
+
+We can keep substituting, but it sure looks like they match.
+ Before eq 208 he has
+\begin_inset Formula 
+\[
+H_{\left(\sigma_{l}a_{l-1}a_{l}\right)\left(\sigma'_{l}a'_{l-1}a'_{l}\right)}^{eff}=\sum_{b_{l}b_{l-1}}L_{b_{l-1}}^{a_{l-1}a'_{l-1}}W_{b_{l-1}b_{l}}^{\sigma\sigma'}R_{b_{l}}^{a_{l}a'_{l}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+H_{\left(mi_{1}i_{2}\right)\left(nj_{1}j_{2}\right)}^{eff}=\sum_{w_{1}w_{2}}L_{w_{1}}^{i_{1}j_{1}}W_{w_{1}w_{2}}^{mn}R_{w_{2}}^{i_{2}j_{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+H_{\left(mi_{1}i_{2}\right)\left(nj_{1}j_{2}\right)}^{eff}=\sum_{w_{1}w_{2}}N_{w_{1}i_{1}j_{1}}^{left}W_{w_{1}w_{2}}^{mn}N_{w_{2}i_{2}j_{2}}^{right}
+\]
+
+\end_inset
+
+For efficiency we should do
+\begin_inset Formula 
+\[
+H_{\left(mi_{1}i_{2}\right)\left(nj_{1}j_{2}\right)}^{eff}=\sum_{w_{1}}N_{w_{1}i_{1}j_{1}}^{left}\left(\sum_{w_{2}}W_{w_{1}w_{2}}^{mn}N_{w_{2}i_{2}j_{2}}^{right}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It is not clear to me that this is a Harmitian matrix
+\begin_inset Formula 
+\[
+H_{\left(mi_{1}i_{2}\right)\left(nj_{1}j_{2}\right)}^{eff}=H_{\left(nj_{1}j_{2}\right)\left(mi_{1}i_{2}\right)}^{eff^{*}}
+\]
+
+\end_inset
+
+If this does not hold then the eigen value will in general be complex, in
+ which case how do you decide which eigenvalue is the lowest?
+\end_layout
+
+\begin_layout Standard
+Either way we can test 
+\begin_inset Formula $H^{eff}$
+\end_inset
+
+ by contracting
+\begin_inset Formula 
+\begin{equation}
+E=\sum_{mn}\sum_{\left\{ ij\right\} }M_{i_{1}i_{2}}^{*m}H_{\left(mi_{1}i_{2}\right)\left(nj_{1}j_{2}\right)}^{eff}M_{j_{1}j_{2}}^{n}\label{eq:Heff Contraction}
+\end{equation}
+
+\end_inset
+
+take the complex conjugate of both sides (
+\begin_inset Formula $E$
+\end_inset
+
+ is of course real)
+\begin_inset Formula 
+\[
+E=\sum_{mn}\sum_{\left\{ ij\right\} }M_{i_{1}i_{2}}^{m}H_{\left(mi_{1}i_{2}\right)\left(nj_{1}j_{2}\right)}^{eff^{*}}M_{j_{1}j_{2}}^{*n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+E=\sum_{mn}\sum_{\left\{ ij\right\} }M_{j_{1}j_{2}}^{*n}H_{\left(mi_{1}i_{2}\right)\left(nj_{1}j_{2}\right)}^{eff^{*}}M_{i_{1}i_{2}}^{m}
+\]
+
+\end_inset
+
+now swap indicies 
+\begin_inset Formula $m\Leftrightarrow n,\:i_{1}\Leftrightarrow j_{1},\:i_{2}\Leftrightarrow j_{2}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+E=\sum_{mn}\sum_{\left\{ ij\right\} }M_{i_{1}i_{2}}^{*m}H_{\left(nj_{1}j_{2}\right)\left(mi_{1}i_{2}\right)}^{eff^{*}}M_{j_{1}j_{2}}^{n}
+\]
+
+\end_inset
+
+comparing with eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Heff Contraction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ we see that
+\begin_inset Formula 
+\[
+H_{\left(mi_{1}i_{2}\right)\left(nj_{1}j_{2}\right)}^{eff}=H_{\left(nj_{1}j_{2}\right)\left(mi_{1}i_{2}\right)}^{eff^{*}}
+\]
+
+\end_inset
+
+which the Hermicity condition.
+\end_layout
+
+\begin_layout Standard
+He recommend building the 
+\begin_inset Formula $L$
+\end_inset
+
+ and 
+\begin_inset Formula $R$
+\end_inset
+
+ tensors recursively, starting with
+\begin_inset Formula 
+\[
+F_{i_{1}w_{1}j_{1}}^{[1]}=\sum_{m_{1}n_{1}}\sum_{i_{0}w_{0}j_{0}}W_{w_{0}w_{1}}^{[1]m_{1}n_{1}}\left(A^{[1]m_{1}\dagger}\right)_{i_{1}i_{0}}F_{i_{0}w_{0}j_{0}}^{[0]}A_{j_{0}j_{1}}^{[1]n_{1}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $F^{[0]}=1$
+\end_inset
+
+ is a dummy scalar with 
+\begin_inset Formula $i_{0}w_{0}j_{0}$
+\end_inset
+
+ only taking value of 1, to kick off the iterations.
+ Now
+\begin_inset Formula 
+\[
+F_{i_{a}w_{a}j_{a}}^{[a]}=\sum_{m_{a}n_{a}}\sum_{i_{a-1}w_{a-1}j_{a-1}}W_{w_{a-1}w_{a}}^{[a]m_{a}n_{a}}\left(A^{[a]m_{a}\dagger}\right)_{i_{a}i_{a-1}}F_{i_{a-1}w_{a-1}j_{a-1}}^{[a-1]}A_{j_{a-1}j_{a}}^{[a]n_{a}}
+\]
+
+\end_inset
+
+He now recommends optimal bracketing
+\begin_inset Formula 
+\[
+F_{i_{a}w_{a}j_{a}}^{[a]}=\sum_{m_{a}}\sum_{i_{a-1}}\left(A^{[a]m_{a}\dagger}\right)_{i_{a}i_{a-1}}\left[\sum_{n_{a}}\sum_{w_{a-1}}W_{w_{a-1}w_{a}}^{[a]m_{a}n_{a}}\left(\sum_{j_{a-1}}F_{i_{a-1}w_{a-1}j_{a-1}}^{[a-1]}A_{j_{a-1}j_{a}}^{[a]n_{a}}\right)\right]
+\]
+
+\end_inset
+
+I prefer to get rid of the 
+\begin_inset Formula $a$
+\end_inset
+
+ subscripts for coding purposes
+\begin_inset Formula 
+\[
+F_{i_{2}w_{2}j_{2}}^{[a]}=\sum_{m}\sum_{i_{1}}\left(A^{[a]m\dagger}\right)_{i_{2}i_{1}}\left[\sum_{n}\sum_{w_{1}}W_{w_{1}w_{2}}^{[a]mn}\left(\sum_{j_{1}}F_{i_{1}w_{1}j_{1}}^{[a-1]}A_{j_{1}j_{2}}^{[a]n}\right)\right]
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{m}\sum_{i_{1}}A_{i_{1}i_{2}}^{[a]m*}\left[\sum_{n}\sum_{w_{1}}W_{w_{1}w_{2}}^{[a]mn}\left(\sum_{j_{1}}F_{i_{1}w_{1}j_{1}}^{[a-1]}A_{j_{1}j_{2}}^{[a]n}\right)\right]
+\]
+
+\end_inset
+
+I also like 
+\begin_inset Formula $w$
+\end_inset
+
+ indicies for come first
+\begin_inset Formula 
+\[
+F_{w_{2}i_{2}j_{2}}^{[a]}=\sum_{m}\sum_{i_{1}}A_{i_{1}i_{2}}^{[a]m*}\left[\sum_{n}\sum_{w_{1}}W_{w_{1}w_{2}}^{[a]mn}\left(\sum_{j_{1}}F_{w_{1}i_{1}j_{1}}^{[a-1]}A_{j_{1}j_{2}}^{[a]n}\right)\right]
+\]
+
+\end_inset
+
+For coding we can define
+\begin_inset Formula 
+\[
+FA_{w_{1}i_{1}j_{2}}^{n}=\sum_{j_{1}}F_{i_{1}w_{1}j_{1}}^{[a-1]}A_{j_{1}j_{2}}^{[a]n},\;O\left(D\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+WFA_{w_{2}i_{1}j_{2}}^{m}=\sum_{n}\sum_{w_{1}}W_{w_{1}w_{2}}^{[a]mn}FA_{w_{1}i_{1}j_{2}},\;O\left(pD_{w}D\right)\label{eq:WFA contraction}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+F_{w_{2}i_{2}j_{2}}^{[a]}=\sum_{m}\sum_{i_{1}}A_{i_{1}i_{2}}^{[a]m*}WFA_{w_{2}i_{1}j_{2}}^{m},\;O\left(p^{2}D_{w}D^{2}\right)
+\]
+
+\end_inset
+
+Or alternately:
+\begin_inset Formula 
+\[
+F_{w_{2}i_{2}j_{2}}^{[a]}=\sum_{n}\sum_{m}\sum_{w_{1}}W_{w_{1}w_{2}}^{[a]mn}\left[\sum_{i_{1}}A_{i_{1}i_{2}}^{[a]m*}\left(\sum_{j_{1}}F_{w_{1}i_{1}j_{1}}^{[a-1]}A_{j_{1}j_{2}}^{[a]n}\right)\right]
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+AFA_{i_{2}j_{2}}^{mn}=\sum_{i_{1}}A_{i_{1}i_{2}}^{[a]m*}FA_{w_{1}i_{1}j_{2}}^{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+What about going right to left?
+\begin_inset Formula 
+\[
+F_{i_{L-1}w_{L-1}j_{L-1}}^{[L]}=\sum_{m_{L}n_{L}}\sum_{i_{L}w_{L}j_{L}}W_{w_{L-1}w_{L}}^{[L]m_{L}n_{L}}\left(B^{[L]m_{L}\dagger}\right)_{i_{L}i_{L-1}}F_{i_{L}w_{L}j_{L}}^{[0]}B_{j_{L-1}j_{L}}^{[L]n_{L}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+F_{i_{L-1}w_{L-1}j_{L-1}}^{[L]}=\sum_{m_{L}n_{L}}\sum_{i_{L}w_{L}j_{L}}W_{w_{L-1}w_{L}}^{[L]m_{L}n_{L}}B_{i_{L-1}i_{L}}^{[L]m_{L}*}F_{i_{L}w_{L}j_{L}}^{[0]}B_{j_{L-1}j_{L}}^{[L]n_{L}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+F_{i_{a-1}w_{a-1}j_{a-1}}^{[a]}=\sum_{m_{a}n_{a}}\sum_{i_{a}w_{a}j_{a}}W_{w_{a-1}w_{a}}^{[a]m_{a}n_{a}}B_{i_{a-1}i_{a}}^{[a]m_{a}*}F_{i_{a}w_{a}j_{a}}^{[a+1]}B_{j_{a-1}j_{a}}^{[a]n_{a}}
+\]
+
+\end_inset
+
+Remove the 
+\begin_inset Formula $a$
+\end_inset
+
+'s
+\begin_inset Formula 
+\[
+F_{i_{1}w_{1}j_{1}}^{[a]}=\sum_{mn}\sum_{i_{2}w_{2}j_{2}}W_{w_{1}w_{2}}^{[a]mn}B_{i_{1}i_{2}}^{[a]m*}F_{i_{2}w_{2}j_{2}}^{[a+1]}B_{j_{1}j_{2}}^{[a]n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{m}\sum_{i_{2}}B_{i_{1}i_{2}}^{[a]m*}\left[\sum_{nw_{2}}W_{w_{1}w_{2}}^{[a]mn}\left(\sum_{j_{2}}F_{i_{2}w_{2}j_{2}}^{[a+1]}B_{j_{1}j_{2}}^{[a]n}\right)\right]
+\]
+
+\end_inset
+
+Not sure if we can reuse code here, all the lower indicies are reversed.
+\begin_inset Formula 
+\[
+FB_{w_{2}i_{2}j_{1}}^{n}=\sum_{j_{2}}F_{i_{2}w_{2}j_{2}}^{[a+1]}B_{j_{1}j_{2}}^{[a]n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+WFB_{w_{1}i_{2}j_{1}}^{m}=\sum_{nw_{2}}W_{w_{1}w_{2}}^{[a]mn}FB_{w_{2}i_{2}j_{1}}^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+F_{i_{1}w_{1}j_{1}}^{[a]}=\sum_{m}\sum_{i_{2}}B_{i_{1}i_{2}}^{[a]m*}WFB_{w_{1}i_{2}j_{1}}^{m}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Two operators
+\end_layout
+
+\begin_layout Standard
+Fof convergence tests we need
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left\langle \psi\right|\hat{H}^{2}\left|\psi\right\rangle =\left\langle \psi\right|\hat{\boldsymbol{W}^{1}}\hat{\boldsymbol{W}^{2}}\cdots\hat{\boldsymbol{W}^{L}}\hat{\boldsymbol{W}^{1}}\hat{\boldsymbol{W}^{2}}\cdots\hat{\boldsymbol{W}^{L}}\left|\psi\right\rangle 
+\]
+
+\end_inset
+
+The best way to sort this type of thing out is to draw a tensor network
+ diagram, for this we see that we get a new set of quantum numers to sum
+ over.
+ I used 
+\begin_inset Formula $o_{a}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left\langle \psi\right|\hat{H}^{2}\left|\psi\right\rangle =\sum_{\left\{ i\right\} =1}^{D}\sum_{\left\{ j\right\} =1}^{D}\sum_{\left\{ wv\right\} =1}^{D_{w}}\left(\sum_{m_{1}n_{1}o_{1}}M_{1i_{1}}^{*m_{1}}W_{1w_{1}}^{m_{1}o_{1}}W_{1v_{1}}^{o_{1}n_{1}}M_{1j_{1}}^{n_{1}}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\times\left(\sum_{m_{2}n_{2}o_{2}}M_{i_{1}i_{2}}^{*m_{2}}W_{w_{1}w_{2}}^{m_{2}o_{2}}W_{v_{1}v_{2}}^{o_{2}n_{2}}M_{j_{1}j_{2}}^{n_{2}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\cdots\times\left(\sum_{m_{L}n_{L}o_{L}}M_{i_{L-1}1}^{*m_{L}}W_{w_{L-1}1}^{m_{L}o_{L}}W_{v_{L-1}1}^{o_{L}n_{L}}M_{j_{L-1}1}^{n_{L}}\right)
+\]
+
+\end_inset
+
+The recursion relations will look like this
+\begin_inset Formula 
+\[
+F_{w_{2}v_{2}i_{2}j_{2}}^{[a]}=\sum_{m}\sum_{i_{1}}A_{i_{1}i_{2}}^{[a]m*}\left[\sum_{no}\sum_{w_{1}v_{1}}W_{w_{1}w_{2}}^{[a]mo}W_{v_{1}v_{2}}^{[a]on}\left(\sum_{j_{1}}F_{w_{1}v_{1}i_{1}j_{1}}^{[a-1]}A_{j_{1}j_{2}}^{[a]n}\right)\right]
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+F_{w_{2}v_{2}i_{2}j_{2}}^{[a]}=\sum_{m}\sum_{i_{1}}A_{i_{1}i_{2}}^{[a]m*}\left\{ \sum_{o}\sum_{w_{1}}W_{w_{1}w_{2}}^{[a]mo}\left[\sum_{n}\sum_{v_{1}}W_{v_{1}v_{2}}^{[a]on}\left(\sum_{j_{1}}F_{w_{1}v_{1}i_{1}j_{1}}^{[a-1]}A_{j_{1}j_{2}}^{[a]n}\right)\right]\right\} 
+\]
+
+\end_inset
+
+In software we can't reuse the 
+\begin_inset Formula $WFA$
+\end_inset
+
+ contraction from eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:WFA contraction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ becuase now 
+\begin_inset Formula $F^{[a-1]}$
+\end_inset
+
+ has 4 indicies instead of three, and therefore
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+F_{w_{2}v_{2}i_{2}j_{2}}^{[a]}=\sum_{m}\sum_{i_{1}}A_{i_{1}i_{2}}^{[a]m*}WWFA_{w_{2}v_{2}i_{1}j_{2}}^{m}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+WWFA_{w_{2}v_{2}i_{1}j_{2}}^{m}=\sum_{o}\sum_{w_{1}}W_{w_{1}w_{2}}^{[a]mo}WFA_{w_{1}v_{2}i_{1}j_{2}}^{o}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+WFA_{w_{1}v_{2}i_{1}j_{2}}^{o}=\sum_{n}\sum_{v_{1}}W_{v_{1}v_{2}}^{[a]on}FA_{w_{1}v_{1}i_{1}j_{2}}^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+FA_{w_{1}v_{1}i_{1}j_{2}}^{n}=\sum_{j_{1}}F_{w_{1}v_{1}i_{1}j_{1}}^{[a-1]}A_{j_{1}j_{2}}^{[a]n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Reduced Density Matrix
+\end_layout
+
+\begin_layout Standard
+The density operator
+\begin_inset Formula 
+\[
+\left|\psi\right\rangle \left\langle \psi\right|=\sum_{\left\{ mn\right\} }a_{m_{1}m_{2}\cdots m_{L}}^{\dagger}a_{n_{1}n_{2}\cdots n_{L}}\left|m_{1}m_{2}\cdots m_{L}\right\rangle \left\langle n_{1}n_{2}\cdots n_{L}\right|
+\]
+
+\end_inset
+
+can be partially traced over all sites except one
+\begin_inset Formula 
+\[
+\hat{\rho}_{1}=\sum_{\left\{ n'\right\} }\left\langle n'_{2}n'_{3}\cdots n'_{L}\right|\left|\psi\right\rangle \left\langle \psi\right|\left|n'_{2}n'_{3}\cdots n'_{L}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{m_{1}n_{1}}\sum_{\left\{ n'\right\} }a_{m_{1}n'_{2}\cdots n'_{L}}^{\dagger}a_{n_{1}n'_{2}\cdots n'_{L}}\left|m_{1}\right\rangle \left\langle n_{1}\right|
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{m_{1}n_{1}}\rho_{1}^{m_{1}n_{1}}\left|m_{1}\right\rangle \left\langle n_{1}\right|
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\rho_{1}^{m_{1}n_{1}}=\sum_{\left\{ n'\right\} }a_{m_{1}n'_{2}\cdots n'_{L}}^{\dagger}a_{n_{1}n'_{2}\cdots n'_{L}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{n_{L}=1}^{p}\boldsymbol{M}^{n_{L}^{\dagger}}\cdots\left\{ \sum_{n_{3}=1}^{p}\boldsymbol{M}^{n_{3}^{\dagger}}\left[\sum_{n_{2}=1}^{p}\boldsymbol{M}^{n_{2}^{\dagger}}\left(\boldsymbol{M}^{m_{1}^{\dagger}}\boldsymbol{M}^{n_{1}}\right)\boldsymbol{M}^{n_{2}}\right]\boldsymbol{M}^{n_{3}}\right\} \cdots\boldsymbol{M}^{n_{L}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ ij\right\} }\sum_{n_{L}=1}^{p}M_{i_{L}i_{L-1}}^{n_{L}^{\dagger}}\cdots\left\{ \sum_{n_{3}=1}^{p}M_{i_{3}i_{2}}^{n_{3}^{\dagger}}\left[\sum_{n_{2}=1}^{p}M_{i_{2}i_{1}}^{n_{2}^{\dagger}}\left(M_{i_{1}1}^{m_{1}^{\dagger}}M_{1j_{1}}^{n_{1}}\right)M_{j_{1}j_{2}}^{n_{2}}\right]M_{j_{2}j_{3}}^{n_{3}}\right\} \cdots M_{j_{L-1}j_{L}}^{n_{L}}
+\]
+
+\end_inset
+
+Starting the recursion with
+\begin_inset Formula 
+\[
+F_{i_{1}j_{1}}^{[1]m_{1}n_{1}}=M_{i_{1}1}^{m_{1}^{\dagger}}M_{1j_{1}}^{n_{1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+F_{i_{2}j_{2}}^{[2]m_{1}n_{1}}=\sum_{i_{1}j_{1}}\sum_{n_{2}=1}^{p}M_{i_{2}i_{1}}^{n_{2}^{\dagger}}F_{i_{1}j_{1}}^{[1]m_{1}n_{1}}M_{j_{1}j_{2}}^{n_{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Software Plan
+\end_layout
+
+\begin_layout Subsection
+1D chain
+\end_layout
+
+\begin_layout Standard
+At each step in this process we need to make unit ttests for every little
+ advance.
+ This will make refactoring so much easier.
+ Start with something simple, 
+\begin_inset Formula $1D$
+\end_inset
+
+ Heisenberg chain for general spin 
+\begin_inset Formula $S$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Set up a variational wave function for spin 
+\begin_inset Formula $S,p=2S+1$
+\end_inset
+
+, 
+\begin_inset Formula $L$
+\end_inset
+
+ lattice sites, 
+\begin_inset Formula $D$
+\end_inset
+
+ internal indicies on every site.
+\end_layout
+
+\begin_layout Enumerate
+Load it up with a simple product state for initialiazation.
+ This turns out to be non trival, in particular getting a normalized result
+ for Left, Right and total overlap.
+\end_layout
+
+\begin_layout Enumerate
+Calculate the overlap
+\end_layout
+
+\begin_layout Enumerate
+Calculate partial contration over all sites except 1.
+\end_layout
+
+\begin_layout Enumerate
+Create Hamiltonian and MPO classes.
+\end_layout
+
+\begin_layout Enumerate
+SVD going for complex matrices.
+\end_layout
+
+\begin_layout Enumerate
+Do left normalization with auto re-shaping if rank is lower than D.
+\end_layout
+
+\begin_layout Enumerate
+Make a recursive state dump function, for displaying states on the screen.
+\end_layout
+
+\begin_layout Enumerate
+Sweep the lattice and find a ground state.
+\end_layout
+
+\begin_layout Standard
+Once this is in hand we can think about other features
+\end_layout
+
+\begin_layout Itemize
+SVD compression
+\end_layout
+
+\begin_layout Itemize
+Imaginary time dynamics
+\end_layout
+
+\begin_layout Itemize
+How to visualize results
+\end_layout
+
+\begin_layout Itemize
+Measure entanglement entropy, correlations
+\end_layout
+
+\begin_layout Itemize
+find excitied states.
+ Can we see a Haldane gap for 
+\begin_inset Formula $S=1$
+\end_inset
+
+?
+\end_layout
+
+\begin_layout Itemize
+Make a wxPy GUI
+\end_layout
+
+\begin_layout Itemize
+Can we generalize the Hamiltonian in software, ie go from 
+\begin_inset Formula $\left\{ J_{z},J_{x},J_{y},\vec{H}_{ext}\right\} \longrightarrow\mathcal{H}_{a}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Try DMRG
+\end_layout
+
+\begin_layout Standard
+At his point we would be in a good possition to do a major OOD refactoring.
+ Figure out how to use abstract base classes as much as possible, in order
+ to control dependencies, etc.
+\end_layout
+
+\end_body
+\end_document

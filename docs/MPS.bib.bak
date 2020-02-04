@@ -1,0 +1,83 @@
+% Encoding: UTF-8
+
+@Misc{Woit1,
+  author = {Peter Woit},
+  title  = {Is Quantum Mechanics a Probabilistic Theory?},
+  year   = {2018},
+  note   = {https://www.math.columbia.edu/~woit/wordpress/?p=10533},
+  url    = {https://www.math.columbia.edu/~woit/wordpress/?p=10533},
+}
+
+@Misc{Neumaier2019,
+  author      = {Arnold Neumaier},
+  title       = {Foundations of quantum physics IV. More on the thermal interpretation},
+  abstract    = {This paper continues the discussion of the thermal interpretation of quantum physics. While Part II and Part III of this series of papers explained and justified the reasons for the departure from tradition, the present Part IV summarizes the main features and adds intuitive explanations and new technical developments. It is shown how the spectral features of quantum systems and an approximate classical dynamics arise under appropriate conditions. Evidence is given for how, in the thermal interpretation, the measurement of a qubit by a pointer q-expectation may result in a binary detection event with probabilities given by the diagonal entries of the reduced density matrix of the prepared qubit. Differences in the conventions about measurement errors in the thermal interpretation and in traditional interpretations are discussed in detail. Several standard experiments, the double slit, Stern--Gerlach, and particle decay are described from the perspective of the thermal interpretation.},
+  date        = {2019-04-29},
+  eprint      = {1904.12721v2},
+  eprintclass = {quant-ph},
+  eprinttype  = {arXiv},
+  file        = {online:http\://arxiv.org/pdf/1904.12721v2:PDF},
+  keywords    = {quant-ph, physics.hist-ph, 81P15},
+}
+
+@Misc{Neumaier2019a,
+  author        = {Arnold Neumaier},
+  title         = {Foundations of quantum physics I. A critique of the tradition},
+  abstract      = {This paper gives a thorough critique of the foundations of quantum physics in its mainstream interpretation (i.e., treating pure states as primitives, without reference to hidden variables, and without modifications of the quantum laws). This is achieved by cleanly separating a concise version of the (universally accepted) formal core of quantum physics from the (controversial) interpretation issues. The latter are primarily related to measurement, but also to questions of existence and of the meaning of basic concepts like 'state' and 'particle'. The requirements for good foundations of quantum physics are discussed. Main results: * Born's rule cannot be valid universally, and must be considered as a scientific law with a restricted domain of validity. * If the state of every composite quantum system contains all information that can be known about this system, it cannot be a pure state in general.},
+  archiveprefix = {arXiv},
+  date          = {2019-02-27},
+  eprint        = {1902.10778v2},
+  eprintclass   = {quant-ph},
+  eprinttype    = {arXiv },
+  file          = {online:http\://arxiv.org/pdf/1902.10778v2:PDF},
+  keywords      = {quant-ph, physics.hist-ph, 81P10},
+}
+
+@Misc{Neumaier2019b,
+  author      = {Arnold Neumaier},
+  title       = {Foundations of quantum physics III. Measurement},
+  abstract    = {This paper presents the measurement problem from the point of view of the thermal interpretation of quantum physics introduced in Part II. The measurement of a Hermitian quantity $A$ is regarded as giving an uncertain value approximating the q-expectation $\langle A\rangle$ rather than (as tradition wanted to have it) as an exact revelation of an eigenvalue of $A$. Single observations of microscopic systems are (except under special circumstances) very uncertain measurements only. The thermal interpretation * treats detection events as a statistical measurement of particle beam intensity. * claims that the particle concept is only asymptotically valid, under conditions where particles are essentially free. * claims that the unmodeled environment influences the results enough to cause all randomness in quantum physics. * allows one to derive Born's rule for scattering and in the limit of ideal measurements; but in general, only part of Born's rule holds exactly: Whenever a quantity A with zero uncertainty is measured exactly, its value is an eigenvalue of A. * has no explicit collapse -- the latter emerges approximately in non-isolated subsystems. * gives a valid interpretation of systems modeled by a quantum-classical dynamics. * explains the peculiar features of the Copenhagen interpretation (lacking realism between measurements) and the minimal statistical interpretation (lacking realism for the single case) where these interpretations apply -- in the microscopic domain. The thermal interpretation is an interpretation of quantum physics that is in principle refutable by theoretical arguments leading to a negative answer to a number of open issues collected at the end of the paper, since there is plenty of experimental evidence for each of the points mentioned there.},
+  date        = {2019-02-27},
+  eprint      = {1902.10782v2},
+  eprintclass = {quant-ph},
+  eprinttype  = {arXiv},
+  file        = {online:http\://arxiv.org/pdf/1902.10782v2:PDF},
+  keywords    = {quant-ph, 81P15},
+}
+
+@Misc{Neumaier2019c,
+  author        = {Arnold Neumaier},
+  title         = {Foundations of quantum physics II. The thermal interpretation},
+  __markedentry = {[MER:6]},
+  abstract      = {This paper presents the thermal interpretation of quantum physics. The insight from Part I of this series that Born's rule has its limitations -- hence cannot be the foundation of quantum physics -- opens the way for an alternative interpretation -- the thermal interpretation of quantum physics. It gives new foundations that connect quantum physics (including quantum mechanics, statistical mechanics, quantum field theory and their applications) to experiment. The thermal interpretation resolves the problems of the foundations of quantum physics revealed in the critique from Part I of this series. It improves the traditional foundations in several respects: * The thermal interpretation reflects the actual practice of quantum physics, especially regarding its macroscopic implications. * The thermal interpretation gives a fair account of the interpretational differences between quantum mechanics and quantum field theory. * The thermal interpretation gives a natural, realistic meaning to the standard formalism of quantum mechanics and quantum field theory in a single world, without introducing additional hidden variables. * The thermal interpretation is independent of the measurement problem. The latter becomes a precise problem in statistical mechanics rather than a fuzzy and problematic notion in the foundations. Details will be discussed in Part III.},
+  date          = {2019-02-27},
+  eprint        = {1902.10779v2},
+  eprintclass   = {quant-ph},
+  eprinttype    = {arXiv},
+  file          = {online:http\://arxiv.org/pdf/1902.10779v2:PDF},
+  keywords      = {quant-ph, 81P05},
+}
+
+@Misc{Neumaier2019d,
+  author      = {Arnold Neumaier},
+  title       = {Foundations of quantum physics V. Coherent foundations},
+  abstract    = {This paper is a programmatic article presenting an outline of a new view of the foundations of quantum mechanics and quantum field theory. In short, the proposed foundations are given by the following statements: * Coherent quantum physics is physics in terms of a coherent space consisting of a line bundle over a classical phase space and an appropriate coherent product. * The kinematical structure of quantum physics and the meaning of the fundamental quantum observables are given by the symmetries of this coherent space, their infinitesimal generators, and associated operators on the quantum space of the coherent space. * The connection of quantum physics to experiment is given through the thermal interpretation. The dynamics of quantum physics is given (for isolated systems) by the Ehrenfest equations for q-expectations.},
+  date        = {2019-05-02},
+  eprint      = {1905.00920v2},
+  eprintclass = {quant-ph},
+  eprinttype  = {arXiv},
+  file        = {online:http\://arxiv.org/pdf/1905.00920v2:PDF},
+  keywords    = {quant-ph, math-ph, math.MP, 81P05},
+}
+
+@Article{Scholl-1,
+  author   = {Ulrich Schollwoeck},
+  title    = {The density-matrix renormalization group in the age of matrix product states},
+  journal  = {Annals of Physics 326(1)},
+  year     = {2010},
+  abstract = {The density-matrix renormalization group method (DMRG) has established itself over the last decade as the leading method for the simulation of the statics and dynamics of one-dimensional strongly correlated quantum lattice systems. In the further development of the method, the realization that DMRG operates on a highly interesting class of quantum states, so-called matrix product states (MPS), has allowed a much deeper understanding of the inner structure of the DMRG method, its further potential and its limitations. In this paper, I want to give a detailed exposition of current DMRG thinking in the MPS language in order to make the advisable implementation of the family of DMRG algorithms in exclusively MPS terms transparent. I then move on to discuss some directions of potentially fruitful further algorithmic development: while DMRG is a very mature method by now, I still see potential for further improvements, as exemplified by a number of recently introduced algorithms.},
+  doi      = {10.1016/j.aop.2010.09.012},
+  url      = {https://arxiv.org/abs/1008.3477},
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}

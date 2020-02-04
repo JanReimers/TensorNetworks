@@ -1,0 +1,1020 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Tensor Networks and Matrix Product States II
+\end_layout
+
+\begin_layout Author
+Jan Reimers
+\end_layout
+
+\begin_layout Date
+Jan 2019
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+These notes are based on the review article by Scholwoeck
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Scholl-1"
+literal "false"
+
+\end_inset
+
+ which has all the details required for programming a Matrix Product State
+ (MPS) code.
+\end_layout
+
+\begin_layout Standard
+It turns out that quantum states encountered in nature and in particular
+ ground and low lying states, only sample an exponentially tiny fraction
+ of the available Hilbert space.
+ So in principle we could save ourselves a lot of work if there was a way
+ of restricting the wave function to the relevant part of Hilbert space.
+ In fact we do this all the time with mean field methods like the Hartree-Fock
+ approximation.
+ In this form we just assume that the wave function is a product of single
+ particle state functions.
+ But this goes to far, we need a way of constraining the wave function in
+ a tune-able way.
+ Over the last twenty years this has been essentially solved for 
+\begin_inset Formula $1D$
+\end_inset
+
+ systems with Matrix Product States (MPS) and with tensor networks (really
+ Tensor Product States) for higher dimensional systems.
+ These ideas grew out of White and Wilson's Density Matrix Renormalization
+ Group methods.
+\end_layout
+
+\begin_layout Section
+MPS Preliminaries
+\end_layout
+
+\begin_layout Subsection
+Definition
+\end_layout
+
+\begin_layout Standard
+The most general form for the state vector of a 
+\begin_inset Formula $1D$
+\end_inset
+
+ lattice of spins with open boundary conditions (OBC), is
+\begin_inset Formula 
+\begin{equation}
+\left|\psi\right\rangle =\sum_{n_{1}n_{2}\cdots n_{L}=0}^{d}c_{n_{1}n_{2}\cdots n_{L}}\left|n_{1}n_{2}\cdots n_{L}\right\rangle \label{eq:GeneralStateVector}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $L$
+\end_inset
+
+ is the number of particles or spins on the lattice sites, 
+\begin_inset Formula $d$
+\end_inset
+
+ is the dimension of the local Hilbert space for each spin, 
+\begin_inset Formula $n_{a}$
+\end_inset
+
+ is the quantum number for the spin at lattice site 
+\begin_inset Formula $a$
+\end_inset
+
+ and the 
+\begin_inset Formula $c_{n_{1}n_{2}\cdots n_{L}}$
+\end_inset
+
+ are the 
+\begin_inset Formula $L^{d}$
+\end_inset
+
+ complex amplitudes.
+ One can show
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Scholl-1"
+literal "false"
+
+\end_inset
+
+ that this massive tensor can be expressed as a product of matrices
+\begin_inset Formula 
+\begin{equation}
+c_{n_{1}n_{2}\cdots n_{L}}=\boldsymbol{M}^{\left[1\right]n_{1}}\boldsymbol{M}^{\left[2\right]n_{2}}\ldots\boldsymbol{M}^{\left[L\right]n_{L}}\label{eq:MPS Representation}
+\end{equation}
+
+\end_inset
+
+provided that dimensions of the matrices have dimensions 
+\begin_inset Formula $1\times d$
+\end_inset
+
+, 
+\begin_inset Formula $d\times d^{2}$
+\end_inset
+
+, 
+\begin_inset Formula $d^{2}\times d^{3}\cdots d^{\left(L-1\right)/2}\times d^{L/2}\cdots d\times1$
+\end_inset
+
+.
+ The boundry matrices are tractable but they get exponentially large towards
+ the center of the spin chain.
+ The ansatz is than we can place a cutoff 
+\begin_inset Formula $D$
+\end_inset
+
+ on the size of the matrices.
+ 
+\begin_inset Formula $D$
+\end_inset
+
+ is often referred to as the maximum bond dimension.
+ It turns out that very accurate ground state wave functions for many 
+\begin_inset Formula $1D$
+\end_inset
+
+ systems can be represented with 
+\begin_inset Formula $D\lesssim O\left(100\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+MPS Diagrams
+\end_layout
+
+\begin_layout Standard
+We can express eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:MPS Representation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ in a diagram form shown in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:MPS bra and ket"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename BraKet.png
+	scale 60
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:MPS bra and ket"
+
+\end_inset
+
+Diagrammatic representation of an MPS state ket (a) and is adjoint bra in
+ (b)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For programming it is often convenient to include names for all the internal
+ and external legs in the diagram.
+ Each circle in the diagram correspond to one of the
+\begin_inset Formula $\boldsymbol{M}$
+\end_inset
+
+ matrix in eq 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:MPS Representation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Also it is nice to avoid Greek symbols when programming.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:MPS bra and ket"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a corresponds to
+\begin_inset Formula 
+\begin{equation}
+\left|\psi\right\rangle =\sum_{\left\{ n\right\} =0}^{d}\sum_{\left\{ j\right\} =1}^{D}M_{1j_{1}}^{\left[1\right]n_{1}}M_{j_{1}j_{2}}^{\left[2\right]n_{2}}M_{j_{2}j_{3}}^{\left[3\right]n_{3}}M_{j_{3}j_{4}}^{\left[4\right]n_{4}}M_{j_{4}1}^{\left[5\right]n_{5}}\left|n_{1}n_{2}n_{3}n_{4}n_{5}\right\rangle \label{eq:KetFull}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\sum_{\left\{ n\right\} }\prod_{a}\boldsymbol{M}^{n_{a}}\left|n_{a}\right\rangle \label{eq:KetCompact}
+\end{equation}
+
+\end_inset
+
+Where the second line as a compact representation with summation limits,
+ matrix multiplications and state tensor products implied.
+ The conventions here are that
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $a$
+\end_inset
+
+ labels a lattice site.
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $n_{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $m_{a}$
+\end_inset
+
+ are bra and ket quantum numbers ranging from 
+\begin_inset Formula $0\rightarrow d$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $i_{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $j_{a}$
+\end_inset
+
+ are bra and ket internal indices than tie together neighbouring matrices.
+ These are called the bond indices.
+ These are 
+\begin_inset Formula $1$
+\end_inset
+
+ based (not 
+\begin_inset Formula $0$
+\end_inset
+
+ based).
+ They can usually range up to some maximum 
+\begin_inset Formula $D$
+\end_inset
+
+, but can also site dependent 
+\begin_inset Formula $D_{a}$
+\end_inset
+
+ for certain algorithms which dynamically tune 
+\begin_inset Formula $D_{a}$
+\end_inset
+
+ separately for each site in order to achieve a specified accuracy.
+\end_layout
+
+\begin_layout Enumerate
+open up and down leg in the diagram have local bra 
+\begin_inset Formula $\left\langle m_{a}\right|$
+\end_inset
+
+ or ket 
+\begin_inset Formula $\left|n_{a}\right\rangle $
+\end_inset
+
+ states associated with them.
+ These are called the physical indices
+\end_layout
+
+\begin_layout Enumerate
+For each matrix the number in square brackets 
+\begin_inset Formula $\left[a\right]$
+\end_inset
+
+ labels the matrix as being associated with lattice site 
+\begin_inset Formula $a$
+\end_inset
+
+.
+ Often these labels are omitted since quantum number label 
+\begin_inset Formula $n_{a}$
+\end_inset
+
+ also identifies the site.
+ 
+\begin_inset Formula $\boldsymbol{M}^{\left[a\right]n_{a}}=\boldsymbol{M}^{n_{a}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Lower indices on the 
+\begin_inset Formula $\boldsymbol{M}$
+\end_inset
+
+'s are for bond indices and upper indices are for the physical index.
+\end_layout
+
+\begin_layout Enumerate
+For open boundary conditions (OBC) the edge matrices are 
+\begin_inset Formula $1\times D$
+\end_inset
+
+ and 
+\begin_inset Formula $D\times1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+One can think of the 
+\begin_inset Formula $\boldsymbol{M}$
+\end_inset
+
+'s on each site as a group of 
+\begin_inset Formula $d$
+\end_inset
+
+, 
+\begin_inset Formula $D\times D$
+\end_inset
+
+ matrices or as a rank 
+\begin_inset Formula $3$
+\end_inset
+
+ tensor on each site.
+ With all this in mind the bra vector in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:MPS bra and ket"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+b is
+\begin_inset Formula 
+\begin{equation}
+\left\langle \psi\right|=\sum_{\left\{ m\right\} =0}^{d}\sum_{\left\{ i\right\} =1}^{D}M_{1i_{5}}^{*\left[5\right]m_{5}}M_{i_{5}i_{4}}^{*\left[4\right]m_{4}}M_{i_{4}i_{3}}^{*\left[3\right]m_{3}}M_{i_{3}i_{2}}^{*\left[2\right]m_{2}}M_{i_{1}1}^{*\left[1\right]m_{1}}\left\langle m_{1}m_{2}m_{3}m_{4}m_{5}\right|\label{eq:BraFull}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+=\sum_{\left\{ m\right\} }\prod_{a=L}^{1}\boldsymbol{M}^{*m_{a}}\left\langle m_{a}\right|\label{eq:BraCompact}
+\end{equation}
+
+\end_inset
+
+where I have explicitly shown that the product runs backward through the
+ lattice since 
+\begin_inset Formula $\left(\boldsymbol{A}\boldsymbol{B}\right)^{\dagger}=\boldsymbol{B}^{\dagger}\boldsymbol{A}^{\dagger}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Calculating the overlap
+\end_layout
+
+\begin_layout Standard
+The brute force approach to the overlap 
+\begin_inset Formula $\left\langle \psi\right|\left.\psi\right\rangle $
+\end_inset
+
+ would be to combine eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:BraFull"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:KetFull"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and then do the algebra.
+ However it is much easier to get the answer from a diagram.
+ We can join the physical legs of the diagram in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:MPS bra and ket"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and use 
+\begin_inset Formula $\left\langle m\right|\left.n\right\rangle =\delta_{mn}$
+\end_inset
+
+ everywhere.
+ The resulting labeled diagram is shown in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Overlap"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Overlap.png
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Overlap"
+
+\end_inset
+
+Diagrammatic representation of the overlap
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+From the diagram we can read off the overlap expression by summing over
+ all indices
+\begin_inset Formula 
+\[
+\left\langle \psi\right|\left.\psi\right\rangle =\sum_{\left\{ n\right\} }\left(\boldsymbol{M}^{*n_{5}}\boldsymbol{M}^{*n_{4}}\boldsymbol{M}^{*n_{3}}\boldsymbol{M}^{*n_{2}}\boldsymbol{M}^{*n_{1}}\right)\left(\boldsymbol{M}^{n_{1}}\boldsymbol{M}^{n_{2}}\boldsymbol{M}^{n_{3}}\boldsymbol{M}^{n_{4}}\boldsymbol{M}^{n_{5}}\right).
+\]
+
+\end_inset
+
+where matrix multiplacation occure inside the brakets, but not between the
+ two brakets.
+ The big win with MPS is that the 
+\begin_inset Formula $2^{L}$
+\end_inset
+
+ summation over quantum numbers now factorizes
+\begin_inset Formula 
+\[
+\left\langle \psi\right|\left.\psi\right\rangle =\sum_{n_{5}}\boldsymbol{M}^{*n_{5}}\cdots\left[\sum_{n_{2}}\boldsymbol{M}^{*n_{2}}\left(\sum_{n_{1}}\boldsymbol{M}^{*n_{1}}\boldsymbol{M}^{n_{1}}\right)\boldsymbol{M}^{n_{2}}\right]\cdots\boldsymbol{M}^{n_{5}}.
+\]
+
+\end_inset
+
+This is the most efficient contraction order.
+ Note that 
+\begin_inset Formula $\boldsymbol{M}^{*n_{1}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{M}^{n_{1}}$
+\end_inset
+
+ have different indices so we are not multiplying them, it is more like
+ an outer product.
+ At this point we can define the so called transfer matrix for each site
+\begin_inset Formula 
+\[
+E_{\left(11\right)\left(i_{1}j_{1}\right)}^{1}=\sum_{n_{1}}\boldsymbol{M}^{*n_{1}}\boldsymbol{M}^{n_{1}}=\sum_{n_{1}}M_{1i_{1}}^{*n_{1}}M_{1j_{1}}^{n_{1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+E_{\left(i_{a-1}j_{a-1}\right)\left(i_{a}j_{a}\right)}^{a}=\sum_{n_{a}}\boldsymbol{M}^{*n_{a}}\boldsymbol{M}^{n_{a}}=\sum_{n_{a}}M_{i_{a-1}i_{a}}^{*n_{a}}M_{j_{a-1}j_{a}}^{n_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+E_{\left(i_{L-1}j_{L-1}\right)\left(11\right)}^{L}=\sum_{n_{L}}\boldsymbol{M}^{*n_{L}}\boldsymbol{M}^{n_{L}}=\sum_{n_{L}}M_{i_{L-1}i_{1}}^{*n_{L}}M_{j_{L-1}j_{1}}^{n_{L}}.
+\]
+
+\end_inset
+
+In terms of transfer matrices the overlap is
+\begin_inset Formula 
+\[
+\left\langle \psi\right|\left.\psi\right\rangle =\sum_{\left\{ ij\right\} }E_{\left(11\right)\left(i_{1}j_{1}\right)}^{1}E_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}^{2}\cdots E_{\left(i_{L-1}j_{L-1}\right)\left(11\right)}^{L}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\prod_{a}\boldsymbol{E}^{a}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Gauge freedom and canonical forms
+\end_layout
+
+\begin_layout Standard
+The matrices in the an MPS are not uniquely defined, for any matrix product
+ on can always insert or sandwich the identity matrix without changing the
+ result of the product
+\begin_inset Formula 
+\[
+\boldsymbol{A}\boldsymbol{B}=\boldsymbol{A}\text{𝕀}\boldsymbol{B}=\boldsymbol{A}\boldsymbol{X}\boldsymbol{X}^{-1}\boldsymbol{B}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We will now use this guage freedom the represent and MPS in canonical form.
+ Essential for this is the concept of re-shaping tensors.
+\end_layout
+
+\begin_layout Subsubsection
+Re-shaping and SVD
+\end_layout
+
+\begin_layout Standard
+Any rank-
+\begin_inset Formula $3$
+\end_inset
+
+ tensor can be re-shaped into rank-
+\begin_inset Formula $2$
+\end_inset
+
+ matrix as follows
+\begin_inset Formula 
+\[
+M_{i_{a-1}i_{a}}^{n_{a}}\rightarrow M_{(i_{a-1},n_{a})i_{a}}=\begin{bmatrix}\boldsymbol{M}^{\left[a\right]0}\\
+\boldsymbol{M}^{\left[a\right]1}\\
+\vdots\\
+\boldsymbol{M}^{\left[a\right]d}
+\end{bmatrix}
+\]
+
+\end_inset
+
+where we have grouped together the 
+\begin_inset Formula $i_{a-1}$
+\end_inset
+
+ and 
+\begin_inset Formula $n_{a}$
+\end_inset
+
+ indices with brackets.
+ We can also think of this as 
+\begin_inset Formula $d$
+\end_inset
+
+ matrices with shape 
+\begin_inset Formula $D_{a-1}\times D_{a}$
+\end_inset
+
+ being reshaped into a larger 
+\begin_inset Formula $dD_{a-1}\times D_{a}$
+\end_inset
+
+ matrix.
+ This general non-square matrix can be decompesed using Singular Value Decomposi
+tion (SVD)
+\begin_inset Formula 
+\[
+M_{(i_{a-1},n_{1})i_{a}}=\boldsymbol{UsV}=\sum_{j_{a}}U_{\left(i_{a-1},n_{a}\right)j_{a}}s_{j_{a}j_{a}}V_{j_{a}i_{a}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{s}$
+\end_inset
+
+ is a diagonal matrix of singular values and 
+\begin_inset Formula $\boldsymbol{U}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{V}$
+\end_inset
+
+ are orthonormal matrices satisfying
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{U}^{\dagger}\boldsymbol{U}=\text{𝕀},\;\boldsymbol{V}\boldsymbol{V}^{\dagger}=\text{𝕀}.\label{eq:SVDOrthoNormConditions}
+\end{equation}
+
+\end_inset
+
+The 
+\begin_inset Formula $\boldsymbol{U}$
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ can now be reshaped backwards as
+\begin_inset Formula 
+\[
+\Gamma_{i_{a-1}j_{a}}^{n_{a}}=U_{\left(i_{a-1},n_{a}\right)j_{a}}
+\]
+
+\end_inset
+
+The normalization conditions in eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SVDOrthoNormConditions"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ can also be reshaped 
+\begin_inset Formula 
+\[
+\sum_{n_{a}}\boldsymbol{\Gamma}^{\dagger n_{a}}\boldsymbol{\Gamma}^{n_{a}}=\text{𝕀}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Repeated SVD and canonical form
+\end_layout
+
+\begin_layout Standard
+We can now start on the left and zip throught the lattice and convert the
+ whole MPS into canonical form.
+ Starting with site 
+\begin_inset Formula $1$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+M_{1i_{1}}^{n_{1}}\rightarrow M_{(1,n_{1})i_{1}}=\boldsymbol{U}^{1}\boldsymbol{s}^{1}\boldsymbol{V}^{1}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Gamma_{1j_{1}}^{n_{1}}=U_{\left(1,n_{1}\right)j_{1}}.
+\]
+
+\end_inset
+
+At tis point we need to decide what to do with 
+\begin_inset Formula $\boldsymbol{s}^{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{V}^{1}$
+\end_inset
+
+.
+ We keep the singular values separate, and they actually live on the bond
+ between sites 
+\begin_inset Formula $1$
+\end_inset
+
+ and 
+\begin_inset Formula $2$
+\end_inset
+
+.
+ The 
+\begin_inset Formula $\boldsymbol{V}^{1}$
+\end_inset
+
+ matrix gets absorbed into 
+\begin_inset Formula $\boldsymbol{M}^{n_{2}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{\boldsymbol{M}}^{n_{2}}=\boldsymbol{V}^{1}\boldsymbol{M}^{n_{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\tilde{M}_{j_{1}i_{2}}^{n_{2}}=\sum_{i_{1}=1}^{D_{1}}V_{j_{1}i_{1}}^{1}M_{i_{1}i_{2}}^{n_{2}}
+\]
+
+\end_inset
+
+the guage freedom allows this.
+ Now the MPS looks like
+\begin_inset Formula 
+\[
+\boldsymbol{\varGamma}^{n_{1}}\boldsymbol{s}^{1}\tilde{\boldsymbol{M}}^{n_{2}}\boldsymbol{M}^{n_{3}}\cdots\boldsymbol{M}^{n_{L}}
+\]
+
+\end_inset
+
+One can now continue this process by zipping through the lattice repeating
+ the above steps, finally arriving at
+\begin_inset Formula 
+\[
+\boldsymbol{\varGamma}^{n_{1}}\boldsymbol{s}^{1}\boldsymbol{\varGamma}^{n_{2}}\boldsymbol{s}^{2}\boldsymbol{\varGamma}^{n_{3}}\boldsymbol{s}^{3}\cdots\boldsymbol{s}^{L-1}\boldsymbol{\varGamma}^{n_{L}}
+\]
+
+\end_inset
+
+This form is useful in a number of ways.
+ Firstly the singular values on each bond tell us something about the suitablity
+ the bond dimension 
+\begin_inset Formula $D_{a}$
+\end_inset
+
+.
+ If 
+\begin_inset Formula $\boldsymbol{s_{a}}$
+\end_inset
+
+ has a lot of singular values close to zero (
+\begin_inset Formula $<\epsilon\approx10^{-14}$
+\end_inset
+
+ in a double precision calculation) then 
+\begin_inset Formula $D_{a}$
+\end_inset
+
+ is bigger than it needs to be.
+ Reducing 
+\begin_inset Formula $D$
+\end_inset
+
+ so that only singular values above some threshold are retained is called
+ SVD compression.
+ On the other if the lowest singular value 
+\begin_inset Formula $s_{min}\gg\epsilon$
+\end_inset
+
+ then we know 
+\begin_inset Formula $D$
+\end_inset
+
+ is not big enough to get an accurate ground state.
+ Other advanteges will become obvious below.
+\end_layout
+
+\begin_layout Subsubsection
+Left and right normalization
+\end_layout
+
+\begin_layout Standard
+Defining the left normalized matrices
+\begin_inset Formula 
+\[
+\boldsymbol{A}^{n_{1}}=\boldsymbol{\varGamma}^{n_{1}},\;\boldsymbol{A}^{n_{a}}=\boldsymbol{s}^{a-1}\boldsymbol{\varGamma}^{n_{a}}
+\]
+
+\end_inset
+
+and right normalized matrices
+\begin_inset Formula 
+\[
+\boldsymbol{B}^{n_{L}}=\boldsymbol{\varGamma}^{n_{L}},\;\boldsymbol{B}^{n_{a}}=\boldsymbol{\varGamma}^{n_{a}}\boldsymbol{s}^{a}
+\]
+
+\end_inset
+
+one can show that
+\begin_inset Formula 
+\[
+\sum_{n}\boldsymbol{A}^{\dagger n}\boldsymbol{A}^{n}=\text{𝕀}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{n}\boldsymbol{B}^{n}\boldsymbol{B}^{\dagger n}=\boldsymbol{\mathbb{I}}
+\]
+
+\end_inset
+
+
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintCited"
+bibfiles "MPS"
+options "plain"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
