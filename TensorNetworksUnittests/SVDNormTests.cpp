@@ -2,6 +2,8 @@
 
 #include "TensorNetworksImp/MatrixProductStateImp.H"
 #include "TensorNetworks/LRPSupervisor.H"
+#include "TensorNetworks/Epsilons.H"
+
 #include "oml/stream.h"
 #include "oml/random.h"
 #include <complex>
@@ -14,6 +16,7 @@ public:
     : itsMPS(0)
     , eps(1.0e-10)
     , itsSupervisor( new LRPSupervisor())
+    , itsEps()
     {
         StreamableObject::SetToPretty();
         Setup(10,1,2);
@@ -25,45 +28,19 @@ public:
     void Setup(int L, int S2, int D)
     {
         delete itsMPS;
-        itsMPS=new MatrixProductStateImp(L,S2,D);
+        itsMPS=new MatrixProductStateImp(L,S2,D,itsEps);
     }
 
     typedef TensorNetworks::MatrixCT MatrixCT;
-    MatrixCT GetNeff   (int isite) const {return itsMPS->GetNeff(isite);}
-
-    void VerifyLeftNorm();
-    void VerifyRightNorm();
-
 
     MatrixProductStateImp* itsMPS;
     double eps;
     LRPSupervisor* itsSupervisor;
+    Epsilons               itsEps;
 };
 
 
 
-
-void MPSNormTesting::VerifyLeftNorm()
-{
-    // Skip the last site
-    for (int i=0; i<itsMPS->GetL(); i++)
-    {
-//        cout << mps->GetLeftNorm(i) << endl;
-        VerifyUnit(itsMPS->itsSites[i]->GetLeftNorm(),eps);
-        VerifyUnit(itsMPS->GetMLeft(i),eps);
-    }
-}
-
-void MPSNormTesting::VerifyRightNorm()
-{
-    //skip the first site
-    for (int i=0; i<itsMPS->GetL(); i++)
-    {
-//        cout << mps->GetRightNorm(i) << endl;
-        VerifyUnit(itsMPS->itsSites[i]->GetRightNorm(),eps);
-        VerifyUnit(itsMPS->GetMRight(i),eps);
-    }
-}
 
 std::string ExpectedNorm(int isite,int L)
 {
@@ -87,40 +64,45 @@ std::string BuildNormString(const MatrixProductStateImp* mps,int L)
 
 TEST_F(MPSNormTesting,LeftNormalMatriciesProductStateL10S3D2)
 {
+    int L=itsMPS->GetL();
     itsMPS->InitializeWith(TensorNetworks::Product);
     itsMPS->Normalize(TensorNetworks::Left,new LRPSupervisor());
-    VerifyLeftNorm();
+    EXPECT_EQ(BuildNormString(itsMPS,L),"A0I0I0I0I0I0I0I0I0A0");
 }
 
 
 TEST_F(MPSNormTesting,RightNormalMatriciesProductStateL100S3D2)
 {
+    int L=itsMPS->GetL();
     itsMPS->InitializeWith(TensorNetworks::Product);
     itsMPS->Normalize(TensorNetworks::Right,new LRPSupervisor());
-    VerifyRightNorm();
+    EXPECT_EQ(BuildNormString(itsMPS,L),"B0I0I0I0I0I0I0I0I0B0");
 }
 
 
 TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D2)
 {
+    int L=itsMPS->GetL();
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::Left,new LRPSupervisor());
-    VerifyLeftNorm();
+    EXPECT_EQ(BuildNormString(itsMPS,L),"A0A0A0A0A0A0A0A0A0A0");
 }
 
 TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL100S3D2)
 {
+    int L=itsMPS->GetL();
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::Right,new LRPSupervisor());
-    VerifyRightNorm();
+    EXPECT_EQ(BuildNormString(itsMPS,L),"B0B0B0B0B0B0B0B0B0B0");
 }
 
 TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D3)
 {
-    Setup(10,3,3);
+    int L=10;
+    Setup(L,3,3);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::Left,new LRPSupervisor());
-    VerifyLeftNorm();
+    EXPECT_EQ(BuildNormString(itsMPS,L),"A0A0A0A0A0A0A0A0A0A0");
 }
 
 TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S1D1)
@@ -129,7 +111,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S1D1)
     Setup(L,1,1);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
-    VerifyLeftNorm();
+    EXPECT_EQ(BuildNormString(itsMPS,L),"I0I0I0I0I0I0I0I0I0I0");
 }
 TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S5D1)
 {
@@ -137,7 +119,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S5D1)
     Setup(L,5,1);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
-    VerifyLeftNorm();
+    EXPECT_EQ(BuildNormString(itsMPS,L),"I0I0I0I0I0I0I0I0I0I0");
 }
 TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S1D1)
 {
@@ -145,7 +127,7 @@ TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S1D1)
     Setup(L,1,1);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
-    VerifyLeftNorm();
+    EXPECT_EQ(BuildNormString(itsMPS,L),"I0I0I0I0I0I0I0I0I0I0");
 }
 TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S5D1)
 {
@@ -153,70 +135,45 @@ TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S5D1)
     Setup(L,5,1);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
-    VerifyLeftNorm();
+    EXPECT_EQ(BuildNormString(itsMPS,L),"I0I0I0I0I0I0I0I0I0I0");
 }
 
 TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D10)
 {
-    Setup(10,1,10);
+    int L=10;
+    Setup(L,1,10);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
-    VerifyLeftNorm();
+    EXPECT_EQ(BuildNormString(itsMPS,L),"A0A0A0A0A0A0A0A0A0A0");
 }
 
 TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S3D10)
 {
-    Setup(10,3,10);
+    int L=10;
+    Setup(L,3,10);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
-    VerifyRightNorm();
+    EXPECT_EQ(BuildNormString(itsMPS,L),"B0B0B0B0B0B0B0B0B0B0");
 }
 
 TEST_F(MPSNormTesting,LeftNormalOverlapL10S1D2)
 {
-    Setup(10,1,2);
+    int L=10;
+    Setup(L,1,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
-    EXPECT_NEAR(itsMPS->GetOverlap(),1.0,eps);
+    EXPECT_EQ(BuildNormString(itsMPS,L),"A0A0A0A0A0A0A0A0A0A0");
 }
 
 TEST_F(MPSNormTesting,RightNormalOverlapL10S2D2)
 {
-    Setup(10,3,2);
+    int L=10;
+    Setup(L,3,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
-    EXPECT_NEAR(itsMPS->GetOverlap(),1.0,eps);
+    EXPECT_EQ(BuildNormString(itsMPS,L),"B0B0B0B0B0B0B0B0B0B0");
 }
 
-TEST_F(MPSNormTesting,RightNormalOverlapSite0L10S1D3)
-{
-    Setup(10,1,3);
-    itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
-    VerifyUnit(GetNeff(0),eps);
-}
-TEST_F(MPSNormTesting,LeftNormalOverlapSiteLL10S1D3)
-{
-    Setup(10,1,3);
-    itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
-    VerifyUnit(GetNeff(itsMPS->GetL()-1),eps);
-}
-
-TEST_F(MPSNormTesting,RightNormalOverlapSite0L10S5D2)
-{
-    Setup(10,5,2);
-    itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
-    VerifyUnit(GetNeff(0),eps);
-}
-TEST_F(MPSNormTesting,LeftNormalOverlapSiteLL10S5D2)
-{
-    Setup(10,5,2);
-    itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
-    VerifyUnit(GetNeff(itsMPS->GetL()-1),eps);
-}
 
 
 TEST_F(MPSNormTesting,MixedCanonicalL10S1D3)
@@ -227,49 +184,8 @@ TEST_F(MPSNormTesting,MixedCanonicalL10S1D3)
     for (int ia=0;ia<itsMPS->GetL();ia++)
     {
         itsMPS->Normalize(ia);
-        VerifyUnit(GetNeff(ia),eps);
         EXPECT_EQ(BuildNormString(itsMPS,L),ExpectedNorm(ia,L));
     }
 }
 
-//  Slow test
-TEST_F(MPSNormTesting,MixedCanonicalL10S3D10)
-{
-    int L=10;
-    Setup(L,3,10);
-    itsMPS->InitializeWith(TensorNetworks::Random);
-    for (int ia=0;ia<itsMPS->GetL();ia++)
-    {
-        itsMPS->Normalize(ia);
-        VerifyUnit(GetNeff(ia),eps);
-        EXPECT_EQ(BuildNormString(itsMPS,L),ExpectedNorm(ia,L));
-   }
-}
 
-
-TEST_F(MPSNormTesting,MixedCanonicalL10S5D2)
-{
-    int L=10;
-    Setup(L,5,2);
-    itsMPS->InitializeWith(TensorNetworks::Random);
-    for (int ia=0;ia<itsMPS->GetL();ia++)
-    {
-        itsMPS->Normalize(ia);
-        VerifyUnit(GetNeff(ia),eps);
-        EXPECT_EQ(BuildNormString(itsMPS,L),ExpectedNorm(ia,L));
-    }
-}
-
-TEST_F(MPSNormTesting,MixedCanonicalL10S5D1)
-{
-    int L=10;
-    Setup(L,5,1);
-    itsMPS->InitializeWith(TensorNetworks::Random);
-    for (int ia=0;ia<itsMPS->GetL();ia++)
-    {
-        itsMPS->Normalize(ia);
-        VerifyUnit(GetNeff(ia),eps);
-        // This fails for D=1 becuase left and right normalization are indistinguisable when D=1
-        //EXPECT_EQ(itsMPS->GetNormStatus(),ExpectedNorm(ia,L));
-    }
-}

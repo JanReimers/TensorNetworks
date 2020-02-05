@@ -95,7 +95,7 @@ Introduction
 These notes are based on the review article by Scholwoeck
 \begin_inset CommandInset citation
 LatexCommand cite
-key "Scholl-1"
+key "schollwoeck_density-matrix_2010"
 literal "false"
 
 \end_inset
@@ -122,8 +122,15 @@ It turns out that quantum states encountered in nature and in particular
 
  systems with Matrix Product States (MPS) and with tensor networks (really
  Tensor Product States) for higher dimensional systems.
- These ideas grew out of White and Wilson's Density Matrix Renormalization
- Group methods.
+ These ideas grew out of White
+\begin_inset CommandInset citation
+LatexCommand cite
+key "white_density_1992,white_density-matrix_1993"
+literal "false"
+
+\end_inset
+
+ and Wilson's Density Matrix Renormalization Group methods.
 \end_layout
 
 \begin_layout Section
@@ -260,13 +267,10 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
+\align center
 \begin_inset Graphics
 	filename BraKet.png
-	scale 60
+	rotateOrigin center
 
 \end_inset
 
@@ -582,6 +586,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Graphics
 	filename Overlap.png
 
@@ -632,9 +637,9 @@ where matrix multiplacation occure inside the brakets, but not between the
 
  summation over quantum numbers now factorizes
 \begin_inset Formula 
-\[
-\left\langle \psi\right|\left.\psi\right\rangle =\sum_{n_{5}}\boldsymbol{M}^{*n_{5}}\cdots\left[\sum_{n_{2}}\boldsymbol{M}^{*n_{2}}\left(\sum_{n_{1}}\boldsymbol{M}^{*n_{1}}\boldsymbol{M}^{n_{1}}\right)\boldsymbol{M}^{n_{2}}\right]\cdots\boldsymbol{M}^{n_{5}}.
-\]
+\begin{equation}
+\left\langle \psi\right|\left.\psi\right\rangle =\sum_{n_{5}}\boldsymbol{M}^{*n_{5}}\cdots\left[\sum_{n_{2}}\boldsymbol{M}^{*n_{2}}\left(\sum_{n_{1}}\boldsymbol{M}^{*n_{1}}\boldsymbol{M}^{n_{1}}\right)\boldsymbol{M}^{n_{2}}\right]\cdots\boldsymbol{M}^{n_{5}}.\label{eq:OverlapUnormalized}
+\end{equation}
 
 \end_inset
 
@@ -659,9 +664,9 @@ E_{\left(11\right)\left(i_{1}j_{1}\right)}^{1}=\sum_{n_{1}}\boldsymbol{M}^{*n_{1
 
 
 \begin_inset Formula 
-\[
-E_{\left(i_{a-1}j_{a-1}\right)\left(i_{a}j_{a}\right)}^{a}=\sum_{n_{a}}\boldsymbol{M}^{*n_{a}}\boldsymbol{M}^{n_{a}}=\sum_{n_{a}}M_{i_{a-1}i_{a}}^{*n_{a}}M_{j_{a-1}j_{a}}^{n_{a}}
-\]
+\begin{equation}
+E_{\left(i_{a-1}j_{a-1}\right)\left(i_{a}j_{a}\right)}^{a}=\sum_{n_{a}}\boldsymbol{M}^{*n_{a}}\boldsymbol{M}^{n_{a}}=\sum_{n_{a}}M_{i_{a-1}i_{a}}^{*n_{a}}M_{j_{a-1}j_{a}}^{n_{a}}\label{eq:TransferSitea}
+\end{equation}
 
 \end_inset
 
@@ -675,9 +680,9 @@ E_{\left(i_{L-1}j_{L-1}\right)\left(11\right)}^{L}=\sum_{n_{L}}\boldsymbol{M}^{*
 
 In terms of transfer matrices the overlap is
 \begin_inset Formula 
-\[
-\left\langle \psi\right|\left.\psi\right\rangle =\sum_{\left\{ ij\right\} }E_{\left(11\right)\left(i_{1}j_{1}\right)}^{1}E_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}^{2}\cdots E_{\left(i_{L-1}j_{L-1}\right)\left(11\right)}^{L}
-\]
+\begin{equation}
+\left\langle \psi\right|\left.\psi\right\rangle =\sum_{\left\{ ij\right\} }E_{\left(11\right)\left(i_{1}j_{1}\right)}^{1}E_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}^{2}\cdots E_{\left(i_{L-1}j_{L-1}\right)\left(11\right)}^{L}\label{eq:OverlapTransfer}
+\end{equation}
 
 \end_inset
 
@@ -811,7 +816,7 @@ The
  can now be reshaped backwards as
 \begin_inset Formula 
 \[
-\Gamma_{i_{a-1}j_{a}}^{n_{a}}=U_{\left(i_{a-1},n_{a}\right)j_{a}}
+A_{i_{a-1}j_{a}}^{n_{a}}=U_{\left(i_{a-1},n_{a}\right)j_{a}}
 \]
 
 \end_inset
@@ -829,9 +834,9 @@ noprefix "false"
 
  can also be reshaped 
 \begin_inset Formula 
-\[
-\sum_{n_{a}}\boldsymbol{\Gamma}^{\dagger n_{a}}\boldsymbol{\Gamma}^{n_{a}}=\text{𝕀}
-\]
+\begin{equation}
+\sum_{n_{a}}\boldsymbol{A}^{\dagger n_{a}}\boldsymbol{A}^{n_{a}}=\text{𝕀}\label{eq:LeftNormalized}
+\end{equation}
 
 \end_inset
 
@@ -839,7 +844,7 @@ noprefix "false"
 \end_layout
 
 \begin_layout Subsubsection
-Repeated SVD and canonical form
+Repeated SVD and normalization
 \end_layout
 
 \begin_layout Standard
@@ -860,12 +865,12 @@ M_{1i_{1}}^{n_{1}}\rightarrow M_{(1,n_{1})i_{1}}=\boldsymbol{U}^{1}\boldsymbol{s
 
 \begin_inset Formula 
 \[
-\Gamma_{1j_{1}}^{n_{1}}=U_{\left(1,n_{1}\right)j_{1}}.
+A_{1j_{1}}^{n_{1}}=U_{\left(1,n_{1}\right)j_{1}}.
 \]
 
 \end_inset
 
-At tis point we need to decide what to do with 
+At this point we need to decide what to do with 
 \begin_inset Formula $\boldsymbol{s}^{1}$
 \end_inset
 
@@ -884,11 +889,15 @@ At tis point we need to decide what to do with
 \end_inset
 
 .
- The 
+ In addition the 
+\begin_inset Formula $\boldsymbol{s}^{1}$
+\end_inset
+
+ and 
 \begin_inset Formula $\boldsymbol{V}^{1}$
 \end_inset
 
- matrix gets absorbed into 
+ matrices gets absorbed into 
 \begin_inset Formula $\boldsymbol{M}^{n_{2}}$
 \end_inset
 
@@ -898,7 +907,7 @@ At tis point we need to decide what to do with
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\tilde{\boldsymbol{M}}^{n_{2}}=\boldsymbol{V}^{1}\boldsymbol{M}^{n_{2}}
+\tilde{\boldsymbol{M}}^{n_{2}}=\boldsymbol{s}^{1}\boldsymbol{V}^{1}\boldsymbol{M}^{n_{2}}
 \]
 
 \end_inset
@@ -906,7 +915,7 @@ At tis point we need to decide what to do with
 
 \begin_inset Formula 
 \[
-\tilde{M}_{j_{1}i_{2}}^{n_{2}}=\sum_{i_{1}=1}^{D_{1}}V_{j_{1}i_{1}}^{1}M_{i_{1}i_{2}}^{n_{2}}
+\tilde{M}_{j_{1}i_{2}}^{n_{2}}=\sum_{i_{1}=1}^{D_{1}}s_{i_{1}i_{1}}V_{j_{1}i_{1}}^{1}M_{i_{1}i_{2}}^{n_{2}}
 \]
 
 \end_inset
@@ -915,7 +924,7 @@ the guage freedom allows this.
  Now the MPS looks like
 \begin_inset Formula 
 \[
-\boldsymbol{\varGamma}^{n_{1}}\boldsymbol{s}^{1}\tilde{\boldsymbol{M}}^{n_{2}}\boldsymbol{M}^{n_{3}}\cdots\boldsymbol{M}^{n_{L}}
+\boldsymbol{A}^{n_{1}}\tilde{\boldsymbol{M}}^{n_{2}}\boldsymbol{M}^{n_{3}}\cdots\boldsymbol{M}^{n_{L}}
 \]
 
 \end_inset
@@ -924,12 +933,20 @@ One can now continue this process by zipping through the lattice repeating
  the above steps, finally arriving at
 \begin_inset Formula 
 \[
-\boldsymbol{\varGamma}^{n_{1}}\boldsymbol{s}^{1}\boldsymbol{\varGamma}^{n_{2}}\boldsymbol{s}^{2}\boldsymbol{\varGamma}^{n_{3}}\boldsymbol{s}^{3}\cdots\boldsymbol{s}^{L-1}\boldsymbol{\varGamma}^{n_{L}}
+\boldsymbol{A}^{n_{1}}\boldsymbol{A}^{n_{2}}\boldsymbol{A}^{n_{3}}\cdots\boldsymbol{A}^{n_{L}}
 \]
 
 \end_inset
 
-This form is useful in a number of ways.
+This form, introduced by Videl
+\begin_inset CommandInset citation
+LatexCommand cite
+key "vidal_efficient_2003"
+literal "false"
+
+\end_inset
+
+, is useful in a number of ways.
  Firstly the singular values on each bond tell us something about the suitablity
  the bond dimension 
 \begin_inset Formula $D_{a}$
@@ -967,36 +984,17 @@ This form is useful in a number of ways.
  Other advanteges will become obvious below.
 \end_layout
 
-\begin_layout Subsubsection
-Left and right normalization
-\end_layout
-
 \begin_layout Standard
-Defining the left normalized matrices
-\begin_inset Formula 
-\[
-\boldsymbol{A}^{n_{1}}=\boldsymbol{\varGamma}^{n_{1}},\;\boldsymbol{A}^{n_{a}}=\boldsymbol{s}^{a-1}\boldsymbol{\varGamma}^{n_{a}}
-\]
-
+The whole process can also be run in the other direction starting on the
+ right at site 
+\begin_inset Formula $L$
 \end_inset
 
-and right normalized matrices
-\begin_inset Formula 
-\[
-\boldsymbol{B}^{n_{L}}=\boldsymbol{\varGamma}^{n_{L}},\;\boldsymbol{B}^{n_{a}}=\boldsymbol{\varGamma}^{n_{a}}\boldsymbol{s}^{a}
-\]
-
+, yielding right normalized matrices 
+\begin_inset Formula $\boldsymbol{B}$
 \end_inset
 
-one can show that
-\begin_inset Formula 
-\[
-\sum_{n}\boldsymbol{A}^{\dagger n}\boldsymbol{A}^{n}=\text{𝕀}
-\]
-
-\end_inset
-
-
+ which satisfy
 \begin_inset Formula 
 \[
 \sum_{n}\boldsymbol{B}^{n}\boldsymbol{B}^{\dagger n}=\boldsymbol{\mathbb{I}}
@@ -1005,10 +1003,442 @@ one can show that
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsubsection
+Mixed canonical form
+\end_layout
+
+\begin_layout Standard
+For calculating expectation values it is often useful so start with a mixed
+ canonical state that looks like
+\begin_inset Formula 
+\[
+\left|\psi\right\rangle =\sum_{\left\{ n\right\} }\boldsymbol{A}^{n_{1}}\boldsymbol{A}^{n_{2}}\cdots\boldsymbol{A}^{n_{a}}\boldsymbol{B}^{n_{a+1}}\cdots\boldsymbol{B}^{n_{L}}\left|\left\{ n\right\} \right\rangle 
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\begin{equation}
+\left|\psi\right\rangle =\sum_{\left\{ n\right\} }\boldsymbol{A}^{n_{1}}\boldsymbol{A}^{n_{2}}\cdots\boldsymbol{A}^{n_{a-1}}\boldsymbol{M}^{n_{a}}\boldsymbol{B}^{n_{a+1}}\cdots\boldsymbol{B}^{n_{L}}\left|\left\{ n\right\} \right\rangle \label{eq:MixedCanonicalM}
+\end{equation}
+
+\end_inset
+
+These state are optimal for calculting the expectation value of a one site
+ operator at site 
+\begin_inset Formula $a$
+\end_inset
+
+.
+ In practice one would start with a right normalized and sweep through the
+ lattice from left to right and evalute all required expectations on each
+ site as you sweep.
+ While sweeping you leave behind left normalized matrices on the left of
+ the current site.
+\end_layout
+
+\begin_layout Subsection
+Density matrices
+\end_layout
+
+\begin_layout Standard
+Single and two site density matrices make the calculation if expectation
+ values trivial since
+\begin_inset Formula 
+\[
+\left\langle \psi\right|\hat{O}_{a}\left|\psi\right\rangle =Tr\left(O_{a}\rho_{a}\right)=\sum_{mn=0}^{d}O_{a}^{mn}\rho_{a}^{mn}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\left\langle \psi\right|\hat{O}_{a}\hat{O}_{b}\left|\psi\right\rangle =Tr\left(O_{a}O_{b}\rho_{ab}\right)=\sum_{m_{a}n_{a}=0}^{d}\sum_{m_{b}n_{b}=0}^{d}O_{a}^{m_{a}n_{a}}O_{b}^{m_{b}n_{b}}\rho_{ab}^{\left(m_{a}m_{b}\right)\left(n_{a}n_{b}\right)}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\rho_{ab}$
+\end_inset
+
+ is a 
+\begin_inset Formula $d^{2}\times d^{2}$
+\end_inset
+
+ two site density matrix.
+ In addition these density matrices are of interest in the their own right.
+ For example the two site density matrix 
+\begin_inset Formula $d^{2}$
+\end_inset
+
+ posative definite eigenvalues all summing to 
+\begin_inset Formula $1$
+\end_inset
+
+.
+ The largest 
+\begin_inset Formula $d$
+\end_inset
+
+ of these will associated with disentangled states on each site.
+ The remaining 
+\begin_inset Formula $d^{2}-d$
+\end_inset
+
+ eigenvalues are a measure of the entanglement entropy between the two site.
+ It will be interesting to see how this entaglement measure drops with distance.
+\end_layout
+
+\begin_layout Subsubsection
+One site density matrix
+\end_layout
+
+\begin_layout Standard
+The diagram for a one site density matrix at site 
+\begin_inset Formula $2$
+\end_inset
+
+ is show in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:OneSiteDensity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ It is the same as the overlap diagram with one exception, we make a cut
+ on the physical (vertical) leg between 
+\begin_inset Formula $\boldsymbol{M}^{n_{2}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{M}^{\dagger m_{2}}$
+\end_inset
+
+, leaving the site 
+\begin_inset Formula $2$
+\end_inset
+
+quantum numbers uncontracted.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename density1.png
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:OneSiteDensity"
+
+\end_inset
+
+Diagram for the density matrix at site 
+\begin_inset Formula $2$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+In order to evaulate diagram 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:OneSiteDensity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ we would need to contract from the left and right using epxreesions like
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:OverlapUnormalized"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ or 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:OverlapTransfer"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Neighbouring two site density matrix
+\end_layout
+
+\begin_layout Standard
+However the calcultion becomes trivial if the system is in a mixed canonical
+ state as per eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:MixedCanonicalM"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ In this case the diagram is much simpler as show in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:NormalizedDensity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a.
+ We can read the epxression as
+\begin_inset Formula 
+\[
+\rho_{a}^{mn}=\sum_{j_{a-1}j_{a}}A_{j_{a-1}j_{a}}^{*m}A_{j_{a-1}j_{a}}^{n}=Tr\left(\boldsymbol{A}^{*m}\boldsymbol{A}^{n}\right).
+\]
+
+\end_inset
+
+The two site density matrix for neighbouring site is almost as simple
+\begin_inset Formula 
+\[
+\rho_{a,a+1}^{\left(m_{a}m_{a+1}\right)\left(n_{a}n_{a+1}\right)}=\sum_{j_{a-1}j_{a+1}}\sum_{j_{a}i_{a}}A_{j_{a-1}i_{a}}^{*m_{a}}A_{j_{a-1}j_{a}}^{n_{a}}A_{i_{a}j_{a+1}}^{*m_{a+1}}A_{j_{a}j_{a+1}}^{n_{a+1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{j_{a-1}j_{a+1}}\left(\sum_{i_{a}}A_{j_{a-1}i_{a}}^{*m_{a}}A_{i_{a}j_{a+1}}^{*m_{a+1}}\right)\left(\sum_{j_{a}}A_{j_{a-1}j_{a}}^{n_{a}}A_{j_{a}j_{a+1}}^{n_{a+1}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{j_{a-1}j_{a+1}}\left(\boldsymbol{A}^{*m_{a}}\boldsymbol{A}^{*m_{a+1}}\right)_{j_{a-1}j_{a+1}}\left(\boldsymbol{A}^{n_{a}}\boldsymbol{A}^{n_{a+1}}\right)_{j_{a-1}j_{a+1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=Tr\left[\left(\boldsymbol{A}^{*m_{a}}\boldsymbol{A}^{*m_{a+1}}\right)\left(\boldsymbol{A}^{n_{a}}\boldsymbol{A}^{n_{a+1}}\right)\right]
+\]
+
+\end_inset
+
+_
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename density2.png
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:NormalizedDensity"
+
+\end_inset
+
+Diagrams for one and two site density matrices for suitable mixed normalized
+ states.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+General two site density matrix
+\end_layout
+
+\begin_layout Standard
+Reading from the diagram in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:NormalizedDensity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+b we have
+\begin_inset Formula 
+\[
+\rho_{a,b}^{\left(m_{a}m_{b}\right)\left(n_{a}n_{b}\right)}=\sum_{\left\{ ij\right\} }A_{j_{a-1}i_{a}}^{*m_{a}}A_{j_{a-1}j_{a}}^{n_{a}}E_{\left(i_{a}j_{a}\right)\left(i_{a+1}j_{a+1}\right)}^{a+1}\cdots E_{\left(i_{b-2}j_{b-2}\right)\left(i_{b-1}j_{b-1}\right)}^{b-1}A_{i_{b-1}j_{b}}^{*m_{b}}A_{j_{b-1}j_{b}}^{n_{b}}
+\]
+
+\end_inset
+
+using the transfer matrices defined i eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:TransferSitea"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Now we see where the name transfer matrix comes from, they allows us the
+ transfer from one site to another.
+\end_layout
+
+\begin_layout Standard
+Now we need to decide on an efficient way of zipping through the lattice
+ from site 
+\begin_inset Formula $a$
+\end_inset
+
+ to site 
+\begin_inset Formula $b$
+\end_inset
+
+.
+ Calculating 
+\begin_inset Formula $D^{2}\times D^{2}$
+\end_inset
+
+ transfer matrices is probably not the way to go.
+ The first step is too pick a direction.
+ Let's try left to right.
+ The obvious first step is to contract over 
+\begin_inset Formula $j_{a-1}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+C_{i_{a}j_{a}}^{m_{a}n_{a}}=\sum_{j_{a-1}}A_{j_{a-1}i_{a}}^{*m_{a}}A_{j_{a-1}j_{a}}^{n_{a}}.
+\]
+
+\end_inset
+
+Next we contract over 
+\begin_inset Formula $j_{a}$
+\end_inset
+
+ first and then over 
+\begin_inset Formula $i_{a}n_{a}$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+C_{i_{a+1}j_{a+1}}^{m_{a}n_{a}}=\sum_{i_{a}j_{a}}\sum_{n_{a}}C_{i_{a}j_{a}}^{m_{a}n_{a}}M_{i_{a}i_{a+1}}^{*n_{a+1}}M_{j_{a}j_{a+1}}^{n_{a+1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{i_{a}}\sum_{n_{a}}M_{i_{a}i_{a+1}}^{*n_{a+1}}\left(\sum_{j_{a}}C_{i_{a}j_{a}}^{m_{a}n_{a}}M_{j_{a}j_{a+1}}^{n_{a+1}}\right)
+\]
+
+\end_inset
+
+We continue this iteratation until we reach 
+\begin_inset Formula $C_{i_{b-1}j_{b-1}}^{m_{a}n_{a}}$
+\end_inset
+
+ from which we can evaluate the final result
+\begin_inset Formula 
+\[
+\rho_{a,b}^{\left(m_{a}m_{b}\right)\left(n_{a}n_{b}\right)}=\sum_{i_{b-1}j_{b}}M_{i_{b-1}j_{b}}^{*n_{b}}\left(\sum_{j_{b-1}}C_{i_{b-1}j_{b-1}}^{m_{a}n_{a}}M_{j_{b-1}j_{b}}^{n_{b}}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+Bibliography
+\end_layout
+
+\begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
 btprint "btPrintCited"
-bibfiles "MPS"
+bibfiles "MPS1"
 options "plain"
 
 \end_inset

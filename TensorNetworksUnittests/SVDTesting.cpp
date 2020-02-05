@@ -1,6 +1,8 @@
 #include "Tests.H"
 
 #include "TensorNetworksImp/MatrixProductStateImp.H"
+#include "TensorNetworks/Epsilons.H"
+
 #include "oml/stream.h"
 #include "oml/numeric.h"
 #include "oml/cnumeric.h"
@@ -18,19 +20,19 @@ class SVDTesting : public ::testing::Test
 public:
     typedef TensorNetworks::MatrixCT MatrixT;
     SVDTesting()
-    : mps(10,1,2)
-  //  , itsSites(mps.itsSites)
+    : itsEps()
+    , mps(10,1,2,itsEps)
     , eps(1.0e-13)
     {
         StreamableObject::SetToPretty();
         mps.InitializeWith(TensorNetworks::Product);
     }
- //   const MatrixT& GetA(int i,int ip) const {return itsSites[i]->itsAs[ip]; }
 
 
-    MatrixProductStateImp mps;
-//    MatrixProductState::SitesType& itsSites;
+    Epsilons               itsEps;
+   MatrixProductStateImp mps;
     double eps;
+
 };
 
 
@@ -241,16 +243,17 @@ TEST_F(SVDTesting,Prime_EigenSolverSparseComplexHermitian200x200)
     }
     Mtype Ah=A+Transpose(conj(A)); //Make it hermitian
 
-    PrimeEigenSolver<eType> solver(1e-5);
-    solver.Solve(Ah,Ne);
-    solver.NewEps(1e-9);
-    solver.Solve(Ah,Ne);
-    solver.NewEps(1e-12);
-    solver.Solve(Ah,Ne);
-    solver.NewEps(1e-13);
-    solver.Solve(Ah,Ne);
-    solver.NewEps(1e-14);
-    solver.Solve(Ah,Ne);
+    PrimeEigenSolver<eType> solver;
+    itsEps.itsEigenConvergenceEpsilon=1e-4;
+    solver.Solve(Ah,Ne,itsEps);
+    itsEps.itsEigenConvergenceEpsilon=1e-6;
+    solver.Solve(Ah,Ne,itsEps);
+    itsEps.itsEigenConvergenceEpsilon=1e-8;
+    solver.Solve(Ah,Ne,itsEps);
+    itsEps.itsEigenConvergenceEpsilon=1e-11;
+    solver.Solve(Ah,Ne,itsEps);
+    itsEps.itsEigenConvergenceEpsilon=1e-14;
+    solver.Solve(Ah,Ne,itsEps);
 
     Mtype diag=Transpose(conj(solver.GetEigenVectors()))*Ah*solver.GetEigenVectors();
     Vector<double> evals=solver.GetEigenValues();
@@ -272,16 +275,17 @@ TEST_F(SVDTesting,Prime_EigenSolverDenseComplexHermitian200x200)
     }
     Mtype Ah=A+Transpose(conj(A)); //Make it hermitian
 
-    PrimeEigenSolver<eType> solver(1e-5);
-    solver.Solve(Ah,Ne);
-    solver.NewEps(1e-9);
-    solver.Solve(Ah,Ne);
-    solver.NewEps(1e-12);
-    solver.Solve(Ah,Ne);
-    solver.NewEps(1e-13);
-    solver.Solve(Ah,Ne);
-    solver.NewEps(1e-14);
-    solver.Solve(Ah,Ne);
+    PrimeEigenSolver<eType> solver;
+    itsEps.itsEigenConvergenceEpsilon=1e-4;
+    solver.Solve(Ah,Ne,itsEps);
+    itsEps.itsEigenConvergenceEpsilon=1e-6;
+    solver.Solve(Ah,Ne,itsEps);
+    itsEps.itsEigenConvergenceEpsilon=1e-8;
+    solver.Solve(Ah,Ne,itsEps);
+    itsEps.itsEigenConvergenceEpsilon=1e-11;
+    solver.Solve(Ah,Ne,itsEps);
+    itsEps.itsEigenConvergenceEpsilon=1e-14;
+    solver.Solve(Ah,Ne,itsEps);
 
     Mtype diag=Transpose(conj(solver.GetEigenVectors()))*Ah*solver.GetEigenVectors();
     Vector<double> evals=solver.GetEigenValues();

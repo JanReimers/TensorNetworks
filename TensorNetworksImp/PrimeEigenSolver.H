@@ -11,7 +11,7 @@ class Epsilons;
 template <class T> class PrimeEigenSolver
 {
     public:
-        PrimeEigenSolver(double eps);
+        PrimeEigenSolver();
         ~PrimeEigenSolver();
 
         // Get lowest N eigen values and vectors with no initial guess

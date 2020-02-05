@@ -4,6 +4,8 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/LRPSupervisor.H"
+#include "TensorNetworks/Epsilons.H"
+
 #include "oml/stream.h"
 #include "oml/vector_io.h"
 #include "oml/stopw.h"
@@ -20,6 +22,7 @@ public:
         : eps(1.0e-13)
         , itsFactory(TensorNetworks::Factory::GetFactory())
         , itsSupervisor( new LRPSupervisor())
+        , itsEps()
 
     {
         assert(itsFactory);
@@ -30,13 +33,13 @@ public:
     {
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S2/2.0,1.0,1.0,0.0);
         itsWRep=dynamic_cast<OperatorWRepresentation*>(itsH);
-        itsMPS=itsH->CreateMPS(D);
+        itsMPS=itsH->CreateMPS(D,itsEps);
     }
     double ENeel(int S2) const;
-    Matrix6T GetHeff(int isite) const {return GetMPSImp()->GetHeff(itsH,isite);}
+    //Matrix6T GetHeff(int isite) const {return GetMPSImp()->GetHeff(itsH,isite);}
     Matrix6T GetHeffIterate(int isite) const {return GetMPSImp()->GetHeffIterate(itsH,isite);}
-    double ContractHeff(int isite,const Matrix6T& Heff) const{return GetMPSImp()->itsSites[isite]->ContractHeff(Heff);}
-    double ContractHeff(int isite,const MatrixCT& Heff) const{return GetMPSImp()->itsSites[isite]->ContractHeff(Heff);}
+//    double ContractHeff(int isite,const Matrix6T& Heff) const{return GetMPSImp()->itsSites[isite]->ContractHeff(Heff);}
+//    double ContractHeff(int isite,const MatrixCT& Heff) const{return GetMPSImp()->itsSites[isite]->ContractHeff(Heff);}
     Vector3T GetEOLeft_Iterate(int isite,bool cache=false) const {return GetMPSImp()->GetEOLeft_Iterate(itsH,itsSupervisor,isite,cache);}
     Vector3T GetEORightIterate(int isite,bool cache=false) const {return GetMPSImp()->GetEORightIterate(itsH,itsSupervisor,isite,cache);}
     void LoadHeffCaches() {GetMPSImp()->LoadHeffCaches(itsH,itsSupervisor);}
@@ -52,6 +55,7 @@ public:
     OperatorWRepresentation* itsWRep;
     MatrixProductState*    itsMPS;
     LRPSupervisor* itsSupervisor;
+    Epsilons             itsEps;
 };
 
 
@@ -125,8 +129,7 @@ TEST_F(MPOTesting,DoHamiltionExpectationL10S1_5D2)
     {
         Setup(10,S2,2);
         itsMPS->InitializeWith(TensorNetworks::Neel);
-        itsMPS->GetExpectation(itsH);
-        EXPECT_NEAR(itsMPS->GetExpectation(itsH),ENeel(S2),1e-11);
+        EXPECT_NEAR(itsMPS->GetExpectationIterate(itsH),ENeel(S2),1e-11);
     }
 }
 
@@ -134,15 +137,13 @@ TEST_F(MPOTesting,DoHamiltionExpectationProductL10S1D1)
 {
     Setup(10,1,1);
     itsMPS->InitializeWith(TensorNetworks::Neel);
-    itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
+    EXPECT_NEAR(itsMPS->GetExpectationIterate(itsH),-2.25,1e-11);
 }
 TEST_F(MPOTesting,DoHamiltionExpectationNeelL10S1D1)
 {
     Setup(10,1,1);
     itsMPS->InitializeWith(TensorNetworks::Neel);
-    itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
+    EXPECT_NEAR(itsMPS->GetExpectationIterate(itsH),-2.25,1e-11);
 }
 
 TEST_F(MPOTesting,LeftNormalizeThenDoHamiltionExpectation)
@@ -150,100 +151,16 @@ TEST_F(MPOTesting,LeftNormalizeThenDoHamiltionExpectation)
     Setup(10,1,2);
     itsMPS->InitializeWith(TensorNetworks::Neel);
     itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
-    itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
+    EXPECT_NEAR(itsMPS->GetExpectationIterate(itsH),-2.25,1e-11);
 }
 TEST_F(MPOTesting,RightNormalizeThenDoHamiltionExpectation)
 {
     Setup(10,1,2);
     itsMPS->InitializeWith(TensorNetworks::Neel);
     itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
-    itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
+    EXPECT_NEAR(itsMPS->GetExpectationIterate(itsH),-2.25,1e-11);
 }
 
-TEST_F(MPOTesting,TestHeffWithProductState)
-{
-    Setup(10,1,2);
-//    itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->InitializeWith(TensorNetworks::Neel);
-    for (int ia=0; ia<itsH->GetL(); ia++)
-    {
-        itsMPS->Normalize(ia);
-        Matrix6T Heff=GetHeff(ia);
- //       cout << "E(" << ia << ")=" << itsMPS->ConstractHeff(ia,Heff) << endl;
-        EXPECT_NEAR(ContractHeff(ia,Heff),-2.25,1e-11);
-        MatrixCT HeffF=Heff.Flatten();
-        //cout << "Heff=" << Heff << endl;
-        MatrixCT d=HeffF-Transpose(conj(HeffF));
-        EXPECT_NEAR(Max(abs(d)),0.0,1e-11);
-
-//    cout << "d=" << d << endl;
-    }
-}
-
-TEST_F(MPOTesting,TestHeffWithRandomStateL10S1D2)
-{
-    Setup(10,1,2);
-    itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
-    double E1=itsMPS->GetExpectation(itsH);
-    for (int ia=0; ia<itsH->GetL(); ia++)
-    {
-        itsMPS->Normalize(ia);
-        Matrix6T Heff=GetHeff(ia);
-        double E2=ContractHeff(ia,Heff);
-        EXPECT_NEAR(E1,E2,100*eps);
-        double E3=ContractHeff(ia,Heff.Flatten());
-        EXPECT_NEAR(E1,E3,100*eps);
-
-        MatrixCT HeffF=Heff.Flatten();
-        MatrixCT d=HeffF-Transpose(conj(HeffF));
-        EXPECT_NEAR(Max(abs(d)),0.0,100*eps);
-    }
-}
-
-TEST_F(MPOTesting,TestHeffWithRandomStateL10S1D1)
-{
-    Setup(10,1,1);
-    itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
-    double E1=itsMPS->GetExpectation(itsH);
-    for (int ia=0; ia<itsH->GetL(); ia++)
-    {
-        itsMPS->Normalize(ia);
-        Matrix6T Heff=GetHeff(ia);
-        double E2=ContractHeff(ia,Heff);
-        EXPECT_NEAR(E1,E2,100*eps);
-        double E3=ContractHeff(ia,Heff.Flatten());
-        EXPECT_NEAR(E1,E3,100*eps);
-
-        MatrixCT HeffF=Heff.Flatten();
-        MatrixCT d=HeffF-Transpose(conj(HeffF));
-        EXPECT_NEAR(Max(abs(d)),0.0,100*eps);
-    }
-}
-
-TEST_F(MPOTesting,TestHeffWithRandomStateL10S5D1)
-{
-    Setup(10,5,1);
-    itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
-    double E1=itsMPS->GetExpectation(itsH);
-    for (int ia=0; ia<itsH->GetL(); ia++)
-    {
-        itsMPS->Normalize(ia);
-        Matrix6T Heff=GetHeff(ia);
-        double E2=ContractHeff(ia,Heff);
-        EXPECT_NEAR(E1,E2,100000*eps);
-        double E3=ContractHeff(ia,Heff.Flatten());
-        EXPECT_NEAR(E1,E3,100000*eps);
-
-        MatrixCT HeffF=Heff.Flatten();
-        MatrixCT d=HeffF-Transpose(conj(HeffF));
-        EXPECT_NEAR(Max(abs(d)),0.0,100000*eps);
-    }
-}
 
 
 TEST_F(MPOTesting,TestGetLRIterateL10S1D2)
@@ -315,29 +232,11 @@ TEST_F(MPOTesting,TestEoldEnew)
     eType EL=L3(1,1,1);
     Vector3T R3=GetEORightIterate(-1);
     eType ER=R3(1,1,1);
-    double Enew=itsMPS->GetExpectation(itsH);
-    double Eold=itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(std::real(ER),Eold,100*eps);
-    EXPECT_NEAR(std::real(EL),Eold,100*eps);
-    EXPECT_NEAR(Enew,Eold,100*eps);
+    double Enew=itsMPS->GetExpectationIterate(itsH);
+    EXPECT_NEAR(std::real(ER),Enew,100*eps);
+    EXPECT_NEAR(std::real(EL),Enew,100*eps);
 }
 
-TEST_F(MPOTesting,TestHeff)
-{
-    int L=10;
-    Setup(L,1,2);
-    itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
-    LoadHeffCaches();
-    // This only work for site 0 since the Left cache only gets updates by the SweepRight routine.
-    int ia=0;
-        Matrix6T HeffI=GetHeffIterate(ia);
-//        cout << "HeffI=" << HeffI <<endl;
-        Matrix6T HeffO=GetHeff(ia);
-//        cout << "HeffO=" << HeffO <<endl;
-        double error=Max(abs(HeffI.Flatten()-HeffO.Flatten()));
-        EXPECT_NEAR(error,0,10*eps);
-}
 
 TEST_F(MPOTesting,TestGetExpectation2_I_I)
 {
@@ -348,8 +247,8 @@ TEST_F(MPOTesting,TestGetExpectation2_I_I)
     OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
     Operator* IO=itsH->CreateOperator(IWO);
 
-    double E1=itsMPS->GetExpectation(itsH);
-    double I1=itsMPS->GetExpectation(IO);
+    double E1=itsMPS->GetExpectationIterate(itsH);
+    double I1=itsMPS->GetExpectationIterate(IO);
     double II=itsMPS->GetExpectation(IO,IO);
     double IE=itsMPS->GetExpectation(IO,itsH);
     double EI=itsMPS->GetExpectation(itsH,IO);

@@ -13,7 +13,7 @@ void SparseMatvec(void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *block
 template<class T> const SparseMatrix<T>* PrimeEigenSolver<T>::theSparseMatrix = 0;
 template<class T> const      DMatrix<T>* PrimeEigenSolver<T>::theDenseMatrix = 0;
 
-template <class T> PrimeEigenSolver<T>::PrimeEigenSolver(double eps)
+template <class T> PrimeEigenSolver<T>::PrimeEigenSolver()
 : itsNumGuesses(0)
 {
 

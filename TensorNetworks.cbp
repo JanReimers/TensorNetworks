@@ -111,6 +111,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/MatrixProductSite.H" />
+		<Unit filename="TensorNetworksImp/MatrixProductSite_Contractions.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="TensorNetworksImp/MatrixProductStateImp.C">
 			<Option compilerVar="CC" />
 		</Unit>

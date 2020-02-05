@@ -4,6 +4,7 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/LRPSupervisor.H"
+#include "TensorNetworks/Epsilons.H"
 
 #include "oml/stream.h"
 #include "oml/stopw.h"
@@ -16,6 +17,7 @@ public:
     GroundStateTesting()
     : eps(1.0e-13)
     , itsFactory(TensorNetworks::Factory::GetFactory())
+    , itsEps()
     {
         StreamableObject::SetToPretty();
 
@@ -24,7 +26,7 @@ public:
     void Setup(int L, int S2, int D)
     {
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S2/2.0,1.0,1.0,0.0);
-        itsMPS=itsH->CreateMPS(D);
+        itsMPS=itsH->CreateMPS(D,itsEps);
     }
 
 
@@ -32,6 +34,7 @@ public:
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
     Hamiltonian*         itsH;
     MatrixProductState*  itsMPS;
+    Epsilons             itsEps;
 };
 
 
@@ -42,7 +45,7 @@ TEST_F(GroundStateTesting,TestIdentityOperator)
     itsMPS->Normalize(TensorNetworks::Left,new LRPSupervisor());
     OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
     Operator* IO=itsH->CreateOperator(IWO);
-    double S=itsMPS->GetExpectation(IO);
+    double S=itsMPS->GetExpectationIterate(IO);
     EXPECT_NEAR(S,1.0,eps);
 
 }
@@ -56,8 +59,6 @@ TEST_F(GroundStateTesting,TestSweepL9S1D2)
     int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
 
     double E=itsMPS->GetExpectationIterate(itsH);
-    double o=itsMPS->GetOverlap();
-    EXPECT_NEAR(o,1.0,eps);
     EXPECT_NEAR(E/(L-1),-0.45317425,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }
@@ -73,8 +74,6 @@ TEST_F(GroundStateTesting,TestSweepL9S1D8)
     int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
 
     double E=itsMPS->GetExpectationIterate(itsH);
-    double o=itsMPS->GetOverlap();
-    EXPECT_NEAR(o,1.0,eps);
     EXPECT_NEAR(E/(L-1),-0.46703753,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }
@@ -87,8 +86,6 @@ TEST_F(GroundStateTesting,TestSweepL9S5D2)
     int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
 
     double E=itsMPS->GetExpectationIterate(itsH);
-    double o=itsMPS->GetOverlap();
-    EXPECT_NEAR(o,1.0,eps);
     EXPECT_NEAR(E/(L-1),-7.025661 ,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }
@@ -108,8 +105,6 @@ TEST_F(GroundStateTesting,TestSweepL19S5D4)
     cout << "FindGroundState for L=" << L << ", S=" << S2/2.0 << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
 
     double E=itsMPS->GetExpectationIterate(itsH);
-    double o=itsMPS->GetOverlap();
-    EXPECT_NEAR(o,1.0,eps);
     EXPECT_NEAR(E/(L-1),-7.1766766 ,1e-5);
     EXPECT_LT(nSweep,maxIter);
 }
@@ -126,8 +121,6 @@ TEST_F(GroundStateTesting,TestSweepL19S1D8)
     cout << "FindGroundState for L=" << L << ", S=" << S2/2.0 << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
 
     double E=itsMPS->GetExpectationIterate(itsH);
-    double o=itsMPS->GetOverlap();
-    EXPECT_NEAR(o,1.0,eps);
     EXPECT_NEAR(E/(L-1),-0.45535447609272839,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }

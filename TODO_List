@@ -1,37 +1,38 @@
 -GUI
-    Done Separate norm status widgets for each site, update singles
-    E/J plot for each site doesn't really work since the y range gets so tiny
-        Done Fix some plots, plot dE vs site# on log scale
-        Done Plot points instead of lines
-        Does wxDrivet support log scales?
-        Done Rank vs. site#
-        Done Fix axis code to avoid scientific unless ymin=0 or ymax=0
     Control panel
         Play/Pause in one button.  Use icons?
-        Done Get restart working(have restart do what start does now, get rid of start, play nad step will start it)
-        Done On startup Step should start the run
-    Done Stop shoud kill the thread
-    Done Split the classes into separate files wxMPSFrame.py is getting too big.
     Status bar. ModelName (from H), L,S, D, iter#, E, CPU & meminfo (use psutils)
-    Done Create Bond objects between sites.  Each site can see its left and right bond objects.
-    Done Fix alignments on Ham tab
-    Done Use eps values.
-    Fresh checkout and build.
-    Ham->CreateMPS should be a /Factory/ sp py knows to delete it.
-    Convergence schedule,  increase D, drop epsilons
-    Dynamically add lattice site, pseudo DMRG
-
--Done Mega classes MPState MPSite are too big, how split up responsibilities?
-    Move some stuff into bond objects
-    Partially DONE.  Made more stuff private at least.
-    separate out contraction functions into a separate .C file.  SHould they be non-members?
+-Fresh checkout and build.
+-Ham->CreateMPS should be a /Factory/ so py knows to delete it.
+-Convergence schedule,  increase D, drop epsilons
+-Dynamically add lattice site, pseudo DMRG
+-Done Separate out contraction code in MPSite
+-Done Get rid of old dumm-ass contraction code.
+-More refactoring, duplicated code in SweepLR routines
+-Simplify rescale step in normalization?
 -Calc <Sx> <Sy> <Sz>
     Could start by calculating one density matrices.  Then ops are easy
 -Correlation functions <Sa*Sa+n>-<Sa>*<Sa+n>
     Extend to pair density matricies.  It would interesting to see the eigen values of distant
     pair DMs.  Do the lowest two EVs drop with distance, indicating decrreasing entanglement?
+-Calc 1&2 site density matrices
+    Done Start a new theory doc.
+    Done Get refs working from DOIs (give up on JabRef)
+    Write out diagrams and iterative formulas for 2 site density matrix.
 -Why optimize site 1, just leave it a |up> and take out global SU(2) invariance
+    is this related to poor convergence for S>1/2 ??
+-Why is dE~10e-15 for sites 1&2 on right sweep and sites L-1,L-2 on left sweep?
+    is this related to poor convergence for S>1/2 ??
 -Valgrind, any memeory leaks?
+Done -Start a new cleaner lyx doc with tensor diagrams
+    Done -Find a quite diagraming tool: LibreOfficeDraw seems to work.  However you can export whole pages
+     as PNGs so one must then use ImageMagic to crop and separate the diagram.  Ho-hum
+
+
+
+-Done Mega classes MPState MPSite are too big, how split up responsibilities?
+    Move some stuff into bond objects
+    Partially DONE.  Made more stuff private at least.
 -Done Give Lanczos an initial guess from previous iteration.
 -Done Speed up <E^2> contractions, take advantage of W shapes.  Make Dw2 a function of w1.
     Before Implementation:
@@ -81,3 +82,19 @@ DONE -  Improve with <H^2>-<H>^2 convergence, You need converge in D for this to
 DONE -Show sparsisity (# non zero elements) in H_eff for each site.
 DONE -Profile, where are we spending the most time?
 DONE -Start using sparse eigen solver.  Used the PRIMME system.
+Done Separate norm status widgets for each site, update singles
+E/J plot for each site doesn't really work since the y range gets so tiny
+    Done Fix some plots, plot dE vs site# on log scale
+    Done Plot points instead of lines
+    Does wxDrivet support log scales?
+    Done Rank vs. site#
+    Done Fix axis code to avoid scientific unless ymin=0 or ymax=0
+Control panel
+    Done Get restart working(have restart do what start does now, get rid of start, play nad step will start it)
+    Done On startup Step should start the run
+    Done Stop shoud kill the thread
+Done Split the classes into separate files wxMPSFrame.py is getting too big.
+Done Create Bond objects between sites.  Each site can see its left and right bond objects.
+Done Fix alignments on Ham tab
+Done Use eps values.
+

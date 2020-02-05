@@ -42,9 +42,10 @@ public:
 //
 //  Access to information
 //
-        int     GetL      () const {return itsL;}
-        int     GetD      () const {return itsD;}
-        int     Getp      () const {return itsp;}
+        int     GetL        () const {return itsL;}
+        int     GetD        () const {return itsD;}
+        int     Getp        () const {return itsp;}
+        double  GetMaxDeltaE() const;
 
 //--------------------------------------------------------------------------------------
 //
@@ -52,7 +53,6 @@ public:
 //
         virtual void Normalize(TensorNetworks::Position LR,LRPSupervisor*);
         virtual void Normalize(int isite); //Mixed Canonical normalization
-        virtual bool CheckNormalized(int isite,double eps) const;
 //--------------------------------------------------------------------------------------
 //
 // Find ground state
@@ -62,11 +62,8 @@ public:
 //
 //    Overlap and expectation contractions
 //
-public:
 
-        virtual double   GetOverlap           () const;
         virtual double   GetExpectationIterate(const Operator* o) const;
-        virtual double   GetExpectation       (const Operator *o) const;
         virtual double   GetExpectation       (const Operator* o1,const Operator* o2) const;
 //--------------------------------------------------------------------------------------
 //
@@ -92,30 +89,20 @@ private:
 //
 //  For groound state search
 //
+        void     Refine        (const Hamiltonian *h,LRPSupervisor*,const Epsilons& eps,int isite); //Minimize energy WRT the Ms in one site.
         double   SweepRight    (const Hamiltonian* h,LRPSupervisor*,const Epsilons& eps,bool quiet=true);
         double   SweepLeft     (const Hamiltonian* h,LRPSupervisor*,const Epsilons& eps,bool quiet=true);
-        void     Refine        (const Hamiltonian *h,LRPSupervisor*,const Epsilons& eps,int isite); //Minimize energy WRT the Ms in one site.
-        void     LoadHeffCaches(const Hamiltonian* h,LRPSupervisor*);
-        Vector3T GetHLeft_Cache(int isite) const;
-        Vector3T GetHRightCache(int isite) const;
-        double   GetMaxDeltaE  () const;
-        Matrix6T GetHeffIterate(const Hamiltonian* h,int isite) const;
         void     UpdateBondData(int isite);
 
 //--------------------------------------------------------------------------------------
 //
-//  For low level ttesting only
+// Calc Heff, calc L&R caches
 //
-        MatrixCT GetMLeft (int isite) const;
-        MatrixCT GetMRight(int isite) const;
+        Matrix6T GetHeffIterate(const Hamiltonian* h,int isite) const;
 
-        Matrix6T GetHeff       (const Hamiltonian* h,int isite) const;
-        Matrix6T GetEOLeft     (const Operator* o   ,int isite) const;
-        Matrix6T GetEORight    (const Operator* o   ,int isite) const;
-
-        MatrixCT GetNeff   (int isite) const;
-
- //       Matrix6T GetEO(int isite, const MPOSite* mpos) const;
+        void     LoadHeffCaches(const Hamiltonian* h,LRPSupervisor*);
+        Vector3T GetHLeft_Cache(int isite) const;
+        Vector3T GetHRightCache(int isite) const;
         Vector3T GetEOLeft_Iterate(const Operator* o,LRPSupervisor*,int isite,bool cache=false) const;
         Vector3T GetEORightIterate(const Operator* o,LRPSupervisor*,int isite,bool cache=false) const;
 

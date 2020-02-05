@@ -24,7 +24,7 @@ class MatrixProductState : public virtual MultiPlotable
 //
         virtual void Normalize(TensorNetworks::Position LR,LRPSupervisor*)=0;
         virtual void Normalize(int isite)=0; //Mixed Canonical normalization
-        virtual bool CheckNormalized(int isite,double eps) const=0;
+//        virtual bool CheckNormalized(int isite,double eps) const=0;
 //--------------------------------------------------------------------------------------
 //
 // Find ground state.  Return <E^2>-<E>^2
@@ -34,9 +34,9 @@ class MatrixProductState : public virtual MultiPlotable
 //
 //    Overlap and expectation contractions
 //
-        virtual double   GetOverlap           () const=0;
+//        virtual double   GetOverlap           () const=0;
         virtual double   GetExpectationIterate(const Operator* o) const=0;
-        virtual double   GetExpectation       (const Operator *o) const=0;
+//        virtual double   GetExpectation       (const Operator *o) const=0;
         virtual double   GetExpectation       (const Operator* o1,const Operator* o2) const=0;
 //--------------------------------------------------------------------------------------
 //

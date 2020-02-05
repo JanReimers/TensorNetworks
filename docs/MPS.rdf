@@ -1,0 +1,627 @@
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:z="http://www.zotero.org/namespaces/export#"
+ xmlns:bib="http://purl.org/net/biblio#"
+ xmlns:foaf="http://xmlns.com/foaf/0.1/"
+ xmlns:dcterms="http://purl.org/dc/terms/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:link="http://purl.org/rss/1.0/modules/link/"
+ xmlns:prism="http://prismstandard.org/namespaces/1.2/basic/">
+    <bib:Book rdf:about="https://www.math.columbia.edu/ woit/wordpress/?p=10533">
+        <z:itemType>book</z:itemType>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Woit</foaf:surname>
+                        <foaf:givenName>Peter</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dcterms:isReferencedBy rdf:resource="#item_2"/>
+        <dc:title>Is Quantum Mechanics a Probabilistic Theory?</dc:title>
+        <dc:date>2018</dc:date>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://www.math.columbia.edu/ woit/wordpress/?p=10533</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+    </bib:Book>
+    <bib:Memo rdf:about="#item_2">
+        <rdf:value>&lt;p&gt;https://www.math.columbia.edu/ woit/wordpress/?p=10533&lt;/p&gt;</rdf:value>
+    </bib:Memo>
+    <bib:Book rdf:about="#item_3">
+        <z:itemType>book</z:itemType>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Neumaier</foaf:surname>
+                        <foaf:givenName>Arnold</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_4"/>
+        <dc:subject>81P15</dc:subject>
+        <dc:subject>physics.hist-ph</dc:subject>
+        <dc:subject>quant-ph</dc:subject>
+        <dc:title>Foundations of quantum physics IV. More on the thermal interpretation</dc:title>
+        <dcterms:abstract>This paper continues the discussion of the thermal interpretation of quantum physics. While Part II and Part III of this series of papers explained and justified the reasons for the departure from tradition, the present Part IV summarizes the main features and adds intuitive explanations and new technical developments. It is shown how the spectral features of quantum systems and an approximate classical dynamics arise under appropriate conditions. Evidence is given for how, in the thermal interpretation, the measurement of a qubit by a pointer q-expectation may result in a binary detection event with probabilities given by the diagonal entries of the reduced density matrix of the prepared qubit. Differences in the conventions about measurement errors in the thermal interpretation and in traditional interpretations are discussed in detail. Several standard experiments, the double slit, Stern–Gerlach, and particle decay are described from the perspective of the thermal interpretation.</dcterms:abstract>
+        <dc:date>2019-04-29</dc:date>
+        <dc:description>arXiv: 1904.12721v2</dc:description>
+    </bib:Book>
+    <z:Attachment rdf:about="#item_4">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>online</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>http://arxiv.org/pdf/1904.12721v2</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 19:49:25</dcterms:dateSubmitted>
+        <z:linkMode>3</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <bib:Book rdf:about="#item_5">
+        <z:itemType>book</z:itemType>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Neumaier</foaf:surname>
+                        <foaf:givenName>Arnold</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_6"/>
+        <dc:subject>physics.hist-ph</dc:subject>
+        <dc:subject>quant-ph</dc:subject>
+        <dc:subject>81P10</dc:subject>
+        <dc:title>Foundations of quantum physics I. A critique of the tradition</dc:title>
+        <dcterms:abstract>This paper gives a thorough critique of the foundations of quantum physics in its mainstream interpretation (i.e., treating pure states as primitives, without reference to hidden variables, and without modifications of the quantum laws). This is achieved by cleanly separating a concise version of the (universally accepted) formal core of quantum physics from the (controversial) interpretation issues. The latter are primarily related to measurement, but also to questions of existence and of the meaning of basic concepts like 'state' and 'particle'. The requirements for good foundations of quantum physics are discussed. Main results: * Born's rule cannot be valid universally, and must be considered as a scientific law with a restricted domain of validity. * If the state of every composite quantum system contains all information that can be known about this system, it cannot be a pure state in general.</dcterms:abstract>
+        <dc:date>2019-02-27</dc:date>
+        <dc:description>arXiv: 1902.10778v2</dc:description>
+    </bib:Book>
+    <z:Attachment rdf:about="#item_6">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>online</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>http://arxiv.org/pdf/1902.10778v2</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 19:49:26</dcterms:dateSubmitted>
+        <z:linkMode>3</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <bib:Book rdf:about="#item_7">
+        <z:itemType>book</z:itemType>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Neumaier</foaf:surname>
+                        <foaf:givenName>Arnold</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_8"/>
+        <dc:subject>81P15</dc:subject>
+        <dc:subject>quant-ph</dc:subject>
+        <dc:title>Foundations of quantum physics III. Measurement</dc:title>
+        <dcterms:abstract>This paper presents the measurement problem from the point of view of the thermal interpretation of quantum physics introduced in Part II. The measurement of a Hermitian quantity $A$ is regarded as giving an uncertain value approximating the q-expectation $\langle A\rangle$ rather than (as tradition wanted to have it) as an exact revelation of an eigenvalue of $A$. Single observations of microscopic systems are (except under special circumstances) very uncertain measurements only. The thermal interpretation * treats detection events as a statistical measurement of particle beam intensity. * claims that the particle concept is only asymptotically valid, under conditions where particles are essentially free. * claims that the unmodeled environment influences the results enough to cause all randomness in quantum physics. * allows one to derive Born's rule for scattering and in the limit of ideal measurements; but in general, only part of Born's rule holds exactly: Whenever a quantity A with zero uncertainty is measured exactly, its value is an eigenvalue of A. * has no explicit collapse – the latter emerges approximately in non-isolated subsystems. * gives a valid interpretation of systems modeled by a quantum-classical dynamics. * explains the peculiar features of the Copenhagen interpretation (lacking realism between measurements) and the minimal statistical interpretation (lacking realism for the single case) where these interpretations apply – in the microscopic domain. The thermal interpretation is an interpretation of quantum physics that is in principle refutable by theoretical arguments leading to a negative answer to a number of open issues collected at the end of the paper, since there is plenty of experimental evidence for each of the points mentioned there.</dcterms:abstract>
+        <dc:date>2019-02-27</dc:date>
+        <dc:description>arXiv: 1902.10782v2</dc:description>
+    </bib:Book>
+    <z:Attachment rdf:about="#item_8">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>online</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>http://arxiv.org/pdf/1902.10782v2</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 19:49:26</dcterms:dateSubmitted>
+        <z:linkMode>3</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <bib:Book rdf:about="#item_9">
+        <z:itemType>book</z:itemType>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Neumaier</foaf:surname>
+                        <foaf:givenName>Arnold</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_10"/>
+        <dc:subject>quant-ph</dc:subject>
+        <dc:subject>81P05</dc:subject>
+        <dc:title>Foundations of quantum physics II. The thermal interpretation</dc:title>
+        <dcterms:abstract>This paper presents the thermal interpretation of quantum physics. The insight from Part I of this series that Born's rule has its limitations – hence cannot be the foundation of quantum physics – opens the way for an alternative interpretation – the thermal interpretation of quantum physics. It gives new foundations that connect quantum physics (including quantum mechanics, statistical mechanics, quantum field theory and their applications) to experiment. The thermal interpretation resolves the problems of the foundations of quantum physics revealed in the critique from Part I of this series. It improves the traditional foundations in several respects: * The thermal interpretation reflects the actual practice of quantum physics, especially regarding its macroscopic implications. * The thermal interpretation gives a fair account of the interpretational differences between quantum mechanics and quantum field theory. * The thermal interpretation gives a natural, realistic meaning to the standard formalism of quantum mechanics and quantum field theory in a single world, without introducing additional hidden variables. * The thermal interpretation is independent of the measurement problem. The latter becomes a precise problem in statistical mechanics rather than a fuzzy and problematic notion in the foundations. Details will be discussed in Part III.</dcterms:abstract>
+        <dc:date>2019-02-27</dc:date>
+        <dc:description>arXiv: 1902.10779v2</dc:description>
+    </bib:Book>
+    <z:Attachment rdf:about="#item_10">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>online</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>http://arxiv.org/pdf/1902.10779v2</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 19:49:27</dcterms:dateSubmitted>
+        <z:linkMode>3</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <bib:Book rdf:about="#item_11">
+        <z:itemType>book</z:itemType>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Neumaier</foaf:surname>
+                        <foaf:givenName>Arnold</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_12"/>
+        <dc:subject>quant-ph</dc:subject>
+        <dc:subject>81P05</dc:subject>
+        <dc:subject>math-ph</dc:subject>
+        <dc:subject>math.MP</dc:subject>
+        <dc:title>Foundations of quantum physics V. Coherent foundations</dc:title>
+        <dcterms:abstract>This paper is a programmatic article presenting an outline of a new view of the foundations of quantum mechanics and quantum field theory. In short, the proposed foundations are given by the following statements: * Coherent quantum physics is physics in terms of a coherent space consisting of a line bundle over a classical phase space and an appropriate coherent product. * The kinematical structure of quantum physics and the meaning of the fundamental quantum observables are given by the symmetries of this coherent space, their infinitesimal generators, and associated operators on the quantum space of the coherent space. * The connection of quantum physics to experiment is given through the thermal interpretation. The dynamics of quantum physics is given (for isolated systems) by the Ehrenfest equations for q-expectations.</dcterms:abstract>
+        <dc:date>2019-05-02</dc:date>
+        <dc:description>arXiv: 1905.00920v2</dc:description>
+    </bib:Book>
+    <z:Attachment rdf:about="#item_12">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>online</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>http://arxiv.org/pdf/1905.00920v2</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 19:49:28</dcterms:dateSubmitted>
+        <z:linkMode>3</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <bib:Article rdf:about="https://arxiv.org/abs/1008.3477">
+        <z:itemType>journalArticle</z:itemType>
+        <dcterms:isPartOf>
+            <bib:Journal>
+                <dc:title>Annals of Physics 326(1)</dc:title>
+                <dc:identifier>DOI 10.1016/j.aop.2010.09.012</dc:identifier>
+            </bib:Journal>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Schollwoeck</foaf:surname>
+                        <foaf:givenName>Ulrich</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dc:title>The density-matrix renormalization group in the age of matrix product states</dc:title>
+        <dcterms:abstract>The density-matrix renormalization group method (DMRG) has established itself over the last decade as the leading method for the simulation of the statics and dynamics of one-dimensional strongly correlated quantum lattice systems. In the further development of the method, the realization that DMRG operates on a highly interesting class of quantum states, so-called matrix product states (MPS), has allowed a much deeper understanding of the inner structure of the DMRG method, its further potential and its limitations. In this paper, I want to give a detailed exposition of current DMRG thinking in the MPS language in order to make the advisable implementation of the family of DMRG algorithms in exclusively MPS terms transparent. I then move on to discuss some directions of potentially fruitful further algorithmic development: while DMRG is a very mature method by now, I still see potential for further improvements, as exemplified by a number of recently introduced algorithms.</dcterms:abstract>
+        <dc:date>2010</dc:date>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://arxiv.org/abs/1008.3477</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+    </bib:Article>
+    <bib:Article rdf:about="#item_14">
+        <z:itemType>journalArticle</z:itemType>
+        <dcterms:isPartOf>
+            <bib:Journal>
+                <dc:title>Annals of Physics 349 (2014) 117-158</dc:title>
+                <dc:identifier>DOI 10.1016/j.aop.2014.06.013</dc:identifier>
+            </bib:Journal>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Orus</foaf:surname>
+                        <foaf:givenName>Roman</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_15"/>
+        <dc:subject>quant-ph</dc:subject>
+        <dc:subject>cond-mat.str-el</dc:subject>
+        <dc:subject>hep-lat</dc:subject>
+        <dc:subject>hep-th</dc:subject>
+        <dc:title>A Practical Introduction to Tensor Networks: Matrix Product States and Projected Entangled Pair States</dc:title>
+        <dcterms:abstract>This is a partly non-technical introduction to selected topics on tensor network methods, based on several lectures and introductory seminars given on the subject. It should be a good place for newcomers to get familiarized with some of the key ideas in the field, specially regarding the numerics. After a very general introduction we motivate the concept of tensor network and provide several examples. We then move on to explain some basics about Matrix Product States (MPS) and Projected Entangled Pair States (PEPS). Selected details on some of the associated numerical methods for 1d and 2d quantum lattice systems are also discussed.</dcterms:abstract>
+        <dc:date>2013-06-10</dc:date>
+        <dc:description>arXiv: 1306.2164v3</dc:description>
+    </bib:Article>
+    <z:Attachment rdf:about="#item_15">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>online</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>http://arxiv.org/pdf/1306.2164v3</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 19:49:28</dcterms:dateSubmitted>
+        <z:linkMode>3</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <bib:Article rdf:about="https://linkinghub.elsevier.com/retrieve/pii/S0003491614001596">
+        <z:itemType>journalArticle</z:itemType>
+        <dcterms:isPartOf rdf:resource="urn:issn:00034916"/>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Orús</foaf:surname>
+                        <foaf:givenName>Román</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_18"/>
+        <dc:title>A practical introduction to tensor networks: Matrix product states and projected entangled pair states</dc:title>
+        <dc:date>10/2014</dc:date>
+        <z:language>en</z:language>
+        <z:shortTitle>A practical introduction to tensor networks</z:shortTitle>
+        <z:libraryCatalog>DOI.org (Crossref)</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://linkinghub.elsevier.com/retrieve/pii/S0003491614001596</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 19:54:06</dcterms:dateSubmitted>
+        <bib:pages>117-158</bib:pages>
+    </bib:Article>
+    <bib:Journal rdf:about="urn:issn:00034916">
+        <prism:volume>349</prism:volume>
+        <dc:title>Annals of Physics</dc:title>
+        <dc:identifier>DOI 10.1016/j.aop.2014.06.013</dc:identifier>
+        <dcterms:alternative>Annals of Physics</dcterms:alternative>
+        <dc:identifier>ISSN 00034916</dc:identifier>
+    </bib:Journal>
+    <z:Attachment rdf:about="#item_18">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>Submitted Version</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://arxiv.org/pdf/1306.2164</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 19:54:16</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <bib:Article rdf:about="https://link.aps.org/doi/10.1103/PhysRevB.96.155120">
+        <z:itemType>journalArticle</z:itemType>
+        <dcterms:isPartOf rdf:resource="urn:issn:2469-9950,%202469-9969"/>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Ran</foaf:surname>
+                        <foaf:givenName>Shi-Ju</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Piga</foaf:surname>
+                        <foaf:givenName>Angelo</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Peng</foaf:surname>
+                        <foaf:givenName>Cheng</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Su</foaf:surname>
+                        <foaf:givenName>Gang</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Lewenstein</foaf:surname>
+                        <foaf:givenName>Maciej</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_20"/>
+        <dc:title>Few-body systems capture many-body physics: Tensor network approach</dc:title>
+        <dc:date>2017-10-13</dc:date>
+        <z:language>en</z:language>
+        <z:shortTitle>Few-body systems capture many-body physics</z:shortTitle>
+        <z:libraryCatalog>DOI.org (Crossref)</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://link.aps.org/doi/10.1103/PhysRevB.96.155120</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 19:55:19</dcterms:dateSubmitted>
+        <bib:pages>155120</bib:pages>
+    </bib:Article>
+    <bib:Journal rdf:about="urn:issn:2469-9950,%202469-9969">
+        <prism:volume>96</prism:volume>
+        <dc:title>Physical Review B</dc:title>
+        <dc:identifier>DOI 10.1103/PhysRevB.96.155120</dc:identifier>
+        <prism:number>15</prism:number>
+        <dcterms:alternative>Phys. Rev. B</dcterms:alternative>
+        <dc:identifier>ISSN 2469-9950, 2469-9969</dc:identifier>
+    </bib:Journal>
+    <z:Attachment rdf:about="#item_20">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>Submitted Version</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://arxiv.org/pdf/1703.09814</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 19:55:25</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <bib:Article rdf:about="https://link.aps.org/doi/10.1103/PhysRevLett.69.2863">
+        <z:itemType>journalArticle</z:itemType>
+        <dcterms:isPartOf rdf:resource="urn:issn:0031-9007"/>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>White</foaf:surname>
+                        <foaf:givenName>Steven R.</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dc:title>Density matrix formulation for quantum renormalization groups</dc:title>
+        <dc:date>1992-11-9</dc:date>
+        <z:language>en</z:language>
+        <z:libraryCatalog>DOI.org (Crossref)</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://link.aps.org/doi/10.1103/PhysRevLett.69.2863</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 19:58:14</dcterms:dateSubmitted>
+        <bib:pages>2863-2866</bib:pages>
+    </bib:Article>
+    <bib:Journal rdf:about="urn:issn:0031-9007">
+        <prism:volume>69</prism:volume>
+        <dc:title>Physical Review Letters</dc:title>
+        <dc:identifier>DOI 10.1103/PhysRevLett.69.2863</dc:identifier>
+        <prism:number>19</prism:number>
+        <dcterms:alternative>Phys. Rev. Lett.</dcterms:alternative>
+        <dc:identifier>ISSN 0031-9007</dc:identifier>
+    </bib:Journal>
+    <bib:Article rdf:about="https://link.aps.org/doi/10.1103/PhysRevB.48.10345">
+        <z:itemType>journalArticle</z:itemType>
+        <dcterms:isPartOf rdf:resource="urn:issn:0163-1829,%201095-3795"/>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>White</foaf:surname>
+                        <foaf:givenName>Steven R.</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dc:title>Density-matrix algorithms for quantum renormalization groups</dc:title>
+        <dc:date>1993-10-1</dc:date>
+        <z:language>en</z:language>
+        <z:libraryCatalog>DOI.org (Crossref)</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://link.aps.org/doi/10.1103/PhysRevB.48.10345</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 19:58:35</dcterms:dateSubmitted>
+        <bib:pages>10345-10356</bib:pages>
+    </bib:Article>
+    <bib:Journal rdf:about="urn:issn:0163-1829,%201095-3795">
+        <prism:volume>48</prism:volume>
+        <dc:title>Physical Review B</dc:title>
+        <dc:identifier>DOI 10.1103/PhysRevB.48.10345</dc:identifier>
+        <prism:number>14</prism:number>
+        <dcterms:alternative>Phys. Rev. B</dcterms:alternative>
+        <dc:identifier>ISSN 0163-1829, 1095-3795</dc:identifier>
+    </bib:Journal>
+    <bib:Article rdf:about="#item_23">
+        <z:itemType>journalArticle</z:itemType>
+        <dcterms:isPartOf rdf:resource="urn:issn:0006-3002"/>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Nieto</foaf:surname>
+                        <foaf:givenName>M.</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Muñoz</foaf:surname>
+                        <foaf:givenName>E.</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Carreira</foaf:surname>
+                        <foaf:givenName>J.</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Andreu</foaf:surname>
+                        <foaf:givenName>J. M.</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_24"/>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>Adenosine Triphosphatases</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>Cell Membrane</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>Circular Dichroism</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>Hydrogen-Ion Concentration</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>Kinetics</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>Micrococcus</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>Microscopy, Electron</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>Molecular Weight</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>Osmolar Concentration</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>Protein Conformation</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>Spectrophotometry, Ultraviolet</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>Tryptophan</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>Tyrosine</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:title>Conformational and molecular responses to pH variation of the purified membrane adenosine triphosphatase of Micrococcus lysodeikticus</dc:title>
+        <dcterms:abstract>A preparation of ATPase from the membranes of Micrococcus lysodeikticus, solubilized and more than 95% pure, showed two main bands in analytical polyacrylamide gel electrophoresis. They did not correspond to isoenzymes because one band could be converted into the other by exposure to a mildly alkaline pH value. The conversion was paralleled by changes in molecular weight, circular dichroism and catalytic properties. Denaturation by pH at 25 degrees C was followed by means of circular dichroism, ultracentrifugation and polyacrylamide gel electrophoresis. A large conformational transition took place in the acid range with midpoints at about pH = 3.6 (I = 10(-4) M), 4.3 (I = 0.03 M) and 5.3 (I = 0.1 M). The transition was irreversible. Strong aggregation of the protein occurred in this range of pH. The final product was largely random coil, but even at pH 1.5 dissociation into individual subunits was not complete. However, partial dissociation took place at pH 5 (I = 0.028 M). At this pH value the enzyme was inactive, but 20-30% of the activity could be recovered when the pH was returned to 7.5. In the alkaline region the midpoint of the transition occurred near pH = 11 (I = 0.028 M). The pK of most of the tyrosine residues of the protein was about 10.9. The unfolding was irreversible and the protein was soon converted into peptide species with molecular weights lower than those determined for the subunits by gel electrophoresis in the presence of sodium dodecyl sulphate. Conventional proteolysis did not account for the transformation.</dcterms:abstract>
+        <dc:date>Dec 16, 1975</dc:date>
+        <z:language>eng</z:language>
+        <z:libraryCatalog>PubMed</z:libraryCatalog>
+        <dc:description>PMID: 91</dc:description>
+        <bib:pages>394-414</bib:pages>
+    </bib:Article>
+    <bib:Journal rdf:about="urn:issn:0006-3002">
+        <prism:volume>413</prism:volume>
+        <dc:title>Biochimica Et Biophysica Acta</dc:title>
+        <dc:identifier>DOI 10.1016/0005-2736(75)90123-6</dc:identifier>
+        <prism:number>3</prism:number>
+        <dcterms:alternative>Biochim. Biophys. Acta</dcterms:alternative>
+        <dc:identifier>ISSN 0006-3002</dc:identifier>
+    </bib:Journal>
+    <z:Attachment rdf:about="#item_24">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>PubMed entry</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>http://www.ncbi.nlm.nih.gov/pubmed/91</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 20:01:20</dcterms:dateSubmitted>
+        <z:linkMode>3</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
+    <bib:Article rdf:about="https://link.aps.org/doi/10.1103/PhysRevLett.91.147902">
+        <z:itemType>journalArticle</z:itemType>
+        <dcterms:isPartOf rdf:resource="urn:issn:0031-9007,%201079-7114"/>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Vidal</foaf:surname>
+                        <foaf:givenName>Guifré</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_26"/>
+        <dc:title>Efficient Classical Simulation of Slightly Entangled Quantum Computations</dc:title>
+        <dc:date>2003-10-1</dc:date>
+        <z:language>en</z:language>
+        <z:libraryCatalog>DOI.org (Crossref)</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://link.aps.org/doi/10.1103/PhysRevLett.91.147902</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 20:01:39</dcterms:dateSubmitted>
+        <bib:pages>147902</bib:pages>
+    </bib:Article>
+    <bib:Journal rdf:about="urn:issn:0031-9007,%201079-7114">
+        <prism:volume>91</prism:volume>
+        <dc:title>Physical Review Letters</dc:title>
+        <dc:identifier>DOI 10.1103/PhysRevLett.91.147902</dc:identifier>
+        <prism:number>14</prism:number>
+        <dcterms:alternative>Phys. Rev. Lett.</dcterms:alternative>
+        <dc:identifier>ISSN 0031-9007, 1079-7114</dc:identifier>
+    </bib:Journal>
+    <z:Attachment rdf:about="#item_26">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>Submitted Version</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://arxiv.org/pdf/quant-ph/0301063</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-02-04 20:01:42</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+   <z:Collection rdf:about="#collection_1"><dc:title>MPS</dc:title></z:Collection>
+    <z:Collection rdf:about="#collection_2">
+        <dc:title>MPS 2/4/2020, 1:49:24 PM</dc:title>
+        <dcterms:hasPart rdf:resource="https://www.math.columbia.edu/ woit/wordpress/?p=10533"/>
+        <dcterms:hasPart rdf:resource="#item_3"/>
+        <dcterms:hasPart rdf:resource="#item_5"/>
+        <dcterms:hasPart rdf:resource="#item_7"/>
+        <dcterms:hasPart rdf:resource="#item_9"/>
+        <dcterms:hasPart rdf:resource="#item_11"/>
+        <dcterms:hasPart rdf:resource="https://arxiv.org/abs/1008.3477"/>
+        <dcterms:hasPart rdf:resource="#item_14"/>
+        <dcterms:hasPart rdf:resource="https://linkinghub.elsevier.com/retrieve/pii/S0003491614001596"/>
+        <dcterms:hasPart rdf:resource="https://link.aps.org/doi/10.1103/PhysRevB.96.155120"/>
+        <dcterms:hasPart rdf:resource="https://link.aps.org/doi/10.1103/PhysRevLett.69.2863"/>
+        <dcterms:hasPart rdf:resource="https://link.aps.org/doi/10.1103/PhysRevB.48.10345"/>
+        <dcterms:hasPart rdf:resource="#item_23"/>
+        <dcterms:hasPart rdf:resource="https://link.aps.org/doi/10.1103/PhysRevLett.91.147902"/>
+    </z:Collection>
+</rdf:RDF>

@@ -33,7 +33,7 @@ class MatrixProductSite
 //
 //  Access to information
 //
-        const MatLimits GetLimits() const {return itsAs[0].GetLimits();}
+//        const MatLimits GetLimits() const {return itsAs[0].GetLimits();}
         double GetSiteEnergy () {return itsEmin;}
         double GetEGap       () {return itsGapE;}
         double GetIterDE     () {return itsIterDE;}
@@ -42,53 +42,33 @@ class MatrixProductSite
 //
 //  Required for ground state calculations
 //
-        void   Refine (const MatrixCT& Heff,const Epsilons& eps);
+        void     Refine (const MatrixCT& Heff,const Epsilons& eps);
         Matrix6T GetHeff(const SiteOperator* so,const Vector3T& L,const Vector3T& R) const;
-        Matrix6T GetHeff(const SiteOperator* so,const Matrix6T& L,const Matrix6T& R) const;
-        const  Vector3T& GetHLeft_Cache() const {return itsHLeft_Cache;}
-        const  Vector3T& GetHRightCache() const {return itsHRightCache;}
-        double GetIterDE() const {return itsIterDE;}
-        void   UpdateCache(const SiteOperator* so, const Vector3T& HLeft, const Vector3T& HRight);
+        const    Vector3T& GetHLeft_Cache() const {return itsHLeft_Cache;}
+        const    Vector3T& GetHRightCache() const {return itsHRightCache;}
+        void     UpdateCache(const SiteOperator* so, const Vector3T& HLeft, const Vector3T& HRight);
+        Vector3T IterateLeft_F(const SiteOperator* so, const Vector3T& Fam1,bool cache=true);
+        Vector3T IterateRightF(const SiteOperator* so, const Vector3T& Fam1,bool cache=true);
+        Vector4T IterateLeft_F(const SiteOperator* so1,const SiteOperator* so2, const Vector4T& Fam1) const;
 
 //---------------------------------------------------------------------------------
 //
 // Normalization
 //
-public:
-        MatrixCT GetNeff(const MatrixCT& Eleft, const MatrixCT Eright) const;
-        MatrixCT GetLeftNorm() const;
-        MatrixCT GetRightNorm() const;
-        void ReshapeFromLeft (int D1);
-        void ReshapeFromRight(int D2);
         void SVDLeft_Normalize(VectorT& s, MatrixCT& Vdagger);
         void SVDRightNormalize(MatrixCT& U, VectorT& s );
-        void Rescale(double norm);
         bool IsLeftNormalized(double eps) const;
         bool IsRightNormalized(double eps) const;
-        void    Contract(const VectorT& s, const MatrixCT& Vdagger);
-        void    Contract(const MatrixCT& U, const VectorT& s);
-
-
-//---------------------------------------------------------------------------------
+        void ReshapeFromLeft (int D1);
+        void ReshapeFromRight(int D2);
+        void Rescale(double norm);
+        void Contract(const VectorT& s, const MatrixCT& Vdagger);
+        void Contract(const MatrixCT& U, const VectorT& s);
+        MatrixCT GetLeftNorm() const;//Used only for the final rescale op
+        MatrixCT GetRightNorm() const;
 //
-// Transfer matrix
+//  Statusreporting
 //
-        MatrixCT GetE() const; //For the left most site only
-        MatrixCT GetELeft (const MatrixCT& ELeft) const; //For interior sites
-        MatrixCT GetERight(const MatrixCT& ERight) const; //For interior sites
-
-        Matrix6T GetEO(       const SiteOperator* so) const;
-private:
-        Matrix4T GetNO(int m, const SiteOperator* so) const;
-public:
-
-
-        Vector3T IterateLeft_F(const SiteOperator* so, const Vector3T& Fam1,bool cache=true);
-        Vector3T IterateRightF(const SiteOperator* so, const Vector3T& Fam1,bool cache=true);
-        Vector4T IterateLeft_F(const SiteOperator* so1,const SiteOperator* so2, const Vector4T& Fam1) const;
-private:
-public:
-
         std::string GetNormStatus(double eps) const;
         void        Report(std::ostream&) const;
 
@@ -97,65 +77,60 @@ public:
 //  This stuff is for unti testing only.
 //
 private:
-        friend class MPOTesting;
-        double ContractHeff(const Matrix6T& Heff) const;
-        double ContractHeff(const MatrixCT& Heff) const;
-        eType  ContractWR(int w1, int i2, int j2,const MatrixT& W, int Dw2, const Vector3T& R) const;
+    friend class MPOTesting;
 
-
-    protected:
     TensorNetworks::Position WhereAreWe() const {return itsPosition;}
 
     void     Reshape(int D1, int D2, bool saveData=false);
-    MatrixCT  ReshapeLeft();
-    MatrixCT  ReshapeRight();
+    MatrixCT ReshapeLeft ();
+    MatrixCT ReshapeRight();
     void     ReshapeLeft (const MatrixCT& U);
     void     ReshapeRight(const MatrixCT& Vdagger);
-    static MatrixCT  Contract1(const VectorT& s, const MatrixCT& VA);
-    static MatrixCT  Contract1(const MatrixCT& AU,const VectorT& s);
+    void     Update      (const VectorCT& newAs);
+
     static bool     IsUnit(const MatrixCT& m,double eps);
-    double GetMaxAmplitude() const;
-private:
-        void   Update(const VectorCT& newAs);
-private:
 //-----------------------------------------------------------------------------------
 //
 //  Internal contraction function
 //
-        eType    ContractAWFA (int w2, int i2, int j2,         const SiteOperator* so, const Vector3T& Fam1) const;
-        eType    ContractWFA  (int m , int w2, int i1, int j2, const SiteOperator* so, const Vector3T& Fam1) const;
-        eType    ContractFA   (int n , int w1, int i1, int j2,                         const Vector3T& Fam1) const;
-        eType    ContractBWFB (int w1, int i1, int j1,         const SiteOperator* so, const Vector3T& Fap1) const;
-        eType    ContractWFB  (int m , int w1, int i2, int j1, const SiteOperator* so, const Vector3T& Fap1) const;
-        eType    ContractFB   (int n , int w2, int i2, int j1,                         const Vector3T& Fap1) const;
+    static MatrixCT  Contract1(const VectorT& s, const MatrixCT& VA);
+    static MatrixCT  Contract1(const MatrixCT& AU,const VectorT& s);
 
-        eType    ContractAWWFA(int w2, int v2, int i2, int j2        , const SiteOperator* so1, const SiteOperator* so2, const Vector4T& Fam1) const;
-        eType    ContractWWFA (int m , int w2, int v2, int i1, int j2, const SiteOperator* so1, const SiteOperator* so2, const Vector4T& Fam1) const;
-        eType    ContractWFA  (int o , int w1, int v2, int i1, int j2, const SiteOperator* so, const Vector4T& Fam1) const;
-        eType    ContractFA   (int n , int w1, int v1, int i1, int j2,                         const Vector4T& Fam1) const;
+    eType ContractAWFA (int w2,int i2, int j2,         const SiteOperator* so, const Vector3T& Fam1) const;
+    eType ContractWFA  (int m, int w2, int i1, int j2, const SiteOperator* so, const Vector3T& Fam1) const;
+    eType ContractFA   (int n, int w1, int i1, int j2,                         const Vector3T& Fam1) const;
+    eType ContractBWFB (int w1,int i1, int j1,         const SiteOperator* so, const Vector3T& Fap1) const;
+    eType ContractWFB  (int m, int w1, int i2, int j1, const SiteOperator* so, const Vector3T& Fap1) const;
+    eType ContractFB   (int n, int w2, int i2, int j1,                         const Vector3T& Fap1) const;
+
+    eType ContractAWWFA(int w2,int v2, int i2, int j2, const SiteOperator* so1, const SiteOperator* so2, const Vector4T& Fam1) const;
+    eType ContractWWFA (int m, int w2, int v2, int i1, int j2, const SiteOperator* so1, const SiteOperator* so2, const Vector4T& Fam1) const;
+    eType ContractWFA  (int o, int w1, int v2, int i1, int j2, const SiteOperator* so, const Vector4T& Fam1) const;
+    eType ContractFA   (int n, int w1, int v1, int i1, int j2,                         const Vector4T& Fam1) const;
+    eType ContractWR   (int w1,int i2, int j2,const MatrixT& W, int Dw2, const Vector3T& R) const;
 
 
 
-        friend class MatrixProductTesting;
-        typedef std::vector<MatrixCT> pVectorT;
-        typedef pVectorT::      iterator  pIterT;
-        typedef pVectorT::const_iterator cpIterT;
+    friend class MatrixProductTesting;
+    typedef std::vector<MatrixCT> pVectorT;
+    typedef pVectorT::      iterator  pIterT;
+    typedef pVectorT::const_iterator cpIterT;
 
-        Bond* itsLeft_Bond;
-        Bond* itsRightBond;
-        int itsp; //2*S+1
-        int itsD1,itsD2;
-        pVectorT itsAs; //We need a separate matrix for eash of the p basis states on one site.
-        Vector3T itsHLeft_Cache;
-        Vector3T itsHRightCache;
-        PrimeEigenSolver<eType> itsEigenSolver;
+    Bond* itsLeft_Bond;
+    Bond* itsRightBond;
+    int itsp; //2*S+1
+    int itsD1,itsD2;
+    pVectorT itsAs; //We need a separate matrix for eash of the p basis states on one site.
+    Vector3T itsHLeft_Cache;
+    Vector3T itsHRightCache;
+    PrimeEigenSolver<eType> itsEigenSolver;
 
-        int itsNumUpdates;
-        double itsHeffDensity;
-        double itsEmin;
-        double itsGapE;  //Gap to the next excited state.
-        double itsIterDE;
-        TensorNetworks::Position itsPosition; //Left Bulk or Right
+    int itsNumUpdates;
+    double itsHeffDensity;
+    double itsEmin;
+    double itsGapE;  //Gap to the next excited state.
+    double itsIterDE;
+    TensorNetworks::Position itsPosition; //Left Bulk or Right
 };
 
 #endif // MATRIXPRODUCTSITE_H
