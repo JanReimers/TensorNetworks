@@ -151,10 +151,27 @@ void MatrixProductSite::ReshapeFromLeft (int D1)
     Reshape(   D1,itsD2,true);
 }
 
+void MatrixProductSite::ReshapeAndNormFromLeft (int D1)
+{
+    ReshapeFromLeft(D1);
+    double norm=std::real(GetLeftNorm()(1,1));
+    Rescale(sqrt(norm));
+
+}
+
 void MatrixProductSite::ReshapeFromRight(int D2)
 {
     Reshape(itsD1,   D2,true);
 }
+
+void MatrixProductSite::ReshapeAndNormFromRight(int D2)
+{
+    ReshapeFromRight(D2);
+    double norm=std::real(GetRightNorm()(1,1));
+    Rescale(sqrt(norm));
+}
+
+
 
 void MatrixProductSite::Rescale(double norm)
 {

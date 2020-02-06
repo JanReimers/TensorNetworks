@@ -61,11 +61,10 @@ class MatrixProductSite
         bool IsRightNormalized(double eps) const;
         void ReshapeFromLeft (int D1);
         void ReshapeFromRight(int D2);
-        void Rescale(double norm);
+        void ReshapeAndNormFromLeft (int D1);
+        void ReshapeAndNormFromRight(int D2);
         void Contract(const VectorT& s, const MatrixCT& Vdagger);
         void Contract(const MatrixCT& U, const VectorT& s);
-        MatrixCT GetLeftNorm() const;//Used only for the final rescale op
-        MatrixCT GetRightNorm() const;
 //
 //  Statusreporting
 //
@@ -81,6 +80,9 @@ private:
 
     TensorNetworks::Position WhereAreWe() const {return itsPosition;}
 
+    MatrixCT GetLeftNorm() const;//Used only for the final rescale op
+    MatrixCT GetRightNorm() const;
+    void Rescale(double norm);
     void     Reshape(int D1, int D2, bool saveData=false);
     MatrixCT ReshapeLeft ();
     MatrixCT ReshapeRight();

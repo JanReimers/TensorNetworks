@@ -8,8 +8,8 @@
 -Dynamically add lattice site, pseudo DMRG
 -Done Separate out contraction code in MPSite
 -Done Get rid of old dumm-ass contraction code.
--More refactoring, duplicated code in SweepLR routines
--Simplify rescale step in normalization?
+-Done Simplify rescale step in normalization?
+-Figure out why S=1,L>5 has such poor convergence. We may need to count degeneracy of lowest SVs.
 -Calc <Sx> <Sy> <Sz>
     Could start by calculating one density matrices.  Then ops are easy
 -Correlation functions <Sa*Sa+n>-<Sa>*<Sa+n>

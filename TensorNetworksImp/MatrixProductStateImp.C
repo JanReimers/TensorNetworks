@@ -140,9 +140,7 @@ void MatrixProductStateImp::Normalize(TensorNetworks::Position LR,LRPSupervisor*
             itsSites[ia+1]->Contract(s,Vdagger);
             Supervisor->DoneOneStep(2,SiteMessage("Transfer M=s*V_dagger*M on site",ia+1),ia+1);
         }
-        itsSites[itsL-1]->ReshapeFromLeft(s.GetHigh());
-        double norm=std::real(itsSites[itsL-1]->GetLeftNorm()(1,1));
-        itsSites[itsL-1]->Rescale(sqrt(norm));
+        itsSites[itsL-1]->ReshapeAndNormFromLeft(s.GetHigh());
         UpdateBondData(itsL-2);
         Supervisor->DoneOneStep(2,SiteMessage("Rescale site ",itsL-1),itsL-1);
     }
@@ -157,9 +155,7 @@ void MatrixProductStateImp::Normalize(TensorNetworks::Position LR,LRPSupervisor*
             itsSites[ia-1]->Contract(U,s);
             Supervisor->DoneOneStep(2,SiteMessage("Transfer M=M*U*s on site ",ia-1),ia-1);
         }
-        itsSites[0]->ReshapeFromRight(s.GetHigh());
-        double norm=std::real(itsSites[0]->GetRightNorm()(1,1));
-        itsSites[0]->Rescale(sqrt(norm));
+        itsSites[0]->ReshapeAndNormFromRight(s.GetHigh());
         UpdateBondData(0);
         Supervisor->DoneOneStep(2,SiteMessage("Rescale site ",0),0);
     }
