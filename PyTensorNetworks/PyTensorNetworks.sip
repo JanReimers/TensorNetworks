@@ -79,9 +79,7 @@ public:
     virtual void   Normalize(TensorNetworks::Position LR,LRPSupervisor*)=0;
     virtual double FindGroundState(const Hamiltonian* H,int maxIter, const Epsilons& eps,LRPSupervisor*)=0;
 
-    virtual double   GetOverlap           () const=0;
     virtual double   GetExpectationIterate(const Operator* o) const=0;
-    virtual double   GetExpectation       (const Operator *o) const=0;
     virtual double   GetExpectation       (const Operator* o1,const Operator* o2) const=0;
 
     virtual std::string GetNormStatus(int isite) const=0;
