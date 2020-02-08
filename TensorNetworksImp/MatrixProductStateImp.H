@@ -23,11 +23,13 @@ class MatrixProductStateImp
 private:
         typedef TensorNetworks::MatrixT  MatrixT;
         typedef TensorNetworks::VectorT  VectorT;
+        typedef TensorNetworks:: ArrayT  ArrayT;
         typedef TensorNetworks::MatrixCT MatrixCT;
         typedef TensorNetworks::VectorCT VectorCT;
         typedef TensorNetworks::Matrix6T Matrix6T;
         typedef TensorNetworks::Vector3T Vector3T;
         typedef TensorNetworks::Vector4T Vector4T;
+        typedef TensorNetworks::Matrix4T Matrix4T;
         typedef TensorNetworks::eType    eType;
 //--------------------------------------------------------------------------------------
 //
@@ -43,7 +45,7 @@ public:
 //  Access to information
 //
         int     GetL        () const {return itsL;}
-        int     GetD        () const {return itsD;}
+//        int     GetD        () const {return itsD;}
         int     Getp        () const {return itsp;}
         double  GetMaxDeltaE() const;
 
@@ -65,6 +67,15 @@ public:
 
         virtual double   GetExpectationIterate(const Operator* o) const;
         virtual double   GetExpectation       (const Operator* o1,const Operator* o2) const;
+//--------------------------------------------------------------------------------------
+//
+//    One site density matrix and expectation calculations
+//
+        virtual void CalculateOneSiteDMs(       LRPSupervisor*);
+        virtual void CalculateTwoSiteDMs(int dx,LRPSupervisor*);
+        virtual Matrix4T CalculateTwoSiteDM(int ia,int ib) const;
+        virtual ArrayT GetOneSiteExpectation(const MatrixT &) const;
+        virtual ArrayT GetOneSiteExpectation(const MatrixCT&) const;
 //--------------------------------------------------------------------------------------
 //
 //    Reporting
@@ -117,6 +128,8 @@ private:
         typedef SitesType::      reverse_iterator  rSIter;
         typedef SitesType::const_reverse_iterator crSIter;
 
+        typedef std::vector<MatrixCT> MatrixListT;
+
 //--------------------------------------------------------------------------------------
 //
 //  Data member
@@ -124,23 +137,24 @@ private:
 
         int itsL;   //Number of lattice sites
         int itsS2;  //2*S, avoid storing floats for S=n/2
-        int itsD;   //Dimension of internal/virtual state space.
+        //int itsD;   //Dimension of internal/virtual state space.
         int itsp;   //Number ot states for the spin on each site = 2S+1
         int itsNSweep;
-        Epsilons itsEpsilons;
-        BondsType itsBonds;
-        SitesType itsSites;
+        Epsilons    itsEpsilons;
+        BondsType   itsBonds;
+        SitesType   itsSites;
+        MatrixListT itsOneSiteDMs; //One site densitymatrixes
 
         UniformMesh*  itsSitesMesh;
         Mesh*         itsBondsMesh;
         PlotableMesh* itsSitesPMesh;
         PlotableMesh* itsBondsPMesh;
 
-        Array<double> itsSiteEnergies;  //Minimum eigen value of Heff on each site.
-        Array<double> itsSiteEGaps;     //Gap to second eigen value on each site.
-        Array<double> itsBondEntropies; // Sum(s^2*ln(s^2)) for each bond
-        Array<double> itsBondMinSVs;    // smallest singluar value for each bond
-        Array<double> itsBondRanks;    // Effective rank based on non zero singular values
+        ArrayT itsSiteEnergies;  //Minimum eigen value of Heff on each site.
+        ArrayT itsSiteEGaps;     //Gap to second eigen value on each site.
+        ArrayT itsBondEntropies; // Sum(s^2*ln(s^2)) for each bond
+        ArrayT itsBondMinSVs;    // smallest singluar value for each bond
+        ArrayT itsBondRanks;    // Effective rank based on non zero singular values
 
         static GraphDefinition theGraphs[];
         static const int n_graphs;

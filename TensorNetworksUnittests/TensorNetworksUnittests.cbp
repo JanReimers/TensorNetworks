@@ -55,6 +55,9 @@
 			<Add library="gfortran" />
 			<Add library="pthread" />
 		</Linker>
+		<Unit filename="ExpectationsTests.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="GroundStataeTests.cpp" />
 		<Unit filename="MPOTests.cpp" />
 		<Unit filename="MPSTests.cpp" />

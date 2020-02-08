@@ -1386,12 +1386,12 @@ Now we need to decide on an efficient way of zipping through the lattice
 
 \begin_inset Formula 
 \[
-C_{i_{a}j_{a}}^{m_{a}n_{a}}=\sum_{j_{a-1}}A_{j_{a-1}i_{a}}^{*m_{a}}A_{j_{a-1}j_{a}}^{n_{a}}.
+C_{i_{a}j_{a}}^{m_{a}n_{a}}=\sum_{i_{a-1}}A_{i_{a-1}i_{a}}^{*m_{a}}A_{i_{a-1}j_{a}}^{n_{a}}.
 \]
 
 \end_inset
 
-Next we contract over 
+INext we contract over 
 \begin_inset Formula $j_{a}$
 \end_inset
 
@@ -1402,7 +1402,7 @@ Next we contract over
 :
 \begin_inset Formula 
 \[
-C_{i_{a+1}j_{a+1}}^{m_{a}n_{a}}=\sum_{i_{a}j_{a}}\sum_{n_{a}}C_{i_{a}j_{a}}^{m_{a}n_{a}}M_{i_{a}i_{a+1}}^{*n_{a+1}}M_{j_{a}j_{a+1}}^{n_{a+1}}
+C_{i_{a+1}j_{a+1}}^{m_{a}n_{a}}=\sum_{i_{a}j_{a}}\sum_{n_{a+1}}C_{i_{a}j_{a}}^{m_{a}n_{a}}M_{i_{a}i_{a+1}}^{*n_{a+1}}M_{j_{a}j_{a+1}}^{n_{a+1}}
 \]
 
 \end_inset
@@ -1422,7 +1422,7 @@ We continue this iteratation until we reach
  from which we can evaluate the final result
 \begin_inset Formula 
 \[
-\rho_{a,b}^{\left(m_{a}m_{b}\right)\left(n_{a}n_{b}\right)}=\sum_{i_{b-1}j_{b}}M_{i_{b-1}j_{b}}^{*n_{b}}\left(\sum_{j_{b-1}}C_{i_{b-1}j_{b-1}}^{m_{a}n_{a}}M_{j_{b-1}j_{b}}^{n_{b}}\right)
+\rho_{a,b}^{\left(m_{a}m_{b}\right)\left(n_{a}n_{b}\right)}=\sum_{i_{b-1}j_{b}}M_{i_{b-1}j_{b}}^{*m_{b}}\left(\sum_{j_{b-1}}C_{i_{b-1}j_{b-1}}^{m_{a}n_{a}}M_{j_{b-1}j_{b}}^{n_{b}}\right)
 \]
 
 \end_inset

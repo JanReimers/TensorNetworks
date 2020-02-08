@@ -16,14 +16,14 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
     , itsJz(Jz)
     , itshz(hz)
 {
+//    cout << "L=" << L << endl;
+//    cout << "S=" << S << endl;
+//    cout << "Jxy=" << Jxy << endl;
+//    cout << "Jz=" << Jz << endl;
+//    cout << "hz=" << hz << endl;
     assert(itsL>=1);
     assert(itsS>=0.5);
     assert(fabs(itsJxy)+fabs(Jz)>0.0);
-    //cout << "L=" << L << endl;
-    //cout << "S=" << S << endl;
-    //cout << "Jxy=" << Jxy << endl;
-    //cout << "Jz=" << Jz << endl;
-    //cout << "hz=" << hz << endl;
 
     Vector<int> w1_first_1x5(5);
     Fill(w1_first_1x5,1);

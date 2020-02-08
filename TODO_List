@@ -10,6 +10,12 @@
 -Done Get rid of old dumm-ass contraction code.
 -Done Simplify rescale step in normalization?
 -Figure out why S=1,L>5 has such poor convergence. We may need to count degeneracy of lowest SVs.
+    -For L=5 D=9 works, but that is the 2^L Hilbert space
+    -For L=6 D=12 and D=27 works
+    -For L=9 Hard to find a D that converges
+Bugs:
+    -log(DE) sopts plotting L=6 D=?
+    -Bond Entropy missing points L=6 D=?
 -Calc <Sx> <Sy> <Sz>
     Could start by calculating one density matrices.  Then ops are easy
 -Correlation functions <Sa*Sa+n>-<Sa>*<Sa+n>

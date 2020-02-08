@@ -65,6 +65,15 @@ class MatrixProductSite
         void ReshapeAndNormFromRight(int D2);
         void Contract(const VectorT& s, const MatrixCT& Vdagger);
         void Contract(const MatrixCT& U, const VectorT& s);
+//--------------------------------------------------------------------------------------
+//
+//    Density matrix calculations
+//
+        MatrixCT CalculateOneSiteDM();
+        Vector4T InitializeTwoSiteDM(                 );
+        Vector4T    IterateTwoSiteDM(      Vector4T& C);
+        Matrix4T  FinializeTwoSiteDM(const Vector4T& C);
+
 //
 //  Statusreporting
 //
@@ -111,7 +120,7 @@ private:
     eType ContractFA   (int n, int w1, int v1, int i1, int j2,                         const Vector4T& Fam1) const;
     eType ContractWR   (int w1,int i2, int j2,const MatrixT& W, int Dw2, const Vector3T& R) const;
 
-
+    Vector4T ContractCM(int n2, const Vector4T& C) const;
 
     friend class MatrixProductTesting;
     typedef std::vector<MatrixCT> pVectorT;

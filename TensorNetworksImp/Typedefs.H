@@ -16,8 +16,6 @@ namespace TensorNetworks
 {
         typedef Vector <double> VectorT;
 
-        typedef std::complex<double> eType;
-        typedef DMatrix<eType>  MatrixCT;
         typedef Vector <eType > VectorCT;
         typedef Matrix6<eType>  Matrix6T;
         typedef Matrix4<eType>  Matrix4T;

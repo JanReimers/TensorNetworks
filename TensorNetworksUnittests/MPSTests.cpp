@@ -48,7 +48,7 @@ public:
 TEST_F(MatrixProductTesting,Constructor)
 {
     EXPECT_EQ(itsMPS->GetL(),10);
-    EXPECT_EQ(itsMPS->GetD(),2);
+//    EXPECT_EQ(itsMPS->GetD(),2);
     EXPECT_EQ(itsMPS->Getp(),2);
 }
 

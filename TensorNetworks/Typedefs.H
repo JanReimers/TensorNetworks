@@ -11,7 +11,10 @@
 //
 namespace TensorNetworks
 {
+    typedef std::complex<double> eType;
+    typedef DMatrix  <eType>   MatrixCT;
     typedef DMatrix  <double>  MatrixT;
+    typedef Array    <double>  ArrayT;
     typedef std::pair<int,int> ipairT;
 };
 

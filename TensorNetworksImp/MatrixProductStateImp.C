@@ -2,6 +2,7 @@
 #include "TensorNetworksImp/Bond.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/LRPSupervisor.H"
+#include "Containers/Matrix4.H"
 #include "Functions/Mesh/PlotableMesh.H"
 #include "Plotting/CurveUnits.H"
 #include "Plotting/Factory.H"
@@ -24,7 +25,7 @@ using Dimensions::PureNumber;
 MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D,const Epsilons& eps)
     : itsL(L)
     , itsS2(S2)
-    , itsD(D)
+//    , itsD(D)
     , itsp(itsS2+1)
     , itsNSweep(0)
     , itsEpsilons(eps)
@@ -39,10 +40,10 @@ MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D,const Epsilons
     //
     //  Create Sites
     //
-    itsSites.push_back(new MatrixProductSite(TensorNetworks::Left,NULL,itsBonds[0],itsp,1,itsD));
+    itsSites.push_back(new MatrixProductSite(TensorNetworks::Left,NULL,itsBonds[0],itsp,1,D));
     for (int i=1;i<itsL-1;i++)
-        itsSites.push_back(new MatrixProductSite(TensorNetworks::Bulk,itsBonds[i-1],itsBonds[i],itsp,itsD,itsD));
-    itsSites.push_back(new MatrixProductSite(TensorNetworks::Right,itsBonds[L-2],NULL,itsp,itsD,1));
+        itsSites.push_back(new MatrixProductSite(TensorNetworks::Bulk,itsBonds[i-1],itsBonds[i],itsp,D,D));
+    itsSites.push_back(new MatrixProductSite(TensorNetworks::Right,itsBonds[L-2],NULL,itsp,D,1));
 
     Range rsites(1.0,itsL);
     itsSitesMesh=new UniformMesh(rsites,1.0);
@@ -501,7 +502,110 @@ MatrixProductStateImp::Vector3T MatrixProductStateImp::GetEORightIterate(const O
 }
 
 
+void MatrixProductStateImp::CalculateOneSiteDMs(LRPSupervisor* supervisor)
+{
+    itsOneSiteDMs.clear();
+    Normalize(TensorNetworks::Right,supervisor);
+    VectorT s; // This get passed from one site to the next.
+    MatrixCT Vdagger;// This get passed from one site to the next.
+    for (int ia=0; ia<itsL-1; ia++)
+    {
+        supervisor->DoneOneStep(2,SiteMessage("Calculate ro(mn) site: ",ia),ia);
+        itsOneSiteDMs.push_back(itsSites[ia]->CalculateOneSiteDM());
+        supervisor->DoneOneStep(2,SiteMessage("SVD Left Normalize site: ",ia),ia);
+        itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
+        UpdateBondData(ia);
+        supervisor->DoneOneStep(2,SiteMessage("Transfer M=s*V_dagger*M on site: ",ia+1),ia+1);
+        itsSites[ia+1]->Contract(s,Vdagger);
+    }
+    UpdateBondData(itsL-2);
+    supervisor->DoneOneStep(2,SiteMessage("Calculate ro(mn) site: ",itsL-1),itsL-1);
+    itsOneSiteDMs.push_back(itsSites[itsL-1]->CalculateOneSiteDM());
+}
 
+MatrixProductStateImp::Matrix4T MatrixProductStateImp::CalculateTwoSiteDM(int ia,int ib) const
+{
+    assert(ia>=0);
+    assert(ib<itsL);
+#ifdef DEBUG
+    for (int is=0; is<ia; is++)
+        assert(GetNormStatus(is)[0]=='A');
+    for (int is=ib; is<itsL; is++)
+        assert(GetNormStatus(is)[0]=='B');
+#endif
+    // Start the zipper
+    Vector4T C=itsSites[ia]->InitializeTwoSiteDM();
+    for (int ix=ia+1; ix<ib; ix++)
+        C=itsSites[ix]->IterateTwoSiteDM(C);
+    return itsSites[ib]->FinializeTwoSiteDM(C);
+
+}
+
+
+void MatrixProductStateImp::CalculateTwoSiteDMs(int dx,LRPSupervisor* supervisor)
+{
+    assert(dx>0);
+    assert(dx<itsL);
+    //Normalize(TensorNetworks::Right,supervisor);//Don't do this it wrecks the MPS
+    VectorT s; // This get passed from one site to the next.
+    MatrixCT Vdagger;// This get passed from one site to the next.
+
+    for (int ia=0; ia<itsL-1; ia++)
+    {
+        for (int ib=ia+1;ib<itsL;ib++)
+        {
+        Matrix4T ro=CalculateTwoSiteDM(ia,ib);
+        VectorT s=EigenValuesOnly<double,MatrixCT>(ro.Flatten());
+        cout << "s(" << ia << "," << ib << ")=" << s << ", sum=" << Sum(s) << endl;
+        itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
+        UpdateBondData(ia);
+        itsSites[ia+1]->Contract(s,Vdagger);
+        }
+    }
+
+}
+
+
+template <class Ma,class Mb> double Trace(const Ma& a, const Mb& b)
+{
+    assert(a.GetLimits()==b.GetLimits());
+    assert(a.GetRowLimits()==a.GetColLimits());
+    assert(a.GetRowLimits().Low==1);
+    int N=a.GetNumRows();
+    TensorNetworks::eType ret(0.0);
+    for (int ir=1;ir<=N;ir++)
+        for (int ic=1;ic<=N;ic++)
+            ret+=a(ir,ic)*b(ir,ic);
+    //cout << "ret=" << ret << endl;
+    assert(std::fabs(std::imag(ret))<1e-14);
+    return std::real(ret);
+}
+
+TensorNetworks::ArrayT MatrixProductStateImp::GetOneSiteExpectation(const MatrixT& o) const
+{
+    assert(IsSymmetric(o));
+    assert(o.GetNumRows()==itsp);
+    assert(o.GetNumCols()==itsp);
+    assert(itsOneSiteDMs.size()>0);
+    assert(itsOneSiteDMs[0].GetLimits()==o.GetLimits());
+    ArrayT ret(itsL);
+    for (int ia=0; ia<itsL; ia++)
+        ret[ia]=Trace(o,itsOneSiteDMs[ia]);
+    return ret;
+}
+
+TensorNetworks::ArrayT MatrixProductStateImp::GetOneSiteExpectation(const MatrixCT& o) const
+{
+    assert(IsHermitian(o));
+    assert(o.GetNumRows()==itsp);
+    assert(o.GetNumCols()==itsp);
+    assert(itsOneSiteDMs.size()>0);
+    assert(itsOneSiteDMs[0].GetLimits()==o.GetLimits());
+    ArrayT ret(itsL);
+    for (int ia=0; ia<itsL; ia++)
+        ret[ia]=Trace(o,itsOneSiteDMs[ia]);
+    return ret;
+}
 
 
 

@@ -92,7 +92,10 @@ void MatrixProductSite::InitializeWith(TensorNetworks::State state,int sgn)
     case TensorNetworks::Random :
         {
             for (pIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
+            {
                 FillRandom(*ip);
+                (*ip)*=1.0/sqrt(itsp*itsD1*itsD2); //Try and keep <psi|psi>~O(1)
+            }
             break;
         }
     case TensorNetworks::Neel :
@@ -154,6 +157,7 @@ void MatrixProductSite::ReshapeFromLeft (int D1)
 void MatrixProductSite::ReshapeAndNormFromLeft (int D1)
 {
     ReshapeFromLeft(D1);
+    cout << "Left norm=" << GetLeftNorm() << endl;
     double norm=std::real(GetLeftNorm()(1,1));
     Rescale(sqrt(norm));
 
@@ -167,6 +171,7 @@ void MatrixProductSite::ReshapeFromRight(int D2)
 void MatrixProductSite::ReshapeAndNormFromRight(int D2)
 {
     ReshapeFromRight(D2);
+    cout << "Right norm=" << GetRightNorm() << endl;
     double norm=std::real(GetRightNorm()(1,1));
     Rescale(sqrt(norm));
 }
@@ -267,3 +272,80 @@ void MatrixProductSite::UpdateCache(const SiteOperator* so, const Vector3T& HLef
     itsHRightCache=IterateRightF(so,HRight);
 }
 
+MatrixProductSite::MatrixCT MatrixProductSite::CalculateOneSiteDM()
+{
+    MatrixCT ro(itsp,itsp); //These can't be zero based if we want run them through eigen routines, which are hard ocded for 1 based matricies
+    Fill(ro,eType(0.0));
+    for (int m=0; m<itsp; m++)
+        for (int n=0; n<itsp; n++)
+            for (int j1=1; j1<=itsD1; j1++)
+                for (int j2=1; j2<=itsD2; j2++)
+                    ro(m+1,n+1)+=std::conj(itsAs[m](j1,j2))*itsAs[n](j1,j2);
+    return ro;
+}
+
+MatrixProductSite::Vector4T MatrixProductSite::InitializeTwoSiteDM()
+{
+    Vector4T C(itsp,itsp,itsD2,itsD2,1);
+    C.Fill(eType(0.0));
+    for (int m=0; m<itsp; m++)
+        for (int n=0; n<itsp; n++)
+            for (int i2=1; i2<=itsD2; i2++)
+                for (int j2=1; j2<=itsD2; j2++)
+                    for (int i1=1; i1<=itsD1; i1++)
+                        C(m+1,n+1,i2,j2)+=std::conj(itsAs[m](i1,i2))*itsAs[n](i1,j2);
+    return C;
+}
+
+MatrixProductSite::Vector4T MatrixProductSite::IterateTwoSiteDM(Vector4T& C)
+{
+    Vector4T ret(itsp,itsp,itsD2,itsD2,1);
+    ret.Fill(eType(0.0));
+    for (int n2=0; n2<itsp; n2++)
+    {
+        Vector4T CM=ContractCM(n2,C);
+        for (int m=0; m<itsp; m++)
+            for (int n=0; n<itsp; n++)
+                for (int i2=1; i2<=itsD2; i2++)
+                    for (int j2=1; j2<=itsD2; j2++)
+                        for (int i1=1; i1<=itsD1; i1++)
+                            ret(m+1,n+1,i2,j2)+=std::conj(itsAs[n2](i1,i2))*CM(m+1,n+1,i1,j2);
+    }
+    return ret;
+}
+
+MatrixProductSite::Vector4T MatrixProductSite::ContractCM(int n2, const Vector4T& C) const
+{
+    Vector4T ret(itsp,itsp,itsD1,itsD2,1);
+    ret.Fill(eType(0.0));
+    for (int m=0; m<itsp; m++)
+        for (int n=0; n<itsp; n++)
+            for (int j2=1; j2<=itsD2; j2++)
+                for (int i1=1; i1<=itsD1; i1++)
+                    for (int j1=1; j1<=itsD1; j1++)
+                        ret(m+1,n+1,i1,j2)+=C(m+1,n+1,i1,j1)*itsAs[n2](j1,j2);
+    return ret;
+}
+
+MatrixProductSite::Matrix4T MatrixProductSite::FinializeTwoSiteDM(const Vector4T& C)
+{
+    Matrix4T ret(itsp,itsp,itsp,itsp);
+    ret.Fill(eType(0.0));
+    for (int n2=0; n2<itsp; n2++)
+    {
+        Vector4T CM=ContractCM(n2,C);
+        for (int m2=0; m2<itsp; m2++)
+            for (int m=0; m<itsp; m++)
+                for (int n=0; n<itsp; n++)
+                    for (int i2=1; i2<=itsD2; i2++)
+                        for (int j2=1; j2<=itsD2; j2++)
+                            for (int i1=1; i1<=itsD1; i1++)
+                                ret(m+1,m2+1,n+1,n2+1)+=std::conj(itsAs[m2](i1,i2))*CM(m+1,n+1,i1,j2);
+    }
+#ifdef DEBUG
+    MatrixCT zero=ret.Flatten()-conj(Transpose(ret.Flatten()));
+    assert(Max(abs(zero))<1e-14);
+#endif
+
+    return ret;
+}

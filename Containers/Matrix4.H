@@ -33,6 +33,7 @@ template <class T> class Matrix4
 //            return itsData(index1(m,i1,i2),index2(n,j1,j2));
 //        }
 
+        MatrixT& Flatten() {return itsData;}
         void Fill(const T& fill) {::Fill(itsData,fill);}
 
         friend std::ostream& operator<<(std::ostream& os,const Matrix4& m) {return os << m.itsData;}
