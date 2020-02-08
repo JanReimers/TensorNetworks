@@ -530,39 +530,47 @@ MatrixProductStateImp::Matrix4T MatrixProductStateImp::CalculateTwoSiteDM(int ia
 #ifdef DEBUG
     for (int is=0; is<ia; is++)
         assert(GetNormStatus(is)[0]=='A');
-    for (int is=ib; is<itsL; is++)
+    for (int is=ib+1; is<itsL; is++)
         assert(GetNormStatus(is)[0]=='B');
 #endif
+    Matrix4T ret(itsp,itsp,itsp,itsp,1);
+    ret.Fill(eType(0.0));
     // Start the zipper
-    Vector4T C=itsSites[ia]->InitializeTwoSiteDM();
-    for (int ix=ia+1; ix<ib; ix++)
-        C=itsSites[ix]->IterateTwoSiteDM(C);
-    return itsSites[ib]->FinializeTwoSiteDM(C);
-
+    for (int m=0; m<itsp; m++)
+        for (int n=0; n<itsp; n++)
+        {
+            MatrixCT C=itsSites[ia]->InitializeTwoSiteDM(m,n);
+            for (int ix=ia+1; ix<ib; ix++)
+                C=itsSites[ix]->IterateTwoSiteDM(C);
+            C=itsSites[ib]->FinializeTwoSiteDM(C);
+            for (int m2=0; m2<itsp; m2++)
+                for (int n2=0; n2<itsp; n2++)
+                    ret(m+1,m2+1,n+1,n2+1)=C(m2+1,n2+1);
+        }
+#ifdef DEBUG
+    MatrixCT zero=ret.Flatten()-conj(Transpose(ret.Flatten()));
+    assert(Max(abs(zero))<1e-14);
+#endif
+    return ret;
 }
 
 
-void MatrixProductStateImp::CalculateTwoSiteDMs(int dx,LRPSupervisor* supervisor)
+TwoSiteDMs MatrixProductStateImp::CalculateTwoSiteDMs(LRPSupervisor* supervisor)
 {
-    assert(dx>0);
-    assert(dx<itsL);
     //Normalize(TensorNetworks::Right,supervisor);//Don't do this it wrecks the MPS
     VectorT s; // This get passed from one site to the next.
     MatrixCT Vdagger;// This get passed from one site to the next.
-
+    TwoSiteDMs ret(itsL,itsp);
     for (int ia=0; ia<itsL-1; ia++)
-    {
         for (int ib=ia+1;ib<itsL;ib++)
         {
-        Matrix4T ro=CalculateTwoSiteDM(ia,ib);
-        VectorT s=EigenValuesOnly<double,MatrixCT>(ro.Flatten());
-        cout << "s(" << ia << "," << ib << ")=" << s << ", sum=" << Sum(s) << endl;
-        itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
-        UpdateBondData(ia);
-        itsSites[ia+1]->Contract(s,Vdagger);
+            Matrix4T ro=CalculateTwoSiteDM(ia,ib);
+            ret.Insert(ia,ib,ro);
+            itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
+            UpdateBondData(ia);
+            itsSites[ia+1]->Contract(s,Vdagger);
         }
-    }
-
+    return ret;
 }
 
 

@@ -284,68 +284,57 @@ MatrixProductSite::MatrixCT MatrixProductSite::CalculateOneSiteDM()
     return ro;
 }
 
-MatrixProductSite::Vector4T MatrixProductSite::InitializeTwoSiteDM()
+MatrixProductSite::MatrixCT MatrixProductSite::InitializeTwoSiteDM(int m, int n)
 {
-    Vector4T C(itsp,itsp,itsD2,itsD2,1);
-    C.Fill(eType(0.0));
-    for (int m=0; m<itsp; m++)
-        for (int n=0; n<itsp; n++)
-            for (int i2=1; i2<=itsD2; i2++)
-                for (int j2=1; j2<=itsD2; j2++)
-                    for (int i1=1; i1<=itsD1; i1++)
-                        C(m+1,n+1,i2,j2)+=std::conj(itsAs[m](i1,i2))*itsAs[n](i1,j2);
+    MatrixCT C(itsD2,itsD2);
+    Fill(C,eType(0.0));
+    for (int i2=1; i2<=itsD2; i2++)
+        for (int j2=1; j2<=itsD2; j2++)
+            for (int i1=1; i1<=itsD1; i1++)
+                C(i2,j2)+=std::conj(itsAs[m](i1,i2))*itsAs[n](i1,j2);
     return C;
 }
 
-MatrixProductSite::Vector4T MatrixProductSite::IterateTwoSiteDM(Vector4T& C)
+MatrixProductSite::MatrixCT MatrixProductSite::IterateTwoSiteDM(MatrixCT& Cmn)
 {
-    Vector4T ret(itsp,itsp,itsD2,itsD2,1);
-    ret.Fill(eType(0.0));
+    MatrixCT ret(itsD2,itsD2);
+    Fill(ret,eType(0.0));
     for (int n2=0; n2<itsp; n2++)
     {
-        Vector4T CM=ContractCM(n2,C);
-        for (int m=0; m<itsp; m++)
-            for (int n=0; n<itsp; n++)
-                for (int i2=1; i2<=itsD2; i2++)
-                    for (int j2=1; j2<=itsD2; j2++)
-                        for (int i1=1; i1<=itsD1; i1++)
-                            ret(m+1,n+1,i2,j2)+=std::conj(itsAs[n2](i1,i2))*CM(m+1,n+1,i1,j2);
-    }
-    return ret;
-}
-
-MatrixProductSite::Vector4T MatrixProductSite::ContractCM(int n2, const Vector4T& C) const
-{
-    Vector4T ret(itsp,itsp,itsD1,itsD2,1);
-    ret.Fill(eType(0.0));
-    for (int m=0; m<itsp; m++)
-        for (int n=0; n<itsp; n++)
+        MatrixCT CAmn=ContractCA(n2,Cmn);
+        for (int i2=1; i2<=itsD2; i2++)
             for (int j2=1; j2<=itsD2; j2++)
                 for (int i1=1; i1<=itsD1; i1++)
-                    for (int j1=1; j1<=itsD1; j1++)
-                        ret(m+1,n+1,i1,j2)+=C(m+1,n+1,i1,j1)*itsAs[n2](j1,j2);
+                    ret(i2,j2)+=std::conj(itsAs[n2](i1,i2))*CAmn(i1,j2);
+    }
     return ret;
 }
 
-MatrixProductSite::Matrix4T MatrixProductSite::FinializeTwoSiteDM(const Vector4T& C)
+MatrixProductSite::MatrixCT MatrixProductSite::ContractCA(int n2, const MatrixCT& Cmn) const
 {
-    Matrix4T ret(itsp,itsp,itsp,itsp);
-    ret.Fill(eType(0.0));
+    MatrixCT ret(itsD1,itsD2);
+    Fill(ret,eType(0.0));
+    for (int j2=1; j2<=itsD2; j2++)
+        for (int i1=1; i1<=itsD1; i1++)
+            for (int j1=1; j1<=itsD1; j1++)
+                ret(i1,j2)+=Cmn(i1,j1)*itsAs[n2](j1,j2);
+    return ret;
+}
+
+MatrixProductSite::MatrixCT MatrixProductSite::FinializeTwoSiteDM(const MatrixCT & Cmn)
+{
+    MatrixCT ret(itsp,itsp);
+    Fill(ret,eType(0.0));
     for (int n2=0; n2<itsp; n2++)
     {
-        Vector4T CM=ContractCM(n2,C);
+        MatrixCT CAmn=ContractCA(n2,Cmn);
         for (int m2=0; m2<itsp; m2++)
-            for (int m=0; m<itsp; m++)
-                for (int n=0; n<itsp; n++)
-                    for (int i2=1; i2<=itsD2; i2++)
-                        for (int j2=1; j2<=itsD2; j2++)
-                            for (int i1=1; i1<=itsD1; i1++)
-                                ret(m+1,m2+1,n+1,n2+1)+=std::conj(itsAs[m2](i1,i2))*CM(m+1,n+1,i1,j2);
+            for (int i2=1; i2<=itsD2; i2++)
+                for (int j2=1; j2<=itsD2; j2++)
+                    for (int i1=1; i1<=itsD1; i1++)
+                        ret(m2+1,n2+1)+=std::conj(itsAs[m2](i1,i2))*CAmn(i1,j2);
     }
-#ifdef DEBUG
-    MatrixCT zero=ret.Flatten()-conj(Transpose(ret.Flatten()));
-    assert(Max(abs(zero))<1e-14);
-#endif
+
 
     return ret;
 }

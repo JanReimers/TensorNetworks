@@ -123,6 +123,18 @@ TEST_F(ExpectationsTesting,TestTwoSiteDMs)
     int L=9,D=4;
     double S=0.5;
     Setup(L,S,D);
-    itsMPS->CalculateTwoSiteDMs(1,itsLRPSupervisor);
+    TwoSiteDMs ros=itsMPS->CalculateTwoSiteDMs(itsLRPSupervisor);
+    cout << "Traces=" << ros.GetTraces() << endl;
+    cout << "Von Neumann entropies=" << ros.GetVNEntropies() << endl;
+    SpinCalculator sc(S);
+    cout << "SxSx=" << ros.Contract(sc.GetSxSx()) << endl;
+    cout << "SxSy=" << ros.Contract(sc.GetSxSy()) << endl;
+    cout << "SxSz=" << ros.Contract(sc.GetSxSz()) << endl;
+    cout << "SySx=" << ros.Contract(sc.GetSySx()) << endl;
+    cout << "SySy=" << ros.Contract(sc.GetSySy()) << endl;
+    cout << "SySz=" << ros.Contract(sc.GetSySz()) << endl;
+    cout << "SzSx=" << ros.Contract(sc.GetSzSx()) << endl;
+    cout << "SzSy=" << ros.Contract(sc.GetSzSy()) << endl;
+    cout << "SzSz=" << ros.Contract(sc.GetSzSz()) << endl;
 }
 

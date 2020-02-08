@@ -4,6 +4,7 @@
 #include "TensorNetworks/Enums.H"
 #include "TensorNetworks/Typedefs.H"
 #include "TensorNetworks/MultiPlotable.H"
+#include "Containers/TwoSiteDMs.H"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -45,9 +46,11 @@ class MatrixProductState : public virtual MultiPlotable
 //    One and two site density matrix and expectation calculations
 //
         virtual void CalculateOneSiteDMs(LRPSupervisor*)=0;
-        virtual void CalculateTwoSiteDMs(int dx,LRPSupervisor*)=0;
         virtual ArrayT GetOneSiteExpectation(const MatrixT &) const=0;
         virtual ArrayT GetOneSiteExpectation(const MatrixCT&) const=0;
+
+        virtual TwoSiteDMs CalculateTwoSiteDMs(LRPSupervisor*)=0;
+
 //--------------------------------------------------------------------------------------
 //
 //    Reporting

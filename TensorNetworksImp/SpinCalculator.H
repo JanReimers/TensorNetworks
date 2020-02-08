@@ -1,6 +1,7 @@
 #ifndef SPINCALCULATOR_H
 #define SPINCALCULATOR_H
 
+#include "Containers/Matrix4.H"
 #include "oml/dmatrix.h"
 #include <complex>
 #include <cassert>
@@ -14,7 +15,8 @@ class SpinCalculator
         typedef std::complex<double> complx;
         typedef DMatrix<complx> MatrixCT;
         typedef DMatrix<double> MatrixT;
-
+        typedef Matrix4<complx> Matrix4CT;
+        typedef Matrix4<double> Matrix4T;
         typedef double(SpinCalculator::*dfp)(int,int) const;
         typedef complx(SpinCalculator::*cfp)(int,int) const;
 
@@ -35,10 +37,24 @@ class SpinCalculator
         MatrixT  GetSx (int lowerIndex=1) const;
         MatrixCT GetSy (int lowerIndex=1) const;
         MatrixT  GetSz (int lowerIndex=1) const;
+        //
+        //  Two site Matrix versions
+        //
+        Matrix4T  GetSxSx (int lowerIndex=1) const;
+        Matrix4CT GetSxSy (int lowerIndex=1) const;
+        Matrix4T  GetSxSz (int lowerIndex=1) const;
+        Matrix4CT GetSySx (int lowerIndex=1) const;
+        Matrix4CT GetSySy (int lowerIndex=1) const;
+        Matrix4CT GetSySz (int lowerIndex=1) const;
+        Matrix4T  GetSzSx (int lowerIndex=1) const;
+        Matrix4CT GetSzSy (int lowerIndex=1) const;
+        Matrix4T  GetSzSz (int lowerIndex=1) const;
+
 
     private:
         double ConvertToSpin(int n) const;
         template <class M, class F> M BuildMatrix(int lowerIndex,F) const;
+        template <class M, class F1,class F2> M BuildMatrix(int lowerIndex,F1,F2) const;
         double itsS; // Total spin
         int    itsd;
 };

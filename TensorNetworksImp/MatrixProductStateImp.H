@@ -72,10 +72,12 @@ public:
 //    One site density matrix and expectation calculations
 //
         virtual void CalculateOneSiteDMs(       LRPSupervisor*);
-        virtual void CalculateTwoSiteDMs(int dx,LRPSupervisor*);
+
         virtual Matrix4T CalculateTwoSiteDM(int ia,int ib) const;
         virtual ArrayT GetOneSiteExpectation(const MatrixT &) const;
         virtual ArrayT GetOneSiteExpectation(const MatrixCT&) const;
+
+        TwoSiteDMs CalculateTwoSiteDMs(LRPSupervisor*);
 //--------------------------------------------------------------------------------------
 //
 //    Reporting
