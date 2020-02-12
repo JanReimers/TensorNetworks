@@ -64,6 +64,10 @@
 		</Linker>
 		<Unit filename="Containers/Matrix4.H" />
 		<Unit filename="Containers/Matrix6.H" />
+		<Unit filename="Containers/OneSiteDMs.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Containers/OneSiteDMs.H" />
 		<Unit filename="Containers/SparseMatrix.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -109,9 +113,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/IdentityOperator.H" />
-		<Unit filename="TensorNetworksImp/MatrixProductOperator.C">
+		<Unit filename="TensorNetworksImp/MPO_LRB.C">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="TensorNetworksImp/MPO_LRB.H" />
+		<Unit filename="TensorNetworksImp/MPO_OneSite.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/MPO_OneSite.H" />
 		<Unit filename="TensorNetworksImp/MatrixProductOperator.H" />
 		<Unit filename="TensorNetworksImp/MatrixProductSite.C">
 			<Option compilerVar="CC" />
@@ -128,6 +137,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/MultiPlotableImp.H" />
+		<Unit filename="TensorNetworksImp/OneSiteSpinOperator.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/OneSiteSpinOperator.H" />
 		<Unit filename="TensorNetworksImp/PrimeEigenSolver.C">
 			<Option compilerVar="CC" />
 		</Unit>

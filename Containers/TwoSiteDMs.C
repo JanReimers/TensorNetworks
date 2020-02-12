@@ -1,4 +1,5 @@
-#include "TwoSiteDMs.H"
+#include "Containers/TwoSiteDMs.H"
+#include "TensorNetworks/VNEntropy.H"
 #include "oml/cnumeric.h"
 
 
@@ -61,20 +62,6 @@ TwoSiteDMs::ExpectationT TwoSiteDMs::GetTraces() const
     return ret;
 }
 
-double VNEntropy(const Vector<double>& s)
-{
-    static double eps=1e-14;
-    int N=s.size();
-    double ret=0.0;
-    for (int i=1;i<=N;i++)
-    {
-        assert(s(i)>=-eps);
-        if (s(i)>1.0) cout << "S(i)-1=" << s(i)-1 << endl;
-        assert(s(i)<=1.0+1000*eps);  //This check is really tough to satify
-        if (s(i)>0.0) ret+=s(i)*std::log(s(i));
-    }
-    return -ret/std::log(N);
-}
 
 TwoSiteDMs::ExpectationT TwoSiteDMs::GetVNEntropies() const
 {
@@ -86,7 +73,7 @@ TwoSiteDMs::ExpectationT TwoSiteDMs::GetVNEntropies() const
             //Vector<double> s=EigenValuesOnly<double,MatrixCT>(itsDMs(ia,ib).Flatten());
             Vector<eType> s(itsDMs(ia,ib).Flatten().GetDiagonal());
 //            cout << "s(" << ia << "," << ib << ")=" << s << ", sum=" << Sum(s) << endl;
-            ret(ia,ib)=VNEntropy(real(s));
+            ret(ia,ib)=VNEntropyFromEVs(real(s));
         }
     return ret;
 }

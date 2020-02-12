@@ -1,25 +1,25 @@
-#include "TensorNetworksImp/MatrixProductOperator.H"
+#include "TensorNetworksImp/MPO_LRB.H"
 #include "TensorNetworksImp/SiteOperatorImp.H"
 
-MatrixProductOperator::MatrixProductOperator(int L, int S2)
+MPO_LRB::MPO_LRB(int L, int S2)
     : itsL(L)
     , itsp(S2+1)
 {
 }
 
-MatrixProductOperator::MatrixProductOperator(const OperatorWRepresentation* O,int L, int S2)
+MPO_LRB::MPO_LRB(const OperatorWRepresentation* O,int L, int S2)
     : itsL(L)
     , itsp(S2+1)
 {
     Init(O);
 }
 
-MatrixProductOperator::~MatrixProductOperator()
+MPO_LRB::~MPO_LRB()
 {
     //dtor
 }
 
-void MatrixProductOperator::Init(const OperatorWRepresentation* O)
+void MPO_LRB::Init(const OperatorWRepresentation* O)
 {
     assert(O);
     //
@@ -33,7 +33,7 @@ void MatrixProductOperator::Init(const OperatorWRepresentation* O)
     itsSites.push_back(right);     //Right edge
 }
 
-TensorNetworks::Position MatrixProductOperator::GetPosition(int isite) const
+TensorNetworks::Position MPO_LRB::GetPosition(int isite) const
 {
     return isite==0 ? TensorNetworks::Left :
            (isite==itsL-1 ? TensorNetworks::Right : TensorNetworks::Bulk);

@@ -157,7 +157,7 @@ void MatrixProductSite::ReshapeFromLeft (int D1)
 void MatrixProductSite::ReshapeAndNormFromLeft (int D1)
 {
     ReshapeFromLeft(D1);
-    cout << "Left norm=" << GetLeftNorm() << endl;
+    //cout << "Left norm=" << GetLeftNorm() << endl;
     double norm=std::real(GetLeftNorm()(1,1));
     Rescale(sqrt(norm));
 
@@ -171,7 +171,7 @@ void MatrixProductSite::ReshapeFromRight(int D2)
 void MatrixProductSite::ReshapeAndNormFromRight(int D2)
 {
     ReshapeFromRight(D2);
-    cout << "Right norm=" << GetRightNorm() << endl;
+    //cout << "Right norm=" << GetRightNorm() << endl;
     double norm=std::real(GetRightNorm()(1,1));
     Rescale(sqrt(norm));
 }

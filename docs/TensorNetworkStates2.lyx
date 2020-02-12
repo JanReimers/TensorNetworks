@@ -1076,7 +1076,7 @@ where
 \begin_inset Formula $d^{2}$
 \end_inset
 
- posative definite eigenvalues all summing to 
+ positive definite eigenvalues all summing to 
 \begin_inset Formula $1$
 \end_inset
 
@@ -1380,7 +1380,7 @@ Now we need to decide on an efficient way of zipping through the lattice
  The first step is too pick a direction.
  Let's try left to right.
  The obvious first step is to contract over 
-\begin_inset Formula $j_{a-1}$
+\begin_inset Formula $i_{a-1}=j_{a-1}$
 \end_inset
 
 
@@ -1391,12 +1391,12 @@ C_{i_{a}j_{a}}^{m_{a}n_{a}}=\sum_{i_{a-1}}A_{i_{a-1}i_{a}}^{*m_{a}}A_{i_{a-1}j_{
 
 \end_inset
 
-INext we contract over 
+Next we contract over 
 \begin_inset Formula $j_{a}$
 \end_inset
 
  first and then over 
-\begin_inset Formula $i_{a}n_{a}$
+\begin_inset Formula $i_{a}n_{a+1}$
 \end_inset
 
 :
@@ -1428,6 +1428,303 @@ We continue this iteratation until we reach
 \end_inset
 
 
+\end_layout
+
+\begin_layout Section
+Matrix Product Operators
+\end_layout
+
+\begin_layout Standard
+We can project out a single wave function amplitute as
+\begin_inset Formula 
+\[
+\left\langle n_{1}n_{2}\cdots n_{L}\right|\left.\psi\right\rangle =\boldsymbol{M}^{n_{1}}\boldsymbol{M}^{n_{2}}\ldots\boldsymbol{M}^{n_{N}}
+\]
+
+\end_inset
+
+in an analogous manner we can write the expection of any operator 
+\begin_inset Formula $\mathcal{\hat{O}}$
+\end_inset
+
+ as
+\begin_inset Formula 
+\[
+\left\langle n_{1}n_{2}\cdots n_{L}\right|\hat{O}\left|m_{1}m_{2}\cdots m_{L}\right\rangle =\boldsymbol{W}^{n_{1}m_{1}}\boldsymbol{W}^{n_{2}m_{2}}\cdots\boldsymbol{W}^{n_{L}m_{L}}
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+\hat{O}=\sum_{\left\{ nm\right\} }\boldsymbol{W}^{n_{1}m_{1}}\boldsymbol{W}^{n_{2}m_{2}}\cdots\boldsymbol{W}^{n_{L}m_{L}}\left|n_{1}\cdots n_{L}\right\rangle \left\langle m_{1}\cdots m_{L}\right|
+\]
+
+\end_inset
+
+The 
+\begin_inset Formula $\boldsymbol{W}^{n_{a}m_{a}}$
+\end_inset
+
+ matrices are analogous to the 
+\begin_inset Formula $\boldsymbol{A}^{n_{a}}$
+\end_inset
+
+ matrices in the state expansion with the exception that the 
+\begin_inset Formula $W's$
+\end_inset
+
+ have two physical indices.
+ So the big question how do we go from a Hamiltonian expression to the 
+\begin_inset Formula $W's$
+\end_inset
+
+? We can also write this in terms of operator valued matrices
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{W}^{a}}=\sum_{n_{a}m_{a}}\boldsymbol{W}^{n_{a}m_{a}}\left|n_{a}\right\rangle \left\langle m_{a}\right|\label{eq:OpValuedMatrix}
+\end{equation}
+
+\end_inset
+
+now
+\begin_inset Formula 
+\[
+\hat{O}=\hat{\boldsymbol{W}^{1}}\hat{\boldsymbol{W}^{2}}\cdots\hat{\boldsymbol{W}^{L}}
+\]
+
+\end_inset
+
+In this representation each 
+\begin_inset Formula $\hat{\boldsymbol{W}^{a}}$
+\end_inset
+
+ acts on one site
+\end_layout
+
+\begin_layout Subsection
+Representing the Hamiltonian as an MPO
+\end_layout
+
+\begin_layout Standard
+For a simple Heisenberg hamiltonian
+\begin_inset Formula 
+\[
+\mathcal{\hat{H}}=\sum_{a=1}^{L-1}\vec{S}_{a}\cdot\vec{S}_{a+1}=\sum_{a=1}^{L-1}\hat{\mathcal{H}}_{a}
+\]
+
+\end_inset
+
+we need realize that this is a compact way of expressing
+\begin_inset Formula 
+\[
+\mathcal{\hat{H}}=\hat{\mathcal{H}}_{1}\otimes\mathbb{I}_{3}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}+\mathbb{I}_{1}\otimes\hat{\mathcal{H}}_{2}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}+\cdots+\mathbb{I}_{1}\otimes\mathbb{I}_{2}\otimes\mathbb{I}_{3}\cdots\otimes\hat{\mathcal{H}}_{L-1}
+\]
+
+\end_inset
+
+where the 
+\begin_inset Formula $\mathbb{I}_{a}'s$
+\end_inset
+
+ are 
+\begin_inset Formula $p\times p$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\mathcal{H}}_{a}'s$
+\end_inset
+
+ are
+\begin_inset Formula $p^{2}\times p^{2}$
+\end_inset
+
+ since they couple two neighbouring sites.
+ We can break this down even further using
+\begin_inset Formula 
+\[
+\hat{\mathcal{H}}_{a}=\frac{1}{2}\left(\hat{S}_{+}^{a}\hat{S}_{-}^{a+1}+\hat{S}_{-}^{a}\hat{S}_{+}^{a+1}\right)+\hat{S}_{z}^{a}\hat{S}_{z}^{a+1}
+\]
+
+\end_inset
+
+now
+\begin_inset Formula 
+\[
+\mathcal{\hat{H}}=\frac{1}{2}\hat{S}_{+}^{1}\otimes\hat{S}_{-}^{2}\otimes\mathbb{I}_{3}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}+\frac{1}{2}\hat{S}_{-}^{1}\otimes\hat{S}_{+}^{2}\otimes\mathbb{I}_{3}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}+\hat{S}_{z}^{1}\otimes\hat{S}_{z}^{2}\otimes\mathbb{I}_{3}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
++\mathbb{I}_{1}\otimes\frac{1}{2}\hat{S}_{+}^{2}\otimes\hat{S}_{-}^{3}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}+\mathbb{I}_{1}\otimes\frac{1}{2}\hat{S}_{-}^{2}\otimes\hat{S}_{+}^{3}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}+\mathbb{I}_{1}\otimes\hat{S}_{z}^{2}\otimes\hat{S}_{z}^{3}\otimes\mathbb{I}_{4}\cdots\otimes\mathbb{I}_{L}+\cdots\label{eq:HamitonianTensorProduct}
+\end{equation}
+
+\end_inset
+
+This may look tedious but I need to write these tensor product out explicitly
+ until I gain experience working with these ideas.
+ So how do map the first term in eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:HamitonianTensorProduct"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ as something like eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:OpValuedMatrix"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+? We apparently need 
+\begin_inset Formula $D_{W}=3+2=2$
+\end_inset
+
+ becuase we have three non-comuting terms.
+\end_layout
+
+\begin_layout Standard
+It turns out we can write
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{W}^{1}=\begin{bmatrix}0, & \frac{1}{2}\hat{S}_{-}^{1} & \frac{1}{2}\hat{S}_{+}^{1}, & \hat{S}_{z}^{1}, & \mathbb{I}^{1}\end{bmatrix}\label{eq:W1forH}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{W}^{2}=\begin{bmatrix}\mathbb{I}^{2} & 0 & 0 & 0 & 0\\
+\hat{S}_{+}^{2} & 0 & 0 & 0 & 0\\
+\hat{S}_{-}^{2} & 0 & 0 & 0 & 0\\
+\hat{S}_{z}^{2} & 0 & 0 & 0 & 0\\
+0 & \frac{1}{2}\hat{S}_{-}^{2} & \frac{1}{2}\hat{S}_{+}^{2} & \hat{S}_{z}^{2} & \mathbb{I}^{2}
+\end{bmatrix}\label{eq:W2forH}
+\end{equation}
+
+\end_inset
+
+ Now
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{W}^{1}}\hat{\boldsymbol{W}^{2}}=\begin{bmatrix}\frac{1}{2}\hat{S}_{-}^{1}\otimes\hat{S}_{+}^{2}+\frac{1}{2}\hat{S}_{+}^{1}\otimes\hat{S}_{-}^{2}+\hat{S}_{z}^{1}\otimes\hat{S}_{z}^{2}, & \mathbb{I}^{1}\otimes\frac{1}{2}\hat{S}_{-}^{2}, & \mathbb{I}^{1}\otimes\frac{1}{2}\hat{S}_{+}^{2}, & \mathbb{I}^{1}\otimes & \hat{S}_{z}^{2}, & \mathbb{I}^{1}\otimes\mathbb{I}^{2}\end{bmatrix}
+\]
+
+\end_inset
+
+We can now right multiply the row vector by 
+\begin_inset Formula $\hat{\boldsymbol{W}^{3}}$
+\end_inset
+
+ and get three more terms in the first element for the interactions between
+ sites 
+\begin_inset Formula $2$
+\end_inset
+
+ and 
+\begin_inset Formula $3$
+\end_inset
+
+.
+ Finally with 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{W}^{L}=\begin{bmatrix}\mathbb{I}^{L}\\
+\hat{S}_{+}^{L}\\
+\hat{S}_{-}^{L}\\
+\hat{S}_{z}^{L}\\
+0
+\end{bmatrix}\label{eq:W4forH}
+\end{equation}
+
+\end_inset
+
+the whole thing zips up to a scalar which is the Hamiltonian.
+\end_layout
+
+\begin_layout Subsection
+One site spin MPO
+\end_layout
+
+\begin_layout Standard
+If we want to calucate one site expectations like
+\begin_inset Formula 
+\[
+\left\langle \vec{S}^{a}\right\rangle =\left(\left\langle S_{x}^{a}\right\rangle ,\left\langle S_{y}^{a}\right\rangle ,\left\langle S_{z}^{a}\right\rangle \right)
+\]
+
+\end_inset
+
+how to represent this with an MPO? The first thing to keep in mind is the
+ products of 
+\begin_inset Formula $W$
+\end_inset
+
+'s always contract to scalar, so the output is always a number not a vector
+ or a nuber for each site.
+ We can make an MPO that returns 
+\begin_inset Formula $S_{x}$
+\end_inset
+
+ for ssite one
+\begin_inset Formula 
+\[
+\boldsymbol{W}^{1x}=\begin{bmatrix}\hat{S}_{x}^{1}\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boldsymbol{W}^{a}=\begin{bmatrix}\mathbb{I}^{a}\end{bmatrix},\;a>1
+\]
+
+\end_inset
+
+This becomes a little less pedantic a two site correlation
+\begin_inset Formula 
+\[
+\left\langle S_{x}^{1}S_{x}^{2}\right\rangle 
+\]
+
+\end_inset
+
+then
+\begin_inset Formula 
+\[
+\boldsymbol{W}^{1x}=\begin{bmatrix}\hat{S}_{x}^{1}\end{bmatrix},\quad\boldsymbol{W}^{2x}=\begin{bmatrix}\hat{S}_{x}^{2}\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boldsymbol{W}^{a}=\begin{bmatrix}\mathbb{I}^{a}\end{bmatrix},\;a>2
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Ground State
 \end_layout
 
 \begin_layout Section*

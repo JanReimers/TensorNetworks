@@ -4,6 +4,7 @@
 #include "TensorNetworks/Enums.H"
 #include "TensorNetworks/Typedefs.H"
 #include "TensorNetworks/MultiPlotable.H"
+#include "Containers/OneSiteDMs.H"
 #include "Containers/TwoSiteDMs.H"
 #include <string>
 #include <vector>
@@ -18,7 +19,8 @@ class MatrixProductState : public virtual MultiPlotable
 {
     typedef TensorNetworks::MatrixT  MatrixT;
     typedef TensorNetworks::MatrixCT MatrixCT;
-    typedef TensorNetworks::ArrayT  ArrayT;
+    typedef TensorNetworks::ArrayT   ArrayT;
+    typedef TensorNetworks::eType    eType;
     public:
         MatrixProductState() {}
         virtual ~MatrixProductState() {}
@@ -39,16 +41,14 @@ class MatrixProductState : public virtual MultiPlotable
 //
 //    Overlap and expectation contractions
 //
-        virtual double   GetExpectationIterate(const Operator* o) const=0;
-        virtual double   GetExpectation       (const Operator* o1,const Operator* o2) const=0;
+        virtual double   GetExpectation (const Operator* o) const=0;
+        virtual eType    GetExpectationC(const Operator* o) const=0; //For non hermitian operators, S+, S-. Sy
+        virtual double   GetExpectation (const Operator* o1,const Operator* o2) const=0;
 //--------------------------------------------------------------------------------------
 //
 //    One and two site density matrix and expectation calculations
 //
-        virtual void CalculateOneSiteDMs(LRPSupervisor*)=0;
-        virtual ArrayT GetOneSiteExpectation(const MatrixT &) const=0;
-        virtual ArrayT GetOneSiteExpectation(const MatrixCT&) const=0;
-
+        virtual OneSiteDMs CalculateOneSiteDMs(LRPSupervisor*)=0;
         virtual TwoSiteDMs CalculateTwoSiteDMs(LRPSupervisor*)=0;
 
 //--------------------------------------------------------------------------------------

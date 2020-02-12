@@ -129,7 +129,7 @@ TEST_F(MPOTesting,DoHamiltionExpectationL10S1_5D2)
     {
         Setup(10,S2,2);
         itsMPS->InitializeWith(TensorNetworks::Neel);
-        EXPECT_NEAR(itsMPS->GetExpectationIterate(itsH),ENeel(S2),1e-11);
+        EXPECT_NEAR(itsMPS->GetExpectation(itsH),ENeel(S2),1e-11);
     }
 }
 
@@ -137,13 +137,13 @@ TEST_F(MPOTesting,DoHamiltionExpectationProductL10S1D1)
 {
     Setup(10,1,1);
     itsMPS->InitializeWith(TensorNetworks::Neel);
-    EXPECT_NEAR(itsMPS->GetExpectationIterate(itsH),-2.25,1e-11);
+    EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
 }
 TEST_F(MPOTesting,DoHamiltionExpectationNeelL10S1D1)
 {
     Setup(10,1,1);
     itsMPS->InitializeWith(TensorNetworks::Neel);
-    EXPECT_NEAR(itsMPS->GetExpectationIterate(itsH),-2.25,1e-11);
+    EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
 }
 
 TEST_F(MPOTesting,LeftNormalizeThenDoHamiltionExpectation)
@@ -151,14 +151,14 @@ TEST_F(MPOTesting,LeftNormalizeThenDoHamiltionExpectation)
     Setup(10,1,2);
     itsMPS->InitializeWith(TensorNetworks::Neel);
     itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
-    EXPECT_NEAR(itsMPS->GetExpectationIterate(itsH),-2.25,1e-11);
+    EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
 }
 TEST_F(MPOTesting,RightNormalizeThenDoHamiltionExpectation)
 {
     Setup(10,1,2);
     itsMPS->InitializeWith(TensorNetworks::Neel);
     itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
-    EXPECT_NEAR(itsMPS->GetExpectationIterate(itsH),-2.25,1e-11);
+    EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
 }
 
 
@@ -232,7 +232,7 @@ TEST_F(MPOTesting,TestEoldEnew)
     eType EL=L3(1,1,1);
     Vector3T R3=GetEORightIterate(-1);
     eType ER=R3(1,1,1);
-    double Enew=itsMPS->GetExpectationIterate(itsH);
+    double Enew=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(std::real(ER),Enew,100*eps);
     EXPECT_NEAR(std::real(EL),Enew,100*eps);
 }
@@ -247,8 +247,8 @@ TEST_F(MPOTesting,TestGetExpectation2_I_I)
     OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
     Operator* IO=itsH->CreateOperator(IWO);
 
-    double E1=itsMPS->GetExpectationIterate(itsH);
-    double I1=itsMPS->GetExpectationIterate(IO);
+    double E1=itsMPS->GetExpectation(itsH);
+    double I1=itsMPS->GetExpectation(IO);
     double II=itsMPS->GetExpectation(IO,IO);
     double IE=itsMPS->GetExpectation(IO,itsH);
     double EI=itsMPS->GetExpectation(itsH,IO);

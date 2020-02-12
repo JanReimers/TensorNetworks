@@ -277,7 +277,7 @@ double MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Sup
     if (!quiet)
     {
         cout.precision(10);
-        cout << "SweepRight  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
+        cout << "SweepRight  E=" << GetExpectation(h)/(itsL-1) << endl;
     }
     double diter=itsNSweep; //Fractional iter count for log(dE) plot
     for (int ia=0; ia<itsL-1; ia++)
@@ -301,11 +301,11 @@ double MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Sup
                 AddPoint("Iter log(dE/J)",Plotting::Point(diter,log10(de)));
         }
         diter+=1.0/itsL;
-        if (!quiet) cout << "SweepRight post constract  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
+        if (!quiet) cout << "SweepRight post constract  E=" << GetExpectation(h)/(itsL-1) << endl;
     }
     itsNSweep++;
     Supervisor->DoneOneStep(0,"Calculating Expectation <E>"); //Supervisor will update the graphs
-    double E1=GetExpectationIterate(h);
+    double E1=GetExpectation(h);
     if (weHaveGraphs())
     {
         AddPoint("Iter E/J",Plotting::Point(itsNSweep,E1));
@@ -318,7 +318,7 @@ double MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supe
     if (!quiet)
     {
         cout.precision(10);
-        cout << "SweepLeft  entry  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
+        cout << "SweepLeft  entry  E=" << GetExpectation(h)/(itsL-1) << endl;
     }
     double diter=itsNSweep; //Fractional iter count for log(dE) plot
     for (int ia=itsL-1; ia>0; ia--)
@@ -343,12 +343,12 @@ double MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supe
         }
         diter+=1.0/itsL;
         if (!quiet)
-            cout << "SweepLeft  post contract  E=" << GetExpectationIterate(h)/(itsL-1) << endl;
+            cout << "SweepLeft  post contract  E=" << GetExpectation(h)/(itsL-1) << endl;
 
     }
     itsNSweep++;
     Supervisor->DoneOneStep(0,"Calculating Expectation <E>"); //Supervisor will update the graphs
-    double E1=GetExpectationIterate(h);
+    double E1=GetExpectation(h);
     if (weHaveGraphs())
     {
         AddPoint("Iter E/J",Plotting::Point(itsNSweep,E1));
@@ -420,7 +420,7 @@ void MatrixProductStateImp::Insert(Plotting::MultiGraph* graphs)
 
 
 
-double   MatrixProductStateImp::GetExpectationIterate   (const Operator* o) const
+double   MatrixProductStateImp::GetExpectation   (const Operator* o) const
 {
     Vector3T F(1,1,1,1);
     F(1,1,1)=eType(1.0);
@@ -432,6 +432,16 @@ double   MatrixProductStateImp::GetExpectationIterate   (const Operator* o) cons
         cout << "Warning: MatrixProductState::GetExpectation Imag(E)=" << std::imag(F(1,1,1)) << endl;
 
     return std::real(F(1,1,1));
+}
+
+eType   MatrixProductStateImp::GetExpectationC(const Operator* o) const
+{
+    Vector3T F(1,1,1,1);
+    F(1,1,1)=eType(1.0);
+    for (int ia=0; ia<itsL; ia++)
+        F=itsSites[ia]->IterateLeft_F(o->GetSiteOperator(ia),F);
+
+    return F(1,1,1);
 }
 
 double   MatrixProductStateImp::GetExpectation(const Operator* o1,const Operator* o2) const
@@ -502,16 +512,16 @@ MatrixProductStateImp::Vector3T MatrixProductStateImp::GetEORightIterate(const O
 }
 
 
-void MatrixProductStateImp::CalculateOneSiteDMs(LRPSupervisor* supervisor)
+OneSiteDMs MatrixProductStateImp::CalculateOneSiteDMs(LRPSupervisor* supervisor)
 {
-    itsOneSiteDMs.clear();
-    Normalize(TensorNetworks::Right,supervisor);
+    OneSiteDMs ret(itsL,itsp);
+    //Normalize(TensorNetworks::Right,supervisor);
     VectorT s; // This get passed from one site to the next.
     MatrixCT Vdagger;// This get passed from one site to the next.
     for (int ia=0; ia<itsL-1; ia++)
     {
         supervisor->DoneOneStep(2,SiteMessage("Calculate ro(mn) site: ",ia),ia);
-        itsOneSiteDMs.push_back(itsSites[ia]->CalculateOneSiteDM());
+        ret.Insert(ia,itsSites[ia]->CalculateOneSiteDM());
         supervisor->DoneOneStep(2,SiteMessage("SVD Left Normalize site: ",ia),ia);
         itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
         UpdateBondData(ia);
@@ -520,7 +530,8 @@ void MatrixProductStateImp::CalculateOneSiteDMs(LRPSupervisor* supervisor)
     }
     UpdateBondData(itsL-2);
     supervisor->DoneOneStep(2,SiteMessage("Calculate ro(mn) site: ",itsL-1),itsL-1);
-    itsOneSiteDMs.push_back(itsSites[itsL-1]->CalculateOneSiteDM());
+    ret.Insert(itsL-1,itsSites[itsL-1]->CalculateOneSiteDM());
+    return ret;
 }
 
 MatrixProductStateImp::Matrix4T MatrixProductStateImp::CalculateTwoSiteDM(int ia,int ib) const
@@ -547,10 +558,7 @@ MatrixProductStateImp::Matrix4T MatrixProductStateImp::CalculateTwoSiteDM(int ia
                 for (int n2=0; n2<itsp; n2++)
                     ret(m+1,m2+1,n+1,n2+1)=C(m2+1,n2+1);
         }
-#ifdef DEBUG
-    MatrixCT zero=ret.Flatten()-conj(Transpose(ret.Flatten()));
-    assert(Max(abs(zero))<1e-14);
-#endif
+    assert(IsHermitian(ret.Flatten(),1e-14));
     return ret;
 }
 
@@ -573,7 +581,7 @@ TwoSiteDMs MatrixProductStateImp::CalculateTwoSiteDMs(LRPSupervisor* supervisor)
     return ret;
 }
 
-
+/*
 template <class Ma,class Mb> double Trace(const Ma& a, const Mb& b)
 {
     assert(a.GetLimits()==b.GetLimits());
@@ -614,6 +622,6 @@ TensorNetworks::ArrayT MatrixProductStateImp::GetOneSiteExpectation(const Matrix
         ret[ia]=Trace(o,itsOneSiteDMs[ia]);
     return ret;
 }
-
+*/
 
 

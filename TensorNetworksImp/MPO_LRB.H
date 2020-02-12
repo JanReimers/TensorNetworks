@@ -8,12 +8,17 @@
 class SiteOperator;
 class OperatorWRepresentation;
 
-class MatrixProductOperator : public virtual Operator
+//
+//  Represent an MPO with Left/Bulk/Right structure.  What this means is that we only need store
+//  separate W matrices for the left, bulk and right locations.
+//  This works for Hamiltonians
+//
+class MPO_LRB : public virtual Operator
 {
     public:
-        MatrixProductOperator(int L, int S2);
-        MatrixProductOperator(const OperatorWRepresentation* O, int L, int S2);
-        virtual ~MatrixProductOperator();
+        MPO_LRB(int L, int S2);
+        MPO_LRB(const OperatorWRepresentation* O, int L, int S2);
+        virtual ~MPO_LRB();
 
         const SiteOperator* GetSiteOperator(int isite) const
         {

@@ -1,6 +1,6 @@
 #include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
 #include "TensorNetworksImp/MatrixProductStateImp.H"
-#include "TensorNetworksImp/MatrixProductOperator.H"
+#include "TensorNetworksImp/MPO_LRB.H"
 #include "TensorNetworks/Dw12.H"
 
 #include <iostream>
@@ -9,7 +9,7 @@ using std::cout;
 using std::endl;
 
 Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, double Jxy,double Jz, double hz)
-    : MatrixProductOperator(L,2*S)
+    : MPO_LRB(L,2*S)
     , itsL(L)
     , itsS(S)
     , itsJxy(Jxy)
@@ -225,6 +225,6 @@ MatrixProductState* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,const Epsilons
 
  Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(const OperatorWRepresentation* Wrep) const
  {
-    return new MatrixProductOperator(Wrep,itsL,2*itsS);
+    return new MPO_LRB(Wrep,itsL,2*itsS);
  }
 

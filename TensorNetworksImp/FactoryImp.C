@@ -15,7 +15,7 @@ Make1D_NN_HeisenbergHamiltonian(int L, double S, double Jxy, double Jz, double h
 
 Operator* TensorNetworks::FactoryImp::MakeOperator(const OperatorWRepresentation* Wrep, int L, int S2) const
 {
-    return new MatrixProductOperator(Wrep,L,S2);
+    return new MPO_LRB(Wrep,L,S2);
 }
 
 

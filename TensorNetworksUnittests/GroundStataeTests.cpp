@@ -45,7 +45,7 @@ TEST_F(GroundStateTesting,TestIdentityOperator)
     itsMPS->Normalize(TensorNetworks::Left,new LRPSupervisor());
     OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
     Operator* IO=itsH->CreateOperator(IWO);
-    double S=itsMPS->GetExpectationIterate(IO);
+    double S=itsMPS->GetExpectation(IO);
     EXPECT_NEAR(S,1.0,eps);
 
 }
@@ -58,7 +58,7 @@ TEST_F(GroundStateTesting,TestSweepL9S1D2)
     itsMPS->InitializeWith(TensorNetworks::Random);
     int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
 
-    double E=itsMPS->GetExpectationIterate(itsH);
+    double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.45317425,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }
@@ -73,7 +73,7 @@ TEST_F(GroundStateTesting,TestSweepL9S1D8)
     itsMPS->InitializeWith(TensorNetworks::Random);
     int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
 
-    double E=itsMPS->GetExpectationIterate(itsH);
+    double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.46703753,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }
@@ -85,7 +85,7 @@ TEST_F(GroundStateTesting,TestSweepL9S5D2)
     itsMPS->InitializeWith(TensorNetworks::Random);
     int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
 
-    double E=itsMPS->GetExpectationIterate(itsH);
+    double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-7.025661 ,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }

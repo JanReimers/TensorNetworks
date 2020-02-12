@@ -3,7 +3,7 @@
 
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/OperatorWRepresentation.H"
-#include "TensorNetworksImp/MatrixProductOperator.H"
+#include "TensorNetworksImp/MPO_LRB.H"
 
 //
 //  H=Sum(a=1..L,J*Sa*Sa+1) where Sa spin S operator on site a
@@ -11,7 +11,7 @@
 class Hamiltonian_1D_NN_Heisenberg
     : public virtual Hamiltonian
     , public virtual OperatorWRepresentation
-    , public MatrixProductOperator
+    , public MPO_LRB
 {
     public:
         Hamiltonian_1D_NN_Heisenberg(int L, double S, double Jxy,double Jz, double hz);

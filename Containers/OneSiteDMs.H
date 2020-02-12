@@ -1,25 +1,26 @@
-#ifndef TWOSITEDMS_H
-#define TWOSITEDMS_H
+#ifndef ONESITEDMS_H
+#define ONESITEDMS_H
 
-#include "Containers/Matrix4.H"
+#include "oml/dmatrix.h"
 #include "oml/smatrix.h"
+#include "oml/array.h"
 #include <complex>
 //---------------------------------------------------------------------------------------
 //
 //  Store and manipulate 2-site density matricies
 //
-class TwoSiteDMs
+class OneSiteDMs
 {
 public:
     typedef std::complex<double> eType;
-    typedef Matrix4<eType> DMType;
-    typedef Matrix4<double> OperatorT;
-    typedef Matrix4<eType>  OperatorCT;
-    typedef SMatrix<double> ExpectationT;
+    typedef DMatrix<eType> DMType;
+    typedef DMatrix<double> OperatorT;
+    typedef DMatrix<eType>  OperatorCT;
+    typedef Array<double> ExpectationT;
 
-    TwoSiteDMs(int L,int p);
-    ~TwoSiteDMs();
-    void Insert(int ia, int ib,const DMType& dm);
+    OneSiteDMs(int L,int p);
+    ~OneSiteDMs();
+    void Insert(int ia, const DMType& dm);
     int    GetL() const {return itsL;}
     double GetS() const {return (itsp-1.0)/2.0;}
 
@@ -28,12 +29,12 @@ public:
     ExpectationT GetVNEntropies() const;
 
 private:
-    typedef SMatrix<DMType> DMsType;
+    typedef Array<DMType> DMsType;
     typedef DMatrix<eType> MatrixCT;
 
-    int itsL;
-    int itsp;
+    int    itsL;
+    int    itsp;
     DMsType itsDMs;
 };
 
-#endif // TWOSITEDMS_H
+#endif // ONESITEDMS_H

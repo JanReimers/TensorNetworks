@@ -65,18 +65,14 @@ public:
 //    Overlap and expectation contractions
 //
 
-        virtual double   GetExpectationIterate(const Operator* o) const;
-        virtual double   GetExpectation       (const Operator* o1,const Operator* o2) const;
+        virtual double   GetExpectation (const Operator* o) const;
+        virtual eType    GetExpectationC(const Operator* o) const;
+        virtual double   GetExpectation (const Operator* o1,const Operator* o2) const;
 //--------------------------------------------------------------------------------------
 //
 //    One site density matrix and expectation calculations
 //
-        virtual void CalculateOneSiteDMs(       LRPSupervisor*);
-
-        virtual Matrix4T CalculateTwoSiteDM(int ia,int ib) const;
-        virtual ArrayT GetOneSiteExpectation(const MatrixT &) const;
-        virtual ArrayT GetOneSiteExpectation(const MatrixCT&) const;
-
+        OneSiteDMs CalculateOneSiteDMs(LRPSupervisor*);
         TwoSiteDMs CalculateTwoSiteDMs(LRPSupervisor*);
 //--------------------------------------------------------------------------------------
 //
@@ -119,6 +115,8 @@ private:
         Vector3T GetEOLeft_Iterate(const Operator* o,LRPSupervisor*,int isite,bool cache=false) const;
         Vector3T GetEORightIterate(const Operator* o,LRPSupervisor*,int isite,bool cache=false) const;
 
+        Matrix4T CalculateTwoSiteDM(int ia,int ib) const;
+
 //--------------------------------------------------------------------------------------
 //
 //  Iterator Typedefs
@@ -129,8 +127,6 @@ private:
         typedef SitesType::const_iterator cSIter;
         typedef SitesType::      reverse_iterator  rSIter;
         typedef SitesType::const_reverse_iterator crSIter;
-
-        typedef std::vector<MatrixCT> MatrixListT;
 
 //--------------------------------------------------------------------------------------
 //
@@ -145,7 +141,6 @@ private:
         Epsilons    itsEpsilons;
         BondsType   itsBonds;
         SitesType   itsSites;
-        MatrixListT itsOneSiteDMs; //One site densitymatrixes
 
         UniformMesh*  itsSitesMesh;
         Mesh*         itsBondsMesh;
