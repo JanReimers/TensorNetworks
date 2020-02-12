@@ -55,10 +55,6 @@
 			<Add library="gfortran" />
 			<Add library="pthread" />
 		</Linker>
-		<Unit filename="../TensorNetworks/VNEntropy.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../TensorNetworks/VNEntropy.H" />
 		<Unit filename="ExpectationsTests.C">
 			<Option compilerVar="CC" />
 		</Unit>

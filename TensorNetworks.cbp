@@ -97,6 +97,10 @@
 		<Unit filename="TensorNetworks/OperatorWRepresentation.H" />
 		<Unit filename="TensorNetworks/SiteOperator.H" />
 		<Unit filename="TensorNetworks/Typedefs.H" />
+		<Unit filename="TensorNetworks/VNEntropy.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworks/VNEntropy.H" />
 		<Unit filename="TensorNetworksImp/Bond.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -121,6 +125,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/MPO_OneSite.H" />
+		<Unit filename="TensorNetworksImp/MPO_TwoSite.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/MPO_TwoSite.H" />
 		<Unit filename="TensorNetworksImp/MatrixProductOperator.H" />
 		<Unit filename="TensorNetworksImp/MatrixProductSite.C">
 			<Option compilerVar="CC" />

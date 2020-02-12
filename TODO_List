@@ -2,7 +2,8 @@
     Control panel
         Play/Pause in one button.  Use icons?
     Status bar. ModelName (from H), L,S, D, iter#, E, CPU & meminfo (use psutils)
--Fresh checkout and build.
+-DOne Fresh checkout and build.
+-Refactor operators into a separate folder.
 -Ham->CreateMPS should be a /Factory/ so py knows to delete it.
 -Convergence schedule,  increase D, drop epsilons
 -Dynamically add lattice site, pseudo DMRG

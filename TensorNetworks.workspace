@@ -8,10 +8,15 @@
 		<Project filename="../Plotting/wxPlotting.cbp">
 			<Depends filename="../Plotting/Plotting.cbp" />
 		</Project>
-		<Project filename="../Plotting/PyPlotting.cbp" />
+		<Project filename="../Plotting/PyPlotting.cbp">
+			<Depends filename="../Misc/wxMisc.cbp" />
+			<Depends filename="../Plotting/wxPlotting.cbp" />
+		</Project>
 		<Project filename="../Functions/Functions.cbp" />
 		<Project filename="TensorNetworks.cbp">
+			<Depends filename="../Misc/Misc.cbp" />
 			<Depends filename="../Plotting/wxPlotting.cbp" />
+			<Depends filename="../Functions/Functions.cbp" />
 		</Project>
 		<Project filename="TensorNetworksUnittests/TensorNetworksUnittests.cbp">
 			<Depends filename="TensorNetworks.cbp" />

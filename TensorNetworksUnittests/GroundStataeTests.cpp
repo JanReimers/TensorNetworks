@@ -104,7 +104,7 @@ TEST_F(GroundStateTesting,TestSweepL19S5D4)
     sw.Stop();
     cout << "FindGroundState for L=" << L << ", S=" << S2/2.0 << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
 
-    double E=itsMPS->GetExpectationIterate(itsH);
+    double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-7.1766766 ,1e-5);
     EXPECT_LT(nSweep,maxIter);
 }
@@ -120,7 +120,7 @@ TEST_F(GroundStateTesting,TestSweepL19S1D8)
     sw.Stop();
     cout << "FindGroundState for L=" << L << ", S=" << S2/2.0 << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
 
-    double E=itsMPS->GetExpectationIterate(itsH);
+    double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.45535447609272839,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }
