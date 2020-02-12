@@ -5,7 +5,9 @@
 
 double VNEntropyFromEVs(const Vector<double>& s)
 {
+#ifdef DEBUG
     static double eps=1e-14;
+#endif
     int N=s.size();
     double ret=0.0;
     for (int i=1;i<=N;i++)
@@ -20,7 +22,9 @@ double VNEntropyFromEVs(const Vector<double>& s)
 
 double VNEntropyFromSVs(const Vector<double>& s)
 {
+#ifdef DEBUG
     static double eps=1e-14;
+#endif
     int N=s.size();
     double ret=0.0;
     for (int i=1;i<=N;i++)

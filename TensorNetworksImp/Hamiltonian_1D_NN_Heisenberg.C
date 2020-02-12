@@ -1,6 +1,6 @@
 #include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
 #include "TensorNetworksImp/MatrixProductStateImp.H"
-#include "TensorNetworksImp/MPO_LRB.H"
+#include "Operators/MPO_LRB.H"
 #include "TensorNetworks/Dw12.H"
 
 #include <iostream>

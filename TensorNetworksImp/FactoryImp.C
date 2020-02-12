@@ -1,6 +1,6 @@
 #include "TensorNetworksImp/FactoryImp.H"
 #include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
-#include "TensorNetworksImp/IdentityOperator.H"
+#include "Operators/IdentityOperator.H"
 
 const TensorNetworks::Factory* TensorNetworks::Factory::GetFactory()
 {

@@ -78,6 +78,30 @@
 		<Unit filename="Containers/TwoSiteDMs.H" />
 		<Unit filename="Containers/Vector3.H" />
 		<Unit filename="Containers/Vector4.H" />
+		<Unit filename="Operators/IdentityOperator.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/IdentityOperator.H" />
+		<Unit filename="Operators/MPO_LRB.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/MPO_LRB.H" />
+		<Unit filename="Operators/MPO_OneSite.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/MPO_OneSite.H" />
+		<Unit filename="Operators/MPO_TwoSite.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/MPO_TwoSite.H" />
+		<Unit filename="Operators/OneSiteSpinOperator.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/OneSiteSpinOperator.H" />
+		<Unit filename="Operators/SiteOperatorImp.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/SiteOperatorImp.H" />
 		<Unit filename="TODO_List" />
 		<Unit filename="TensorNetworks/Dw12.C">
 			<Option compilerVar="CC" />
@@ -113,23 +137,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H" />
-		<Unit filename="TensorNetworksImp/IdentityOperator.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworksImp/IdentityOperator.H" />
-		<Unit filename="TensorNetworksImp/MPO_LRB.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworksImp/MPO_LRB.H" />
-		<Unit filename="TensorNetworksImp/MPO_OneSite.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworksImp/MPO_OneSite.H" />
-		<Unit filename="TensorNetworksImp/MPO_TwoSite.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworksImp/MPO_TwoSite.H" />
-		<Unit filename="TensorNetworksImp/MatrixProductOperator.H" />
 		<Unit filename="TensorNetworksImp/MatrixProductSite.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -145,18 +152,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/MultiPlotableImp.H" />
-		<Unit filename="TensorNetworksImp/OneSiteSpinOperator.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworksImp/OneSiteSpinOperator.H" />
 		<Unit filename="TensorNetworksImp/PrimeEigenSolver.C">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/PrimeEigenSolver.H" />
-		<Unit filename="TensorNetworksImp/SiteOperatorImp.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworksImp/SiteOperatorImp.H" />
 		<Unit filename="TensorNetworksImp/SpinCalculator.C">
 			<Option compilerVar="CC" />
 		</Unit>

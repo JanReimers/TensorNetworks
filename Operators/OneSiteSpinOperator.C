@@ -1,4 +1,4 @@
-#include "TensorNetworksImp/OneSiteSpinOperator.H"
+#include "Operators/OneSiteSpinOperator.H"
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 

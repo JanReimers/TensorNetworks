@@ -3,7 +3,7 @@
 
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/OperatorWRepresentation.H"
-#include "TensorNetworksImp/MPO_LRB.H"
+#include "Operators/MPO_LRB.H"
 
 //
 //  H=Sum(a=1..L,J*Sa*Sa+1) where Sa spin S operator on site a

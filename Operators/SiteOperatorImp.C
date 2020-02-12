@@ -1,4 +1,4 @@
-#include "TensorNetworksImp/SiteOperatorImp.H"
+#include "Operators/SiteOperatorImp.H"
 #include "TensorNetworks/OperatorWRepresentation.H"
 
 

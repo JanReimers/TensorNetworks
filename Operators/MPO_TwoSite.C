@@ -1,7 +1,7 @@
-#include "TensorNetworksImp/MPO_TwoSite.H"
-#include "TensorNetworksImp/SiteOperatorImp.H"
-#include "TensorNetworksImp/OneSiteSpinOperator.H"
-#include "TensorNetworksImp/IdentityOperator.H"
+#include "Operators/MPO_TwoSite.H"
+#include "Operators/SiteOperatorImp.H"
+#include "Operators/OneSiteSpinOperator.H"
+#include "Operators/IdentityOperator.H"
 
 MPO_TwoSite::MPO_TwoSite(int L, double S ,int isite1,int isite2, TensorNetworks::SpinOperator so1, TensorNetworks::SpinOperator so2)
     : itsL(L)

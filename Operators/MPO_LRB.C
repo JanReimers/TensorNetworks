@@ -1,5 +1,5 @@
-#include "TensorNetworksImp/MPO_LRB.H"
-#include "TensorNetworksImp/SiteOperatorImp.H"
+#include "Operators/MPO_LRB.H"
+#include "Operators/SiteOperatorImp.H"
 
 MPO_LRB::MPO_LRB(int L, int S2)
     : itsL(L)
