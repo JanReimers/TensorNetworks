@@ -2,6 +2,8 @@
 #include "TensorNetworksImp/MatrixProductStateImp.H"
 #include "Operators/MPO_LRB.H"
 #include "TensorNetworks/Dw12.H"
+#include "TensorNetworksImp/SpinCalculator.H"
+
 
 #include <iostream>
 
@@ -60,14 +62,6 @@ Hamiltonian_1D_NN_Heisenberg::~Hamiltonian_1D_NN_Heisenberg()
      delete itsDw12s[TensorNetworks::Right];
 }
 
-double Hamiltonian_1D_NN_Heisenberg::ConvertToSpin(int n) const
-{
-    double s=n-itsS;
-    assert(s>=-itsS);
-    assert(s<=+itsS);
-    return s;
-}
-
 double Hamiltonian_1D_NN_Heisenberg::I(int m, int n) const
 {
     assert(m>=0);
@@ -76,59 +70,11 @@ double Hamiltonian_1D_NN_Heisenberg::I(int m, int n) const
     if (n==m) ret=1.0;
     return ret;
 }
-//
-//  The best place to look these up for general S is
-//    http://easyspin.org/easyspin/documentation/spinoperators.html
-//
-double    Hamiltonian_1D_NN_Heisenberg::GetSm(int m, int n) const
-{
-    assert(m>=0);
-    assert(n>=0);
-    double sm=ConvertToSpin(m);
-    double sn=ConvertToSpin(n);
-    double ret=0.0;
-    if (m+1==n)
-    {
-        ret=sqrt(itsS*(itsS+1.0)-sm*sn);
-    }
-
-    return ret;
-}
-double    Hamiltonian_1D_NN_Heisenberg::GetSp(int m, int n) const
-{
-    assert(m>=0);
-    assert(n>=0);
-    double sm=ConvertToSpin(m);
-    double sn=ConvertToSpin(n);
-    double ret=0.0;
-    if (m==n+1)
-    {
-        ret=sqrt(itsS*(itsS+1.0)-sm*sn);
-    }
-
-    return ret;
-}
-
-double Hamiltonian_1D_NN_Heisenberg::GetSz    (int m, int n) const
-{
-    assert(m>=0);
-    assert(n>=0);
-    double sm=ConvertToSpin(m);
-    double ret=0.0;
-    if (m==n)
-    {
-        ret=sm;
-    }
-
-    return ret;
-}
-
-
-
 
 TensorNetworks::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Position lbr,int m, int n) const
 {
     TensorNetworks::MatrixT W;
+    SpinCalculator sc(itsS);
 
     switch (lbr)
     {
@@ -138,10 +84,10 @@ TensorNetworks::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Posi
     case TensorNetworks::Left:
     {
         W.SetLimits(1,Dw);
-        W(1,1)=itshz*GetSz(m,n);
-        W(1,2)=itsJxy/2.0*GetSm(m,n);
-        W(1,3)=itsJxy/2.0*GetSp(m,n);
-        W(1,4)=itsJz     *GetSz(m,n);
+        W(1,1)=itshz*sc.GetSz(m,n);
+        W(1,2)=itsJxy/2.0*sc.GetSm(m,n);
+        W(1,3)=itsJxy/2.0*sc.GetSp(m,n);
+        W(1,4)=itsJz     *sc.GetSz(m,n);
         W(1,5)=I(m,n);
     }
     break;
@@ -156,13 +102,13 @@ TensorNetworks::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Posi
         W.SetLimits(Dw,Dw);
         Fill(W,ElementT(0.0));
         W(1,1)=I(m,n);
-        W(2,1)=GetSp(m,n);
-        W(3,1)=GetSm(m,n);
-        W(4,1)=GetSz(m,n);
-        W(5,1)=itshz*GetSz(m,n);
-        W(5,2)=itsJxy/2.0*GetSm(m,n);
-        W(5,3)=itsJxy/2.0*GetSp(m,n);
-        W(5,4)=itsJz     *GetSz(m,n); //The get return 2*Sz to avoid half integers
+        W(2,1)=sc.GetSp(m,n);
+        W(3,1)=sc.GetSm(m,n);
+        W(4,1)=sc.GetSz(m,n);
+        W(5,1)=itshz*sc.GetSz(m,n);
+        W(5,2)=itsJxy/2.0*sc.GetSm(m,n);
+        W(5,3)=itsJxy/2.0*sc.GetSp(m,n);
+        W(5,4)=itsJz     *sc.GetSz(m,n); //The get return 2*Sz to avoid half integers
         W(5,5)=I(m,n);
     }
     break;
@@ -178,10 +124,10 @@ TensorNetworks::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Posi
 
         W.SetLimits(Dw,1);
         W(1,1)=I(m,n);
-        W(2,1)=GetSp(m,n);
-        W(3,1)=GetSm(m,n);
-        W(4,1)=GetSz(m,n); //The get return 2*Sz to avoid half integers
-        W(5,1)=itshz*GetSz(m,n);
+        W(2,1)=sc.GetSp(m,n);
+        W(3,1)=sc.GetSm(m,n);
+        W(4,1)=sc.GetSz(m,n); //The get return 2*Sz to avoid half integers
+        W(5,1)=itshz*sc.GetSz(m,n);
     }
     break;
     }
