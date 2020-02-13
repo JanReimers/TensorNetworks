@@ -11,14 +11,15 @@ class Dw12;
 class SiteOperator
 {
 public:
+    typedef TensorNetworks::MatrixT MatrixT;
+
     SiteOperator() {};
     virtual ~SiteOperator() {};
-    virtual TensorNetworks::ipairT GetDw  () const=0;
-    virtual const Dw12&            GetDw12() const=0;
+    virtual const Dw12& GetDw12() const=0;
     //
-    //  Generate MPO matrices.  m,n are quantum numbers for <m|Ha|n>
+    //  Generate MPO matrices.  m,n are quantum numbers for <m|Oa|n>
     //
-    virtual const TensorNetworks::MatrixT& GetW(int m, int n) const=0;
+    virtual const MatrixT& GetW(int m, int n) const=0;
 };
 
 #endif // SITEOPERATOR_H

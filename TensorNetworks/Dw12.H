@@ -1,3 +1,5 @@
+#ifndef DW12_H
+#define DW12_H
 #include "oml/vector.h"
 
 //
@@ -7,9 +9,12 @@
 //
 struct Dw12
 {
+    Dw12();
     Dw12(int _Dw1, int _Dw2, const Vector<int>& _w1_first, const Vector<int>& _w2_last);
 
     int Dw1,Dw2;
     Vector<int> w1_first; //strt index for w1 as a function of w2
     Vector<int> w2_last; //Dw2 as a function of w1
 };
+
+#endif //DW12_H

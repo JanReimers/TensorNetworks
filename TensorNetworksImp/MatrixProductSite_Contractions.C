@@ -178,8 +178,7 @@ ContractWR(int w1, int i2, int j2,const MatrixT& W, int Dw2,const Vector3T& R) c
 
 MatrixProductSite::Vector3T MatrixProductSite::IterateLeft_F(const SiteOperator* so, const Vector3T& Fam1,bool cache)
 {
-    TensorNetworks::ipairT Dw=so->GetDw();
-    int Dw2=Dw.second;
+    int Dw2=so->GetDw12().Dw2;
     Vector3T F(Dw2,itsD2,itsD2,1);
     for (int w2=1;w2<=Dw2;w2++)
         for (int i2=1;i2<=itsD2;i2++)
@@ -304,8 +303,7 @@ MatrixProductSite::eType MatrixProductSite::ContractFA(int n, int w1, int i1, in
 
 MatrixProductSite::Vector3T MatrixProductSite::IterateRightF(const SiteOperator* so, const Vector3T& Fap1, bool cache)
 {
-    TensorNetworks::ipairT Dw=so->GetDw();
-    int Dw1=Dw.first;
+    int Dw1=so->GetDw12().Dw1;;
     Vector3T F(Dw1,itsD1,itsD1,1);
     for (int w1=1;w1<=Dw1;w1++)
         for (int i1=1;i1<=itsD1;i1++)

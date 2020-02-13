@@ -3,19 +3,19 @@
 
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Enums.H"
+#include "TensorNetworks/Dw12.H"
+
 class OperatorWRepresentation;
 
 class SiteOperatorImp : public virtual SiteOperator
 {
-//        typedef MatrixProductSite::MatrixT MatrixT;
-//        typedef MatrixProductSite::MatrixCT MatrixCT;
     public:
         SiteOperatorImp(TensorNetworks::Position lbr, const OperatorWRepresentation* O,int p);
         virtual ~SiteOperatorImp();
 
-        virtual TensorNetworks::ipairT GetDw  () const {return itsDws;}
-        virtual const Dw12&            GetDw12() const {return *itsDw12;}
-        virtual const TensorNetworks::MatrixT& GetW(int m, int n) const
+
+        virtual const Dw12&    GetDw12() const {return itsDw12;}
+        virtual const MatrixT& GetW(int m, int n) const
         {
             return itsWs(m+1,n+1);
         }
@@ -27,8 +27,7 @@ class SiteOperatorImp : public virtual SiteOperator
         typedef DMatrix<TensorNetworks::MatrixT> TensorT;
 
         int itsp; //2*S+1
-        TensorNetworks::ipairT itsDws;
-        const Dw12* itsDw12;
+        Dw12 itsDw12;
 
         TensorT itsWs;
 };

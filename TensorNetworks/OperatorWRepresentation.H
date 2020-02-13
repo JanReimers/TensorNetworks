@@ -14,12 +14,12 @@ class OperatorWRepresentation
 {
     public:
         typedef double ElementT;
+        typedef TensorNetworks::MatrixT MatrixT;
         OperatorWRepresentation() {}
         virtual ~OperatorWRepresentation() {}
 
-        virtual TensorNetworks::MatrixT GetW   (TensorNetworks::Position,int m, int n) const=0;
-        virtual TensorNetworks::ipairT  GetDw  (TensorNetworks::Position) const=0;
-        virtual const Dw12*             GetDw12(TensorNetworks::Position) const=0;
+        virtual MatrixT GetW   (TensorNetworks::Position,int m, int n) const=0;
+        virtual Dw12    GetDw12(TensorNetworks::Position) const=0;
 };
 
 #endif // OPERATORWREPRESENTATION_H

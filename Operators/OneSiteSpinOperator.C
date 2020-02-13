@@ -1,5 +1,4 @@
 #include "Operators/OneSiteSpinOperator.H"
-#include "TensorNetworks/Dw12.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 
 
@@ -8,23 +7,14 @@ OneSiteSpinOperator::OneSiteSpinOperator(double S, TensorNetworks::SpinOperator 
 : itsS(S)
 , itsp(2*S+1)
 , itsOperator(o)
+, itsDw12(1,1,Vector<int>(1),Vector<int>(1))
 {
-    Vector<int> Dw1s(1),Dw2s(1);
-    Dw1s(1)=1;
-    Dw2s(1)=1;
-
-    itsDw12=new Dw12(1,1,Dw1s,Dw2s);
-
+    itsDw12.w1_first(1)=1;
+    itsDw12.w2_last (1)=1;
 }
 
 OneSiteSpinOperator::~OneSiteSpinOperator()
 {
-    delete itsDw12;
-}
-
-TensorNetworks::ipairT  OneSiteSpinOperator::GetDw(TensorNetworks::Position) const
-{
-    return TensorNetworks::ipairT(1,1);
 }
 
 TensorNetworks::MatrixT OneSiteSpinOperator::GetW (TensorNetworks::Position lbr,int m, int n) const

@@ -15,7 +15,7 @@ namespace TensorNetworks
     typedef DMatrix  <eType>   MatrixCT;
     typedef DMatrix  <double>  MatrixT;
     typedef Array    <double>  ArrayT;
-    typedef std::pair<int,int> ipairT;
+//    typedef std::pair<int,int> ipairT;
 };
 
 #endif //_TYPEDEFS_H_

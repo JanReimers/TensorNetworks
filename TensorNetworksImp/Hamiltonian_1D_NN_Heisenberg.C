@@ -1,7 +1,6 @@
 #include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
 #include "TensorNetworksImp/MatrixProductStateImp.H"
 #include "Operators/MPO_LRB.H"
-#include "TensorNetworks/Dw12.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 
 
@@ -46,9 +45,9 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
 
 
 
-    itsDw12s[TensorNetworks::Left ]=new Dw12(1,5,w1_first_1x5,w2_last_1x5);
-    itsDw12s[TensorNetworks::Bulk ]=new Dw12(5,5,w1_first_5x5,w2_last_5x5);
-    itsDw12s[TensorNetworks::Right]=new Dw12(5,1,w1_first_5x1,w2_last_5x1);
+    itsDw12s[TensorNetworks::Left ]=Dw12(1,5,w1_first_1x5,w2_last_1x5);
+    itsDw12s[TensorNetworks::Bulk ]=Dw12(5,5,w1_first_5x5,w2_last_5x5);
+    itsDw12s[TensorNetworks::Right]=Dw12(5,1,w1_first_5x1,w2_last_5x1);
 
     Init(this);
 
@@ -57,9 +56,6 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
 Hamiltonian_1D_NN_Heisenberg::~Hamiltonian_1D_NN_Heisenberg()
 {
      cout << "Hamiltonian_1D_NN_Heisenberg destructor." << endl;
-     delete itsDw12s[TensorNetworks::Left ];
-     delete itsDw12s[TensorNetworks::Bulk ];
-     delete itsDw12s[TensorNetworks::Right];
 }
 
 double Hamiltonian_1D_NN_Heisenberg::I(int m, int n) const
@@ -134,29 +130,10 @@ TensorNetworks::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Posi
     return W;
 }
 
-TensorNetworks::ipairT  Hamiltonian_1D_NN_Heisenberg::GetDw(TensorNetworks::Position lbr) const
-{
-    TensorNetworks::ipairT ret;
-    switch (lbr)
-    {
-        case TensorNetworks::Left:
-            ret=TensorNetworks::ipairT(1,5);
-            break;
-        case TensorNetworks::Bulk:
-            ret=TensorNetworks::ipairT(5,5);
-            break;
-        case TensorNetworks::Right:
-            ret=TensorNetworks::ipairT(5,1);
-            break;
-    }
-    return ret;
-}
-
-const Dw12* Hamiltonian_1D_NN_Heisenberg::GetDw12(TensorNetworks::Position lbr) const
+Dw12 Hamiltonian_1D_NN_Heisenberg::GetDw12(TensorNetworks::Position lbr) const
 {
     assert(lbr>=0);
     assert(lbr<3);
-    assert(itsDw12s[lbr]);
     return itsDw12s[lbr];
 }
 
