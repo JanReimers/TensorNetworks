@@ -3,13 +3,14 @@
         Play/Pause in one button.  Use icons?
     Status bar. ModelName (from H), L,S, D, iter#, E, CPU & meminfo (use psutils)
 -DOne Fresh checkout and build.
--Refactor operators into a separate folder.
+-Done Refactor operators into a separate folder.
 -Ham->CreateMPS should be a /Factory/ so py knows to delete it.
 -Convergence schedule,  increase D, drop epsilons
 -Dynamically add lattice site, pseudo DMRG
 -Done Separate out contraction code in MPSite
 -Done Get rid of old dumm-ass contraction code.
--Done Simplify rescale step in normalization?
+-Done Simplify rescale step in normalization
+-Use spin calculator in Heis Ham
 -Figure out why S=1,L>5 has such poor convergence. We may need to count degeneracy of lowest SVs.
     -For L=5 D=9 works, but that is the 2^L Hilbert space
     -For L=6 D=12 and D=27 works
@@ -17,15 +18,16 @@
 Bugs:
     -log(DE) sopts plotting L=6 D=?
     -Bond Entropy missing points L=6 D=?
--Calc <Sx> <Sy> <Sz>
-    Could start by calculating one density matrices.  Then ops are easy
--Correlation functions <Sa*Sa+n>-<Sa>*<Sa+n>
-    Extend to pair density matricies.  It would interesting to see the eigen values of distant
+-Done Calc <Sx> <Sy> <Sz>
+    Done Could start by calculating one density matrices.  Then ops are easy
+-Done Correlation functions <Sa*Sa+n>-<Sa>*<Sa+n>
+    Done Extend to pair density matricies.  It would interesting to see the eigen values of distant
     pair DMs.  Do the lowest two EVs drop with distance, indicating decrreasing entanglement?
--Calc 1&2 site density matrices
+-Done Calc 1&2 site density matrices
     Done Start a new theory doc.
     Done Get refs working from DOIs (give up on JabRef)
-    Write out diagrams and iterative formulas for 2 site density matrix.
+    Done Write out diagrams and iterative formulas for 2 site density matrix.
+-Why Eigen values of Sus tensor <S^a*S^b>-<S^a>*<S^b> are not equal they always look like (e1,e1,e2) or (e1,e2,e2).
 -Why optimize site 1, just leave it a |up> and take out global SU(2) invariance
     is this related to poor convergence for S>1/2 ??
 -Why is dE~10e-15 for sites 1&2 on right sweep and sites L-1,L-2 on left sweep?

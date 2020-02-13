@@ -192,6 +192,63 @@ SMatrix<DMatrix<double> > SuseptibilityTensor(const OneSiteDMs& dm1,const TwoSit
     return ret;
 }
 
+SMatrix<DMatrix<double> > SuseptibilityTensor(const MatrixProductState* mps,const TwoSiteDMs& dm2)
+{
+    int L=dm2.GetL();
+    double S=dm2.GetS();
+//    assert(dm2.GetL()==L);
+//    assert(dm2.GetS()==mps.GetS());
+
+    OneSiteDMs::ExpectationT Sx_mpo(L),Sz_mpo(L);
+    Array<std::complex<double> > Sp_mpo(L),Sm_mpo(L);
+    for (int ia=0; ia<L; ia++)
+    {
+        Operator* Sxo=new MPO_OneSite(L,S,ia, TensorNetworks::Sx);
+        Operator* Szo=new MPO_OneSite(L,S,ia, TensorNetworks::Sz);
+        Operator* Spo=new MPO_OneSite(L,S,ia, TensorNetworks::Sp);
+        Operator* Smo=new MPO_OneSite(L,S,ia, TensorNetworks::Sm);
+        Sx_mpo[ia]=mps->GetExpectation(Sxo);
+        Sz_mpo[ia]=mps->GetExpectation(Szo);
+        Sp_mpo[ia]=mps->GetExpectationC(Smo);
+        Sm_mpo[ia]=mps->GetExpectationC(Spo);
+        delete Sxo;
+        delete Szo;
+        delete Spo;
+        delete Smo;
+    }
+    OneSiteDMs::ExpectationT Sy_mpo=-0.5*imag(Sp_mpo-Sm_mpo);
+
+    SMatrix<DMatrix<double> > ret(0,L-1,0,L-1);
+    SpinCalculator sc(dm2.GetS());
+
+
+    TwoSiteDMs::ExpectationT SxSx=dm2.Contract(sc.GetSxSx());
+    TwoSiteDMs::ExpectationT SxSy=dm2.Contract(sc.GetSxSy());
+    TwoSiteDMs::ExpectationT SxSz=dm2.Contract(sc.GetSxSz());
+    TwoSiteDMs::ExpectationT SySx=dm2.Contract(sc.GetSySx());
+    TwoSiteDMs::ExpectationT SySy=dm2.Contract(sc.GetSySy());
+    TwoSiteDMs::ExpectationT SySz=dm2.Contract(sc.GetSySz());
+    TwoSiteDMs::ExpectationT SzSx=dm2.Contract(sc.GetSzSx());
+    TwoSiteDMs::ExpectationT SzSy=dm2.Contract(sc.GetSzSy());
+    TwoSiteDMs::ExpectationT SzSz=dm2.Contract(sc.GetSzSz());
+    for (int ia=0; ia<L-1; ia++)
+        for (int ib=ia+1; ib<L; ib++)
+        {
+            DMatrix<double> Sus(3,3);
+            Sus(1,1)=SxSx(ia,ib)-Sx_mpo[ia]*Sx_mpo[ib];
+            Sus(1,2)=SxSy(ia,ib)-Sx_mpo[ia]*Sy_mpo[ib];
+            Sus(1,3)=SxSz(ia,ib)-Sx_mpo[ia]*Sz_mpo[ib];
+            Sus(2,1)=SySx(ia,ib)-Sy_mpo[ia]*Sx_mpo[ib];
+            Sus(2,2)=SySy(ia,ib)-Sy_mpo[ia]*Sy_mpo[ib];
+            Sus(2,3)=SySz(ia,ib)-Sy_mpo[ia]*Sz_mpo[ib];
+            Sus(3,1)=SzSx(ia,ib)-Sz_mpo[ia]*Sx_mpo[ib];
+            Sus(3,2)=SzSy(ia,ib)-Sz_mpo[ia]*Sy_mpo[ib];
+            Sus(3,3)=SzSz(ia,ib)-Sz_mpo[ia]*Sz_mpo[ib];
+            ret(ia,ib)=Sus;
+        }
+    return ret;
+}
+
 TEST_F(ExpectationsTesting,TestTwoSiteDMs)
 {
     int L=9,D=4;
@@ -241,8 +298,15 @@ TEST_F(ExpectationsTesting,TestTwoSiteDMs)
 
 
     TwoSiteDMs ros=itsMPS->CalculateTwoSiteDMs(itsLRPSupervisor);
-    cout << "Traces=" << ros.GetTraces() << endl;
-    cout << "Von Neumann entropies=" << ros.GetVNEntropies() << endl;
+    TwoSiteDMs::ExpectationT traces=ros.GetTraces();
+    TwoSiteDMs::ExpectationT VNs=ros.GetVNEntropies();
+     for (int ia=0; ia<L-1; ia++)
+        for (int ib=ia+1; ib<L; ib++)
+        {
+            EXPECT_NEAR(traces(ia,ib),1.0,1e-13);
+            EXPECT_GT(VNs(ia,ib),0.0);
+            EXPECT_LE(VNs(ia,ib),log(D));
+        }
     SpinCalculator sc(S);
     TwoSiteDMs::ExpectationT SxSx=ros.Contract(sc.GetSxSx());
     TwoSiteDMs::ExpectationT SxSy=ros.Contract(sc.GetSxSy());
@@ -253,33 +317,46 @@ TEST_F(ExpectationsTesting,TestTwoSiteDMs)
     TwoSiteDMs::ExpectationT SzSx=ros.Contract(sc.GetSzSx());
     TwoSiteDMs::ExpectationT SzSy=ros.Contract(sc.GetSzSy());
     TwoSiteDMs::ExpectationT SzSz=ros.Contract(sc.GetSzSz());
-    cout << "SxSx    =" << SxSx << endl;
-    cout << "SxSx_mpo=" << SxSx_mpo << endl;
-    cout << "SxSy=" << SxSy << endl;
-    cout << "SxSz=" << SxSz << endl;
-    cout << "SxSz_mpo=" << SxSz_mpo << endl;
-    cout << "SySx=" << SySx << endl;
-    cout << "SySy=" << SySy << endl;
-    cout << "SySz=" << SySz << endl;
-    cout << "SzSx=" << SzSx << endl;
-    cout << "SzSx_mpo=" << SzSx_mpo << endl;
-    cout << "SzSy=" << SzSy << endl;
-    cout << "SzSz=" << SzSz << endl;
-    cout << "SzSz_mpo=" << SzSz_mpo << endl;
+    double eps=1e-14;
+    for (int ia=0; ia<L-1; ia++)
+        for (int ib=ia+1; ib<L; ib++)
+        {
+            EXPECT_NEAR(SxSx(ia,ib),SxSx_mpo(ia,ib),eps);
+            EXPECT_NEAR(SxSz(ia,ib),SxSz_mpo(ia,ib),eps);
+            EXPECT_NEAR(SzSx(ia,ib),SzSx_mpo(ia,ib),eps);
+            EXPECT_NEAR(SzSz(ia,ib),SzSz_mpo(ia,ib),eps);
+        }
 
- /*   OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs(itsLRPSupervisor);
-    OneSiteDMs::ExpectationT Sx=ro1.Contract(sc.GetSx());
-    OneSiteDMs::ExpectationT Sy=ro1.Contract(sc.GetSy());
-    OneSiteDMs::ExpectationT Sz=ro1.Contract(sc.GetSz());
-    SMatrix<DMatrix<double> > Sus=SuseptibilityTensor(ro1,ros);
+    OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs(itsLRPSupervisor);
+//    OneSiteDMs::ExpectationT Sx=ro1.Contract(sc.GetSx());
+//    OneSiteDMs::ExpectationT Sy=ro1.Contract(sc.GetSy());
+//    OneSiteDMs::ExpectationT Sz=ro1.Contract(sc.GetSz());
+    SMatrix<DMatrix<double> > Sus1=SuseptibilityTensor(ro1,ros);
+    SMatrix<DMatrix<double> > Sus2=SuseptibilityTensor(itsMPS,ros);
 
     for (int ia=0;ia<L-1;ia++)
         for (int ib=ia+1;ib<L;ib++)
         {
-            cout << "Sites (" << ia << "," << ib << "): <S_a*S_b>-<S_a>*<S_b>=" << Sus(ia,ib) <<endl;
-//            cout << "Sites (" << ia << "," << ib << "): Eigen Values=" << Diagonalize(Sus(ia,ib)) <<endl;
+ //           cout << "Sites (" << ia << "," << ib << "): <S_a*S_b>-<S_a>*<S_b>=" << Sus(ia,ib) <<endl;
+            double err=Max(abs(Sus1(ia,ib)-Sus2(ia,ib)));
+            double err1=Max(abs(Sus1(ia,ib)-Transpose(Sus1(ia,ib))));
+            double err2=Max(abs(Sus2(ia,ib)-Transpose(Sus2(ia,ib))));
+            EXPECT_NEAR(err,0.0,1e-14);
+            EXPECT_NEAR(err1,0.0,1e-8);
+            EXPECT_NEAR(err2,0.0,1e-8);
+//            cout << "Err 12,nonsym1,nonsym2=" << err << " " << err1 << " " << err2 << endl;
+//            DMatrix<double> SusSym=0.5*(Sus2(ia,ib)+ Transpose(Sus2(ia,ib)));
+//            cout << "Sites (" << ia << "," << ib << "): Eigen Values=" << Diagonalize(SusSym) <<endl;
         }
-        */
+    //
+    // Check ground dtate energy
+    //
+    double E1=0.0;
+    for (int ia=0;ia<L-1;ia++)
+        E1+=SxSx(ia,ia+1)+SySy(ia,ia+1)+SzSz(ia,ia+1);
+    double E2=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E1,E2,1e-13);
+//    cout << "E1-E2=" << E1-E2 << endl;
 }
 
 #define TYPE DMatrix<double>

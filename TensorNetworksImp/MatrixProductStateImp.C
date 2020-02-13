@@ -515,7 +515,7 @@ MatrixProductStateImp::Vector3T MatrixProductStateImp::GetEORightIterate(const O
 OneSiteDMs MatrixProductStateImp::CalculateOneSiteDMs(LRPSupervisor* supervisor)
 {
     OneSiteDMs ret(itsL,itsp);
-    //Normalize(TensorNetworks::Right,supervisor);
+    Normalize(TensorNetworks::Right,supervisor);
     VectorT s; // This get passed from one site to the next.
     MatrixCT Vdagger;// This get passed from one site to the next.
     for (int ia=0; ia<itsL-1; ia++)
@@ -554,6 +554,7 @@ MatrixProductStateImp::Matrix4T MatrixProductStateImp::CalculateTwoSiteDM(int ia
             for (int ix=ia+1; ix<ib; ix++)
                 C=itsSites[ix]->IterateTwoSiteDM(C);
             C=itsSites[ib]->FinializeTwoSiteDM(C);
+
             for (int m2=0; m2<itsp; m2++)
                 for (int n2=0; n2<itsp; n2++)
                     ret(m+1,m2+1,n+1,n2+1)=C(m2+1,n2+1);
@@ -565,7 +566,7 @@ MatrixProductStateImp::Matrix4T MatrixProductStateImp::CalculateTwoSiteDM(int ia
 
 TwoSiteDMs MatrixProductStateImp::CalculateTwoSiteDMs(LRPSupervisor* supervisor)
 {
-    //Normalize(TensorNetworks::Right,supervisor);//Don't do this it wrecks the MPS
+    Normalize(TensorNetworks::Right,supervisor);
     VectorT s; // This get passed from one site to the next.
     MatrixCT Vdagger;// This get passed from one site to the next.
     TwoSiteDMs ret(itsL,itsp);
@@ -580,48 +581,3 @@ TwoSiteDMs MatrixProductStateImp::CalculateTwoSiteDMs(LRPSupervisor* supervisor)
         }
     return ret;
 }
-
-/*
-template <class Ma,class Mb> double Trace(const Ma& a, const Mb& b)
-{
-    assert(a.GetLimits()==b.GetLimits());
-    assert(a.GetRowLimits()==a.GetColLimits());
-    assert(a.GetRowLimits().Low==1);
-    int N=a.GetNumRows();
-    TensorNetworks::eType ret(0.0);
-    for (int ir=1;ir<=N;ir++)
-        for (int ic=1;ic<=N;ic++)
-            ret+=a(ir,ic)*b(ir,ic);
-    //cout << "ret=" << ret << endl;
-    assert(std::fabs(std::imag(ret))<1e-14);
-    return std::real(ret);
-}
-
-TensorNetworks::ArrayT MatrixProductStateImp::GetOneSiteExpectation(const MatrixT& o) const
-{
-    assert(IsSymmetric(o));
-    assert(o.GetNumRows()==itsp);
-    assert(o.GetNumCols()==itsp);
-    assert(itsOneSiteDMs.size()>0);
-    assert(itsOneSiteDMs[0].GetLimits()==o.GetLimits());
-    ArrayT ret(itsL);
-    for (int ia=0; ia<itsL; ia++)
-        ret[ia]=Trace(o,itsOneSiteDMs[ia]);
-    return ret;
-}
-
-TensorNetworks::ArrayT MatrixProductStateImp::GetOneSiteExpectation(const MatrixCT& o) const
-{
-    assert(IsHermitian(o));
-    assert(o.GetNumRows()==itsp);
-    assert(o.GetNumCols()==itsp);
-    assert(itsOneSiteDMs.size()>0);
-    assert(itsOneSiteDMs[0].GetLimits()==o.GetLimits());
-    ArrayT ret(itsL);
-    for (int ia=0; ia<itsL; ia++)
-        ret[ia]=Trace(o,itsOneSiteDMs[ia]);
-    return ret;
-}
-*/
-
-

@@ -329,10 +329,9 @@ MatrixProductSite::MatrixCT MatrixProductSite::FinializeTwoSiteDM(const MatrixCT
     {
         MatrixCT CAmn=ContractCA(n2,Cmn);
         for (int m2=0; m2<itsp; m2++)
-            for (int i2=1; i2<=itsD2; i2++)
-                for (int j2=1; j2<=itsD2; j2++)
-                    for (int i1=1; i1<=itsD1; i1++)
-                        ret(m2+1,n2+1)+=std::conj(itsAs[m2](i1,i2))*CAmn(i1,j2);
+            for (int j2=1; j2<=itsD2; j2++)
+                for (int i1=1; i1<=itsD1; i1++)
+                    ret(m2+1,n2+1)+=std::conj(itsAs[m2](i1,j2))*CAmn(i1,j2);
     }
 
 
