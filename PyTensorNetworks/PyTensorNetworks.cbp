@@ -34,7 +34,7 @@
 		</Compiler>
 		<ExtraCommands>
 			<Add after="python3 configure.py;make" />
-			<Add after="pkexec  make -C /home/jan/CDT1/TensorNetworks/PyTensorNetworks install" />
+			<Add after="pkexec  make -C /home/jan/CDT2/TensorNetworks/PyTensorNetworks install" />
 		</ExtraCommands>
 		<Unit filename="PyTensorNetworks.sip" />
 		<Unit filename="StdString.sip" />

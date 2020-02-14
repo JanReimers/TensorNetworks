@@ -2,6 +2,10 @@
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/MatrixProductState.H"
+#include "TensorNetworks/Epsilons.H"
+#include "TensorNetworks/LRPSupervisor.H"
+
+
 #include "wxDriver/wxFactory.H"
 #include "Plotting/MultiGraph.H"
 #include "Plotting/CurveUnits.H"
@@ -85,8 +89,6 @@ bool wxMPSApp::OnInit()
 
 bool wxMPSApp::OnInit()
 {
-    Plotting::wxFactoryMain fact;
-    TensorNetworks::FactoryMain fMain;
     const Plotting::wxFactory* wxfactory=Plotting::wxFactory::GetFactory();
     assert(wxfactory);
     const TensorNetworks::Factory* tnfactory =TensorNetworks::Factory::GetFactory();
@@ -97,14 +99,17 @@ bool wxMPSApp::OnInit()
     Plotting::MultiGraph* graphs=wxfactory->MakewxMultiGraph(frame);
     frame->Show(TRUE);
 
-    int L=9,S2=1,D=2,maxIter=100;
-    Hamiltonian* itsH=tnfactory->Make1D_NN_HeisenbergHamiltonian(L,S2,1.0,1.0,1.0,0.0);
-    MatrixProductState* itsMPS=itsH->CreateMPS(D);
+    int L=9,D=2,maxIter=100;
+    double S=0.5;
+    Epsilons eps;
+    LRPSupervisor* supervisor=new LRPSupervisor();
+    Hamiltonian* itsH=tnfactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
+    MatrixProductState* itsMPS=itsH->CreateMPS(D,eps);
     itsMPS->Insert(graphs);
 
     // This point we need to return true and let the wx event loop take over.
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->FindGroundState(itsH,maxIter,1e-9);
+    itsMPS->FindGroundState(itsH,maxIter,eps,supervisor);
 
 
     return true;

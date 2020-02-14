@@ -24,8 +24,10 @@ public:
   virtual void Insert     (Plotting::MultiGraph*)=0;
   //! Temporarily attach drivers to graphs.
   virtual void Attach     (Plotting::MultiGraph*)=0;
-  //! Insert misc. plotabel objects.
+  //! Insert misc. plotable objects.
   virtual void Insert(const Plotting::Plotable*)=0;
+  //! select a site (or anything with an index) to plot
+  virtual void Select(int index)=0;
 };
 
 #endif //_MultiPlotable_H_

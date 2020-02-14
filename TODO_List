@@ -2,11 +2,14 @@
     Control panel
         Play/Pause in one button.  Use icons?
     Status bar. ModelName (from H), L,S, D, iter#, E, CPU & meminfo (use psutils)
+-Plotting support log axes in wxdriver.
 -Ham->CreateMPS should be a /Factory/ so py knows to delete it.
 -Convergence schedule,  increase D, drop epsilons
 -Dynamically add lattice site, pseudo DMRG
 -Plot correlations
--Plot singular value spectrum, need a site selection sider like in coolfoil
+-Done Plot singular value spectrum,
+-need a site selection sider like in coolfoil
+-Get rid of all S2's, just use double S everywhere.
 -Figure out why S=1,L>5 has such poor convergence. We may need to count degeneracy of lowest SVs.
     -For L=5 D=9 works, but that is the 2^L Hilbert space
     -For L=6 D=12 and D=27 works

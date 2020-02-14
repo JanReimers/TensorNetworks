@@ -43,6 +43,7 @@
 		<Linker>
 			<Add option="$(#wx.lflags)" />
 			<Add library="TensorNetworks" />
+			<Add library="Functions" />
 			<Add library="wxPlotting" />
 			<Add library="wxMisc" />
 			<Add library="Plotting" />

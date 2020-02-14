@@ -14,10 +14,11 @@ class Bond
         double GetBondEntropy() const {return itsBondEntropy;}
         double GetMinSV      () const {return itsMinSV;}
         int    GetRank       () const {return itsRank;}
+        Array<double> GetSVs () const {return itsSingularValues;}
     protected:
 
     private:
-        Vector<double> itsSingularValues;
+        Array<double> itsSingularValues;
         double itsEps; //SVs < eps are considered zero
         double itsBondEntropy;
         double itsMinSV;

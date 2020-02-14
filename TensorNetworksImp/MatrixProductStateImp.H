@@ -45,7 +45,6 @@ public:
 //  Access to information
 //
         int     GetL        () const {return itsL;}
-//        int     GetD        () const {return itsD;}
         int     Getp        () const {return itsp;}
         double  GetMaxDeltaE() const;
 
@@ -86,6 +85,7 @@ public:
 //
         virtual void MakeAllGraphs();
         virtual void Insert(Plotting::MultiGraph* graphs);
+        virtual void Select(int index);
 //--------------------------------------------------------------------------------------
 //
 //  Allows unit test classes inside.
@@ -135,23 +135,28 @@ private:
 
         int itsL;   //Number of lattice sites
         int itsS2;  //2*S, avoid storing floats for S=n/2
-        //int itsD;   //Dimension of internal/virtual state space.
         int itsp;   //Number ot states for the spin on each site = 2S+1
         int itsNSweep;
+        int itsSelectedSite; //Selected site for plots which show lots of data for one site.
+
         Epsilons    itsEpsilons;
         BondsType   itsBonds;
         SitesType   itsSites;
 
         UniformMesh*  itsSitesMesh;
         Mesh*         itsBondsMesh;
+        UniformMesh*  itsSVMesh;
+
         PlotableMesh* itsSitesPMesh;
         PlotableMesh* itsBondsPMesh;
+        PlotableMesh* itsSVMeshPMesh;
 
         ArrayT itsSiteEnergies;  //Minimum eigen value of Heff on each site.
         ArrayT itsSiteEGaps;     //Gap to second eigen value on each site.
         ArrayT itsBondEntropies; // Sum(s^2*ln(s^2)) for each bond
         ArrayT itsBondMinSVs;    // smallest singluar value for each bond
-        ArrayT itsBondRanks;    // Effective rank based on non zero singular values
+        ArrayT itsBondRanks;     // Effective rank based on non zero singular values
+        ArrayT itssSelectedEntropySpectrum; //full spectrum of SVs for a selected site.
 
         static GraphDefinition theGraphs[];
         static const int n_graphs;

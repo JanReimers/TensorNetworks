@@ -25,9 +25,9 @@ using Dimensions::PureNumber;
 MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D,const Epsilons& eps)
     : itsL(L)
     , itsS2(S2)
-//    , itsD(D)
     , itsp(itsS2+1)
     , itsNSweep(0)
+    , itsSelectedSite(L/2)
     , itsEpsilons(eps)
     , itsSitesMesh(0)
     , itsBondsMesh(0)
@@ -48,20 +48,25 @@ MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D,const Epsilons
     Range rsites(1.0,itsL);
     itsSitesMesh=new UniformMesh(rsites,1.0);
     itsBondsMesh=new Mesh(itsSitesMesh->CenterPoints());
+    itsSVMesh=new UniformMesh(Range(1,D+1),1.0); //Range 1->D causes problems when D=1
 
     itsSitesPMesh = new PlotableMesh(*itsSitesMesh,"none");
     itsBondsPMesh = new PlotableMesh(*itsBondsMesh,"none");
+    itsSVMeshPMesh= new PlotableMesh(*itsSVMesh   ,"none");
 
     itsSiteEnergies .SetSize(itsL);
     itsSiteEGaps    .SetSize(itsL);
     itsBondEntropies.SetSize(itsL-1);
     itsBondMinSVs   .SetSize(itsL-1);
     itsBondRanks    .SetSize(itsL-1);
+    itssSelectedEntropySpectrum.SetSize(D);
+
     Fill(itsSiteEnergies ,0.0);
     Fill(itsSiteEGaps    ,0.0);
     Fill(itsBondEntropies,0.0);
     Fill(itsBondMinSVs   ,0.0);
     Fill(itsBondRanks    ,0.0);
+    Fill(itssSelectedEntropySpectrum,1.0);
 
     NamedUnit EJ("none","Site E/J");
     itsSitesPMesh->Insert
@@ -92,6 +97,12 @@ MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D,const Epsilons
     (
         new TPlotableMeshClient<PureNumber,Array<double> >
         (*itsBondsPMesh,"Bond Rank","Rank",NamedUnit("none","Rank"),PureNumber(1.0),itsBondRanks, Plotting::Red)
+        ,Plotting::Circle,false
+    );
+    itsSVMeshPMesh->Insert
+    (
+        new TPlotableMeshClient<PureNumber,Array<double> >
+        (*itsSVMeshPMesh,"Singular Values","SVs",NamedUnit("none","SVs"),PureNumber(1.0),itssSelectedEntropySpectrum, Plotting::Red)
         ,Plotting::Circle,false
     );
 
@@ -196,6 +207,7 @@ void MatrixProductStateImp::Normalize(int isite)
 
 GraphDefinition MatrixProductStateImp::theGraphs[]=
 {
+    {"Singular Values"  ,"none"     ,"none"  ,"Sites"     ,"SV index"},
     {"Site E/J"         ,"none"     ,"none"  ,"Sites"     ,"Lattice Site #"},
     {"Site Egap/J"      ,"none"     ,"none"  ,"Sites"     ,"Lattice Site #"},
     {"Bond Entropy"     ,"none"     ,"none"  ,"Sites"     ,"Lattice Site #"},
@@ -222,6 +234,7 @@ void MatrixProductStateImp::MakeAllGraphs()
     l->SetSymbolColour(Plotting::Blue);
     MultiPlotableImp::Insert(itsSitesPMesh);
     MultiPlotableImp::Insert(itsBondsPMesh);
+    MultiPlotableImp::Insert(itsSVMeshPMesh);
 
     Plotting::Graph* g=0;
     for (int i=0; i<n_graphs; i++)
@@ -230,20 +243,34 @@ void MatrixProductStateImp::MakeAllGraphs()
         NamedUnit x(gd.Xunits,gd.Xtitle);
         NamedUnit y(gd.Yunits,gd.Title);
         g=Plotting::Factory::GetFactory()->MakeGraph(gd.Title,Plotting::CurveUnits(x,y));
+//        cout << "New graph " << gd.Title << endl;
         g->SetVerbose();
         if (std::string(gd.Title)=="Bond Entropy")
             g->SetLimits(0.0,1.0,y,Plotting::yAxis);
         if (std::string(gd.Xtitle)=="Lattice Site #")
             g->SetLimits(1.0,itsL,y,Plotting::xAxis);
+        if (std::string(gd.Xtitle)=="Singular Values")
+            g->SetLogAxis(y,Plotting::yAxis);
+
         MultiPlotableImp::Insert(g,gd.Layer);
     }
 }
+
+void MatrixProductStateImp::Select(int index)
+{
+    if (itsSelectedSite!=index)
+        itssSelectedEntropySpectrum=itsBonds[index]->GetSVs();
+    itsSelectedSite=index;
+}
+
 
 void MatrixProductStateImp::UpdateBondData(int isite)
 {
     itsBondEntropies[isite]=itsBonds[isite]->GetBondEntropy();
     itsBondMinSVs   [isite]=log10(itsBonds[isite]->GetMinSV());
     itsBondRanks    [isite]=itsBonds[isite]->GetRank();
+    if (isite==itsSelectedSite)
+        itssSelectedEntropySpectrum=itsBonds[isite]->GetSVs();
 }
 
 //--------------------------------------------------------------------------------------
