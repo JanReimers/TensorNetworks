@@ -8,10 +8,11 @@
 -Dynamically add lattice site, pseudo DMRG
 -Plot correlations
 -Done Plot singular value spectrum,
--need a site selection sider like in coolfoil
+-Done need a site selection sider like in coolfoil
+-Refactor sweep left/right routines.  Tonnes of diplicated code in there.
 -Get rid of all S2's, just use double S everywhere.
 -Figure out why S=1,L>5 has such poor convergence. We may need to count degeneracy of lowest SVs.
-    -For L=5 D=9 works, but that is the 2^L Hilbert space
+    -For L=5 D>=9 works, but that is the 2^L Hilbert space
     -For L=6 D=12 and D=27 works
     -For L=9 Hard to find a D that converges
 Bugs:

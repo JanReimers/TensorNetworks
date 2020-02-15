@@ -55,7 +55,7 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
 
 Hamiltonian_1D_NN_Heisenberg::~Hamiltonian_1D_NN_Heisenberg()
 {
-     cout << "Hamiltonian_1D_NN_Heisenberg destructor." << endl;
+//     cout << "Hamiltonian_1D_NN_Heisenberg destructor." << endl;
 }
 
 double Hamiltonian_1D_NN_Heisenberg::I(int m, int n) const

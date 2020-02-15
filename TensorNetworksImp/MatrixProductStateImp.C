@@ -113,7 +113,7 @@ MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D,const Epsilons
 
 MatrixProductStateImp::~MatrixProductStateImp()
 {
-    //cout << "MatrixProductStateImp destructor." << endl;
+//    cout << "MatrixProductStateImp destructor." << endl;
     delete itsBondsPMesh;
     delete itsSitesPMesh;
     delete itsBondsMesh;
@@ -314,7 +314,6 @@ double MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Sup
         cout.precision(10);
         cout << "SweepRight  E=" << GetExpectation(h)/(itsL-1) << endl;
     }
-    double diter=itsNSweep; //Fractional iter count for log(dE) plot
     for (int ia=0; ia<itsL-1; ia++)
     {
         Refine(h,Supervisor,eps,ia);
@@ -328,14 +327,14 @@ double MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Sup
         itsSites[ia+1]->Contract(s,Vdagger);
         Supervisor->DoneOneStep(1,SiteMessage("Update L&R caches for site ",ia));
         itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
-        if (weHaveGraphs()&&itsNSweep>=1)
+        if (weHaveGraphs())
         {
             double de=fabs(itsSites[ia]->GetIterDE());
             //cout << "ia,diter,de=" << ia << " " << diter << " " << de << endl;
-            if (de>0.0)
-                AddPoint("Iter log(dE/J)",Plotting::Point(diter,log10(de)));
+            if (de<1e-16) de=1e-16;
+            double diter=itsNSweep+static_cast<double>(ia)/(itsL-1); //Fractional iter count for log(dE) plot
+            AddPoint("Iter log(dE/J)",Plotting::Point(diter,log10(de)));
         }
-        diter+=1.0/itsL;
         if (!quiet) cout << "SweepRight post constract  E=" << GetExpectation(h)/(itsL-1) << endl;
     }
     itsNSweep++;
@@ -355,7 +354,7 @@ double MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supe
         cout.precision(10);
         cout << "SweepLeft  entry  E=" << GetExpectation(h)/(itsL-1) << endl;
     }
-    double diter=itsNSweep; //Fractional iter count for log(dE) plot
+
     for (int ia=itsL-1; ia>0; ia--)
     {
         Refine(h,Supervisor,eps,ia);
@@ -373,10 +372,11 @@ double MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supe
         {
             double de=fabs(itsSites[ia]->GetIterDE());
             //cout << "ia,diter,de=" << ia << " " << diter << " " << de << endl;
-            if (de>0.0)
-                AddPoint("Iter log(dE/J)",Plotting::Point(diter,log10(de)));
+            if (de<1e-16) de=1e-16;
+            double diter=itsNSweep+static_cast<double>(itsL-1-ia)/(itsL-1); //Fractional iter count for log(dE) plot
+            AddPoint("Iter log(dE/J)",Plotting::Point(diter,log10(de)));
         }
-        diter+=1.0/itsL;
+
         if (!quiet)
             cout << "SweepLeft  post contract  E=" << GetExpectation(h)/(itsL-1) << endl;
 
