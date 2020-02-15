@@ -22,6 +22,9 @@ class GUIHandler:
     def OnStop():
         pass
 
+    def OnSite(siteNumber):
+        pass
+
 class MPSSupervisor(PyTensorNetworks.LRPSupervisor):
     def __init__(self,_GUIhandler):
         super().__init__()
@@ -78,6 +81,9 @@ class MPSSupervisor(PyTensorNetworks.LRPSupervisor):
             self.OnStop(e)
         self.OnPlay(e)
 
+    def OnSite(self,e):
+        siteNumber = e.GetEventObject().GetValue()
+        self.GUIhandler.OnSite(siteNumber)
 
     def get_id(self):
         # returns id of the respective thread
@@ -102,6 +108,7 @@ ID_PAUSE   =wx.NewIdRef()
 ID_STEP    =wx.NewIdRef()
 ID_STOP    =wx.NewIdRef()
 ID_RESTART =wx.NewIdRef()
+ID_SITE    =wx.NewIdRef()
 
 class wxMPSControlsPanel(wx.Panel):
     def __init__(self,parent,supervisor):
@@ -111,12 +118,15 @@ class wxMPSControlsPanel(wx.Panel):
         b3=wx.Button(self,ID_STEP   ,"Step")
         b4=wx.Button(self,ID_STOP   ,"Stop")
         b5=wx.Button(self,ID_RESTART,"Restart")
+        self.s1=wx.Slider(self, ID_SITE, value=1, minValue=1, maxValue=10,style=wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL)
+        self.s1.SetTickFreq(1)
         sizer=wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(b1)
         sizer.Add(b2)
         sizer.Add(b3)
         sizer.Add(b4)
         sizer.Add(b5)
+        sizer.Add(self.s1,proportion=1,flag=wx.EXPAND)
         self.SetSizer(sizer)
         self.Layout()
 
@@ -125,6 +135,10 @@ class wxMPSControlsPanel(wx.Panel):
         b3.Bind(wx.EVT_BUTTON,supervisor.OnStep)
         b4.Bind(wx.EVT_BUTTON,supervisor.OnStop)
         b5.Bind(wx.EVT_BUTTON,supervisor.OnRestart)
+        self.s1.Bind(wx.EVT_SLIDER,supervisor.OnSite)
+
+    def NewLattice(self,L):
+        self.s1.SetMax(L-1) #This works on bond index not site index, so it goes from 1 to L-1.
 
 class MPSFrame(wx.Frame,GUIHandler):
     def __init__(self,*args,**kwargs):
@@ -173,11 +187,11 @@ class MPSFrame(wx.Frame,GUIHandler):
         self.graphs=self.PlottingFactory.MakewxMultiGraph(self) #tabbed notebook of graphs
         graphsPanel=self.PlottingFactory.GetPanel(self.graphs) #dynamic cross cast to panel for sizing
         self.statusPanel=wxMPSStatusPanel(self)
-        controlsPanel=wxMPSControlsPanel(self,self.supervisor)
+        self.controlsPanel=wxMPSControlsPanel(self,self.supervisor)
         rightsizer=wx.BoxSizer(wx.VERTICAL)
         rightsizer.Add(graphsPanel,proportion=1,flag=wx.EXPAND) #Give the graphs as much space as possible
         rightsizer.Add(self.statusPanel,proportion=0)
-        rightsizer.Add(controlsPanel,proportion=0)
+        rightsizer.Add(self.controlsPanel,proportion=0,flag=wx.EXPAND)
         #
         #  Combine left nad right and size everything
         #
@@ -197,6 +211,7 @@ class MPSFrame(wx.Frame,GUIHandler):
             self.supervisor.OnStop(e)
         self.Hamiltonian=self.HamiltonianPanel.MakeHamiltonian(self.TNFactory)
         self.statusPanel.NewLattice(self.Hamiltonian.GetL())
+        self.controlsPanel.NewLattice(self.Hamiltonian.GetL())
         self.OnNewMPS(e)
 
     def OnNewMPS(self,e):
@@ -219,6 +234,10 @@ class MPSFrame(wx.Frame,GUIHandler):
         print("Crunch thread stopped")
         del self.MPS
         self.OnNewMPS(e)
+
+    def OnSite(self,siteNumber):
+        self.MPS.Select(siteNumber-1)
+        self.graphs.ReplotActiveGraph()
 
 
     def FindGroundState(self):

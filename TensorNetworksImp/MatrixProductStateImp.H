@@ -134,6 +134,7 @@ private:
 //
 
         int itsL;   //Number of lattice sites
+        int itsDmax; //Maximum bond dimension
         int itsS2;  //2*S, avoid storing floats for S=n/2
         int itsp;   //Number ot states for the spin on each site = 2S+1
         int itsNSweep;

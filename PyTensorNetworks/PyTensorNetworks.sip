@@ -37,6 +37,7 @@ public:
   virtual void Insert(Plotting::MultiGraph*)=0;
   virtual void Attach(Plotting::MultiGraph*)=0;
   virtual void Insert(const Plotting::Plotable*)=0;
+  virtual void Select(int index)=0;
 };
 
 

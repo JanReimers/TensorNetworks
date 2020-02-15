@@ -24,14 +24,17 @@ using Dimensions::PureNumber;
 //
 MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D,const Epsilons& eps)
     : itsL(L)
+    , itsDmax(D)
     , itsS2(S2)
     , itsp(itsS2+1)
     , itsNSweep(0)
-    , itsSelectedSite(L/2)
+    , itsSelectedSite(1)
     , itsEpsilons(eps)
     , itsSitesMesh(0)
     , itsBondsMesh(0)
 {
+    assert(itsL>0);
+    assert(itsDmax>0);
     //
     //  Create bond objects
     //
@@ -207,12 +210,12 @@ void MatrixProductStateImp::Normalize(int isite)
 
 GraphDefinition MatrixProductStateImp::theGraphs[]=
 {
-    {"Singular Values"  ,"none"     ,"none"  ,"Sites"     ,"SV index"},
     {"Site E/J"         ,"none"     ,"none"  ,"Sites"     ,"Lattice Site #"},
     {"Site Egap/J"      ,"none"     ,"none"  ,"Sites"     ,"Lattice Site #"},
-    {"Bond Entropy"     ,"none"     ,"none"  ,"Sites"     ,"Lattice Site #"},
-    {"Bond log(Min(s))" ,"none"     ,"none"  ,"Sites"     ,"Lattice Site #"},
-    {"Bond Rank"        ,"none"     ,"none"  ,"Sites"     ,"Lattice Site #"},
+    {"Singular Values"  ,"none"     ,"none"  ,"Bonds"     ,"SV index"},
+    {"Bond Entropy"     ,"none"     ,"none"  ,"Bonds"     ,"Lattice Site #"},
+    {"Bond log(Min(s))" ,"none"     ,"none"  ,"Bonds"     ,"Lattice Site #"},
+    {"Bond Rank"        ,"none"     ,"none"  ,"Bonds"     ,"Lattice Site #"},
     {"Iter E/J"         ,"none"     ,"none"  ,"Iterations","Iteration #"},
     {"Iter log(dE/J)"   ,"none"     ,"none"  ,"Iterations","Iteration #"},
 };
@@ -248,9 +251,12 @@ void MatrixProductStateImp::MakeAllGraphs()
         if (std::string(gd.Title)=="Bond Entropy")
             g->SetLimits(0.0,1.0,y,Plotting::yAxis);
         if (std::string(gd.Xtitle)=="Lattice Site #")
-            g->SetLimits(1.0,itsL,y,Plotting::xAxis);
-        if (std::string(gd.Xtitle)=="Singular Values")
+            g->SetLimits(1.0,itsL,x,Plotting::xAxis);
+        if (std::string(gd.Title)=="Singular Values")
+        {
             g->SetLogAxis(y,Plotting::yAxis);
+            g->SetLimits(1.0,itsDmax,x,Plotting::xAxis);
+        }
 
         MultiPlotableImp::Insert(g,gd.Layer);
     }
@@ -258,6 +264,8 @@ void MatrixProductStateImp::MakeAllGraphs()
 
 void MatrixProductStateImp::Select(int index)
 {
+    assert(index>=0);
+    assert(index<itsL-1);
     if (itsSelectedSite!=index)
         itssSelectedEntropySpectrum=itsBonds[index]->GetSVs();
     itsSelectedSite=index;
@@ -439,8 +447,9 @@ double  MatrixProductStateImp::GetMaxDeltaE() const
 
 void MatrixProductStateImp::Insert(Plotting::MultiGraph* graphs)
 {
-    graphs->InsertLayer("Sites");
     graphs->InsertLayer("Iterations");
+    graphs->InsertLayer("Sites");
+    graphs->InsertLayer("Bonds");
     MultiPlotableImp::Insert(graphs);
 }
 

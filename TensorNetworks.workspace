@@ -32,8 +32,9 @@
 			<Depends filename="TensorNetworks.cbp" />
 		</Project>
 		<Project filename="wxMPSUnitTests.cbp">
-			<Depends filename="TensorNetworks.cbp" />
 			<Depends filename="../Plotting/wxPlotting.cbp" />
+			<Depends filename="../Functions/Functions.cbp" />
+			<Depends filename="TensorNetworks.cbp" />
 		</Project>
 	</Workspace>
 </CodeBlocks_workspace_file>
