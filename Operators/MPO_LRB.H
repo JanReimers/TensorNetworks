@@ -16,8 +16,8 @@ class OperatorWRepresentation;
 class MPO_LRB : public virtual Operator
 {
     public:
-        MPO_LRB(int L, int S2);
-        MPO_LRB(const OperatorWRepresentation* O, int L, int S2);
+        MPO_LRB(int L, double S);
+        MPO_LRB(const OperatorWRepresentation* O, int L, double S);
         virtual ~MPO_LRB();
 
         const SiteOperator* GetSiteOperator(int isite) const

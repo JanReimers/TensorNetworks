@@ -1,16 +1,28 @@
 #include "Operators/MPO_LRB.H"
 #include "Operators/SiteOperatorImp.H"
 
-MPO_LRB::MPO_LRB(int L, int S2)
+MPO_LRB::MPO_LRB(int L, double S)
     : itsL(L)
-    , itsp(S2+1)
+    , itsp(2*S+1)
 {
+#ifdef DEBUG
+    double ipart;
+    double frac=std::modf(2.0*S,&ipart);
+    assert(frac==0.0);
+#endif
+    assert(S>=0.5);
 }
 
-MPO_LRB::MPO_LRB(const OperatorWRepresentation* O,int L, int S2)
+MPO_LRB::MPO_LRB(const OperatorWRepresentation* O,int L, double S)
     : itsL(L)
-    , itsp(S2+1)
+    , itsp(2*S+1)
 {
+#ifdef DEBUG
+    double ipart;
+    double frac=std::modf(2.0*S,&ipart);
+    assert(frac==0.0);
+#endif
+    assert(S>=0.5);
     Init(O);
 }
 

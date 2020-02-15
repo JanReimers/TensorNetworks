@@ -10,7 +10,7 @@ using std::cout;
 using std::endl;
 
 Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, double Jxy,double Jz, double hz)
-    : MPO_LRB(L,2*S)
+    : MPO_LRB(L,S)
     , itsL(L)
     , itsS(S)
     , itsJxy(Jxy)
@@ -23,6 +23,11 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
 //    cout << "Jz=" << Jz << endl;
 //    cout << "hz=" << hz << endl;
     assert(itsL>=1);
+#ifdef DEBUG
+    double ipart;
+    double frac=std::modf(2.0*itsS,&ipart);
+    assert(frac==0.0);
+#endif
     assert(itsS>=0.5);
     assert(fabs(itsJxy)+fabs(Jz)>0.0);
 
@@ -143,11 +148,11 @@ Dw12 Hamiltonian_1D_NN_Heisenberg::GetDw12(TensorNetworks::Position lbr) const
 //
 MatrixProductState* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,const Epsilons& eps) const
 {
-    return new MatrixProductStateImp(itsL,2*itsS,D,eps);
+    return new MatrixProductStateImp(itsL,itsS,D,eps);
 }
 
  Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(const OperatorWRepresentation* Wrep) const
  {
-    return new MPO_LRB(Wrep,itsL,2*itsS);
+    return new MPO_LRB(Wrep,itsL,itsS);
  }
 

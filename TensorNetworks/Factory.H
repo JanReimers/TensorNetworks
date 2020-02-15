@@ -19,7 +19,7 @@ public:
 
 
     virtual Hamiltonian*             Make1D_NN_HeisenbergHamiltonian(int L, double S, double Jxy, double Jz, double hz)const=0;
-    virtual Operator*                MakeOperator(const OperatorWRepresentation*, int L, int S2) const=0;
+    virtual Operator*                MakeOperator(const OperatorWRepresentation*, int L, double S) const=0;
     virtual OperatorWRepresentation* MakeIdentityOperator() const=0;
 };
 

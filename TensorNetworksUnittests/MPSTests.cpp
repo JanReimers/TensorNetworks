@@ -13,17 +13,17 @@ public:
     , itsEps()
     , eps(1.0e-10)
     {
-        Setup(10,1,2);
+        Setup(10,0.5,2);
         StreamableObject::SetToPretty();
     }
     ~MatrixProductTesting() {delete itsMPS;}
 
 
 
-    void Setup(int L, int S2, int D)
+    void Setup(int L, double  S, int D)
     {
         delete itsMPS;
-        itsMPS=new MatrixProductStateImp(L,S2,D,itsEps);
+        itsMPS=new MatrixProductStateImp(L,S,D,itsEps);
     }
 
 
@@ -83,7 +83,7 @@ TEST_F(MatrixProductTesting,RightNormalMatricies)
 
 TEST_F(MatrixProductTesting,LeftNormalMatricies_S2)
 {
-    Setup(10,3,2);
+    Setup(10,1.5,2);
     itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetLeftNorm(0),eps);
     VerifyUnit(GetLeftNorm(1),eps);
@@ -92,7 +92,7 @@ TEST_F(MatrixProductTesting,LeftNormalMatricies_S2)
 
 TEST_F(MatrixProductTesting,RightNormalMatricies_S2)
 {
-    Setup(10,3,3);
+    Setup(10,1.5,3);
     itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetRightNorm(1),eps);
     VerifyUnit(GetRightNorm(8),eps);

@@ -36,7 +36,7 @@ private:
 //  Conctruction and initialization zone
 //
 public:
-        MatrixProductStateImp(int L, int S2, int D,const Epsilons& eps);
+        MatrixProductStateImp(int L, double S, int D,const Epsilons& eps);
         virtual ~MatrixProductStateImp();
 
         virtual void InitializeWith(TensorNetworks::State);
@@ -130,15 +130,15 @@ private:
 
 //--------------------------------------------------------------------------------------
 //
-//  Data member
+//  Data members
 //
 
-        int itsL;   //Number of lattice sites
-        int itsDmax; //Maximum bond dimension
-        int itsS2;  //2*S, avoid storing floats for S=n/2
-        int itsp;   //Number ot states for the spin on each site = 2S+1
-        int itsNSweep;
-        int itsSelectedSite; //Selected site for plots which show lots of data for one site.
+        int    itsL;   //Number of lattice sites
+        int    itsDmax; //Maximum bond dimension
+        double itsS;  //2*S, avoid storing floats for S=n/2
+        int    itsp;   //Number ot states for the spin on each site = 2S+1
+        int    itsNSweep;
+        int    itsSelectedSite; //Selected site for plots which show lots of data for one site.
 
         Epsilons    itsEpsilons;
         BondsType   itsBonds;

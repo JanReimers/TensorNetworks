@@ -13,9 +13,9 @@ Make1D_NN_HeisenbergHamiltonian(int L, double S, double Jxy, double Jz, double h
     return new Hamiltonian_1D_NN_Heisenberg(L,S,Jxy,Jz,hz);
 }
 
-Operator* TensorNetworks::FactoryImp::MakeOperator(const OperatorWRepresentation* Wrep, int L, int S2) const
+Operator* TensorNetworks::FactoryImp::MakeOperator(const OperatorWRepresentation* Wrep, int L, double S) const
 {
-    return new MPO_LRB(Wrep,L,S2);
+    return new MPO_LRB(Wrep,L,S);
 }
 
 

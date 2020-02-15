@@ -22,11 +22,11 @@ using Dimensions::PureNumber;
 //
 //  Init/construction zone
 //
-MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D,const Epsilons& eps)
+MatrixProductStateImp::MatrixProductStateImp(int L, double S, int D,const Epsilons& eps)
     : itsL(L)
     , itsDmax(D)
-    , itsS2(S2)
-    , itsp(itsS2+1)
+    , itsS(S)
+    , itsp(2*S+1)
     , itsNSweep(0)
     , itsSelectedSite(1)
     , itsEpsilons(eps)
@@ -34,6 +34,12 @@ MatrixProductStateImp::MatrixProductStateImp(int L, int S2, int D,const Epsilons
     , itsBondsMesh(0)
 {
     assert(itsL>0);
+#ifdef DEBUG
+    double ipart;
+    double frac=std::modf(2.0*itsS,&ipart);
+    assert(frac==0.0);
+#endif
+    assert(itsS>=0.5);
     assert(itsDmax>0);
     //
     //  Create bond objects
