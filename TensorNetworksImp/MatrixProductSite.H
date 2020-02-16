@@ -55,21 +55,14 @@ class MatrixProductSite
 //
 // Normalization
 //
-        void SVDLeft_Normalize(VectorT& s, MatrixCT& Vdagger);
-        void SVDRightNormalize(MatrixCT& U, VectorT& s );
+        int  SVDNormalize(TensorNetworks::Direction lr);//  Returns rank of singular values.
         bool IsLeftNormalized(double eps) const;
         bool IsRightNormalized(double eps) const;
-        void ReshapeFromLeft (int D1);
-        void ReshapeFromRight(int D2);
-        void ReshapeAndNormFromLeft (int D1);
-        void ReshapeAndNormFromRight(int D2);
-        void Contract(const VectorT& s, const MatrixCT& Vdagger);
-        void Contract(const MatrixCT& U, const VectorT& s);
 //--------------------------------------------------------------------------------------
 //
 //    Density matrix calculations
 //
-        MatrixCT CalculateOneSiteDM();
+        MatrixCT  CalculateOneSiteDM();
         MatrixCT InitializeTwoSiteDM(int m, int n     );
         MatrixCT    IterateTwoSiteDM(      MatrixCT& C);
         MatrixCT  FinializeTwoSiteDM(const MatrixCT& C);
@@ -86,6 +79,7 @@ class MatrixProductSite
 //
 private:
     friend class MPOTesting;
+    friend class Bond;
 
     TensorNetworks::Position WhereAreWe() const {return itsPosition;}
 
@@ -97,6 +91,10 @@ private:
     MatrixCT ReshapeRight();
     void     ReshapeLeft (const MatrixCT& U);
     void     ReshapeRight(const MatrixCT& Vdagger);
+    void     ReshapeFromLeft (int D1);
+    void     ReshapeFromRight(int D2);
+    void     ReshapeAndNormFromLeft (int D1);
+    void     ReshapeAndNormFromRight(int D2);
     void     Update      (const VectorCT& newAs);
 
     static bool     IsUnit(const MatrixCT& m,double eps);
@@ -104,6 +102,7 @@ private:
 //
 //  Internal contraction function
 //
+    void Contract(TensorNetworks::Direction lr,const VectorT& s, const MatrixCT& UV);
     static MatrixCT  Contract1(const VectorT& s, const MatrixCT& VA);
     static MatrixCT  Contract1(const MatrixCT& AU,const VectorT& s);
 

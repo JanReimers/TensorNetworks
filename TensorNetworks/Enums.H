@@ -3,7 +3,8 @@
 
 namespace TensorNetworks
 {
-    enum Position {Left,Bulk,Right};
+    enum Position  {PLeft,PBulk,PRight};
+    enum Direction {DLeft,DRight};
     enum State {Product,Random,Neel};
     enum SpinOperator{Sx,Sy,Sz,Sp,Sm};
 };

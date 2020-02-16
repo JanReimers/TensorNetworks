@@ -49,10 +49,15 @@ MatrixProductStateImp::MatrixProductStateImp(int L, double S, int D,const Epsilo
     //
     //  Create Sites
     //
-    itsSites.push_back(new MatrixProductSite(TensorNetworks::Left,NULL,itsBonds[0],itsp,1,D));
+    itsSites.push_back(new MatrixProductSite(TensorNetworks::PLeft,NULL,itsBonds[0],itsp,1,D));
     for (int i=1;i<itsL-1;i++)
-        itsSites.push_back(new MatrixProductSite(TensorNetworks::Bulk,itsBonds[i-1],itsBonds[i],itsp,D,D));
-    itsSites.push_back(new MatrixProductSite(TensorNetworks::Right,itsBonds[L-2],NULL,itsp,D,1));
+        itsSites.push_back(new MatrixProductSite(TensorNetworks::PBulk,itsBonds[i-1],itsBonds[i],itsp,D,D));
+    itsSites.push_back(new MatrixProductSite(TensorNetworks::PRight,itsBonds[L-2],NULL,itsp,D,1));
+    //
+    //  Tell each bond about its left and right sites.
+    //
+    for (int i=0;i<itsL-1;i++)
+        itsBonds[i]->SetSites(itsSites[i],itsSites[i+1]);
 
     Range rsites(1.0,itsL);
     itsSitesMesh=new UniformMesh(rsites,1.0);
@@ -147,40 +152,37 @@ c_str SiteMessage(c_str message,int site)
 //
 //   Normalization routines
 //
-void MatrixProductStateImp::Normalize(TensorNetworks::Position LR,LRPSupervisor* Supervisor)
+void MatrixProductStateImp::Normalize(TensorNetworks::Direction LR,LRPSupervisor* Supervisor)
 {
-    VectorT s; // This get passed from one site to the next.
-    if (LR==TensorNetworks::Left)
+    if (LR==TensorNetworks::DLeft)
     {
-        MatrixCT Vdagger;// This get passed from one site to the next.
-        for (int ia=0;ia<itsL-1;ia++)
+        for (int ia=0;ia<itsL;ia++)
         {
-            itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
-            UpdateBondData(ia);
             Supervisor->DoneOneStep(2,SiteMessage("SVD Left Normalize site ",ia),ia);
-            itsSites[ia+1]->Contract(s,Vdagger);
-            Supervisor->DoneOneStep(2,SiteMessage("Transfer M=s*V_dagger*M on site",ia+1),ia+1);
+            NormalizeSite(LR,ia);
         }
-        itsSites[itsL-1]->ReshapeAndNormFromLeft(s.GetHigh());
-        UpdateBondData(itsL-2);
         Supervisor->DoneOneStep(2,SiteMessage("Rescale site ",itsL-1),itsL-1);
     }
-    else if (LR==TensorNetworks::Right)
+    else if (LR==TensorNetworks::DRight)
     {
-        MatrixCT U;// This get passed from one site to the next.
-        for (int ia=itsL-1;ia>0;ia--)
+        for (int ia=itsL-1;ia>=0;ia--)
         {
-            itsSites[ia]->SVDRightNormalize(U,s);
-            UpdateBondData(ia-1);
             Supervisor->DoneOneStep(2,SiteMessage("SVD Right Normalize site ",ia),ia);
-            itsSites[ia-1]->Contract(U,s);
-            Supervisor->DoneOneStep(2,SiteMessage("Transfer M=M*U*s on site ",ia-1),ia-1);
+            NormalizeSite(LR,ia);
         }
-        itsSites[0]->ReshapeAndNormFromRight(s.GetHigh());
-        UpdateBondData(0);
         Supervisor->DoneOneStep(2,SiteMessage("Rescale site ",0),0);
     }
 
+}
+
+
+int MatrixProductStateImp::NormalizeSite(TensorNetworks::Direction lr,int isite)
+{
+    int rank=itsSites[isite]->SVDNormalize(lr);
+    int bond_index=isite+( lr==TensorNetworks::DLeft ? 0 :-1);
+    if (bond_index<itsL-1 && bond_index>=0)
+        UpdateBondData(bond_index);
+    return rank;
 }
 
 //
@@ -190,26 +192,20 @@ void MatrixProductStateImp::Normalize(int isite)
 {
     if (isite>0)
     {
-        VectorT s; // This get passed from one site to the next.
-        MatrixCT Vdagger;// This get passed from one site to the next.
         for (int ia=0; ia<isite; ia++)
         {
-            itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
-            itsSites[ia+1]->Contract(s,Vdagger);
+            NormalizeSite(TensorNetworks::DLeft,ia);
         }
-        itsSites[isite]->ReshapeFromLeft(s.GetHigh());
+//        itsSites[isite]->ReshapeFromLeft(rank);
     }
 
     if (isite<itsL-1)
     {
-        VectorT s; // This get passed from one site to the next.
-        MatrixCT U;// This get passed from one site to the next.
         for (int ia=itsL-1; ia>isite; ia--)
         {
-            itsSites[ia]->SVDRightNormalize(U,s);
-            itsSites[ia-1]->Contract(U,s);
+            NormalizeSite(TensorNetworks::DRight,ia);
         }
-        itsSites[isite]->ReshapeFromRight(s.GetHigh());
+//        itsSites[isite]->ReshapeFromRight(rank);
     }
 }
 
@@ -294,7 +290,7 @@ void MatrixProductStateImp::UpdateBondData(int isite)
 double MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, int maxIter, const Epsilons& eps,LRPSupervisor* Supervisor)
 {
     Supervisor->ReadyToStart("Right normalize");
-    Normalize(TensorNetworks::Right,Supervisor);
+    Normalize(TensorNetworks::DRight,Supervisor);
     Supervisor->DoneOneStep(0,"Load L&R caches");
     LoadHeffCaches(hamiltonian,Supervisor);
 
@@ -324,13 +320,8 @@ double MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Sup
     {
         Refine(h,Supervisor,eps,ia);
 
-        VectorT s;
-        MatrixCT Vdagger;
         Supervisor->DoneOneStep(2,SiteMessage("SVD Left Normalize site ",ia),ia);
-        itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
-        UpdateBondData(ia);
-        Supervisor->DoneOneStep(2,SiteMessage("Transfer M=s*V_dagger*M on site ",ia+1),ia);
-        itsSites[ia+1]->Contract(s,Vdagger);
+        NormalizeSite(TensorNetworks::DLeft,ia);
         Supervisor->DoneOneStep(1,SiteMessage("Update L&R caches for site ",ia));
         itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
         if (weHaveGraphs())
@@ -365,13 +356,8 @@ double MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supe
     {
         Refine(h,Supervisor,eps,ia);
 
-        VectorT s;
-        MatrixCT U;
         Supervisor->DoneOneStep(2,SiteMessage("SVD Rigft Normalize site ",ia),ia);
-        itsSites[ia]->SVDRightNormalize(U,s);
-        UpdateBondData(ia-1);
-        Supervisor->DoneOneStep(2,SiteMessage("Transfer M=M*U*s on site ",ia-1),ia);
-        itsSites[ia-1]->Contract(U,s);
+        NormalizeSite(TensorNetworks::DRight,ia);
         Supervisor->DoneOneStep(1,SiteMessage("Update L&R caches for site ",ia));
         itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
         if (weHaveGraphs()&&itsNSweep>=1)
@@ -557,18 +543,13 @@ MatrixProductStateImp::Vector3T MatrixProductStateImp::GetEORightIterate(const O
 OneSiteDMs MatrixProductStateImp::CalculateOneSiteDMs(LRPSupervisor* supervisor)
 {
     OneSiteDMs ret(itsL,itsp);
-    Normalize(TensorNetworks::Right,supervisor);
-    VectorT s; // This get passed from one site to the next.
-    MatrixCT Vdagger;// This get passed from one site to the next.
+    Normalize(TensorNetworks::DRight,supervisor);
     for (int ia=0; ia<itsL-1; ia++)
     {
         supervisor->DoneOneStep(2,SiteMessage("Calculate ro(mn) site: ",ia),ia);
         ret.Insert(ia,itsSites[ia]->CalculateOneSiteDM());
         supervisor->DoneOneStep(2,SiteMessage("SVD Left Normalize site: ",ia),ia);
-        itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
-        UpdateBondData(ia);
-        supervisor->DoneOneStep(2,SiteMessage("Transfer M=s*V_dagger*M on site: ",ia+1),ia+1);
-        itsSites[ia+1]->Contract(s,Vdagger);
+        NormalizeSite(TensorNetworks::DLeft,ia);
     }
     UpdateBondData(itsL-2);
     supervisor->DoneOneStep(2,SiteMessage("Calculate ro(mn) site: ",itsL-1),itsL-1);
@@ -608,18 +589,14 @@ MatrixProductStateImp::Matrix4T MatrixProductStateImp::CalculateTwoSiteDM(int ia
 
 TwoSiteDMs MatrixProductStateImp::CalculateTwoSiteDMs(LRPSupervisor* supervisor)
 {
-    Normalize(TensorNetworks::Right,supervisor);
-    VectorT s; // This get passed from one site to the next.
-    MatrixCT Vdagger;// This get passed from one site to the next.
+    Normalize(TensorNetworks::DRight,supervisor);
     TwoSiteDMs ret(itsL,itsp);
     for (int ia=0; ia<itsL-1; ia++)
         for (int ib=ia+1;ib<itsL;ib++)
         {
             Matrix4T ro=CalculateTwoSiteDM(ia,ib);
             ret.Insert(ia,ib,ro);
-            itsSites[ia]->SVDLeft_Normalize(s,Vdagger);
-            UpdateBondData(ia);
-            itsSites[ia+1]->Contract(s,Vdagger);
+            NormalizeSite(TensorNetworks::DLeft,ia);
         }
     return ret;
 }

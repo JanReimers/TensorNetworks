@@ -1,15 +1,22 @@
 #ifndef BOND_H
 #define BOND_H
 
+#include "TensorNetworks/Enums.H"
+#include "TensorNetworksImp/Typedefs.H"
 #include "oml/vector.h"
+
+class MatrixProductSite;
 
 class Bond
 {
-    public:
+     typedef TensorNetworks::VectorT  VectorT;
+     typedef TensorNetworks::MatrixCT MatrixCT;
+   public:
         Bond(double eps);
         virtual ~Bond();
+        void SetSites(MatrixProductSite* left, MatrixProductSite* right);
 
-        void SetSingularValues(const Vector<double> s);
+        void SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,const MatrixCT& UV);
 
         double GetBondEntropy() const {return itsBondEntropy;}
         double GetMinSV      () const {return itsMinSV;}
@@ -18,11 +25,16 @@ class Bond
     protected:
 
     private:
+        void SetSingularValues(const VectorT& s);
+
         Array<double> itsSingularValues;
         double itsEps; //SVs < eps are considered zero
         double itsBondEntropy;
         double itsMinSV;
         int    itsRank;
+        MatrixProductSite* itsLeft_Site;
+        MatrixProductSite* itsRightSite;
+
 };
 
 #endif // BOND_H

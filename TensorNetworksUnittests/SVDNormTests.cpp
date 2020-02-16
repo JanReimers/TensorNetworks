@@ -66,7 +66,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesProductStateL10S3D2)
 {
     int L=itsMPS->GetL();
     itsMPS->InitializeWith(TensorNetworks::Product);
-    itsMPS->Normalize(TensorNetworks::Left,new LRPSupervisor());
+    itsMPS->Normalize(TensorNetworks::DLeft,new LRPSupervisor());
     EXPECT_EQ(BuildNormString(itsMPS,L),"A0I0I0I0I0I0I0I0I0A0");
 }
 
@@ -75,7 +75,7 @@ TEST_F(MPSNormTesting,RightNormalMatriciesProductStateL100S3D2)
 {
     int L=itsMPS->GetL();
     itsMPS->InitializeWith(TensorNetworks::Product);
-    itsMPS->Normalize(TensorNetworks::Right,new LRPSupervisor());
+    itsMPS->Normalize(TensorNetworks::DRight,new LRPSupervisor());
     EXPECT_EQ(BuildNormString(itsMPS,L),"B0I0I0I0I0I0I0I0I0B0");
 }
 
@@ -84,7 +84,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D2)
 {
     int L=itsMPS->GetL();
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Left,new LRPSupervisor());
+    itsMPS->Normalize(TensorNetworks::DLeft,new LRPSupervisor());
     EXPECT_EQ(BuildNormString(itsMPS,L),"A0A0A0A0A0A0A0A0A0A0");
 }
 
@@ -92,7 +92,7 @@ TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL100S3D2)
 {
     int L=itsMPS->GetL();
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,new LRPSupervisor());
+    itsMPS->Normalize(TensorNetworks::DRight,new LRPSupervisor());
     EXPECT_EQ(BuildNormString(itsMPS,L),"B0B0B0B0B0B0B0B0B0B0");
 }
 
@@ -101,7 +101,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D3)
     int L=10;
     Setup(L,1.5,3);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Left,new LRPSupervisor());
+    itsMPS->Normalize(TensorNetworks::DLeft,new LRPSupervisor());
     EXPECT_EQ(BuildNormString(itsMPS,L),"A0A0A0A0A0A0A0A0A0A0");
 }
 
@@ -110,7 +110,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S1D1)
     int L=10;
     Setup(L,0.5,1);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DLeft,itsSupervisor);
     EXPECT_EQ(BuildNormString(itsMPS,L),"I0I0I0I0I0I0I0I0I0I0");
 }
 TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S5D1)
@@ -118,7 +118,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S5D1)
     int L=10;
     Setup(L,2.5,1);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DLeft,itsSupervisor);
     EXPECT_EQ(BuildNormString(itsMPS,L),"I0I0I0I0I0I0I0I0I0I0");
 }
 TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S1D1)
@@ -126,7 +126,7 @@ TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S1D1)
     int L=10;
     Setup(L,0.5,1);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
     EXPECT_EQ(BuildNormString(itsMPS,L),"I0I0I0I0I0I0I0I0I0I0");
 }
 TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S5D1)
@@ -134,7 +134,7 @@ TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S5D1)
     int L=10;
     Setup(L,2.5,1);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
     EXPECT_EQ(BuildNormString(itsMPS,L),"I0I0I0I0I0I0I0I0I0I0");
 }
 
@@ -143,7 +143,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D10)
     int L=10;
     Setup(L,0.5,10);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DLeft,itsSupervisor);
     EXPECT_EQ(BuildNormString(itsMPS,L),"A0A0A0A0A0A0A0A0A0A0");
 }
 
@@ -152,7 +152,7 @@ TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S3D10)
     int L=10;
     Setup(L,1.5,10);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
     EXPECT_EQ(BuildNormString(itsMPS,L),"B0B0B0B0B0B0B0B0B0B0");
 }
 
@@ -161,7 +161,7 @@ TEST_F(MPSNormTesting,LeftNormalOverlapL10S1D2)
     int L=10;
     Setup(L,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DLeft,itsSupervisor);
     EXPECT_EQ(BuildNormString(itsMPS,L),"A0A0A0A0A0A0A0A0A0A0");
 }
 
@@ -170,7 +170,7 @@ TEST_F(MPSNormTesting,RightNormalOverlapL10S2D2)
     int L=10;
     Setup(L,1.5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
     EXPECT_EQ(BuildNormString(itsMPS,L),"B0B0B0B0B0B0B0B0B0B0");
 }
 

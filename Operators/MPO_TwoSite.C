@@ -11,9 +11,9 @@ MPO_TwoSite::MPO_TwoSite(int L, double S ,int isite1,int isite2, TensorNetworks:
     , itsSpin1WOp(new OneSiteSpinOperator(S,so1))
     , itsSpin2WOp(new OneSiteSpinOperator(S,so2))
     , itsIdentityWOp(new IdentityOperator())
-    , itsSite1Operator(new SiteOperatorImp(TensorNetworks::Bulk,itsSpin1WOp,itsp))
-    , itsSite2Operator(new SiteOperatorImp(TensorNetworks::Bulk,itsSpin2WOp,itsp))
-    , itsIndentityOperator(new SiteOperatorImp(TensorNetworks::Bulk,itsIdentityWOp,itsp))
+    , itsSite1Operator(new SiteOperatorImp(TensorNetworks::PBulk,itsSpin1WOp,itsp))
+    , itsSite2Operator(new SiteOperatorImp(TensorNetworks::PBulk,itsSpin2WOp,itsp))
+    , itsIndentityOperator(new SiteOperatorImp(TensorNetworks::PBulk,itsIdentityWOp,itsp))
 {
 
 }

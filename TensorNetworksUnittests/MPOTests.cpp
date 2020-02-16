@@ -71,43 +71,43 @@ TEST_F(MPOTesting,MakeHamiltonian)
 TEST_F(MPOTesting,HamiltonianGetLeftW00)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::Left,0,0)),"(1:1),(1:5) \n[ -0 0 0 -0.5 1 ]\n");
+    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PLeft,0,0)),"(1:1),(1:5) \n[ -0 0 0 -0.5 1 ]\n");
 }
 
 TEST_F(MPOTesting,HamiltonianGetRightW00)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::Right,0,0)),"(1:5),(1:1) \n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ -0.5 ]\n[ -0 ]\n");
+    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PRight,0,0)),"(1:5),(1:1) \n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ -0.5 ]\n[ -0 ]\n");
 }
 TEST_F(MPOTesting,HamiltonianGetLeftW10)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::Left,1,0)),"(1:1),(1:5) \n[ 0 0 0.5 0 0 ]\n");
+    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PLeft,1,0)),"(1:1),(1:5) \n[ 0 0 0.5 0 0 ]\n");
 }
 TEST_F(MPOTesting,HamiltonianGetRightW10)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::Right,1,0)),"(1:5),(1:1) \n[ 0 ]\n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ 0 ]\n");
+    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PRight,1,0)),"(1:5),(1:1) \n[ 0 ]\n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ 0 ]\n");
 }
 TEST_F(MPOTesting,HamiltonianGetLeftW01)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::Left,0,1)),"(1:1),(1:5) \n[ 0 0.5 0 0 0 ]\n");
+    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PLeft,0,1)),"(1:1),(1:5) \n[ 0 0.5 0 0 0 ]\n");
 }
 TEST_F(MPOTesting,HamiltonianGetRightW01)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::Right,0,1)),"(1:5),(1:1) \n[ 0 ]\n[ 0 ]\n[ 1 ]\n[ 0 ]\n[ 0 ]\n");
+    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PRight,0,1)),"(1:5),(1:1) \n[ 0 ]\n[ 0 ]\n[ 1 ]\n[ 0 ]\n[ 0 ]\n");
 }
 TEST_F(MPOTesting,HamiltonianGetLeftW11)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::Left,1,1)),"(1:1),(1:5) \n[ 0 0 0 0.5 1 ]\n");
+    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PLeft,1,1)),"(1:1),(1:5) \n[ 0 0 0 0.5 1 ]\n");
 }
 TEST_F(MPOTesting,HamiltonianGetRightW11)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::Right,1,1)),"(1:5),(1:1) \n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ 0.5 ]\n[ 0 ]\n");
+    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PRight,1,1)),"(1:5),(1:1) \n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ 0.5 ]\n[ 0 ]\n");
 }
 
 TEST_F(MPOTesting,CheckThatWsGotLoaded)
@@ -149,14 +149,14 @@ TEST_F(MPOTesting,LeftNormalizeThenDoHamiltionExpectation)
 {
     Setup(10,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Neel);
-    itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DLeft,itsSupervisor);
     EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
 }
 TEST_F(MPOTesting,RightNormalizeThenDoHamiltionExpectation)
 {
     Setup(10,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Neel);
-    itsMPS->Normalize(TensorNetworks::Left,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DLeft,itsSupervisor);
     EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
 }
 
@@ -167,7 +167,7 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D2)
     int L=10;
     Setup(L,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
     Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
     Vector3T R3=GetEORightIterate(-1);
@@ -182,7 +182,7 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D1)
     int L=10;
     Setup(L,0.5,1);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
     Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
     Vector3T R3=GetEORightIterate(-1);
@@ -197,7 +197,7 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D6)
     int L=10;
     Setup(L,0.5,6);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
     Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
     Vector3T R3=GetEORightIterate(-1);
@@ -211,7 +211,7 @@ TEST_F(MPOTesting,TestGetLRIterateL10S5D2)
     int L=10;
     Setup(L,2.5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
     Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
     Vector3T R3=GetEORightIterate(-1);
@@ -226,7 +226,7 @@ TEST_F(MPOTesting,TestEoldEnew)
     int L=10;
     Setup(L,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
     Vector3T L3=GetEOLeft_Iterate(L);
     eType EL=L3(1,1,1);
     Vector3T R3=GetEORightIterate(-1);
@@ -243,7 +243,7 @@ TEST_F(MPOTesting,TestGetExpectation2_I_I)
     double S=0.5;
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
     OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
     Operator* IO=itsH->CreateOperator(IWO);
 

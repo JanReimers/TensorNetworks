@@ -354,8 +354,8 @@ MatrixProductSite::eType MatrixProductSite::ContractFB(int n, int w2, int i2, in
 }
 
 
-
-void MatrixProductSite::Contract(const VectorT& s, const MatrixCT& Vdagger)
+//Left
+/*void MatrixProductSite::Contract(const VectorT& s, const MatrixCT& Vdagger)
 {
     int N1=s.GetHigh(); //N1=0 on the first site.
     if (N1>0 && N1<itsD1) itsD1=N1; //The contraction below will automatically reshape the As.
@@ -370,6 +370,7 @@ void MatrixProductSite::Contract(const VectorT& s, const MatrixCT& Vdagger)
     }
 }
 
+// Right
 void MatrixProductSite::Contract(const MatrixCT& U, const VectorT& s)
 {
     int N1=s.GetHigh(); //N1=0 on the first site.
@@ -381,6 +382,43 @@ void MatrixProductSite::Contract(const MatrixCT& U, const VectorT& s)
         itsAs[in].SetLimits(0,0);
         itsAs[in]=temp; //Shallow copy
         assert(itsAs[in].GetNumCols()==itsD2); //Verify shape is correct;
+    }
+}
+*/
+void MatrixProductSite::Contract(TensorNetworks::Direction lr,const VectorT& s, const MatrixCT& UV)
+{
+     switch (lr)
+    {
+        case TensorNetworks::DRight:
+        {
+            int N1=s.GetHigh(); //N1=0 on the first site.
+            if (N1>0 && N1<itsD2)
+                itsD2=N1; //The contraction below will automatically reshape the As.
+            for (int in=0; in<itsp; in++)
+            {
+                MatrixCT temp=Contract1(itsAs[in]*UV,s);
+                itsAs[in].SetLimits(0,0);
+                itsAs[in]=temp; //Shallow copy
+                assert(itsAs[in].GetNumCols()==itsD2); //Verify shape is correct;
+            }
+            break;
+        }
+        case TensorNetworks::DLeft:
+        {
+            int N1=s.GetHigh(); //N1=0 on the first site.
+            if (N1>0 && N1<itsD1) itsD1=N1; //The contraction below will automatically reshape the As.
+
+            for (int in=0; in<itsp; in++)
+            {
+                MatrixCT temp=Contract1(s,UV*itsAs[in]);
+                itsAs[in].SetLimits(0,0);
+                itsAs[in]=temp; //Shallow copy
+        //        cout << "A[" << in << "]=" << itsAs[in] << endl;
+                assert(itsAs[in].GetNumRows()==itsD1); //Verify shape is correct;
+            }
+            break;
+        }
+
     }
 }
 

@@ -52,8 +52,9 @@ public:
 //
 //  Normalization members
 //
-        virtual void Normalize(TensorNetworks::Position LR,LRPSupervisor*);
+        virtual void Normalize(TensorNetworks::Direction LR,LRPSupervisor*);
         virtual void Normalize(int isite); //Mixed Canonical normalization
+        virtual int  NormalizeSite(TensorNetworks::Direction lr,int isite); //Return SVD rank
 //--------------------------------------------------------------------------------------
 //
 // Find ground state

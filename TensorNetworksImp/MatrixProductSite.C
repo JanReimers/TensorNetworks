@@ -27,11 +27,11 @@ MatrixProductSite::MatrixProductSite(TensorNetworks::Position lbr, Bond* leftBon
     , itsIterDE(1.0)
     , itsPosition(lbr)
 {
-    if (lbr==TensorNetworks::Left)
+    if (lbr==TensorNetworks::PLeft)
     {
         assert(itsRightBond);
     }
-    if (lbr==TensorNetworks::Right)
+    if (lbr==TensorNetworks::PRight)
     {
         assert(itsLeft_Bond);
     }
@@ -63,7 +63,7 @@ void MatrixProductSite::InitializeWith(TensorNetworks::State state,int sgn)
             TensorNetworks::Position lbr=WhereAreWe();
             switch(lbr)
             {
-            case  TensorNetworks::Left :
+            case  TensorNetworks::PLeft :
                 {
                     int i=1;
                     for (pIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++,i++)
@@ -71,7 +71,7 @@ void MatrixProductSite::InitializeWith(TensorNetworks::State state,int sgn)
                             (*ip)(1,i)=std::complex<double>(sgn); //Left normalized
                     break;
                 }
-            case TensorNetworks::Right :
+            case TensorNetworks::PRight :
                 {
                     int i=1;
                     for (pIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++,i++)
@@ -79,7 +79,7 @@ void MatrixProductSite::InitializeWith(TensorNetworks::State state,int sgn)
                             (*ip)(i,1)=std::complex<double>(sgn);  //Left normalized
                     break;
                 }
-            case TensorNetworks::Bulk :
+            case TensorNetworks::PBulk :
                 {
                     for (pIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
                         for (int i=1; i<=Min(itsD1,itsD2); i++)
@@ -112,7 +112,7 @@ void MatrixProductSite::InitializeWith(TensorNetworks::State state,int sgn)
     }
 }
 
-void MatrixProductSite::SVDLeft_Normalize(VectorT& s, MatrixCT& Vdagger)
+/*void MatrixProductSite::SVDLeft_Normalize(VectorT& s, MatrixCT& Vdagger)
 {
 
     MatrixCT A=ReshapeLeft();
@@ -148,6 +148,73 @@ void MatrixProductSite::SVDRightNormalize(MatrixCT& U, VectorT& s)
     assert(itsLeft_Bond);
     if (itsLeft_Bond) itsLeft_Bond->SetSingularValues(s);
 }
+*/
+
+int MatrixProductSite::SVDNormalize(TensorNetworks::Direction lr)
+{
+    VectorT s; // This get passed from one site to the next.
+    MatrixCT UV;// This get passed from one site to the next.
+
+    switch (lr)
+    {
+    case TensorNetworks::DRight:
+    {
+        if (itsLeft_Bond)
+        {
+            MatrixCT A=ReshapeRight();
+            int N=Min(A.GetNumRows(),A.GetNumCols());
+            s.SetLimits(N);
+            MatrixCT V(N,A.GetNumCols());
+            CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
+            UV.SetLimits(0,0);  //Wipe out old data;
+            UV=A;
+            //
+            //  Extract Bs from U
+            //
+            ReshapeRight(Transpose(conj(V)));  //A is now Vdagger
+            assert(itsLeft_Bond);
+            itsLeft_Bond->SVDTransfer(TensorNetworks::DLeft,s,UV);
+        }
+        else
+        {
+            assert(itsRightBond);
+            ReshapeAndNormFromRight(itsRightBond->GetRank());
+        }
+        break;
+    }
+    case TensorNetworks::DLeft:
+    {
+        if (itsRightBond)
+        {
+        MatrixCT A=ReshapeLeft();
+        //
+        //  Set up and do SVD
+        //
+        int N=Min(A.GetNumRows(),A.GetNumCols());
+        s.SetLimits(N);
+        MatrixCT V(N,A.GetNumCols());
+        CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
+        UV.SetLimits(0,0);  //Wipe out old data;
+        UV=Transpose(conj(V)); //Set Vdagger
+        //
+        //  Extract As from U
+        //
+        ReshapeLeft(A);  //A is now U
+        itsRightBond->SVDTransfer(TensorNetworks::DRight,s,UV);
+        }
+        else
+        {
+            assert(itsLeft_Bond);
+            ReshapeAndNormFromLeft(itsLeft_Bond->GetRank());
+        }
+
+        break;
+    }
+
+    }
+    return s.size();
+}
+
 
 void MatrixProductSite::ReshapeFromLeft (int D1)
 {

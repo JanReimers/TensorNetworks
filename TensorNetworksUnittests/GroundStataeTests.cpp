@@ -42,7 +42,7 @@ TEST_F(GroundStateTesting,TestIdentityOperator)
 {
     Setup(10,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Left,new LRPSupervisor());
+    itsMPS->Normalize(TensorNetworks::DLeft,new LRPSupervisor());
     OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
     Operator* IO=itsH->CreateOperator(IWO);
     double S=itsMPS->GetExpectation(IO);

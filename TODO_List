@@ -7,9 +7,18 @@
 -Convergence schedule,  increase D, drop epsilons
 -Dynamically add lattice site, pseudo DMRG
 -Plot correlations
+    Two site correlation calcultion is expensive, so we need a way for the user to eneable and disable them
+    This brings up layout issues.  We need screen realestate for
+        1) COntrol of current step update detail levels
+        2) COntrol of what gets calculated, Correlations, propgator, gradE
+        3) Exporting graphs to grace
+        4) Saving a "project"
+        5) COnvergence schedule editor (listview?)
+        6) Freezing one site to remove SU(N) degeneracy
+        7) one or two (or N!) site updates. Part of convergence schedule?
+
 -Done Plot singular value spectrum,
 -Done need a site selection sider like in coolfoil
--Current task messages don;t always make sense, site number are often off by 1.
 -Refactor sweep left/right routines.  Tonnes of diplicated code in there.
 -Done Get rid of all S2's, just use double S everywhere.
 -Figure out why S=1,L>5 has such poor convergence. We may need to count degeneracy of lowest SVs.
@@ -17,8 +26,9 @@
     -For L=6 D=12 and D=27 works
     -For L=9 Hard to find a D that converges
 Bugs:
-    -log(DE) sopts plotting L=6 D=?
+    -log(DE) stops plotting L=6, S=1 D=?
     -Bond Entropy missing points L=6 D=?
+    -Current task messages don;t always make sense, site number are often off by 1.
 -Why Eigen values of Sus tensor <S^a*S^b>-<S^a>*<S^b> are not equal they always look like (e1,e1,e2) or (e1,e2,e2).
 -Why optimize site 1, just leave it a |up> and take out global SU(2) invariance
     is this related to poor convergence for S>1/2 ??

@@ -50,9 +50,9 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
 
 
 
-    itsDw12s[TensorNetworks::Left ]=Dw12(1,5,w1_first_1x5,w2_last_1x5);
-    itsDw12s[TensorNetworks::Bulk ]=Dw12(5,5,w1_first_5x5,w2_last_5x5);
-    itsDw12s[TensorNetworks::Right]=Dw12(5,1,w1_first_5x1,w2_last_5x1);
+    itsDw12s[TensorNetworks::PLeft ]=Dw12(1,5,w1_first_1x5,w2_last_1x5);
+    itsDw12s[TensorNetworks::PBulk ]=Dw12(5,5,w1_first_5x5,w2_last_5x5);
+    itsDw12s[TensorNetworks::PRight]=Dw12(5,1,w1_first_5x1,w2_last_5x1);
 
     Init(this);
 
@@ -82,7 +82,7 @@ TensorNetworks::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Posi
 //
 //  Implement W=[ 0, Jxy/2*S-, Jxy/2*S+, JzSz, 1 ]
 //
-    case TensorNetworks::Left:
+    case TensorNetworks::PLeft:
     {
         W.SetLimits(1,Dw);
         W(1,1)=itshz*sc.GetSz(m,n);
@@ -98,7 +98,7 @@ TensorNetworks::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Posi
 //      [ Sz      0        0      0    0 ]
 //      [ hzSz  Jxy/2*S- Jxy/2*S+ JzSz 1 ]
 //
-    case TensorNetworks::Bulk :
+    case TensorNetworks::PBulk :
     {
         W.SetLimits(Dw,Dw);
         Fill(W,ElementT(0.0));
@@ -120,7 +120,7 @@ TensorNetworks::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Posi
 //      [ Sz ]
 //      [ 0  ]
 //
-    case  TensorNetworks::Right :
+    case  TensorNetworks::PRight :
     {
 
         W.SetLimits(Dw,1);
