@@ -44,8 +44,10 @@ class MatrixProductSite
 //
         void     Refine (const MatrixCT& Heff,const Epsilons& eps);
         Matrix6T GetHeff(const SiteOperator* so,const Vector3T& L,const Vector3T& R) const;
-        const    Vector3T& GetHLeft_Cache() const {return itsHLeft_Cache;}
-        const    Vector3T& GetHRightCache() const {return itsHRightCache;}
+        const    Vector3T& GetHeffCache(TensorNetworks::Direction lr) const
+        {
+            return lr==TensorNetworks::DLeft ? itsHLeft_Cache : itsHRightCache;
+        }
         void     UpdateCache(const SiteOperator* so, const Vector3T& HLeft, const Vector3T& HRight);
         Vector3T IterateLeft_F(const SiteOperator* so, const Vector3T& Fam1,bool cache=true);
         Vector3T IterateRightF(const SiteOperator* so, const Vector3T& Fam1,bool cache=true);
@@ -55,9 +57,8 @@ class MatrixProductSite
 //
 // Normalization
 //
-        int  SVDNormalize(TensorNetworks::Direction lr);//  Returns rank of singular values.
-        bool IsLeftNormalized(double eps) const;
-        bool IsRightNormalized(double eps) const;
+        void SVDNormalize(TensorNetworks::Direction lr);//  Returns rank of singular values.
+        bool IsNormalized(TensorNetworks::Direction lr,double eps) const;
 //--------------------------------------------------------------------------------------
 //
 //    Density matrix calculations
@@ -83,21 +84,22 @@ private:
 
     TensorNetworks::Position WhereAreWe() const {return itsPosition;}
 
-    MatrixCT GetLeftNorm() const;//Used only for the final rescale op
-    MatrixCT GetRightNorm() const;
-    void Rescale(double norm);
+    MatrixCT GetNorm(TensorNetworks::Direction lr) const;
+    MatrixCT Reshape(TensorNetworks::Direction lr);
+    void     Reshape(TensorNetworks::Direction lr,const MatrixCT& UV);
+    void     Rescale(double norm);
     void     Reshape(int D1, int D2, bool saveData=false);
-    MatrixCT ReshapeLeft ();
-    MatrixCT ReshapeRight();
-    void     ReshapeLeft (const MatrixCT& U);
-    void     ReshapeRight(const MatrixCT& Vdagger);
-    void     ReshapeFromLeft (int D1);
-    void     ReshapeFromRight(int D2);
-    void     ReshapeAndNormFromLeft (int D1);
-    void     ReshapeAndNormFromRight(int D2);
     void     Update      (const VectorCT& newAs);
 
     static bool     IsUnit(const MatrixCT& m,double eps);
+
+    //
+    //  lr is the normalization direction.  For normalization we need to access the right bond.
+    //
+    Bond* GetBond(TensorNetworks::Direction lr)
+    {
+        return lr==TensorNetworks::DLeft ? itsRightBond : itsLeft_Bond;
+    }
 //-----------------------------------------------------------------------------------
 //
 //  Internal contraction function
@@ -136,7 +138,6 @@ private:
     PrimeEigenSolver<eType> itsEigenSolver;
 
     int itsNumUpdates;
-    double itsHeffDensity;
     double itsEmin;
     double itsGapE;  //Gap to the next excited state.
     double itsIterDE;

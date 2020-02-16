@@ -26,6 +26,13 @@ class Bond
 
     private:
         void SetSingularValues(const VectorT& s);
+        //
+        //  lr is the normalization direction.  For normalization we need to access the right bond.
+        //
+        MatrixProductSite* GetSite(TensorNetworks::Direction lr)
+        {
+            return lr==TensorNetworks::DLeft ? itsRightSite : itsLeft_Site;
+        }
 
         Array<double> itsSingularValues;
         double itsEps; //SVs < eps are considered zero

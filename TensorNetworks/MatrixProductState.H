@@ -30,7 +30,7 @@ class MatrixProductState : public virtual MultiPlotable
 //  Normalization members
 //
         virtual void Normalize(TensorNetworks::Direction LR,LRPSupervisor*)=0;
-        virtual void Normalize(int isite)=0; //Mixed Canonical normalization
+        virtual void Normalize(int isite,LRPSupervisor*)=0; //Mixed Canonical normalization
 //        virtual bool CheckNormalized(int isite,double eps) const=0;
 //--------------------------------------------------------------------------------------
 //

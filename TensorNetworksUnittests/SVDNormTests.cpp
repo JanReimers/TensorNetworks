@@ -183,7 +183,7 @@ TEST_F(MPSNormTesting,MixedCanonicalL10S1D3)
     itsMPS->InitializeWith(TensorNetworks::Random);
     for (int ia=0;ia<itsMPS->GetL();ia++)
     {
-        itsMPS->Normalize(ia);
+        itsMPS->Normalize(ia,itsSupervisor);
         EXPECT_EQ(BuildNormString(itsMPS,L),ExpectedNorm(ia,L));
     }
 }

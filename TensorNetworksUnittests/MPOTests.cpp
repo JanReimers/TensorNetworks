@@ -268,7 +268,7 @@ TEST_F(MPOTesting,TestTimingE2_S5D4)
     double S=2.5;
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
     StopWatch sw;
     sw.Start();
     double EE=itsMPS->GetExpectation(itsH,itsH);
@@ -282,7 +282,7 @@ TEST_F(MPOTesting,TestTimingE2_S1D16)
     double S=2.5;
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::Right,itsSupervisor);
+    itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
     StopWatch sw;
     sw.Start();
     double EE=itsMPS->GetExpectation(itsH,itsH);

@@ -46,22 +46,12 @@ void Bond::SetSingularValues(const VectorT& s)
 
 }
 
+//
+//  Direction is the normaliztions direction, which i opposite to the direction that UV gets tranferred.
+//
 void Bond::SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,const MatrixCT& UV)
 {
     SetSingularValues(s);
-    switch(lr)
-    {
-        case TensorNetworks::DLeft:
-        {
-            assert(itsLeft_Site);
-            itsLeft_Site->Contract(TensorNetworks::DRight,s,UV);
-            break;
-        }
-        case TensorNetworks::DRight:
-        {
-            itsRightSite->Contract(TensorNetworks::DLeft,s,UV);
-            break;
-        }
-
-    }
+    assert(GetSite(lr));
+    GetSite(lr)->Contract(lr,s,UV);
 }

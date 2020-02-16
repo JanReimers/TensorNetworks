@@ -11,25 +11,33 @@
 using std::cout;
 using std::endl;
 
-MatrixProductSite::MatrixCT  MatrixProductSite::ReshapeLeft()
-{
-    MatrixCT A(itsp*itsD1,itsD2);
-    int i2_1=1;
-    for (int in=0;in<itsp;in++)
-        for (int i1=1;i1<=itsD1;i1++,i2_1++)
-            for (int i2=1;i2<=itsD2;i2++)
-                A(i2_1,i2)=itsAs[in](i1,i2);
-    return A;
-}
 
-MatrixProductSite::MatrixCT  MatrixProductSite::ReshapeRight()
+MatrixProductSite::MatrixCT  MatrixProductSite::Reshape(TensorNetworks::Direction lr)
 {
-    MatrixCT A(itsD1,itsp*itsD2);
-    int i2_2=1;
-    for (int in=0; in<itsp; in++)
-        for (int i2=1; i2<=itsD2; i2++,i2_2++)
-            for (int i1=1; i1<=itsD1; i1++)
-                A(i1,i2_2)=itsAs[in](i1,i2);
+    MatrixCT A;
+    switch (lr)
+    {
+        case TensorNetworks::DLeft:
+        {
+            A.SetLimits(itsp*itsD1,itsD2);
+            int i2_1=1;
+            for (int in=0;in<itsp;in++)
+                for (int i1=1;i1<=itsD1;i1++,i2_1++)
+                    for (int i2=1;i2<=itsD2;i2++)
+                        A(i2_1,i2)=itsAs[in](i1,i2);
+            break;
+        }
+        case TensorNetworks::DRight:
+        {
+            A.SetLimits(itsD1,itsp*itsD2);
+            int i2_2=1;
+            for (int in=0; in<itsp; in++)
+                for (int i2=1; i2<=itsD2; i2++,i2_2++)
+                    for (int i1=1; i1<=itsD1; i1++)
+                        A(i1,i2_2)=itsAs[in](i1,i2);
+            break;
+        }
+    }
     return A;
 }
 
@@ -43,31 +51,38 @@ void MatrixProductSite::Reshape(int D1, int D2, bool saveData)
     for (int in=0; in<itsp; in++)
         itsAs[in].SetLimits(itsD1,itsD2,saveData);
 }
-void MatrixProductSite::ReshapeLeft(const MatrixCT& U)
-{
-    //  If U has less columns than the As then we need to reshape the whole site.
-    //  Typically this will happen at the edges of the lattice.
-    //
-    if (U.GetNumCols()<itsD2) Reshape(itsD1,U.GetNumCols());//This throws away the old data
-    int i2_1=1;
-    for (int in=0; in<itsp; in++)
-        for (int i1=1; i1<=itsD1; i1++,i2_1++)
-            for (int i2=1; i2<=itsD2; i2++)
-                itsAs[in](i1,i2)=U(i2_1,i2);
 
-}
-void MatrixProductSite::ReshapeRight(const MatrixCT& Vdagger)
+void  MatrixProductSite::Reshape(TensorNetworks::Direction lr,const MatrixCT& UV)
 {
-    //  If Vdagger has less row than the As then we need to reshape the whole site.
-    //  Typically this will happen at the edges of the lattice.
-    //
-    if (Vdagger.GetNumRows()<itsD1) Reshape(Vdagger.GetNumRows(),itsD2,false);//This throws away the old data
-    int i2_2=1;
-    for (int in=0; in<itsp; in++)
-        for (int i2=1; i2<=itsD2; i2++,i2_2++)
-            for (int i1=1; i1<=itsD1; i1++)
-                itsAs[in](i1,i2)=Vdagger(i1,i2_2);
-
+    switch (lr)
+    {
+        case TensorNetworks::DLeft:
+        {
+            //  If U has less columns than the As then we need to reshape the whole site.
+            //  Typically this will happen at the edges of the lattice.
+            //
+            if (UV.GetNumCols()<itsD2) Reshape(itsD1,UV.GetNumCols());//This throws away the old data
+            int i2_1=1;
+            for (int in=0; in<itsp; in++)
+                for (int i1=1; i1<=itsD1; i1++,i2_1++)
+                    for (int i2=1; i2<=itsD2; i2++)
+                        itsAs[in](i1,i2)=UV(i2_1,i2);
+            break;
+        }
+        case TensorNetworks::DRight:
+        {
+            //  If Vdagger has less row than the As then we need to reshape the whole site.
+            //  Typically this will happen at the edges of the lattice.
+            //
+            if (UV.GetNumRows()<itsD1) Reshape(UV.GetNumRows(),itsD2,false);//This throws away the old data
+            int i2_2=1;
+            for (int in=0; in<itsp; in++)
+                for (int i2=1; i2<=itsD2; i2++,i2_2++)
+                    for (int i1=1; i1<=itsD1; i1++)
+                        itsAs[in](i1,i2)=UV(i1,i2_2);
+            break;
+        }
+    }
 }
 
 //
@@ -104,11 +119,40 @@ MatrixProductSite::MatrixCT MatrixProductSite::Contract1(const MatrixCT& AU,cons
     return Anew;
 }
 
-
+MatrixProductSite::MatrixCT MatrixProductSite::GetNorm(TensorNetworks::Direction lr) const
+{
+    MatrixCT ret;
+    switch(lr)
+    {
+        case TensorNetworks::DLeft:
+        {
+            ret.SetLimits(itsD2,itsD2);
+            Fill(ret,std::complex<double>(0.0));
+            //
+            //  Sum_ip A^t(ip) * A(ip)
+            //
+            for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
+                ret+=conj(Transpose((*ip)))*(*ip);
+            break;
+        }
+        case TensorNetworks::DRight:
+        {
+            ret.SetLimits(itsD1,itsD1);
+            Fill(ret,std::complex<double>(0.0));
+            //
+            //  Sum_ip A(ip)*A^t(ip)
+            //
+            for (cpIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
+                ret+=(*ip)*conj(Transpose((*ip)));
+            break;
+        }
+    }
+    return ret;
+}
 //
 //  Sum_ip A^t(ip) * A(ip)
 //
-MatrixProductSite::MatrixCT MatrixProductSite::GetLeftNorm() const
+/*MatrixProductSite::MatrixCT MatrixProductSite::GetLeftNorm() const
 {
     MatrixCT ret(itsD2,itsD2);
     Fill(ret,std::complex<double>(0.0));
@@ -131,7 +175,7 @@ MatrixProductSite::MatrixCT MatrixProductSite::GetRightNorm() const
     return ret;
 }
 
-
+*/
 MatrixProductSite::Matrix6T MatrixProductSite::
 GetHeff(const SiteOperator* mops,const Vector3T& L,const Vector3T& R) const
 {

@@ -53,8 +53,7 @@ public:
 //  Normalization members
 //
         virtual void Normalize(TensorNetworks::Direction LR,LRPSupervisor*);
-        virtual void Normalize(int isite); //Mixed Canonical normalization
-        virtual int  NormalizeSite(TensorNetworks::Direction lr,int isite); //Return SVD rank
+        virtual void Normalize(int isite,LRPSupervisor*); //Mixed Canonical normalization
 //--------------------------------------------------------------------------------------
 //
 // Find ground state
@@ -99,10 +98,10 @@ private:
 //
 //  For groound state search
 //
-        void     Refine        (const Hamiltonian *h,LRPSupervisor*,const Epsilons& eps,int isite); //Minimize energy WRT the Ms in one site.
-        double   SweepRight    (const Hamiltonian* h,LRPSupervisor*,const Epsilons& eps,bool quiet=true);
-        double   SweepLeft     (const Hamiltonian* h,LRPSupervisor*,const Epsilons& eps,bool quiet=true);
+        void     Refine(TensorNetworks::Direction lr,const Hamiltonian *h,LRPSupervisor*,const Epsilons& eps,int isite); //Minimize energy WRT the Ms in one site.
+        double   Sweep (TensorNetworks::Direction lr,const Hamiltonian* h,LRPSupervisor*,const Epsilons& eps);
         void     UpdateBondData(int isite);
+        void     NormalizeSite(TensorNetworks::Direction lr,int isite,LRPSupervisor*);
 
 //--------------------------------------------------------------------------------------
 //
@@ -111,12 +110,27 @@ private:
         Matrix6T GetHeffIterate(const Hamiltonian* h,int isite) const;
 
         void     LoadHeffCaches(const Hamiltonian* h,LRPSupervisor*);
-        Vector3T GetHLeft_Cache(int isite) const;
-        Vector3T GetHRightCache(int isite) const;
+        Vector3T GetHeffCache(TensorNetworks::Direction lr,int isite) const;
         Vector3T GetEOLeft_Iterate(const Operator* o,LRPSupervisor*,int isite,bool cache=false) const;
         Vector3T GetEORightIterate(const Operator* o,LRPSupervisor*,int isite,bool cache=false) const;
 
         Matrix4T CalculateTwoSiteDM(int ia,int ib) const;
+//
+//  Loop Control
+//
+        int GetStart(TensorNetworks::Direction lr) const
+        {
+            return lr==TensorNetworks::DLeft ? 0 : itsL-1;
+        }
+        int GetStop(TensorNetworks::Direction lr) const
+        { //These need to be one beyond, like stl iterators
+            return lr==TensorNetworks::DLeft ? itsL : -1;
+        }
+        int GetIncrement(TensorNetworks::Direction lr) const
+        {
+            return lr==TensorNetworks::DLeft ? 1 : -1;
+        }
+
 
 //--------------------------------------------------------------------------------------
 //

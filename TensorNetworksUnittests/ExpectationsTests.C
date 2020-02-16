@@ -342,8 +342,8 @@ TEST_F(ExpectationsTesting,TestTwoSiteDMs)
             double err1=Max(abs(Sus1(ia,ib)-Transpose(Sus1(ia,ib))));
             double err2=Max(abs(Sus2(ia,ib)-Transpose(Sus2(ia,ib))));
             EXPECT_NEAR(err,0.0,1e-14);
-            EXPECT_NEAR(err1,0.0,1e-8);
-            EXPECT_NEAR(err2,0.0,1e-8);
+            EXPECT_NEAR(err1,0.0,2e-8);
+            EXPECT_NEAR(err2,0.0,2e-8);
 //            cout << "Err 12,nonsym1,nonsym2=" << err << " " << err1 << " " << err2 << endl;
 //            DMatrix<double> SusSym=0.5*(Sus2(ia,ib)+ Transpose(Sus2(ia,ib)));
 //            cout << "Sites (" << ia << "," << ib << "): Eigen Values=" << Diagonalize(SusSym) <<endl;

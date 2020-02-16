@@ -31,8 +31,10 @@ public:
 
     MatrixCT GetA(int i,int ip) const {return GetSite(i)->itsAs[ip]; }
     const MatrixProductSite* GetSite(int isite) const {return itsMPS->itsSites[isite];}
-    MatrixCT GetLeftNorm(int isite) const {return GetSite(isite)->GetLeftNorm();}
-    MatrixCT GetRightNorm(int isite) const {return GetSite(isite)->GetRightNorm();}
+    MatrixCT GetNorm(TensorNetworks::Direction lr,int isite) const
+    {
+        return GetSite(isite)->GetNorm(lr);
+    }
 
     MatrixProductStateImp* itsMPS;
     Epsilons               itsEps;
@@ -64,9 +66,9 @@ TEST_F(MatrixProductTesting,MatrixOpMul)
 TEST_F(MatrixProductTesting,LeftNormalMatricies)
 {
     itsMPS->InitializeWith(TensorNetworks::Product);
-    VerifyUnit(GetLeftNorm(0),eps);
-    VerifyUnit(GetLeftNorm(1),eps);
-    VerifyUnit(GetLeftNorm(8),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DLeft,0),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DLeft,1),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DLeft,8),eps);
 }
 
 
@@ -74,10 +76,10 @@ TEST_F(MatrixProductTesting,RightNormalMatricies)
 {
     itsMPS->InitializeWith(TensorNetworks::Product);
     // The first site will not be right normalized
-    EXPECT_EQ(ToString(GetRightNorm(0)),"(1:1),(1:1) \n[ (2,0) ]\n");
-    VerifyUnit(GetRightNorm(1),eps);
-    VerifyUnit(GetRightNorm(8),eps);
-    VerifyUnit(GetRightNorm(9),eps);
+    EXPECT_EQ(ToString(GetNorm(TensorNetworks::DRight,0)),"(1:1),(1:1) \n[ (2,0) ]\n");
+    VerifyUnit(GetNorm(TensorNetworks::DRight,1),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DRight,8),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DRight,9),eps);
 }
 
 
@@ -85,19 +87,19 @@ TEST_F(MatrixProductTesting,LeftNormalMatricies_S2)
 {
     Setup(10,1.5,2);
     itsMPS->InitializeWith(TensorNetworks::Product);
-    VerifyUnit(GetLeftNorm(0),eps);
-    VerifyUnit(GetLeftNorm(1),eps);
-    VerifyUnit(GetLeftNorm(8),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DLeft,0),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DLeft,1),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DLeft,8),eps);
 }
 
 TEST_F(MatrixProductTesting,RightNormalMatricies_S2)
 {
     Setup(10,1.5,3);
     itsMPS->InitializeWith(TensorNetworks::Product);
-    VerifyUnit(GetRightNorm(1),eps);
-    VerifyUnit(GetRightNorm(8),eps);
-    VerifyUnit(GetRightNorm(9),eps);
-    EXPECT_EQ(ToString(GetRightNorm(0)),"(1:1),(1:1) \n[ (3,0) ]\n");
+    VerifyUnit(GetNorm(TensorNetworks::DRight,1),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DRight,8),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DRight,9),eps);
+    EXPECT_EQ(ToString(GetNorm(TensorNetworks::DRight,0)),"(1:1),(1:1) \n[ (3,0) ]\n");
 }
 
 

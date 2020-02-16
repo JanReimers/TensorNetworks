@@ -4,9 +4,10 @@
 #include "TensorNetworks/Dw12.H"
 #include "oml/minmax.h"
 #include "oml/cnumeric.h"
-#include "oml/vector_io.h"
+//#include "oml/vector_io.h"
 #include "oml/random.h"
 #include <iostream>
+#include <iomanip>
 
 using std::cout;
 using std::endl;
@@ -21,7 +22,6 @@ MatrixProductSite::MatrixProductSite(TensorNetworks::Position lbr, Bond* leftBon
     , itsHRightCache(1,1,1,1)
     , itsEigenSolver()
     , itsNumUpdates(0)
-    , itsHeffDensity(0)
     , itsEmin(0.0)
     , itsGapE(0.0)
     , itsIterDE(1.0)
@@ -112,138 +112,53 @@ void MatrixProductSite::InitializeWith(TensorNetworks::State state,int sgn)
     }
 }
 
-/*void MatrixProductSite::SVDLeft_Normalize(VectorT& s, MatrixCT& Vdagger)
+void MatrixProductSite::SVDNormalize(TensorNetworks::Direction lr)
 {
+    // Handle edge cases first
+    if (lr==TensorNetworks::DRight && !itsLeft_Bond)
+    {
+        assert(itsRightBond);
+        int newD2=itsRightBond->GetRank();
+        Reshape(itsD1,newD2,true);
+        Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
+        return;
+    }
+    if(lr==TensorNetworks::DLeft && !itsRightBond)
+    {
+        assert(itsLeft_Bond);
+        int newD1=itsLeft_Bond->GetRank();
+        Reshape(newD1,itsD2,true);
+        Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
+        return;
+    }
 
-    MatrixCT A=ReshapeLeft();
-    //
-    //  Set up and do SVD
-    //
-    int N=Min(A.GetNumRows(),A.GetNumCols());
-    s.SetLimits(N);
-    MatrixCT V(N,A.GetNumCols());
-    CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
-    Vdagger.SetLimits(0,0);  //Wipe out old data;
-    Vdagger=Transpose(conj(V));
-    //
-    //  Extract As from U
-    //
-    ReshapeLeft(A);  //A is now U
-    if (itsRightBond) itsRightBond->SetSingularValues(s);
-}
-
-void MatrixProductSite::SVDRightNormalize(MatrixCT& U, VectorT& s)
-{
-    MatrixCT A=ReshapeRight();
-    int N=Min(A.GetNumRows(),A.GetNumCols());
-    s.SetLimits(N);
-    MatrixCT V(N,A.GetNumCols());
-    CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
-    U.SetLimits(0,0);  //Wipe out old data;
-    U=A;
-    //
-    //  Extract Bs from U
-    //
-    ReshapeRight(Transpose(conj(V)));  //A is now Vdagger
-    assert(itsLeft_Bond);
-    if (itsLeft_Bond) itsLeft_Bond->SetSingularValues(s);
-}
-*/
-
-int MatrixProductSite::SVDNormalize(TensorNetworks::Direction lr)
-{
+    //We are in the bulk
     VectorT s; // This get passed from one site to the next.
-    MatrixCT UV;// This get passed from one site to the next.
+    MatrixCT A=Reshape(lr);
+    int N=Min(A.GetNumRows(),A.GetNumCols());
+    s.SetLimits(N);
+    MatrixCT V(N,A.GetNumCols());
+    CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
+
+    MatrixCT UV;// This get transferred through the bond to a neighbouring site.
 
     switch (lr)
     {
-    case TensorNetworks::DRight:
-    {
-        if (itsLeft_Bond)
+        case TensorNetworks::DRight:
         {
-            MatrixCT A=ReshapeRight();
-            int N=Min(A.GetNumRows(),A.GetNumCols());
-            s.SetLimits(N);
-            MatrixCT V(N,A.GetNumCols());
-            CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
-            UV.SetLimits(0,0);  //Wipe out old data;
             UV=A;
-            //
-            //  Extract Bs from U
-            //
-            ReshapeRight(Transpose(conj(V)));  //A is now Vdagger
-            assert(itsLeft_Bond);
-            itsLeft_Bond->SVDTransfer(TensorNetworks::DLeft,s,UV);
+            Reshape(lr,Transpose(conj(V)));  //A is now Vdagger
+            break;
         }
-        else
+        case TensorNetworks::DLeft:
         {
-            assert(itsRightBond);
-            ReshapeAndNormFromRight(itsRightBond->GetRank());
+            UV=Transpose(conj(V)); //Set Vdagger
+            Reshape(lr,A);  //A is now U
+            break;
         }
-        break;
     }
-    case TensorNetworks::DLeft:
-    {
-        if (itsRightBond)
-        {
-        MatrixCT A=ReshapeLeft();
-        //
-        //  Set up and do SVD
-        //
-        int N=Min(A.GetNumRows(),A.GetNumCols());
-        s.SetLimits(N);
-        MatrixCT V(N,A.GetNumCols());
-        CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
-        UV.SetLimits(0,0);  //Wipe out old data;
-        UV=Transpose(conj(V)); //Set Vdagger
-        //
-        //  Extract As from U
-        //
-        ReshapeLeft(A);  //A is now U
-        itsRightBond->SVDTransfer(TensorNetworks::DRight,s,UV);
-        }
-        else
-        {
-            assert(itsLeft_Bond);
-            ReshapeAndNormFromLeft(itsLeft_Bond->GetRank());
-        }
-
-        break;
-    }
-
-    }
-    return s.size();
+    GetBond(lr)->SVDTransfer(lr,s,UV);
 }
-
-
-void MatrixProductSite::ReshapeFromLeft (int D1)
-{
-    Reshape(   D1,itsD2,true);
-}
-
-void MatrixProductSite::ReshapeAndNormFromLeft (int D1)
-{
-    ReshapeFromLeft(D1);
-    //cout << "Left norm=" << GetLeftNorm() << endl;
-    double norm=std::real(GetLeftNorm()(1,1));
-    Rescale(sqrt(norm));
-
-}
-
-void MatrixProductSite::ReshapeFromRight(int D2)
-{
-    Reshape(itsD1,   D2,true);
-}
-
-void MatrixProductSite::ReshapeAndNormFromRight(int D2)
-{
-    ReshapeFromRight(D2);
-    //cout << "Right norm=" << GetRightNorm() << endl;
-    double norm=std::real(GetRightNorm()(1,1));
-    Rescale(sqrt(norm));
-}
-
-
 
 void MatrixProductSite::Rescale(double norm)
 {
@@ -256,15 +171,15 @@ std::string MatrixProductSite::GetNormStatus(double eps) const
 //    for (int ip=0;ip<itsp; ip++)
 //        cout << "A[" << ip << "]=" << itsAs[ip] << endl;
     std::string ret;
-    if (IsLeftNormalized(eps))
+    if (IsNormalized(TensorNetworks::DLeft,eps))
     {
-        if (IsRightNormalized(eps))
+        if (IsNormalized(TensorNetworks::DRight,eps))
             ret="I"; //This should be rare
         else
             ret="A";
     }
     else
-        if (IsRightNormalized(eps))
+        if (IsNormalized(TensorNetworks::DRight,eps))
             ret="B";
         else
             ret="M";
@@ -279,21 +194,16 @@ void MatrixProductSite::Report(std::ostream& os) const
     << std::setw(4) << itsD1
     << std::setw(4)  << itsD2 << std::fixed
     << std::setw(5)  << itsNumUpdates << "      "
-    << std::setw(5)  << itsHeffDensity << "   " << std::setprecision(7)
+    << std::setprecision(7)
     << std::setw(9)  << itsEmin << "     " << std::setprecision(4)
     << std::setw(5)  << itsGapE << "   " << std::scientific
     << std::setw(5)  << itsIterDE << "  "
     ;
 }
 
-
-bool MatrixProductSite::IsLeftNormalized(double eps) const
+bool MatrixProductSite::IsNormalized(TensorNetworks::Direction lr,double eps) const
 {
-    return IsUnit(GetLeftNorm(),eps);
-}
-bool MatrixProductSite::IsRightNormalized(double eps) const
-{
-    return IsUnit(GetRightNorm(),eps);
+    return IsUnit(GetNorm(lr),eps);
 }
 
 bool MatrixProductSite::IsUnit(const MatrixCT& m,double eps)

@@ -8,9 +8,6 @@
 #include "Plotting/Factory.H"
 #include "Plotting/MultiGraph.H"
 #include "Misc/Dimension.H"
-#include "Misc/NamedUnits.H"
-#include "oml/cnumeric.h"
-#include "oml/vector_io.h"
 #include <iostream>
 #include <iomanip>
 
@@ -142,59 +139,45 @@ void MatrixProductStateImp::InitializeWith(TensorNetworks::State state)
 
 }
 
-c_str SiteMessage(c_str message,int site)
+c_str SiteMessage(const std::string& message,int site)
 {
     static std::string ret;
     ret=message+std::to_string(site+1); //user sees 1 based site number as opposed to zero based in code
     return ret.c_str();
 }
+
+#define ForLoop(LR) for (int ia=GetStart(LR);ia!=GetStop(LR);ia+=GetIncrement(LR))
 //-------------------------------------------------------------------------------
 //
 //   Normalization routines
 //
 void MatrixProductStateImp::Normalize(TensorNetworks::Direction LR,LRPSupervisor* Supervisor)
 {
-    if (LR==TensorNetworks::DLeft)
-    {
-        for (int ia=0;ia<itsL;ia++)
-        {
-            Supervisor->DoneOneStep(2,SiteMessage("SVD Left Normalize site ",ia),ia);
-            NormalizeSite(LR,ia);
-        }
-        Supervisor->DoneOneStep(2,SiteMessage("Rescale site ",itsL-1),itsL-1);
-    }
-    else if (LR==TensorNetworks::DRight)
-    {
-        for (int ia=itsL-1;ia>=0;ia--)
-        {
-            Supervisor->DoneOneStep(2,SiteMessage("SVD Right Normalize site ",ia),ia);
-            NormalizeSite(LR,ia);
-        }
-        Supervisor->DoneOneStep(2,SiteMessage("Rescale site ",0),0);
-    }
-
+    ForLoop(LR)
+        NormalizeSite(LR,ia,Supervisor);
 }
 
 
-int MatrixProductStateImp::NormalizeSite(TensorNetworks::Direction lr,int isite)
+void MatrixProductStateImp::NormalizeSite(TensorNetworks::Direction lr,int isite,LRPSupervisor* super)
 {
-    int rank=itsSites[isite]->SVDNormalize(lr);
+    std::string lrs=lr==TensorNetworks::DLeft ? "Left" : "Right";
+    super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize site ",isite),isite);
+    itsSites[isite]->SVDNormalize(lr);
     int bond_index=isite+( lr==TensorNetworks::DLeft ? 0 :-1);
     if (bond_index<itsL-1 && bond_index>=0)
         UpdateBondData(bond_index);
-    return rank;
 }
 
 //
 //  Mixed canonical  A*A*A*A...A*M(isite)*B*B...B*B
 //
-void MatrixProductStateImp::Normalize(int isite)
+void MatrixProductStateImp::Normalize(int isite,LRPSupervisor* super)
 {
     if (isite>0)
     {
         for (int ia=0; ia<isite; ia++)
         {
-            NormalizeSite(TensorNetworks::DLeft,ia);
+            NormalizeSite(TensorNetworks::DLeft,ia,super);
         }
 //        itsSites[isite]->ReshapeFromLeft(rank);
     }
@@ -203,7 +186,7 @@ void MatrixProductStateImp::Normalize(int isite)
     {
         for (int ia=itsL-1; ia>isite; ia--)
         {
-            NormalizeSite(TensorNetworks::DRight,ia);
+            NormalizeSite(TensorNetworks::DRight,ia,super);
         }
 //        itsSites[isite]->ReshapeFromRight(rank);
     }
@@ -298,9 +281,9 @@ double MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, in
     for (int in=0; in<maxIter; in++)
     {
         Supervisor->DoneOneStep(0,"Sweep Right");
-        E1=SweepRight(hamiltonian,Supervisor,eps,true);
+        E1=Sweep(TensorNetworks::DLeft ,hamiltonian,Supervisor,eps); //This actually sweeps to the right, but leaves left normalized sites in its wake
         Supervisor->DoneOneStep(0,"Sweep Left");
-        E1=SweepLeft (hamiltonian,Supervisor,eps,true);
+        E1=Sweep(TensorNetworks::DRight,hamiltonian,Supervisor,eps);
         if (GetMaxDeltaE()<eps.itsEnergyConvergenceEpsilon) break;
     }
     Supervisor->DoneOneStep(0,"Contracting <E^2>"); //Supervisor will update the graphs
@@ -308,31 +291,21 @@ double MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, in
     return E2-E1*E1;
 }
 
-
-double MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Supervisor,const Epsilons& eps,bool quiet)
+double MatrixProductStateImp::Sweep(TensorNetworks::Direction lr,const Hamiltonian* h,LRPSupervisor* Supervisor,const Epsilons& eps)
 {
-    if (!quiet)
+    int iter=0;
+    ForLoop(lr)
     {
-        cout.precision(10);
-        cout << "SweepRight  E=" << GetExpectation(h)/(itsL-1) << endl;
-    }
-    for (int ia=0; ia<itsL-1; ia++)
-    {
-        Refine(h,Supervisor,eps,ia);
-
-        Supervisor->DoneOneStep(2,SiteMessage("SVD Left Normalize site ",ia),ia);
-        NormalizeSite(TensorNetworks::DLeft,ia);
-        Supervisor->DoneOneStep(1,SiteMessage("Update L&R caches for site ",ia));
-        itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
+        Refine(lr,h,Supervisor,eps,ia);
         if (weHaveGraphs())
         {
             double de=fabs(itsSites[ia]->GetIterDE());
             //cout << "ia,diter,de=" << ia << " " << diter << " " << de << endl;
             if (de<1e-16) de=1e-16;
-            double diter=itsNSweep+static_cast<double>(ia)/(itsL-1); //Fractional iter count for log(dE) plot
+            double diter=itsNSweep+static_cast<double>(iter)/(itsL-1); //Fractional iter count for log(dE) plot
             AddPoint("Iter log(dE/J)",Plotting::Point(diter,log10(de)));
+            iter++; //ia doesn;t always count upwards, but this guy does.
         }
-        if (!quiet) cout << "SweepRight post constract  E=" << GetExpectation(h)/(itsL-1) << endl;
     }
     itsNSweep++;
     Supervisor->DoneOneStep(0,"Calculating Expectation <E>"); //Supervisor will update the graphs
@@ -344,46 +317,8 @@ double MatrixProductStateImp::SweepRight(const Hamiltonian* h,LRPSupervisor* Sup
     return E1;
 }
 
-double MatrixProductStateImp::SweepLeft(const Hamiltonian* h,LRPSupervisor* Supervisor,const Epsilons& eps,bool quiet)
-{
-    if (!quiet)
-    {
-        cout.precision(10);
-        cout << "SweepLeft  entry  E=" << GetExpectation(h)/(itsL-1) << endl;
-    }
 
-    for (int ia=itsL-1; ia>0; ia--)
-    {
-        Refine(h,Supervisor,eps,ia);
-
-        Supervisor->DoneOneStep(2,SiteMessage("SVD Rigft Normalize site ",ia),ia);
-        NormalizeSite(TensorNetworks::DRight,ia);
-        Supervisor->DoneOneStep(1,SiteMessage("Update L&R caches for site ",ia));
-        itsSites[ia]->UpdateCache(h->GetSiteOperator(ia),GetHLeft_Cache(ia-1),GetHRightCache(ia+1));
-        if (weHaveGraphs()&&itsNSweep>=1)
-        {
-            double de=fabs(itsSites[ia]->GetIterDE());
-            //cout << "ia,diter,de=" << ia << " " << diter << " " << de << endl;
-            if (de<1e-16) de=1e-16;
-            double diter=itsNSweep+static_cast<double>(itsL-1-ia)/(itsL-1); //Fractional iter count for log(dE) plot
-            AddPoint("Iter log(dE/J)",Plotting::Point(diter,log10(de)));
-        }
-
-        if (!quiet)
-            cout << "SweepLeft  post contract  E=" << GetExpectation(h)/(itsL-1) << endl;
-
-    }
-    itsNSweep++;
-    Supervisor->DoneOneStep(0,"Calculating Expectation <E>"); //Supervisor will update the graphs
-    double E1=GetExpectation(h);
-    if (weHaveGraphs())
-    {
-        AddPoint("Iter E/J",Plotting::Point(itsNSweep,E1));
-    }
-    return E1;
-}
-
-void MatrixProductStateImp::Refine(const Hamiltonian *h,LRPSupervisor* Supervisor,const Epsilons& eps,int isite)
+void MatrixProductStateImp::Refine(TensorNetworks::Direction lr,const Hamiltonian *h,LRPSupervisor* Supervisor,const Epsilons& eps,int isite)
 {
 //    assert(CheckNormalized(isite,eps.itsNormalizationEpsilon));
     Supervisor->DoneOneStep(2,"Calculating Heff",isite); //Supervisor will update the graphs
@@ -392,30 +327,25 @@ void MatrixProductStateImp::Refine(const Hamiltonian *h,LRPSupervisor* Superviso
     itsSites[isite]->Refine(Heff6.Flatten(),eps);
     itsSiteEnergies[isite]=itsSites[isite]->GetSiteEnergy();
     itsSiteEGaps   [isite]=itsSites[isite]->GetEGap      ();
+    NormalizeSite(lr,isite,Supervisor);
+    itsSites[isite]->UpdateCache(h->GetSiteOperator(isite),
+                            GetHeffCache(TensorNetworks::DLeft ,isite-1),
+                            GetHeffCache(TensorNetworks::DRight,isite+1));
 
 }
 
-
-MatrixProductStateImp::Vector3T MatrixProductStateImp::GetHLeft_Cache (int isite) const
+MatrixProductStateImp::Vector3T MatrixProductStateImp::GetHeffCache (TensorNetworks::Direction lr,int isite) const
 {
-    Vector3T HLeft(1,1,1,1);
-    HLeft(1,1,1)=eType(1.0);
-    if (isite>=0)  HLeft=itsSites[isite]->GetHLeft_Cache();
-    return HLeft;
+    Vector3T H(1,1,1,1);
+    H(1,1,1)=eType(1.0);
+    if (isite>=0 && isite<itsL)  H=itsSites[isite]->GetHeffCache(lr);
+    return H;
 }
-MatrixProductStateImp::Vector3T MatrixProductStateImp::GetHRightCache(int isite) const
-{
-    Vector3T HRight(1,1,1,1);
-    HRight(1,1,1)=eType(1.0);
-    if (isite<itsL)  HRight=itsSites[isite]->GetHRightCache();
-    return HRight;
-}
-
 
 MatrixProductStateImp::Matrix6T MatrixProductStateImp::GetHeffIterate   (const Hamiltonian* h,int isite) const
 {
-    Vector3T Lcache=GetHLeft_Cache(isite-1);
-    Vector3T Rcache=GetHRightCache(isite+1);
+    Vector3T Lcache=GetHeffCache(TensorNetworks::DLeft ,isite-1);
+    Vector3T Rcache=GetHeffCache(TensorNetworks::DRight,isite+1);
     return itsSites[isite]->GetHeff(h->GetSiteOperator(isite),Lcache,Rcache);
 }
 void MatrixProductStateImp::LoadHeffCaches(const Hamiltonian* h,LRPSupervisor* supervisor)
@@ -462,7 +392,7 @@ double   MatrixProductStateImp::GetExpectation   (const Operator* o) const
     return std::real(F(1,1,1));
 }
 
-eType   MatrixProductStateImp::GetExpectationC(const Operator* o) const
+MatrixProductStateImp::eType   MatrixProductStateImp::GetExpectationC(const Operator* o) const
 {
     Vector3T F(1,1,1,1);
     F(1,1,1)=eType(1.0);
@@ -544,16 +474,12 @@ OneSiteDMs MatrixProductStateImp::CalculateOneSiteDMs(LRPSupervisor* supervisor)
 {
     OneSiteDMs ret(itsL,itsp);
     Normalize(TensorNetworks::DRight,supervisor);
-    for (int ia=0; ia<itsL-1; ia++)
+    for (int ia=0; ia<itsL; ia++)
     {
         supervisor->DoneOneStep(2,SiteMessage("Calculate ro(mn) site: ",ia),ia);
         ret.Insert(ia,itsSites[ia]->CalculateOneSiteDM());
-        supervisor->DoneOneStep(2,SiteMessage("SVD Left Normalize site: ",ia),ia);
-        NormalizeSite(TensorNetworks::DLeft,ia);
+        NormalizeSite(TensorNetworks::DLeft,ia,supervisor);
     }
-    UpdateBondData(itsL-2);
-    supervisor->DoneOneStep(2,SiteMessage("Calculate ro(mn) site: ",itsL-1),itsL-1);
-    ret.Insert(itsL-1,itsSites[itsL-1]->CalculateOneSiteDM());
     return ret;
 }
 
@@ -596,7 +522,9 @@ TwoSiteDMs MatrixProductStateImp::CalculateTwoSiteDMs(LRPSupervisor* supervisor)
         {
             Matrix4T ro=CalculateTwoSiteDM(ia,ib);
             ret.Insert(ia,ib,ro);
-            NormalizeSite(TensorNetworks::DLeft,ia);
+            NormalizeSite(TensorNetworks::DLeft,ia,supervisor);
         }
+    // Normalize the last to keep things tidy
+    NormalizeSite(TensorNetworks::DLeft,itsL-1,supervisor);
     return ret;
 }
