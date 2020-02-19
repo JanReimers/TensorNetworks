@@ -151,6 +151,29 @@ TEST_F(ExpectationsTesting,TestOneSiteExpectations)
     cout << "E=" << E << endl;
 */
 }
+TEST_F(ExpectationsTesting,TestFreezeL9S1D2)
+{
+    int L=9,D=2,maxIter=100;
+    double S=0.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Freeze(L-1,S); //Site 0 spin up
+    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
+
+    double E=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E/(L-1),-0.45317425 ,1e-7);
+    EXPECT_LT(nSweep,maxIter);
+
+    SpinCalculator sc(S);
+    OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs(itsLRPSupervisor);
+    OneSiteDMs::ExpectationT Sx=ro1.Contract(sc.GetSx());
+    OneSiteDMs::ExpectationT Sy=ro1.Contract(sc.GetSy());
+    OneSiteDMs::ExpectationT Sz=ro1.Contract(sc.GetSz());
+
+    cout << "Sx=" << Sx << endl;
+    cout << "Sy=" << Sy << endl;
+    cout << "Sz=" << Sz << endl;
+}
 
 
 
@@ -349,7 +372,7 @@ TEST_F(ExpectationsTesting,TestTwoSiteDMs)
 //            cout << "Sites (" << ia << "," << ib << "): Eigen Values=" << Diagonalize(SusSym) <<endl;
         }
     //
-    // Check ground dtate energy
+    // Check ground state energy
     //
     double E1=0.0;
     for (int ia=0;ia<L-1;ia++)
@@ -358,6 +381,7 @@ TEST_F(ExpectationsTesting,TestTwoSiteDMs)
     EXPECT_NEAR(E1,E2,1e-13);
 //    cout << "E1-E2=" << E1-E2 << endl;
 }
+
 
 #define TYPE DMatrix<double>
 #include "oml/src/smatrix.cc"

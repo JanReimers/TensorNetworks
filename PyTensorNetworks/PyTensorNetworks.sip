@@ -23,7 +23,8 @@
 
 namespace TensorNetworks
 {
-    enum Position {Left,Bulk,Right};
+    enum Position  {PLeft,PBulk,PRight};
+    enum Direction {DLeft,DRight};
     enum State {Product,Random,Neel};
 };
 
@@ -76,8 +77,9 @@ public:
     MatrixProductState();
     virtual ~MatrixProductState();
     virtual void InitializeWith(TensorNetworks::State)=0;
+    virtual void Freeze(int isite,double s)=0;
 
-    virtual void   Normalize(TensorNetworks::Position LR,LRPSupervisor*)=0;
+    virtual void   Normalize(TensorNetworks::Direction LR,LRPSupervisor*)=0;
     virtual double FindGroundState(const Hamiltonian* H,int maxIter, const Epsilons& eps,LRPSupervisor*)=0;
 
     virtual double   GetExpectation(const Operator* o) const=0;
@@ -96,6 +98,7 @@ class Hamiltonian : public Operator /Abstract/
         virtual ~Hamiltonian();
         virtual int GetL() const=0;
         virtual int Getp() const=0;
+        virtual int GetS() const=0;
         virtual MatrixProductState* CreateMPS(int D,const Epsilons&) const=0/Factory/;
 };
 

@@ -93,6 +93,20 @@ TEST_F(GroundStateTesting,TestSweepL9S5D2)
     EXPECT_LT(nSweep,maxIter);
 }
 
+TEST_F(GroundStateTesting,TestFreezeL9S1D2)
+{
+    int L=9,D=2,maxIter=100;
+    double S=0.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Freeze(0,0.5); //Site 0 spin up
+    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
+
+    double E=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E/(L-1),-0.45317425 ,1e-7);
+    EXPECT_LT(nSweep,maxIter);
+}
+
 #ifndef DEBUG
 
 //This never converges.  So take it out for now.

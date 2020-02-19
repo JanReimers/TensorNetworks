@@ -22,6 +22,7 @@ MatrixProductSite::MatrixProductSite(TensorNetworks::Position lbr, Bond* leftBon
     , itsHRightCache(1,1,1,1)
     , itsEigenSolver()
     , itsNumUpdates(0)
+    , isFrozen(false)
     , itsEmin(0.0)
     , itsGapE(0.0)
     , itsIterDE(1.0)
@@ -110,6 +111,24 @@ void MatrixProductSite::InitializeWith(TensorNetworks::State state,int sgn)
             break;
         }
     }
+}
+
+void MatrixProductSite::Freeze(double Sz)
+{
+    isFrozen=true;
+#ifdef DEBUG
+    double ipart;
+    double frac=std::modf(2.0*Sz,&ipart);
+    assert(frac==0.0);
+#endif
+    double S=(static_cast<double>(itsp)-1.0)/2.0;
+    int n=Sz+S;
+    assert(n>=0);
+    assert(n<itsp);
+    for (pIterT ip=itsAs.begin(); ip!=itsAs.end(); ip++)
+        Fill(*ip,eType(0.0));
+    itsAs[n](1,1)=1.0;
+    itsIterDE=0.0;
 }
 
 void MatrixProductSite::SVDNormalize(TensorNetworks::Direction lr)
@@ -219,6 +238,7 @@ bool MatrixProductSite::IsUnit(const MatrixCT& m,double eps)
 
 void MatrixProductSite::Refine(const MatrixCT& Heff,const Epsilons& eps)
 {
+    assert(!isFrozen);
     assert(Heff.GetNumRows()==Heff.GetNumCols());
     int N=Heff.GetNumRows();
     Vector<double>  eigenValues(N);

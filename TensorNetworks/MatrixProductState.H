@@ -25,6 +25,7 @@ class MatrixProductState : public virtual MultiPlotable
         MatrixProductState() {}
         virtual ~MatrixProductState() {}
         virtual void InitializeWith(TensorNetworks::State)=0;
+        virtual void Freeze(int isite,double s)=0;
 //--------------------------------------------------------------------------------------
 //
 //  Normalization members

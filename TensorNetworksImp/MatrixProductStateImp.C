@@ -139,6 +139,13 @@ void MatrixProductStateImp::InitializeWith(TensorNetworks::State state)
 
 }
 
+void MatrixProductStateImp::Freeze(int isite,double s)
+{
+    assert(isite>=0);
+    assert(isite<itsL);
+    itsSites[isite]->Freeze(s);
+}
+
 c_str SiteMessage(const std::string& message,int site)
 {
     static std::string ret;
@@ -161,8 +168,9 @@ void MatrixProductStateImp::Normalize(TensorNetworks::Direction LR,LRPSupervisor
 void MatrixProductStateImp::NormalizeSite(TensorNetworks::Direction lr,int isite,LRPSupervisor* super)
 {
     std::string lrs=lr==TensorNetworks::DLeft ? "Left" : "Right";
-    super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize site ",isite),isite);
+    super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize site ",isite+1),isite);
     itsSites[isite]->SVDNormalize(lr);
+    super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize update Bond data ",isite+1),isite);
     int bond_index=isite+( lr==TensorNetworks::DLeft ? 0 :-1);
     if (bond_index<itsL-1 && bond_index>=0)
         UpdateBondData(bond_index);
@@ -304,8 +312,8 @@ double MatrixProductStateImp::Sweep(TensorNetworks::Direction lr,const Hamiltoni
             if (de<1e-16) de=1e-16;
             double diter=itsNSweep+static_cast<double>(iter)/(itsL-1); //Fractional iter count for log(dE) plot
             AddPoint("Iter log(dE/J)",Plotting::Point(diter,log10(de)));
-            iter++; //ia doesn;t always count upwards, but this guy does.
         }
+        iter++; //ia doesn;t always count upwards, but this guy does.
     }
     itsNSweep++;
     Supervisor->DoneOneStep(0,"Calculating Expectation <E>"); //Supervisor will update the graphs
@@ -321,10 +329,13 @@ double MatrixProductStateImp::Sweep(TensorNetworks::Direction lr,const Hamiltoni
 void MatrixProductStateImp::Refine(TensorNetworks::Direction lr,const Hamiltonian *h,LRPSupervisor* Supervisor,const Epsilons& eps,int isite)
 {
 //    assert(CheckNormalized(isite,eps.itsNormalizationEpsilon));
-    Supervisor->DoneOneStep(2,"Calculating Heff",isite); //Supervisor will update the graphs
-    Matrix6T Heff6=GetHeffIterate(h,isite); //New iterative version
-    Supervisor->DoneOneStep(2,"Running eigen solver",isite); //Supervisor will update the graphs
-    itsSites[isite]->Refine(Heff6.Flatten(),eps);
+    if (!itsSites[isite]->IsFrozen())
+    {
+        Supervisor->DoneOneStep(2,"Calculating Heff",isite); //Supervisor will update the graphs
+        Matrix6T Heff6=GetHeffIterate(h,isite); //New iterative version
+        Supervisor->DoneOneStep(2,"Running eigen solver",isite); //Supervisor will update the graphs
+        itsSites[isite]->Refine(Heff6.Flatten(),eps);
+    }
     itsSiteEnergies[isite]=itsSites[isite]->GetSiteEnergy();
     itsSiteEGaps   [isite]=itsSites[isite]->GetEGap      ();
     NormalizeSite(lr,isite,Supervisor);

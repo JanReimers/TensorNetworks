@@ -219,6 +219,9 @@ class MPSFrame(wx.Frame,GUIHandler):
             self.supervisor.OnStop(e)
         self.MPS=self.ApproximationsPanel.CreateMPS(self.Hamiltonian)
         self.MPS.InitializeWith(PyTensorNetworks.Random)
+        L=self.Hamiltonian.GetL();
+        S=self.Hamiltonian.GetS();
+        self.MPS.Freeze(L-1,S)
         self.graphs.Clear()
         self.MPS.Insert(self.graphs) #Tell the MPS where to plot data
         self.graphs.ReplotActiveGraph()

@@ -437,7 +437,12 @@ void MatrixProductSite::Contract(TensorNetworks::Direction lr,const VectorT& s, 
         {
             int N1=s.GetHigh(); //N1=0 on the first site.
             if (N1>0 && N1<itsD2)
-                itsD2=N1; //The contraction below will automatically reshape the As.
+            {
+                if (itsAs[0].GetNumCols()!=UV.GetNumRows())
+                    Reshape(itsD1,N1,true);
+                else
+                    itsD2=N1; //The contraction below will automatically reshape the As.
+            }
             for (int in=0; in<itsp; in++)
             {
                 MatrixCT temp=Contract1(itsAs[in]*UV,s);

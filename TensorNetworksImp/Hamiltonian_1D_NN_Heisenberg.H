@@ -23,6 +23,7 @@ class Hamiltonian_1D_NN_Heisenberg
         //
         virtual int GetL () const {return itsL;}
         virtual int Getp () const {return 2*itsS+1;}
+        virtual int GetS () const {return itsS;}
         virtual MatrixProductState* CreateMPS(int D,const Epsilons&) const;
         virtual Operator*           CreateOperator(const OperatorWRepresentation*) const;
 

@@ -5,6 +5,16 @@
 -Plotting support log axes in wxdriver.
 -Done Ham->CreateMPS should be a /Factory/ so py knows to delete it.
 -Convergence schedule,  increase D, drop epsilons
+    ListView with columns
+        -Step #
+        -Eps De
+        -Eps Eigen
+        -N
+        -D
+        -Jxy  Turn these on gradually to find GS, Hamiltonian nees to supply a list paramater names and ranges.
+        -Jz
+        Globally we need N_max, Dmax, Eps <E^2>-<E>^2
+
 -Dynamically add lattice site, pseudo DMRG
 -Plot correlations
     Two site correlation calcultion is expensive, so we need a way for the user to eneable and disable them
@@ -16,6 +26,7 @@
         5) COnvergence schedule editor (listview?)
         6) Freezing one site to remove SU(N) degeneracy
         7) one or two (or N!) site updates. Part of convergence schedule?
+        8) Report windows (HTML table?) with columns in the report(ostream) method
 
 -Done Plot singular value spectrum,
 -Done need a site selection sider like in coolfoil

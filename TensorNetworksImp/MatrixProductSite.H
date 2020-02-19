@@ -28,16 +28,16 @@ class MatrixProductSite
         MatrixProductSite(TensorNetworks::Position lbr,Bond* leftBond, Bond* rightBond, int p, int D1, int D2);
         virtual ~MatrixProductSite();
         void InitializeWith(TensorNetworks::State,int sgn);
+        void Freeze(double s);
 
 //--------------------------------------------------------------------------------------
 //
 //  Access to information
 //
-//        const MatLimits GetLimits() const {return itsAs[0].GetLimits();}
-        double GetSiteEnergy () {return itsEmin;}
-        double GetEGap       () {return itsGapE;}
-        double GetIterDE     () {return itsIterDE;}
-
+        double GetSiteEnergy () const {return itsEmin;}
+        double GetEGap       () const {return itsGapE;}
+        double GetIterDE     () const {return itsIterDE;}
+        bool   IsFrozen      () const {return isFrozen;}
 //---------------------------------------------------------------------------------
 //
 //  Required for ground state calculations
@@ -138,6 +138,7 @@ private:
     PrimeEigenSolver<eType> itsEigenSolver;
 
     int itsNumUpdates;
+    bool   isFrozen; //Don't refine this site.
     double itsEmin;
     double itsGapE;  //Gap to the next excited state.
     double itsIterDE;

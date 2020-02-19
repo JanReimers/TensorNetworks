@@ -40,6 +40,7 @@ public:
         virtual ~MatrixProductStateImp();
 
         virtual void InitializeWith(TensorNetworks::State);
+        virtual void Freeze(int isite,double s);
 //--------------------------------------------------------------------------------------
 //
 //  Access to information
