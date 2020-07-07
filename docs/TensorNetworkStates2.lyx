@@ -29,9 +29,10 @@
 \bibtex_command default
 \index_command default
 \paperfontsize default
+\spacing single
 \use_hyperref false
 \papersize default
-\use_geometry false
+\use_geometry true
 \use_package amsmath 1
 \use_package amssymb 1
 \use_package cancel 1
@@ -44,6 +45,7 @@
 \use_package undertilde 1
 \cite_engine basic
 \cite_engine_type default
+\biblio_style plain
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
@@ -55,6 +57,10 @@
 \shortcut idx
 \color #008000
 \end_index
+\leftmargin 2cm
+\topmargin 2cm
+\rightmargin 2cm
+\bottommargin 2cm
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
@@ -84,7 +90,7 @@ Jan Reimers
 \end_layout
 
 \begin_layout Date
-Jan 2019
+Jan 2020
 \end_layout
 
 \begin_layout Section
@@ -92,7 +98,7 @@ Introduction
 \end_layout
 
 \begin_layout Standard
-These notes are based on the review article by Scholwoeck
+These notes are based on the review article by Schollwoeck
 \begin_inset CommandInset citation
 LatexCommand cite
 key "schollwoeck_density-matrix_2010"
@@ -114,8 +120,8 @@ It turns out that quantum states encountered in nature and in particular
  approximation.
  In this form we just assume that the wave function is a product of single
  particle state functions.
- But this goes to far, we need a way of constraining the wave function in
- a tune-able way.
+ But this goes too far, we need a way of constraining the wave function
+ in a tune-able way.
  Over the last twenty years this has been essentially solved for 
 \begin_inset Formula $1D$
 \end_inset
@@ -179,10 +185,10 @@ where
 \end_inset
 
  complex amplitudes.
- One can show
+ One can show 
 \begin_inset CommandInset citation
 LatexCommand cite
-key "Scholl-1"
+key "schollwoeck_density-matrix_2010"
 literal "false"
 
 \end_inset
@@ -195,7 +201,7 @@ c_{n_{1}n_{2}\cdots n_{L}}=\boldsymbol{M}^{\left[1\right]n_{1}}\boldsymbol{M}^{\
 
 \end_inset
 
-provided that dimensions of the matrices have dimensions 
+provided that the matrices have dimensions 
 \begin_inset Formula $1\times d$
 \end_inset
 
@@ -208,9 +214,9 @@ provided that dimensions of the matrices have dimensions
 \end_inset
 
 .
- The boundry matrices are tractable but they get exponentially large towards
+ The boundary matrices are tractable but they get exponentially large towards
  the center of the spin chain.
- The ansatz is than we can place a cutoff 
+ The ansatz is that we can place a cutoff 
 \begin_inset Formula $D$
 \end_inset
 
@@ -257,7 +263,7 @@ noprefix "false"
 
 \end_inset
 
-.
+a.
 \end_layout
 
 \begin_layout Standard
@@ -305,11 +311,11 @@ Diagrammatic representation of an MPS state ket (a) and is adjoint bra in
 \begin_layout Standard
 For programming it is often convenient to include names for all the internal
  and external legs in the diagram.
- Each circle in the diagram correspond to one of the
+ Each circle in the diagram corresponds to one of the 
 \begin_inset Formula $\boldsymbol{M}$
 \end_inset
 
- matrix in eq 
+ matrices in eq 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "eq:MPS Representation"
@@ -347,7 +353,7 @@ a corresponds to
 
 \end_inset
 
-Where the second line as a compact representation with summation limits,
+Where the second line is a compact representation with summation limits,
  matrix multiplications and state tensor products implied.
  The conventions here are that
 \end_layout
@@ -360,15 +366,15 @@ Where the second line as a compact representation with summation limits,
 \end_layout
 
 \begin_layout Enumerate
-\begin_inset Formula $n_{a}$
-\end_inset
-
- and 
 \begin_inset Formula $m_{a}$
 \end_inset
 
+ and 
+\begin_inset Formula $n_{a}$
+\end_inset
+
  are bra and ket quantum numbers ranging from 
-\begin_inset Formula $0\rightarrow d$
+\begin_inset Formula $0\rightarrow d-1$
 \end_inset
 
 
@@ -397,7 +403,7 @@ Where the second line as a compact representation with summation limits,
 \begin_inset Formula $D$
 \end_inset
 
-, but can also site dependent 
+, but can also be site dependent 
 \begin_inset Formula $D_{a}$
 \end_inset
 
@@ -409,7 +415,7 @@ Where the second line as a compact representation with summation limits,
 \end_layout
 
 \begin_layout Enumerate
-open up and down leg in the diagram have local bra 
+open up and down legs in the diagram have local bra 
 \begin_inset Formula $\left\langle m_{a}\right|$
 \end_inset
 
@@ -494,7 +500,7 @@ noprefix "false"
 b is
 \begin_inset Formula 
 \begin{equation}
-\left\langle \psi\right|=\sum_{\left\{ m\right\} =0}^{d}\sum_{\left\{ i\right\} =1}^{D}M_{1i_{5}}^{*\left[5\right]m_{5}}M_{i_{5}i_{4}}^{*\left[4\right]m_{4}}M_{i_{4}i_{3}}^{*\left[3\right]m_{3}}M_{i_{3}i_{2}}^{*\left[2\right]m_{2}}M_{i_{1}1}^{*\left[1\right]m_{1}}\left\langle m_{1}m_{2}m_{3}m_{4}m_{5}\right|\label{eq:BraFull}
+\left\langle \psi\right|=\sum_{\left\{ m\right\} =0}^{d}\sum_{\left\{ i\right\} =1}^{D}M_{1i_{4}}^{*\left[5\right]m_{5}}M_{i_{4}i_{3}}^{*\left[4\right]m_{4}}M_{i_{3}i_{2}}^{*\left[3\right]m_{3}}M_{i_{2}i_{1}}^{*\left[2\right]m_{2}}M_{i_{1}1}^{*\left[1\right]m_{1}}\left\langle m_{1}m_{2}m_{3}m_{4}m_{5}\right|\label{eq:BraFull}
 \end{equation}
 
 \end_inset
@@ -629,8 +635,8 @@ From the diagram we can read off the overlap expression by summing over
 
 \end_inset
 
-where matrix multiplacation occure inside the brakets, but not between the
- two brakets.
+where matrix multiplication occur inside the brackets, but not between the
+ two brackets.
  The big win with MPS is that the 
 \begin_inset Formula $2^{L}$
 \end_inset
@@ -652,8 +658,8 @@ This is the most efficient contraction order.
 \begin_inset Formula $\boldsymbol{M}^{n_{1}}$
 \end_inset
 
- have different indices so we are not multiplying them, it is more like
- an outer product.
+ have different internal indices so we are not multiplying them, it is more
+ like an outer product.
  At this point we can define the so called transfer matrix for each site
 \begin_inset Formula 
 \[
@@ -703,8 +709,8 @@ Gauge freedom and canonical forms
 
 \begin_layout Standard
 The matrices in the an MPS are not uniquely defined, for any matrix product
- on can always insert or sandwich the identity matrix without changing the
- result of the product
+ one can always insert or sandwich the identity matrix without changing
+ the result of the product
 \begin_inset Formula 
 \[
 \boldsymbol{A}\boldsymbol{B}=\boldsymbol{A}\text{𝕀}\boldsymbol{B}=\boldsymbol{A}\boldsymbol{X}\boldsymbol{X}^{-1}\boldsymbol{B}
@@ -716,7 +722,7 @@ The matrices in the an MPS are not uniquely defined, for any matrix product
 \end_layout
 
 \begin_layout Standard
-We will now use this guage freedom the represent and MPS in canonical form.
+We will now use this gauge freedom the represent and MPS in canonical form.
  Essential for this is the concept of re-shaping tensors.
 \end_layout
 
@@ -767,12 +773,12 @@ where we have grouped together the
 \end_inset
 
  matrix.
- This general non-square matrix can be decompesed using Singular Value Decomposi
+ This general non-square matrix can be decomposed using Singular Value Decomposi
 tion (SVD)
 \begin_inset Formula 
-\[
-M_{(i_{a-1},n_{1})i_{a}}=\boldsymbol{UsV}=\sum_{j_{a}}U_{\left(i_{a-1},n_{a}\right)j_{a}}s_{j_{a}j_{a}}V_{j_{a}i_{a}}
-\]
+\begin{equation}
+M_{(i_{a-1},n_{1})i_{a}}=\left(\boldsymbol{UsV}\right)_{(i_{a-1},n_{1})i_{a}}=\sum_{j_{a}}^{D}U_{\left(i_{a-1},n_{a}\right)j_{a}}s_{j_{a}j_{a}}V_{j_{a}i_{a}}\label{eq:SVDDecomp}
+\end{equation}
 
 \end_inset
 
@@ -788,7 +794,7 @@ where
 \begin_inset Formula $\boldsymbol{V}$
 \end_inset
 
- are orthonormal matrices satisfying
+ are ortho-normal matrices satisfying
 \begin_inset Formula 
 \begin{equation}
 \boldsymbol{U}^{\dagger}\boldsymbol{U}=\text{𝕀},\;\boldsymbol{V}\boldsymbol{V}^{\dagger}=\text{𝕀}.\label{eq:SVDOrthoNormConditions}
@@ -815,9 +821,9 @@ The
 \color none
  can now be reshaped backwards as
 \begin_inset Formula 
-\[
-A_{i_{a-1}j_{a}}^{n_{a}}=U_{\left(i_{a-1},n_{a}\right)j_{a}}
-\]
+\begin{equation}
+A_{i_{a-1}j_{a}}^{n_{a}}=U_{\left(i_{a-1},n_{a}\right)j_{a}}\label{eq:Uassign}
+\end{equation}
 
 \end_inset
 
@@ -848,7 +854,7 @@ Repeated SVD and normalization
 \end_layout
 
 \begin_layout Standard
-We can now start on the left and zip throught the lattice and convert the
+We can now start on the left and zip through the lattice and convert the
  whole MPS into canonical form.
  Starting with site 
 \begin_inset Formula $1$
@@ -864,9 +870,9 @@ M_{1i_{1}}^{n_{1}}\rightarrow M_{(1,n_{1})i_{1}}=\boldsymbol{U}^{1}\boldsymbol{s
 
 
 \begin_inset Formula 
-\[
-A_{1j_{1}}^{n_{1}}=U_{\left(1,n_{1}\right)j_{1}}.
-\]
+\begin{equation}
+A_{1j_{1}}^{n_{1}}=U_{\left(1,n_{1}\right)j_{1}}.\label{eq:Uassign1}
+\end{equation}
 
 \end_inset
 
@@ -914,13 +920,13 @@ At this point we need to decide what to do with
 
 
 \begin_inset Formula 
-\[
-\tilde{M}_{j_{1}i_{2}}^{n_{2}}=\sum_{i_{1}=1}^{D_{1}}s_{i_{1}i_{1}}V_{j_{1}i_{1}}^{1}M_{i_{1}i_{2}}^{n_{2}}
-\]
+\begin{equation}
+\tilde{M}_{j_{1}i_{2}}^{n_{2}}=\sum_{i_{1}=1}^{D_{1}}s_{i_{1}i_{1}}V_{j_{1}i_{1}}^{1}M_{i_{1}i_{2}}^{n_{2}}\label{eq:SVTransfer}
+\end{equation}
 
 \end_inset
 
-the guage freedom allows this.
+the gauge freedom allows this.
  Now the MPS looks like
 \begin_inset Formula 
 \[
@@ -938,16 +944,7 @@ One can now continue this process by zipping through the lattice repeating
 
 \end_inset
 
-This form, introduced by Videl
-\begin_inset CommandInset citation
-LatexCommand cite
-key "vidal_efficient_2003"
-literal "false"
-
-\end_inset
-
-, is useful in a number of ways.
- Firstly the singular values on each bond tell us something about the suitablity
+The singular values on each bond tell us something about the suitability
  the bond dimension 
 \begin_inset Formula $D_{a}$
 \end_inset
@@ -972,7 +969,7 @@ literal "false"
 
  so that only singular values above some threshold are retained is called
  SVD compression.
- On the other if the lowest singular value 
+ On the other hand if the lowest singular value 
 \begin_inset Formula $s_{min}\gg\epsilon$
 \end_inset
 
@@ -981,7 +978,7 @@ literal "false"
 \end_inset
 
  is not big enough to get an accurate ground state.
- Other advanteges will become obvious below.
+ Other advantages will become obvious below.
 \end_layout
 
 \begin_layout Standard
@@ -1027,14 +1024,14 @@ or
 
 \end_inset
 
-These state are optimal for calculting the expectation value of a one site
- operator at site 
+These states are optimal for calculating the expectation value of a one
+ site operator at site 
 \begin_inset Formula $a$
 \end_inset
 
 .
  In practice one would start with a right normalized and sweep through the
- lattice from left to right and evalute all required expectations on each
+ lattice from left to right and evaluate all required expectations on each
  site as you sweep.
  While sweeping you leave behind left normalized matrices on the left of
  the current site.
@@ -1045,7 +1042,7 @@ Density matrices
 \end_layout
 
 \begin_layout Standard
-Single and two site density matrices make the calculation if expectation
+Single and two site density matrices make the calculation of expectation
  values trivial since
 \begin_inset Formula 
 \[
@@ -1076,7 +1073,7 @@ where
 \begin_inset Formula $d^{2}$
 \end_inset
 
- positive definite eigenvalues all summing to 
+ has positive definite eigenvalues all summing to 
 \begin_inset Formula $1$
 \end_inset
 
@@ -1090,8 +1087,9 @@ where
 \begin_inset Formula $d^{2}-d$
 \end_inset
 
- eigenvalues are a measure of the entanglement entropy between the two site.
- It will be interesting to see how this entaglement measure drops with distance.
+ eigenvalues are a measure of the entanglement entropy between the two sites.
+ It will be interesting to see how this entanglement measure drops with
+ distance.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1127,20 +1125,17 @@ noprefix "false"
 \begin_inset Formula $2$
 \end_inset
 
-quantum numbers uncontracted.
+ quantum numbers un-contracted.
 \begin_inset Float figure
 wide false
 sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \align center
 \begin_inset Graphics
 	filename density1.png
+	scale 50
 
 \end_inset
 
@@ -1172,7 +1167,7 @@ Diagram for the density matrix at site
 
 \end_inset
 
-In order to evaulate diagram 
+In order to evaluate diagram 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:OneSiteDensity"
@@ -1182,7 +1177,7 @@ noprefix "false"
 
 \end_inset
 
- we would need to contract from the left and right using epxreesions like
+ we would need to contract from the left and right using expressions like
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -1211,7 +1206,7 @@ Neighbouring two site density matrix
 \end_layout
 
 \begin_layout Standard
-However the calcultion becomes trivial if the system is in a mixed canonical
+However the calculation becomes trivial if the system is in a mixed canonical
  state as per eq.
  
 \begin_inset CommandInset ref
@@ -1224,7 +1219,7 @@ noprefix "false"
 \end_inset
 
 .
- In this case the diagram is much simpler as show in figure 
+ In this case the diagram is much simpler as shown in figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:NormalizedDensity"
@@ -1235,7 +1230,7 @@ noprefix "false"
 \end_inset
 
 a.
- We can read the epxression as
+ We can read the expression as
 \begin_inset Formula 
 \[
 \rho_{a}^{mn}=\sum_{j_{a-1}j_{a}}A_{j_{a-1}j_{a}}^{*m}A_{j_{a-1}j_{a}}^{n}=Tr\left(\boldsymbol{A}^{*m}\boldsymbol{A}^{n}\right).
@@ -1291,6 +1286,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename density2.png
+	scale 50
 
 \end_inset
 
@@ -1345,7 +1341,7 @@ b we have
 
 \end_inset
 
-using the transfer matrices defined i eq.
+using the transfer matrices defined in eq.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -1357,13 +1353,13 @@ noprefix "false"
 \end_inset
 
 .
- Now we see where the name transfer matrix comes from, they allows us the
+ Now we see where the name transfer matrix comes from, they allow us to
  transfer from one site to another.
 \end_layout
 
 \begin_layout Standard
-Now we need to decide on an efficient way of zipping through the lattice
- from site 
+We need to decide on an efficient way of zipping through the lattice from
+ site 
 \begin_inset Formula $a$
 \end_inset
 
@@ -1377,7 +1373,7 @@ Now we need to decide on an efficient way of zipping through the lattice
 \end_inset
 
  transfer matrices is probably not the way to go.
- The first step is too pick a direction.
+ The first step is to pick a direction.
  Let's try left to right.
  The obvious first step is to contract over 
 \begin_inset Formula $i_{a-1}=j_{a-1}$
@@ -1415,7 +1411,7 @@ C_{i_{a+1}j_{a+1}}^{m_{a}n_{a}}=\sum_{i_{a}j_{a}}\sum_{n_{a+1}}C_{i_{a}j_{a}}^{m
 
 \end_inset
 
-We continue this iteratation until we reach 
+We continue this iteration until we reach 
 \begin_inset Formula $C_{i_{b-1}j_{b-1}}^{m_{a}n_{a}}$
 \end_inset
 
@@ -1435,7 +1431,7 @@ Matrix Product Operators
 \end_layout
 
 \begin_layout Standard
-We can project out a single wave function amplitute as
+We can project out a single wave function amplitude as
 \begin_inset Formula 
 \[
 \left\langle n_{1}n_{2}\cdots n_{L}\right|\left.\psi\right\rangle =\boldsymbol{M}^{n_{1}}\boldsymbol{M}^{n_{2}}\ldots\boldsymbol{M}^{n_{N}}
@@ -1443,7 +1439,7 @@ We can project out a single wave function amplitute as
 
 \end_inset
 
-in an analogous manner we can write the expection of any operator 
+in an analogous manner we can write the expectation of any operator 
 \begin_inset Formula $\mathcal{\hat{O}}$
 \end_inset
 
@@ -1476,7 +1472,8 @@ The
 \end_inset
 
  have two physical indices.
- So the big question how do we go from a Hamiltonian expression to the 
+ So the big question is how do we go from a Hamiltonian expression to the
+ 
 \begin_inset Formula $W's$
 \end_inset
 
@@ -1508,7 +1505,7 @@ Representing the Hamiltonian as an MPO
 \end_layout
 
 \begin_layout Standard
-For a simple Heisenberg hamiltonian
+For a simple Heisenberg Hamiltonian
 \begin_inset Formula 
 \[
 \mathcal{\hat{H}}=\sum_{a=1}^{L-1}\vec{S}_{a}\cdot\vec{S}_{a+1}=\sum_{a=1}^{L-1}\hat{\mathcal{H}}_{a}
@@ -1567,7 +1564,7 @@ now
 
 This may look tedious but I need to write these tensor product out explicitly
  until I gain experience working with these ideas.
- So how do map the first term in eq.
+ So how do we map the first term in eq.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -1590,10 +1587,10 @@ noprefix "false"
 \end_inset
 
 ? We apparently need 
-\begin_inset Formula $D_{W}=3+2=2$
+\begin_inset Formula $D_{W}=3+2=5$
 \end_inset
 
- becuase we have three non-comuting terms.
+ because we have three non-commuting terms.
 \end_layout
 
 \begin_layout Standard
@@ -1661,7 +1658,7 @@ One site spin MPO
 \end_layout
 
 \begin_layout Standard
-If we want to calucate one site expectations like
+If we want to calculate one site expectations like
 \begin_inset Formula 
 \[
 \left\langle \vec{S}^{a}\right\rangle =\left(\left\langle S_{x}^{a}\right\rangle ,\left\langle S_{y}^{a}\right\rangle ,\left\langle S_{z}^{a}\right\rangle \right)
@@ -1675,12 +1672,12 @@ how to represent this with an MPO? The first thing to keep in mind is the
 \end_inset
 
 's always contract to scalar, so the output is always a number not a vector
- or a nuber for each site.
+ or a number for each site.
  We can make an MPO that returns 
 \begin_inset Formula $S_{x}$
 \end_inset
 
- for ssite one
+ for site one
 \begin_inset Formula 
 \[
 \boldsymbol{W}^{1x}=\begin{bmatrix}\hat{S}_{x}^{1}\end{bmatrix}
@@ -1727,6 +1724,1106 @@ then
 Ground State
 \end_layout
 
+\begin_layout Standard
+The energy expectation
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+E=\left\langle n_{1}n_{2}\cdots n_{L}\right|\mathcal{\hat{H}}\left|m_{1}m_{2}\cdots m_{L}\right\rangle 
+\]
+
+\end_inset
+
+can be expressed as a diagram shown in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:OperatorContraction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ where the squares represent the Hamiltonian MPO elements.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename OperatorExp.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:OperatorContraction"
+
+\end_inset
+
+Expectation of an operator
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Variational Ground State Search
+\end_layout
+
+\begin_layout Standard
+In order to find the ground state we must minimize this with respect to
+ the wave function coefficients
+\begin_inset Formula 
+\[
+\frac{\partial E}{\partial M^{n_{i}}}=0,\;i\in1..L.
+\]
+
+\end_inset
+
+We also need to constrain the overlap to be unity, so we also need to add
+ a Lagrange multiplier term
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial E}{\partial M^{n_{i}}}-\lambda\frac{\partial N}{\partial M^{n_{i}}}=0,\;i\in1..L.\label{eq:GSEquations}
+\end{equation}
+
+\end_inset
+
+In the diagram this simply corresponds to deleting the site 
+\begin_inset Formula $i$
+\end_inset
+
+ from contractions as shown in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:NeffHeff"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ In the literature these terms are refereed to as 
+\begin_inset Formula $H_{eff}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{eff}$
+\end_inset
+
+ for site 
+\begin_inset Formula $i$
+\end_inset
+
+, which are matrices with dimension 
+\begin_inset Formula $D^{2}d$
+\end_inset
+
+.
+ If one has already normalized to the left and right of site 
+\begin_inset Formula $i$
+\end_inset
+
+ then 
+\begin_inset Formula $N_{eff}$
+\end_inset
+
+ is already diagonal.
+ A standard algorithm is to solve eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:GSEquations"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for site 
+\begin_inset Formula $1$
+\end_inset
+
+ and replace 
+\begin_inset Formula $M^{1}$
+\end_inset
+
+ with the new values, and then proceed through the lattice optimizing each
+ site.
+ One can also optimize two or more sites at once which improves the convergence
+ rate but also requires solving much larger secular equations in eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:GSEquations"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename HeffNeff.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+a) 
+\begin_inset Formula $N_{eff}$
+\end_inset
+
+ for site 3, b) 
+\begin_inset Formula $H_{eff}$
+\end_inset
+
+ for site 3
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:NeffHeff"
+
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Time Evolution
+\end_layout
+
+\begin_layout Standard
+Another method for finding the ground state is imaginary time evolution
+ by applying the operator 
+\begin_inset Formula $e^{-\beta\mathcal{\hat{H}}}$
+\end_inset
+
+ where 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is real and corresponds to an imaginary time interval.
+\begin_inset Formula 
+\[
+\left|\psi\left(i\beta\right)\right\rangle =e^{-\beta\mathcal{\hat{H}}}\left|\psi\left(0\right)\right\rangle 
+\]
+
+\end_inset
+
+In statistical mechanics the limit 
+\begin_inset Formula $\beta=\frac{1}{kT}\rightarrow\infty$
+\end_inset
+
+ corresponds to the temperature going to zero.
+ So it is like we are annealing the wave function towards its ground state.
+ This sounds rather hand-waving and the literature is not very loud about
+ a more rigorous explanation.
+ But nevertheless it works as long as the original wave function (or some
+ starting guess) has a non-zero overlap with the ground state wave function.
+\end_layout
+
+\begin_layout Subsubsection
+Trotter Decomposition
+\end_layout
+
+\begin_layout Standard
+In order to handle the operator 
+\begin_inset Formula $e^{-\beta\mathcal{\hat{H}}}$
+\end_inset
+
+ we need break the time interval into small but finite intervals 
+\begin_inset Formula $\beta=N\tau$
+\end_inset
+
+ and take the limit 
+\begin_inset Formula $N\rightarrow\infty$
+\end_inset
+
+ and 
+\begin_inset Formula $\tau\rightarrow0$
+\end_inset
+
+.
+ For a nearest neighbour interacting system we can express the Hamiltonian
+ as a sum of single site operators
+\begin_inset Formula 
+\[
+\mathcal{\hat{H}}=\sum_{a=1}^{L-1}\vec{S}_{a}\cdot\vec{S}_{a+1}=\sum_{a=1}^{L-1}\hat{\mathcal{H}}_{a}
+\]
+
+\end_inset
+
+Now the first order decomposition looks like
+\begin_inset Formula 
+\begin{equation}
+e^{-\tau\mathcal{\hat{H}}}=e^{-\tau\mathcal{\hat{H}}_{1}}\otimes e^{-\tau\mathcal{\hat{H}}_{2}}\otimes e^{-\tau\mathcal{\hat{H}}_{3}}\otimes\cdots\otimes e^{-\tau\mathcal{\hat{H}}_{L-1}}+O\left(\tau^{2}\right)\label{eq:Trotter1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\tau^{2}$
+\end_inset
+
+ correction arises because the neighbouring Hamiltonian operators do not
+ commute
+\begin_inset Formula 
+\[
+\left[\mathcal{\hat{H}}_{i},\mathcal{\hat{H}}_{i+1}\right]\neq0
+\]
+
+\end_inset
+
+However further neightbours do commute 
+\begin_inset Formula 
+\[
+\left[\mathcal{\hat{H}}_{i},\mathcal{\hat{H}}_{i+2}\right]=0
+\]
+
+\end_inset
+
+Note that I am using tensor products in eq 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Trotter1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to make it clear the we are really building a huge 
+\begin_inset Formula $d^{N}$
+\end_inset
+
+ matrix from a sequence of 
+\begin_inset Formula $d^{2}$
+\end_inset
+
+ matrices.
+ Since they commute we can group all the even operators and update the even
+ sites in one step, and then do the same with the odd sites.
+ I call this a spatial decomposition.
+ 
+\begin_inset Formula 
+\[
+e^{-\tau\mathcal{\hat{H}}}=e^{-\tau\mathcal{\hat{H}}_{odd}}e^{-\tau\mathcal{\hat{H}}_{even}}+O\left(\tau^{2}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+What do we do if there are interactions beyond nearest neighbour? Well if
+ there are only a few further neighbour interactions then one can still
+ gather the sites into mutually commuting groups, there will just be more
+ than two groups that's all.
+ But another option is to divide system in spin space
+\begin_inset Formula 
+\[
+\hat{H}=\hat{H}_{x}+\hat{H}_{y}+\hat{H}_{z}
+\]
+
+\end_inset
+
+ where for example 
+\begin_inset Formula 
+\[
+\hat{H}_{x}=\sum_{a=1}^{L-1}S_{a}^{x}S_{a+1}^{x}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+e^{-\tau\mathcal{\hat{H}}}=e^{-\tau\mathcal{\hat{H}}_{x}}e^{-\tau\mathcal{\hat{H}}_{y}}e^{-\tau\mathcal{\hat{H}}_{z}}+O\left(\tau^{2}\right)
+\]
+
+\end_inset
+
+Can we do better than 
+\begin_inset Formula $O\left(\tau^{2}\right)?$
+\end_inset
+
+ Absolutely yes, examples of higher order options are 
+\begin_inset Formula 
+\[
+e^{-\tau\mathcal{\hat{H}}}=e^{-\frac{\tau}{2}\mathcal{\hat{H}}_{odd}}e^{-\tau\mathcal{\hat{H}}_{even}}e^{-\frac{\tau}{2}\mathcal{\hat{H}}_{odd}}+O\left(\tau^{3}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+e^{-\tau\mathcal{\hat{H}}}=U\left(\tau_{1}\right)U\left(\tau_{2}\right)U\left(\tau_{3}\right)U\left(\tau_{2}\right)U\left(\tau_{1}\right)+O\left(\tau^{5}\right)
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+U\left(\tau\right)=e^{-\frac{\tau}{2}\mathcal{\hat{H}}_{odd}}e^{-\tau\mathcal{\hat{H}}_{even}}e^{-\frac{\tau}{2}\mathcal{\hat{H}}_{odd}}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\tau_{1}=\tau_{2}=\frac{1}{4-\sqrt[3]{4}}\tau,\;\tau_{3}=\tau-2\tau_{1}-2\tau_{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+MPO representation
+\end_layout
+
+\begin_layout Standard
+A trotter step for all odd bonds on a chain looks like
+\begin_inset Formula 
+\[
+e^{-\tau\mathcal{\hat{H}}_{1}}\otimes e^{-\tau\mathcal{\hat{H}}_{3}}\otimes e^{-\tau\mathcal{\hat{H}}_{5}}\otimes\cdots\otimes e^{-\tau\mathcal{\hat{H}}_{L-1}}\left|\psi\right\rangle 
+\]
+
+\end_inset
+
+where I am using the tensor product symbol to make it explicit that each
+ term in the product operates on a different sector of the the Hilbert space.
+ One bond evolution operator has the form
+\begin_inset Formula 
+\[
+e^{-\tau\mathcal{\hat{H}}_{1}}=\sum_{m_{1}m_{2}}\sum_{n_{1}n_{2}}O^{\left(m_{1}n_{1}\right)\left(m_{2}n_{2}\right)}\left|n_{1}n_{2}\right\rangle \left\langle m_{1}m_{2}\right|
+\]
+
+\end_inset
+
+and we can think of 
+\begin_inset Formula $O$
+\end_inset
+
+ as a 
+\begin_inset Formula $d^{2}\times d^{2}$
+\end_inset
+
+ matrix.
+ We need to evaluate matrix elements
+\begin_inset Formula 
+\[
+O^{\left(m_{1}n_{1}\right)\left(m_{2}n_{2}\right)}=\left\langle m_{1}m_{2}\right|e^{-\tau\mathcal{\hat{H}}_{1}}\left|n_{1}n_{2}\right\rangle 
+\]
+
+\end_inset
+
+which I suppose we can do by Taylor expansion
+\begin_inset Formula 
+\[
+\left\langle m_{1}m_{2}\right|e^{-\tau\mathcal{\hat{H}}_{1}}\left|n_{1}n_{2}\right\rangle =\left\langle m_{1}m_{2}\right|1-\tau\mathcal{\hat{H}}_{1}\left|n_{1}n_{2}\right\rangle +O\left(\tau^{2}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\delta_{m_{1}m_{2}}\delta_{n_{1}n_{2}}-\tau\left\langle m_{1}m_{2}\right|\mathcal{\hat{H}}_{1}\left|n_{1}n_{2}\right\rangle +O\left(\tau^{2}\right)
+\]
+
+\end_inset
+
+This may be fine for first order trotter decomposition since that also throws
+ away corrections of 
+\begin_inset Formula $O(\tau^{2})$
+\end_inset
+
+.
+ But what then for higher order decompositions? Let try this
+\begin_inset Formula 
+\[
+O^{\left(m_{1}n_{1}\right)\left(m_{2}n_{2}\right)}=O^{ij}=\left\langle i\right|e^{-\tau\mathcal{\hat{H}}}\left|j\right\rangle 
+\]
+
+\end_inset
+
+we can use the identity (see appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Exponential-of-an Operator"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ )
+\begin_inset Formula 
+\[
+e^{-\tau\mathcal{\hat{H}}}=Ue^{-\tau\mathcal{\hat{\lambda}}}U^{\dagger}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+O^{ij}=\sum_{kl}U^{ik}\delta_{kl}e^{-\tau\lambda_{k}}\left(U^{\dagger}\right)^{lj}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{k}U^{ik}e^{-\tau\lambda_{k}}\left(U^{\dagger}\right)^{kj}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+=\sum_{k}U^{ik}e^{-\tau\lambda_{k}}U^{jk}\label{eq:EigenO}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In order for this to look like an MPO we need 
+\begin_inset Formula $O$
+\end_inset
+
+ in the form
+\begin_inset Formula 
+\[
+O^{\left(n_{1}m_{1}\right)\left(n_{2}m_{2}\right)}=\sum_{w_{1}}W_{1w_{1}}^{m_{1}n_{1}}W_{w_{1}1}^{m_{2}n_{2}}.
+\]
+
+\end_inset
+
+In general this can be achieved by standard reshaping and SVD techniques
+\begin_inset Formula 
+\[
+O^{\left(n_{1}m_{1}\right)\left(n_{2}m_{2}\right)}=\sum_{k=1}^{d^{2}}U_{\left(n_{1}m_{1}\right),k}s_{k,k}\left(V^{\dagger}\right)_{k,\left(n_{2}m_{2}\right)}
+\]
+
+\end_inset
+
+and we absorb the singular values in both directions
+\begin_inset Formula 
+\[
+W_{1w_{1}}^{m_{1}n_{1}}=U_{\left(n_{1}m_{1}\right),w_{1}}\sqrt{s_{w_{1},w_{1}}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+W_{w_{1}1}^{m_{2}n_{2}}=\sqrt{s_{w_{1},w_{1}}}\left(V^{\dagger}\right)_{w_{1},\left(n_{2}m_{2}\right)}
+\]
+
+\end_inset
+
+These 
+\begin_inset Formula $W$
+\end_inset
+
+ matrices are really mostly zero except for the first row and column.We can
+ see that we already have this form in eq 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:EigenO"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ if we assign
+\begin_inset Formula 
+\[
+W_{1w_{1}}^{m_{1}n_{1}}=U^{\left(m_{1}n_{1}\right)w_{1}}e^{-\frac{\tau}{2}\lambda_{w_{1}}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+W_{w_{1}1}^{m_{2}n_{2}}=e^{-\frac{\tau}{2}\lambda_{w_{1}}}U^{\left(m_{2}n_{2}\right)w_{1}}
+\]
+
+\end_inset
+
+For lower spins it is easy to calculate these symbolically, but I think
+ there is no advantage in this.
+ We need only calculate 
+\begin_inset Formula $W$
+\end_inset
+
+'s once for any given value of 
+\begin_inset Formula $\tau$
+\end_inset
+
+ so we might as well just do them numerically.
+ Also one pair of 
+\begin_inset Formula $W$
+\end_inset
+
+'s works for all bonds on the lattice.
+\end_layout
+
+\begin_layout Subsubsection
+SVD compression
+\end_layout
+
+\begin_layout Standard
+If the starting wave function has bond dimension 
+\begin_inset Formula $D$
+\end_inset
+
+ then after one operation with 
+\begin_inset Formula $e^{-\tau\mathcal{\hat{H}}}$
+\end_inset
+
+ it will have bond dimension 
+\begin_inset Formula $D_{w}D=d^{2}D$
+\end_inset
+
+ which is clearly not sustainable over many iterations.
+ The simplest option for compressing back down to bond dimension 
+\begin_inset Formula $D$
+\end_inset
+
+ is truncate the summation in eq, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SVDDecomp"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+M_{(i_{a-1},n_{1})i_{a}}=\boldsymbol{UsV}=\sum_{j_{a}}^{d^{2}D}U_{\left(i_{a-1},n_{a}\right)j_{a}}s_{j_{a}j_{a}}V_{j_{a}i_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\approx\tilde{M}_{(i_{a-1},n_{1})i_{a}}=\sum_{j_{a}}^{D}U_{\left(i_{a-1},n_{a}\right)j_{a}}s_{j_{a}j_{a}}V_{j_{a}i_{a}}
+\]
+
+\end_inset
+
+where the 
+\begin_inset Formula $\left(d^{2}-1\right)D$
+\end_inset
+
+ smallest singular values have been discarded.
+ Here were are using the convention that 
+\begin_inset Formula $\tilde{M}$
+\end_inset
+
+ and 
+\begin_inset Formula $\tilde{\psi}$
+\end_inset
+
+ symbols are used for the compressed state.
+ This can be carried out while right or left normalizing full state by only
+ keeping the first 
+\begin_inset Formula $D$
+\end_inset
+
+ columns when assigning 
+\begin_inset Formula $U$
+\end_inset
+
+ to 
+\begin_inset Formula $A$
+\end_inset
+
+ in eq 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Uassign"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Uassign1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and store 
+\begin_inset Formula $\tilde{A}$
+\end_inset
+
+ separately for the each site.
+ And similarly for assigning rows of 
+\begin_inset Formula $V$
+\end_inset
+
+ to 
+\begin_inset Formula $\tilde{B}$
+\end_inset
+
+ for right normalization.
+ 
+\end_layout
+
+\begin_layout Standard
+Schollwoeck
+\begin_inset CommandInset citation
+LatexCommand cite
+key "schollwoeck_density-matrix_2010"
+literal "false"
+
+\end_inset
+
+ (page 108) talks about re-scaling the singular values in order maintain
+ normalization.
+ SVD compression is not optimal, but it provides a good guess for the optimizati
+on algorithm in the section below.
+\end_layout
+
+\begin_layout Subsubsection
+Optimal compression
+\end_layout
+
+\begin_layout Standard
+An alternate approach is to minimize the distance in Hilbert space
+\begin_inset Formula 
+\[
+\left\Vert \psi-\tilde{\psi}\right\Vert ^{2}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\psi$
+\end_inset
+
+ has bond dimension 
+\begin_inset Formula $D_{w}D$
+\end_inset
+
+ and 
+\begin_inset Formula $\tilde{\psi}$
+\end_inset
+
+ has reduced bond dimension 
+\begin_inset Formula $D$
+\end_inset
+
+.
+ This gives the best possible wave function for a given reduced bond dimension.
+ Expanding and differentiating WRT 
+\begin_inset Formula $M^{a*}$
+\end_inset
+
+ (which only appears in 
+\begin_inset Formula $\left\langle \tilde{\psi}\right|$
+\end_inset
+
+)
+\begin_inset Formula 
+\[
+\frac{\partial}{\partial\tilde{M}^{a*}}\left(\left\langle \psi|\psi\right\rangle -\left\langle \psi|\tilde{\psi}\right\rangle -\left\langle \tilde{\psi}|\psi\right\rangle +\left\langle \tilde{\psi}|\tilde{\psi}\right\rangle \right)=0
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{\partial}{\partial\tilde{M}^{a*}}\left(\left\langle \tilde{\psi}|\tilde{\psi}\right\rangle -\left\langle \tilde{\psi}|\psi\right\rangle \right)=0.
+\]
+
+\end_inset
+
+This results in a linear system for an improved version of 
+\begin_inset Formula $\tilde{M}^{a}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{j_{a-1}j_{a}}\tilde{O}_{\left(i_{a-1}i_{a}\right)\left(j_{a-1}j_{a}\right)}\tilde{M}_{j_{a-1}j_{a}}^{n_{a}}=O_{i_{a-1}i_{a}}^{n_{a}}
+\]
+
+\end_inset
+
+see Schollwoeck page 132-133 for details.
+ This can be vastly simplified if we use a normalized state with the 
+\begin_inset Formula $\cdots AAAAMBBB\cdots$
+\end_inset
+
+ form.
+ Then
+\begin_inset Formula 
+\[
+\tilde{M}_{i_{a-1}i_{a}}^{n_{a}}=\sum_{j_{a-1}}\tilde{L}_{i_{a-1}j_{a-1}}\left(\sum_{j_{a}}\tilde{R}_{i_{a}j_{a}}M_{j_{a-1}j_{a}}^{n_{a}}\right)
+\]
+
+\end_inset
+
+This is very similar to the lattice sweeps used in the a ground state calculatio
+n.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Full compression Algorithm
+\end_layout
+
+\begin_layout Standard
+Finally the full compression algorithm is
+\end_layout
+
+\begin_layout Enumerate
+Right normalize 
+\begin_inset Formula $\left|\psi\right\rangle $
+\end_inset
+
+ and at the same time build an SVD compressed version of 
+\begin_inset Formula $\left|\tilde{\psi}\right\rangle $
+\end_inset
+
+.
+ For each site 
+\begin_inset Formula $a$
+\end_inset
+
+ do
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Only assign 
+\begin_inset Formula $D$
+\end_inset
+
+ rows of 
+\begin_inset Formula $V^{a}$
+\end_inset
+
+ to 
+\begin_inset Formula $\tilde{B^{a}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+For each site 
+\begin_inset Formula $a$
+\end_inset
+
+ cache
+\begin_inset Formula 
+\[
+\tilde{L}_{i_{a-1}i_{a}}=\sum_{n_{a-1}}\boldsymbol{\tilde{M}}^{n_{a-1}^{\dagger}}\left(\cdots\left(\sum_{n_{1}}\boldsymbol{\tilde{M}}^{n_{1}^{\dagger}}\boldsymbol{M}^{n_{1}}\right)\cdots\right)\boldsymbol{M}^{n_{a-1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\tilde{R}_{i_{a}i_{a+1}}=\sum_{n_{a+1}}\boldsymbol{M}^{n_{a+1}}\left(\cdots\left(\sum_{n_{L}}\boldsymbol{M}^{n_{L}}\boldsymbol{\tilde{M}}^{n_{L}^{\dagger}}\right)\cdots\right)\boldsymbol{\tilde{M}}^{n_{a+1}^{\dagger}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Perform a second sweep through the lattice and optimize 
+\begin_inset Formula $\left|\tilde{\psi}\right\rangle $
+\end_inset
+
+ with
+\begin_inset Formula 
+\begin{equation}
+\tilde{M}_{i_{a-1}i_{a}}^{n_{a}}=\sum_{j_{a-1}}\tilde{L}_{i_{a-1}j_{a-1}}\left(\sum_{j_{a}}\tilde{R}_{i_{a}j_{a}}M_{j_{a-1}j_{a}}^{n_{a}}\right)\label{eq:Mtilda}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Check convergence of
+\begin_inset Formula 
+\[
+\left\Vert \psi-\tilde{\psi}\right\Vert ^{2}=1-\sum_{\left\{ n\right\} }Tr\left(\tilde{M}^{n_{a}\dagger}\tilde{M}^{n_{a}}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Loop to step 2
+\end_layout
+
+\begin_layout Enumerate
+Normalize 
+\begin_inset Formula $\left|\tilde{\psi}\right\rangle $
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|\tilde{\psi}\right\rangle =\frac{1}{\sum_{\left\{ n\right\} }Tr\left(\tilde{M}^{n_{a}\dagger}\tilde{M}^{n_{a}}\right)}\left|\tilde{\psi}\right\rangle 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\start_of_appendix
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Exponential-of-an Operator"
+
+\end_inset
+
+Exponential of an operator
+\end_layout
+
+\begin_layout Standard
+Starting with 
+\begin_inset Formula 
+\[
+\hat{O}=e^{-\tau\mathcal{\hat{H}}}
+\]
+
+\end_inset
+
+we can use the eigen decomposition of 
+\begin_inset Formula $\mathcal{\hat{H}}=U\mathcal{\hat{\lambda}}U^{\dagger}$
+\end_inset
+
+ where 
+\begin_inset Formula $\mathcal{\hat{\lambda}}$
+\end_inset
+
+ is the diagonal matrix of eigen values and 
+\begin_inset Formula $U$
+\end_inset
+
+ is a unitary matrix with eigen vectors as columns, we can Taylor expand
+\begin_inset Formula 
+\[
+e^{-\tau\mathcal{\hat{H}}}=e^{-\tau U\mathcal{\hat{\lambda}}U^{\dagger}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\mathbb{I}-\tau U\mathcal{\hat{\lambda}}U^{\dagger}+\frac{1}{2!}\tau^{2}U\mathcal{\hat{\lambda}}U^{\dagger}U\mathcal{\hat{\lambda}}U^{\dagger}-\frac{1}{3!}\tau^{3}U\mathcal{\hat{\lambda}}U^{\dagger}U\mathcal{\hat{\lambda}}U^{\dagger}U\mathcal{\hat{\lambda}}U^{\dagger}+\ldots
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\mathbb{I}-\tau U\mathcal{\hat{\lambda}}U^{\dagger}+\frac{1}{2!}\tau^{2}U\mathcal{\hat{\lambda}}\mathcal{\hat{\lambda}}U^{\dagger}-\frac{1}{3!}\tau^{3}U\mathcal{\hat{\lambda}}\mathcal{\hat{\lambda}}\mathcal{\hat{\lambda}}U^{\dagger}+\ldots
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=U\left\{ \mathbb{I}-\tau\mathcal{\hat{\lambda}}+\frac{1}{2!}\tau^{2}\mathcal{\hat{\lambda}}^{2}-\frac{1}{3!}\tau^{3}\mathcal{\hat{\lambda}}^{3}+\ldots\right\} U^{\dagger}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=Ue^{-\tau\mathcal{\hat{\lambda}}}U^{\dagger}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+e^{-\tau\mathcal{\hat{\lambda}}}=\begin{bmatrix}e^{-\tau\lambda_{1}} & 0 & 0 & \cdots & 0\\
+0 & e^{-\tau\lambda_{2}} & 0 & \cdots & 0\\
+0 & 0 & e^{-\tau\lambda_{3}} & \cdots & 0\\
+\vdots & \vdots & \vdots & \ddots & \vdots\\
+0 & 0 & 0 & \cdots & e^{-\tau\lambda_{N}}
+\end{bmatrix}=\delta_{ij}e^{-\tau\lambda_{i}}
+\]
+
+\end_inset
+
+As an example for 
+\begin_inset Formula $S=\frac{1}{2}$
+\end_inset
+
+ we find
+\begin_inset Formula 
+\[
+\hat{O}=\begin{bmatrix}e^{-\nicefrac{\tau}{4}} & 0 & 0 & 0\\
+0 & e^{\nicefrac{\tau}{4}}2\cosh\frac{\tau}{2} & -e^{\nicefrac{\tau}{4}}2\sinh\frac{\tau}{2} & 0\\
+0 & -e^{\nicefrac{\tau}{4}}2\sinh\frac{\tau}{2} & e^{\nicefrac{\tau}{4}}2\cosh\frac{\tau}{2} & 0\\
+0 & 0 & 0 & e^{-\nicefrac{\tau}{4}}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Puzzle #1
+\end_layout
+
+\begin_layout Standard
+Schollwoeck eq.
+ eq 150 is
+\begin_inset Formula 
+\[
+\left\Vert \psi-\tilde{\psi}\right\Vert ^{2}=1-\sum_{n_{a}}Tr\left(\tilde{M}^{n_{a}\dagger}\tilde{M}^{n_{a}}\right)
+\]
+
+\end_inset
+
+and the summation as written is not valid because site 
+\begin_inset Formula $a$
+\end_inset
+
+ is singled out.
+ What it could mean is
+\begin_inset Formula 
+\[
+\left\Vert \psi-\tilde{\psi}\right\Vert ^{2}=1-\sum_{\left\{ n\right\} }Tr\left(\tilde{M}^{n_{a}\dagger}\tilde{M}^{n_{a}}\right)
+\]
+
+\end_inset
+
+i.e.
+ a 
+\begin_inset Formula $2^{N}$
+\end_inset
+
+ sum of all states.
+ He claims that the sum just 
+\begin_inset Formula $\left\langle \tilde{\psi}|\tilde{\psi}\right\rangle $
+\end_inset
+
+ which we already know is
+\begin_inset Formula 
+\[
+\left\langle \tilde{\psi}|\tilde{\psi}\right\rangle =\sum_{n_{L}}\boldsymbol{\tilde{M}}^{n_{L}^{\dagger}}\left(\cdots\left(\sum_{n_{1}}\boldsymbol{\tilde{M}}^{n_{1}^{\dagger}}\boldsymbol{\tilde{M}}^{n_{1}}\right)\cdots\right)\boldsymbol{\tilde{M}}^{n_{L}}
+\]
+
+\end_inset
+
+and apparently the cross terms 
+\begin_inset Formula $-\left\langle \psi|\tilde{\psi}\right\rangle -\left\langle \tilde{\psi}|\psi\right\rangle $
+\end_inset
+
+ drop out due to Schollwoeck eq 148 which is eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Mtilda"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ in these notes.
+\end_layout
+
 \begin_layout Section*
 Bibliography
 \end_layout
@@ -1736,7 +2833,7 @@ Bibliography
 LatexCommand bibtex
 btprint "btPrintCited"
 bibfiles "MPS1"
-options "plain"
+options "bibtotoc,plain"
 
 \end_inset
 
