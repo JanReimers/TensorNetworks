@@ -862,9 +862,9 @@ We can now start on the left and zip through the lattice and convert the
 
 
 \begin_inset Formula 
-\[
-M_{1i_{1}}^{n_{1}}\rightarrow M_{(1,n_{1})i_{1}}=\boldsymbol{U}^{1}\boldsymbol{s}^{1}\boldsymbol{V}^{1}
-\]
+\begin{equation}
+M_{1i_{1}}^{n_{1}}\rightarrow M_{(1,n_{1})i_{1}}=\boldsymbol{U}^{1}\boldsymbol{s}^{1}\boldsymbol{V}^{1}\label{eq:SVD Site 1}
+\end{equation}
 
 \end_inset
 
@@ -1035,6 +1035,92 @@ These states are optimal for calculating the expectation value of a one
  site as you sweep.
  While sweeping you leave behind left normalized matrices on the left of
  the current site.
+\end_layout
+
+\begin_layout Subsubsection
+Videls Canonical Form
+\end_layout
+
+\begin_layout Standard
+Yet another cononical form due to Videl
+\begin_inset CommandInset citation
+LatexCommand cite
+key "vidal_efficient_2003"
+literal "false"
+
+\end_inset
+
+ involves storing the singular values on each bond.
+ Consider and SVD decomposition of the first matrix at site 
+\begin_inset Formula $1$
+\end_inset
+
+ as in eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SVD Site 1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and define
+\begin_inset Formula 
+\[
+\varGamma_{1i_{1}}^{n_{1}}=U_{\left(1,n_{1}\right)i_{1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\lambda_{i_{1}i_{1}}=s_{i_{1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\tilde{\boldsymbol{M}}^{n_{2}}=\boldsymbol{V}^{1}\boldsymbol{M}^{n_{2}}
+\]
+
+\end_inset
+
+and repeat this process across the lattice.
+ We end up with
+\begin_inset Formula 
+\[
+\Gamma^{n_{1}}\lambda^{[1]}\Gamma^{n_{2}}\lambda^{[2]}\Gamma^{n_{3}}\lambda^{[3]}\ldots\lambda^{[L-1]}\Gamma^{n_{L}}.
+\]
+
+\end_inset
+
+with this representation we can bifurcate the lattice at any bond and quickly
+ create a block wave function or a mixed canonical form
+\begin_inset Formula 
+\[
+\left(\Gamma^{n_{1}}\lambda^{[1]}\Gamma^{n_{2}}\lambda^{[2]}\ldots\Gamma^{n_{a}}\right)\lambda^{[a]}\left(\Gamma^{n_{a+1}}\ldots\lambda^{[L-1]}\Gamma^{n_{L}}\right)
+\]
+
+\end_inset
+
+where the left bracket is called the 
+\begin_inset Formula $A$
+\end_inset
+
+ block, the right is the 
+\begin_inset Formula $B$
+\end_inset
+
+ block and 
+\begin_inset Formula $\lambda^{[a]}$
+\end_inset
+
+ are the Schmidt coefficients.
 \end_layout
 
 \begin_layout Subsection
@@ -2655,6 +2741,248 @@ Normalize
 \end_inset
 
 
+\end_layout
+
+\begin_layout Section
+Infinite Lattice Systems
+\end_layout
+
+\begin_layout Standard
+In order to estimate physics for infinite systems one must somehow extroplate
+ both 
+\begin_inset Formula $L\rightarrow\infty$
+\end_inset
+
+ and 
+\begin_inset Formula $D\rightarrow\infty$
+\end_inset
+
+.
+ Another approach is to represent the wave function as an infinite product
+ of some repeating unit cell.
+ For example if the unit cell is four lattice site (corresponding to a wavevecto
+r 
+\begin_inset Formula $k=\nicefrac{1}{4}$
+\end_inset
+
+) the matrix product would look like
+\begin_inset Formula 
+\[
+\ldots\boldsymbol{M}^{[1]n_{1}}\boldsymbol{M}^{[2]n_{2}}\boldsymbol{M}^{[3]n_{3}}\boldsymbol{M}^{[4]n_{4}}\boldsymbol{M}^{[1]n_{5}}\boldsymbol{M}^{[2]n_{6}}\boldsymbol{M}^{[3]n_{7}}\boldsymbol{M}^{[4]n_{8}}\ldots
+\]
+
+\end_inset
+
+where the elipses represent infite repeat of the unit cell to the left and
+ right.
+ Notice there are only four distinct matrices but the quantum numbers 
+\begin_inset Formula $n_{i}$
+\end_inset
+
+ do not repeat, there are iniftly many 
+\begin_inset Formula $n_{i}$
+\end_inset
+
+.
+ Hence the need for proper site labels 
+\begin_inset Formula $[a]$
+\end_inset
+
+ in the square brackets.
+ In this example the quantum number to the left could take on negative indices.
+ Standard notation is put the reapting unit cell in brackets
+\begin_inset Formula 
+\begin{equation}
+\ldots\left(\boldsymbol{M}^{[1]n_{1}}\boldsymbol{M}^{[2]n_{2}}\boldsymbol{M}^{[3]n_{3}}\boldsymbol{M}^{[4]n_{4}}\right)\ldots\label{eq:iMPS1}
+\end{equation}
+
+\end_inset
+
+the corresponding wave function is
+\begin_inset Formula 
+\begin{equation}
+\left|\psi\right\rangle =\sum_{\ldots n_{1}n_{2}n_{3}n_{4}\ldots}\ldots\left(\boldsymbol{M}^{[1]n_{1}}\boldsymbol{M}^{[2]n_{2}}\boldsymbol{M}^{[3]n_{3}}\boldsymbol{M}^{[4]n_{4}}\right)\ldots\left|\ldots n_{1}n_{2}n_{3}n_{4}\ldots\right\rangle \label{eq:iMPSWF}
+\end{equation}
+
+\end_inset
+
+One draw back of this idea is that part of the answer is already built into
+ the choice unit cell.
+ So for a ferromagnet we know ind advance that a one site unit cell is sufficien
+t to the present the answer.
+ For an unfrustrated antiferromagnet we know in advance that a two site
+ unit cell should suffice.
+ But if there are any competing interactions the choice of unit cell become
+ non-trivial.
+ In this case I think it is prudent to see what(which) wave vector(s) is(are)
+ selected by minimizing the Fourier transformed Hamiltonian and use that
+ as a starting point for the quantum problem.
+ Hopefully the ordering wave vector is a rational number!!
+\end_layout
+
+\begin_layout Standard
+So far what we have above is called iMPS.
+ The two common approaches to finding a ground state using iMPS are iDMRG
+ and iTBED.
+ 
+\end_layout
+
+\begin_layout Subsection
+Infinite Time Evolved Block Decimation (iTBED)
+\end_layout
+
+\begin_layout Subsection
+Infinite Density Matrix Renormalization Group (iDMRG)
+\end_layout
+
+\begin_layout Standard
+The idea here is to start with a small system with only two sites, and we
+ keep adding sites in the middle of the lattice until the matrices for the
+ central sites converge to fixed point.
+ For this it is convenient to change our lattice site number scheme from
+ 
+\begin_inset Formula $1\ldots L$
+\end_inset
+
+ to 
+\begin_inset Formula $1\ldots LL\ldots1$
+\end_inset
+
+ and sites to left of center have an additional label 
+\begin_inset Formula $A$
+\end_inset
+
+ and sites to right 
+\begin_inset Formula $B$
+\end_inset
+
+.
+ The starting state is
+\begin_inset Formula 
+\[
+\left|\psi_{1}\right\rangle =\sum_{n_{1}^{A}n_{1}^{B}}\boldsymbol{C}^{n_{1}^{A}n_{1}^{B}}\left|n_{1}^{A}n_{1}^{B}\right\rangle 
+\]
+
+\end_inset
+
+which is just the full wavefunction (not an MPS) and 
+\begin_inset Formula $C$
+\end_inset
+
+ is a 
+\begin_inset Formula $d\times d$
+\end_inset
+
+ matrix of amplitudes.
+ We can SVD 
+\begin_inset Formula $C$
+\end_inset
+
+ (without any reshaping for once!)
+\begin_inset Formula 
+\[
+\boldsymbol{C}=\boldsymbol{UsV^{\dagger}}
+\]
+
+\end_inset
+
+and rename 
+\begin_inset Formula $U_{n_{1}^{A},i_{1}}\rightarrow A_{1,i_{1}}^{[1]n_{1}^{A}}$
+\end_inset
+
+, 
+\begin_inset Formula $s\rightarrow\Lambda^{[1]}$
+\end_inset
+
+ and 
+\begin_inset Formula $\left(V^{\dagger}\right)_{i_{1},n_{1}^{B}}\rightarrow B_{i_{1},1}^{[1]n_{1}^{B}}$
+\end_inset
+
+ so that 
+\begin_inset Formula 
+\[
+\left|\psi_{1}\right\rangle =\sum_{n_{1}^{A}n_{1}^{B}}\boldsymbol{A}^{[1]n_{1}^{A}}\boldsymbol{\Lambda}^{[1]}\boldsymbol{B}^{[1]n_{1}^{B}}\left|n_{1}^{A}n_{1}^{B}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{n_{1}^{A}n_{1}^{B}}\sum_{i_{1}=1}^{\min\left\{ d,D\right\} }A_{1,i_{1}}^{[1]n_{1}^{A}}\varLambda_{i_{1}}^{[1]}B_{i_{1},1}^{[1]n_{1}^{B}}\left|n_{1}^{A}n_{1}^{B}\right\rangle 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+I am not sure if this is purely formal so far if a computer code needs to
+ actually start with a two spin ground state at this point.
+ The next step is described as
+\begin_inset CommandInset citation
+LatexCommand cite
+key "schollwoeck_density-matrix_2010"
+literal "false"
+
+\end_inset
+
+ 
+\begin_inset Quotes eld
+\end_inset
+
+...we now insert two sites, and minimize the energy with respect to 
+\begin_inset Formula $\hat{H}$
+\end_inset
+
+...
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|\psi_{2}\right\rangle =\sum_{n_{1}^{A}n_{2}^{A}n_{2}^{B}n_{1}^{B}}\boldsymbol{A}^{[1]n_{1}^{A}}\boldsymbol{\boldsymbol{C}}^{n_{2}^{A}n_{2}^{B}}\boldsymbol{B}^{[1]n_{1}^{B}}\left|n_{1}^{A}n_{2}^{A}n_{2}^{B}n_{1}^{B}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{n_{1}^{A}n_{2}^{A}n_{2}^{B}n_{1}^{B}}\sum_{i_{1},i_{2}=1}^{\min\left\{ d,D\right\} }A_{1,i_{1}}^{[1]n_{1}^{A}}\boldsymbol{C}_{i_{1}i_{2}}^{n_{2}^{A}n_{2}^{B}}B_{i_{2},1}^{[1]n_{1}^{B}}\left|n_{1}^{A}n_{2}^{A}n_{2}^{B}n_{1}^{B}\right\rangle 
+\]
+
+\end_inset
+
+As far as I know there is no such thing as minimizing the energy with respect
+ to 
+\begin_inset Formula $\hat{H}$
+\end_inset
+
+, we minimize WRT 
+\begin_inset Formula $C$
+\end_inset
+
+ or 
+\begin_inset Formula $A$
+\end_inset
+
+ or 
+\begin_inset Formula $B$
+\end_inset
+
+, or sweep through the lattice and minimize WRT to all three.
+ 
+\begin_inset Formula $\left|\psi_{2}\right\rangle $
+\end_inset
+
+ is starting to look like an MPS except that 
+\begin_inset Formula $C$
+\end_inset
+
+ has two physical indices and needs to factored to get an MPS
 \end_layout
 
 \begin_layout Section
