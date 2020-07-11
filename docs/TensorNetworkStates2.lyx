@@ -1121,6 +1121,47 @@ where the left bracket is called the
 \end_inset
 
  are the Schmidt coefficients.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename CanonicalVidal.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Vidal's-canonial-form"
+
+\end_inset
+
+Vidal's canonial form
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -2215,6 +2256,13 @@ and
 
 \begin_layout Subsubsection
 MPO representation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:MPO-representation"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2416,6 +2464,13 @@ For lower spins it is easy to calculate these symbolically, but I think
 
 \begin_layout Subsubsection
 SVD compression
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:SVD-compression"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2544,6 +2599,13 @@ on algorithm in the section below.
 
 \begin_layout Subsubsection
 Optimal compression
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Optimal-compression"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2828,11 +2890,292 @@ So far what we have above is called iMPS.
 \end_layout
 
 \begin_layout Subsection
+Infinite Lattice Contractions
+\end_layout
+
+\begin_layout Standard
+In this section I will use a two site unit cell iMPS.
+ The extension to other unit cell size should be trivial.
+\end_layout
+
+\begin_layout Subsubsection
+Overlap
+\end_layout
+
+\begin_layout Standard
+The diagram for the overlap of a two site unit cell iMPS is shown in figure
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:iMPS Overlap"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename iMPS1.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename iMPSTransfer.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:iMPS Overlap"
+
+\end_inset
+
+a) iMPS for a 2 site unit cell in canonical form.
+ b) Transfer matrix for site 1
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The transfer matrix for site 
+\begin_inset Formula $1$
+\end_inset
+
+ (figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:iMPS Overlap"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+b) is
+\begin_inset Formula 
+\[
+E_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}^{1}=\sum_{n_{1}}\left(\varGamma_{i_{1}i_{2}}^{1n_{1}}\lambda_{i_{2}}^{1}\right)^{\dagger}\varGamma_{j_{1}j_{2}}^{1n_{1}}\lambda_{j_{2}}^{1}=\lambda_{i_{2}}^{1}\lambda_{j_{2}}^{1}\sum_{n_{1}}\varGamma_{i_{2}i_{1}}^{1*n_{1}}\varGamma_{j_{1}j_{2}}^{1n_{1}}
+\]
+
+\end_inset
+
+where the indices are grouped to shape this as a 
+\begin_inset Formula $D^{2}\times D^{2}$
+\end_inset
+
+ matrix, as opposed to a rank four tensor.
+ Now the overlap can be expressed as a matrix product
+\begin_inset Formula 
+\[
+\left\langle \psi|\psi\right\rangle =\ldots\boldsymbol{E}^{1}\boldsymbol{E}^{2}\boldsymbol{E}^{1}\boldsymbol{E}^{2}\ldots
+\]
+
+\end_inset
+
+Strictly speaking this expression is not a scalar but just wait.
+ To proceed we can do an eigen decomposition of the repeating product 
+\begin_inset Formula $\boldsymbol{E}^{1}\boldsymbol{E}^{2}=\boldsymbol{U}\boldsymbol{e}\boldsymbol{U}^{\dagger}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left\langle \psi|\psi\right\rangle =\lim_{N\rightarrow\infty}\boldsymbol{e}^{N}
+\]
+
+\end_inset
+
+which is matrix of eigen values to the high power.
+ Of course all the eigemodes are irrelevant except for dominant one so in
+ the end we get 
+\begin_inset Formula 
+\[
+\left\langle \psi|\psi\right\rangle =\lim_{N\rightarrow\infty}e_{max}^{N}
+\]
+
+\end_inset
+
+So we can easily normalize and iMPS by rescaling the 
+\begin_inset Formula $\varGamma$
+\end_inset
+
+ matrices
+\begin_inset Formula 
+\[
+\varGamma\rightarrow\frac{1}{\sqrt{e_{max}}}\varGamma
+\]
+
+\end_inset
+
+which should ensure that the new 
+\begin_inset Formula $e_{max}=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Energy
+\end_layout
+
+\begin_layout Standard
+The diagram for the overlap of a two site unit cell iMPS is shown in figure
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:iMPS Energy"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename iMPSE.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename iMPSETransfer.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:iMPS Energy"
+
+\end_inset
+
+a) Energy Diagram, b) Energy transfer matrix
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The transfer matrix for site 
+\begin_inset Formula $1$
+\end_inset
+
+ (figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:iMPS Energy"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+b) is
+\begin_inset Formula 
+\[
+E_{\left(i_{1}j_{1}w_{1}\right)\left(i_{2}j_{2}w_{2}\right)}^{1}=\sum_{m_{1}n_{1}}\left(\varGamma_{i_{1}i_{2}}^{1m_{1}}\lambda_{i_{2}}^{1}\right)^{\dagger}W_{w_{1}w_{2}}^{m_{1}n_{1}}\varGamma_{j_{1}j_{2}}^{1n_{1}}\lambda_{j_{2}}^{1}=\lambda_{i_{2}}^{1}\lambda_{j_{2}}^{1}\sum_{n_{1}}\varGamma_{i_{2}i_{1}}^{1*n_{1}}W_{w_{1}w_{2}}^{m_{1}n_{1}}\varGamma_{j_{1}j_{2}}^{1n_{1}}
+\]
+
+\end_inset
+
+where the indices are grouped to shape this as a 
+\begin_inset Formula $D_{w}D^{2}\times D_{w}D^{2}$
+\end_inset
+
+ matrix, as opposed to a rank six tensor.
+ Now the Energy per unit cell can be expressed as a matrix product
+\begin_inset Formula 
+\[
+\frac{1}{N}\left\langle \psi\right|\mathcal{\hat{H}}\left|\psi\right\rangle =\frac{1}{N}\ldots\boldsymbol{E}^{1}\boldsymbol{E}^{2}\boldsymbol{E}^{1}\boldsymbol{E}^{2}\ldots=\lim_{N\rightarrow\infty}\frac{1}{N}\boldsymbol{e}^{N}=\lim_{N\rightarrow\infty}\frac{1}{N}e_{max}^{N}
+\]
+
+\end_inset
+
+How do we get an infinite product to generate anythong other then 
+\begin_inset Formula $0,1,\infty$
+\end_inset
+
+?
+\end_layout
+
+\begin_layout Subsection
 Infinite Time Evolved Block Decimation (iTBED)
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Infinite-Time-Evolved"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
 Infinite Density Matrix Renormalization Group (iDMRG)
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Infinite-Density-Matrix"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2874,6 +3217,22 @@ which is just the full wavefunction (not an MPS) and
 \end_inset
 
  matrix of amplitudes.
+ We calculate 
+\begin_inset Formula $\boldsymbol{C}$
+\end_inset
+
+ by exact diagonalization of the of the 
+\begin_inset Formula $d^{2}\times d^{2}$
+\end_inset
+
+ Hamiltonian matrix and reshaping the ground state eigvector
+\begin_inset Formula 
+\[
+U_{1,i}\rightarrow U_{1,(n_{1}^{A}n_{1}^{B})}=\boldsymbol{C}^{n_{1}^{A}n_{1}^{B}}
+\]
+
+\end_inset
+
  We can SVD 
 \begin_inset Formula $C$
 \end_inset
@@ -2909,18 +3268,24 @@ and rename
 
 \begin_inset Formula 
 \[
-=\sum_{n_{1}^{A}n_{1}^{B}}\sum_{i_{1}=1}^{\min\left\{ d,D\right\} }A_{1,i_{1}}^{[1]n_{1}^{A}}\varLambda_{i_{1}}^{[1]}B_{i_{1},1}^{[1]n_{1}^{B}}\left|n_{1}^{A}n_{1}^{B}\right\rangle 
+=\sum_{n_{1}^{A}n_{1}^{B}}\sum_{i_{1}=1}^{d}A_{1,i_{1}}^{[1]n_{1}^{A}}\varLambda_{i_{1}}^{[1]}B_{i_{1},1}^{[1]n_{1}^{B}}\left|n_{1}^{A}n_{1}^{B}\right\rangle 
 \]
 
 \end_inset
 
+This assumes that 
+\begin_inset Formula $D>d$
+\end_inset
 
+ so we don;t need to truncate the sum of 
+\begin_inset Formula $i_{1}$
+\end_inset
+
+ at this statge.
 \end_layout
 
 \begin_layout Standard
-I am not sure if this is purely formal so far if a computer code needs to
- actually start with a two spin ground state at this point.
- The next step is described as
+The next step is described as
 \begin_inset CommandInset citation
 LatexCommand cite
 key "schollwoeck_density-matrix_2010"
@@ -2951,7 +3316,7 @@ literal "false"
 
 \begin_inset Formula 
 \[
-=\sum_{n_{1}^{A}n_{2}^{A}n_{2}^{B}n_{1}^{B}}\sum_{i_{1},i_{2}=1}^{\min\left\{ d,D\right\} }A_{1,i_{1}}^{[1]n_{1}^{A}}\boldsymbol{C}_{i_{1}i_{2}}^{n_{2}^{A}n_{2}^{B}}B_{i_{2},1}^{[1]n_{1}^{B}}\left|n_{1}^{A}n_{2}^{A}n_{2}^{B}n_{1}^{B}\right\rangle 
+=\sum_{n_{1}^{A}n_{2}^{A}n_{2}^{B}n_{1}^{B}}\sum_{i_{1},i_{2}=1}^{\min\left\{ d,D\right\} }A_{1,i_{1}^{A}}^{[1]n_{1}^{A}}\boldsymbol{C}_{i_{1}^{A}i_{1}^{B}}^{n_{2}^{A}n_{2}^{B}}B_{i_{1}^{B},1}^{[1]n_{1}^{B}}\left|n_{1}^{A}n_{2}^{A}n_{2}^{B}n_{1}^{B}\right\rangle 
 \]
 
 \end_inset
@@ -2961,30 +3326,346 @@ As far as I know there is no such thing as minimizing the energy with respect
 \begin_inset Formula $\hat{H}$
 \end_inset
 
-, we minimize WRT 
+! What we need to do is minimize WRT 
 \begin_inset Formula $C$
 \end_inset
 
- or 
-\begin_inset Formula $A$
+ and keep 
+\begin_inset Formula $A^{[1]}$
 \end_inset
 
- or 
-\begin_inset Formula $B$
+ and 
+\begin_inset Formula $B^{[1]}$
 \end_inset
 
-, or sweep through the lattice and minimize WRT to all three.
+ fixed.
+ Schollwoek says [Strongly Correlated Systems: Numerical Methods page 83]
  
-\begin_inset Formula $\left|\psi_{2}\right\rangle $
+\begin_inset Quotes eld
 \end_inset
 
- is starting to look like an MPS except that 
-\begin_inset Formula $C$
+At each step we can write down 
+\begin_inset Formula $\hat{H}$
 \end_inset
 
- has two physical indices and needs to factored to get an MPS
+ as an MPO and do the energy minimization
+\begin_inset Quotes erd
+\end_inset
+
+.
+ For coding we need unpack this last phrase in detail.
+ A diagram is useful
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
 \end_layout
 
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename iDMRGEnergy.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Energy contraction for the 4 site DMRG state.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+We need to solve
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial E}{\partial C^{n_{2}^{A}n_{2}^{B}}}-\lambda\frac{\partial\left\langle \psi|\psi\right\rangle }{\partial C^{n_{2}^{A}n_{2}^{B}}}=0\label{eq:GSEquations-1}
+\end{equation}
+
+\end_inset
+
+From the diagram we see use the rulle for 
+\begin_inset Formula $H_{eff}$
+\end_inset
+
+ just delete the tensors we want to optimize, in this case delete both 
+\begin_inset Formula $C$
+\end_inset
+
+ tensors.
+ As a result
+\begin_inset Formula 
+\[
+H_{eff}\left(i_{1}^{A},i_{1}^{B},m_{2}^{A},m_{2}^{B}\right)\left(j_{1}^{A},j_{1}^{B},n_{2}^{A},n_{2}^{B}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ w\right\} }\left(\sum_{n_{1}^{A}m_{1}^{A}}A_{1,i_{1}^{A}}^{\dagger[1]m_{1}^{A}}W_{1w_{1}^{A}}^{m_{1}^{A}n_{1}^{A}}A_{1,j_{1}^{A}}^{[1]n_{1}^{A}}\right)W_{w_{1}^{A}w_{2}}^{m_{2}^{A}n_{2}^{A}}W_{w_{2}w_{1}^{B}}^{m_{2}^{B}n_{2}^{B}}\left(\sum_{n_{1}^{B}m_{1}^{B}}B_{i_{1}^{B},1}^{\dagger[1]m_{1}^{B}}W_{w_{1}^{B}1}^{m_{1}^{B}n_{1}^{B}}B_{j_{1}^{B},1}^{[1]n_{1}^{B}}\right)
+\]
+
+\end_inset
+
+As usual we can define
+\begin_inset Formula 
+\[
+L_{i_{1}^{A}w_{1}^{A}j_{1}^{A}}^{[1]}=\sum_{n_{1}^{A}m_{1}^{A}}A_{1,i_{1}^{A}}^{\dagger[1]m_{1}^{A}}W_{1w_{1}^{A}}^{m_{1}^{A}n_{1}^{A}}A_{1,j_{1}^{A}}^{[1]n_{1}^{A}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+R_{i_{1}^{B}w_{1}^{B}j_{1}^{B}}^{[1]}=\sum_{n_{1}^{B}m_{1}^{B}}B_{i_{1}^{B},1}^{\dagger[1]m_{1}^{B}}W_{w_{1}^{B}1}^{m_{1}^{B}n_{1}^{B}}B_{j_{1}^{B},1}^{[1]n_{1}^{B}}
+\]
+
+\end_inset
+
+These can be cached and recursively updated
+\begin_inset Formula 
+\[
+L_{i_{2}^{A}w_{2}^{A}j_{2}^{A}}^{[2]}=\sum_{n_{2}^{A}m_{2}^{A}}\sum_{i_{1}^{A}w_{1}^{A}j_{1}^{A}}A_{i_{2}^{A}i_{1}^{A}}^{*[2]m_{2}^{A}}W_{w_{1}^{A}w_{2}^{A}}^{m_{2}^{A}n_{2}^{A}}L_{i_{1}^{A}w_{1}^{A}j_{1}^{A}}^{[1]}A_{j_{1}^{A}j_{2}^{A}}^{[2]n_{2}^{A}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+R_{i_{2}^{B}w_{2}^{B}j_{2}^{B}}^{[2]}=\sum_{n_{2}^{B}m_{2}^{B}}\sum_{i_{1}^{B}w_{1}^{B}j_{1}^{B}}B_{i_{1}^{B},1}^{\dagger[2]m_{2}^{B}}W_{w_{1}^{B}w_{2}^{B}}^{m_{2}^{B}n_{2}^{B}}R_{i_{1}^{B}w_{1}^{B}j_{1}^{B}}^{[1]}B_{j_{1}^{B},1}^{[2]n_{2}^{B}}
+\]
+
+\end_inset
+
+We can see form the indices that 
+\begin_inset Formula $H_{eff}$
+\end_inset
+
+ is 
+\begin_inset Formula $D^{2}d^{2}\times D^{2}d^{2}$
+\end_inset
+
+ matrix which is getting pretty sizable.
+ 
+\end_layout
+
+\begin_layout Standard
+We go about this by reshaping and decomposing
+\begin_inset Formula 
+\[
+\boldsymbol{C}_{i_{1}^{A}i_{1}^{B}}^{n_{2}^{A}n_{2}^{B}}\rightarrow C_{\left(i_{1}^{A}n_{2}^{A}\right)\left(i_{1}^{B}n_{2}^{B}\right)}=U^{2}s^{2}V^{2\dagger}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Software Plan
+\end_layout
+
+\begin_layout Standard
+As of Feb 2020 we have the following implemented
+\end_layout
+
+\begin_layout Enumerate
+Finite lattice MPS with open boundary conditions
+\end_layout
+
+\begin_layout Enumerate
+MPOs with optimized conractions routines
+\end_layout
+
+\begin_layout Enumerate
+Single site ground state sweeps
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Convergence for these is spotty, particularly for 
+\begin_inset Formula $S\geq1$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Embryonic UI using wxPython using the wxPlotting library
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Run time is not reliable, crashes when inializing graphs on home PC
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Calculation of 1 and 2 site density matrices
+\end_layout
+
+\begin_layout Enumerate
+Full unit testing suite
+\end_layout
+
+\begin_layout Standard
+Going forward we need
+\end_layout
+
+\begin_layout Itemize
+More graphics
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Show spin expectations across the lattice (3D arrows?)
+\end_layout
+
+\begin_layout Itemize
+Show 2D shade plot of spin spin correlations
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Better convergence
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+For fixed 
+\begin_inset Formula $L$
+\end_inset
+
+ start with 
+\begin_inset Formula $D=2$
+\end_inset
+
+ and grow 
+\begin_inset Formula $D$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Follow a schedule with ever tightening convergence criteria.
+\end_layout
+
+\begin_layout Itemize
+Try two site optimization.
+ We need this for iDMRG anyway
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Exact diagonalization for small lattices
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Useful for unit testing
+\end_layout
+
+\begin_layout Itemize
+Required for setting up 
+\begin_inset Formula $\left\langle i\right|e^{-\tau\mathcal{\hat{H}}}\left|j\right\rangle $
+\end_inset
+
+ calculations
+\end_layout
+
+\begin_layout Itemize
+Required for kick off of iDMRG
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Time (imag and/or real) evolution for finite OBC lattice
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Construct so called Trotter gate MPO 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:MPO-representation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Apply to MPS
+\end_layout
+
+\begin_layout Itemize
+SVD compress 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SVD-compression"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Optimal compress 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Optimal-compression"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+iDMRG
+\end_layout
+
+\begin_layout Itemize
+iTEBD
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Finish writing up theory
+\end_layout
+
+\end_deeper
 \begin_layout Section
 \start_of_appendix
 \begin_inset CommandInset label
