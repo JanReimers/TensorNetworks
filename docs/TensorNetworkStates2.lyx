@@ -1093,9 +1093,9 @@ noprefix "false"
 and repeat this process across the lattice.
  We end up with
 \begin_inset Formula 
-\[
-\Gamma^{n_{1}}\lambda^{[1]}\Gamma^{n_{2}}\lambda^{[2]}\Gamma^{n_{3}}\lambda^{[3]}\ldots\lambda^{[L-1]}\Gamma^{n_{L}}.
-\]
+\begin{equation}
+\Gamma^{n_{1}}\lambda^{[1]}\Gamma^{n_{2}}\lambda^{[2]}\Gamma^{n_{3}}\lambda^{[3]}\ldots\lambda^{[L-1]}\Gamma^{n_{L}}.\label{eq:Vidal Canonical}
+\end{equation}
 
 \end_inset
 
@@ -2087,10 +2087,11 @@ In statistical mechanics the limit
 
  corresponds to the temperature going to zero.
  So it is like we are annealing the wave function towards its ground state.
- This sounds rather hand-waving and the literature is not very loud about
- a more rigorous explanation.
- But nevertheless it works as long as the original wave function (or some
- starting guess) has a non-zero overlap with the ground state wave function.
+ This sounds rather hand-waving but it is related to the power method for
+ finding the extreme eigen value and eigen vector of a matrix.
+ This is known to be a slowely converging method but it works as long as
+ the original wave function (or some starting guess) has a non-zero overlap
+ with the ground state wave function.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2116,7 +2117,7 @@ In order to handle the operator
 
 .
  For a nearest neighbour interacting system we can express the Hamiltonian
- as a sum of single site operators
+ as a sum of two site operators
 \begin_inset Formula 
 \[
 \mathcal{\hat{H}}=\sum_{a=1}^{L-1}\vec{S}_{a}\cdot\vec{S}_{a+1}=\sum_{a=1}^{L-1}\hat{\mathcal{H}}_{a}
@@ -2278,9 +2279,9 @@ where I am using the tensor product symbol to make it explicit that each
  term in the product operates on a different sector of the the Hilbert space.
  One bond evolution operator has the form
 \begin_inset Formula 
-\[
-e^{-\tau\mathcal{\hat{H}}_{1}}=\sum_{m_{1}m_{2}}\sum_{n_{1}n_{2}}O^{\left(m_{1}n_{1}\right)\left(m_{2}n_{2}\right)}\left|n_{1}n_{2}\right\rangle \left\langle m_{1}m_{2}\right|
-\]
+\begin{equation}
+e^{-\tau\mathcal{\hat{H}}_{1}}=\sum_{m_{1}m_{2}}\sum_{n_{1}n_{2}}O^{\left(m_{1}n_{1}\right)\left(m_{2}n_{2}\right)}\left|n_{1}n_{2}\right\rangle \left\langle m_{1}m_{2}\right|\label{eq:One Bond Operator}
+\end{equation}
 
 \end_inset
 
@@ -2805,6 +2806,93 @@ Normalize
 
 \end_layout
 
+\begin_layout Subsection
+Time Evolved Block Decimation
+\end_layout
+
+\begin_layout Standard
+We start with the canonical form but with a two site center
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Gamma^{n_{1}}\lambda^{[1]}\Gamma^{n_{2}}\lambda^{[2]}\ldots\lambda^{[a]}\Gamma^{n_{a+1}}\lambda^{[a+1]}\Gamma^{n_{a+2}}\lambda^{[a+2]}\ldots\lambda^{[L-1]}\Gamma^{n_{L}}
+\]
+
+\end_inset
+
+and we can apply the local evolution operator (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:One Bond Operator"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+)
+\begin_inset Formula 
+\[
+\Phi_{i_{a}i_{a+2}}^{m_{a+1}m_{a+2}}=\sum_{n_{a+1}n_{a+2}}\sum_{i_{a+1}}\hat{O}^{\left(n_{a+1}m_{a+1}\right)\left(n_{a+2}m_{a+2}\right)}\lambda_{i_{a}}^{[a]}\Gamma_{i_{a}i_{a+1}}^{n_{a+1}}\lambda_{i_{a+1}}^{[a+1]}\Gamma_{i_{a+1}i_{a+2}}^{n_{a+2}}\lambda_{i_{a+2}}^{[a+2]}
+\]
+
+\end_inset
+
+Or using the MPO representation
+\begin_inset Formula 
+\[
+\Phi_{i_{a}i_{a+2}}^{m_{a+1}m_{a+2}}=\sum_{n_{a+1}n_{a+2}}\sum_{i_{a+1}}\sum_{w}W_{1,w}^{n_{a+1}m_{a+1}}W_{w,1}^{n_{a+2}m_{a+2}}\lambda_{i_{a}}^{[a]}\Gamma_{i_{a}i_{a+1}}^{n_{a+1}}\lambda_{i_{a+1}}^{[a+1]}\Gamma_{i_{a+1}i_{a+2}}^{n_{a+2}}\lambda_{i_{a+2}}^{[a+2]}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename TEBD1.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Two site MPO acting on sites 
+\begin_inset Formula $a+1$
+\end_inset
+
+ and 
+\begin_inset Formula $a+2$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Infinite Lattice Systems
 \end_layout
@@ -3161,6 +3249,29 @@ Infinite Time Evolved Block Decimation (iTBED)
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Infinite-Time-Evolved"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This technique usualy starts Vidal's canonical form, eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Vidal Canonical"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ adapted for a repeating unit cell
+\begin_inset Formula 
+\[
+\ldots\left(\Gamma^{n_{1}}\lambda^{[1]}\Gamma^{n_{2}}\lambda^{[2]}\right)\ldots
+\]
 
 \end_inset
 
@@ -3666,6 +3777,153 @@ Finish writing up theory
 \end_layout
 
 \end_deeper
+\begin_layout Itemize
+Wrappers
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Python
+\end_layout
+
+\begin_layout Itemize
+Julia use 
+\begin_inset CommandInset href
+LatexCommand href
+name "CxxWrap"
+target "https://github.com/JuliaInterop/CxxWrap.jl"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Julia docs 
+\begin_inset CommandInset href
+LatexCommand href
+name "here"
+target "https://docs.julialang.org/en/v1/manual/calling-c-and-fortran-code/"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+Investigate other MPS packages
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "OpenMPS"
+target "https://openmps.sourceforge.io/"
+literal "false"
+
+\end_inset
+
+, related publications are listed 
+\begin_inset CommandInset href
+LatexCommand href
+name "here"
+target "https://openmps.sourceforge.io/chapters/acknowledgments.html"
+literal "false"
+
+\end_inset
+
+.
+ (Python wrapper to FORTRAN)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "ITensor"
+target "http://itensor.org/"
+literal "false"
+
+\end_inset
+
+ (C++)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "iPEPS"
+target "https://arxiv.org/abs/1902.02663"
+literal "false"
+
+\end_inset
+
+ (Julia)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "TiledArray"
+target "https://github.com/ValeevGroup/tiledarray"
+literal "false"
+
+\end_inset
+
+ (C++)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "Fastor"
+target "https://github.com/romeric/Fastor"
+literal "false"
+
+\end_inset
+
+ (C++) This one looks good for rank 
+\begin_inset Formula $>2$
+\end_inset
+
+ tensors.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "Cyclops"
+target "http://solomon2.web.engr.illinois.edu/ctf/"
+literal "false"
+
+\end_inset
+
+ (C++)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "Uni10"
+target "http://yingjerkao.github.io/uni10/"
+literal "false"
+
+\end_inset
+
+ (C++)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Try making Itensor and Fastor versions of the MPSSite class.
+ How much code needs to sequestored behind an interface in order to do this?
+\end_layout
+
 \begin_layout Section
 \start_of_appendix
 \begin_inset CommandInset label
