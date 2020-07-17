@@ -9,7 +9,11 @@ template <class T> class SparseMatrix
 {
     public:
         SparseMatrix(const DMatrix<T>& denseMatrix,double eps);
+        SparseMatrix(int Nr, int Nc);
         ~SparseMatrix() {};
+
+        void Insert(const T&,int i, int j);
+        T operator()(int i, int j) const;
 
         friend std::ostream& operator<<(std::ostream& os,const SparseMatrix<T>& m)
         {
