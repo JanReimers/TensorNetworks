@@ -11,6 +11,7 @@ int main(int argc, char **argv)
 //    testing::GTEST_FLAG(filter) = "MPOTesting*";
  //  testing::GTEST_FLAG(filter) = "GroundStateTesting*";
 //  testing::GTEST_FLAG(filter) = "ExpectationsTesting*";
+  testing::GTEST_FLAG(filter) = "ExactDiagTesting*";
 
     return RUN_ALL_TESTS();
 }

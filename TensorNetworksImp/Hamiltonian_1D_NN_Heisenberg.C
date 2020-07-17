@@ -1,7 +1,6 @@
 #include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
 #include "TensorNetworksImp/MatrixProductStateImp.H"
 #include "Operators/MPO_LRB.H"
-#include "TensorNetworksImp/SpinCalculator.H"
 
 
 #include <iostream>
@@ -141,6 +140,34 @@ Dw12 Hamiltonian_1D_NN_Heisenberg::GetDw12(TensorNetworks::Position lbr) const
     assert(lbr<3);
     return itsDw12s[lbr];
 }
+
+
+//
+//  Build the a local (2 site for NN interactions) Hamiltonian Matrix
+//
+SparseMatrixCT Hamiltonian_1D_NN_Heisenberg::BuildLocalMatrix() const
+{
+    SpinCalculator sc(itsS);
+    int p=Getp(),i=0,j=0;
+    long int N=p*p;
+    SparseMatrixCT Hab(N,N);
+    for (int na=0;na<p;na++)
+        for (int nb=0;nb<p;nb++)
+        {
+            i++;
+            j=0;
+            for (int ma=0;ma<p;ma++)
+                for (int mb=0;mb<p;mb++)
+                {
+                    j++;
+                    double h=GetH(ma,na,mb,nb,sc);
+                    Hab.Insert(h,i,j);
+                }
+        }
+    return Hab;
+}
+
+
 
 //
 //  Create states.  Why are these here?  Because the Hamiltonian is the

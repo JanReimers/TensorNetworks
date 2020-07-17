@@ -55,6 +55,7 @@
 			<Add library="gfortran" />
 			<Add library="pthread" />
 		</Linker>
+		<Unit filename="../Install" />
 		<Unit filename="ExpectationsTests.C">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -5,6 +5,8 @@
 #include "TensorNetworks/OperatorWRepresentation.H"
 #include "Operators/MPO_LRB.H"
 #include "TensorNetworks/Dw12.H"
+#include "TensorNetworksImp/SpinCalculator.H"
+
 
 
 //
@@ -23,10 +25,10 @@ class Hamiltonian_1D_NN_Heisenberg
         //
         virtual int GetL () const {return itsL;}
         virtual int Getp () const {return 2*itsS+1;}
-        virtual int GetS () const {return itsS;}
+        //virtual int GetS () const {return itsS;}
         virtual MatrixProductState* CreateMPS(int D,const Epsilons&) const;
         virtual Operator*           CreateOperator(const OperatorWRepresentation*) const;
-
+        virtual SparseMatrixCT      BuildLocalMatrix   () const;
         //
         //  OperatorWRepresentation interface
         //
@@ -34,6 +36,13 @@ class Hamiltonian_1D_NN_Heisenberg
         virtual Dw12    GetDw12(TensorNetworks::Position lbr) const;
 
     private:
+
+        double GetH(int ma,int na,int mb,int nb,const SpinCalculator& sc) const
+        {
+            return 0.5*itsJxy*(sc.GetSp(ma,na)*sc.GetSm(mb,nb)+sc.GetSm(ma,na)*sc.GetSp(mb,nb))
+            +itsJz*sc.GetSz(ma,na)*sc.GetSz(mb,nb)
+            +itshz*(sc.GetSz(ma,na)+sc.GetSz(mb,nb)); //Should we only include one stie here?
+        }
         double I    (int m, int n) const;
         static const int Dw=5;
         int    itsL; //Number of lattice sites
