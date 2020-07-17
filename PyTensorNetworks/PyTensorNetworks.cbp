@@ -33,8 +33,8 @@
 			<Add option="-fPIC" />
 		</Compiler>
 		<ExtraCommands>
-			<Add after="python3 configure.py;make" />
-			<Add after="pkexec  make -C /home/jan/CDT2/TensorNetworks/PyTensorNetworks install" />
+			<Add after="python3 configure.py;make -j4" />
+			<Add after="pkexec  make -C $(HOME)/CDT2/TensorNetworks/PyTensorNetworks install" />
 		</ExtraCommands>
 		<Unit filename="PyTensorNetworks.sip" />
 		<Unit filename="StdString.sip" />
