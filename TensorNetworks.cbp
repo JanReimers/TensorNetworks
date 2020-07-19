@@ -113,6 +113,7 @@
 		</Unit>
 		<Unit filename="TensorNetworks/Epsilons.H" />
 		<Unit filename="TensorNetworks/Factory.H" />
+		<Unit filename="TensorNetworks/FullState.H" />
 		<Unit filename="TensorNetworks/Hamiltonian.H" />
 		<Unit filename="TensorNetworks/LRPSupervisor.H" />
 		<Unit filename="TensorNetworks/MatrixProductState.H" />
@@ -133,6 +134,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/FactoryImp.H" />
+		<Unit filename="TensorNetworksImp/FullStateImp.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/FullStateImp.H" />
 		<Unit filename="TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -166,9 +171,6 @@
 		<Unit filename="wx/wxMPSApproximationsPanel.py" />
 		<Unit filename="wx/wxMPSFrame.py" />
 		<Unit filename="wx/wxMPSStatusPanel.py" />
-		<Extensions>
-			<code_completion />
-			<debugger />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

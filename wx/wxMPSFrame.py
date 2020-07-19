@@ -138,6 +138,7 @@ class wxMPSControlsPanel(wx.Panel):
         self.s1.Bind(wx.EVT_SLIDER,supervisor.OnSite)
 
     def NewLattice(self,L):
+        print ("L=",L)
         self.s1.SetMax(L-1) #This works on bond index not site index, so it goes from 1 to L-1.
 
 class MPSFrame(wx.Frame,GUIHandler):
@@ -219,9 +220,10 @@ class MPSFrame(wx.Frame,GUIHandler):
             self.supervisor.OnStop(e)
         self.MPS=self.ApproximationsPanel.CreateMPS(self.Hamiltonian)
         self.MPS.InitializeWith(PyTensorNetworks.Random)
-        L=self.Hamiltonian.GetL();
-        S=self.Hamiltonian.GetS();
+        L=self.Hamiltonian.GetL()
+        S=self.Hamiltonian.GetS()
         self.MPS.Freeze(L-1,S)
+        print (self.graphs)
         self.graphs.Clear()
         self.MPS.Insert(self.graphs) #Tell the MPS where to plot data
         self.graphs.ReplotActiveGraph()

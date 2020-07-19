@@ -3,9 +3,12 @@
 	<Workspace title="Workspace">
 		<Project filename="../oml/oml.cbp" />
 		<Project filename="../Misc/Misc.cbp" />
-		<Project filename="../Misc/wxMisc.cbp" />
+		<Project filename="../Misc/wxMisc.cbp">
+			<Depends filename="../Misc/Misc.cbp" />
+		</Project>
 		<Project filename="../Plotting/Plotting.cbp" />
 		<Project filename="../Plotting/wxPlotting.cbp">
+			<Depends filename="../Misc/wxMisc.cbp" />
 			<Depends filename="../Plotting/Plotting.cbp" />
 		</Project>
 		<Project filename="../Plotting/PyPlotting.cbp">

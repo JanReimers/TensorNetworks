@@ -17,6 +17,7 @@ class Hamiltonian_1D_NN_Heisenberg
     , public virtual OperatorWRepresentation
     , public MPO_LRB
 {
+        typedef Hamiltonian::Matrix4T Matrix4T;
     public:
         Hamiltonian_1D_NN_Heisenberg(int L, double S, double Jxy,double Jz, double hz);
         virtual ~Hamiltonian_1D_NN_Heisenberg();
@@ -26,9 +27,10 @@ class Hamiltonian_1D_NN_Heisenberg
         virtual int GetL () const {return itsL;}
         virtual int Getp () const {return 2*itsS+1;}
         //virtual int GetS () const {return itsS;}
-        virtual MatrixProductState* CreateMPS(int D,const Epsilons&) const;
-        virtual Operator*           CreateOperator(const OperatorWRepresentation*) const;
-        virtual SparseMatrixCT      BuildLocalMatrix   () const;
+        virtual MatrixProductState* CreateMPS       (int D,const Epsilons&) const;
+        virtual Operator*           CreateOperator  (const OperatorWRepresentation*) const;
+        virtual Matrix4T            BuildLocalMatrix() const;
+        virtual FullState*          CreateFullState () const;
         //
         //  OperatorWRepresentation interface
         //

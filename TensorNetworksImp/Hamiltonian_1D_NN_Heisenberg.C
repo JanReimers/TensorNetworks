@@ -1,5 +1,6 @@
 #include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
 #include "TensorNetworksImp/MatrixProductStateImp.H"
+#include "TensorNetworksImp/FullStateImp.H"
 #include "Operators/MPO_LRB.H"
 
 
@@ -145,25 +146,17 @@ Dw12 Hamiltonian_1D_NN_Heisenberg::GetDw12(TensorNetworks::Position lbr) const
 //
 //  Build the a local (2 site for NN interactions) Hamiltonian Matrix
 //
-SparseMatrixCT Hamiltonian_1D_NN_Heisenberg::BuildLocalMatrix() const
+TensorNetworks::Matrix4T Hamiltonian_1D_NN_Heisenberg::BuildLocalMatrix() const
 {
     SpinCalculator sc(itsS);
-    int p=Getp(),i=0,j=0;
-    long int N=p*p;
-    SparseMatrixCT Hab(N,N);
+    int p=Getp();
+    Matrix4T Hab(p,p,p,p,0);
     for (int na=0;na<p;na++)
         for (int nb=0;nb<p;nb++)
-        {
-            i++;
-            j=0;
             for (int ma=0;ma<p;ma++)
                 for (int mb=0;mb<p;mb++)
-                {
-                    j++;
-                    double h=GetH(ma,na,mb,nb,sc);
-                    Hab.Insert(h,i,j);
-                }
-        }
+                    Hab(ma,mb,na,nb)=GetH(ma,na,mb,nb,sc);
+
     return Hab;
 }
 
@@ -181,5 +174,10 @@ MatrixProductState* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,const Epsilons
  Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(const OperatorWRepresentation* Wrep) const
  {
     return new MPO_LRB(Wrep,itsL,itsS);
+ }
+
+ FullState* Hamiltonian_1D_NN_Heisenberg::CreateFullState () const
+ {
+    return new FullStateImp(itsL,itsS);
  }
 

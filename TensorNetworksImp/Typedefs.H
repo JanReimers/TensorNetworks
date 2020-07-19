@@ -7,6 +7,7 @@
 #include "Containers/Vector3.H"
 #include "Containers/Vector4.H"
 #include "oml/vector.h"
+#include "oml/array.h"
 
 //--------------------------------------------------------------------------------------
 //
@@ -15,12 +16,13 @@
 namespace TensorNetworks
 {
         typedef Vector <double> VectorT;
-
         typedef Vector <eType > VectorCT;
-        typedef Matrix6<eType>  Matrix6T;
-        typedef Matrix4<eType>  Matrix4T;
-        typedef Vector3<eType>  Vector3T;
-        typedef Vector4<eType>  Vector4T;
+        typedef Array  <eType > ArrayCT;
+
+        typedef Matrix6<eType>  Matrix6CT;
+        typedef Matrix4<eType>  Matrix4CT;
+        typedef Vector3<eType>  Vector3CT;
+        typedef Vector4<eType>  Vector4CT;
 };
 
 #endif //_IMPTYPEDEFS_H_

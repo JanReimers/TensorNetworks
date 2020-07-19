@@ -2,16 +2,17 @@
 #define HAMILTONIAN_H
 
 #include "TensorNetworks/Operator.H"
-#include "Containers/SparseMatrix.H"
+#include "TensorNetworks/Typedefs.H"
 
 class OperatorWRepresentation;
 class MatrixProductState;
+class FullState;
 class Epsilons;
-
-typedef SparseMatrix<std::complex<double> > SparseMatrixCT;
 
 class Hamiltonian : public virtual Operator
 {
+    protected:
+        typedef TensorNetworks::Matrix4T Matrix4T;
     public:
         Hamiltonian() {}
         virtual ~Hamiltonian() {}
@@ -21,7 +22,8 @@ class Hamiltonian : public virtual Operator
         //  Creates an MPS or operators with the correct lattice size and spin space.
         virtual MatrixProductState* CreateMPS     (int D,const Epsilons&) const=0;
         virtual Operator*           CreateOperator(const OperatorWRepresentation*) const=0;
-        virtual SparseMatrixCT      BuildLocalMatrix() const=0;
+        virtual Matrix4T            BuildLocalMatrix() const=0;
+        virtual FullState*          CreateFullState() const=0;
 };
 
 #endif //HAMILTONIAN_H

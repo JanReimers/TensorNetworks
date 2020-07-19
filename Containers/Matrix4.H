@@ -52,8 +52,8 @@ template <class T> class Matrix4
         friend std::istream& operator>>(std::istream& is,      Matrix4& m) {return is >> m.itsData;}
 
     protected:
-        int index1(int w1, int i1) const {return w1+itswLow+itsDw1*(i1-1);}
-        int index2(int w2, int i2) const {return w2+itswLow+itsDw2*(i2-1);}
+        int index1(int w1, int i1) const {return w1+itswLow+itsDw1*(i1-1+itswLow);}
+        int index2(int w2, int i2) const {return w2+itswLow+itsDw2*(i2-1+itswLow);}
 
     private:
         int itsDw1,itsD1,itsDw2,itsD2, itswLow;

@@ -1,18 +1,10 @@
 #include "Tests.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/Factory.H"
-#include "TensorNetworks/LRPSupervisor.H"
-#include "TensorNetworks/Epsilons.H"
-//#include "TensorNetworksImp/SpinCalculator.H"
-//#include "Operators/MPO_OneSite.H"
-//#include "Operators/MPO_TwoSite.H"
-
-//#include "oml/stream.h"
-//#include "oml/array_io.h"
-//#include "oml/smatrix.h"
+#include "TensorNetworks/FullState.H"
 #include "oml/numeric.h"
 
-//using std::setw;
+using TensorNetworks::MatrixT;
 
 class ExactDiagTesting : public ::testing::Test
 {
@@ -23,7 +15,6 @@ public:
     ExactDiagTesting()
         : itsFactory(TensorNetworks::Factory::GetFactory())
         , itsH(0)
-        , itsLRPSupervisor(new LRPSupervisor())
         , itsEps()
     {
         StreamableObject::SetToPretty();
@@ -32,7 +23,6 @@ public:
     ~ExactDiagTesting()
     {
         delete itsFactory;
-        delete itsLRPSupervisor;
         delete itsH;
     }
 
@@ -45,43 +35,37 @@ public:
     TensorNetworks::MatrixT GetH(double S)
     {
         Setup(2,S);
-        SparseMatrixCT Hab=itsH->BuildLocalMatrix();
-        int N=Hab.GetNumRows();
-        TensorNetworks::MatrixT H(N,N);
-        for (int i=1;i<=N;i++)
-            for (int j=1;j<=N;j++)
-                H(i,j)=real(Hab(i,j));
-        return H;
+        return itsH->BuildLocalMatrix().Flatten();
     }
 
 
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
     Hamiltonian*         itsH;
-    LRPSupervisor*       itsLRPSupervisor;
     Epsilons             itsEps;
 };
 
-
+/*
 TEST_F(ExactDiagTesting,TestHabS12)
 {
     Setup(10,0.5);
-    SparseMatrixCT Hab=itsH->BuildLocalMatrix();
+    MatrixT Hab=itsH->BuildLocalMatrix().Flatten();
     //cout << "Hab=" << Hab << endl;
-    EXPECT_EQ(ToString(Hab),"[1,1]=(0.25,0)\n[2,2]=(-0.25,0)\n[2,3]=(0.5,0)\n[3,2]=(0.5,0)\n[3,3]=(-0.25,0)\n[4,4]=(0.25,0)\n");
+    EXPECT_EQ(ToString(Hab),"(1:4),(1:4) \n[ 0.25 0 0 0 ]\n[ 0 -0.25 0.5 0 ]\n[ 0 0.5 -0.25 0 ]\n[ 0 0 0 0.25 ]\n");
 }
+
 
 TEST_F(ExactDiagTesting,TestHabS1)
 {
     Setup(10,1.0);
-    SparseMatrixCT Hab=itsH->BuildLocalMatrix();
-    EXPECT_EQ(ToString(Hab),"[1,1]=(1,0)\n[2,4]=(1,0)\n[3,3]=(-1,0)\n[3,5]=(1,0)\n[4,2]=(1,0)\n[5,3]=(1,0)\n[5,7]=(1,0)\n[6,8]=(1,0)\n[7,5]=(1,0)\n[7,7]=(-1,0)\n[8,6]=(1,0)\n[9,9]=(1,0)\n");
+    MatrixT Hab=itsH->BuildLocalMatrix().Flatten();
+    EXPECT_EQ(ToString(Hab),"(1:9),(1:9) \n[ 1 0 0 0 0 0 0 0 0 ]\n[ 0 0 0 1 0 0 0 0 0 ]\n[ 0 0 -1 0 1 0 0 0 0 ]\n[ 0 1 0 0 0 0 0 0 0 ]\n[ 0 0 1 0 0 0 1 0 0 ]\n[ 0 0 0 0 0 0 0 1 0 ]\n[ 0 0 0 0 1 0 -1 0 0 ]\n[ 0 0 0 0 0 1 0 0 0 ]\n[ 0 0 0 0 0 0 0 0 1 ]\n");
 }
 
 TEST_F(ExactDiagTesting,TestHabS32)
 {
     Setup(10,1.5);
-    SparseMatrixCT Hab=itsH->BuildLocalMatrix();
-    EXPECT_EQ(ToString(Hab),"[1,1]=(2.25,0)\n[2,2]=(0.75,0)\n[2,5]=(1.5,0)\n[3,3]=(-0.75,0)\n[3,6]=(1.73205,0)\n[4,4]=(-2.25,0)\n[4,7]=(1.5,0)\n[5,2]=(1.5,0)\n[5,5]=(0.75,0)\n[6,3]=(1.73205,0)\n[6,6]=(0.25,0)\n[6,9]=(1.73205,0)\n[7,4]=(1.5,0)\n[7,7]=(-0.25,0)\n[7,10]=(2,0)\n[8,8]=(-0.75,0)\n[8,11]=(1.73205,0)\n[9,6]=(1.73205,0)\n[9,9]=(-0.75,0)\n[10,7]=(2,0)\n[10,10]=(-0.25,0)\n[10,13]=(1.5,0)\n[11,8]=(1.73205,0)\n[11,11]=(0.25,0)\n[11,14]=(1.73205,0)\n[12,12]=(0.75,0)\n[12,15]=(1.5,0)\n[13,10]=(1.5,0)\n[13,13]=(-2.25,0)\n[14,11]=(1.73205,0)\n[14,14]=(-0.75,0)\n[15,12]=(1.5,0)\n[15,15]=(0.75,0)\n[16,16]=(2.25,0)\n");
+    TensorNetworks::MatrixT Hab=itsH->BuildLocalMatrix().Flatten();
+    EXPECT_EQ(ToString(Hab),"(1:16),(1:16) \n[ 2.25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ]\n[ 0 0.75 0 0 1.5 0 0 0 0 0 0 0 0 0 0 0 ]\n[ 0 0 -0.75 0 0 1.73205 0 0 0 0 0 0 0 0 0 0 ]\n[ 0 0 0 -2.25 0 0 1.5 0 0 0 0 0 0 0 0 0 ]\n[ 0 1.5 0 0 0.75 0 0 0 0 0 0 0 0 0 0 0 ]\n[ 0 0 1.73205 0 0 0.25 0 0 1.73205 0 0 0 0 0 0 0 ]\n[ 0 0 0 1.5 0 0 -0.25 0 0 2 0 0 0 0 0 0 ]\n[ 0 0 0 0 0 0 0 -0.75 0 0 1.73205 0 0 0 0 0 ]\n[ 0 0 0 0 0 1.73205 0 0 -0.75 0 0 0 0 0 0 0 ]\n[ 0 0 0 0 0 0 2 0 0 -0.25 0 0 1.5 0 0 0 ]\n[ 0 0 0 0 0 0 0 1.73205 0 0 0.25 0 0 1.73205 0 0 ]\n[ 0 0 0 0 0 0 0 0 0 0 0 0.75 0 0 1.5 0 ]\n[ 0 0 0 0 0 0 0 0 0 1.5 0 0 -2.25 0 0 0 ]\n[ 0 0 0 0 0 0 0 0 0 0 1.73205 0 0 -0.75 0 0 ]\n[ 0 0 0 0 0 0 0 0 0 0 0 1.5 0 0 0.75 0 ]\n[ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2.25 ]\n");
 }
 
 TEST_F(ExactDiagTesting,TestEvsS12)
@@ -122,3 +106,78 @@ TEST_F(ExactDiagTesting,TestEvsS52)
     Vector<double> evs=Diagonalize(H);
     EXPECT_EQ(ToString(evs),"(1:36){ -8.75 -7.75 -7.75 -7.75 -5.75 -5.75 -5.75 -5.75 -5.75 -2.75 -2.75 -2.75 -2.75 -2.75 -2.75 -2.75 1.25 1.25 1.25 1.25 1.25 1.25 1.25 1.25 1.25 6.25 6.25 6.25 6.25 6.25 6.25 6.25 6.25 6.25 6.25 6.25 }");
 }
+
+TEST_F(ExactDiagTesting,CreateFullStateL10S12)
+{
+    Setup(10,0.5);
+    FullState* psi=itsH->CreateFullState();
+    EXPECT_EQ(psi->GetSize(),1024);
+}
+
+TEST_F(ExactDiagTesting,CreateFullStateL10S22)
+{
+    Setup(10,1.0);
+    FullState* psi=itsH->CreateFullState();
+    EXPECT_EQ(psi->GetSize(),59049);
+}
+
+TEST_F(ExactDiagTesting,CreateFullStateL10S32)
+{
+    Setup(10,1.5);
+    FullState* psi=itsH->CreateFullState();
+    EXPECT_EQ(psi->GetSize(),1048576);
+}
+
+TEST_F(ExactDiagTesting,CreateFullStateL10S42)
+{
+    Setup(10,2.0);
+    FullState* psi=itsH->CreateFullState();
+    EXPECT_EQ(psi->GetSize(),9765625);
+}
+
+TEST_F(ExactDiagTesting,CreateFullStateL10S52)
+{
+    Setup(5,2.5);
+    FullState* psi=itsH->CreateFullState();
+    EXPECT_EQ(psi->GetSize(),7776);
+}
+*/
+TEST_F(ExactDiagTesting,HPsiL2S12)
+{
+    Setup(2,0.5);
+    FullState* psi=itsH->CreateFullState();
+    psi->Contract(itsH->BuildLocalMatrix());
+    cout << *psi << endl;
+}
+
+TEST_F(ExactDiagTesting,HPsiL3S12)
+{
+    Setup(3,0.5);
+    FullState* psi=itsH->CreateFullState();
+    psi->Contract(itsH->BuildLocalMatrix());
+    cout << *psi << endl;
+}
+
+TEST_F(ExactDiagTesting,HPsiL10S12)
+{
+    Setup(10,0.5);
+    FullState* psi=itsH->CreateFullState();
+    psi->Contract(itsH->BuildLocalMatrix());
+//    cout << *psi << endl;
+}
+
+TEST_F(ExactDiagTesting,PowerMethodGroundStateL2S12)
+{
+    Setup(4,0.5);
+    FullState* psi=itsH->CreateFullState();
+    psi->Normalize();
+    TensorNetworks::Matrix4T Hlocal=itsH->BuildLocalMatrix();
+    for (int n=1;n<100;n++)
+    {
+        psi->Contract(Hlocal);
+        cout << "E=" <<     psi->Normalize() << endl;
+
+    }
+    cout << *psi << endl;
+}
+

@@ -21,16 +21,16 @@ class MatrixProductStateImp
 //  Typedefs for various containers
 //
 private:
-        typedef TensorNetworks::MatrixT  MatrixT;
-        typedef TensorNetworks::VectorT  VectorT;
-        typedef TensorNetworks:: ArrayT  ArrayT;
-        typedef TensorNetworks::MatrixCT MatrixCT;
-        typedef TensorNetworks::VectorCT VectorCT;
-        typedef TensorNetworks::Matrix6T Matrix6T;
-        typedef TensorNetworks::Vector3T Vector3T;
-        typedef TensorNetworks::Vector4T Vector4T;
-        typedef TensorNetworks::Matrix4T Matrix4T;
-        typedef TensorNetworks::eType    eType;
+        typedef TensorNetworks::MatrixT   MatrixT;
+        typedef TensorNetworks::VectorT   VectorT;
+        typedef TensorNetworks:: ArrayT   ArrayT;
+        typedef TensorNetworks::MatrixCT  MatrixCT;
+        typedef TensorNetworks::VectorCT  VectorCT;
+        typedef TensorNetworks::Matrix6CT Matrix6T;
+        typedef TensorNetworks::Vector3CT Vector3T;
+        typedef TensorNetworks::Vector4CT Vector4T;
+        typedef TensorNetworks::Matrix4CT Matrix4T;
+        typedef TensorNetworks::eType     eType;
 //--------------------------------------------------------------------------------------
 //
 //  Conctruction and initialization zone
