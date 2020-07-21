@@ -8,4 +8,5 @@ Epsilons::Epsilons(double default_eps)
     , itsNormalizationEpsilon            (default_eps)
     , itsSingularValueZeroEpsilon        (default_eps)
     , itsSparseMatrixEpsilon             (default_eps)
+    , itsMaxIter                         (50)
 {}

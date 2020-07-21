@@ -165,6 +165,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/SpinCalculator.H" />
+		<Unit filename="TensorNetworksImp/StateIterator.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/StateIterator.H" />
 		<Unit filename="TensorNetworksImp/Typedefs.H" />
 		<Unit filename="wx/wxHamiltonianPanel.py" />
 		<Unit filename="wx/wxMPS.py" />

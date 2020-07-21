@@ -2,6 +2,7 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/FullState.H"
+#include "TensorNetworksImp/StateIterator.H"
 #include "oml/numeric.h"
 
 using TensorNetworks::MatrixT;
@@ -15,8 +16,10 @@ public:
     ExactDiagTesting()
         : itsFactory(TensorNetworks::Factory::GetFactory())
         , itsH(0)
-        , itsEps()
+        , itsEps(1e-10)
     {
+        itsEps.itsEnergyConvergenceEpsilon=1e-15;
+        itsEps.itsMaxIter=1000;
         StreamableObject::SetToPretty();
 
     }
@@ -44,7 +47,15 @@ public:
     Epsilons             itsEps;
 };
 
-/*
+TEST_F(ExactDiagTesting,TestStateIterator)
+{
+
+    for (StateIterator is(3,3);!is.end();is++)
+        EXPECT_EQ(is.GetLinearIndex(),is.GetIndex(is.GetQuantumNumbers()));
+}
+
+
+
 TEST_F(ExactDiagTesting,TestHabS12)
 {
     Setup(10,0.5);
@@ -71,7 +82,6 @@ TEST_F(ExactDiagTesting,TestHabS32)
 TEST_F(ExactDiagTesting,TestEvsS12)
 {
     TensorNetworks::MatrixT H=GetH(1.0/2.0);
-//    cout << "Hab=" << H << endl;
     Vector<double> evs=Diagonalize(H);
     EXPECT_EQ(ToString(evs),"(1:4){ -0.75 0.25 0.25 0.25 }");
 }
@@ -141,13 +151,12 @@ TEST_F(ExactDiagTesting,CreateFullStateL10S52)
     FullState* psi=itsH->CreateFullState();
     EXPECT_EQ(psi->GetSize(),7776);
 }
-*/
+
 TEST_F(ExactDiagTesting,HPsiL2S12)
 {
     Setup(2,0.5);
     FullState* psi=itsH->CreateFullState();
     psi->Contract(itsH->BuildLocalMatrix());
-    cout << *psi << endl;
 }
 
 TEST_F(ExactDiagTesting,HPsiL3S12)
@@ -155,7 +164,6 @@ TEST_F(ExactDiagTesting,HPsiL3S12)
     Setup(3,0.5);
     FullState* psi=itsH->CreateFullState();
     psi->Contract(itsH->BuildLocalMatrix());
-    cout << *psi << endl;
 }
 
 TEST_F(ExactDiagTesting,HPsiL10S12)
@@ -163,21 +171,89 @@ TEST_F(ExactDiagTesting,HPsiL10S12)
     Setup(10,0.5);
     FullState* psi=itsH->CreateFullState();
     psi->Contract(itsH->BuildLocalMatrix());
-//    cout << *psi << endl;
 }
+
 
 TEST_F(ExactDiagTesting,PowerMethodGroundStateL2S12)
 {
-    Setup(4,0.5);
+    Setup(2,0.5);
     FullState* psi=itsH->CreateFullState();
-    psi->Normalize();
-    TensorNetworks::Matrix4T Hlocal=itsH->BuildLocalMatrix();
-    for (int n=1;n<100;n++)
-    {
-        psi->Contract(Hlocal);
-        cout << "E=" <<     psi->Normalize() << endl;
-
-    }
+    psi->PowerIterate(itsEps,itsH->BuildLocalMatrix());
     cout << *psi << endl;
+    EXPECT_NEAR(psi->GetE(),-0.75,itsEps.itsEnergyConvergenceEpsilon);
 }
 
+TEST_F(ExactDiagTesting,PowerMethodGroundStateL3S12)
+{
+    Setup(3,0.5);
+    FullState* psi=itsH->CreateFullState();
+    psi->PowerIterate(itsEps,itsH->BuildLocalMatrix());
+    cout << *psi << endl;
+    EXPECT_NEAR(psi->GetE(),-1.0,itsEps.itsEnergyConvergenceEpsilon);
+}
+
+TEST_F(ExactDiagTesting,PowerMethodGroundStateL4S12)
+{
+    Setup(4,0.5);
+    FullState* psi=itsH->CreateFullState();
+    psi->PowerIterate(itsEps,itsH->BuildLocalMatrix());
+    EXPECT_NEAR(psi->GetE(), -1.6160254037844393,itsEps.itsEnergyConvergenceEpsilon);
+}
+TEST_F(ExactDiagTesting,PowerMethodGroundStateL6S12)
+{
+    Setup(6,0.5);
+    FullState* psi=itsH->CreateFullState();
+    psi->PowerIterate(itsEps,itsH->BuildLocalMatrix());
+    EXPECT_NEAR(psi->GetE(),  -2.4935771338879262,itsEps.itsEnergyConvergenceEpsilon);
+}
+TEST_F(ExactDiagTesting,PowerMethodGroundStateL10S12)
+{
+    Setup(10,0.5);
+    FullState* psi=itsH->CreateFullState();
+    psi->PowerIterate(itsEps,itsH->BuildLocalMatrix());
+    EXPECT_NEAR(psi->GetE(),-4.2580352072828864 ,itsEps.itsEnergyConvergenceEpsilon*10);
+}
+
+TEST_F(ExactDiagTesting,PowerMethodGroundStateL2S1)
+{
+    Setup(2,1.0);
+    FullState* psi=itsH->CreateFullState();
+    psi->PowerIterate(itsEps,itsH->BuildLocalMatrix());
+    cout << *psi << endl;
+    EXPECT_NEAR(psi->GetE(),-2,itsEps.itsEnergyConvergenceEpsilon);
+}
+
+TEST_F(ExactDiagTesting,PowerMethodGroundStateL2S32)
+{
+    Setup(2,1.5);
+    FullState* psi=itsH->CreateFullState();
+    psi->PowerIterate(itsEps,itsH->BuildLocalMatrix());
+    cout << *psi << endl;
+    EXPECT_NEAR(psi->GetE(),-3.75,itsEps.itsEnergyConvergenceEpsilon);
+}
+
+TEST_F(ExactDiagTesting,PowerMethodGroundStateL2S2)
+{
+    Setup(2,2.0);
+    FullState* psi=itsH->CreateFullState();
+    psi->PowerIterate(itsEps,itsH->BuildLocalMatrix());
+    EXPECT_NEAR(psi->GetE(),-6,itsEps.itsEnergyConvergenceEpsilon);
+}
+
+TEST_F(ExactDiagTesting,PowerMethodGroundStateL2S52)
+{
+    Setup(2,2.5);
+    FullState* psi=itsH->CreateFullState();
+    psi->PowerIterate(itsEps,itsH->BuildLocalMatrix());
+    EXPECT_NEAR(psi->GetE(),-8.75,itsEps.itsEnergyConvergenceEpsilon*10);
+}
+
+#ifndef DEBUG
+TEST_F(ExactDiagTesting,PowerMethodGroundStateL4S52)
+{
+    Setup(4,2.5);
+    FullState* psi=itsH->CreateFullState();
+    psi->PowerIterate(itsEps,itsH->BuildLocalMatrix());
+    EXPECT_NEAR(psi->GetE(),-22.762419480032261,itsEps.itsEnergyConvergenceEpsilon*50);
+}
+#endif // DEBUG

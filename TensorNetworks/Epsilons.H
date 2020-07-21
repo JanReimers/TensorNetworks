@@ -14,6 +14,7 @@ struct Epsilons
     double itsNormalizationEpsilon;             //Is normalized if max|A-I|<eps
     double itsSingularValueZeroEpsilon;         //s is deemed to be zero if s<eps
     double itsSparseMatrixEpsilon;              //matrix element A_ij is deemed to be zero if A_ij <eps
+    int    itsMaxIter;                          //Max # of allowed iterations.
 };
 
 #endif // EPSILONS_H

@@ -10,18 +10,21 @@
 //
 class FullStateImp : public virtual FullState
 {
+    typedef TensorNetworks::ArrayCT ArrayCT;
     public:
         FullStateImp(int L, double S);
         virtual ~FullStateImp();
 
-        virtual long int GetSize() const {return itsN;}
-        virtual void Contract(const Matrix4T& Hlocal);
-        virtual double Normalize();
+        virtual long int GetSize     () const {return itsN;}
+        virtual void     Normalize   (ArrayCT& amplitudes);
+        virtual double   PowerIterate(const Epsilons&,const Matrix4T& Hlocal,bool quite=true);
+        virtual double   Contract    (const Matrix4T& Hlocal);
+        virtual double   GetE        () const {return itsE;}
+
         virtual std::ostream& Dump(std::ostream&) const;
 
     protected:
-        int  GetIndex(const Vector<int>& state) const;
-        void ContractLocal(int isite,int ia,Vector<int>& stateVector,int& indexn,int& indexm, const Matrix4T& Hlocal);
+        void ContractLocal(int ia, const Matrix4T& Hlocal, ArrayCT& newAmplitudes) const;
 
 
     private:
@@ -29,10 +32,8 @@ class FullStateImp : public virtual FullState
         double   itsS;
         int      itsp;
         long int itsN; //p^L
-        TensorNetworks::ArrayCT itsAmplitudes;
-        TensorNetworks::ArrayCT itsAmplitudes1;
-
-
+        double   itsE; //Eigen energy from power iterations
+        ArrayCT itsAmplitudes;
 };
 
 #endif // FULLSTATEIMP_H
