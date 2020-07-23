@@ -30,7 +30,7 @@ public:
 
 
     Epsilons               itsEps;
-   MatrixProductStateImp mps;
+    MatrixProductStateImp mps;
     double eps;
 
 };

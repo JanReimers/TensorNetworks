@@ -2,7 +2,10 @@
 #define PRIMEEIGENSOLVER_H
 
 #include "Containers/SparseMatrix.H"
+#include "TensorNetworks/Typedefs.H"
+
 class Epsilons;
+class FullStateImp;
 //
 //  Solve sparse eigen systems using the PRIMME library
 //  For efficiency client code should keep and instance of PrimeEigenSolver alive
@@ -10,12 +13,15 @@ class Epsilons;
 //
 template <class T> class PrimeEigenSolver
 {
+        typedef TensorNetworks::Matrix4T Matrix4T;
     public:
         PrimeEigenSolver();
         ~PrimeEigenSolver();
 
         // Get lowest N eigen values and vectors with no initial guess
-        void Solve(const DMatrix<T>&, int NumEigenValues,const Epsilons& eps);
+        int Solve(const DMatrix<T>&                              , int NumEigenValues,const Epsilons& eps);
+        int Solve(const Matrix4T& Hlocal, const FullStateImp* Psi, int NumEigenValues,const Epsilons& eps);
+
 
         Vector <T> GetEigenVector (int index) const;
         DMatrix<T> GetEigenVectors() const {return itsEigenVectors;}
@@ -24,8 +30,8 @@ template <class T> class PrimeEigenSolver
         static const SparseMatrix<T>* theSparseMatrix;
         static const      DMatrix<T>* theDenseMatrix;
     protected:
-        void SolveSparse(int NumEigenValues,double eps);
-        void SolveDense (int NumEigenValues,double eps);
+        int SolveSparse(int NumEigenValues,double eps);
+        int SolveDense (int NumEigenValues,double eps);
 
 
     private:

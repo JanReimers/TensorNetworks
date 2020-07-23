@@ -2,8 +2,10 @@
 #define FULLSTATE_H
 
 #include "TensorNetworks/Typedefs.H"
+#include <iosfwd>
 
 class Epsilons;
+class Hamiltonian;
 
 //--------------------------------------------------------------------------------
 //
@@ -12,18 +14,17 @@ class Epsilons;
 class FullState
 {
     protected:
-        typedef TensorNetworks::Matrix4T Matrix4T;
-
+        typedef TensorNetworks::eType eType;
     public:
         FullState() {}
         virtual ~FullState() {}
 
         virtual long int GetSize     () const=0; //p^L
         virtual double   GetE        () const=0; //GS Eigen energy from power iterations
-        // calculate |Psi'>=H*|Psi>
-        virtual double   Contract    (const Matrix4T& Hlocal)=0;
         // Iteracte |Psi'>=H*|Psi> until convergence to a ground state
-        virtual double   PowerIterate(const Epsilons&,const Matrix4T& Hlocal,bool quite=true)=0;
+        virtual double   PowerIterate   (const Epsilons&,const Hamiltonian&,bool quite=true)=0;
+        // Use proper Lanczos to find the ground state
+        virtual double   FindGroundState(const Epsilons&,const Hamiltonian&,bool quite=true)=0;
         // IO routines
         virtual std::ostream& Dump(std::ostream&) const=0;
         friend  std::ostream& operator<<(std::ostream& os,const FullState& psi)
