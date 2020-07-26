@@ -26,9 +26,10 @@ class Hamiltonian_1D_NN_Heisenberg
         //
         virtual int GetL () const {return itsL;}
         virtual int Getp () const {return 2*itsS+1;}
-        //virtual int GetS () const {return itsS;}
+
         virtual MatrixProductState* CreateMPS       (int D,const Epsilons&) const;
         virtual Operator*           CreateOperator  (const OperatorWRepresentation*) const;
+        virtual Operator*           CreateOperator  (double dt, TensorNetworks::Trotter type       ) const;
         virtual Matrix4T            BuildLocalMatrix() const;
         virtual FullState*          CreateFullState () const;
         //
@@ -38,7 +39,6 @@ class Hamiltonian_1D_NN_Heisenberg
         virtual Dw12    GetDw12(TensorNetworks::Position lbr) const;
 
     private:
-
         double GetH(int ma,int na,int mb,int nb,const SpinCalculator& sc) const
         {
             return 0.5*itsJxy*(sc.GetSp(ma,na)*sc.GetSm(mb,nb)+sc.GetSm(ma,na)*sc.GetSp(mb,nb))

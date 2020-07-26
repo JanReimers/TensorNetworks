@@ -4,13 +4,17 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Enums.H"
 #include "TensorNetworks/Dw12.H"
+#include "TensorNetworksImp/Typedefs.H"
+
 
 class OperatorWRepresentation;
 
 class SiteOperatorImp : public virtual SiteOperator
 {
+        typedef TensorNetworks::VectorT VectorT;
     public:
-        SiteOperatorImp(TensorNetworks::Position lbr, const OperatorWRepresentation* O,int p);
+        SiteOperatorImp(TensorNetworks::Position  lbr, const OperatorWRepresentation* O,int p);
+        SiteOperatorImp(TensorNetworks::Direction lr , const MatrixT& U, const VectorT& expEvs, int p);
         virtual ~SiteOperatorImp();
 
 

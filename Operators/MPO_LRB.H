@@ -20,7 +20,7 @@ class MPO_LRB : public virtual Operator
         MPO_LRB(const OperatorWRepresentation* O, int L, double S);
         virtual ~MPO_LRB();
 
-        const SiteOperator* GetSiteOperator(int isite) const
+        virtual const SiteOperator* GetSiteOperator(int isite) const
         {
             assert(itsSites.size()>0);
             return itsSites[GetPosition(isite)];

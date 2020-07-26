@@ -112,7 +112,6 @@ template <class T> int PrimeEigenSolver<T>::SolveDense(int NumEigenValues,double
 
     primme_free(&primme);
     itsNumGuesses=NumEigenValues; //Set up using guesses for next time around
-//    itsNumGuesses=0; //Set up using guesses for next time around
     return niter;
 }
 

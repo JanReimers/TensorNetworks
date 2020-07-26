@@ -17,10 +17,7 @@
 					<Add option="-Wall" />
 					<Add option="-g" />
 					<Add option="-DDEBUG" />
-					<Add directory="./" />
-					<Add directory="TensorNetworks" />
-					<Add directory="TensorNetworksImp" />
-					<Add directory="Containers" />
+					<Add directory="Operators" />
 				</Compiler>
 				<Linker>
 					<Add directory="../Debug" />
@@ -38,10 +35,7 @@
 					<Add option="-Wall" />
 					<Add option="-pg" />
 					<Add option="-DNDEBUG" />
-					<Add directory="./" />
-					<Add directory="TensorNetworks" />
-					<Add directory="TensorNetworksImp" />
-					<Add directory="Containers" />
+					<Add directory="Operators" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />
@@ -51,6 +45,7 @@
 		<Compiler>
 			<Add option="-fPIC" />
 			<Add option="-DHAVE_CONFIG_H" />
+			<Add directory="./" />
 			<Add directory="../" />
 			<Add directory="../Plotting" />
 		</Compiler>
@@ -62,6 +57,9 @@
 			<Add library="lapack" />
 			<Add library="blas" />
 		</Linker>
+		<ExtraCommands>
+			<Add before="pwd" />
+		</ExtraCommands>
 		<Unit filename="Containers/Matrix4.H" />
 		<Unit filename="Containers/Matrix6.H" />
 		<Unit filename="Containers/OneSiteDMs.C">
@@ -90,6 +88,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/MPO_OneSite.H" />
+		<Unit filename="Operators/MPO_SpatialTrotter.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/MPO_SpatialTrotter.H" />
 		<Unit filename="Operators/MPO_TwoSite.C">
 			<Option compilerVar="CC" />
 		</Unit>

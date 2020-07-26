@@ -4,6 +4,8 @@
     Status bar. ModelName (from H), L,S, D, iter#, E, CPU & meminfo (use psutils)
 -Plotting support log axes in wxdriver.
 -Done Ham->CreateMPS should be a /Factory/ so py knows to delete it.
+-Fix conventions for lattice site indexing, zero or one based?
+    MPS is zero based, FullState is one based, LyX notes are one based
 -Convergence schedule,  increase D, drop epsilons
     ListView with columns
         -Step #

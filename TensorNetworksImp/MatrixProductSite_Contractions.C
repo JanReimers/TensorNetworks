@@ -538,3 +538,35 @@ MatrixProductSite::MatrixCT MatrixProductSite::FinializeTwoSiteDM(const MatrixCT
 
     return ret;
 }
+
+void  MatrixProductSite::Apply(const SiteOperator* so)
+{
+    const Dw12& Dws=so->GetDw12();
+    int newD1=itsD1*Dws.Dw1;
+    int newD2=itsD2*Dws.Dw2;
+    pVectorT newAs;
+
+    for (int n=0; n<itsp; n++)
+    {
+        newAs.push_back(MatrixCT(newD1,newD2));
+        Fill(newAs[n],eType(0.0));
+        for (int m=0; m<itsp; m++)
+        {
+            const MatrixT& W=so->GetW(n,m);
+            assert(W.GetNumRows()==Dws.Dw1);
+            assert(W.GetNumCols()==Dws.Dw2);
+            int i1=1; //i1=(w1,j1)
+            for (int w1=1;w1<=Dws.Dw1;w1++)
+                for (int j1=1; j1<=itsD1; j1++,i1++)
+                {
+                    int i2=1; //i2=(w2,j2)
+                    for (int w2=1;w2<=Dws.Dw2;w2++)
+                        for (int j2=1; j2<=itsD2; j2++,i2++)
+                            newAs[n](i1,i2)+=W(w1,w2)*itsAs[m](j1,j2);
+                }
+        }
+    }
+    itsD1=newD1;
+    itsD2=newD2;
+    itsAs=newAs;
+}

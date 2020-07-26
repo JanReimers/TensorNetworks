@@ -2375,6 +2375,38 @@ O^{ij}=\sum_{kl}U^{ik}\delta_{kl}e^{-\tau\lambda_{k}}\left(U^{\dagger}\right)^{l
 \end_inset
 
 
+\begin_inset Formula 
+\[
+=\sum_{w=1}^{p^{2}}U^{iw}e^{-\tau\lambda_{w}}U^{jw}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{w=1}^{p^{2}}U^{iw}e^{-\frac{\tau}{2}\lambda_{w}}e^{-\frac{\tau}{2}\lambda_{w}}U^{jw}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+O^{\left(n_{1}m_{1}\right)\left(n_{2}m_{2}\right)}=\sum_{w=1}^{p^{2}}U^{\left(n_{1}m_{1}\right)w}e^{-\frac{\tau}{2}\lambda_{w}}e^{-\frac{\tau}{2}\lambda_{w}}U^{\left(n_{2}m_{2}\right)w}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+O^{\left(n_{1}m_{1}\right)\left(n_{2}m_{2}\right)}=\sum_{w=1}^{p^{2}}\left[U^{\left(n_{1}m_{1}\right)w}e^{-\frac{\tau}{2}\lambda_{w}}\right]\left[e^{-\frac{\tau}{2}\lambda_{w}}U^{\left(n_{2}m_{2}\right)w}\right]
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

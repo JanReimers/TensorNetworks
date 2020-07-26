@@ -427,6 +427,13 @@ double   MatrixProductStateImp::GetExpectation(const Operator* o1,const Operator
     return std::real(F(1,1,1,1));
 }
 
+
+void  MatrixProductStateImp::Apply(const Operator* o)
+{
+    for (int ia=0; ia<itsL; ia++)
+        itsSites[ia]->Apply(o->GetSiteOperator(ia+1)); //TODO need consistenct on one or zero based for site numbers
+}
+
 //--------------------------------------------------------------------------------------
 //
 //    Reporting

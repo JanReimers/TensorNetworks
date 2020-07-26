@@ -47,6 +47,12 @@ class MatrixProductState : public virtual MultiPlotable
         virtual double   GetExpectation (const Operator* o1,const Operator* o2) const=0;
 //--------------------------------------------------------------------------------------
 //
+//  Operate on MPS with an MPO:  |Psi> -> O|Psi>.
+//  In general this will increase the bond dimension from D to D*Dw
+//
+        virtual void  Apply(const Operator* o)=0;
+//--------------------------------------------------------------------------------------
+//
 //    One and two site density matrix and expectation calculations
 //
         virtual OneSiteDMs CalculateOneSiteDMs(LRPSupervisor*)=0;

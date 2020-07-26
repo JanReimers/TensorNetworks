@@ -2,6 +2,7 @@
 #include "TensorNetworksImp/MatrixProductStateImp.H"
 #include "TensorNetworksImp/FullStateImp.H"
 #include "Operators/MPO_LRB.H"
+#include "Operators/MPO_SpatialTrotter.H"
 
 
 #include <iostream>
@@ -171,13 +172,31 @@ MatrixProductState* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,const Epsilons
     return new MatrixProductStateImp(itsL,itsS,D,eps);
 }
 
- Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(const OperatorWRepresentation* Wrep) const
- {
+Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(const OperatorWRepresentation* Wrep) const
+{
     return new MPO_LRB(Wrep,itsL,itsS);
- }
+}
 
- FullState* Hamiltonian_1D_NN_Heisenberg::CreateFullState () const
+Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::Trotter type       ) const
+{
+    Operator* O=0;
+    Matrix4T U; // Store exp(-dt*Hlocal);
+    if (type==TensorNetworks::Odd || type==TensorNetworks::Even)
+    {
+        Matrix4T Hlocal=BuildLocalMatrix();
+        O=new MPO_SpatialTrotter(dt,type,itsL,Getp(),Hlocal);
+    }
+    else //Spin space decomposition
+    {
+
+    }
+    assert(O);
+    return O;
+}
+
+FullState* Hamiltonian_1D_NN_Heisenberg::CreateFullState () const
  {
     return new FullStateImp(itsL,itsS);
  }
+
 

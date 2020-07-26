@@ -51,11 +51,11 @@ public:
 
     double eps;
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
-    Hamiltonian* itsH;
-    OperatorWRepresentation* itsWRep;
-    MatrixProductState*    itsMPS;
-    LRPSupervisor* itsSupervisor;
-    Epsilons             itsEps;
+    Hamiltonian*                   itsH;
+    OperatorWRepresentation*       itsWRep;
+    MatrixProductState*            itsMPS;
+    LRPSupervisor*                 itsSupervisor;
+    Epsilons                       itsEps;
 };
 
 
@@ -257,7 +257,7 @@ TEST_F(MPOTesting,TestGetExpectation2_I_I)
     EXPECT_NEAR(II,1.0,eps);
     EXPECT_NEAR(IE,E1,eps);
     EXPECT_NEAR(EI,E1,eps);
-    (void)EE; //Nothing to test this agains right now
+    (void)EE; //Nothing to test this against right now
 }
 
 #ifndef DEBUG

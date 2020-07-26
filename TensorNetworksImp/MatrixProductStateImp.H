@@ -70,6 +70,12 @@ public:
         virtual double   GetExpectation (const Operator* o1,const Operator* o2) const;
 //--------------------------------------------------------------------------------------
 //
+//  Operate on MPS with an MPO:  |Psi> -> O|Psi>.
+//  In general this will increase the bond dimension from D to D*Dw
+//
+        virtual void  Apply(const Operator* o);
+//--------------------------------------------------------------------------------------
+//
 //    One site density matrix and expectation calculations
 //
         OneSiteDMs CalculateOneSiteDMs(LRPSupervisor*);

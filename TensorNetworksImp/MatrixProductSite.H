@@ -60,6 +60,12 @@ class MatrixProductSite
         void SVDNormalize(TensorNetworks::Direction lr);//  Returns rank of singular values.
         bool IsNormalized(TensorNetworks::Direction lr,double eps) const;
 //--------------------------------------------------------------------------------------
+//  Operate on MPS with an MPO:  |Psi> -> O|Psi>.
+//  In general this will increase the bond dimension from D to D*Dw
+//
+        void  Apply(const SiteOperator* o);
+
+//--------------------------------------------------------------------------------------
 //
 //    Density matrix calculations
 //
