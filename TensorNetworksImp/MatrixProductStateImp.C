@@ -41,19 +41,21 @@ MatrixProductStateImp::MatrixProductStateImp(int L, double S, int D,const Epsilo
     //
     //  Create bond objects
     //
-    for (int i=0;i<itsL-1;i++)
+    itsBonds.push_back(0);  //Dummy space holder. We want this array to be 1 based.
+    for (int i=1;i<itsL;i++)
         itsBonds.push_back(new Bond(eps.itsSingularValueZeroEpsilon));
     //
     //  Create Sites
     //
-    itsSites.push_back(new MatrixProductSite(TensorNetworks::PLeft,NULL,itsBonds[0],itsp,1,D));
-    for (int i=1;i<itsL-1;i++)
+    itsSites.push_back(0);  //Dummy space holder. We want this array to be 1 based.
+    itsSites.push_back(new MatrixProductSite(TensorNetworks::PLeft,NULL,itsBonds[1],itsp,1,D));
+    for (int i=2;i<=itsL-1;i++)
         itsSites.push_back(new MatrixProductSite(TensorNetworks::PBulk,itsBonds[i-1],itsBonds[i],itsp,D,D));
-    itsSites.push_back(new MatrixProductSite(TensorNetworks::PRight,itsBonds[L-2],NULL,itsp,D,1));
+    itsSites.push_back(new MatrixProductSite(TensorNetworks::PRight,itsBonds[L-1],NULL,itsp,D,1));
     //
     //  Tell each bond about its left and right sites.
     //
-    for (int i=0;i<itsL-1;i++)
+    for (int i=1;i<itsL;i++)
         itsBonds[i]->SetSites(itsSites[i],itsSites[i+1]);
 
     Range rsites(1.0,itsL);
@@ -65,11 +67,11 @@ MatrixProductStateImp::MatrixProductStateImp(int L, double S, int D,const Epsilo
     itsBondsPMesh = new PlotableMesh(*itsBondsMesh,"none");
     itsSVMeshPMesh= new PlotableMesh(*itsSVMesh   ,"none");
 
-    itsSiteEnergies .SetSize(itsL);
-    itsSiteEGaps    .SetSize(itsL);
-    itsBondEntropies.SetSize(itsL-1);
-    itsBondMinSVs   .SetSize(itsL-1);
-    itsBondRanks    .SetSize(itsL-1);
+    itsSiteEnergies .SetSize(itsL+1);
+    itsSiteEGaps    .SetSize(itsL+1);
+    itsBondEntropies.SetSize(itsL);
+    itsBondMinSVs   .SetSize(itsL);
+    itsBondRanks    .SetSize(itsL);
     itssSelectedEntropySpectrum.SetSize(D);
 
     Fill(itsSiteEnergies ,0.0);
@@ -128,12 +130,23 @@ MatrixProductStateImp::~MatrixProductStateImp()
     delete itsSitesMesh;
 }
 
+#define SiteLoop(ia) for (int ia=1;ia<=itsL;ia++)
+#define CheckSiteNumber(ia)\
+    assert(ia>=1);\
+    assert(ia<=itsL);\
+
+#define CheckBondNumber(ib)\
+    assert(ib>=1);\
+    assert(ib<itsL);\
+
+
+
 void MatrixProductStateImp::InitializeWith(TensorNetworks::State state)
 {
     int sgn=1;
-    for (SIter i=itsSites.begin();i!=itsSites.end();i++)
+    SiteLoop(ia)
     {
-        i->InitializeWith(state,sgn);
+        itsSites[ia]->InitializeWith(state,sgn);
         sgn*=-1;
     }
 
@@ -141,15 +154,14 @@ void MatrixProductStateImp::InitializeWith(TensorNetworks::State state)
 
 void MatrixProductStateImp::Freeze(int isite,double s)
 {
-    assert(isite>=0);
-    assert(isite<itsL);
+    CheckSiteNumber(isite);
     itsSites[isite]->Freeze(s);
 }
 
-c_str SiteMessage(const std::string& message,int site)
+c_str SiteMessage(const std::string& message,int isite)
 {
     static std::string ret;
-    ret=message+std::to_string(site+1); //user sees 1 based site number as opposed to zero based in code
+    ret=message+std::to_string(isite);
     return ret.c_str();
 }
 
@@ -167,12 +179,13 @@ void MatrixProductStateImp::Normalize(TensorNetworks::Direction LR,LRPSupervisor
 
 void MatrixProductStateImp::NormalizeSite(TensorNetworks::Direction lr,int isite,LRPSupervisor* super)
 {
+    CheckSiteNumber(isite);
     std::string lrs=lr==TensorNetworks::DLeft ? "Left" : "Right";
-    super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize site ",isite+1),isite);
+    super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize site ",isite),isite);
     itsSites[isite]->SVDNormalize(lr);
-    super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize update Bond data ",isite+1),isite);
+    super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize update Bond data ",isite),isite);
     int bond_index=isite+( lr==TensorNetworks::DLeft ? 0 :-1);
-    if (bond_index<itsL-1 && bond_index>=0)
+    if (bond_index<itsL && bond_index>=1)
         UpdateBondData(bond_index);
 }
 
@@ -181,18 +194,19 @@ void MatrixProductStateImp::NormalizeSite(TensorNetworks::Direction lr,int isite
 //
 void MatrixProductStateImp::Normalize(int isite,LRPSupervisor* super)
 {
-    if (isite>0)
+    CheckSiteNumber(isite);
+    if (isite>1)
     {
-        for (int ia=0; ia<isite; ia++)
+        for (int ia=1; ia<isite; ia++)
         {
             NormalizeSite(TensorNetworks::DLeft,ia,super);
         }
 //        itsSites[isite]->ReshapeFromLeft(rank);
     }
 
-    if (isite<itsL-1)
+    if (isite<itsL)
     {
-        for (int ia=itsL-1; ia>isite; ia--)
+        for (int ia=itsL; ia>isite; ia--)
         {
             NormalizeSite(TensorNetworks::DRight,ia,super);
         }
@@ -257,8 +271,7 @@ void MatrixProductStateImp::MakeAllGraphs()
 
 void MatrixProductStateImp::Select(int index)
 {
-    assert(index>=0);
-    assert(index<itsL-1);
+    CheckSiteNumber(index);
     if (itsSelectedSite!=index)
         itssSelectedEntropySpectrum=itsBonds[index]->GetSVs();
     itsSelectedSite=index;
@@ -267,6 +280,7 @@ void MatrixProductStateImp::Select(int index)
 
 void MatrixProductStateImp::UpdateBondData(int isite)
 {
+    CheckBondNumber(isite);
     itsBondEntropies[isite]=itsBonds[isite]->GetBondEntropy();
     itsBondMinSVs   [isite]=log10(itsBonds[isite]->GetMinSV());
     itsBondRanks    [isite]=itsBonds[isite]->GetRank();
@@ -304,6 +318,7 @@ double MatrixProductStateImp::Sweep(TensorNetworks::Direction lr,const Hamiltoni
     int iter=0;
     ForLoop(lr)
     {
+        CheckSiteNumber(ia);
         Refine(lr,h,Supervisor,eps,ia);
         if (weHaveGraphs())
         {
@@ -329,6 +344,7 @@ double MatrixProductStateImp::Sweep(TensorNetworks::Direction lr,const Hamiltoni
 void MatrixProductStateImp::Refine(TensorNetworks::Direction lr,const Hamiltonian *h,LRPSupervisor* Supervisor,const Epsilons& eps,int isite)
 {
 //    assert(CheckNormalized(isite,eps.itsNormalizationEpsilon));
+    CheckSiteNumber(isite);
     if (!itsSites[isite]->IsFrozen())
     {
         Supervisor->DoneOneStep(2,"Calculating Heff",isite); //Supervisor will update the graphs
@@ -347,14 +363,16 @@ void MatrixProductStateImp::Refine(TensorNetworks::Direction lr,const Hamiltonia
 
 MatrixProductStateImp::Vector3T MatrixProductStateImp::GetHeffCache (TensorNetworks::Direction lr,int isite) const
 {
+    //CheckSiteNumber(isite); this function accepts out of range site numbers
     Vector3T H(1,1,1,1);
     H(1,1,1)=eType(1.0);
-    if (isite>=0 && isite<itsL)  H=itsSites[isite]->GetHeffCache(lr);
+    if (isite>=1 && isite<=itsL)  H=itsSites[isite]->GetHeffCache(lr);
     return H;
 }
 
 MatrixProductStateImp::Matrix6T MatrixProductStateImp::GetHeffIterate   (const Hamiltonian* h,int isite) const
 {
+    CheckSiteNumber(isite);
     Vector3T Lcache=GetHeffCache(TensorNetworks::DLeft ,isite-1);
     Vector3T Rcache=GetHeffCache(TensorNetworks::DRight,isite+1);
     return itsSites[isite]->GetHeff(h->GetSiteOperator(isite),Lcache,Rcache);
@@ -362,14 +380,14 @@ MatrixProductStateImp::Matrix6T MatrixProductStateImp::GetHeffIterate   (const H
 void MatrixProductStateImp::LoadHeffCaches(const Hamiltonian* h,LRPSupervisor* supervisor)
 {
     assert(supervisor);
-    GetEOLeft_Iterate(h,supervisor,0,true);
-    GetEORightIterate(h,supervisor,0,true);
+    GetEOLeft_Iterate(h,supervisor,1,true);
+    GetEORightIterate(h,supervisor,1,true);
 }
 
 double  MatrixProductStateImp::GetMaxDeltaE() const
 {
     double MaxDeltaE=0.0;
-    for (int ia=0; ia<itsL; ia++)
+    SiteLoop(ia)
     {
         double de=fabs(itsSites[ia]->GetIterDE());
         if (de>MaxDeltaE) MaxDeltaE=de;
@@ -393,7 +411,7 @@ double   MatrixProductStateImp::GetExpectation   (const Operator* o) const
 {
     Vector3T F(1,1,1,1);
     F(1,1,1)=eType(1.0);
-    for (int ia=0; ia<itsL; ia++)
+    SiteLoop(ia)
         F=itsSites[ia]->IterateLeft_F(o->GetSiteOperator(ia),F);
 
     double iE=std::imag(F(1,1,1));
@@ -407,7 +425,7 @@ MatrixProductStateImp::eType   MatrixProductStateImp::GetExpectationC(const Oper
 {
     Vector3T F(1,1,1,1);
     F(1,1,1)=eType(1.0);
-    for (int ia=0; ia<itsL; ia++)
+    SiteLoop(ia)
         F=itsSites[ia]->IterateLeft_F(o->GetSiteOperator(ia),F);
 
     return F(1,1,1);
@@ -417,7 +435,7 @@ double   MatrixProductStateImp::GetExpectation(const Operator* o1,const Operator
 {
     Vector4T F(1,1,1,1,1);
     F(1,1,1,1)=eType(1.0);
-    for (int ia=0; ia<itsL; ia++)
+    SiteLoop(ia)
         F=itsSites[ia]->IterateLeft_F(o1->GetSiteOperator(ia),o2->GetSiteOperator(ia),F);
 
     double iE=std::imag(F(1,1,1,1));
@@ -430,8 +448,8 @@ double   MatrixProductStateImp::GetExpectation(const Operator* o1,const Operator
 
 void  MatrixProductStateImp::Apply(const Operator* o)
 {
-    for (int ia=0; ia<itsL; ia++)
-        itsSites[ia]->Apply(o->GetSiteOperator(ia+1)); //TODO need consistenct on one or zero based for site numbers
+    SiteLoop(ia)
+        itsSites[ia]->Apply(o->GetSiteOperator(ia)); //TODO need consistenct on one or zero based for site numbers
 }
 
 //--------------------------------------------------------------------------------------
@@ -443,7 +461,7 @@ void MatrixProductStateImp::Report(std::ostream& os) const
     os.precision(3);
     os << "Matrix product state for " << itsL << " lattice sites." << endl;
     os << "  Site  D1  D2  Bond Entropy   #updates  Rank  Sparsisty     Emin      Egap    dA" << endl;
-    for (int ia=0; ia<itsL; ia++)
+    SiteLoop(ia)
     {
         os << std::setw(3) << ia << "  ";
         itsSites[ia]->Report(os);
@@ -453,6 +471,7 @@ void MatrixProductStateImp::Report(std::ostream& os) const
 
 std::string MatrixProductStateImp::GetNormStatus(int isite) const
 {
+    CheckSiteNumber(isite);
     return itsSites[isite]->GetNormStatus(itsEpsilons.itsNormalizationEpsilon);
 }
 
@@ -461,10 +480,11 @@ std::string MatrixProductStateImp::GetNormStatus(int isite) const
 //
 MatrixProductStateImp::Vector3T MatrixProductStateImp::GetEOLeft_Iterate(const Operator* o,LRPSupervisor* supervisor,int isite, bool cache) const
 {
+//    CheckSiteNumber(isite);  this function accepts out of bounds site numbers
     assert(supervisor);
     Vector3T F(1,1,1,1);
     F(1,1,1)=eType(1.0);
-    for (int ia=0; ia<isite; ia++)
+    for (int ia=1; ia<isite; ia++)
     {
         supervisor->DoneOneStep(1,SiteMessage("Calculating L cache for site ",ia));
         F=itsSites[ia]->IterateLeft_F(o->GetSiteOperator(ia),F,cache);
@@ -476,10 +496,11 @@ MatrixProductStateImp::Vector3T MatrixProductStateImp::GetEOLeft_Iterate(const O
 //
 MatrixProductStateImp::Vector3T MatrixProductStateImp::GetEORightIterate(const Operator* o,LRPSupervisor* supervisor,int isite, bool cache) const
 {
+//    CheckSiteNumber(isite); this function accepts out of bounds site numbers
     assert(supervisor);
     Vector3T F(1,1,1,1);
     F(1,1,1)=eType(1.0);
-    for (int ia=itsL-1; ia>isite; ia--)
+    for (int ia=itsL; ia>isite; ia--)
     {
         supervisor->DoneOneStep(1,SiteMessage("Calculating R cache for site ",ia));
         F=itsSites[ia]->IterateRightF(o->GetSiteOperator(ia),F,cache);
@@ -492,7 +513,7 @@ OneSiteDMs MatrixProductStateImp::CalculateOneSiteDMs(LRPSupervisor* supervisor)
 {
     OneSiteDMs ret(itsL,itsp);
     Normalize(TensorNetworks::DRight,supervisor);
-    for (int ia=0; ia<itsL; ia++)
+    SiteLoop(ia)
     {
         supervisor->DoneOneStep(2,SiteMessage("Calculate ro(mn) site: ",ia),ia);
         ret.Insert(ia,itsSites[ia]->CalculateOneSiteDM());
@@ -503,12 +524,12 @@ OneSiteDMs MatrixProductStateImp::CalculateOneSiteDMs(LRPSupervisor* supervisor)
 
 MatrixProductStateImp::Matrix4T MatrixProductStateImp::CalculateTwoSiteDM(int ia,int ib) const
 {
-    assert(ia>=0);
-    assert(ib<itsL);
+    CheckSiteNumber(ia);
+    CheckSiteNumber(ib);
 #ifdef DEBUG
-    for (int is=0; is<ia; is++)
+    for (int is=1; is<ia; is++)
         assert(GetNormStatus(is)[0]=='A');
-    for (int is=ib+1; is<itsL; is++)
+    for (int is=ib+1; is<=itsL; is++)
         assert(GetNormStatus(is)[0]=='B');
 #endif
     Matrix4T ret(itsp,itsp,itsp,itsp,1);
@@ -535,14 +556,14 @@ TwoSiteDMs MatrixProductStateImp::CalculateTwoSiteDMs(LRPSupervisor* supervisor)
 {
     Normalize(TensorNetworks::DRight,supervisor);
     TwoSiteDMs ret(itsL,itsp);
-    for (int ia=0; ia<itsL-1; ia++)
-        for (int ib=ia+1;ib<itsL;ib++)
+    SiteLoop(ia)
+        for (int ib=ia+1;ib<=itsL;ib++)
         {
             Matrix4T ro=CalculateTwoSiteDM(ia,ib);
             ret.Insert(ia,ib,ro);
             NormalizeSite(TensorNetworks::DLeft,ia,supervisor);
         }
     // Normalize the last to keep things tidy
-    NormalizeSite(TensorNetworks::DLeft,itsL-1,supervisor);
+    NormalizeSite(TensorNetworks::DLeft,itsL,supervisor);
     return ret;
 }

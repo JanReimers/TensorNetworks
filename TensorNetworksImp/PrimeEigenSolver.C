@@ -108,7 +108,7 @@ template <class T> int PrimeEigenSolver<T>::SolveDense(int NumEigenValues,double
     if (Max(abs(rnorms))>1000*eps)
         cout << "Warning high rnorms in PrimeEigenSolver::SolveDense rnorma=" << std::scientific << rnorms << endl;
     int niter=primme.stats.numOuterIterations;
-    std::cout << "Primme niter=" << niter << std::endl;
+//    std::cout << "Primme niter=" << niter << std::endl;
 
     primme_free(&primme);
     itsNumGuesses=NumEigenValues; //Set up using guesses for next time around

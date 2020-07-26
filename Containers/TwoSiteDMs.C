@@ -6,7 +6,7 @@
 TwoSiteDMs::TwoSiteDMs(int L, int p)
     : itsL(L)
     , itsp(p)
-    , itsDMs(0,L-1,0,L-1)
+    , itsDMs(1,L,1,L)
 {
     //ctor
 }
@@ -30,10 +30,10 @@ template <class O> TwoSiteDMs::ExpectationT TwoSiteDMs::Contract(const O& op) co
     assert(op.Flatten().GetNumCols()==itsp*itsp);
 //    assert(op.IsHermitian(1e-14));
 //    cout << "op=" << op << endl;
-    ExpectationT ret(0,itsL-1,0,itsL-1);
+    ExpectationT ret(itsL,itsL);
     Fill(ret,0.0);
-    for (int ia=0; ia<itsL-1;ia++)
-        for (int ib=ia+1; ib<itsL; ib++)
+    for (int ia=1; ia<=itsL-1;ia++)
+        for (int ib=ia+1; ib<=itsL; ib++)
         {
             eType ex(0.0);
             const DMType& dm=itsDMs(ia,ib);
@@ -54,10 +54,10 @@ template TwoSiteDMs::ExpectationT TwoSiteDMs::Contract<TwoSiteDMs::OperatorCT>(c
 
 TwoSiteDMs::ExpectationT TwoSiteDMs::GetTraces() const
 {
-    ExpectationT ret(0,itsL-1,0,itsL-1);
+    ExpectationT ret(itsL,itsL);
     Fill(ret,0.0);
-    for (int ia=0; ia<itsL-1;ia++)
-        for (int ib=ia+1; ib<itsL; ib++)
+    for (int ia=1; ia<=itsL-1;ia++)
+        for (int ib=ia+1; ib<=itsL; ib++)
             ret(ia,ib)=std::real(Sum(itsDMs(ia,ib).Flatten().GetDiagonal()));
     return ret;
 }
@@ -65,10 +65,10 @@ TwoSiteDMs::ExpectationT TwoSiteDMs::GetTraces() const
 
 TwoSiteDMs::ExpectationT TwoSiteDMs::GetVNEntropies() const
 {
-    ExpectationT ret(0,itsL-1,0,itsL-1);
+    ExpectationT ret(itsL,itsL);
     Fill(ret,0.0);
-    for (int ia=0; ia<itsL-1;ia++)
-        for (int ib=ia+1; ib<itsL; ib++)
+    for (int ia=1; ia<=itsL-1;ia++)
+        for (int ib=ia+1; ib<=itsL; ib++)
         {
             //Vector<double> s=EigenValuesOnly<double,MatrixCT>(itsDMs(ia,ib).Flatten());
             Vector<eType> s(itsDMs(ia,ib).Flatten().GetDiagonal());

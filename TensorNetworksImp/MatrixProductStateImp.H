@@ -127,11 +127,11 @@ private:
 //
         int GetStart(TensorNetworks::Direction lr) const
         {
-            return lr==TensorNetworks::DLeft ? 0 : itsL-1;
+            return lr==TensorNetworks::DLeft ? 1 : itsL;
         }
         int GetStop(TensorNetworks::Direction lr) const
         { //These need to be one beyond, like stl iterators
-            return lr==TensorNetworks::DLeft ? itsL : -1;
+            return lr==TensorNetworks::DLeft ? itsL+1 : 0;
         }
         int GetIncrement(TensorNetworks::Direction lr) const
         {

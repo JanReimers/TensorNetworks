@@ -47,7 +47,7 @@ void MPO_LRB::Init(const OperatorWRepresentation* O)
 
 TensorNetworks::Position MPO_LRB::GetPosition(int isite) const
 {
-    return isite==0 ? TensorNetworks::PLeft :
-           (isite==itsL-1 ? TensorNetworks::PRight : TensorNetworks::PBulk);
+    return isite==1 ? TensorNetworks::PLeft :
+           (isite==itsL ? TensorNetworks::PRight : TensorNetworks::PBulk);
 }
 

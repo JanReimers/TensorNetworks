@@ -3,7 +3,7 @@
 
 #include "oml/dmatrix.h"
 #include "oml/smatrix.h"
-#include "oml/array.h"
+#include "oml/vector.h"
 #include <complex>
 //---------------------------------------------------------------------------------------
 //
@@ -13,10 +13,10 @@ class OneSiteDMs
 {
 public:
     typedef std::complex<double> eType;
-    typedef DMatrix<eType> DMType;
-    typedef DMatrix<double> OperatorT;
-    typedef DMatrix<eType>  OperatorCT;
-    typedef Array<double> ExpectationT;
+    typedef DMatrix<eType>       DMType;
+    typedef DMatrix<double>      OperatorT;
+    typedef DMatrix<eType>       OperatorCT;
+    typedef Vector<double>       ExpectationT;
 
     OneSiteDMs(int L,int p);
     ~OneSiteDMs();
@@ -29,11 +29,11 @@ public:
     ExpectationT GetVNEntropies() const;
 
 private:
-    typedef Array<DMType> DMsType;
+    typedef Vector<DMType> DMsType;
     typedef DMatrix<eType> MatrixCT;
 
-    int    itsL;
-    int    itsp;
+    int     itsL;
+    int     itsp;
     DMsType itsDMs;
 };
 

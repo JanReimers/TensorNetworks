@@ -21,7 +21,7 @@ void OneSiteDMs::Insert(int ia, const DMType& dm)
     assert(dm.GetNumRows()==itsp);
     assert(dm.GetNumCols()==itsp);
     assert(IsHermitian(dm,1e-14));
-    itsDMs[ia]=dm;
+    itsDMs(ia)=dm;
 }
 
 template <class O> OneSiteDMs::ExpectationT OneSiteDMs::Contract(const O& op) const
@@ -32,17 +32,18 @@ template <class O> OneSiteDMs::ExpectationT OneSiteDMs::Contract(const O& op) co
 //    cout << "op=" << op << endl;
     ExpectationT ret(itsL);
     Fill(ret,0.0);
-    for (int ia=0; ia<itsL; ia++)
+    for (int ia=1; ia<=itsL; ia++)
     {
         eType ex(0.0);
-        const DMType& dm=itsDMs[ia];
+        const DMType& dm=itsDMs(ia);
 //            cout << "dm=" << dm << endl;
         for (int m1=1; m1<=itsp; m1++)
             for (int n1=1; n1<=itsp; n1++)
                 ex+=op(m1,n1)*dm(m1,n1);
+
         assert(fabs(std::imag(ex))<1e-14);
 //            cout << "ia,ib,ex=" << ia << " " << ib << " " << ex << endl;
-        ret[ia]=std::real(ex);
+        ret(ia)=std::real(ex);
     }
     return ret;
 }
@@ -53,8 +54,8 @@ OneSiteDMs::ExpectationT OneSiteDMs::GetTraces() const
 {
     ExpectationT ret(itsL);
     Fill(ret,0.0);
-    for (int ia=0; ia<itsL; ia++)
-        ret[ia]=std::real(Sum(itsDMs[ia].GetDiagonal()));
+    for (int ia=1; ia<=itsL; ia++)
+        ret(ia)=std::real(Sum(itsDMs(ia).GetDiagonal()));
     return ret;
 }
 
@@ -62,12 +63,12 @@ OneSiteDMs::ExpectationT OneSiteDMs::GetVNEntropies() const
 {
     ExpectationT ret(itsL);
     Fill(ret,0.0);
-    for (int ia=0; ia<itsL; ia++)
+    for (int ia=1; ia<=itsL; ia++)
     {
         //Vector<double> s=EigenValuesOnly<double,MatrixCT>(itsDMs(ia,ib).Flatten());
-        Vector<eType> s(itsDMs[ia].GetDiagonal());
+        Vector<eType> s(itsDMs(ia).GetDiagonal());
 //            cout << "s(" << ia << "," << ib << ")=" << s << ", sum=" << Sum(s) << endl;
-        ret[ia]=VNEntropyFromEVs(real(s));
+        ret(ia)=VNEntropyFromEVs(real(s));
     }
     return ret;
 }

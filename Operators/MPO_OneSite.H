@@ -19,8 +19,8 @@ class MPO_OneSite : public virtual Operator
 
         const SiteOperator* GetSiteOperator(int isite) const
         {
-            assert(isite>=0);
-            assert(isite<itsL);
+            assert(isite>=1);
+            assert(isite<=itsL);
             return isite==itsSiteIndex ? itsSiteOperator : itsIndentityOperator;
         }
 

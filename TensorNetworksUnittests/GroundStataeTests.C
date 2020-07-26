@@ -99,7 +99,7 @@ TEST_F(GroundStateTesting,TestFreezeL9S1D2)
     double S=0.5;
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Freeze(0,0.5); //Site 0 spin up
+    itsMPS->Freeze(1,0.5); //Site 0 spin up
     int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
 
     double E=itsMPS->GetExpectation(itsH);

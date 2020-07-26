@@ -19,8 +19,8 @@ class MPO_TwoSite : public virtual Operator
 
         const SiteOperator* GetSiteOperator(int isite) const
         {
-            assert(isite>=0);
-            assert(isite<itsL);
+            assert(isite>=1);
+            assert(isite<=itsL);
             return isite==itsSite1Index ? itsSite1Operator :
                 (isite==itsSite2Index ? itsSite2Operator : itsIndentityOperator);
         }

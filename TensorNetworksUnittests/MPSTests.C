@@ -66,9 +66,9 @@ TEST_F(MatrixProductTesting,MatrixOpMul)
 TEST_F(MatrixProductTesting,LeftNormalMatricies)
 {
     itsMPS->InitializeWith(TensorNetworks::Product);
-    VerifyUnit(GetNorm(TensorNetworks::DLeft,0),eps);
     VerifyUnit(GetNorm(TensorNetworks::DLeft,1),eps);
-    VerifyUnit(GetNorm(TensorNetworks::DLeft,8),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DLeft,2),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DLeft,9),eps);
 }
 
 
@@ -76,10 +76,10 @@ TEST_F(MatrixProductTesting,RightNormalMatricies)
 {
     itsMPS->InitializeWith(TensorNetworks::Product);
     // The first site will not be right normalized
-    EXPECT_EQ(ToString(GetNorm(TensorNetworks::DRight,0)),"(1:1),(1:1) \n[ (2,0) ]\n");
-    VerifyUnit(GetNorm(TensorNetworks::DRight,1),eps);
-    VerifyUnit(GetNorm(TensorNetworks::DRight,8),eps);
+    EXPECT_EQ(ToString(GetNorm(TensorNetworks::DRight,1)),"(1:1),(1:1) \n[ (2,0) ]\n");
+    VerifyUnit(GetNorm(TensorNetworks::DRight,2),eps);
     VerifyUnit(GetNorm(TensorNetworks::DRight,9),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DRight,10),eps);
 }
 
 
@@ -87,19 +87,19 @@ TEST_F(MatrixProductTesting,LeftNormalMatricies_S2)
 {
     Setup(10,1.5,2);
     itsMPS->InitializeWith(TensorNetworks::Product);
-    VerifyUnit(GetNorm(TensorNetworks::DLeft,0),eps);
     VerifyUnit(GetNorm(TensorNetworks::DLeft,1),eps);
-    VerifyUnit(GetNorm(TensorNetworks::DLeft,8),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DLeft,2),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DLeft,9),eps);
 }
 
 TEST_F(MatrixProductTesting,RightNormalMatricies_S2)
 {
     Setup(10,1.5,3);
     itsMPS->InitializeWith(TensorNetworks::Product);
-    VerifyUnit(GetNorm(TensorNetworks::DRight,1),eps);
-    VerifyUnit(GetNorm(TensorNetworks::DRight,8),eps);
+    VerifyUnit(GetNorm(TensorNetworks::DRight,2),eps);
     VerifyUnit(GetNorm(TensorNetworks::DRight,9),eps);
-    EXPECT_EQ(ToString(GetNorm(TensorNetworks::DRight,0)),"(1:1),(1:1) \n[ (3,0) ]\n");
+    VerifyUnit(GetNorm(TensorNetworks::DRight,10),eps);
+    EXPECT_EQ(ToString(GetNorm(TensorNetworks::DRight,1)),"(1:1),(1:1) \n[ (3,0) ]\n");
 }
 
 

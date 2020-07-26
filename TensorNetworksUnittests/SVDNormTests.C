@@ -34,8 +34,8 @@ public:
     typedef TensorNetworks::MatrixCT MatrixCT;
 
     MatrixProductStateImp* itsMPS;
-    double eps;
-    LRPSupervisor* itsSupervisor;
+    double                 eps;
+    LRPSupervisor*         itsSupervisor;
     Epsilons               itsEps;
 };
 
@@ -45,16 +45,16 @@ public:
 std::string ExpectedNorm(int isite,int L)
 {
     std::string ret;
-    for (int ia=0;ia<isite;ia++) ret+="A0";
+    for (int ia=1;ia<isite;ia++) ret+="A0";
     ret+="M0";
-    for (int ia=isite+1;ia<L;ia++) ret+="B0";
+    for (int ia=isite+1;ia<=L;ia++) ret+="B0";
     return ret;
 }
 
 std::string BuildNormString(const MatrixProductStateImp* mps,int L)
 {
     std::string ret;
-    for (int ia=0;ia<L;ia++) ret+=mps->GetNormStatus(ia);
+    for (int ia=1;ia<=L;ia++) ret+=mps->GetNormStatus(ia);
     return ret;
 }
 
@@ -181,7 +181,7 @@ TEST_F(MPSNormTesting,MixedCanonicalL10S1D3)
     int L=10;
     Setup(L,0.5,3);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    for (int ia=0;ia<itsMPS->GetL();ia++)
+    for (int ia=1;ia<=itsMPS->GetL();ia++)
     {
         itsMPS->Normalize(ia,itsSupervisor);
         EXPECT_EQ(BuildNormString(itsMPS,L),ExpectedNorm(ia,L));

@@ -113,8 +113,8 @@ TEST_F(MPOTesting,HamiltonianGetRightW11)
 TEST_F(MPOTesting,CheckThatWsGotLoaded)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(GetW(1,0,0)),"(1:5),(1:5) \n[ 1 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ -0.5 0 0 0 0 ]\n[ -0 0 0 -0.5 1 ]\n");
-    EXPECT_EQ(ToString(GetW(1,0,1)),"(1:5),(1:5) \n[ 0 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 1 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 0 0.5 0 0 0 ]\n");
+    EXPECT_EQ(ToString(GetW(2,0,0)),"(1:5),(1:5) \n[ 1 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ -0.5 0 0 0 0 ]\n[ -0 0 0 -0.5 1 ]\n");
+    EXPECT_EQ(ToString(GetW(2,0,1)),"(1:5),(1:5) \n[ 0 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 1 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 0 0.5 0 0 0 ]\n");
 }
 
 double MPOTesting::ENeel(double s) const
@@ -168,9 +168,9 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D2)
     Setup(L,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
-    Vector3CT L3=GetEOLeft_Iterate(L);
+    Vector3CT L3=GetEOLeft_Iterate(L+1);
     eType EL=L3(1,1,1);
-    Vector3CT R3=GetEORightIterate(-1);
+    Vector3CT R3=GetEORightIterate(0);
     eType ER=R3(1,1,1);
     EXPECT_NEAR(std::imag(EL),0.0,eps);
     EXPECT_NEAR(std::imag(ER),0.0,eps);
@@ -183,9 +183,9 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D1)
     Setup(L,0.5,1);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
-    Vector3CT L3=GetEOLeft_Iterate(L);
+    Vector3CT L3=GetEOLeft_Iterate(L+1);
     eType EL=L3(1,1,1);
-    Vector3CT R3=GetEORightIterate(-1);
+    Vector3CT R3=GetEORightIterate(0);
     eType ER=R3(1,1,1);
     EXPECT_NEAR(std::imag(EL),0.0,eps);
     EXPECT_NEAR(std::imag(ER),0.0,eps);
@@ -198,9 +198,9 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D6)
     Setup(L,0.5,6);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
-    Vector3CT L3=GetEOLeft_Iterate(L);
+    Vector3CT L3=GetEOLeft_Iterate(L+1);
     eType EL=L3(1,1,1);
-    Vector3CT R3=GetEORightIterate(-1);
+    Vector3CT R3=GetEORightIterate(0);
     eType ER=R3(1,1,1);
     EXPECT_NEAR(std::imag(EL),0.0,10*eps);
     EXPECT_NEAR(std::imag(ER),0.0,10*eps);
@@ -212,9 +212,9 @@ TEST_F(MPOTesting,TestGetLRIterateL10S5D2)
     Setup(L,2.5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
-    Vector3CT L3=GetEOLeft_Iterate(L);
+    Vector3CT L3=GetEOLeft_Iterate(L+1);
     eType EL=L3(1,1,1);
-    Vector3CT R3=GetEORightIterate(-1);
+    Vector3CT R3=GetEORightIterate(0);
     eType ER=R3(1,1,1);
     EXPECT_NEAR(std::imag(EL),0.0,100000*eps);
     EXPECT_NEAR(std::imag(ER),0.0,100000*eps);
@@ -227,9 +227,9 @@ TEST_F(MPOTesting,TestEoldEnew)
     Setup(L,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
-    Vector3CT L3=GetEOLeft_Iterate(L);
+    Vector3CT L3=GetEOLeft_Iterate(L+1);
     eType EL=L3(1,1,1);
-    Vector3CT R3=GetEORightIterate(-1);
+    Vector3CT R3=GetEORightIterate(0);
     eType ER=R3(1,1,1);
     double Enew=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(std::real(ER),Enew,100*eps);
