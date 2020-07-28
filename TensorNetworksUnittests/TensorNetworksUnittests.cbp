@@ -64,13 +64,26 @@
 		<Unit filename="ExpectationsTests.C">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="GroundStataeTests.cpp" />
+		<Unit filename="GroundStataeTests.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ImaginaryTimeTests.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="MPOTests.cpp" />
-		<Unit filename="MPSTests.cpp" />
-		<Unit filename="SVDNormTests.cpp" />
-		<Unit filename="SVDTesting.cpp" />
+		<Unit filename="MPSTests.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="SVDNormTests.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="SVDTesting.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="Tests.H" />
-		<Unit filename="main.cpp" />
+		<Unit filename="main.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

@@ -58,12 +58,14 @@ class MatrixProductSite
 // Normalization
 //
         void SVDNormalize(TensorNetworks::Direction lr);//  Returns rank of singular values.
+        void SVDNormalize(TensorNetworks::Direction lr,int Dmax,double espMin);//  Returns rank of singular values.
         bool IsNormalized(TensorNetworks::Direction lr,double eps) const;
 //--------------------------------------------------------------------------------------
 //  Operate on MPS with an MPO:  |Psi> -> O|Psi>.
 //  In general this will increase the bond dimension from D to D*Dw
 //
-        void  Apply(const SiteOperator* o);
+        void  ApplyInPlace(const SiteOperator* so);
+        void  Apply       (const SiteOperator* so, MatrixProductSite* psiPrime);
 
 //--------------------------------------------------------------------------------------
 //
@@ -106,6 +108,13 @@ private:
     {
         return lr==TensorNetworks::DLeft ? itsRightBond : itsLeft_Bond;
     }
+
+
+    friend class MatrixProductTesting;
+    typedef std::vector<MatrixCT> pVectorT;
+    typedef pVectorT::      iterator  pIterT;
+    typedef pVectorT::const_iterator cpIterT;
+
 //-----------------------------------------------------------------------------------
 //
 //  Internal contraction function
@@ -128,11 +137,8 @@ private:
     eType ContractWR   (int w1,int i2, int j2,const MatrixT& W, int Dw2, const Vector3T& R) const;
 
     MatrixCT ContractCA(int n2, const MatrixCT& C) const;
+    void     Contract(pVectorT& newAs,const SiteOperator* so);
 
-    friend class MatrixProductTesting;
-    typedef std::vector<MatrixCT> pVectorT;
-    typedef pVectorT::      iterator  pIterT;
-    typedef pVectorT::const_iterator cpIterT;
 
     Bond* itsLeft_Bond;
     Bond* itsRightBond;

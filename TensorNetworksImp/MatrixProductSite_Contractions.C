@@ -539,12 +539,12 @@ MatrixProductSite::MatrixCT MatrixProductSite::FinializeTwoSiteDM(const MatrixCT
     return ret;
 }
 
-void  MatrixProductSite::Apply(const SiteOperator* so)
+void MatrixProductSite::Contract(pVectorT& newAs,const SiteOperator* so)
 {
+    newAs.clear();
     const Dw12& Dws=so->GetDw12();
     int newD1=itsD1*Dws.Dw1;
     int newD2=itsD2*Dws.Dw2;
-    pVectorT newAs;
 
     for (int n=0; n<itsp; n++)
     {
@@ -566,7 +566,26 @@ void  MatrixProductSite::Apply(const SiteOperator* so)
                 }
         }
     }
-    itsD1=newD1;
-    itsD2=newD2;
+
+}
+
+void  MatrixProductSite::ApplyInPlace(const SiteOperator* so)
+{
+    pVectorT newAs;
+    Contract(newAs,so);
+
+    const Dw12& Dws=so->GetDw12();
+    itsD1=itsD1*Dws.Dw1;
+    itsD2=itsD2*Dws.Dw2;
     itsAs=newAs;
 }
+
+void  MatrixProductSite::Apply(const SiteOperator* so, MatrixProductSite* psiPrime)
+{
+    Contract(psiPrime->itsAs,so);
+
+    const Dw12& Dws=so->GetDw12();
+    psiPrime->itsD1=itsD1*Dws.Dw1;
+    psiPrime->itsD2=itsD2*Dws.Dw2;
+}
+

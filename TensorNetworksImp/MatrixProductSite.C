@@ -179,6 +179,66 @@ void MatrixProductSite::SVDNormalize(TensorNetworks::Direction lr)
     GetBond(lr)->SVDTransfer(lr,s,UV);
 }
 
+void MatrixProductSite::SVDNormalize(TensorNetworks::Direction lr, int Dmax, double epsMin)
+{
+    // Handle edge cases first
+    if (lr==TensorNetworks::DRight && !itsLeft_Bond)
+    {
+        assert(itsRightBond);
+        int newD2=itsRightBond->GetRank();
+        Reshape(itsD1,newD2,true);
+        Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
+        return;
+    }
+    if(lr==TensorNetworks::DLeft && !itsRightBond)
+    {
+        assert(itsLeft_Bond);
+        int newD1=itsLeft_Bond->GetRank();
+        Reshape(newD1,itsD2,true);
+        Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
+        return;
+    }
+
+    //We are in the bulk
+    VectorT s; // This get passed from one site to the next.
+    MatrixCT A=Reshape(lr);
+    int N=Min(A.GetNumRows(),A.GetNumCols());
+    s.SetLimits(N);
+    MatrixCT V(N,A.GetNumCols());
+    CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
+    // At this point we have N singular values but we only Dmax of them or only the ones >=epsMin;
+    int D=Dmax>0 ? Min(N,Dmax) : N; //Ignore Dmax if it is 0
+    // Shrink so that all s(is<=D)>=epsMin;
+    for (int is=D;is>=1;is--)
+        if (s(is)>epsMin)
+        {
+            D=is;
+            break;
+        }
+    cout << "Smin=" << s(D) << "  Sum of rejected singular values=" << Sum(s.SubVector(D+1,s.size())) << endl;
+    s.SetLimits(D,true);  // Resize s
+    A.SetLimits(A.GetNumRows(),D,true);
+    V.SetLimits(V.GetNumRows(),D,true);
+    MatrixCT UV;// This get transferred through the bond to a neighbouring site.
+
+    switch (lr)
+    {
+        case TensorNetworks::DRight:
+        {
+            UV=A;
+            Reshape(lr,Transpose(conj(V)));  //A is now Vdagger
+            break;
+        }
+        case TensorNetworks::DLeft:
+        {
+            UV=Transpose(conj(V)); //Set Vdagger
+            Reshape(lr,A);  //A is now U
+            break;
+        }
+    }
+    GetBond(lr)->SVDTransfer(lr,s,UV);
+}
+
 void MatrixProductSite::Rescale(double norm)
 {
     for (int n=0;n<itsp;n++) itsAs[n]/=norm;

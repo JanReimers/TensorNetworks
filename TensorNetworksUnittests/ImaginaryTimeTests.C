@@ -3,7 +3,7 @@
 //#include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
-//#include "TensorNetworks/LRPSupervisor.H"
+#include "TensorNetworks/LRPSupervisor.H"
 #include "TensorNetworks/Epsilons.H"
 
 #include "oml/stream.h"
@@ -38,7 +38,7 @@ public:
 };
 
 
-TEST_F(ImaginaryTimeTesting,TestIdentityOperator)
+TEST_F(ImaginaryTimeTesting,TestApplyInPlaceOddEven)
 {
     double dt=0.1;
     Setup(10,0.5,2);
@@ -46,14 +46,40 @@ TEST_F(ImaginaryTimeTesting,TestIdentityOperator)
     itsMPS->Report(cout);
     Operator* W_Odd =itsH->CreateOperator(dt,TensorNetworks::Odd);
     Operator* W_Even=itsH->CreateOperator(dt,TensorNetworks::Even);
-    itsMPS->Apply(W_Odd);
+    itsMPS->ApplyInPlace(W_Odd);
     itsMPS->Report(cout);
-    itsMPS->Apply(W_Even);
+    itsMPS->ApplyInPlace(W_Even);
     itsMPS->Report(cout);
-    itsMPS->Apply(W_Odd);
+    itsMPS->ApplyInPlace(W_Odd);
     itsMPS->Report(cout);
-    itsMPS->Apply(W_Even);
+    itsMPS->ApplyInPlace(W_Even);
     itsMPS->Report(cout);
+
+
+//    EXPECT_NEAR(S,1.0,eps);
+}
+
+TEST_F(ImaginaryTimeTesting,TestApplyOddEven)
+{
+    double dt=0.1;
+    Setup(10,0.5,8);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Report(cout);
+    Operator* W_Odd =itsH->CreateOperator(dt,TensorNetworks::Odd);
+    Operator* W_Even=itsH->CreateOperator(dt,TensorNetworks::Even);
+    MatrixProductState* Psi1=itsMPS->Apply(W_Odd);
+    MatrixProductState* Psi2=Psi1->Apply(W_Even);
+    Psi2->NormalizeAndCompress(TensorNetworks::DLeft,8,new LRPSupervisor());
+    Psi2->Report(cout);
+    MatrixProductState* Psi3=Psi2->Apply(W_Odd);
+    MatrixProductState* Psi4=Psi3->Apply(W_Even);
+    Psi4->NormalizeAndCompress(TensorNetworks::DLeft,8,new LRPSupervisor());
+    Psi4->Report(cout);
+
+    delete Psi4;
+    delete Psi3;
+    delete Psi2;
+    delete Psi1;
 
 
 //    EXPECT_NEAR(S,1.0,eps);

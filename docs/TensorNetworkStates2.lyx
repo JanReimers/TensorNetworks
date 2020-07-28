@@ -1847,6 +1847,81 @@ then
 
 \end_layout
 
+\begin_layout Subsection
+Applying and MPO to an MPS
+\end_layout
+
+\begin_layout Standard
+If we operate on an MPS state with and MPO we should get a new state
+\begin_inset Formula 
+\[
+\left|\psi'\right\rangle =\hat{O}\left|\psi\right\rangle 
+\]
+
+\end_inset
+
+The diagram for this operation is shown in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Applying-an-MPO"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ from which we can see how the MPS matrices are related.
+\begin_inset Formula 
+\[
+M_{j_{a-1}j}^{\prime n_{a}}=M_{\left(i_{a-1}w_{a-1}\right)\left(i_{a}w_{a}\right)}^{\prime n_{a}}=\sum_{m_{a}}W_{w_{a-1}w_{a}}^{n_{a}m_{a}}M_{i_{a-1}i_{a}}^{m_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename OperatorApply.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Applying-an-MPO"
+
+\end_inset
+
+Applying an MPO to and MPS for a five site system
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Ground State
 \end_layout

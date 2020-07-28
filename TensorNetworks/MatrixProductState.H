@@ -28,11 +28,13 @@ class MatrixProductState : public virtual MultiPlotable
         virtual void Freeze(int isite,double s)=0;
 //--------------------------------------------------------------------------------------
 //
-//  Normalization members
+//  Normalization members with and without SVD compression
 //
         virtual void Normalize(TensorNetworks::Direction LR,LRPSupervisor*)=0;
         virtual void Normalize(int isite,LRPSupervisor*)=0; //Mixed Canonical normalization
-//        virtual bool CheckNormalized(int isite,double eps) const=0;
+
+        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,int      Dmax,LRPSupervisor*)=0;
+        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,double epsMin,LRPSupervisor*)=0;
 //--------------------------------------------------------------------------------------
 //
 // Find ground state.  Return <E^2>-<E>^2
@@ -49,8 +51,15 @@ class MatrixProductState : public virtual MultiPlotable
 //
 //  Operate on MPS with an MPO:  |Psi> -> O|Psi>.
 //  In general this will increase the bond dimension from D to D*Dw
+//  The overloaded operator is just syntatic suger, not sure how usefull it will be
 //
-        virtual void  Apply(const Operator* o)=0;
+        virtual void                 ApplyInPlace(const Operator* o)      =0;
+        virtual MatrixProductState*  Apply       (const Operator* o) const=0;
+
+        friend MatrixProductState* operator*(const Operator& o, const MatrixProductState& psi)
+        {
+            return psi.Apply(&o);
+        }
 //--------------------------------------------------------------------------------------
 //
 //    One and two site density matrix and expectation calculations

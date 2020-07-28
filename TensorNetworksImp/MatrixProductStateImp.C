@@ -189,6 +189,30 @@ void MatrixProductStateImp::NormalizeSite(TensorNetworks::Direction lr,int isite
         UpdateBondData(bond_index);
 }
 
+void MatrixProductStateImp::NormalizeAndCompress(TensorNetworks::Direction LR,int      Dmax,LRPSupervisor* s)
+{
+    ForLoop(LR)
+        NormalizeAndCompressSite(LR,ia,Dmax,0.0,s);
+}
+
+void MatrixProductStateImp::NormalizeAndCompress(TensorNetworks::Direction LR,double epsMin,LRPSupervisor* s)
+{
+    ForLoop(LR)
+        NormalizeAndCompressSite(LR,ia,0,epsMin,s);
+}
+
+void MatrixProductStateImp::NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,int Dmax, double epsMin, LRPSupervisor* super)
+{
+    CheckSiteNumber(isite);
+    std::string lrs=lr==TensorNetworks::DLeft ? "Left" : "Right";
+    super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize site ",isite),isite);
+    itsSites[isite]->SVDNormalize(lr,Dmax,epsMin);
+    super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize update Bond data ",isite),isite);
+    int bond_index=isite+( lr==TensorNetworks::DLeft ? 0 :-1);
+    if (bond_index<itsL && bond_index>=1)
+        UpdateBondData(bond_index);
+}
+
 //
 //  Mixed canonical  A*A*A*A...A*M(isite)*B*B...B*B
 //
@@ -446,10 +470,19 @@ double   MatrixProductStateImp::GetExpectation(const Operator* o1,const Operator
 }
 
 
-void  MatrixProductStateImp::Apply(const Operator* o)
+void  MatrixProductStateImp::ApplyInPlace(const Operator* o)
 {
     SiteLoop(ia)
-        itsSites[ia]->Apply(o->GetSiteOperator(ia)); //TODO need consistenct on one or zero based for site numbers
+        itsSites[ia]->ApplyInPlace(o->GetSiteOperator(ia));
+}
+
+MatrixProductState*  MatrixProductStateImp::Apply(const Operator* o) const
+{
+    MatrixProductStateImp* psiPrime=new MatrixProductStateImp(itsL,itsS,1,itsEpsilons);
+    SiteLoop(ia)
+        itsSites[ia]->Apply(o->GetSiteOperator(ia),psiPrime->itsSites[ia]);
+
+    return psiPrime;
 }
 
 //--------------------------------------------------------------------------------------

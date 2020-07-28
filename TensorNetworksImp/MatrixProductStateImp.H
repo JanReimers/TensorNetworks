@@ -51,10 +51,13 @@ public:
 
 //--------------------------------------------------------------------------------------
 //
-//  Normalization members
+//  Normalization members with and without SVD compression
 //
         virtual void Normalize(TensorNetworks::Direction LR,LRPSupervisor*);
         virtual void Normalize(int isite,LRPSupervisor*); //Mixed Canonical normalization
+
+        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,int      Dmax,LRPSupervisor*);
+        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,double epsMin,LRPSupervisor*);
 //--------------------------------------------------------------------------------------
 //
 // Find ground state
@@ -73,7 +76,8 @@ public:
 //  Operate on MPS with an MPO:  |Psi> -> O|Psi>.
 //  In general this will increase the bond dimension from D to D*Dw
 //
-        virtual void  Apply(const Operator* o);
+        virtual void                 ApplyInPlace(const Operator* o);
+        virtual MatrixProductState*  Apply       (const Operator* o) const;
 //--------------------------------------------------------------------------------------
 //
 //    One site density matrix and expectation calculations
@@ -109,6 +113,7 @@ private:
         double   Sweep (TensorNetworks::Direction lr,const Hamiltonian* h,LRPSupervisor*,const Epsilons& eps);
         void     UpdateBondData(int isite);
         void     NormalizeSite(TensorNetworks::Direction lr,int isite,LRPSupervisor*);
+        void     NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,int Dmax, double epsMin, LRPSupervisor*);
 
 //--------------------------------------------------------------------------------------
 //
