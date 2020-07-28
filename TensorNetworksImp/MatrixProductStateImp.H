@@ -105,6 +105,8 @@ private:
         friend class MPOTesting;
         friend class MPSNormTesting;
         friend class MatrixProductTesting;
+
+        void InitPlotting();
 //--------------------------------------------------------------------------------------
 //
 //  For groound state search
