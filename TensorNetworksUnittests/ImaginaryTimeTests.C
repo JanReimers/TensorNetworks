@@ -6,6 +6,7 @@
 #include "TensorNetworks/LRPSupervisor.H"
 #include "TensorNetworks/Epsilons.H"
 
+#include "oml/matrix.h"
 #include "oml/stream.h"
 #include "oml/stopw.h"
 
@@ -14,6 +15,8 @@ using std::setw;
 class ImaginaryTimeTesting : public ::testing::Test
 {
 public:
+    typedef TensorNetworks::MatrixT MatrixT;
+
     ImaginaryTimeTesting()
     : eps(1.0e-13)
     , itsFactory(TensorNetworks::Factory::GetFactory())
@@ -83,4 +86,60 @@ TEST_F(ImaginaryTimeTesting,TestApplyOddEven)
 
 
 //    EXPECT_NEAR(S,1.0,eps);
+}
+
+TEST_F(ImaginaryTimeTesting,TestApplyIdentity)
+{
+    int D=1;
+    Setup(3,0.5,D);
+    MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
+    Psi1->InitializeWith(TensorNetworks::Neel);
+    double E1=Psi1->GetExpectation(itsH);
+    Psi1->Normalize(TensorNetworks::DRight,new LRPSupervisor());
+    Psi1->Normalize(TensorNetworks::DLeft ,new LRPSupervisor());
+    EXPECT_NEAR(Psi1->GetExpectation(itsH) ,E1,eps);
+
+    OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
+    Operator* IO=itsH->CreateOperator(IWO);
+    MatrixProductState* Psi2=Psi1->Apply(IO);
+    EXPECT_NEAR(Psi2->GetExpectation(itsH) ,E1,eps);
+    delete Psi1;
+    delete Psi2;
+}
+
+
+TEST_F(ImaginaryTimeTesting,TestTryGroundStateDmax8)
+{
+    int D=8,L=9;
+    double dt=0.05000;
+    Setup(L,0.5,D);
+    MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
+    MatrixProductState* Psi2=0;
+    Psi1->InitializeWith(TensorNetworks::Neel);
+    double E1=Psi1->GetExpectation(itsH);
+    cout << "E1=" << std::fixed << E1 << endl;
+
+    Operator* W_Odd =itsH->CreateOperator(dt/2.0,TensorNetworks::Odd);
+    Operator* W_Even=itsH->CreateOperator(dt,TensorNetworks::Even);
+
+    for (int niter=1;niter<=50;niter++)
+    {
+        Psi2=Psi1->Apply(W_Odd);
+        Psi2->NormalizeAndCompress(TensorNetworks::DLeft,D,new LRPSupervisor());
+        Psi2->ApplyInPlace(W_Even);
+        Psi2->NormalizeAndCompress(TensorNetworks::DLeft,D,new LRPSupervisor());
+        Psi2->ApplyInPlace(W_Odd);
+        Psi2->NormalizeAndCompress(TensorNetworks::DLeft,D,new LRPSupervisor());
+//        Psi2->Report(cout);
+        cout << "E=" << std::fixed << Psi2->GetExpectation(itsH) << endl;
+        delete Psi1;
+        Psi1=Psi2;
+    }
+
+    double E2=Psi2->GetExpectation(itsH);
+    EXPECT_NEAR(E2/(L-1),-0.46703753,1e-2);
+
+    delete Psi2;
+
+
 }

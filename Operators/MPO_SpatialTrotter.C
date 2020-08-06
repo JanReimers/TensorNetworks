@@ -9,7 +9,12 @@ typedef TensorNetworks::VectorT VectorT;
 typedef TensorNetworks::MatrixT MatrixT;
 
 
-MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,int L, int p, const Matrix4T& Hlocal)
+
+//
+//  THe local two site Hamiltonian H12 should be stored as H12(m1,m2,n1,n2);
+//   Whem flatted to H(m,n) where m=(m1,m2) n=(n1,n2) it is hermitian and diagonalizable.
+//
+MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,int L, int p, const Matrix4T& H12)
     : itsOddEven(type)
     , itsL(L)
     , itsp(p)
@@ -21,25 +26,46 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,i
     assert(itsL>1);
     assert(itsp>1);
     //
-    //  Diagonalize Hlocal
+    //  Diagonalize H12 in order to caluclate exp(-t*H)
     //
-    MatrixT U=Hlocal.Flatten();
-    VectorT evs=Diagonalize(U);
-    VectorT expEvs=exp(-dt*evs/2.0);
-//    cout << "U=" << U << endl;
-//    cout << "evs=" <<  evs << endl;
+    //cout << "H12=" << H12 << endl;
+    MatrixT U12=H12.Flatten();
+    VectorT evs=Diagonalize(U12);
+    VectorT expEvs=exp(-dt*evs);
+    Matrix4T expH(p,p,p,p,0);
+    Fill(expH.Flatten(),0.0);
+    int i1=1,N=U12.GetNumRows();
+    for (int m1=0; m1<p; m1++)
+        for (int m2=0; m2<p; m2++,i1++)
+        {
+            int i2=1;
+            for (int n1=0; n1<p; n1++)
+                for (int n2=0; n2<p; n2++,i2++)
+                    for (int k=1; k<=N; k++)
+                        expH(m1,n1,m2,n2)+=U12(i1,k)*expEvs(k)*U12(i2,k);
+        }
+
+    //cout << "expH=" << expH << endl;
+
+    VectorT s(N);
+    MatrixT U(expH.Flatten()),V(expH.Flatten().GetLimits());
+    SVDecomp (U,s,V);
+
+    //cout << "U=" << U << endl;
+    //cout << "s=" << s << endl;
+    //cout << "V=" << V << endl;
 //    cout << "expEvs=" <<  expEvs << endl;
     //
     //  Now U is the matrix of eigen vectors
     //
 
     int Dw=evs.size();
-    assert(Dw=itsp*itsp);
+    assert(Dw==itsp*itsp);
     OperatorWRepresentation* IdentityWOp=new IdentityOperator();
 
-    itsLeft_Site=new SiteOperatorImp(TensorNetworks::DLeft ,U,expEvs   ,itsp);
-    itsRightSite=new SiteOperatorImp(TensorNetworks::DRight,U,expEvs   ,itsp);
-    itsUnit_Site=new SiteOperatorImp(TensorNetworks::PBulk ,IdentityWOp,itsp);
+    itsLeft_Site=new SiteOperatorImp(TensorNetworks::DLeft,U,s,itsp);
+    itsRightSite=new SiteOperatorImp(TensorNetworks::DRight,V,s,itsp);
+    itsUnit_Site=new SiteOperatorImp(TensorNetworks::PBulk,IdentityWOp,itsp);
 
     delete IdentityWOp;
 }
@@ -62,24 +88,34 @@ const SiteOperator* MPO_SpatialTrotter::GetSiteOperator(int isite) const
     if (itsOddEven==TensorNetworks::Odd)
     {
         if (itsL%2 && isite==itsL)
-        {  //odd number of sites
+        {
+            //odd number of sites
             ret=itsUnit_Site;
         }
         else
         {
+            // Odd site are left, even are right
             ret=(isite%2) ? itsLeft_Site : itsRightSite;
         }
     }
     else
     {
         if (isite==1 || (!(itsL%2) && isite==itsL))
-        {  //odd number of sites
+        {
+            //odd number of sites
             ret=itsUnit_Site;
         }
         else
         {
+            //Odd sites are right, even are left.
             ret=(isite%2) ? itsRightSite : itsLeft_Site;
         }
     }
+    /*
+    cout << "Site " << isite << " is ";
+    if (ret==itsLeft_Site) cout << "LEFT" << endl;
+    if (ret==itsRightSite) cout << "RIGHT" << endl;
+    if (ret==itsUnit_Site) cout << "UNIT" << endl;
+    */
     return ret;
 }

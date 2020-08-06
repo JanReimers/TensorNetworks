@@ -188,4 +188,13 @@ TEST_F(MPSNormTesting,MixedCanonicalL10S1D3)
     }
 }
 
+TEST_F(MPSNormTesting,SeflOverlapRandomStateL10S3D10)
+{
+    int L=10;
+    Setup(L,1.5,10);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::DRight,itsSupervisor);
+    EXPECT_NEAR(itsMPS->GetOverlap(itsMPS),1.0,eps);
+}
+
 

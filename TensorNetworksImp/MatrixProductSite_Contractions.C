@@ -220,6 +220,19 @@ ContractWR(int w1, int i2, int j2,const MatrixT& W, int Dw2,const Vector3T& R) c
     return WR;
 }
 
+MatrixProductSite::MatrixCT MatrixProductSite::IterateLeft_F(const MatrixProductSite* Psi2, const MatrixCT& Fam1) const
+{
+    MatrixCT F(itsD2,Psi2->itsD2);
+    Fill(F,eType(0.0));
+    for (int m=0; m<itsp; m++)
+        for (int i2=1; i2<=itsD2; i2++)
+            for (int j2=1; j2<=Psi2->itsD2; j2++)
+                for (int i1=1; i1<=itsD1; i1++)
+                    for (int j1=1; j1<=Psi2->itsD1; j1++)
+                        F(i2,j2)+=Fam1(i1,j1)*conj(itsAs[m](i1,i2))*Psi2->itsAs[m](j1,j2); //Not Optimized
+    return F;
+}
+
 MatrixProductSite::Vector3T MatrixProductSite::IterateLeft_F(const SiteOperator* so, const Vector3T& Fam1,bool cache)
 {
     int Dw2=so->GetDw12().Dw2;
@@ -445,6 +458,7 @@ void MatrixProductSite::Contract(TensorNetworks::Direction lr,const VectorT& s, 
             }
             for (int in=0; in<itsp; in++)
             {
+                assert(itsAs[in].GetNumCols()==UV.GetNumRows());
                 MatrixCT temp=Contract1(itsAs[in]*UV,s);
                 itsAs[in].SetLimits(0,0);
                 itsAs[in]=temp; //Shallow copy
@@ -455,10 +469,17 @@ void MatrixProductSite::Contract(TensorNetworks::Direction lr,const VectorT& s, 
         case TensorNetworks::DLeft:
         {
             int N1=s.GetHigh(); //N1=0 on the first site.
-            if (N1>0 && N1<itsD1) itsD1=N1; //The contraction below will automatically reshape the As.
+            if (N1>0 && N1<itsD1)
+            {
+                if (itsAs[0].GetNumRows()!=UV.GetNumCols())
+                    Reshape(N1,itsD2,true);
+                else
+                    itsD1=N1; //The contraction below will automatically reshape the As.
+            }
 
             for (int in=0; in<itsp; in++)
             {
+                assert(UV.GetNumCols()==itsAs[in].GetNumRows());
                 MatrixCT temp=Contract1(s,UV*itsAs[in]);
                 itsAs[in].SetLimits(0,0);
                 itsAs[in]=temp; //Shallow copy
@@ -565,6 +586,7 @@ void MatrixProductSite::Contract(pVectorT& newAs,const SiteOperator* so)
                             newAs[n](i1,i2)+=W(w1,w2)*itsAs[m](j1,j2);
                 }
         }
+      //  cout << "newAs[" << n << "]=" << newAs[n] << endl;
     }
 
 }

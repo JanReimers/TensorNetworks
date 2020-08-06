@@ -41,7 +41,11 @@ void Bond::SetSingularValues(const VectorT& s)
         itsSingularValues[i-1]=log10(s(i)); //Transload from vector to array. OML shouldreally do this automatically with a shallow copy.
         double s2=s(i)*s(i);
         if (s2>0.0) itsBondEntropy-=s2*log(s2);
-        if (fabs(s(i))<1e-12) itsRank--;
+        if (fabs(s(i))<1e-12)
+        {
+            //cout << "Auto rank reduction s=" << s << endl;
+            itsRank--;
+        }
     }
 
 }

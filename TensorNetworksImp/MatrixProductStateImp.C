@@ -118,6 +118,7 @@ void MatrixProductStateImp::NormalizeSite(TensorNetworks::Direction lr,int isite
     CheckSiteNumber(isite);
     std::string lrs=lr==TensorNetworks::DLeft ? "Left" : "Right";
     super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize site ",isite),isite);
+//    cout << "SVD " << lrs << " site " << isite << endl;
     itsSites[isite]->SVDNormalize(lr);
     super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize update Bond data ",isite),isite);
     int bond_index=isite+( lr==TensorNetworks::DLeft ? 0 :-1);
@@ -142,6 +143,7 @@ void MatrixProductStateImp::NormalizeAndCompressSite(TensorNetworks::Direction l
     CheckSiteNumber(isite);
     std::string lrs=lr==TensorNetworks::DLeft ? "Left" : "Right";
     super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize site ",isite),isite);
+    //cout << "SVD " << lrs << " site " << isite << endl;
     itsSites[isite]->SVDNormalize(lr,Dmax,epsMin);
     super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize update Bond data ",isite),isite);
     int bond_index=isite+( lr==TensorNetworks::DLeft ? 0 :-1);
@@ -293,6 +295,24 @@ double  MatrixProductStateImp::GetMaxDeltaE() const
 }
 
 
+double   MatrixProductStateImp::GetOverlap(const MatrixProductState* Psi2) const
+{
+    const MatrixProductStateImp* Psi2Imp=dynamic_cast<const MatrixProductStateImp*>(Psi2);
+    assert(Psi2Imp);
+
+    MatrixCT F(1,1);
+    F(1,1)=eType(1.0);
+    SiteLoop(ia)
+        F=itsSites[ia]->IterateLeft_F(Psi2Imp->itsSites[ia],F);
+
+    assert(F.GetLimits()==MatLimits(1,1));
+    double iO=std::imag(F(1,1));
+    if (fabs(iO)>1e-10)
+        cout << "Warning: MatrixProductState::GetOverlap Imag(O)=" << std::imag(F(1,1)) << endl;
+
+    return std::real(F(1,1));
+}
+
 double   MatrixProductStateImp::GetExpectation   (const Operator* o) const
 {
     Vector3T F(1,1,1,1);
@@ -342,7 +362,10 @@ MatrixProductState*  MatrixProductStateImp::Apply(const Operator* o) const
 {
     MatrixProductStateImp* psiPrime=new MatrixProductStateImp(itsL,itsS,1,itsEpsilons);
     SiteLoop(ia)
+    {
+//        cout << "------------- Site " << ia << "-----------------" << endl;
         itsSites[ia]->Apply(o->GetSiteOperator(ia),psiPrime->itsSites[ia]);
+    }
 
     return psiPrime;
 }

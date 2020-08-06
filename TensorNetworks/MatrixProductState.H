@@ -44,6 +44,7 @@ class MatrixProductState : public virtual MultiPlotable
 //
 //    Overlap and expectation contractions
 //
+        virtual double   GetOverlap     (const MatrixProductState* Psi2) const=0; //<this|Psi2>
         virtual double   GetExpectation (const Operator* o) const=0;
         virtual eType    GetExpectationC(const Operator* o) const=0; //For non hermitian operators, S+, S-. Sy
         virtual double   GetExpectation (const Operator* o1,const Operator* o2) const=0;

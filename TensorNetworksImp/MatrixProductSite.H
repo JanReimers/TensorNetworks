@@ -49,6 +49,8 @@ class MatrixProductSite
             return lr==TensorNetworks::DLeft ? itsHLeft_Cache : itsHRightCache;
         }
         void     UpdateCache(const SiteOperator* so, const Vector3T& HLeft, const Vector3T& HRight);
+
+        MatrixCT IterateLeft_F(const MatrixProductSite* Psi2, const MatrixCT& Fam1) const;
         Vector3T IterateLeft_F(const SiteOperator* so, const Vector3T& Fam1,bool cache=true);
         Vector3T IterateRightF(const SiteOperator* so, const Vector3T& Fam1,bool cache=true);
         Vector4T IterateLeft_F(const SiteOperator* so1,const SiteOperator* so2, const Vector4T& Fam1) const;

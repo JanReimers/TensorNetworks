@@ -151,14 +151,14 @@ TensorNetworks::Matrix4T Hamiltonian_1D_NN_Heisenberg::BuildLocalMatrix() const
 {
     SpinCalculator sc(itsS);
     int p=Getp();
-    Matrix4T Hab(p,p,p,p,0);
-    for (int na=0;na<p;na++)
-        for (int nb=0;nb<p;nb++)
-            for (int ma=0;ma<p;ma++)
-                for (int mb=0;mb<p;mb++)
-                    Hab(ma,mb,na,nb)=GetH(ma,na,mb,nb,sc);
+    Matrix4T H12(p,p,p,p,0);
+    for (int n1=0;n1<p;n1++)
+        for (int n2=0;n2<p;n2++)
+            for (int m1=0;m1<p;m1++)
+                for (int m2=0;m2<p;m2++)
+                    H12(m1,m2,n1,n2)=GetH(m1,n1,m2,n2,sc);
 
-    return Hab;
+    return H12;
 }
 
 
@@ -180,11 +180,10 @@ Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(const OperatorWRepresenta
 Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::Trotter type       ) const
 {
     Operator* O=0;
-    Matrix4T U; // Store exp(-dt*Hlocal);
     if (type==TensorNetworks::Odd || type==TensorNetworks::Even)
     {
-        Matrix4T Hlocal=BuildLocalMatrix();
-        O=new MPO_SpatialTrotter(dt,type,itsL,Getp(),Hlocal);
+        Matrix4T H12=BuildLocalMatrix(); //Full H matrix for two sites 1&2
+        O=new MPO_SpatialTrotter(dt,type,itsL,Getp(),H12);
     }
     else //Spin space decomposition
     {

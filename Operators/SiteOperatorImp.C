@@ -20,12 +20,12 @@ SiteOperatorImp::SiteOperatorImp(TensorNetworks::Position lbr, const OperatorWRe
 //
 // Build from a trotter decomp.
 //
-SiteOperatorImp::SiteOperatorImp(TensorNetworks::Direction lr,const MatrixT& U, const VectorT& expEvs, int p)
+SiteOperatorImp::SiteOperatorImp(TensorNetworks::Direction lr,const MatrixT& U, const VectorT& s, int p)
     : itsp(p)
     , itsDw12()
     , itsWs(p,p)
 {
-    int Dw=expEvs.size();
+    int Dw=s.size();
     if (lr==TensorNetworks::DLeft)
     {
         // Build up w limits
@@ -34,18 +34,17 @@ SiteOperatorImp::SiteOperatorImp(TensorNetworks::Direction lr,const MatrixT& U, 
         Fill(first,1);
         Fill(last ,5);
         itsDw12=Dw12(1,Dw,first,last);
-        int index=1; //Linear index for (m,n) = 1+m+p*n
+        int i1=1; //Linear index for (m,n) = 1+m+p*n
         //  Fill W^(m,n)_w matrices
         for (int m=0;m<itsp;m++)
-            for (int n=0;n<itsp;n++)
+            for (int n=0;n<itsp;n++,i1++)
             {
                 itsWs(m+1,n+1)=MatrixT(1,Dw);
                 for (int w=1;w<=Dw;w++)
-                    itsWs(m+1,n+1)(1,w)=U(index,w)*expEvs(w);
+                    itsWs(m+1,n+1)(1,w)=U(i1,w)*sqrt(s(w));
                 //cout << "Left itsWs(" << m << "," << n << ") = " << itsWs(m+1,n+1) << endl;
                 assert(itsWs(m+1,n+1).GetNumRows()==itsDw12.Dw1);
                 assert(itsWs(m+1,n+1).GetNumCols()==itsDw12.Dw2);
-                index++;
             }
     }
     else if (lr==TensorNetworks::DRight)
@@ -53,21 +52,20 @@ SiteOperatorImp::SiteOperatorImp(TensorNetworks::Direction lr,const MatrixT& U, 
         // Build up w limits
         Vector<int> first(1);
         Vector<int> last (Dw);
-        Fill(first,5);
-        Fill(last ,1);
+        Fill(first,1);
+        Fill(last ,5);
         itsDw12=Dw12(Dw,1,first,last);
-        int index=1; //Linear index for (m,n) = 1+m+p*n
+        int i2=1; //Linear index for (m,n) = 1+m+p*n
         //  Fill W^(m,n)_w matrices
         for (int m=0;m<itsp;m++)
-            for (int n=0;n<itsp;n++)
+            for (int n=0;n<itsp;n++,i2++)
             {
                 itsWs(m+1,n+1)=MatrixT(Dw,1);
                 for (int w=1;w<=Dw;w++)
-                    itsWs(m+1,n+1)(w,1)=U(index,w)*expEvs(w);
+                    itsWs(m+1,n+1)(w,1)=U(i2,w)*sqrt(s(w));
                 //cout << "Right itsWs(" << m << "," << n << ") = " << itsWs(m+1,n+1) << endl;
                 assert(itsWs(m+1,n+1).GetNumRows()==itsDw12.Dw1);
                 assert(itsWs(m+1,n+1).GetNumCols()==itsDw12.Dw2);
-                index++;
             }
     }
     else

@@ -155,6 +155,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/MatrixProductStateImp.H" />
+		<Unit filename="TensorNetworksImp/MatrixProductStateImp_Plotting.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="TensorNetworksImp/MultiPlotableImp.C">
 			<Option compilerVar="CC" />
 		</Unit>
