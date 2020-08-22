@@ -29,6 +29,7 @@ class MatrixProductSite
         virtual ~MatrixProductSite();
         void InitializeWith(TensorNetworks::State,int sgn);
         void Freeze(double s);
+        void CloneState(const MatrixProductSite* psi2);
 
 //--------------------------------------------------------------------------------------
 //
@@ -48,12 +49,19 @@ class MatrixProductSite
         {
             return lr==TensorNetworks::DLeft ? itsHLeft_Cache : itsHRightCache;
         }
-        void     UpdateCache(const SiteOperator* so, const Vector3T& HLeft, const Vector3T& HRight);
+        const    MatrixCT& GetRLCache(TensorNetworks::Direction lr) const
+        {
+            return lr==TensorNetworks::DLeft ? itsLeft_Cache : itsRightCache;
+        }
+        void     UpdateCache(const SiteOperator* so       ,const Vector3T& HLeft,const Vector3T& HRight); //update <Psi|H|Psi> L/R cahces
+        void     UpdateCache(const MatrixProductSite* Psi2,const MatrixCT&  Left,const MatrixCT&  Right); //update <Psi|Psi> L/R cahces
 
-        MatrixCT IterateLeft_F(const MatrixProductSite* Psi2, const MatrixCT& Fam1) const;
-        Vector3T IterateLeft_F(const SiteOperator* so, const Vector3T& Fam1,bool cache=true);
-        Vector3T IterateRightF(const SiteOperator* so, const Vector3T& Fam1,bool cache=true);
-        Vector4T IterateLeft_F(const SiteOperator* so1,const SiteOperator* so2, const Vector4T& Fam1) const;
+        MatrixCT IterateLeft_F(const MatrixProductSite* Psi2,const MatrixCT& Fam1,bool cache=false) const;
+        MatrixCT IterateRightF(const MatrixProductSite* Psi2,const MatrixCT& Fam1,bool cache=false) const;
+        MatrixCT IterateF     (TensorNetworks::Direction lr ,const MatrixCT& M) const;
+        Vector3T IterateLeft_F(const SiteOperator*      so  ,const Vector3T& Fam1,bool cache=false);
+        Vector3T IterateRightF(const SiteOperator*      so  ,const Vector3T& Fam1,bool cache=false);
+        Vector4T IterateLeft_F(const SiteOperator*      so1 ,const SiteOperator* so2, const Vector4T& Fam1) const;
 
 //---------------------------------------------------------------------------------
 //
@@ -62,6 +70,13 @@ class MatrixProductSite
         void SVDNormalize(TensorNetworks::Direction lr);//  Returns rank of singular values.
         void SVDNormalize(TensorNetworks::Direction lr,int Dmax,double espMin);//  Returns rank of singular values.
         bool IsNormalized(TensorNetworks::Direction lr,double eps) const;
+        bool SetCanonicalBondDimensions(int D1,int D2);
+//--------------------------------------------------------------------------------------
+//
+//  Vary this site to be as close as possible to Site by minimizing ||this-Psi2||^2
+//
+        virtual void Optimize(const MatrixProductSite* psi, const MatrixCT& L, const MatrixCT& R); // Minimize ||this-Psi2||^2
+
 //--------------------------------------------------------------------------------------
 //  Operate on MPS with an MPO:  |Psi> -> O|Psi>.
 //  In general this will increase the bond dimension from D to D*Dw
@@ -113,7 +128,7 @@ private:
 
 
     friend class MatrixProductTesting;
-    typedef std::vector<MatrixCT> pVectorT;
+    typedef std::vector<MatrixCT>     pVectorT;
     typedef pVectorT::      iterator  pIterT;
     typedef pVectorT::const_iterator cpIterT;
 
@@ -122,8 +137,8 @@ private:
 //  Internal contraction function
 //
     void Contract(TensorNetworks::Direction lr,const VectorT& s, const MatrixCT& UV);
-    static MatrixCT  Contract1(const VectorT& s, const MatrixCT& VA);
-    static MatrixCT  Contract1(const MatrixCT& AU,const VectorT& s);
+    static MatrixCT  Contract1(const VectorT &  s, const MatrixCT& VA);
+    static MatrixCT  Contract1(const MatrixCT& AU, const VectorT & s );
 
     eType ContractAWFA (int w2,int i2, int j2,         const SiteOperator* so, const Vector3T& Fam1) const;
     eType ContractWFA  (int m, int w2, int i1, int j2, const SiteOperator* so, const Vector3T& Fam1) const;
@@ -140,18 +155,20 @@ private:
 
     MatrixCT ContractCA(int n2, const MatrixCT& C) const;
     void     Contract(pVectorT& newAs,const SiteOperator* so);
+    MatrixCT ContractLRM(const MatrixCT& M, const MatrixCT& L, const MatrixCT& R) const;
+    MatrixCT Contract_RM(const MatrixCT& R, const MatrixCT& M) const;
 
 
     Bond* itsLeft_Bond;
     Bond* itsRightBond;
     int itsp; //2*S+1
-    int itsD1,itsD2;
-    pVectorT itsAs; //We need a separate matrix for eash of the p basis states on one site.
-    Vector3T itsHLeft_Cache;
-    Vector3T itsHRightCache;
+    int itsD1,itsD2;  //Bond dimensions
+    pVectorT itsAs;   //We need a separate matrix for each of the p basis states on one site.
+    Vector3T itsHLeft_Cache,itsHRightCache; //L/R tensors for <Psi|H|Psi>
+    mutable MatrixCT itsLeft_Cache ,itsRightCache;  //L/R matrices for <Psi|Psi>
     PrimeEigenSolver<eType> itsEigenSolver;
 
-    int itsNumUpdates;
+    int    itsNumUpdates;
     bool   isFrozen; //Don't refine this site.
     double itsEmin;
     double itsGapE;  //Gap to the next excited state.

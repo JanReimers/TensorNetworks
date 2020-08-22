@@ -26,6 +26,7 @@ class MatrixProductState : public virtual MultiPlotable
         virtual ~MatrixProductState() {}
         virtual void InitializeWith(TensorNetworks::State)=0;
         virtual void Freeze(int isite,double s)=0;
+        virtual MatrixProductState* Clone() const=0;
 //--------------------------------------------------------------------------------------
 //
 //  Normalization members with and without SVD compression
@@ -40,6 +41,11 @@ class MatrixProductState : public virtual MultiPlotable
 // Find ground state.  Return <E^2>-<E>^2
 //
         virtual double FindGroundState(const Hamiltonian* H,int maxIter, const Epsilons& eps,LRPSupervisor*)=0;
+//--------------------------------------------------------------------------------------
+//
+//  Vary this MPS to be as close as possible to Psi2 by minimizing ||this-Psi2||^2
+//
+        virtual void Optimize(const MatrixProductState* Psi2,int maxIter, const Epsilons& eps,LRPSupervisor*)=0; // Minimize ||this-Psi2||^2
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions
@@ -73,6 +79,7 @@ class MatrixProductState : public virtual MultiPlotable
 //    Reporting
 //
         virtual std::string GetNormStatus(int isite) const=0;
+        virtual std::string GetNormStatus() const=0;
         virtual void Report(std::ostream&) const=0;
 };
 

@@ -37,10 +37,13 @@ private:
 //
 public:
         MatrixProductStateImp(int L, double S, int D,const Epsilons& eps);
+        MatrixProductStateImp(const MatrixProductStateImp& mps);
+
         virtual ~MatrixProductStateImp();
 
         virtual void InitializeWith(TensorNetworks::State);
         virtual void Freeze(int isite,double s);
+        virtual MatrixProductState* Clone() const;
 //--------------------------------------------------------------------------------------
 //
 //  Access to information
@@ -63,6 +66,11 @@ public:
 // Find ground state
 //
         virtual double   FindGroundState(const Hamiltonian* H,int maxIter, const Epsilons& eps,LRPSupervisor*);
+//--------------------------------------------------------------------------------------
+//
+//  Vary this MPS to be as close as possible to Psi2 by minimizing ||this-Psi2||^2
+//
+        virtual void Optimize(const MatrixProductState* Psi2,int maxIter, const Epsilons& eps,LRPSupervisor*); // Minimize ||this-Psi2||^2
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions
@@ -89,6 +97,8 @@ public:
 //    Reporting
 //
         virtual std::string GetNormStatus(int isite) const;
+        virtual std::string GetNormStatus() const;
+        virtual bool IsRLNormalized(int isite) const; //  AAA..AMBB..BBB form at one site.
         virtual void Report(std::ostream&) const;
 //--------------------------------------------------------------------------------------
 //
@@ -106,6 +116,7 @@ private:
         friend class MPSNormTesting;
         friend class MatrixProductTesting;
 
+        void InitSitesAndBonds();
         void InitPlotting();
 //--------------------------------------------------------------------------------------
 //
@@ -116,7 +127,7 @@ private:
         void     UpdateBondData(int isite);
         void     NormalizeSite(TensorNetworks::Direction lr,int isite,LRPSupervisor*);
         void     NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,int Dmax, double epsMin, LRPSupervisor*);
-
+        void     SetCanonicalBondDimensions(TensorNetworks::Direction lr);
 //--------------------------------------------------------------------------------------
 //
 // Calc Heff, calc L&R caches
@@ -129,6 +140,16 @@ private:
         Vector3T GetEORightIterate(const Operator* o,LRPSupervisor*,int isite,bool cache=false) const;
 
         Matrix4T CalculateTwoSiteDM(int ia,int ib) const;
+//--------------------------------------------------------------------
+//
+//  Used for ||Psi1-Psi2||^2 optimizations.
+//
+        double   Sweep (TensorNetworks::Direction lr,const MatrixProductState* Psi2,LRPSupervisor*,const Epsilons& eps);
+        void LoadCaches(const MatrixProductState* Psi2,LRPSupervisor* supervisor);
+        MatrixCT GetRLCache(TensorNetworks::Direction lr,int isite) const;
+        MatrixCT GetEOLeft_Iterate(const MatrixProductState* Psi2,LRPSupervisor*,int isite,bool cache=false) const;
+        MatrixCT GetEORightIterate(const MatrixProductState* Psi2,LRPSupervisor*,int isite,bool cache=false) const;
+
 //
 //  Loop Control
 //
@@ -145,6 +166,10 @@ private:
             return lr==TensorNetworks::DLeft ? 1 : -1;
         }
 
+        TensorNetworks::Direction Invert(TensorNetworks::Direction lr)
+        {
+            return lr==TensorNetworks::DLeft ?  TensorNetworks::DRight : TensorNetworks::DLeft;
+        }
 
 //--------------------------------------------------------------------------------------
 //

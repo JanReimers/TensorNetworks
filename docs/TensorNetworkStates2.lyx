@@ -72,6 +72,7 @@
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
+\listings_params "language={C++},keywordstyle={\color{blue}},commentstyle={\color{magenta}\itshape},emphstyle={\color{red}},breaklines=true,basicstyle={\ttfamily},stringstyle={\color{green}},identifierstyle={\color{cyan}}"
 \tracking_changes false
 \output_changes false
 \html_math_output 0
@@ -362,7 +363,11 @@ Where the second line is a compact representation with summation limits,
 \begin_inset Formula $a$
 \end_inset
 
- labels a lattice site.
+ labels a lattice site from 
+\begin_inset Formula $1\ldots L$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Enumerate
@@ -373,7 +378,11 @@ Where the second line is a compact representation with summation limits,
 \begin_inset Formula $n_{a}$
 \end_inset
 
- are bra and ket quantum numbers ranging from 
+ are bra and ket quantum numbers for site 
+\begin_inset Formula $a$
+\end_inset
+
+ ranging from 
 \begin_inset Formula $0\rightarrow d-1$
 \end_inset
 
@@ -1162,6 +1171,99 @@ Vidal's canonial form
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsubsection
+Canonical Bond Dimensions
+\end_layout
+
+\begin_layout Standard
+For a wave function with OBC bond dimension 
+\begin_inset Formula $D$
+\end_inset
+
+ the edge sites will usually have bond dimension 
+\begin_inset Formula $D_{a}<D$
+\end_inset
+
+.
+ In particular the left edge site will have matrix dimensions 
+\begin_inset Formula $1\times\min\left\{ d,D\right\} $
+\end_inset
+
+ and the next site in will have dimensions 
+\begin_inset Formula $\min\left\{ d,D\right\} \times\min\left\{ d^{2},D\right\} $
+\end_inset
+
+.
+ In general if site 
+\begin_inset Formula $a$
+\end_inset
+
+ is a distance 
+\begin_inset Formula $a$
+\end_inset
+
+from the left then the bond dimensions will be 
+\begin_inset Formula $\min\left\{ d^{a-1},D\right\} \times\min\left\{ d^{a},D\right\} $
+\end_inset
+
+, similarly on the right the dimensions will be 
+\begin_inset Formula $\min\left\{ d^{L-a+1},D\right\} \times\min\left\{ d^{L-a},D\right\} $
+\end_inset
+
+.
+ The literature does make a passing mention of this in a few instances.
+ They don;t have a name for it, so I will just call it 
+\emph on
+canonical bond dimensions
+\emph default
+.
+ These limits are unavoidable, the Hilbert space at the edges of the lattice
+ is only so big.
+ If you run a left normalization sweep across the lattice these conditions
+ will automatically be enforced by the number of non-zero singular values
+ at each bond.
+ However for a left normalization sweep no such automatic sizing happens
+ on the right hand side of the lattice.
+ SImilarly if you only do a right normalization sweep, then left side ends
+ up with non-canonical bond dimension.
+ The last site will always be 
+\begin_inset Formula $D\times1$
+\end_inset
+
+ instead of 
+\begin_inset Formula $\min\left\{ d,D\right\} \times1$
+\end_inset
+
+.
+ Options for handling this in software are
+\end_layout
+
+\begin_layout Enumerate
+Always do a left then a right sweep for normalization.
+\end_layout
+
+\begin_layout Enumerate
+Add code to the left sweep to reshape the right side with canonical dimansions.
+ And similarly for right sweeps.
+\end_layout
+
+\begin_layout Enumerate
+Add code to the MPS constructor so that canonical bond dimensions are built
+ in the from the start.
+\end_layout
+
+\begin_layout Standard
+What we want to avoid is if statments sprinkled randomly throughout the
+ code trying fix up the bond dimensions as problems (usually failed asserts)
+ arise.
+ In addition we may need to enforce canonical bond dimensions when applying
+ an MPO (with 
+\begin_inset Formula $D_{w}>1$
+\end_inset
+
+) to an MPS.
 \end_layout
 
 \begin_layout Subsection
@@ -2355,7 +2457,7 @@ where I am using the tensor product symbol to make it explicit that each
  One bond evolution operator has the form
 \begin_inset Formula 
 \begin{equation}
-e^{-\tau\mathcal{\hat{H}}_{1}}=\sum_{m_{1}m_{2}}\sum_{n_{1}n_{2}}O^{\left(m_{1}n_{1}\right)\left(m_{2}n_{2}\right)}\left|n_{1}n_{2}\right\rangle \left\langle m_{1}m_{2}\right|\label{eq:One Bond Operator}
+e^{-\tau\mathcal{\hat{H}}_{1}}=\sum_{m_{1}m_{2}}\sum_{n_{1}n_{2}}O^{\left(m_{1}m_{2}\right)\left(n_{1}n_{2}\right)}\left|n_{1}n_{2}\right\rangle \left\langle m_{1}m_{2}\right|\label{eq:One Bond Operator}
 \end{equation}
 
 \end_inset
@@ -2372,7 +2474,7 @@ and we can think of
  We need to evaluate matrix elements
 \begin_inset Formula 
 \[
-O^{\left(m_{1}n_{1}\right)\left(m_{2}n_{2}\right)}=\left\langle m_{1}m_{2}\right|e^{-\tau\mathcal{\hat{H}}_{1}}\left|n_{1}n_{2}\right\rangle 
+O^{\left(m_{1}m_{2}\right)\left(n_{1}n_{2}\right)}=\left\langle m_{1}m_{2}\right|e^{-\tau\mathcal{\hat{H}}_{1}}\left|n_{1}n_{2}\right\rangle 
 \]
 
 \end_inset
@@ -2388,7 +2490,7 @@ which I suppose we can do by Taylor expansion
 
 \begin_inset Formula 
 \[
-=\delta_{m_{1}m_{2}}\delta_{n_{1}n_{2}}-\tau\left\langle m_{1}m_{2}\right|\mathcal{\hat{H}}_{1}\left|n_{1}n_{2}\right\rangle +O\left(\tau^{2}\right)
+=\delta_{m_{1}n_{1}}\delta_{m_{2}n_{2}}-\tau\left\langle m_{1}m_{2}\right|\mathcal{\hat{H}}_{1}\left|n_{1}n_{2}\right\rangle +O\left(\tau^{2}\right)
 \]
 
 \end_inset
@@ -2399,10 +2501,22 @@ This may be fine for first order trotter decomposition since that also throws
 \end_inset
 
 .
- But what then for higher order decompositions? Let try this
+ But what then for higher order decompositions? We can calculate 
+\begin_inset Formula $O$
+\end_inset
+
+ exactly by and eigen decomposition of 
+\begin_inset Formula $\hat{H_{1}}$
+\end_inset
+
+ which should be tractable because this is a local 
+\begin_inset Formula $d^{2}\times d^{2}$
+\end_inset
+
+ hamiltonian.
 \begin_inset Formula 
 \[
-O^{\left(m_{1}n_{1}\right)\left(m_{2}n_{2}\right)}=O^{ij}=\left\langle i\right|e^{-\tau\mathcal{\hat{H}}}\left|j\right\rangle 
+O^{\left(m_{1}m_{2}\right)\left(n_{1}n_{2}\right)}=O^{ij}=\left\langle i\right|e^{-\tau\mathcal{\hat{H}}_{1}}\left|j\right\rangle 
 \]
 
 \end_inset
@@ -2420,7 +2534,7 @@ noprefix "false"
  )
 \begin_inset Formula 
 \[
-e^{-\tau\mathcal{\hat{H}}}=Ue^{-\tau\mathcal{\hat{\lambda}}}U^{\dagger}
+e^{-\tau\mathcal{\hat{H}}_{1}}=Ue^{-\tau\mathcal{\hat{\lambda}}}U^{\dagger}
 \]
 
 \end_inset
@@ -2428,15 +2542,7 @@ e^{-\tau\mathcal{\hat{H}}}=Ue^{-\tau\mathcal{\hat{\lambda}}}U^{\dagger}
 
 \begin_inset Formula 
 \[
-O^{ij}=\sum_{kl}U^{ik}\delta_{kl}e^{-\tau\lambda_{k}}\left(U^{\dagger}\right)^{lj}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-=\sum_{k}U^{ik}e^{-\tau\lambda_{k}}\left(U^{\dagger}\right)^{kj}
+O^{ij}=\sum_{k}U^{ik}e^{-\tau\lambda_{k}}\left(U^{\dagger}\right)^{kj}
 \]
 
 \end_inset
@@ -2449,58 +2555,36 @@ O^{ij}=\sum_{kl}U^{ik}\delta_{kl}e^{-\tau\lambda_{k}}\left(U^{\dagger}\right)^{l
 
 \end_inset
 
-
-\begin_inset Formula 
-\[
-=\sum_{w=1}^{p^{2}}U^{iw}e^{-\tau\lambda_{w}}U^{jw}
-\]
-
+This looks like it is factored but it is factored in the wrong direction
+ since 
+\begin_inset Formula $i=\left(m_{1}m_{2}\right)$
 \end_inset
 
-
-\begin_inset Formula 
-\[
-=\sum_{w=1}^{p^{2}}U^{iw}e^{-\frac{\tau}{2}\lambda_{w}}e^{-\frac{\tau}{2}\lambda_{w}}U^{jw}
-\]
-
+ and 
+\begin_inset Formula $j=\left(n_{1}n_{2}\right)$
 \end_inset
 
-
-\begin_inset Formula 
-\[
-O^{\left(n_{1}m_{1}\right)\left(n_{2}m_{2}\right)}=\sum_{w=1}^{p^{2}}U^{\left(n_{1}m_{1}\right)w}e^{-\frac{\tau}{2}\lambda_{w}}e^{-\frac{\tau}{2}\lambda_{w}}U^{\left(n_{2}m_{2}\right)w}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-O^{\left(n_{1}m_{1}\right)\left(n_{2}m_{2}\right)}=\sum_{w=1}^{p^{2}}\left[U^{\left(n_{1}m_{1}\right)w}e^{-\frac{\tau}{2}\lambda_{w}}\right]\left[e^{-\frac{\tau}{2}\lambda_{w}}U^{\left(n_{2}m_{2}\right)w}\right]
-\]
-
-\end_inset
-
-
+.
 \end_layout
 
 \begin_layout Standard
-In order for this to look like an MPO we need 
+In order for this to look like an MPO we need to reshape 
 \begin_inset Formula $O$
 \end_inset
 
  in the form
 \begin_inset Formula 
 \[
-O^{\left(n_{1}m_{1}\right)\left(n_{2}m_{2}\right)}=\sum_{w_{1}}W_{1w_{1}}^{m_{1}n_{1}}W_{w_{1}1}^{m_{2}n_{2}}.
+O^{\left(m_{1}m_{2}\right)\left(n_{1}n_{2}\right)}\Rightarrow O^{\left(n_{1}m_{1}\right)\left(n_{2}m_{2}\right)}
 \]
 
 \end_inset
 
-In general this can be achieved by standard reshaping and SVD techniques
+so that it is by site number rather then by bra and ket quantum numbers.
+ And then do an SVD decomposition
 \begin_inset Formula 
 \[
-O^{\left(n_{1}m_{1}\right)\left(n_{2}m_{2}\right)}=\sum_{k=1}^{d^{2}}U_{\left(n_{1}m_{1}\right),k}s_{k,k}\left(V^{\dagger}\right)_{k,\left(n_{2}m_{2}\right)}
+O^{\left(n_{1}m_{1}\right)\left(n_{2}m_{2}\right)}=\sum_{k=1}^{d^{2}}U_{\left(n_{1}m_{1}\right),k}s_{k}\left(V^{\dagger}\right)_{k,\left(n_{2}m_{2}\right)}
 \]
 
 \end_inset
@@ -2508,7 +2592,7 @@ O^{\left(n_{1}m_{1}\right)\left(n_{2}m_{2}\right)}=\sum_{k=1}^{d^{2}}U_{\left(n_
 and we absorb the singular values in both directions
 \begin_inset Formula 
 \[
-W_{1w_{1}}^{m_{1}n_{1}}=U_{\left(n_{1}m_{1}\right),w_{1}}\sqrt{s_{w_{1},w_{1}}}
+W_{1w}^{m_{1}n_{1}}=U_{\left(n_{1}m_{1}\right),w}\sqrt{s_{w}}
 \]
 
 \end_inset
@@ -2516,38 +2600,7 @@ W_{1w_{1}}^{m_{1}n_{1}}=U_{\left(n_{1}m_{1}\right),w_{1}}\sqrt{s_{w_{1},w_{1}}}
 
 \begin_inset Formula 
 \[
-W_{w_{1}1}^{m_{2}n_{2}}=\sqrt{s_{w_{1},w_{1}}}\left(V^{\dagger}\right)_{w_{1},\left(n_{2}m_{2}\right)}
-\]
-
-\end_inset
-
-These 
-\begin_inset Formula $W$
-\end_inset
-
- matrices are really mostly zero except for the first row and column.We can
- see that we already have this form in eq 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:EigenO"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
- if we assign
-\begin_inset Formula 
-\[
-W_{1w_{1}}^{m_{1}n_{1}}=U^{\left(m_{1}n_{1}\right)w_{1}}e^{-\frac{\tau}{2}\lambda_{w_{1}}}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-W_{w_{1}1}^{m_{2}n_{2}}=e^{-\frac{\tau}{2}\lambda_{w_{1}}}U^{\left(m_{2}n_{2}\right)w_{1}}
+W_{w1}^{m_{2}n_{2}}=\sqrt{s_{w}}\left(V^{\dagger}\right)_{w,\left(n_{2}m_{2}\right)}
 \]
 
 \end_inset
@@ -2568,6 +2621,80 @@ For lower spins it is easy to calculate these symbolically, but I think
 \end_inset
 
 's works for all bonds on the lattice.
+ SO the aolgorithm is
+\end_layout
+
+\begin_layout Enumerate
+Build 
+\begin_inset Formula $H_{1}^{\left(m_{1}m_{2}\right)\left(n_{1}n_{2}\right)}=\left\langle m_{1}m_{2}\right|\mathcal{\hat{H}}_{1}\left|n_{1}n_{2}\right\rangle $
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Do a full eigen decomposition 
+\begin_inset Formula $H_{1}^{\left(m_{1}m_{2}\right)\left(n_{1}n_{2}\right)}=\sum_{k}U^{\left(m_{1}m_{2}\right)k}\lambda_{k}U^{\dagger k\left(n_{1}n_{2}\right)}$
+\end_inset
+
+ and cache 
+\begin_inset Formula $U,\lambda$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+For each 
+\begin_inset Formula $\tau$
+\end_inset
+
+ evaluate 
+\begin_inset Formula $O^{\left(m_{1}m_{2}\right)\left(n_{1}n_{2}\right)}\left(\tau\right)=\sum_{k}U^{\left(m_{1}m_{2}\right)k}e^{\lambda_{k}}U^{\dagger k\left(n_{1}n_{2}\right)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+reshape 
+\begin_inset Formula $O^{\left(m_{1}m_{2}\right)\left(n_{1}n_{2}\right)}\Rightarrow O^{\left(n_{1}m_{1}\right)\left(n_{2}m_{2}\right)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+SVD 
+\begin_inset Formula $O^{\left(n_{1}m_{1}\right)\left(n_{2}m_{2}\right)}=\sum_{k=1}^{d^{2}}U_{\left(n_{1}m_{1}\right),k}s_{k}\left(V^{\dagger}\right)_{k,\left(n_{2}m_{2}\right)}$
+\end_inset
+
+, note that this a new/diffrerent 
+\begin_inset Formula $U$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Assign 
+\begin_inset Formula $W_{1w}^{m_{1}n_{1}}=U_{\left(n_{1}m_{1}\right),w}\sqrt{s_{w}}$
+\end_inset
+
+ and 
+\begin_inset Formula $W_{w1}^{m_{2}n_{2}}=\sqrt{s_{w}}\left(V^{\dagger}\right)_{w,\left(n_{2}m_{2}\right)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Step2 1 and 2 can be once only and the remaining steps need to repeated
+ for each new value of 
+\begin_inset Formula $\tau$
+\end_inset
+
+ which typically decreases and convergence proceeds.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2612,7 +2739,7 @@ noprefix "false"
 
 \begin_inset Formula 
 \[
-M_{(i_{a-1},n_{1})i_{a}}=\boldsymbol{UsV}=\sum_{j_{a}}^{d^{2}D}U_{\left(i_{a-1},n_{a}\right)j_{a}}s_{j_{a}j_{a}}V_{j_{a}i_{a}}
+M_{(i_{a-1},n_{1})i_{a}}=\boldsymbol{UsV}=\sum_{j_{a}}^{D_{w}D}U_{\left(i_{a-1},n_{a}\right)j_{a}}s_{j_{a}j_{a}}V_{j_{a}i_{a}}
 \]
 
 \end_inset
@@ -2700,9 +2827,41 @@ literal "false"
 \end_inset
 
  (page 108) talks about re-scaling the singular values in order maintain
- normalization.
- SVD compression is not optimal, but it provides a good guess for the optimizati
-on algorithm in the section below.
+ normalization but leaves out the details.
+ Since the trunctation error is defined in terms of squares 
+\begin_inset Formula $\epsilon=\sqrt{\sum_{k=D+1}^{D_{w}D}s_{k}^{2}}$
+\end_inset
+
+ I can think of three ways to rescale
+\begin_inset Formula 
+\[
+\tilde{s}_{k}=s_{k}\frac{\sum_{i=1}^{D_{w}D}s_{i}}{\sum_{i=1}^{d}s_{i}}
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+\tilde{s}_{k}=s_{k}\frac{\sum_{i=1}^{D_{w}D}s_{i}^{2}}{\sum_{i=1}^{d}s_{i}^{2}}
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+\tilde{s}_{k}=s_{k}\frac{\sqrt{\sum_{i=1}^{D_{w}D}s_{i}^{2}}}{\sqrt{\sum_{i=1}^{d}s_{i}^{2}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+SVD compression is not optimal, but it provides a good guess for the optimizatio
+n algorithm in the section below.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2788,14 +2947,90 @@ see Schollwoeck page 132-133 for details.
  Then
 \begin_inset Formula 
 \[
-\tilde{M}_{i_{a-1}i_{a}}^{n_{a}}=\sum_{j_{a-1}}\tilde{L}_{i_{a-1}j_{a-1}}\left(\sum_{j_{a}}\tilde{R}_{i_{a}j_{a}}M_{j_{a-1}j_{a}}^{n_{a}}\right)
+\tilde{M}_{i_{a-1}i_{a}}^{n_{a}}=\sum_{j_{a-1}}^{D_{w}D_{1}}L_{i_{a-1}j_{a-1}}\left(\sum_{j_{a}}^{D_{w}D_{2}}R_{i_{a}j_{a}}M_{j_{a-1}j_{a}}^{n_{a}}\right)
 \]
 
 \end_inset
 
-This is very similar to the lattice sweeps used in the a ground state calculatio
-n.
+where
+\begin_inset Formula 
+\[
+L_{i_{a-1}j_{a-1}}=\sum_{n_{a-1}}\boldsymbol{\tilde{M}}^{n_{a-1}^{\dagger}}\left(\cdots\left(\sum_{n_{1}}\boldsymbol{\tilde{M}}^{n_{1}^{\dagger}}\boldsymbol{M}^{n_{1}}\right)\cdots\right)\boldsymbol{M}^{n_{a-1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+R_{i_{a}j_{a}}=\sum_{n_{a+1}}\boldsymbol{M}^{n_{a+1}}\left(\cdots\left(\sum_{n_{L}}\boldsymbol{M}^{n_{L}}\boldsymbol{\tilde{M}}^{n_{L}^{\dagger}}\right)\cdots\right)\boldsymbol{\tilde{M}}^{n_{a+1}^{\dagger}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $L$
+\end_inset
+
+should have limits 
+\begin_inset Formula $\left(D_{1},D_{w}D_{1}\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $R$
+\end_inset
+
+ should have limits 
+\begin_inset Formula $\left(D_{2},D_{w}D_{2}\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In code this is presented 
+\noun on
+MatrixProductSite.H
+\noun default
+ as the function
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+MatrixCT ContractLRM(int na) const;
+\end_layout
+
+\end_inset
+
+ This is very similar to the lattice sweeps used in the a ground state calculati
+on.
  
+\end_layout
+
+\begin_layout Subsubsection
+Convergence
+\end_layout
+
+\begin_layout Standard
+We monitor
+\begin_inset Formula 
+\[
+\left\Vert \psi-\tilde{\psi}\right\Vert ^{2}=\left\langle \psi|\psi\right\rangle -\left\langle \psi|\tilde{\psi}\right\rangle -\left\langle \tilde{\psi}|\psi\right\rangle +\left\langle \tilde{\psi}|\tilde{\psi}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=1-R^{[1]}-L^{[L\}}+\sum_{n_{l}}\boldsymbol{\tilde{M}}^{n_{L}^{\dagger}}\left(\cdots\left(\sum_{n_{1}}\boldsymbol{\tilde{M}}^{n_{1}^{\dagger}}\boldsymbol{\tilde{M}}^{n_{1}}\right)\cdots\right)\boldsymbol{\tilde{M}}^{n_{L}}
+\]
+
+\end_inset
+
+It looks like the cross terms vanish.
 \end_layout
 
 \begin_layout Subsubsection

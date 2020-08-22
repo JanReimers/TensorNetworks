@@ -19,6 +19,14 @@ Bond::~Bond()
     //dtor
 }
 
+void Bond::CloneState(const Bond* b2)
+{
+    itsSingularValues=b2->itsSingularValues;
+    itsBondEntropy   =b2->itsBondEntropy;
+    itsMinSV         =b2->itsMinSV;
+    itsRank          =b2->itsRank;
+}
+
 void Bond::SetSites(MatrixProductSite* left, MatrixProductSite* right)
 {
     itsLeft_Site=left;

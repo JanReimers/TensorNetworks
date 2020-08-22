@@ -14,6 +14,7 @@ class Bond
    public:
         Bond(double eps);
         virtual ~Bond();
+        void CloneState(const Bond* b2);
         void SetSites(MatrixProductSite* left, MatrixProductSite* right);
 
         void SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,const MatrixCT& UV);

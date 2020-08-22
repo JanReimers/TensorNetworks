@@ -6,6 +6,8 @@
 -Done Ham->CreateMPS should be a /Factory/ so py knows to delete it.
 -Fix conventions for lattice site indexing, zero or one based?
     MPS is zero based, FullState is one based, LyX notes are one based
+-GetNormStat(isite) should return a char, keep # iterations separate.
+-Reconcile locel hilbert space dimension, using d int he Lyx doc and p in code.
 -Convergence schedule,  increase D, drop epsilons
     ListView with columns
         -Step #
