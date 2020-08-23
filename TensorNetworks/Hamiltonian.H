@@ -27,8 +27,8 @@ class Hamiltonian : public virtual Operator
         virtual Operator*           CreateOperator(const OperatorWRepresentation*) const=0;
         //  Create full lattice of unit operators
         virtual MPO*                CreateUnitOperator() const=0;
-        //  Create and exp(-dt*H) time evolution operator. Odd or Even
-        virtual Operator*           CreateOperator(double dt, TensorNetworks::Trotter type       ) const=0;
+        //  Create and exp(-dt*H) time evolution operator of a certain order in tau.
+        virtual Operator*           CreateOperator(double dt, TensorNetworks::TrotterOrder) const=0;
         // Get a 2 site local matrix of order p^2 x p^2
         virtual Matrix4T            BuildLocalMatrix() const=0;
         // Create an exact (full) wave function abject suitable for this Hamiltonian

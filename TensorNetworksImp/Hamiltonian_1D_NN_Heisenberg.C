@@ -183,20 +183,52 @@ Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(const OperatorWRepresenta
     return new MPO_LRB(Wrep,itsL,itsS);
 }
 
-Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::Trotter type       ) const
+Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::TrotterOrder order) const
 {
-    Operator* O=0;
-    if (type==TensorNetworks::Odd || type==TensorNetworks::Even)
+    MPO* W=new MPOImp(itsL,itsS);
+    Matrix4T H12=BuildLocalMatrix(); //Full H matrix for two sites 1&2
+    switch (order)
     {
-        Matrix4T H12=BuildLocalMatrix(); //Full H matrix for two sites 1&2
-        O=new MPO_SpatialTrotter(dt,type,itsL,Getp(),H12);
-    }
-    else //Spin space decomposition
-    {
+        case TensorNetworks::FirstOrder :
+        {
+            MPO_SpatialTrotter Wodd (dt,TensorNetworks::Odd ,itsL,Getp(),H12);
+            MPO_SpatialTrotter Weven(dt,TensorNetworks::Even,itsL,Getp(),H12);
+            W->Combine(&Wodd);
+            W->Combine(&Weven);
+            break;
+        }
+        case TensorNetworks::SecondOrder :
+        {
+            MPO_SpatialTrotter Wodd (dt/2.0,TensorNetworks::Odd ,itsL,Getp(),H12);
+            MPO_SpatialTrotter Weven(dt,TensorNetworks::Even,itsL,Getp(),H12);
+            W->Combine(&Wodd);
+            W->Combine(&Weven);
+            W->Combine(&Wodd);
+            break;
+        }
+        case TensorNetworks::FourthOrder :
+        {
+            TensorNetworks::VectorT ts(5);
+            ts(1)=dt/(4-pow(4.0,1.0/3.0));
+            ts(2)=ts(1);
+            ts(3)=dt-2*ts(1)-2*ts(2);
+            ts(4)=ts(2);
+            ts(5)=ts(1);
+            for (int it=1;it<=5;it++)
+            {
+                MPOImp U(itsL,itsS);
+                MPO_SpatialTrotter Wodd (ts(it)/2.0,TensorNetworks::Odd ,itsL,Getp(),H12);
+                MPO_SpatialTrotter Weven(ts(it)    ,TensorNetworks::Even,itsL,Getp(),H12);
+                U.Combine(&Wodd);
+                U.Combine(&Weven);
+                U.Combine(&Wodd);
+                W->Combine(&U);
+            }
+            break;
+        }
+    } //End swtich
 
-    }
-    assert(O);
-    return O;
+    return W;
 }
 
 FullState* Hamiltonian_1D_NN_Heisenberg::CreateFullState () const

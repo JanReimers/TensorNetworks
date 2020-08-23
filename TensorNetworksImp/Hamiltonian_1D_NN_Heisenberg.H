@@ -30,7 +30,7 @@ class Hamiltonian_1D_NN_Heisenberg
         virtual MatrixProductState* CreateMPS         (int D,const Epsilons&) const;
         virtual MPO*                CreateUnitOperator() const;
         virtual Operator*           CreateOperator    (const OperatorWRepresentation*) const;
-        virtual Operator*           CreateOperator    (double dt, TensorNetworks::Trotter type       ) const;
+        virtual Operator*           CreateOperator    (double dt, TensorNetworks::TrotterOrder) const;
         virtual Matrix4T            BuildLocalMatrix  () const;
         virtual FullState*          CreateFullState   () const;
         //

@@ -6,6 +6,7 @@
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/LRPSupervisor.H"
 #include "TensorNetworks/Epsilons.H"
+#include "Operators/MPO_SpatialTrotter.H"
 
 #include "oml/matrix.h"
 #include "oml/stream.h"
@@ -150,19 +151,22 @@ TEST_F(ImaginaryTimeTesting,TestTryGroundStateDmax8)
 
 TEST_F(ImaginaryTimeTesting,TestMPPOCombine)
 {
-    int D=2,L=9;
+    int D=2,L=9,S=0.5;
     double dt=0.05000;
-    Setup(L,0.5,D);
+    Setup(L,S,D);
+
+    TensorNetworks::Matrix4T H12=itsH->BuildLocalMatrix(); //Full H matrix for two sites 1&2
+
     // Create some Trotter 2nd order operators
-    Operator* W_Odd =itsH->CreateOperator(dt/2.0,TensorNetworks::Odd);
-    Operator* W_Even=itsH->CreateOperator(dt,TensorNetworks::Even);
+    MPO_SpatialTrotter W_Odd (dt/2.0,TensorNetworks::Odd ,L,2*S+1,H12);
+    MPO_SpatialTrotter W_Even(dt    ,TensorNetworks::Even,L,2*S+1,H12);
     //
     //  Now combine three trotters into one
     //
     MPO* W=itsH->CreateUnitOperator();
-    W->Combine(W_Odd);
-    W->Combine(W_Even);
-    W->Combine(W_Odd);
+    W->Combine(&W_Odd);
+    W->Combine(&W_Even);
+    W->Combine(&W_Odd);
     //
     //  Make a random normalized wave function
     //
@@ -176,9 +180,9 @@ TEST_F(ImaginaryTimeTesting,TestMPPOCombine)
     //
     //  Psi1 = W_Odd * W_Even * W_Odd * Psi1
     //
-    Psi1->ApplyInPlace(W_Odd);
-    Psi1->ApplyInPlace(W_Even);
-    Psi1->ApplyInPlace(W_Odd);
+    Psi1->ApplyInPlace(&W_Odd);
+    Psi1->ApplyInPlace(&W_Even);
+    Psi1->ApplyInPlace(&W_Odd);
     //
     //  At this point if the Combine function is working Psi1==Psi2
     //
@@ -193,32 +197,27 @@ TEST_F(ImaginaryTimeTesting,TestMPPOCombine)
     delete Psi1;
     delete Psi2;
     delete W;
-    delete W_Odd;
-    delete W_Even;
 }
 
 
 TEST_F(ImaginaryTimeTesting,TestOptimize)
 {
     int D=8,L=9;
-    double dt=0.1000;
+    double dt=0.2000;
     Setup(L,0.5,D);
     MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
 //    Psi1->Report(cout);
-    Psi1->InitializeWith(TensorNetworks::Neel);
+    Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
     double E1=Psi1->GetExpectation(itsH);
     cout << "E1=" << std::fixed << E1 << endl;
     cout << "Psi1 overlap=" << Psi1->GetOverlap(Psi1) << endl;
 
-    Operator* W_Odd =itsH->CreateOperator(dt/2.0,TensorNetworks::Odd);
-    Operator* W_Even=itsH->CreateOperator(dt,TensorNetworks::Even);
+    Operator* W =itsH->CreateOperator(dt,TensorNetworks::FirstOrder);
 
-    for (int niter=1;niter<20;niter++)
+    for (int niter=1;niter<30;niter++)
     {
-        MatrixProductState* Psi2=Psi1->Apply(W_Odd);
-        Psi2->ApplyInPlace(W_Even);
-        Psi2->ApplyInPlace(W_Odd);
+        MatrixProductState* Psi2=Psi1->Apply(W);
         delete Psi1;
         Psi1=Psi2->Clone();
         Psi2->NormalizeAndCompress(TensorNetworks::DRight,D,itsSupervisor);
