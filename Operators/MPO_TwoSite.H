@@ -17,6 +17,7 @@ class MPO_TwoSite : public virtual Operator
         MPO_TwoSite(int L, double S ,int isite1,int isite2, TensorNetworks::SpinOperator so1,TensorNetworks::SpinOperator so2);
         virtual ~MPO_TwoSite();
 
+        virtual int   GetL() const {return itsL;}
         const SiteOperator* GetSiteOperator(int isite) const
         {
             assert(isite>=1);

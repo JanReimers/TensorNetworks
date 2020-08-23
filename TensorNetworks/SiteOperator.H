@@ -20,6 +20,10 @@ public:
     //  Generate MPO matrices.  m,n are quantum numbers for <m|Oa|n>
     //
     virtual const MatrixT& GetW(int m, int n) const=0;
+    //
+    //  Contract MPOs together
+    //
+    virtual void Combine(const SiteOperator* O2)=0;
 };
 
 #endif // SITEOPERATOR_H

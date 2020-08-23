@@ -10,6 +10,7 @@
 struct Dw12
 {
     Dw12();
+    Dw12(int _Dw1, int _Dw2);
     Dw12(int _Dw1, int _Dw2, const Vector<int>& _w1_first, const Vector<int>& _w2_last);
 
     int Dw1,Dw2;

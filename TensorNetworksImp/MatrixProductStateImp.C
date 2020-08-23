@@ -423,9 +423,9 @@ double MatrixProductStateImp::Sweep(TensorNetworks::Direction lr,const MatrixPro
 
         iter++; //ia doesn;t always count upwards, but this guy does.
     }
-    double O11=GetOverlap(this);
-    double O12=GetOverlap(Psi2);
-    cout << "<psi1|psi1> <psi1|psi2>, delta=" << O11 << " " << O12 << " " << O12-O11 << endl;
+//    double O11=GetOverlap(this);
+//    double O12=GetOverlap(Psi2);
+//    cout << "<psi1|psi1> <psi1|psi2>, delta=" << O11 << " " << O12 << " " << O12-O11 << endl;
 //    cout << "MTrace=" << MTrace << endl;
     assert(MTrace.GetNumRows()==1);
     assert(MTrace.GetNumCols()==1);

@@ -17,6 +17,7 @@ class MPO_OneSite : public virtual Operator
         MPO_OneSite(int L, double S ,int isite, TensorNetworks::SpinOperator);
         virtual ~MPO_OneSite();
 
+        virtual int   GetL() const {return itsL;}
         const SiteOperator* GetSiteOperator(int isite) const
         {
             assert(isite>=1);

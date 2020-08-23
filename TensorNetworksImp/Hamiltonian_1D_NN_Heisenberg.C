@@ -2,6 +2,7 @@
 #include "TensorNetworksImp/MatrixProductStateImp.H"
 #include "TensorNetworksImp/FullStateImp.H"
 #include "Operators/MPO_LRB.H"
+#include "Operators/MPOImp.H"
 #include "Operators/MPO_SpatialTrotter.H"
 
 
@@ -170,6 +171,11 @@ TensorNetworks::Matrix4T Hamiltonian_1D_NN_Heisenberg::BuildLocalMatrix() const
 MatrixProductState* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,const Epsilons& eps) const
 {
     return new MatrixProductStateImp(itsL,itsS,D,eps);
+}
+
+MPO* Hamiltonian_1D_NN_Heisenberg::CreateUnitOperator() const
+{
+    return new MPOImp(itsL,itsS);
 }
 
 Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(const OperatorWRepresentation* Wrep) const

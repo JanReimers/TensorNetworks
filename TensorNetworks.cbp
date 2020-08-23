@@ -80,6 +80,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/IdentityOperator.H" />
+		<Unit filename="Operators/MPO.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/MPO.H" />
 		<Unit filename="Operators/MPO_LRB.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -100,6 +104,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/OneSiteSpinOperator.H" />
+		<Unit filename="Operators/Operator.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="Operators/SiteOperatorImp.C">
 			<Option compilerVar="CC" />
 		</Unit>

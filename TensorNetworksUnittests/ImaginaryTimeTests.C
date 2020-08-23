@@ -1,5 +1,6 @@
 #include "Tests.H"
 #include "TensorNetworks/Hamiltonian.H"
+#include "TensorNetworks/MPO.H"
 //#include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
@@ -147,14 +148,64 @@ TEST_F(ImaginaryTimeTesting,TestTryGroundStateDmax8)
 }
 */
 
+TEST_F(ImaginaryTimeTesting,TestMPPOCombine)
+{
+    int D=2,L=9;
+    double dt=0.05000;
+    Setup(L,0.5,D);
+    // Create some Trotter 2nd order operators
+    Operator* W_Odd =itsH->CreateOperator(dt/2.0,TensorNetworks::Odd);
+    Operator* W_Even=itsH->CreateOperator(dt,TensorNetworks::Even);
+    //
+    //  Now combine three trotters into one
+    //
+    MPO* W=itsH->CreateUnitOperator();
+    W->Combine(W_Odd);
+    W->Combine(W_Even);
+    W->Combine(W_Odd);
+    //
+    //  Make a random normalized wave function
+    //
+    MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
+    Psi1->InitializeWith(TensorNetworks::Random);
+    Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
+    //
+    //  Psi2 = W*Psi1
+    //
+    MatrixProductState* Psi2=Psi1->Apply(W);
+    //
+    //  Psi1 = W_Odd * W_Even * W_Odd * Psi1
+    //
+    Psi1->ApplyInPlace(W_Odd);
+    Psi1->ApplyInPlace(W_Even);
+    Psi1->ApplyInPlace(W_Odd);
+    //
+    //  At this point if the Combine function is working Psi1==Psi2
+    //
+    double O11=Psi1->GetOverlap(Psi1);
+    double O12=Psi1->GetOverlap(Psi2);
+    double O21=Psi2->GetOverlap(Psi1);
+    double O22=Psi2->GetOverlap(Psi2);
+    EXPECT_NEAR(O12/O11,1.0,1e-14);
+    EXPECT_NEAR(O21/O11,1.0,1e-14);
+    EXPECT_NEAR(O22/O11,1.0,1e-14);
+
+    delete Psi1;
+    delete Psi2;
+    delete W;
+    delete W_Odd;
+    delete W_Even;
+}
+
+
 TEST_F(ImaginaryTimeTesting,TestOptimize)
 {
     int D=8,L=9;
-    double dt=0.05000;
+    double dt=0.1000;
     Setup(L,0.5,D);
     MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
 //    Psi1->Report(cout);
-    Psi1->InitializeWith(TensorNetworks::Random);
+    Psi1->InitializeWith(TensorNetworks::Neel);
     Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
     double E1=Psi1->GetExpectation(itsH);
     cout << "E1=" << std::fixed << E1 << endl;
@@ -163,22 +214,23 @@ TEST_F(ImaginaryTimeTesting,TestOptimize)
     Operator* W_Odd =itsH->CreateOperator(dt/2.0,TensorNetworks::Odd);
     Operator* W_Even=itsH->CreateOperator(dt,TensorNetworks::Even);
 
-    for (int niter=1;niter<190;niter++)
+    for (int niter=1;niter<20;niter++)
     {
         MatrixProductState* Psi2=Psi1->Apply(W_Odd);
         Psi2->ApplyInPlace(W_Even);
+        Psi2->ApplyInPlace(W_Odd);
         delete Psi1;
         Psi1=Psi2->Clone();
         Psi2->NormalizeAndCompress(TensorNetworks::DRight,D,itsSupervisor);
-        cout << "Psi2 norm=" << Psi2->GetNormStatus() << endl;
-        cout << "E2=" << std::fixed << Psi2->GetExpectation(itsH) << endl;
+//        cout << "Psi2 norm=" << Psi2->GetNormStatus() << endl;
+//        cout << "E2=" << std::fixed << Psi2->GetExpectation(itsH) << endl;
         double O22=Psi2->GetOverlap(Psi2);
         double O21=Psi2->GetOverlap(Psi1);
         double O12=Psi1->GetOverlap(Psi2);
         double O11=Psi1->GetOverlap(Psi1);
         cout << "O11 O12 O21 O22 delta=" << O11 << " " << O12 << " " << O21 << " " << O22 << " " << O11-O12-O21+O22 << endl;
         Psi2->Optimize(Psi1,2,eps,itsSupervisor);
-        cout << "E2=" << std::fixed << Psi2->GetExpectation(itsH) << endl;
+        cout << "E2=" << std::fixed << Psi2->GetExpectation(itsH)/(L-1) << endl;
 //        Psi2->Report(cout);
         Psi1=Psi2;
     }
@@ -187,22 +239,12 @@ TEST_F(ImaginaryTimeTesting,TestOptimize)
 //    Psi2->Report(cout);
 //    Psi2->Report(cout);
 //    Psi3->Report(cout);
-/*
-    for (int niter=1;niter<=50;niter++)
-    {
-        Psi2->NormalizeAndCompress(TensorNetworks::DLeft,D,new LRPSupervisor());
-        Psi2->ApplyInPlace(W_Odd);
-        Psi2->NormalizeAndCompress(TensorNetworks::DLeft,D,new LRPSupervisor());
-//        Psi2->Report(cout);
-        cout << "E=" << std::fixed << Psi2->GetExpectation(itsH) << endl;
-        delete Psi1;
-        Psi1=Psi2;
-    }
 
-    double E2=Psi2->GetExpectation(itsH);
+    double E2=Psi1->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46703753,1e-2);
-*/
+
     delete Psi1;
 
 
 }
+

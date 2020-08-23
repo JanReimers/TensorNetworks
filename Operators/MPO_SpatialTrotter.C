@@ -119,3 +119,4 @@ const SiteOperator* MPO_SpatialTrotter::GetSiteOperator(int isite) const
     */
     return ret;
 }
+

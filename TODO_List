@@ -7,17 +7,15 @@
 -Fix conventions for lattice site indexing, zero or one based?
     MPS is zero based, FullState is one based, LyX notes are one based
 -GetNormStat(isite) should return a char, keep # iterations separate.
--Reconcile locel hilbert space dimension, using d int he Lyx doc and p in code.
--Convergence schedule,  increase D, drop epsilons
-    ListView with columns
-        -Step #
-        -Eps De
-        -Eps Eigen
-        -N
-        -D
+-Reconcile locel hilbert space dimension, using d in the Lyx doc and p in code.
+-Convergence schedule,  increase D, drop epsilons, drop tau for imaginary time evolution
+    -Can we use one schedule for 1) variational and 2) imaginary time GS searches?
+    - Variational needs: Eps.DE, Eps.Eigen, Eps.<E^2>-<E>^2 NIter, Dmax
+    - Imag t needs: Eps.DE, Eps ||Psi1-Psi2||^2, Eps.<E^2>-<E>^2, tau, Niter, Dmax
+    - Both metods migh benifit from Hamiltonian parameter variations.  For example
         -Jxy  Turn these on gradually to find GS, Hamiltonian nees to supply a list paramater names and ranges.
         -Jz
-        Globally we need N_max, Dmax, Eps <E^2>-<E>^2
+
 
 -Dynamically add lattice site, pseudo DMRG
 -Plot correlations

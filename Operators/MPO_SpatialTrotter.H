@@ -20,7 +20,9 @@ class MPO_SpatialTrotter : public virtual Operator
         MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,int L, int p, const Matrix4T& Hlocal);
         virtual ~MPO_SpatialTrotter();
 
+        virtual int   GetL() const {return itsL;}
         virtual const SiteOperator* GetSiteOperator(int isite) const;
+
     protected:
 
     private:

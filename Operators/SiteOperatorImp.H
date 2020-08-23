@@ -23,6 +23,10 @@ class SiteOperatorImp : public virtual SiteOperator
         {
             return itsWs(m+1,n+1);
         }
+        //
+        //  Contract MPOs together
+        //
+        virtual void Combine(const SiteOperator* O2);
 
     protected:
 
