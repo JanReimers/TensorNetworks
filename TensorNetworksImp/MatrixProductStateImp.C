@@ -282,7 +282,7 @@ double MatrixProductStateImp::FindGroundState(const Hamiltonian* hamiltonian, in
         E1=Sweep(TensorNetworks::DLeft ,hamiltonian,Supervisor,eps); //This actually sweeps to the right, but leaves left normalized sites in its wake
         Supervisor->DoneOneStep(0,"Sweep Left");
         E1=Sweep(TensorNetworks::DRight,hamiltonian,Supervisor,eps);
-        if (GetMaxDeltaE()<eps.itsEnergyConvergenceEpsilon) break;
+        if (GetMaxDeltaE()<eps.itsDelatEnergy1Epsilon) break;
     }
     Supervisor->DoneOneStep(0,"Contracting <E^2>"); //Supervisor will update the graphs
     double E2=GetExpectation(hamiltonian,hamiltonian);

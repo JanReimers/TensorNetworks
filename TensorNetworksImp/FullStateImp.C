@@ -1,6 +1,6 @@
 #include "FullStateImp.H"
 #include "TensorNetworks/Hamiltonian.H"
-#include "TensorNetworks/Epsilons.H"
+#include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworksImp/StateIterator.H"
 #include "TensorNetworksImp/PrimeEigenSolver.H"
 #include "Containers/SparseMatrix.H"
@@ -154,7 +154,7 @@ void FullStateImp::Normalize(ArrayCT& amplitudes)
 
 
 
-double FullStateImp::PowerIterate(const Epsilons& eps,const Hamiltonian& H,bool quite)
+double FullStateImp::PowerIterate(const IterationScheduleLine& sched,const Hamiltonian& H,bool quite)
 {
     Normalize(itsAmplitudes);
     double E=0;
@@ -167,26 +167,26 @@ double FullStateImp::PowerIterate(const Epsilons& eps,const Hamiltonian& H,bool 
         cout << "---------------------" << endl;
     }
 
-    for (int n=1; n<eps.itsMaxIter; n++)
+    for (int n=1; n<sched.itsMaxGSSweepIterations; n++)
     {
         double deltaPsi=Contract(Hlocal);
         double dE=fabs(itsE-E);
         E=itsE;
-        if (fabs(deltaPsi)<eps.itsEigenConvergenceEpsilon
-                &&            dE<eps.itsEnergyConvergenceEpsilon) break;
+        if (fabs(deltaPsi)<sched.itsEps.itsEigenSolverEpsilon
+                &&            dE<sched.itsEps.itsDelatEnergy1Epsilon) break;
         if (!quite)
             cout << n << " " << dE << " " << deltaPsi << endl;
     }
     return E;
 }
 
-double FullStateImp::FindGroundState(const Epsilons& eps,const Hamiltonian& H,bool quite)
+double FullStateImp::FindGroundState(const IterationScheduleLine& sched,const Hamiltonian& H,bool quite)
 {
     Matrix4T Hlocal=H.BuildLocalMatrix();
     double E=0;
     int Neig=1;
     PrimeEigenSolver<eType> solver;
-    solver.Solve(Hlocal,this,Neig,eps);
+    solver.Solve(Hlocal,this,Neig,sched.itsEps);
     itsE=solver.GetEigenValues()(1);
     const TensorNetworks::VectorCT amplitudes=solver.GetEigenVector(1);
     for (int i=1;i<=itsN;i++) itsAmplitudes[i-1]=amplitudes(i);

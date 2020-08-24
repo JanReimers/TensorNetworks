@@ -2,6 +2,7 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/FullState.H"
+#include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworksImp/StateIterator.H"
 #include "oml/numeric.h"
 
@@ -16,11 +17,11 @@ public:
     ExactDiagTesting()
         : itsFactory(TensorNetworks::Factory::GetFactory())
         , itsH(0)
-        , itsEps(1e-10)
+        , itsSched({1000,0,8,0.0,Epsilons(1e-10)})
     {
-        itsEps.itsEnergyConvergenceEpsilon=1e-15;
-        itsEps.itsEigenConvergenceEpsilon=1e-15;
-        itsEps.itsMaxIter=1000;
+        itsSched.itsEps.itsDelatEnergy1Epsilon=1e-15;
+        itsSched.itsEps.itsEigenSolverEpsilon=1e-15;
+
         StreamableObject::SetToPretty();
 
     }
@@ -44,8 +45,8 @@ public:
 
 
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
-    Hamiltonian*         itsH;
-    Epsilons             itsEps;
+    Hamiltonian*          itsH;
+    IterationScheduleLine itsSched;
 };
 
 
@@ -160,74 +161,74 @@ TEST_F(ExactDiagTesting,PowerMethodGroundStateL2S12)
 {
     Setup(2,0.5);
     FullState* psi=itsH->CreateFullState();
-    psi->PowerIterate(itsEps,*itsH);
+    psi->PowerIterate(itsSched,*itsH);
     cout << *psi << endl;
-    EXPECT_NEAR(psi->GetE(),-0.75,itsEps.itsEnergyConvergenceEpsilon);
+    EXPECT_NEAR(psi->GetE(),-0.75,itsSched.itsEps.itsDelatEnergy1Epsilon);
 }
 
 TEST_F(ExactDiagTesting,PowerMethodGroundStateL3S12)
 {
     Setup(3,0.5);
     FullState* psi=itsH->CreateFullState();
-    psi->PowerIterate(itsEps,*itsH);
+    psi->PowerIterate(itsSched,*itsH);
     cout << *psi << endl;
-    EXPECT_NEAR(psi->GetE(),-1.0,itsEps.itsEnergyConvergenceEpsilon);
+    EXPECT_NEAR(psi->GetE(),-1.0,itsSched.itsEps.itsDelatEnergy1Epsilon);
 }
 
 TEST_F(ExactDiagTesting,PowerMethodGroundStateL4S12)
 {
     Setup(4,0.5);
     FullState* psi=itsH->CreateFullState();
-    psi->PowerIterate(itsEps,*itsH);
-    EXPECT_NEAR(psi->GetE(), -1.6160254037844393,itsEps.itsEnergyConvergenceEpsilon);
+    psi->PowerIterate(itsSched,*itsH);
+    EXPECT_NEAR(psi->GetE(), -1.6160254037844393,itsSched.itsEps.itsDelatEnergy1Epsilon);
 }
 TEST_F(ExactDiagTesting,PowerMethodGroundStateL6S12)
 {
     Setup(6,0.5);
     FullState* psi=itsH->CreateFullState();
-    psi->PowerIterate(itsEps,*itsH);
-    EXPECT_NEAR(psi->GetE(),  -2.4935771338879262,itsEps.itsEnergyConvergenceEpsilon);
+    psi->PowerIterate(itsSched,*itsH);
+    EXPECT_NEAR(psi->GetE(),  -2.4935771338879262,itsSched.itsEps.itsDelatEnergy1Epsilon);
 }
 TEST_F(ExactDiagTesting,PowerMethodGroundStateL10S12)
 {
     Setup(10,0.5);
     FullState* psi=itsH->CreateFullState();
-    psi->PowerIterate(itsEps,*itsH);
-    EXPECT_NEAR(psi->GetE(),-4.2580352072828864 ,itsEps.itsEnergyConvergenceEpsilon*10);
+    psi->PowerIterate(itsSched,*itsH);
+    EXPECT_NEAR(psi->GetE(),-4.2580352072828864 ,itsSched.itsEps.itsDelatEnergy1Epsilon*10);
 }
 
 TEST_F(ExactDiagTesting,PowerMethodGroundStateL2S1)
 {
     Setup(2,1.0);
     FullState* psi=itsH->CreateFullState();
-    psi->PowerIterate(itsEps,*itsH);
+    psi->PowerIterate(itsSched,*itsH);
     cout << *psi << endl;
-    EXPECT_NEAR(psi->GetE(),-2,itsEps.itsEnergyConvergenceEpsilon);
+    EXPECT_NEAR(psi->GetE(),-2,itsSched.itsEps.itsDelatEnergy1Epsilon);
 }
 
 TEST_F(ExactDiagTesting,PowerMethodGroundStateL2S32)
 {
     Setup(2,1.5);
     FullState* psi=itsH->CreateFullState();
-    psi->PowerIterate(itsEps,*itsH);
+    psi->PowerIterate(itsSched,*itsH);
     cout << *psi << endl;
-    EXPECT_NEAR(psi->GetE(),-3.75,itsEps.itsEnergyConvergenceEpsilon);
+    EXPECT_NEAR(psi->GetE(),-3.75,itsSched.itsEps.itsDelatEnergy1Epsilon);
 }
 
 TEST_F(ExactDiagTesting,PowerMethodGroundStateL2S2)
 {
     Setup(2,2.0);
     FullState* psi=itsH->CreateFullState();
-    psi->PowerIterate(itsEps,*itsH);
-    EXPECT_NEAR(psi->GetE(),-6,itsEps.itsEnergyConvergenceEpsilon);
+    psi->PowerIterate(itsSched,*itsH);
+    EXPECT_NEAR(psi->GetE(),-6,itsSched.itsEps.itsDelatEnergy1Epsilon);
 }
 
 TEST_F(ExactDiagTesting,PowerMethodGroundStateL2S52)
 {
     Setup(2,2.5);
     FullState* psi=itsH->CreateFullState();
-    psi->PowerIterate(itsEps,*itsH);
-    EXPECT_NEAR(psi->GetE(),-8.75,itsEps.itsEnergyConvergenceEpsilon*10);
+    psi->PowerIterate(itsSched,*itsH);
+    EXPECT_NEAR(psi->GetE(),-8.75,itsSched.itsEps.itsDelatEnergy1Epsilon*10);
 }
 
 #ifndef DEBUG
@@ -235,8 +236,8 @@ TEST_F(ExactDiagTesting,PowerMethodGroundStateL4S52)
 {
     Setup(4,2.5);
     FullState* psi=itsH->CreateFullState();
-    psi->PowerIterate(itsEps,*itsH);
-    EXPECT_NEAR(psi->GetE(),-22.762419480032261,itsEps.itsEigenConvergenceEpsilon*50);
+    psi->PowerIterate(itsSched,*itsH);
+    EXPECT_NEAR(psi->GetE(),-22.762419480032261,itsSched.itsEps.itsDelatEnergy1Epsilon*50);
 }
 #endif // DEBUG
 
@@ -244,56 +245,56 @@ TEST_F(ExactDiagTesting,LanczosGroundStateL2S12)
 {
     Setup(2,0.5);
     FullState* psi=itsH->CreateFullState();
-    psi->FindGroundState(itsEps,*itsH);
+    psi->FindGroundState(itsSched,*itsH);
     cout << *psi << endl;
-    EXPECT_NEAR(psi->GetE(),-0.75,itsEps.itsEigenConvergenceEpsilon);
+    EXPECT_NEAR(psi->GetE(),-0.75,itsSched.itsEps.itsDelatEnergy1Epsilon);
 }
 
 TEST_F(ExactDiagTesting,LanczosGroundStateL2S52)
 {
     Setup(2,2.5);
     FullState* psi=itsH->CreateFullState();
-    psi->FindGroundState(itsEps,*itsH);
+    psi->FindGroundState(itsSched,*itsH);
     cout << *psi << endl;
-    EXPECT_NEAR(psi->GetE(),-8.75,itsEps.itsEigenConvergenceEpsilon*10);
+    EXPECT_NEAR(psi->GetE(),-8.75,itsSched.itsEps.itsDelatEnergy1Epsilon*10);
 }
 
 TEST_F(ExactDiagTesting,LanczosGroundStateL10S12)
 {
     Setup(10,0.5);
     FullState* psi=itsH->CreateFullState();
-    psi->FindGroundState(itsEps,*itsH);
+    psi->FindGroundState(itsSched,*itsH);
 //    cout << *psi << endl;
-    EXPECT_NEAR(psi->GetE(),-4.258035207282882,itsEps.itsEigenConvergenceEpsilon);
+    EXPECT_NEAR(psi->GetE(),-4.258035207282882,itsSched.itsEps.itsDelatEnergy1Epsilon);
 }
 
 #ifndef DEBUG
 TEST_F(ExactDiagTesting,LanczosGroundStateL12S12)
 {
-    itsEps.itsEigenConvergenceEpsilon=1e-12;
+    itsSched.itsEps.itsEigenSolverEpsilon=1e-12;
     Setup(12,0.5);
     FullState* psi=itsH->CreateFullState();
-    psi->FindGroundState(itsEps,*itsH);
-    EXPECT_NEAR(psi->GetE(),-5.1420906328405298,itsEps.itsEigenConvergenceEpsilon);
+    psi->FindGroundState(itsSched,*itsH);
+    EXPECT_NEAR(psi->GetE(),-5.1420906328405342,itsSched.itsEps.itsDelatEnergy1Epsilon);
 }
 
 
 TEST_F(ExactDiagTesting,LanczosGroundStateL14S12)
 {
-    itsEps.itsEigenConvergenceEpsilon=1e-12;
+    itsSched.itsEps.itsEigenSolverEpsilon=1e-12;
     Setup(14,0.5);
     FullState* psi=itsH->CreateFullState();
-    psi->FindGroundState(itsEps,*itsH);
-    EXPECT_NEAR(psi->GetE(),-6.0267246618621693,itsEps.itsEigenConvergenceEpsilon);
+    psi->FindGroundState(itsSched,*itsH);
+    EXPECT_NEAR(psi->GetE(),-6.0267246618621693,itsSched.itsEps.itsDelatEnergy1Epsilon);
 }
 
 TEST_F(ExactDiagTesting,LanczosGroundStateL16S12)
 {
-    itsEps.itsEigenConvergenceEpsilon=1e-10;
+    itsSched.itsEps.itsEigenSolverEpsilon=1e-10;
     Setup(16,0.5);
     FullState* psi=itsH->CreateFullState();
-    psi->FindGroundState(itsEps,*itsH);
-    EXPECT_NEAR(psi->GetE(),-6.9117371455751222,itsEps.itsEigenConvergenceEpsilon);
+    psi->FindGroundState(itsSched,*itsH);
+    EXPECT_NEAR(psi->GetE(),-6.9117371455751222,10*itsSched.itsEps.itsDelatEnergy1Epsilon);
 }
 
 #endif

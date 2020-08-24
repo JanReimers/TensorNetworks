@@ -1,6 +1,7 @@
 #include "Tests.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/MPO.H"
+#include "TensorNetworks/IterationSchedule.H"
 //#include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
@@ -151,8 +152,8 @@ TEST_F(ImaginaryTimeTesting,TestTryGroundStateDmax8)
 
 TEST_F(ImaginaryTimeTesting,TestMPPOCombine)
 {
-    int D=2,L=9,S=0.5;
-    double dt=0.05000;
+    int D=2,L=9;
+    double S=0.5,dt=0.05000;
     Setup(L,S,D);
 
     TensorNetworks::Matrix4T H12=itsH->BuildLocalMatrix(); //Full H matrix for two sites 1&2
@@ -198,7 +199,17 @@ TEST_F(ImaginaryTimeTesting,TestMPPOCombine)
     delete Psi2;
     delete W;
 }
+TEST_F(ImaginaryTimeTesting,TestIterationSchedule)
+{
+    Epsilons eps(1e-12);
+    IterationScheduleLine l1={10,5,8,0.2,eps};
 
+    IterationSchedule is;
+    is.Insert(l1);
+    is.Insert({10,5,8,0.1,eps});
+    cout << is;
+
+}
 
 TEST_F(ImaginaryTimeTesting,TestOptimize)
 {
@@ -215,7 +226,7 @@ TEST_F(ImaginaryTimeTesting,TestOptimize)
 
     Operator* W =itsH->CreateOperator(dt,TensorNetworks::FirstOrder);
 
-    for (int niter=1;niter<30;niter++)
+    for (int niter=1;niter<1;niter++)
     {
         MatrixProductState* Psi2=Psi1->Apply(W);
         delete Psi1;

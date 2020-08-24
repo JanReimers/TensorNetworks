@@ -19,8 +19,8 @@ class FullStateImp : public virtual FullState
         virtual long int GetSize     () const {return itsN;}
         virtual double   GetE        () const {return itsE;}
 
-        virtual double   PowerIterate   (const Epsilons&,const Hamiltonian&,bool quite=true);
-        virtual double   FindGroundState(const Epsilons&,const Hamiltonian&,bool quite=true);
+        virtual double   PowerIterate   (const IterationScheduleLine&,const Hamiltonian&,bool quite=true);
+        virtual double   FindGroundState(const IterationScheduleLine&,const Hamiltonian&,bool quite=true);
         virtual void     DoHContraction (int N, eType* xvec, eType* yvec, const Matrix4T& Hlocal) const;
 
         virtual std::ostream& Dump(std::ostream&) const;

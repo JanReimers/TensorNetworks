@@ -1,20 +1,24 @@
 #ifndef EPSILONS_H
 #define EPSILONS_H
 
+#include <iosfwd>
+
 //
-//  Simple struct for passing many epsilons from python GUI to C++
+//  Simple struct for passing many epsilons down through the call hierarchy
 //
 struct Epsilons
 {
     Epsilons(double default_eps=1e-12);
-    double itsEnergyConvergenceEpsilon;         //Keep sweeping until |dE|<eps
-    double itsEigenConvergenceEpsilon;          //Used by eigen solver
-    //double itsSVDConvergenceEpsilon;            //Not currently used by SVD solver
-    double itsEnergyVarienceConvergenceEpsilon; //increase D until <E^2>-<E>^2<eps
-    double itsNormalizationEpsilon;             //Is normalized if max|A-I|<eps
-    double itsSingularValueZeroEpsilon;         //s is deemed to be zero if s<eps
-    double itsSparseMatrixEpsilon;              //matrix element A_ij is deemed to be zero if A_ij <eps
-    int    itsMaxIter;                          //Max # of allowed iterations.
+    double itsDelatEnergy1Epsilon;      // assume converged when <E_n> - <E_n-1> < eps
+    double itsDelatEnergy2Epsilon;      // assume converged when <E^2> - <E>^2 < eps this tests convergence in D
+    double itsDelatNormEpsilon;         // For Psi optimization iterations after SVD compression.
+    double itsEigenSolverEpsilon;       // Decides convergence of whatever eigen solver is used.
+    double itsNormalizationEpsilon;     // Is normalized if max|A-I|<eps
+    double itsSingularValueZeroEpsilon; // s is deemed to be zero if s<eps
+    double itsSparseMatrixEpsilon;      // matrix element A_ij is deemed to be zero if A_ij <eps
+
+    friend std::ostream& operator<<(std::ostream&,const Epsilons&);
+    static std::string Header();
 };
 
 #endif // EPSILONS_H

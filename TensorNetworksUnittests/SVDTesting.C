@@ -244,15 +244,15 @@ TEST_F(SVDTesting,Prime_EigenSolverSparseComplexHermitian200x200)
     Mtype Ah=A+Transpose(conj(A)); //Make it hermitian
 
     PrimeEigenSolver<eType> solver;
-    itsEps.itsEigenConvergenceEpsilon=1e-4;
+    itsEps.itsEigenSolverEpsilon=1e-4;
     solver.Solve(Ah,Ne,itsEps);
-    itsEps.itsEigenConvergenceEpsilon=1e-6;
+    itsEps.itsEigenSolverEpsilon=1e-6;
     solver.Solve(Ah,Ne,itsEps);
-    itsEps.itsEigenConvergenceEpsilon=1e-8;
+    itsEps.itsEigenSolverEpsilon=1e-8;
     solver.Solve(Ah,Ne,itsEps);
-    itsEps.itsEigenConvergenceEpsilon=1e-11;
+    itsEps.itsEigenSolverEpsilon=1e-11;
     solver.Solve(Ah,Ne,itsEps);
-    itsEps.itsEigenConvergenceEpsilon=1e-14;
+    itsEps.itsEigenSolverEpsilon=1e-14;
     solver.Solve(Ah,Ne,itsEps);
 
     Mtype diag=Transpose(conj(solver.GetEigenVectors()))*Ah*solver.GetEigenVectors();
@@ -276,15 +276,15 @@ TEST_F(SVDTesting,Prime_EigenSolverDenseComplexHermitian200x200)
     Mtype Ah=A+Transpose(conj(A)); //Make it hermitian
 
     PrimeEigenSolver<eType> solver;
-    itsEps.itsEigenConvergenceEpsilon=1e-4;
+    itsEps.itsEigenSolverEpsilon=1e-4;
     solver.Solve(Ah,Ne,itsEps);
-    itsEps.itsEigenConvergenceEpsilon=1e-6;
+    itsEps.itsEigenSolverEpsilon=1e-6;
     solver.Solve(Ah,Ne,itsEps);
-    itsEps.itsEigenConvergenceEpsilon=1e-8;
+    itsEps.itsEigenSolverEpsilon=1e-8;
     solver.Solve(Ah,Ne,itsEps);
-    itsEps.itsEigenConvergenceEpsilon=1e-11;
+    itsEps.itsEigenSolverEpsilon=1e-11;
     solver.Solve(Ah,Ne,itsEps);
-    itsEps.itsEigenConvergenceEpsilon=1e-14;
+    itsEps.itsEigenSolverEpsilon=1e-14;
     solver.Solve(Ah,Ne,itsEps);
 
     Mtype diag=Transpose(conj(solver.GetEigenVectors()))*Ah*solver.GetEigenVectors();

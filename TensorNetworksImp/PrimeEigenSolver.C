@@ -41,12 +41,12 @@ template <class T> int PrimeEigenSolver<T>::Solve(const DMatrix<T>& m, int NumEi
     if (sparsem.GetDensity()<80)
     {
         theSparseMatrix=&sparsem;
-        niter=SolveSparse(NumEigenValues,eps.itsEigenConvergenceEpsilon);
+        niter=SolveSparse(NumEigenValues,eps.itsEigenSolverEpsilon);
     }
     else
     {
         theDenseMatrix=&m;
-        niter=SolveDense(NumEigenValues,eps.itsEigenConvergenceEpsilon);
+        niter=SolveDense(NumEigenValues,eps.itsEigenSolverEpsilon);
     }
     return niter;
 }
@@ -130,7 +130,7 @@ template <class T> int PrimeEigenSolver<T>::Solve
     primme.matrixMatvec = PsiMatvec; //Function for doing M*v products.
     primme.n = N; /* set problem dimension */
     primme.numEvals = NumEigenValues;   /* Number of wanted eigenpairs */
-    primme.eps = eps.itsEigenConvergenceEpsilon;      /* ||r|| <= eps * ||matrix|| */
+    primme.eps = eps.itsEigenSolverEpsilon;      /* ||r|| <= eps * ||matrix|| */
     primme.target = primme_smallest; /* Wanted the smallest eigenvalues */
 
     primme.initSize=itsNumGuesses;
@@ -145,7 +145,7 @@ template <class T> int PrimeEigenSolver<T>::Solve
     cout.unsetf(std::ios_base::floatfield);
 //    std::cout << "rnorms=" <<  rnorms << " " << std::endl;
 //    std::cout << "Max(abs(rnorms))=" <<  Max(abs(rnorms)) << " " << std::endl;
-    if (Max(abs(rnorms))>1000*eps.itsEigenConvergenceEpsilon)
+    if (Max(abs(rnorms))>1000*eps.itsEigenSolverEpsilon)
         cout << "Warning high rnorms in PrimeEigenSolver::SolveSparse rnorma=" << std::scientific << rnorms << endl;
     int niter=primme.stats.numOuterIterations;
     //std::cout << "Primme niter=" << niter << std::endl;
