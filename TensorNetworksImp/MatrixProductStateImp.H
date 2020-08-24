@@ -9,6 +9,7 @@
 #include "Misc/ptr_vector.h"
 
 class PlotableMesh;
+class IterationScheduleLine;
 
 class MatrixProductStateImp
 : public virtual MatrixProductState
@@ -65,12 +66,14 @@ public:
 //
 // Find ground state
 //
-        virtual double   FindGroundState(const Hamiltonian* H,int maxIter, const Epsilons& eps,LRPSupervisor*);
+        virtual double FindGroundState(const Hamiltonian* H,int maxIter, const Epsilons& eps,LRPSupervisor*);
+        virtual double FindGroundState(const Hamiltonian* H,const IterationSchedule&    ,LRPSupervisor*);
+        virtual double FindGroundState(const Hamiltonian* H,const IterationScheduleLine&,LRPSupervisor*);
 //--------------------------------------------------------------------------------------
 //
 //  Vary this MPS to be as close as possible to Psi2 by minimizing ||this-Psi2||^2
 //
-        virtual void Optimize(const MatrixProductState* Psi2,int maxIter, const Epsilons& eps,LRPSupervisor*); // Minimize ||this-Psi2||^2
+        virtual void Optimize(const MatrixProductState* Psi2,const IterationScheduleLine&,LRPSupervisor*); // Minimize ||this-Psi2||^2
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions
@@ -144,7 +147,7 @@ private:
 //
 //  Used for ||Psi1-Psi2||^2 optimizations.
 //
-        double   Sweep (TensorNetworks::Direction lr,const MatrixProductState* Psi2,LRPSupervisor*,const Epsilons& eps);
+        double   Sweep (TensorNetworks::Direction lr,const MatrixProductState* Psi2,LRPSupervisor*);
         void LoadCaches(const MatrixProductState* Psi2,LRPSupervisor* supervisor);
         MatrixCT GetRLCache(TensorNetworks::Direction lr,int isite) const;
         MatrixCT GetEOLeft_Iterate(const MatrixProductState* Psi2,LRPSupervisor*,int isite,bool cache=false) const;

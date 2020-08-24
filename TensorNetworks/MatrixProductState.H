@@ -14,6 +14,8 @@ class Operator;
 class Hamiltonian;
 class LRPSupervisor;
 class Epsilons;
+class IterationSchedule;
+class IterationScheduleLine;
 
 class MatrixProductState : public virtual MultiPlotable
 {
@@ -41,11 +43,12 @@ class MatrixProductState : public virtual MultiPlotable
 // Find ground state.  Return <E^2>-<E>^2
 //
         virtual double FindGroundState(const Hamiltonian* H,int maxIter, const Epsilons& eps,LRPSupervisor*)=0;
+        virtual double FindGroundState(const Hamiltonian* H,const IterationSchedule&,LRPSupervisor*)=0;
 //--------------------------------------------------------------------------------------
 //
 //  Vary this MPS to be as close as possible to Psi2 by minimizing ||this-Psi2||^2
 //
-        virtual void Optimize(const MatrixProductState* Psi2,int maxIter, const Epsilons& eps,LRPSupervisor*)=0; // Minimize ||this-Psi2||^2
+        virtual void Optimize(const MatrixProductState* Psi2,const IterationScheduleLine&,LRPSupervisor*)=0; // Minimize ||this-Psi2||^2
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions

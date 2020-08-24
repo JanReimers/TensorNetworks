@@ -214,7 +214,6 @@ TEST_F(ImaginaryTimeTesting,TestIterationSchedule)
 TEST_F(ImaginaryTimeTesting,TestOptimize)
 {
     int D=8,L=9;
-    double dt=0.2000;
     Setup(L,0.5,D);
     MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
 //    Psi1->Report(cout);
@@ -224,34 +223,42 @@ TEST_F(ImaginaryTimeTesting,TestOptimize)
     cout << "E1=" << std::fixed << E1 << endl;
     cout << "Psi1 overlap=" << Psi1->GetOverlap(Psi1) << endl;
 
-    Operator* W =itsH->CreateOperator(dt,TensorNetworks::FirstOrder);
+    Epsilons eps(1e-12);
 
-    for (int niter=1;niter<1;niter++)
-    {
-        MatrixProductState* Psi2=Psi1->Apply(W);
-        delete Psi1;
-        Psi1=Psi2->Clone();
-        Psi2->NormalizeAndCompress(TensorNetworks::DRight,D,itsSupervisor);
-//        cout << "Psi2 norm=" << Psi2->GetNormStatus() << endl;
-//        cout << "E2=" << std::fixed << Psi2->GetExpectation(itsH) << endl;
-        double O22=Psi2->GetOverlap(Psi2);
-        double O21=Psi2->GetOverlap(Psi1);
-        double O12=Psi1->GetOverlap(Psi2);
-        double O11=Psi1->GetOverlap(Psi1);
-        cout << "O11 O12 O21 O22 delta=" << O11 << " " << O12 << " " << O21 << " " << O22 << " " << O11-O12-O21+O22 << endl;
-        Psi2->Optimize(Psi1,2,eps,itsSupervisor);
-        cout << "E2=" << std::fixed << Psi2->GetExpectation(itsH)/(L-1) << endl;
-//        Psi2->Report(cout);
-        Psi1=Psi2;
-    }
-//    cout << "Psi3 overlap=" << Psi3->GetOverlap(Psi3) << endl;
-//    cout << "E3=" << std::fixed << Psi3->GetExpectation(itsH) << endl;
-//    Psi2->Report(cout);
-//    Psi2->Report(cout);
-//    Psi3->Report(cout);
+    IterationSchedule is;
+    eps.itsDelatNormEpsilon=1e-5;
+    eps.itsDelatEnergy1Epsilon=1e-3;
+    is.Insert({50,0,8,0.5,eps});
+    eps.itsDelatEnergy1Epsilon=1e-5;
+    is.Insert({500,0,8,0.2,eps});
+    eps.itsDelatEnergy1Epsilon=1e-5;
+    is.Insert({500,0,8,0.1,eps});
+    eps.itsDelatEnergy1Epsilon=1e-6;
+    is.Insert({500,0,8,0.05,eps});
+    eps.itsDelatEnergy1Epsilon=3e-7;
+    is.Insert({500,1,8,0.02,eps});
+    eps.itsDelatEnergy1Epsilon=1e-7;
+    is.Insert({500,1,8,0.01,eps});
+    eps.itsDelatEnergy1Epsilon=3e-8;
+    is.Insert({500,1,8,0.005,eps});
+    eps.itsDelatEnergy1Epsilon=1e-9;
+    is.Insert({500,1,8,0.002,eps});
+    eps.itsDelatEnergy1Epsilon=3e-10;
+    is.Insert({500,1,8,0.001,eps});
+    cout << is;
+
+    Psi1->FindGroundState(itsH,is,itsSupervisor);
+
+
+//        double O22=Psi2->GetOverlap(Psi2);
+//        double O21=Psi2->GetOverlap(Psi1);
+//        double O12=Psi1->GetOverlap(Psi2);
+//        double O11=Psi1->GetOverlap(Psi1);
+//        cout << "O11 O12 O21 O22 delta=" << O11 << " " << O12 << " " << O21 << " " << O22 << " " << O11-O12-O21+O22 << endl;
+//
 
     double E2=Psi1->GetExpectation(itsH);
-    EXPECT_NEAR(E2/(L-1),-0.46703753,1e-2);
+    EXPECT_NEAR(E2/(L-1),-0.46703753,1e-7);
 
     delete Psi1;
 

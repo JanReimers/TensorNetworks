@@ -22,9 +22,9 @@ class IterationSchedule
     public:
         IterationSchedule() : itsCurrentLine(0) {};
         void Insert(const IterationScheduleLine& l) {itsLines.push_back(l);}
-        void begin() {itsCurrentLine=0;}
-        bool end  () {return itsCurrentLine==itsLines.size();}
-        const IterationScheduleLine& operator++(int) //Move to next line, returns next line
+        void begin() const {itsCurrentLine=0;}
+        bool end  () const {return itsCurrentLine==itsLines.size();}
+        const IterationScheduleLine& operator++(int) const //Move to next line, returns next line
         {
             itsCurrentLine++;
             return itsLines[itsCurrentLine];
@@ -33,7 +33,7 @@ class IterationSchedule
 
         friend std::ostream& operator<<(std::ostream&,IterationSchedule&);
     private:
-        unsigned int itsCurrentLine;
+        mutable unsigned int itsCurrentLine;
         std::vector<IterationScheduleLine> itsLines;
 };
 
