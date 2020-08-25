@@ -2,16 +2,19 @@
 #define ITERATIONSCHEDULE_H
 
 #include "TensorNetworks/Epsilons.H"
+#include "TensorNetworks/Enums.H"
 
 #include <vector>
 #include <iosfwd>
 
 struct IterationScheduleLine
 {
+    typedef  TensorNetworks::TrotterOrder  TOrder;
     int      itsMaxGSSweepIterations;  // Primary # of sweeps for variational GS search or i-time evolution
     int      itsMaxOptimizeIterations; // For post SVD compress optimization iterations
     int      itsDmax;                  // Max bond dimension
     double   itsdt;                    // Delta tau for i-time evolution
+    TOrder   itsTrotterOrder;          // Order for descrete time steps/
     Epsilons itsEps;                   // Struct of various epsilons.
 
     friend std::ostream& operator<<(std::ostream&,const IterationScheduleLine&);

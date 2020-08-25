@@ -389,7 +389,7 @@ double MatrixProductStateImp::FindGroundState(const Hamiltonian* H,const Iterati
     cout << isl << endl;
     cout.precision(5);
     cout << "E=" << std::fixed << E1 << endl;
-    Operator* W =H->CreateOperator(isl.itsdt,TensorNetworks::FirstOrder);
+    Operator* W =H->CreateOperator(isl.itsdt,isl.itsTrotterOrder);
     for (int niter=1; niter<isl.itsMaxGSSweepIterations; niter++)
     {
         ApplyInPlace(W); //this now has large D_2 = D_1*Dw
@@ -438,6 +438,13 @@ void MatrixProductStateImp::Optimize
         //cout << "Norm change=" << O2-O1 << endl;
         if (fabs(O2-O1)<=isl.itsEps.itsDelatNormEpsilon) break;
     }
+    //        double O22=Psi2->GetOverlap(Psi2);
+//        double O21=Psi2->GetOverlap(Psi1);
+//        double O12=Psi1->GetOverlap(Psi2);
+//        double O11=Psi1->GetOverlap(Psi1);
+//        cout << "O11 O12 O21 O22 delta=" << O11 << " " << O12 << " " << O21 << " " << O22 << " " << O11-O12-O21+O22 << endl;
+//
+
 //    Supervisor->DoneOneStep(0,"Contracting <E^2>"); //Supervisor will update the graphs
 }
 
