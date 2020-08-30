@@ -131,6 +131,91 @@ TEST_F(ImaginaryTimeTesting,TestIterationSchedule)
 
 }
 
+
+TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt0)
+{
+    int D=8,L=9;
+    double dt=0.0,epsSVD=1e-5                                                                                                                                                                                                        ;
+    Setup(L,0.5,D);
+    MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
+    Psi1->InitializeWith(TensorNetworks::Random);
+    Psi1->Normalize(TensorNetworks::DLeft ,itsSupervisor);
+    Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
+
+    //Since dt=0 W should be unit operator.
+    MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
+
+    MatrixProductState* Psi2=Psi1->Apply(W);
+    EXPECT_NEAR(Psi1->GetOverlap(Psi2),1.0,eps);
+
+    W->Compress(0,epsSVD);
+    MatrixProductState* Psi3=Psi1->Apply(W);
+    EXPECT_NEAR(Psi1->GetOverlap(Psi3),1.0,1e-7);
+    EXPECT_NEAR(Psi2->GetOverlap(Psi3),1.0,1e-7);
+    EXPECT_NEAR(Psi3->GetOverlap(Psi3),1.0,1e-6);
+
+    delete Psi3;
+    delete Psi2;
+    delete Psi1;
+    delete W;
+}
+
+TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05)
+{
+    int D=8,L=9;
+    double dt=0.05,epsSVD=1e-5                                                                                                                                                                                                        ;
+    Setup(L,0.5,D);
+    MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
+    Psi1->InitializeWith(TensorNetworks::Random);
+    Psi1->Normalize(TensorNetworks::DLeft ,itsSupervisor);
+    Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
+
+    //Since dt=0 W should be unit operator.
+    MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
+
+    MatrixProductState* Psi2=Psi1->Apply(W);
+    W->Compress(0,epsSVD);
+    MatrixProductState* Psi3=Psi1->Apply(W);
+//    EXPECT_NEAR(Psi3->GetOverlap(Psi3),1.0,1e-6);
+//
+    W->Compress(0,epsSVD);
+//    W->Report(cout);
+    MatrixProductState* Psi4=Psi1->Apply(W);
+
+
+    double O23=Psi2->GetOverlap(Psi3);
+    cout << std::fixed << std::setprecision(9) << "O23=" << O23 << endl;
+    double O24=Psi2->GetOverlap(Psi4);
+    cout << "O24=" << O24 << endl;
+    double O34=Psi3->GetOverlap(Psi4);
+    cout << "O34=" << O34 << endl;
+    double O33=Psi3->GetOverlap(Psi3);
+    cout << "O33=" << O33 << endl;
+    double O44=Psi4->GetOverlap(Psi4);
+    cout << "O44=" << O44 << endl;
+    EXPECT_NEAR(O23,O24,eps);
+    EXPECT_NEAR(O34,O44,eps); //The confirm that a second compression on W is a no-op.
+    EXPECT_NEAR(O33,O44,eps);
+
+    delete Psi4;
+    delete Psi3;
+    delete Psi2;
+    delete Psi1;
+    delete W;
+}
+
+
+/*TEST_F(ImaginaryTimeTesting,MPOCompressFourthOrderTrotter)
+{
+    int D=8,L=9;
+    double dt=0.1;
+    Setup(L,0.5,D);
+
+    MPO* W=itsH->CreateOperator(dt,TensorNetworks::FourthOrder);
+    W->Compress(0,1e-3);
+}
+*/
+/*
 TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 {
     int D=8,L=9;
@@ -219,4 +304,4 @@ TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
 
     delete Psi1;
 }
-
+*/

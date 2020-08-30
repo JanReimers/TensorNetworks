@@ -2,8 +2,10 @@
 #define SITEOPERATOR_H
 
 #include "TensorNetworks/Typedefs.H"
+#include "TensorNetworks/Enums.H"
 
 class Dw12;
+class IterationScheduleLine;
 //
 //  The implementation of this class cache all the  <m|W|n> matrix elements
 //  so it can used in hot loops.
@@ -24,6 +26,13 @@ public:
     //  Contract MPOs together
     //
     virtual void Combine(const SiteOperator* O2)=0;
+    //
+    //  SVD compress and normalize to reduce Dw
+    //
+    virtual void Compress(TensorNetworks::Direction,int Dmax, double minSV)=0;
+
+    virtual void Report(std::ostream&) const=0;
+
 };
 
 #endif // SITEOPERATOR_H

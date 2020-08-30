@@ -1,6 +1,7 @@
 #include "TensorNetworksImp/MatrixProductStateImp.H"
 #include "TensorNetworksImp/Bond.H"
 #include "TensorNetworks/Hamiltonian.H"
+#include "TensorNetworks/MPO.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/LRPSupervisor.H"
 #include "Containers/Matrix4.H"

@@ -22,6 +22,8 @@ class MPOImp : public virtual MPO
         }
 
         virtual void Combine(const Operator* O2);
+        virtual void Compress(int Dmax, double minSV);
+        virtual void Report(std::ostream&) const;
 
     protected:
 

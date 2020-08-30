@@ -18,6 +18,8 @@
 					<Add option="-g" />
 					<Add option="-DDEBUG" />
 					<Add directory="Operators" />
+					<Add directory="TensorNetworks" />
+					<Add directory="TensorNetworksImp" />
 				</Compiler>
 				<Linker>
 					<Add directory="../Debug" />
@@ -36,6 +38,8 @@
 					<Add option="-pg" />
 					<Add option="-DNDEBUG" />
 					<Add directory="Operators" />
+					<Add directory="TensorNetworks" />
+					<Add directory="TensorNetworksImp" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />
@@ -80,10 +84,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/IdentityOperator.H" />
-		<Unit filename="Operators/MPO.C">
+		<Unit filename="Operators/MPOImp.C">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="Operators/MPO.H" />
+		<Unit filename="Operators/MPOImp.H" />
 		<Unit filename="Operators/MPO_LRB.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -104,9 +108,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/OneSiteSpinOperator.H" />
-		<Unit filename="Operators/Operator.C">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="Operators/SiteOperatorImp.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -124,7 +125,12 @@
 		<Unit filename="TensorNetworks/Factory.H" />
 		<Unit filename="TensorNetworks/FullState.H" />
 		<Unit filename="TensorNetworks/Hamiltonian.H" />
+		<Unit filename="TensorNetworks/IterationSchedule.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworks/IterationSchedule.H" />
 		<Unit filename="TensorNetworks/LRPSupervisor.H" />
+		<Unit filename="TensorNetworks/MPO.H" />
 		<Unit filename="TensorNetworks/MatrixProductState.H" />
 		<Unit filename="TensorNetworks/MultiPlotable.H" />
 		<Unit filename="TensorNetworks/Operator.H" />
@@ -151,6 +157,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H" />
+		<Unit filename="TensorNetworksImp/LapackSVD.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/LapackSVD.H" />
 		<Unit filename="TensorNetworksImp/MatrixProductSite.C">
 			<Option compilerVar="CC" />
 		</Unit>

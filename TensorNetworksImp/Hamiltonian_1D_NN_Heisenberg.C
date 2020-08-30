@@ -183,7 +183,7 @@ Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(const OperatorWRepresenta
     return new MPO_LRB(Wrep,itsL,itsS);
 }
 
-Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::TrotterOrder order) const
+MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::TrotterOrder order) const
 {
     MPO* W=new MPOImp(itsL,itsS);
     Matrix4T H12=BuildLocalMatrix(); //Full H matrix for two sites 1&2
