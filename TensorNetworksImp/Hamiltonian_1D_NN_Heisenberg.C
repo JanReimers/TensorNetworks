@@ -208,6 +208,10 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::Tro
         }
         case TensorNetworks::FourthOrder :
         {
+            //
+            //  At this order we must compress as we go or we risk consuming all memory
+            //
+            double percent;
             TensorNetworks::VectorT ts(5);
             ts(1)=dt/(4-pow(4.0,1.0/3.0));
             ts(2)=ts(1);
@@ -223,6 +227,7 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::Tro
                 U.Combine(&Weven);
                 U.Combine(&Wodd);
                 W->Combine(&U);
+                W->Compress(0,1e-6*dt);
             }
             break;
         }

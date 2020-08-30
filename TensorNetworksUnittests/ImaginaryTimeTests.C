@@ -17,6 +17,7 @@ using std::setw;
 using TensorNetworks::TrotterOrder;
 using TensorNetworks::FirstOrder;
 using TensorNetworks::SecondOrder;
+using TensorNetworks::FourthOrder;
 
 class ImaginaryTimeTesting : public ::testing::Test
 {
@@ -205,17 +206,18 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05)
 }
 
 
-/*TEST_F(ImaginaryTimeTesting,MPOCompressFourthOrderTrotter)
+TEST_F(ImaginaryTimeTesting,MPOCompressFourthOrderTrotter)
 {
     int D=8,L=9;
     double dt=0.1;
     Setup(L,0.5,D);
 
     MPO* W=itsH->CreateOperator(dt,TensorNetworks::FourthOrder);
-    W->Compress(0,1e-3);
+
+
 }
-*/
-/*
+
+#ifndef DEBUG
 TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 {
     int D=8,L=9;
@@ -229,6 +231,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
     cout << "Psi1 overlap=" << Psi1->GetOverlap(Psi1) << endl;
 
     Epsilons eps(1e-12);
+    eps.itsMPOCompressEpsilon=1e-5;
 
     IterationSchedule is;
     eps.itsDelatNormEpsilon=1e-5;
@@ -274,6 +277,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
     cout << "Psi1 overlap=" << Psi1->GetOverlap(Psi1) << endl;
 
     Epsilons eps(1e-12);
+    eps.itsMPOCompressEpsilon=1e-5;
 
     IterationSchedule is;
     eps.itsDelatNormEpsilon=1e-5;
@@ -285,16 +289,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
     is.Insert({500,3,8,0.1,SecondOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-9;
     is.Insert({500,5,8,0.05,SecondOrder,eps});
-//    eps.itsDelatEnergy1Epsilon=3e-7;
-//    is.Insert({500,1,8,0.02,SecondOrder,eps});
-//    eps.itsDelatEnergy1Epsilon=1e-7;
-//    is.Insert({500,1,8,0.01,SecondOrder,eps});
-//    eps.itsDelatEnergy1Epsilon=3e-8;
-//    is.Insert({500,1,8,0.005,SecondOrder,eps});
-//    eps.itsDelatEnergy1Epsilon=1e-9;
-//    is.Insert({500,1,8,0.002,SecondOrder,eps});
-//    eps.itsDelatEnergy1Epsilon=3e-10;
-//    is.Insert({500,1,8,0.001,SecondOrder,eps});
+
     cout << is;
 
     Psi1->FindGroundState(itsH,is,itsSupervisor);
@@ -304,4 +299,40 @@ TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
 
     delete Psi1;
 }
-*/
+
+TEST_F(ImaginaryTimeTesting,TestITimeFourthOrderTrotter)
+{
+    int D=8,L=9;
+    Setup(L,0.5,D);
+    MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
+//    Psi1->Report(cout);
+    Psi1->InitializeWith(TensorNetworks::Random);
+    Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
+    double E1=Psi1->GetExpectation(itsH);
+    cout << "E1=" << std::fixed << E1 << endl;
+    cout << "Psi1 overlap=" << Psi1->GetOverlap(Psi1) << endl;
+
+    Epsilons eps(1e-12);
+    eps.itsMPOCompressEpsilon=1e-8;
+
+    IterationSchedule is;
+    eps.itsDelatNormEpsilon=1e-5;
+    eps.itsDelatEnergy1Epsilon=1e-5;
+    is.Insert({50,0,8,0.5,FourthOrder,eps});
+    eps.itsDelatEnergy1Epsilon=1e-6;
+    is.Insert({500,1,8,0.2,FourthOrder,eps});
+    eps.itsDelatEnergy1Epsilon=1e-8;
+    is.Insert({500,3,8,0.1,FourthOrder,eps});
+    eps.itsDelatEnergy1Epsilon=1e-9;
+    is.Insert({500,5,8,0.05,FourthOrder,eps});
+
+    cout << is;
+
+    Psi1->FindGroundState(itsH,is,itsSupervisor);
+
+    double E2=Psi1->GetExpectation(itsH);
+    EXPECT_NEAR(E2/(L-1),-0.46703753,1e-7);
+
+    delete Psi1;
+}
+#endif

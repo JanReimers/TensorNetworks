@@ -14,7 +14,8 @@ struct Epsilons
     double itsDelatNormEpsilon;         // For Psi optimization iterations after SVD compression.
     double itsEigenSolverEpsilon;       // Decides convergence of whatever eigen solver is used.
     double itsNormalizationEpsilon;     // Is normalized if max|A-I|<eps
-    double itsSingularValueZeroEpsilon; // s is deemed to be zero if s<eps
+    double itsMPSCompressEpsilon;       // s is deemed to be zero if s<eps
+    double itsMPOCompressEpsilon;       // s is deemed to be zero if s<eps
     double itsSparseMatrixEpsilon;      // matrix element A_ij is deemed to be zero if A_ij <eps
 
     friend std::ostream& operator<<(std::ostream&,const Epsilons&);

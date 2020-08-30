@@ -21,9 +21,9 @@ class MPOImp : public virtual MPO
             return itsSites[isite];
         }
 
-        virtual void Combine(const Operator* O2);
-        virtual void Compress(int Dmax, double minSV);
-        virtual void Report(std::ostream&) const;
+        virtual void   Combine(const Operator* O2);
+        virtual double Compress(int Dmax, double minSV);
+        virtual void   Report(std::ostream&) const;
 
     protected:
 

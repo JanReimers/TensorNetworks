@@ -89,7 +89,7 @@ void MatrixProductStateImp::InitSitesAndBonds()
     //
     itsBonds.push_back(0);  //Dummy space holder. We want this array to be 1 based.
     for (int i=1; i<itsL; i++)
-        itsBonds.push_back(new Bond(itsEpsilons.itsSingularValueZeroEpsilon));
+        itsBonds.push_back(new Bond(itsEpsilons.itsMPSCompressEpsilon));
     //
     //  Create Sites
     //
@@ -390,7 +390,9 @@ double MatrixProductStateImp::FindGroundState(const Hamiltonian* H,const Iterati
     cout << isl << endl;
     cout.precision(5);
     cout << "E=" << std::fixed << E1 << endl;
-    Operator* W =H->CreateOperator(isl.itsdt,isl.itsTrotterOrder);
+    MPO* W =H->CreateOperator(isl.itsdt,isl.itsTrotterOrder);
+    double percent=W->Compress(0,isl.itsEps.itsMPOCompressEpsilon);
+    cout << "FindGroundState dt=" << isl.itsdt << " " << percent << "% compresstion" << endl;
     for (int niter=1; niter<isl.itsMaxGSSweepIterations; niter++)
     {
         ApplyInPlace(W); //this now has large D_2 = D_1*Dw
