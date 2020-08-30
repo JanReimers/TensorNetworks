@@ -61,11 +61,11 @@ DMatrix<T2> ConstractsVT(const Vector<T>& s, const DMatrix<T2>& VT)
 {
     assert(VT.GetNumRows()==s.GetHigh());
     int nk=s.GetHigh();
-    int nj=VT.GetNumRows();
+    int nj=VT.GetNumCols();
     DMatrix<T2> Vs(nk,nj);
     for(int j=1;j<=nj;j++)
         for(int k=1;k<=nk;k++)
-            Vs(k,j)=s(k)*VT(j,k);
+            Vs(k,j)=s(k)*VT(k,j);
     return Vs;
 }
 template <class T,class T2>
@@ -82,61 +82,8 @@ DMatrix<T2> ContractVstar(const Vector<T>& s, const DMatrix<T2>& Vstar)
 }
 
 
-TEST_F(SVDTesting,OML_SVDRandomSquareRealMatrix)
-{
-    int N=10;
-    typedef DMatrix<double> Mtype;
-    Mtype M(N,N),VT(N,N),UnitMatrix(N,N);
-    Vector<double>  s(N);
-    FillRandom(M);
-    Mtype Mcopy(M);
-    Unit(UnitMatrix);
-    SVDecomp(M,s,VT); //Solve M=U*s*VT
-    Mtype V=Transpose(VT);
-    EXPECT_NEAR(Max(fabs(Transpose(M)*M-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(M*Transpose(M)-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(V*VT-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(M*ConstractsVT(s,VT)-Mcopy)),0.0,eps);
-//    EXPECT_NEAR(Max(fabs(M*V-Mcopy)),0.0,eps);
-}
 
-TEST_F(SVDTesting,OML_SVDRandomRectRealMatrix_10x5)
-{
-    int N1=10,N2=5;
-    typedef DMatrix<double> Mtype;
-    Mtype M(N1,N2),VT(N2,N2),UnitMatrix(N1,N1);
-    Vector<double>  s(N2);
-    FillRandom(M);
-    Mtype Mcopy(M);
-    Unit(UnitMatrix);
-    SVDecomp(M,s,VT); //Solve M=U*s*VT
-    Mtype V=Transpose(VT);
-    EXPECT_NEAR(Max(fabs(Transpose(M)*M-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(V*VT-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(M*ConstractsVT(s,VT)-Mcopy)),0.0,eps);
-}
-
-
-TEST_F(SVDTesting,OML_SVDRandomRectRealMatrix_5x10)
-{
-    int N1=5,N2=10;
-    typedef DMatrix<double> Mtype;
-    Mtype M(N1,N2),VT(N2,N2),UnitMatrix(N1,N1);
-    Vector<double>  s(N2);
-    FillRandom(M);
-    Mtype Mcopy(M);
-    Unit(UnitMatrix);
-    SVDecomp(M,s,VT); //Solve M=U*s*VT
-    Mtype V=Transpose(VT);
-    EXPECT_NEAR(Max(fabs(Transpose(M)*M-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(M*ConstractsVT(s,VT)-Mcopy)),0.0,eps);
-}
-
-
-TEST_F(SVDTesting,SVDComplexSquare_N10)
+TEST_F(SVDTesting,SVDComplexMatrix_10x10)
 {
     int N=10;
     typedef DMatrix<eType> Mtype;
@@ -155,7 +102,7 @@ TEST_F(SVDTesting,SVDComplexSquare_N10)
 
 }
 
-TEST_F(SVDTesting,OML_SVDRandomRectComplexMatrix_10x5)
+TEST_F(SVDTesting,OML_SVDRandomComplexMatrix_10x5)
 {
     int M=10,N=5;
     typedef DMatrix<eType> Mtype;
@@ -173,7 +120,7 @@ TEST_F(SVDTesting,OML_SVDRandomRectComplexMatrix_10x5)
 }
 
 
-TEST_F(SVDTesting,OML_SVDRandomRectComplexMatrix_5x10)
+TEST_F(SVDTesting,OML_SVDRandomComplexMatrix_5x10)
 {
     int M=5,N=10;
     typedef DMatrix<eType> Mtype;
@@ -292,4 +239,168 @@ TEST_F(SVDTesting,Prime_EigenSolverDenseComplexHermitian200x200)
     for (int i=1;i<=Ne;i++) diag(i,i)-=evals(i);
     EXPECT_NEAR(Max(abs(diag)),0.0,100*eps);
 }
+
+
+TEST_F(SVDTesting,Prime_SVDComplex4004Matrix_1x4)
+{
+    int N1=1,N2=4;
+    typedef DMatrix<eType> Mtype;
+    Mtype M(N1,N2),V(N2,N1),UnitMatrix(N1,N1);
+    Vector<double>  s(N1);
+    M(1,1)=4.0;
+    M(1,2)=0.0;
+    M(1,3)=0.0;
+    M(1,4)=4.0;
+    Mtype Mcopy(M);
+    Unit(UnitMatrix);
+    CSVDecomp(M,s,V); //Solve M=U*s*VT
+    Mtype VT=Transpose(V);
+
+//    cout << "U S VT=" << M << " " << s << " " << VT << endl;
+//    cout << "Mcopy=" << Mcopy << endl;
+//    cout << "ConstractsVT(s,VT)=" << ConstractsVT(s,VT) << endl;
+//    cout << "U*s*VT" <<  Mtype(M*ConstractsVT(s,VT))-Mcopy << endl;
+    EXPECT_NEAR(Max(abs(Transpose(M)*M-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(abs(VT*V-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(abs(M*ConstractsVT(s,VT)-Mcopy)),0.0,eps);
+}
+
+
+
+#include "TensorNetworksImp/LapackSVD.H"
+
+TEST_F(SVDTesting,LAPACK_SVDReal4004Matrix_1x4a)
+{
+    int M=1,N=4,mn=Min(M,N);
+    typedef DMatrix<double> Mtype;
+    Mtype A(M,N),VT(N,N),UnitMatrix(M,M);
+    Vector<double>  s(mn);
+    //FillRandom(A);
+    A(1,1)=4.0;
+    A(1,2)=0.0;
+    A(1,3)=0.0;
+    A(1,4)=4.0;
+    Mtype Acopy(A);
+    Unit(UnitMatrix);
+
+    LaSVDecomp(A,s,VT);
+    Mtype V=Transpose(VT);
+    EXPECT_NEAR(Max(fabs(Transpose(A)*A-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
+}
+
+TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_1x4a)
+{
+    int M=1,N=4,mn=Min(M,N);
+    typedef DMatrix<double> Mtype;
+    Mtype A(M,N),VT(N,N),UnitMatrix(M,M);
+    Vector<double>  s(mn);
+    FillRandom(A);
+    Mtype Acopy(A);
+    Unit(UnitMatrix);
+
+    LaSVDecomp(A,s,VT);
+    Mtype V=Transpose(VT);
+    EXPECT_NEAR(Max(fabs(Transpose(A)*A-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
+}
+
+TEST_F(SVDTesting,LAPACK_SVDReal4004Matrix_4x1a)
+{
+    int M=4,N=1,mn=Min(M,N);
+    typedef DMatrix<double> Mtype;
+    Mtype A(M,N),VT(N,N),UnitMatrix(M,M);
+    Vector<double>  s(mn);
+    A(1,1)=4;
+    A(2,1)=0;
+    A(3,1)=0;
+    A(4,1)=4;
+    Mtype Acopy(A);
+    Unit(UnitMatrix);
+
+    LaSVDecomp(A,s,VT);
+    Mtype V=Transpose(VT);
+    EXPECT_NEAR(Max(fabs(Transpose(A)*A-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
+}
+
+
+
+
+TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_4x1a)
+{
+    int M=4,N=1,mn=Min(M,N);
+    typedef DMatrix<double> Mtype;
+    Mtype A(M,N),VT(N,N),UnitMatrix(M,M);
+    Vector<double>  s(mn);
+    FillRandom(A);
+    Mtype Acopy(A);
+    Unit(UnitMatrix);
+
+    LaSVDecomp(A,s,VT);
+    Mtype V=Transpose(VT);
+    EXPECT_NEAR(Max(fabs(Transpose(A)*A-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
+}
+
+
+
+TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_200x3a)
+{
+    int M=200,N=3,mn=Min(M,N);
+    typedef DMatrix<double> Mtype;
+    Mtype A(M,N),VT(N,N),UnitMatrix(M,M);
+    Vector<double>  s(mn);
+    FillRandom(A);
+    Mtype Acopy(A);
+    Unit(UnitMatrix);
+
+    LaSVDecomp(A,s,VT);
+    Mtype V=Transpose(VT);
+    EXPECT_NEAR(Max(fabs(Transpose(A)*A-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
+}
+
+TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_3x200a)
+{
+    int M=3,N=200,mn=Min(M,N);
+    typedef DMatrix<double> Mtype;
+    Mtype A(M,N),VT(N,N),UnitMatrix(M,M);
+    Vector<double>  s(mn);
+    FillRandom(A);
+    Mtype Acopy(A);
+    Unit(UnitMatrix);
+
+    LaSVDecomp(A,s,VT);
+    Mtype V=Transpose(VT);
+    EXPECT_NEAR(Max(fabs(Transpose(A)*A-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
+}
+
+TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_100x100)
+{
+    int M=100,N=100,mn=Min(M,N);
+    typedef DMatrix<double> Mtype;
+    Mtype A(M,N),VT(N,N),UnitMatrix(M,M);
+    Vector<double>  s(mn);
+    FillRandom(A);
+    Mtype Acopy(A);
+    Unit(UnitMatrix);
+
+    LaSVDecomp(A,s,VT);
+    Mtype V=Transpose(VT);
+    EXPECT_NEAR(Max(fabs(Transpose(A)*A-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*Transpose(A)-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(V*VT-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
+}
+
+
 
