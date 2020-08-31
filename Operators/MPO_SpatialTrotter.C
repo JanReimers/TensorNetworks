@@ -14,17 +14,17 @@ typedef TensorNetworks::MatrixT MatrixT;
 //  THe local two site Hamiltonian H12 should be stored as H12(m1,m2,n1,n2);
 //   Whem flatted to H(m,n) where m=(m1,m2) n=(n1,n2) it is hermitian and diagonalizable.
 //
-MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,int L, int p, const Matrix4T& H12)
+MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,int L, int d, const Matrix4T& H12)
     : itsOddEven(type)
     , itsL(L)
-    , itsp(p)
+    , itsd(d)
     , itsLeft_Site(0)
     , itsRightSite(0)
     , itsUnit_Site(0)
 {
     assert(itsOddEven==TensorNetworks::Odd || itsOddEven==TensorNetworks::Even);
     assert(itsL>1);
-    assert(itsp>1);
+    assert(itsd>1);
     //
     //  Diagonalize H12 in order to caluclate exp(-t*H)
     //
@@ -32,15 +32,15 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,i
     MatrixT U12=H12.Flatten();
     VectorT evs=Diagonalize(U12);
     VectorT expEvs=exp(-dt*evs);
-    Matrix4T expH(p,p,p,p,0);
+    Matrix4T expH(d,d,d,d,0);
     Fill(expH.Flatten(),0.0);
     int i1=1,N=U12.GetNumRows();
-    for (int m1=0; m1<p; m1++)
-        for (int m2=0; m2<p; m2++,i1++)
+    for (int m1=0; m1<d; m1++)
+        for (int m2=0; m2<d; m2++,i1++)
         {
             int i2=1;
-            for (int n1=0; n1<p; n1++)
-                for (int n2=0; n2<p; n2++,i2++)
+            for (int n1=0; n1<d; n1++)
+                for (int n2=0; n2<d; n2++,i2++)
                     for (int k=1; k<=N; k++)
                         expH(m1,n1,m2,n2)+=U12(i1,k)*expEvs(k)*U12(i2,k);
         }
@@ -59,13 +59,12 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,i
     //  Now U is the matrix of eigen vectors
     //
 
-    int Dw=evs.size();
-    assert(Dw==itsp*itsp);
+    assert(evs.size()==itsd*itsd);
     OperatorWRepresentation* IdentityWOp=new IdentityOperator();
 
-    itsLeft_Site=new SiteOperatorImp(TensorNetworks::DLeft,U,s,itsp);
-    itsRightSite=new SiteOperatorImp(TensorNetworks::DRight,V,s,itsp);
-    itsUnit_Site=new SiteOperatorImp(TensorNetworks::PBulk,IdentityWOp,itsp);
+    itsLeft_Site=new SiteOperatorImp(TensorNetworks::DLeft,U,s,itsd);
+    itsRightSite=new SiteOperatorImp(TensorNetworks::DRight,V,s,itsd);
+    itsUnit_Site=new SiteOperatorImp(TensorNetworks::PBulk,IdentityWOp,itsd);
 
     delete IdentityWOp;
 }

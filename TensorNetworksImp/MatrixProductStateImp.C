@@ -13,23 +13,23 @@ using std::cout;
 using std::endl;
 
 
-int GetD1(int a, int L, int p, int DMax)
+int GetD1(int a, int L, int d, int DMax)
 {
     int D=DMax;
     if (a<=L/2)
-        D=Min(static_cast<int>(pow(p,a-1)),DMax); //LHS
+        D=Min(static_cast<int>(pow(d,a-1)),DMax); //LHS
     else
-        D=Min(static_cast<int>(pow(p,L-a+1)),DMax);  //RHS
+        D=Min(static_cast<int>(pow(d,L-a+1)),DMax);  //RHS
     return D;
 }
 
-int GetD2(int a, int L, int p, int DMax)
+int GetD2(int a, int L, int d, int DMax)
 {
     int D=DMax;
     if (a<=L/2)
-        D=Min(static_cast<int>(pow(p,a)),DMax); //LHS
+        D=Min(static_cast<int>(pow(d,a)),DMax); //LHS
     else
-        D=Min(static_cast<int>(pow(p,L-a)),DMax); //RHS
+        D=Min(static_cast<int>(pow(d,L-a)),DMax); //RHS
     return D;
 }
 
@@ -42,7 +42,7 @@ MatrixProductStateImp::MatrixProductStateImp(int L, double S, int D,const Epsilo
     : itsL(L)
     , itsDmax(D)
     , itsS(S)
-    , itsp(2*S+1)
+    , itsd(2*S+1)
     , itsNSweep(0)
     , itsSelectedSite(1)
     , itsEpsilons(eps)
@@ -67,7 +67,7 @@ MatrixProductStateImp::MatrixProductStateImp(const MatrixProductStateImp& mps)
     : itsL           (mps.itsL)
     , itsDmax        (mps.itsDmax)
     , itsS           (mps.itsS)
-    , itsp           (mps.itsp)
+    , itsd           (mps.itsd)
     , itsNSweep      (mps.itsNSweep)
     , itsSelectedSite(mps.itsSelectedSite)
     , itsEpsilons    (mps.itsEpsilons)
@@ -94,13 +94,13 @@ void MatrixProductStateImp::InitSitesAndBonds()
     //  Create Sites
     //
     itsSites.push_back(0);  //Dummy space holder. We want this array to be 1 based.
-    itsSites.push_back(new MatrixProductSite(TensorNetworks::PLeft,NULL,itsBonds[1],itsp,
-                       GetD1(1,itsL,itsp,itsDmax),GetD2(1,itsL,itsp,itsDmax)));
+    itsSites.push_back(new MatrixProductSite(TensorNetworks::PLeft,NULL,itsBonds[1],itsd,
+                       GetD1(1,itsL,itsd,itsDmax),GetD2(1,itsL,itsd,itsDmax)));
     for (int i=2; i<=itsL-1; i++)
-        itsSites.push_back(new MatrixProductSite(TensorNetworks::PBulk,itsBonds[i-1],itsBonds[i],itsp,
-                           GetD1(i,itsL,itsp,itsDmax),GetD2(i,itsL,itsp,itsDmax)));
-    itsSites.push_back(new MatrixProductSite(TensorNetworks::PRight,itsBonds[itsL-1],NULL,itsp,
-                       GetD1(itsL,itsL,itsp,itsDmax),GetD2(itsL,itsL,itsp,itsDmax)));
+        itsSites.push_back(new MatrixProductSite(TensorNetworks::PBulk,itsBonds[i-1],itsBonds[i],itsd,
+                           GetD1(i,itsL,itsd,itsDmax),GetD2(i,itsL,itsd,itsDmax)));
+    itsSites.push_back(new MatrixProductSite(TensorNetworks::PRight,itsBonds[itsL-1],NULL,itsd,
+                       GetD1(itsL,itsL,itsd,itsDmax),GetD2(itsL,itsL,itsd,itsDmax)));
     //
     //  Tell each bond about its left and right sites.
     //
@@ -244,15 +244,15 @@ void MatrixProductStateImp::Normalize(int isite,LRPSupervisor* super)
 void MatrixProductStateImp::SetCanonicalBondDimensions(TensorNetworks::Direction LR)
 {
     assert(false); //Make sure we are not using this right now.
-    int D1= LR==TensorNetworks::DLeft ? 1    : itsp;
-    int D2= LR==TensorNetworks::DLeft ? itsp : 1   ;
+    int D1= LR==TensorNetworks::DLeft ? 1    : itsd;
+    int D2= LR==TensorNetworks::DLeft ? itsd : 1   ;
 
     ForLoop(LR)
     {
         itsSites[ia]->SetCanonicalBondDimensions(D1,D2);
         if (D1>itsDmax && D2>itsDmax) break;
-        D1*=itsp;
-        D2*=itsp;
+        D1*=itsd;
+        D2*=itsd;
     }
 }
 
@@ -701,7 +701,7 @@ MatrixProductStateImp::MatrixCT MatrixProductStateImp::GetEORightIterate(const M
 
 OneSiteDMs MatrixProductStateImp::CalculateOneSiteDMs(LRPSupervisor* supervisor)
 {
-    OneSiteDMs ret(itsL,itsp);
+    OneSiteDMs ret(itsL,itsd);
     Normalize(TensorNetworks::DRight,supervisor);
     SiteLoop(ia)
     {
@@ -722,19 +722,19 @@ MatrixProductStateImp::Matrix4T MatrixProductStateImp::CalculateTwoSiteDM(int ia
     for (int is=ib+1; is<=itsL; is++)
         assert(GetNormStatus(is)[0]=='B');
 #endif
-    Matrix4T ret(itsp,itsp,itsp,itsp,1);
+    Matrix4T ret(itsd,itsd,itsd,itsd,1);
     ret.Fill(eType(0.0));
     // Start the zipper
-    for (int m=0; m<itsp; m++)
-        for (int n=0; n<itsp; n++)
+    for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
         {
             MatrixCT C=itsSites[ia]->InitializeTwoSiteDM(m,n);
             for (int ix=ia+1; ix<ib; ix++)
                 C=itsSites[ix]->IterateTwoSiteDM(C);
             C=itsSites[ib]->FinializeTwoSiteDM(C);
 
-            for (int m2=0; m2<itsp; m2++)
-                for (int n2=0; n2<itsp; n2++)
+            for (int m2=0; m2<itsd; m2++)
+                for (int n2=0; n2<itsd; n2++)
                     ret(m+1,m2+1,n+1,n2+1)=C(m2+1,n2+1);
         }
     assert(IsHermitian(ret.Flatten(),1e-14));
@@ -745,7 +745,7 @@ MatrixProductStateImp::Matrix4T MatrixProductStateImp::CalculateTwoSiteDM(int ia
 TwoSiteDMs MatrixProductStateImp::CalculateTwoSiteDMs(LRPSupervisor* supervisor)
 {
     Normalize(TensorNetworks::DRight,supervisor);
-    TwoSiteDMs ret(itsL,itsp);
+    TwoSiteDMs ret(itsL,itsd);
     SiteLoop(ia)
     for (int ib=ia+1; ib<=itsL; ib++)
     {

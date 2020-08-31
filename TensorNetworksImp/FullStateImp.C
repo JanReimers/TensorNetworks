@@ -20,9 +20,9 @@ FullStateImp::FullStateImp(int L, double S)
     assert(frac==0.0);
 #endif
     assert(itsS>=0.5);
-    itsp=2*itsS+1;
-    assert(itsp>1);
-    itsN=static_cast<long int>(std::pow(itsp,itsL));
+    itsd=2*itsS+1;
+    assert(itsd>1);
+    itsN=static_cast<long int>(std::pow(itsd,itsL));
     assert(itsN>0);
     itsAmplitudes .SetSize(itsN);
     FillRandom(itsAmplitudes);
@@ -42,7 +42,7 @@ std::ostream& FullStateImp::Dump(std::ostream& os) const
     os << "Full wave function L=" << itsL << " S=" << itsS << " N=" << itsN << " E=" << itsE << endl;
     os.precision(5);
 
-    for (StateIterator is(itsL,itsp); !is.end(); is++)
+    for (StateIterator is(itsL,itsd); !is.end(); is++)
     {
         TensorNetworks::eType a=itsAmplitudes[is.GetLinearIndex()];
         double anorm=sqrt(real(conj(a)*a));
@@ -67,8 +67,8 @@ std::ostream& FullStateImp::Dump(std::ostream& os) const
 
 double FullStateImp::Contract(const Matrix4T& Hlocal)
 {
-    assert(Hlocal.Flatten().GetNumRows()==itsp*itsp);
-    assert(Hlocal.Flatten().GetNumCols()==itsp*itsp);
+    assert(Hlocal.Flatten().GetNumRows()==itsd*itsd);
+    assert(Hlocal.Flatten().GetNumCols()==itsd*itsd);
 
     ArrayCT newAmplitudes(itsAmplitudes.size());
     Fill(newAmplitudes,TensorNetworks::eType(0.0));
@@ -93,8 +93,8 @@ double FullStateImp::Contract(const Matrix4T& Hlocal)
 
 FullStateImp::ArrayCT FullStateImp::Contract(const Matrix4T& Hlocal,const ArrayCT& oldAmpliudes) const
 {
-    assert(Hlocal.Flatten().GetNumRows()==itsp*itsp);
-    assert(Hlocal.Flatten().GetNumCols()==itsp*itsp);
+    assert(Hlocal.Flatten().GetNumRows()==itsd*itsd);
+    assert(Hlocal.Flatten().GetNumCols()==itsd*itsd);
 
     ArrayCT newAmplitudes(itsAmplitudes.size());
     Fill(newAmplitudes,TensorNetworks::eType(0.0));
@@ -111,15 +111,15 @@ void FullStateImp::ContractLocal(int isite, const Matrix4T& Hlocal, ArrayCT& new
 {
     assert(isite>0);
     assert(isite<=itsL);
-    for (StateIterator is(itsL,itsp); !is.end(); is++)
+    for (StateIterator is(itsL,itsd); !is.end(); is++)
     {
         const Vector<int>& QNs=is.GetQuantumNumbers();
         int na=QNs(isite);
         int nb=QNs(isite+1);
         Vector<int> mstate=QNs;
         TensorNetworks::eType c(0.0);
-        for (int ma=0; ma<itsp; ma++)
-            for (int mb=0; mb<itsp; mb++)
+        for (int ma=0; ma<itsd; ma++)
+            for (int mb=0; mb<itsd; mb++)
             {
                 mstate(isite  )=ma;
                 mstate(isite+1)=mb;

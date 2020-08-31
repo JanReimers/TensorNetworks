@@ -31,7 +31,7 @@ class MPOImp : public virtual MPO
         typedef optr_vector<SiteOperator*> SitesType;
 
         int itsL;
-        int itsp;
+        int itsd;
 
         SitesType itsSites;
 

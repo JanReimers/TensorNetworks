@@ -25,7 +25,7 @@ class Hamiltonian_1D_NN_Heisenberg
         //  Hamiltonian interface
         //
         virtual int GetL () const {return itsL;}
-        virtual int Getp () const {return 2*itsS+1;}
+        virtual int Getd () const {return 2*itsS+1;}
 
         virtual MatrixProductState* CreateMPS         (int D,const Epsilons&) const;
         virtual MPO*                CreateUnitOperator() const;

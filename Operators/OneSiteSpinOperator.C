@@ -5,7 +5,7 @@
 
 OneSiteSpinOperator::OneSiteSpinOperator(double S, TensorNetworks::SpinOperator o)
 : itsS(S)
-, itsp(2*S+1)
+, itsd(2*S+1)
 , itsOperator(o)
 , itsDw12(1,1,Vector<int>(1),Vector<int>(1))
 {

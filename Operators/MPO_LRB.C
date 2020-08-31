@@ -3,7 +3,7 @@
 
 MPO_LRB::MPO_LRB(int L, double S)
     : itsL(L)
-    , itsp(2*S+1)
+    , itsd(2*S+1)
 {
 #ifdef DEBUG
     double ipart;
@@ -15,7 +15,7 @@ MPO_LRB::MPO_LRB(int L, double S)
 
 MPO_LRB::MPO_LRB(const OperatorWRepresentation* O,int L, double S)
     : itsL(L)
-    , itsp(2*S+1)
+    , itsd(2*S+1)
 {
 #ifdef DEBUG
     double ipart;
@@ -37,9 +37,9 @@ void MPO_LRB::Init(const OperatorWRepresentation* O)
     //
     //  Load W matrices for the left edge,bulk and right edge
     //
-    SiteOperator* left =new SiteOperatorImp(TensorNetworks::PLeft,O,itsp);
-    SiteOperator* bulk =new SiteOperatorImp(TensorNetworks::PBulk,O,itsp);
-    SiteOperator* right=new SiteOperatorImp(TensorNetworks::PRight,O,itsp);
+    SiteOperator* left =new SiteOperatorImp(TensorNetworks::PLeft,O,itsd);
+    SiteOperator* bulk =new SiteOperatorImp(TensorNetworks::PBulk,O,itsd);
+    SiteOperator* right=new SiteOperatorImp(TensorNetworks::PRight,O,itsd);
     itsSites.push_back(left );     //Left edge
     itsSites.push_back(bulk );     //bulk
     itsSites.push_back(right);     //Right edge

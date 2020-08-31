@@ -13,8 +13,8 @@ class SiteOperatorImp : public virtual SiteOperator
 {
         typedef TensorNetworks::VectorT VectorT;
     public:
-        SiteOperatorImp(TensorNetworks::Position  lbr, const OperatorWRepresentation* O,int p);
-        SiteOperatorImp(TensorNetworks::Direction lr , const MatrixT& U, const VectorT& expEvs, int p);
+        SiteOperatorImp(TensorNetworks::Position  lbr, const OperatorWRepresentation* O,int d);
+        SiteOperatorImp(TensorNetworks::Direction lr , const MatrixT& U, const VectorT& expEvs, int d);
         virtual ~SiteOperatorImp();
         void SetNeighbours(SiteOperator* left, SiteOperator* right);
 
@@ -50,7 +50,7 @@ class SiteOperatorImp : public virtual SiteOperator
 
         typedef DMatrix<TensorNetworks::MatrixT> TensorT;
 
-        int itsp; //2*S+1
+        int itsd; //2*S+1
         Dw12 itsDw12;
 
         TensorT itsWs;

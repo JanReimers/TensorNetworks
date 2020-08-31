@@ -17,11 +17,11 @@ public:
     typedef Matrix4<eType>  OperatorCT;
     typedef SMatrix<double> ExpectationT;
 
-    TwoSiteDMs(int L,int p);
+    TwoSiteDMs(int L,int d);
     ~TwoSiteDMs();
     void Insert(int ia, int ib,const DMType& dm);
     int    GetL() const {return itsL;}
-    double GetS() const {return (itsp-1.0)/2.0;}
+    double GetS() const {return (itsd-1.0)/2.0;}
 
     template <class O> ExpectationT Contract(const O& op) const;
     ExpectationT GetTraces() const;
@@ -32,7 +32,7 @@ private:
     typedef DMatrix<eType> MatrixCT;
 
     int itsL;
-    int itsp;
+    int itsd;
     DMsType itsDMs;
 };
 

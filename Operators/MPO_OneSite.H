@@ -28,7 +28,7 @@ class MPO_OneSite : public virtual Operator
     private:
 
         int itsL;   //Number of lattice sites
-        int itsp;   //Number ot states for the spin on each site = 2S+1
+        int itsd;   //Number ot states for the spin on each site = 2S+1
         int itsSiteIndex;
 
         OperatorWRepresentation* itsSpinWOp;

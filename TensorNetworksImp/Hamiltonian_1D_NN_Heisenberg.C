@@ -151,12 +151,12 @@ Dw12 Hamiltonian_1D_NN_Heisenberg::GetDw12(TensorNetworks::Position lbr) const
 TensorNetworks::Matrix4T Hamiltonian_1D_NN_Heisenberg::BuildLocalMatrix() const
 {
     SpinCalculator sc(itsS);
-    int p=Getp();
-    Matrix4T H12(p,p,p,p,0);
-    for (int n1=0;n1<p;n1++)
-        for (int n2=0;n2<p;n2++)
-            for (int m1=0;m1<p;m1++)
-                for (int m2=0;m2<p;m2++)
+    int d=Getd();
+    Matrix4T H12(d,d,d,d,0);
+    for (int n1=0;n1<d;n1++)
+        for (int n2=0;n2<d;n2++)
+            for (int m1=0;m1<d;m1++)
+                for (int m2=0;m2<d;m2++)
                     H12(m1,m2,n1,n2)=GetH(m1,n1,m2,n2,sc);
 
     return H12;
@@ -191,16 +191,16 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::Tro
     {
         case TensorNetworks::FirstOrder :
         {
-            MPO_SpatialTrotter Wodd (dt,TensorNetworks::Odd ,itsL,Getp(),H12);
-            MPO_SpatialTrotter Weven(dt,TensorNetworks::Even,itsL,Getp(),H12);
+            MPO_SpatialTrotter Wodd (dt,TensorNetworks::Odd ,itsL,Getd(),H12);
+            MPO_SpatialTrotter Weven(dt,TensorNetworks::Even,itsL,Getd(),H12);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             break;
         }
         case TensorNetworks::SecondOrder :
         {
-            MPO_SpatialTrotter Wodd (dt/2.0,TensorNetworks::Odd ,itsL,Getp(),H12);
-            MPO_SpatialTrotter Weven(dt,TensorNetworks::Even,itsL,Getp(),H12);
+            MPO_SpatialTrotter Wodd (dt/2.0,TensorNetworks::Odd ,itsL,Getd(),H12);
+            MPO_SpatialTrotter Weven(dt,TensorNetworks::Even,itsL,Getd(),H12);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             W->Combine(&Wodd);
@@ -211,7 +211,6 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::Tro
             //
             //  At this order we must compress as we go or we risk consuming all memory
             //
-            double percent;
             TensorNetworks::VectorT ts(5);
             ts(1)=dt/(4-pow(4.0,1.0/3.0));
             ts(2)=ts(1);
@@ -221,8 +220,8 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::Tro
             for (int it=1;it<=5;it++)
             {
                 MPOImp U(itsL,itsS);
-                MPO_SpatialTrotter Wodd (ts(it)/2.0,TensorNetworks::Odd ,itsL,Getp(),H12);
-                MPO_SpatialTrotter Weven(ts(it)    ,TensorNetworks::Even,itsL,Getp(),H12);
+                MPO_SpatialTrotter Wodd (ts(it)/2.0,TensorNetworks::Odd ,itsL,Getd(),H12);
+                MPO_SpatialTrotter Weven(ts(it)    ,TensorNetworks::Even,itsL,Getd(),H12);
                 U.Combine(&Wodd);
                 U.Combine(&Weven);
                 U.Combine(&Wodd);

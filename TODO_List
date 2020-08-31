@@ -1,23 +1,42 @@
+-Done Fix conventions for lattice site indexing, zero or one based?
+    MPS is zero based, FullState is one based, LyX notes are one based
+-Done Reconcile local Hilbert space dimension, using d in the Lyx doc and p in code.
+-In code use M for matricies instead A
+
+-GetNormStat(isite) should return a char, keep # iterations separate.
+-Done Convergence schedule,  increase D, drop epsilons, drop tau for imaginary time evolution
+    -Can we use one schedule for 1) variational and 2) imaginary time GS searches?
+    - Variational needs: Eps.DE, Eps.Eigen, Eps.<E^2>-<E>^2 NIter, Dmax
+    - Imag t needs: Eps.DE, Eps ||Psi1-Psi2||^2, Eps.<E^2>-<E>^2, tau, Niter, Dmax
+- Convergence Schedule Both methods might benifit from Hamiltonian parameter variations.  For example
+        -Jxy  Turn these on gradually to find GS, Hamiltonian nees to supply a list paramater names and ranges.
+        -Jz
+        -Might need to identify parameters with strings "Jxy"
+- Support iterations schedule for variational GS search
+- Support dynamic tuning of D in iteration schedule.
+- Take out support for two operator contrations.  Now that we can combine and compress MPOs we don;t need it for <E^2>.
+- Spin space trotter decomp
+- Infinite methods iMPS, iTEBD, iDMRG
+    -iMPS class with small unit cell
+        -calculate largest EV of transfer matrix, use that to normalize.
+        -THen what??
+            See McCUllough Infnite boundary conditions for matrix product state calculations For
+            calculation of L/R eigen vectors
+    -iTEBD reasonably straight forward.
+            Requires the Vidal lambda-Gamma-Lambda canonical forms with singular values
+            stored on the bonds.
+            Can we reuse the MPS class for this?  All contractions need to be modified to incorporate
+            the SVs from the bonds.
+-Dynamically add lattice site, pseudo DMRG
+- Play with iTensor for 2D systems.
+    -Try one tetrahedon.
+
+
 -GUI
     Control panel
         Play/Pause in one button.  Use icons?
     Status bar. ModelName (from H), L,S, D, iter#, E, CPU & meminfo (use psutils)
 -Plotting support log axes in wxdriver.
--Done Ham->CreateMPS should be a /Factory/ so py knows to delete it.
--Fix conventions for lattice site indexing, zero or one based?
-    MPS is zero based, FullState is one based, LyX notes are one based
--GetNormStat(isite) should return a char, keep # iterations separate.
--Reconcile locel hilbert space dimension, using d in the Lyx doc and p in code.
--Convergence schedule,  increase D, drop epsilons, drop tau for imaginary time evolution
-    -Can we use one schedule for 1) variational and 2) imaginary time GS searches?
-    - Variational needs: Eps.DE, Eps.Eigen, Eps.<E^2>-<E>^2 NIter, Dmax
-    - Imag t needs: Eps.DE, Eps ||Psi1-Psi2||^2, Eps.<E^2>-<E>^2, tau, Niter, Dmax
-    - Both metods migh benifit from Hamiltonian parameter variations.  For example
-        -Jxy  Turn these on gradually to find GS, Hamiltonian nees to supply a list paramater names and ranges.
-        -Jz
-
-
--Dynamically add lattice site, pseudo DMRG
 -Plot correlations
     Two site correlation calcultion is expensive, so we need a way for the user to eneable and disable them
     This brings up layout issues.  We need screen realestate for
@@ -30,6 +49,7 @@
         7) one or two (or N!) site updates. Part of convergence schedule?
         8) Report windows (HTML table?) with columns in the report(ostream) method
 
+-Done Ham->CreateMPS should be a /Factory/ so py knows to delete it.
 -Done Plot singular value spectrum,
 -Done need a site selection sider like in coolfoil
 -Done Refactor sweep left/right routines.  Tonnes of diplicated code in there.
@@ -48,6 +68,7 @@ Bugs:
     is this related to poor convergence for S>1/2 ??
 -Why is dE~10e-15 for sites 1&2 on right sweep and sites L-1,L-2 on left sweep?
     is this related to poor convergence for S>1/2 ??
+-Why does MPS compression convergence criteria (Sholwock page 132 yield wierd numbers)
 -Valgrind, any memeory leaks?
 
 

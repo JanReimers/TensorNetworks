@@ -8,13 +8,13 @@
 //
 //  Build from a W rep opbject
 //
-SiteOperatorImp::SiteOperatorImp(TensorNetworks::Position lbr, const OperatorWRepresentation* H,int p)
-    : itsp(p)
+SiteOperatorImp::SiteOperatorImp(TensorNetworks::Position lbr, const OperatorWRepresentation* H,int d)
+    : itsd(d)
     , itsDw12(H->GetDw12(lbr))
-    , itsWs(p,p)
+    , itsWs(d,d)
 {
-    for (int m=0; m<itsp; m++)
-        for (int n=0; n<itsp; n++)
+    for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
         {
             itsWs(m+1,n+1)=H->GetW(lbr,m,n);
             assert(itsWs(m+1,n+1).GetNumRows()==itsDw12.Dw1);
@@ -24,10 +24,10 @@ SiteOperatorImp::SiteOperatorImp(TensorNetworks::Position lbr, const OperatorWRe
 //
 // Build from a trotter decomp.
 //
-SiteOperatorImp::SiteOperatorImp(TensorNetworks::Direction lr,const MatrixT& U, const VectorT& s, int p)
-    : itsp(p)
+SiteOperatorImp::SiteOperatorImp(TensorNetworks::Direction lr,const MatrixT& U, const VectorT& s, int d)
+    : itsd(d)
     , itsDw12()
-    , itsWs(p,p)
+    , itsWs(d,d)
 {
     int Dw=s.size();
     if (lr==TensorNetworks::DLeft)
@@ -40,8 +40,8 @@ SiteOperatorImp::SiteOperatorImp(TensorNetworks::Direction lr,const MatrixT& U, 
         itsDw12=Dw12(1,Dw,first,last);
         int i1=1; //Linear index for (m,n) = 1+m+p*n
         //  Fill W^(m,n)_w matrices
-        for (int m=0; m<itsp; m++)
-            for (int n=0; n<itsp; n++,i1++)
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++,i1++)
             {
                 itsWs(m+1,n+1)=MatrixT(1,Dw);
                 for (int w=1; w<=Dw; w++)
@@ -61,8 +61,8 @@ SiteOperatorImp::SiteOperatorImp(TensorNetworks::Direction lr,const MatrixT& U, 
         itsDw12=Dw12(Dw,1,first,last);
         int i2=1; //Linear index for (m,n) = 1+m+p*n
         //  Fill W^(m,n)_w matrices
-        for (int m=0; m<itsp; m++)
-            for (int n=0; n<itsp; n++,i2++)
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++,i2++)
             {
                 itsWs(m+1,n+1)=MatrixT(Dw,1);
                 for (int w=1; w<=Dw; w++)
@@ -108,13 +108,13 @@ void SiteOperatorImp::Combine(const SiteOperator* O2)
 //    cout << "New D1,D2=" << Dw.Dw1 << " " << Dw.Dw2 << endl;
 
 
-    TensorT newWs(itsp,itsp);
-    for (int m=0; m<itsp; m++)
-        for (int o=0; o<itsp; o++)
+    TensorT newWs(itsd,itsd);
+    for (int m=0; m<itsd; m++)
+        for (int o=0; o<itsd; o++)
         {
             MatrixT Wmo(Dw.Dw1,Dw.Dw2);
             Fill(Wmo,0.0);
-            for (int n=0; n<itsp; n++)
+            for (int n=0; n<itsd; n++)
             {
                 const MatrixT& W1=GetW(m,n);
                 const MatrixT& W2=O2->GetW(n,o);
@@ -242,10 +242,10 @@ TensorNetworks::MatrixT SiteOperatorImp::Reshape(TensorNetworks::Direction lr)
     {
     case TensorNetworks::DLeft:
     {
-        A.SetLimits(itsp*itsp*itsDw12.Dw1,itsDw12.Dw2);
+        A.SetLimits(itsd*itsd*itsDw12.Dw1,itsDw12.Dw2);
         int w=1;
-        for (int m=0; m<itsp; m++)
-            for (int n=0; n<itsp; n++)
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++)
             {
                 const MatrixT& W=GetW(m,n);
                 for (int w1=1; w1<=itsDw12.Dw1; w1++,w++)
@@ -256,10 +256,10 @@ TensorNetworks::MatrixT SiteOperatorImp::Reshape(TensorNetworks::Direction lr)
     }
     case TensorNetworks::DRight:
     {
-        A.SetLimits(itsDw12.Dw1,itsp*itsp*itsDw12.Dw2);
+        A.SetLimits(itsDw12.Dw1,itsd*itsd*itsDw12.Dw2);
         int w=1;
-        for (int m=0; m<itsp; m++)
-            for (int n=0; n<itsp; n++)
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++)
             {
                 const MatrixT& W=GetW(m,n);
                 for (int w2=1; w2<=itsDw12.Dw2; w2++,w++)
@@ -280,8 +280,8 @@ void SiteOperatorImp::Reshape(int D1, int D2, bool saveData)
 //    cout << "Reshape from " << itsDw12.Dw1 << "," << itsDw12.Dw2 << "   to " << D1 << "," << D2 << endl;
     itsDw12.Dw1=D1;
     itsDw12.Dw2=D2;
-    for (int m=0; m<itsp; m++)
-        for (int n=0; n<itsp; n++)
+    for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
             GetW(m,n).SetLimits(itsDw12.Dw1,itsDw12.Dw2,saveData);
 
 }
@@ -297,8 +297,8 @@ void  SiteOperatorImp::Reshape(TensorNetworks::Direction lr,const MatrixT& UV)
         //
         if (UV.GetNumCols()<itsDw12.Dw2) Reshape(itsDw12.Dw1,UV.GetNumCols());//This throws away the old data
         int w=1;
-        for (int m=0; m<itsp; m++)
-            for (int n=0; n<itsp; n++)
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++)
             {
                 MatrixT& W=GetW(m,n);
                 for (int w1=1; w1<=itsDw12.Dw1; w1++,w++)
@@ -314,8 +314,8 @@ void  SiteOperatorImp::Reshape(TensorNetworks::Direction lr,const MatrixT& UV)
         //
         if (UV.GetNumRows()<itsDw12.Dw1) Reshape(UV.GetNumRows(),itsDw12.Dw2,false);//This throws away the old data
         int w=1;
-        for (int m=0; m<itsp; m++)
-            for (int n=0; n<itsp; n++)
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++)
             {
                 MatrixT& W=GetW(m,n);
                 for (int w2=1; w2<=itsDw12.Dw2; w2++,w++)
@@ -342,8 +342,8 @@ void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,
             else
                 itsDw12.Dw2=N1; //The contraction below will automatically reshape the As.
         }
-        for (int m=0; m<itsp; m++)
-            for (int n=0; n<itsp; n++)
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++)
             {
                 MatrixT& W=GetW(m,n);
                 assert(W.GetNumCols()==UV.GetNumRows());
@@ -366,8 +366,8 @@ void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,
                 itsDw12.Dw1=N1; //The contraction below will automatically reshape the As.
         }
 
-        for (int m=0; m<itsp; m++)
-            for (int n=0; n<itsp; n++)
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++)
             {
                 MatrixT& W=GetW(m,n);
                 assert(UV.GetNumCols()==W.GetNumRows());

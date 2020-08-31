@@ -3,9 +3,9 @@
 #include "oml/cnumeric.h"
 
 
-OneSiteDMs::OneSiteDMs(int L, int p)
+OneSiteDMs::OneSiteDMs(int L, int d)
     : itsL(L)
-    , itsp(p)
+    , itsd(d)
     , itsDMs(L)
 {
     //ctor
@@ -18,16 +18,16 @@ OneSiteDMs::~OneSiteDMs()
 
 void OneSiteDMs::Insert(int ia, const DMType& dm)
 {
-    assert(dm.GetNumRows()==itsp);
-    assert(dm.GetNumCols()==itsp);
+    assert(dm.GetNumRows()==itsd);
+    assert(dm.GetNumCols()==itsd);
     assert(IsHermitian(dm,1e-14));
     itsDMs(ia)=dm;
 }
 
 template <class O> OneSiteDMs::ExpectationT OneSiteDMs::Contract(const O& op) const
 {
-    assert(op.GetNumRows()==itsp);
-    assert(op.GetNumCols()==itsp);
+    assert(op.GetNumRows()==itsd);
+    assert(op.GetNumCols()==itsd);
     assert(IsHermitian(op,1e-14));
 //    cout << "op=" << op << endl;
     ExpectationT ret(itsL);
@@ -37,8 +37,8 @@ template <class O> OneSiteDMs::ExpectationT OneSiteDMs::Contract(const O& op) co
         eType ex(0.0);
         const DMType& dm=itsDMs(ia);
 //            cout << "dm=" << dm << endl;
-        for (int m1=1; m1<=itsp; m1++)
-            for (int n1=1; n1<=itsp; n1++)
+        for (int m1=1; m1<=itsd; m1++)
+            for (int n1=1; n1<=itsd; n1++)
                 ex+=op(m1,n1)*dm(m1,n1);
 
         assert(fabs(std::imag(ex))<1e-14);

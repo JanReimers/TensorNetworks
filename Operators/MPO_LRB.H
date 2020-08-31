@@ -38,7 +38,7 @@ class MPO_LRB : public virtual Operator
         typedef SitesType::const_iterator cSIter;
 
         int itsL;   //Number of lattice sites
-        int itsp;   //Number ot states for the spin on each site = 2S+1
+        int itsd;   //Number ot states for the spin on each site = 2S+1
         //
         // I think we only need to store 3 sites for OBC, left,bulk,right.
         //

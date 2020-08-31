@@ -17,7 +17,7 @@ class MPO_SpatialTrotter : public virtual Operator
 {
         typedef TensorNetworks::Matrix4T Matrix4T;
     public:
-        MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,int L, int p, const Matrix4T& Hlocal);
+        MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,int L, int d, const Matrix4T& Hlocal);
         virtual ~MPO_SpatialTrotter();
 
         virtual int   GetL() const {return itsL;}
@@ -29,7 +29,7 @@ class MPO_SpatialTrotter : public virtual Operator
 
         TensorNetworks::Trotter itsOddEven;
         int itsL;   //Number of lattice sites
-        int itsp;   //Number ot states for the spin on each site = 2S+1
+        int itsd;   //Number ot states for the spin on each site = 2S+1
         SiteOperator* itsLeft_Site; //Left  site of pair
         SiteOperator* itsRightSite; //Right site of pair
         SiteOperator* itsUnit_Site; //Site with unit operator for chain ends.

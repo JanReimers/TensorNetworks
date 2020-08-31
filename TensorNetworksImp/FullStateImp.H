@@ -35,7 +35,7 @@ class FullStateImp : public virtual FullState
     private:
         int      itsL;
         double   itsS;
-        int      itsp;
+        int      itsd;
         long int itsN; //p^L
         double   itsE; //Eigen energy from power iterations
         ArrayCT  itsAmplitudes;

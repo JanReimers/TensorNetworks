@@ -5,19 +5,19 @@
 
 MPOImp::MPOImp(int L, double S)
     : itsL(L)
-    , itsp(2*S+1)
+    , itsd(2*S+1)
 {
     assert(itsL>1);
-    assert(itsp>1);
+    assert(itsd>1);
 //
 //  Load up the sites with unit operators
 //
     OperatorWRepresentation* IdentityWOp=new IdentityOperator();
     itsSites.push_back(0); //Start count sites at index 1
-    itsSites.push_back(new SiteOperatorImp(TensorNetworks::PLeft,IdentityWOp,itsp));
+    itsSites.push_back(new SiteOperatorImp(TensorNetworks::PLeft,IdentityWOp,itsd));
     for (int ia=2;ia<=itsL-1;ia++)
-          itsSites.push_back(new SiteOperatorImp(TensorNetworks::PBulk,IdentityWOp,itsp));
-    itsSites.push_back(new SiteOperatorImp(TensorNetworks::PRight,IdentityWOp,itsp));
+          itsSites.push_back(new SiteOperatorImp(TensorNetworks::PBulk,IdentityWOp,itsd));
+    itsSites.push_back(new SiteOperatorImp(TensorNetworks::PRight,IdentityWOp,itsd));
 //
 //  Loop again and set neighbours.  Each site needs to know its neighbours in order to
 //  carry out SVD tranfers, A[1]->U*s*VT, A=U, s*VT -> Transfered to next site.
@@ -75,7 +75,7 @@ double MPOImp::Compress(int Dmax, double minSv)
 
 void MPOImp::Report(std::ostream& os) const
 {
-    os << "Matrix Product Operator for " << itsL << " sites, p=" << itsp << endl;
+    os << "Matrix Product Operator for " << itsL << " sites, p=" << itsd << endl;
     for (int ia=1;ia<=itsL;ia++)
     {
         os << "   Site " << ia << ": ";

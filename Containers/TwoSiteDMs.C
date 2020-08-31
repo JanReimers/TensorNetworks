@@ -3,9 +3,9 @@
 #include "oml/cnumeric.h"
 
 
-TwoSiteDMs::TwoSiteDMs(int L, int p)
+TwoSiteDMs::TwoSiteDMs(int L, int d)
     : itsL(L)
-    , itsp(p)
+    , itsd(d)
     , itsDMs(1,L,1,L)
 {
     //ctor
@@ -18,16 +18,16 @@ TwoSiteDMs::~TwoSiteDMs()
 
 void TwoSiteDMs::Insert(int ia, int ib,const DMType& dm)
 {
-    assert(dm.Flatten().GetNumRows()==itsp*itsp);
-    assert(dm.Flatten().GetNumCols()==itsp*itsp);
+    assert(dm.Flatten().GetNumRows()==itsd*itsd);
+    assert(dm.Flatten().GetNumCols()==itsd*itsd);
     assert(dm.IsHermitian(1e-14));
     itsDMs(ia,ib)=dm;
 }
 
 template <class O> TwoSiteDMs::ExpectationT TwoSiteDMs::Contract(const O& op) const
 {
-    assert(op.Flatten().GetNumRows()==itsp*itsp);
-    assert(op.Flatten().GetNumCols()==itsp*itsp);
+    assert(op.Flatten().GetNumRows()==itsd*itsd);
+    assert(op.Flatten().GetNumCols()==itsd*itsd);
 //    assert(op.IsHermitian(1e-14));
 //    cout << "op=" << op << endl;
     ExpectationT ret(itsL,itsL);
@@ -38,10 +38,10 @@ template <class O> TwoSiteDMs::ExpectationT TwoSiteDMs::Contract(const O& op) co
             eType ex(0.0);
             const DMType& dm=itsDMs(ia,ib);
 //            cout << "dm=" << dm << endl;
-            for (int m1=1; m1<=itsp; m1++)
-                for (int n1=1; n1<=itsp; n1++)
-                    for (int m2=1; m2<=itsp; m2++)
-                        for (int n2=1; n2<=itsp; n2++)
+            for (int m1=1; m1<=itsd; m1++)
+                for (int n1=1; n1<=itsd; n1++)
+                    for (int m2=1; m2<=itsd; m2++)
+                        for (int n2=1; n2<=itsd; n2++)
                             ex+=op(m1,m2,n1,n2)*dm(m1,m2,n1,n2);
             assert(fabs(std::imag(ex))<1e-14);
 //            cout << "ia,ib,ex=" << ia << " " << ib << " " << ex << endl;

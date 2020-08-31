@@ -50,7 +50,7 @@ public:
 //  Access to information
 //
         int     GetL        () const {return itsL;}
-        int     Getp        () const {return itsp;}
+        int     Getp        () const {return itsd;}
         double  GetMaxDeltaE() const;
 
 //--------------------------------------------------------------------------------------
@@ -193,7 +193,7 @@ private:
         int    itsL;   //Number of lattice sites
         int    itsDmax; //Maximum bond dimension
         double itsS;  //2*S, avoid storing floats for S=n/2
-        int    itsp;   //Number ot states for the spin on each site = 2S+1
+        int    itsd;   //Number ot states for the spin on each site = 2S+1
         int    itsNSweep;
         int    itsSelectedSite; //Selected site for plots which show lots of data for one site.
 

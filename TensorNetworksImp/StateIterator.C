@@ -1,14 +1,14 @@
 #include "StateIterator.H"
 
-StateIterator::StateIterator(int L, int p)
+StateIterator::StateIterator(int L, int d)
     : itsL(L)
-    , itspmax(p-1)
+    , itsdmax(d-1)
     , itsNextSiteToIncrement(L)
     , itsLinearIndex(0)
     , itsQuantumNumbers(L)
 {
     assert(itsL>0);
-    assert(itspmax>0);
+    assert(itsdmax>0);
     Fill(itsQuantumNumbers,0);
 }
 
@@ -31,9 +31,9 @@ void StateIterator::Restart()
 //
  int StateIterator::operator++(int)
  {
-    assert(itsQuantumNumbers(itsNextSiteToIncrement)<=itspmax);
+    assert(itsQuantumNumbers(itsNextSiteToIncrement)<=itsdmax);
     itsQuantumNumbers(itsNextSiteToIncrement)++;
-    while (itsQuantumNumbers(itsNextSiteToIncrement)>itspmax)
+    while (itsQuantumNumbers(itsNextSiteToIncrement)>itsdmax)
     {
          itsNextSiteToIncrement--;
          if (itsNextSiteToIncrement==0)
@@ -61,7 +61,7 @@ void StateIterator::Restart()
  // Caluclate the linear index from a rank L tensor index stored in state;
 int StateIterator::GetIndex(const Vector<int>& state) const
 {
-    int ret=0,p=itspmax+1;
+    int ret=0,p=itsdmax+1;
     for (int ia=1; ia<=itsL; ia++)
         ret=p*ret+state(ia);
     return ret; //0 based of Array type used for amplitudes

@@ -6,7 +6,7 @@
 class StateIterator
 {
     public:
-        StateIterator(int L, int p);
+        StateIterator(int L, int d);
         virtual ~StateIterator();
 
         void               Restart          ();
@@ -25,7 +25,7 @@ class StateIterator
 
     private:
         int itsL; //Number of basis sites/spins
-        int itspmax; //max QN on each site/spin
+        int itsdmax; //max QN on each site/spin
         mutable int         itsNextSiteToIncrement;
         mutable int         itsLinearIndex;
         mutable Vector<int> itsQuantumNumbers; //Vector of quantum numbers |n_1,n_2...n_L>

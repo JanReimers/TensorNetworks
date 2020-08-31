@@ -25,7 +25,7 @@ class MatrixProductSite
 //
 //  Conctruction and initialization zone
 //
-        MatrixProductSite(TensorNetworks::Position lbr,Bond* leftBond, Bond* rightBond, int p, int D1, int D2);
+        MatrixProductSite(TensorNetworks::Position lbr,Bond* leftBond, Bond* rightBond, int d, int D1, int D2);
         virtual ~MatrixProductSite();
         void InitializeWith(TensorNetworks::State,int sgn);
         void Freeze(double s);
@@ -128,9 +128,9 @@ private:
 
 
     friend class MatrixProductTesting;
-    typedef std::vector<MatrixCT>     pVectorT;
-    typedef pVectorT::      iterator  pIterT;
-    typedef pVectorT::const_iterator cpIterT;
+    typedef std::vector<MatrixCT>     dVectorT;
+    typedef dVectorT::      iterator  dIterT;
+    typedef dVectorT::const_iterator cdIterT;
 
 //-----------------------------------------------------------------------------------
 //
@@ -154,16 +154,16 @@ private:
     eType ContractWR   (int w1,int i2, int j2,const MatrixT& W, int Dw2, const Vector3T& R) const;
 
     MatrixCT ContractCA(int n2, const MatrixCT& C) const;
-    void     Contract(pVectorT& newAs,const SiteOperator* so);
+    void     Contract(dVectorT& newAs,const SiteOperator* so);
     MatrixCT ContractLRM(const MatrixCT& M, const MatrixCT& L, const MatrixCT& R) const;
     MatrixCT Contract_RM(const MatrixCT& R, const MatrixCT& M) const;
 
 
     Bond* itsLeft_Bond;
     Bond* itsRightBond;
-    int itsp; //2*S+1
+    int itsd; //2*S+1
     int itsD1,itsD2;  //Bond dimensions
-    pVectorT itsAs;   //We need a separate matrix for each of the p basis states on one site.
+    dVectorT itsAs;   //We need a separate matrix for each of the p basis states on one site.
     Vector3T itsHLeft_Cache,itsHRightCache; //L/R tensors for <Psi|H|Psi>
     mutable MatrixCT itsLeft_Cache ,itsRightCache;  //L/R matrices for <Psi|Psi>
     PrimeEigenSolver<eType> itsEigenSolver;

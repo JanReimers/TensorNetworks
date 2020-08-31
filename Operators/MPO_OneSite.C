@@ -5,12 +5,12 @@
 
 MPO_OneSite::MPO_OneSite(int L, double S ,int isite, TensorNetworks::SpinOperator o)
     : itsL(L)
-    , itsp(2*S+1)
+    , itsd(2*S+1)
     , itsSiteIndex(isite)
     , itsSpinWOp(new OneSiteSpinOperator(S,o))
     , itsIdentityWOp(new IdentityOperator())
-    , itsSiteOperator(new SiteOperatorImp(TensorNetworks::PBulk,itsSpinWOp,itsp))
-    , itsIndentityOperator(new SiteOperatorImp(TensorNetworks::PBulk,itsIdentityWOp,itsp))
+    , itsSiteOperator(new SiteOperatorImp(TensorNetworks::PBulk,itsSpinWOp,itsd))
+    , itsIndentityOperator(new SiteOperatorImp(TensorNetworks::PBulk,itsIdentityWOp,itsd))
 {
 
 }
