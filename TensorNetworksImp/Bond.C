@@ -1,5 +1,5 @@
 #include "Bond.H"
-#include "TensorNetworksImp/MatrixProductSite.H"
+#include "TensorNetworksImp/MPSSite.H"
 #include "oml/vector_io.h"
 #include <iostream>
 
@@ -27,7 +27,7 @@ void Bond::CloneState(const Bond* b2)
     itsRank          =b2->itsRank;
 }
 
-void Bond::SetSites(MatrixProductSite* left, MatrixProductSite* right)
+void Bond::SetSites(MPSSite* left, MPSSite* right)
 {
     itsLeft_Site=left;
     itsRightSite=right;

@@ -9,7 +9,7 @@
 class SiteOperator;
 class Bond;
 
-class MatrixProductSite
+class MPSSite
 {
     typedef TensorNetworks::Matrix6CT Matrix6T;
     typedef TensorNetworks::Matrix4CT Matrix4T;
@@ -25,11 +25,11 @@ class MatrixProductSite
 //
 //  Conctruction and initialization zone
 //
-        MatrixProductSite(TensorNetworks::Position lbr,Bond* leftBond, Bond* rightBond, int d, int D1, int D2);
-        virtual ~MatrixProductSite();
+        MPSSite(TensorNetworks::Position lbr,Bond* leftBond, Bond* rightBond, int d, int D1, int D2);
+        virtual ~MPSSite();
         void InitializeWith(TensorNetworks::State,int sgn);
         void Freeze(double s);
-        void CloneState(const MatrixProductSite* psi2);
+        void CloneState(const MPSSite* psi2);
 
 //--------------------------------------------------------------------------------------
 //
@@ -54,10 +54,10 @@ class MatrixProductSite
             return lr==TensorNetworks::DLeft ? itsLeft_Cache : itsRightCache;
         }
         void     UpdateCache(const SiteOperator* so       ,const Vector3T& HLeft,const Vector3T& HRight); //update <Psi|H|Psi> L/R cahces
-        void     UpdateCache(const MatrixProductSite* Psi2,const MatrixCT&  Left,const MatrixCT&  Right); //update <Psi|Psi> L/R cahces
+        void     UpdateCache(const MPSSite* Psi2,const MatrixCT&  Left,const MatrixCT&  Right); //update <Psi|Psi> L/R cahces
 
-        MatrixCT IterateLeft_F(const MatrixProductSite* Psi2,const MatrixCT& Fam1,bool cache=false) const;
-        MatrixCT IterateRightF(const MatrixProductSite* Psi2,const MatrixCT& Fam1,bool cache=false) const;
+        MatrixCT IterateLeft_F(const MPSSite* Psi2,const MatrixCT& Fam1,bool cache=false) const;
+        MatrixCT IterateRightF(const MPSSite* Psi2,const MatrixCT& Fam1,bool cache=false) const;
         MatrixCT IterateF     (TensorNetworks::Direction lr ,const MatrixCT& M) const;
         Vector3T IterateLeft_F(const SiteOperator*      so  ,const Vector3T& Fam1,bool cache=false);
         Vector3T IterateRightF(const SiteOperator*      so  ,const Vector3T& Fam1,bool cache=false);
@@ -75,14 +75,14 @@ class MatrixProductSite
 //
 //  Vary this site to be as close as possible to Site by minimizing ||this-Psi2||^2
 //
-        virtual void Optimize(const MatrixProductSite* psi, const MatrixCT& L, const MatrixCT& R); // Minimize ||this-Psi2||^2
+        virtual void Optimize(const MPSSite* psi, const MatrixCT& L, const MatrixCT& R); // Minimize ||this-Psi2||^2
 
 //--------------------------------------------------------------------------------------
 //  Operate on MPS with an MPO:  |Psi> -> O|Psi>.
 //  In general this will increase the bond dimension from D to D*Dw
 //
         void  ApplyInPlace(const SiteOperator* so);
-        void  Apply       (const SiteOperator* so, MatrixProductSite* psiPrime);
+        void  Apply       (const SiteOperator* so, MPSSite* psiPrime);
 
 //--------------------------------------------------------------------------------------
 //
@@ -163,7 +163,7 @@ private:
     Bond* itsRightBond;
     int itsd; //2*S+1
     int itsD1,itsD2;  //Bond dimensions
-    dVectorT itsAs;   //We need a separate matrix for each of the p basis states on one site.
+    dVectorT itsMs;   //We need a separate matrix for each of the p basis states on one site.
     Vector3T itsHLeft_Cache,itsHRightCache; //L/R tensors for <Psi|H|Psi>
     mutable MatrixCT itsLeft_Cache ,itsRightCache;  //L/R matrices for <Psi|Psi>
     PrimeEigenSolver<eType> itsEigenSolver;

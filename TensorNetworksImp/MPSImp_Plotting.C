@@ -1,4 +1,4 @@
-#include "TensorNetworksImp/MatrixProductStateImp.H"
+#include "TensorNetworksImp/MPSImp.H"
 #include "TensorNetworksImp/Bond.H"
 #include "Functions/Mesh/PlotableMesh.H"
 #include "Plotting/Factory.H"
@@ -8,7 +8,7 @@
 using Dimensions::PureNumber;
 
 
-void MatrixProductStateImp::InitPlotting()
+void MPSImp::InitPlotting()
 {
     Range rsites(1.0,itsL);
     itsSitesMesh=new UniformMesh(rsites,1.0);
@@ -75,7 +75,7 @@ void MatrixProductStateImp::InitPlotting()
 
 
 
-GraphDefinition MatrixProductStateImp::theGraphs[]=
+GraphDefinition MPSImp::theGraphs[]=
 {
     {"Site E/J"         ,"none"     ,"none"  ,"Sites"     ,"Lattice Site #"},
     {"Site Egap/J"      ,"none"     ,"none"  ,"Sites"     ,"Lattice Site #"},
@@ -87,10 +87,10 @@ GraphDefinition MatrixProductStateImp::theGraphs[]=
     {"Iter log(dE/J)"   ,"none"     ,"none"  ,"Iterations","Iteration #"},
 };
 
-const int MatrixProductStateImp::n_graphs=sizeof(MatrixProductStateImp::theGraphs)/sizeof(GraphDefinition);
+const int MPSImp::n_graphs=sizeof(MPSImp::theGraphs)/sizeof(GraphDefinition);
 
 
-void MatrixProductStateImp::MakeAllGraphs()
+void MPSImp::MakeAllGraphs()
 {
     NamedUnit Xunits("none","Iteration #");
     Plotting::Line* l=0;
@@ -133,7 +133,7 @@ void MatrixProductStateImp::MakeAllGraphs()
     assert(ia>=1);\
     assert(ia<=itsL);\
 
-void MatrixProductStateImp::Select(int index)
+void MPSImp::Select(int index)
 {
     CheckSiteNumber(index);
     if (itsSelectedSite!=index)
@@ -141,7 +141,7 @@ void MatrixProductStateImp::Select(int index)
     itsSelectedSite=index;
 }
 
-void MatrixProductStateImp::Insert(Plotting::MultiGraph* graphs)
+void MPSImp::Insert(Plotting::MultiGraph* graphs)
 {
     graphs->InsertLayer("Iterations");
     graphs->InsertLayer("Sites");

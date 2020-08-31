@@ -1,13 +1,5 @@
--Done Fix conventions for lattice site indexing, zero or one based?
-    MPS is zero based, FullState is one based, LyX notes are one based
--Done Reconcile local Hilbert space dimension, using d in the Lyx doc and p in code.
--In code use M for matricies instead A
 
 -GetNormStat(isite) should return a char, keep # iterations separate.
--Done Convergence schedule,  increase D, drop epsilons, drop tau for imaginary time evolution
-    -Can we use one schedule for 1) variational and 2) imaginary time GS searches?
-    - Variational needs: Eps.DE, Eps.Eigen, Eps.<E^2>-<E>^2 NIter, Dmax
-    - Imag t needs: Eps.DE, Eps ||Psi1-Psi2||^2, Eps.<E^2>-<E>^2, tau, Niter, Dmax
 - Convergence Schedule Both methods might benifit from Hamiltonian parameter variations.  For example
         -Jxy  Turn these on gradually to find GS, Hamiltonian nees to supply a list paramater names and ranges.
         -Jz
@@ -49,6 +41,15 @@
         7) one or two (or N!) site updates. Part of convergence schedule?
         8) Report windows (HTML table?) with columns in the report(ostream) method
 
+-Done Convergence schedule,  increase D, drop epsilons, drop tau for imaginary time evolution
+    -Can we use one schedule for 1) variational and 2) imaginary time GS searches?
+    - Variational needs: Eps.DE, Eps.Eigen, Eps.<E^2>-<E>^2 NIter, Dmax
+    - Imag t needs: Eps.DE, Eps ||Psi1-Psi2||^2, Eps.<E^2>-<E>^2, tau, Niter, Dmax
+-Done Fix conventions for lattice site indexing, zero or one based?
+    MPS is zero based, FullState is one based, LyX notes are one based
+-Done Reconcile local Hilbert space dimension, using d in the Lyx doc and p in code.
+-Done In code use M for matricies instead A
+-Done Rename MPS to MPS to be consistent with MPO and save space
 -Done Ham->CreateMPS should be a /Factory/ so py knows to delete it.
 -Done Plot singular value spectrum,
 -Done need a site selection sider like in coolfoil

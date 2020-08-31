@@ -1,6 +1,6 @@
 #include "Tests.H"
 
-#include "TensorNetworksImp/MatrixProductStateImp.H"
+#include "TensorNetworksImp/MPSImp.H"
 #include "TensorNetworks/LRPSupervisor.H"
 #include "TensorNetworks/Epsilons.H"
 
@@ -28,12 +28,12 @@ public:
     void Setup(int L, double S, int D)
     {
         delete itsMPS;
-        itsMPS=new MatrixProductStateImp(L,S,D,itsEps);
+        itsMPS=new MPSImp(L,S,D,itsEps);
     }
 
     typedef TensorNetworks::MatrixCT MatrixCT;
 
-    MatrixProductStateImp* itsMPS;
+    MPSImp*                itsMPS;
     double                 eps;
     LRPSupervisor*         itsSupervisor;
     Epsilons               itsEps;
@@ -51,7 +51,7 @@ std::string ExpectedNorm(int isite,int L)
     return ret;
 }
 
-std::string BuildNormString(const MatrixProductStateImp* mps,int L)
+std::string BuildNormString(const MPSImp* mps,int L)
 {
     std::string ret;
     for (int ia=1;ia<=L;ia++) ret+=mps->GetNormStatus(ia);

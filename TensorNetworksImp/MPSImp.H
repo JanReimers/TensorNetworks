@@ -1,9 +1,9 @@
 #ifndef MATRIXPRODUCTSTATEIMP_H
 #define MATRIXPRODUCTSTATEIMP_H
 
-#include "TensorNetworks/MatrixProductState.H"
+#include "TensorNetworks/MPS.H"
 #include "TensorNetworks/Epsilons.H"
-#include "TensorNetworksImp/MatrixProductSite.H"
+#include "TensorNetworksImp/MPSSite.H"
 #include "TensorNetworksImp/MultiPlotableImp.H"
 #include "Functions/Mesh/TMesh.H"
 #include "Misc/ptr_vector.h"
@@ -11,8 +11,8 @@
 class PlotableMesh;
 class IterationScheduleLine;
 
-class MatrixProductStateImp
-: public virtual MatrixProductState
+class MPSImp
+: public virtual MPS
 , public virtual MultiPlotable
 , private MultiPlotableImp
 {
@@ -37,14 +37,14 @@ private:
 //  Conctruction and initialization zone
 //
 public:
-        MatrixProductStateImp(int L, double S, int D,const Epsilons& eps);
-        MatrixProductStateImp(const MatrixProductStateImp& mps);
+        MPSImp(int L, double S, int D,const Epsilons& eps);
+        MPSImp(const MPSImp& mps);
 
-        virtual ~MatrixProductStateImp();
+        virtual ~MPSImp();
 
         virtual void InitializeWith(TensorNetworks::State);
         virtual void Freeze(int isite,double s);
-        virtual MatrixProductState* Clone() const;
+        virtual MPS* Clone() const;
 //--------------------------------------------------------------------------------------
 //
 //  Access to information
@@ -73,12 +73,12 @@ public:
 //
 //  Vary this MPS to be as close as possible to Psi2 by minimizing ||this-Psi2||^2
 //
-        virtual void Optimize(const MatrixProductState* Psi2,const IterationScheduleLine&,LRPSupervisor*); // Minimize ||this-Psi2||^2
+        virtual void Optimize(const MPS* Psi2,const IterationScheduleLine&,LRPSupervisor*); // Minimize ||this-Psi2||^2
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions
 //
-        virtual double   GetOverlap     (const MatrixProductState* Psi2) const; //<this|Psi2>
+        virtual double   GetOverlap     (const MPS* Psi2) const; //<this|Psi2>
         virtual double   GetExpectation (const Operator* o) const;
         virtual eType    GetExpectationC(const Operator* o) const;
         virtual double   GetExpectation (const Operator* o1,const Operator* o2) const;
@@ -88,7 +88,7 @@ public:
 //  In general this will increase the bond dimension from D to D*Dw
 //
         virtual void                 ApplyInPlace(const Operator* o);
-        virtual MatrixProductState*  Apply       (const Operator* o) const;
+        virtual MPS*  Apply       (const Operator* o) const;
 //--------------------------------------------------------------------------------------
 //
 //    One site density matrix and expectation calculations
@@ -147,11 +147,11 @@ private:
 //
 //  Used for ||Psi1-Psi2||^2 optimizations.
 //
-        double   Sweep (TensorNetworks::Direction lr,const MatrixProductState* Psi2,LRPSupervisor*);
-        void LoadCaches(const MatrixProductState* Psi2,LRPSupervisor* supervisor);
+        double   Sweep (TensorNetworks::Direction lr,const MPS* Psi2,LRPSupervisor*);
+        void LoadCaches(const MPS* Psi2,LRPSupervisor* supervisor);
         MatrixCT GetRLCache(TensorNetworks::Direction lr,int isite) const;
-        MatrixCT GetEOLeft_Iterate(const MatrixProductState* Psi2,LRPSupervisor*,int isite,bool cache=false) const;
-        MatrixCT GetEORightIterate(const MatrixProductState* Psi2,LRPSupervisor*,int isite,bool cache=false) const;
+        MatrixCT GetEOLeft_Iterate(const MPS* Psi2,LRPSupervisor*,int isite,bool cache=false) const;
+        MatrixCT GetEORightIterate(const MPS* Psi2,LRPSupervisor*,int isite,bool cache=false) const;
 
 //
 //  Loop Control
@@ -178,7 +178,7 @@ private:
 //
 //  Iterator Typedefs
 //
-        typedef optr_vector<MatrixProductSite*> SitesType;
+        typedef optr_vector<MPSSite*> SitesType;
         typedef optr_vector<Bond*>              BondsType;
         typedef SitesType::      iterator  SIter;
         typedef SitesType::const_iterator cSIter;

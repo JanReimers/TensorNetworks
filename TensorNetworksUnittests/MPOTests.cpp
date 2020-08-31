@@ -46,14 +46,14 @@ public:
 
     MatrixT GetW(int isite, int m, int n) {return itsH->GetSiteOperator(isite)->GetW(m,n);}
 
-          MatrixProductStateImp* GetMPSImp()       {return dynamic_cast<      MatrixProductStateImp*>(itsMPS);}
-    const MatrixProductStateImp* GetMPSImp() const {return dynamic_cast<const MatrixProductStateImp*>(itsMPS);}
+          MPSImp* GetMPSImp()       {return dynamic_cast<      MPSImp*>(itsMPS);}
+    const MPSImp* GetMPSImp() const {return dynamic_cast<const MPSImp*>(itsMPS);}
 
     double eps;
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
     Hamiltonian*                   itsH;
     OperatorWRepresentation*       itsWRep;
-    MatrixProductState*            itsMPS;
+    MPS*                           itsMPS;
     LRPSupervisor*                 itsSupervisor;
     Epsilons                       itsEps;
 };

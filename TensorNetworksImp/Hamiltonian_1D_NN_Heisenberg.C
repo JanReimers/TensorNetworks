@@ -1,5 +1,5 @@
 #include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
-#include "TensorNetworksImp/MatrixProductStateImp.H"
+#include "TensorNetworksImp/MPSImp.H"
 #include "TensorNetworksImp/FullStateImp.H"
 #include "Operators/MPO_LRB.H"
 #include "Operators/MPOImp.H"
@@ -168,9 +168,9 @@ TensorNetworks::Matrix4T Hamiltonian_1D_NN_Heisenberg::BuildLocalMatrix() const
 //  Create states.  Why are these here?  Because the Hamiltonian is the
 //  only thing that knows L,S,Dw
 //
-MatrixProductState* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,const Epsilons& eps) const
+MPS* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,const Epsilons& eps) const
 {
-    return new MatrixProductStateImp(itsL,itsS,D,eps);
+    return new MPSImp(itsL,itsS,D,eps);
 }
 
 MPO* Hamiltonian_1D_NN_Heisenberg::CreateUnitOperator() const

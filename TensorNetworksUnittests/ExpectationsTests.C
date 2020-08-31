@@ -51,7 +51,7 @@ public:
 
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
     Hamiltonian*         itsH;
-    MatrixProductState*  itsMPS;
+    MPS*                 itsMPS;
     LRPSupervisor*       itsLRPSupervisor;
     Epsilons             itsEps;
 };
@@ -215,7 +215,7 @@ SMatrix<DMatrix<double> > SuseptibilityTensor(const OneSiteDMs& dm1,const TwoSit
     return ret;
 }
 
-SMatrix<DMatrix<double> > SuseptibilityTensor(const MatrixProductState* mps,const TwoSiteDMs& dm2)
+SMatrix<DMatrix<double> > SuseptibilityTensor(const MPS* mps,const TwoSiteDMs& dm2)
 {
     int L=dm2.GetL();
     double S=dm2.GetS();

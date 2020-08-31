@@ -23,21 +23,21 @@ public:
     void Setup(int L, double  S, int D)
     {
         delete itsMPS;
-        itsMPS=new MatrixProductStateImp(L,S,D,itsEps);
+        itsMPS=new MPSImp(L,S,D,itsEps);
     }
 
 
-    typedef MatrixProductSite::MatrixCT MatrixCT;
+    typedef TensorNetworks::MatrixCT MatrixCT;
 
-    MatrixCT GetA(int i,int ip) const {return GetSite(i)->itsAs[ip]; }
-    const MatrixProductSite* GetSite(int isite) const {return itsMPS->itsSites[isite];}
+    MatrixCT GetA(int i,int ip) const {return GetSite(i)->itsMs[ip]; }
+    const MPSSite* GetSite(int isite) const {return itsMPS->itsSites[isite];}
     MatrixCT GetNorm(TensorNetworks::Direction lr,int isite) const
     {
         return GetSite(isite)->GetNorm(lr);
     }
 
-    MatrixProductStateImp* itsMPS;
-    Epsilons               itsEps;
+    MPSImp*     itsMPS;
+    Epsilons itsEps;
 
 
     double eps;

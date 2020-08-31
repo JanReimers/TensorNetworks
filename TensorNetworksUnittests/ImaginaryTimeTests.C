@@ -44,7 +44,7 @@ public:
     double eps;
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
     Hamiltonian*         itsH;
-    MatrixProductState*  itsMPS;
+    MPS*                 itsMPS;
     Epsilons             itsEps;
     LRPSupervisor*       itsSupervisor;
 };
@@ -55,7 +55,7 @@ TEST_F(ImaginaryTimeTesting,TestApplyIdentity)
 {
     int D=1;
     Setup(3,0.5,D);
-    MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
+    MPS* Psi1=itsH->CreateMPS(D,itsEps);
     Psi1->InitializeWith(TensorNetworks::Neel);
     double E1=Psi1->GetExpectation(itsH);
     Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
@@ -64,7 +64,7 @@ TEST_F(ImaginaryTimeTesting,TestApplyIdentity)
 
     OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
     Operator* IO=itsH->CreateOperator(IWO);
-    MatrixProductState* Psi2=Psi1->Apply(IO);
+    MPS* Psi2=Psi1->Apply(IO);
     EXPECT_NEAR(Psi2->GetExpectation(itsH) ,E1,eps);
     delete Psi1;
     delete Psi2;
@@ -92,13 +92,13 @@ TEST_F(ImaginaryTimeTesting,TestMPPOCombine)
     //
     //  Make a random normalized wave function
     //
-    MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
+    MPS* Psi1=itsH->CreateMPS(D,itsEps);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
     //
     //  Psi2 = W*Psi1
     //
-    MatrixProductState* Psi2=Psi1->Apply(W);
+    MPS* Psi2=Psi1->Apply(W);
     //
     //  Psi1 = W_Odd * W_Even * W_Odd * Psi1
     //
@@ -138,7 +138,7 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt0)
     int D=8,L=9;
     double dt=0.0,epsSVD=1e-5                                                                                                                                                                                                        ;
     Setup(L,0.5,D);
-    MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
+    MPS* Psi1=itsH->CreateMPS(D,itsEps);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DLeft ,itsSupervisor);
     Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
@@ -146,11 +146,11 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt0)
     //Since dt=0 W should be unit operator.
     MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
 
-    MatrixProductState* Psi2=Psi1->Apply(W);
+    MPS* Psi2=Psi1->Apply(W);
     EXPECT_NEAR(Psi1->GetOverlap(Psi2),1.0,eps);
 
     W->Compress(0,epsSVD);
-    MatrixProductState* Psi3=Psi1->Apply(W);
+    MPS* Psi3=Psi1->Apply(W);
     EXPECT_NEAR(Psi1->GetOverlap(Psi3),1.0,1e-7);
     EXPECT_NEAR(Psi2->GetOverlap(Psi3),1.0,1e-7);
     EXPECT_NEAR(Psi3->GetOverlap(Psi3),1.0,1e-6);
@@ -166,7 +166,7 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05)
     int D=8,L=9;
     double dt=0.05,epsSVD=1e-5                                                                                                                                                                                                        ;
     Setup(L,0.5,D);
-    MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
+    MPS* Psi1=itsH->CreateMPS(D,itsEps);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DLeft ,itsSupervisor);
     Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
@@ -174,14 +174,14 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05)
     //Since dt=0 W should be unit operator.
     MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
 
-    MatrixProductState* Psi2=Psi1->Apply(W);
+    MPS* Psi2=Psi1->Apply(W);
     W->Compress(0,epsSVD);
-    MatrixProductState* Psi3=Psi1->Apply(W);
+    MPS* Psi3=Psi1->Apply(W);
 //    EXPECT_NEAR(Psi3->GetOverlap(Psi3),1.0,1e-6);
 //
     W->Compress(0,epsSVD);
 //    W->Report(cout);
-    MatrixProductState* Psi4=Psi1->Apply(W);
+    MPS* Psi4=Psi1->Apply(W);
 
 
     double O23=Psi2->GetOverlap(Psi3);
@@ -222,7 +222,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 {
     int D=8,L=9;
     Setup(L,0.5,D);
-    MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
+    MPS* Psi1=itsH->CreateMPS(D,itsEps);
 //    Psi1->Report(cout);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
@@ -268,7 +268,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
 {
     int D=8,L=9;
     Setup(L,0.5,D);
-    MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
+    MPS* Psi1=itsH->CreateMPS(D,itsEps);
 //    Psi1->Report(cout);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
@@ -304,7 +304,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFourthOrderTrotter)
 {
     int D=8,L=9;
     Setup(L,0.5,D);
-    MatrixProductState* Psi1=itsH->CreateMPS(D,itsEps);
+    MPS* Psi1=itsH->CreateMPS(D,itsEps);
 //    Psi1->Report(cout);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);

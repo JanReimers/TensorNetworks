@@ -1,6 +1,6 @@
 #include "Tests.H"
 
-#include "TensorNetworksImp/MatrixProductStateImp.H"
+#include "TensorNetworksImp/MPSImp.H"
 #include "TensorNetworks/Epsilons.H"
 
 #include "oml/stream.h"
@@ -30,7 +30,7 @@ public:
 
 
     Epsilons               itsEps;
-    MatrixProductStateImp mps;
+    MPSImp mps;
     double eps;
 
 };

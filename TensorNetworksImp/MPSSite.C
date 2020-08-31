@@ -1,4 +1,4 @@
-#include "TensorNetworksImp/MatrixProductSite.H"
+#include "TensorNetworksImp/MPSSite.H"
 #include "TensorNetworksImp/Bond.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
@@ -12,7 +12,7 @@
 using std::cout;
 using std::endl;
 
-MatrixProductSite::MatrixProductSite(TensorNetworks::Position lbr, Bond* leftBond, Bond* rightBond,int d, int D1, int D2)
+MPSSite::MPSSite(TensorNetworks::Position lbr, Bond* leftBond, Bond* rightBond,int d, int D1, int D2)
     : itsLeft_Bond(leftBond)
     , itsRightBond(rightBond)
     , itsd(d)
@@ -41,8 +41,8 @@ MatrixProductSite::MatrixProductSite(TensorNetworks::Position lbr, Bond* leftBon
 
     for (int n=0; n<itsd; n++)
     {
-        itsAs.push_back(MatrixCT(D1,D2));
-        Fill(itsAs.back(),std::complex<double>(0.0));
+        itsMs.push_back(MatrixCT(D1,D2));
+        Fill(itsMs.back(),std::complex<double>(0.0));
     }
     itsHLeft_Cache(1,1,1)=1.0;
     itsHRightCache(1,1,1)=1.0;
@@ -50,16 +50,16 @@ MatrixProductSite::MatrixProductSite(TensorNetworks::Position lbr, Bond* leftBon
     itsRightCache (1,1  )=1.0;
 }
 
-MatrixProductSite::~MatrixProductSite()
+MPSSite::~MPSSite()
 {
     //dtor
 }
 
-void MatrixProductSite::CloneState(const MatrixProductSite* psi2)
+void MPSSite::CloneState(const MPSSite* psi2)
 {
     assert(psi2->itsd==itsd);
     for (int n=0;n<itsd;n++)
-        itsAs[n]=psi2->itsAs[n];
+        itsMs[n]=psi2->itsMs[n];
 
     itsD1         =psi2->itsD1;
     itsD2         =psi2->itsD2;
@@ -75,7 +75,7 @@ void MatrixProductSite::CloneState(const MatrixProductSite* psi2)
 //  This is a tricker than one might expect.  In particular I can't get the OBC vectors
 //  to be both left and right normalized
 //
-void MatrixProductSite::InitializeWith(TensorNetworks::State state,int sgn)
+void MPSSite::InitializeWith(TensorNetworks::State state,int sgn)
 {
     switch (state)
     {
@@ -87,7 +87,7 @@ void MatrixProductSite::InitializeWith(TensorNetworks::State state,int sgn)
         case  TensorNetworks::PLeft :
         {
             int i=1;
-            for (dIterT id=itsAs.begin(); id!=itsAs.end(); id++,i++)
+            for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++,i++)
                 if (i<=itsD2)
                     (*id)(1,i)=std::complex<double>(sgn); //Left normalized
             break;
@@ -95,14 +95,14 @@ void MatrixProductSite::InitializeWith(TensorNetworks::State state,int sgn)
         case TensorNetworks::PRight :
         {
             int i=1;
-            for (dIterT id=itsAs.begin(); id!=itsAs.end(); id++,i++)
+            for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++,i++)
                 if (i<=itsD1)
                     (*id)(i,1)=std::complex<double>(sgn);  //Left normalized
             break;
         }
         case TensorNetworks::PBulk :
         {
-            for (dIterT id=itsAs.begin(); id!=itsAs.end(); id++)
+            for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++)
                 for (int i=1; i<=Min(itsD1,itsD2); i++)
                     (*id)(i,i)=std::complex<double>(sgn/sqrt(itsd));
             break;
@@ -112,7 +112,7 @@ void MatrixProductSite::InitializeWith(TensorNetworks::State state,int sgn)
     }
     case TensorNetworks::Random :
     {
-        for (dIterT id=itsAs.begin(); id!=itsAs.end(); id++)
+        for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++)
         {
             FillRandom(*id);
             (*id)*=1.0/sqrt(itsd*itsD1*itsD2); //Try and keep <psi|psi>~O(1)
@@ -121,19 +121,19 @@ void MatrixProductSite::InitializeWith(TensorNetworks::State state,int sgn)
     }
     case TensorNetworks::Neel :
     {
-        for (dIterT id=itsAs.begin(); id!=itsAs.end(); id++)
+        for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++)
             Fill(*id,eType(0.0));
         if (sgn== 1)
-            itsAs[0     ](1,1)=1.0;
+            itsMs[0     ](1,1)=1.0;
         if (sgn==-1)
-            itsAs[itsd-1](1,1)=1.0;
+            itsMs[itsd-1](1,1)=1.0;
 
         break;
     }
     }
 }
 
-void MatrixProductSite::Freeze(double Sz)
+void MPSSite::Freeze(double Sz)
 {
     isFrozen=true;
 #ifdef DEBUG
@@ -145,13 +145,13 @@ void MatrixProductSite::Freeze(double Sz)
     int n=Sz+S;
     assert(n>=0);
     assert(n<itsd);
-    for (dIterT id=itsAs.begin(); id!=itsAs.end(); id++)
+    for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++)
         Fill(*id,eType(0.0));
-    itsAs[n](1,1)=1.0;
+    itsMs[n](1,1)=1.0;
     itsIterDE=0.0;
 }
 
-void MatrixProductSite::SVDNormalize(TensorNetworks::Direction lr)
+void MPSSite::SVDNormalize(TensorNetworks::Direction lr)
 {
     // Handle edge cases first
     if (lr==TensorNetworks::DRight && !itsLeft_Bond)
@@ -201,7 +201,7 @@ void MatrixProductSite::SVDNormalize(TensorNetworks::Direction lr)
     GetBond(lr)->SVDTransfer(lr,s,UV);
 }
 
-void MatrixProductSite::SVDNormalize(TensorNetworks::Direction lr, int Dmax, double epsMin)
+void MPSSite::SVDNormalize(TensorNetworks::Direction lr, int Dmax, double epsMin)
 {
     // Handle edge cases first
     if (lr==TensorNetworks::DRight && !itsLeft_Bond)
@@ -269,12 +269,12 @@ void MatrixProductSite::SVDNormalize(TensorNetworks::Direction lr, int Dmax, dou
     GetBond(lr)->SVDTransfer(lr,s,UV);
 }
 
-void MatrixProductSite::Rescale(double norm)
+void MPSSite::Rescale(double norm)
 {
-    for (int n=0; n<itsd; n++) itsAs[n]/=norm;
+    for (int n=0; n<itsd; n++) itsMs[n]/=norm;
 }
 
-std::string MatrixProductSite::GetNormStatus(double eps) const
+std::string MPSSite::GetNormStatus(double eps) const
 {
 //    StreamableObject::SetToPretty();
 //    for (int id=0;id<itsd; id++)
@@ -296,7 +296,7 @@ std::string MatrixProductSite::GetNormStatus(double eps) const
     return ret;
 }
 
-bool MatrixProductSite::SetCanonicalBondDimensions(int maxAllowedD1,int maxAllowedD2)
+bool MPSSite::SetCanonicalBondDimensions(int maxAllowedD1,int maxAllowedD2)
 {
     bool reshape=false;
     if (itsD1>maxAllowedD1 || itsD2 >maxAllowedD2)
@@ -309,7 +309,7 @@ bool MatrixProductSite::SetCanonicalBondDimensions(int maxAllowedD1,int maxAllow
     return reshape;
 }
 
-void MatrixProductSite::Report(std::ostream& os) const
+void MPSSite::Report(std::ostream& os) const
 {
     os << std::setprecision(3)
        << std::setw(4) << itsD1
@@ -322,12 +322,12 @@ void MatrixProductSite::Report(std::ostream& os) const
        ;
 }
 
-bool MatrixProductSite::IsNormalized(TensorNetworks::Direction lr,double eps) const
+bool MPSSite::IsNormalized(TensorNetworks::Direction lr,double eps) const
 {
     return IsUnit(GetNorm(lr),eps);
 }
 
-bool MatrixProductSite::IsUnit(const MatrixCT& m,double eps)
+bool MPSSite::IsUnit(const MatrixCT& m,double eps)
 {
     assert(m.GetNumRows()==m.GetNumCols());
     int N=m.GetNumRows();
@@ -338,7 +338,7 @@ bool MatrixProductSite::IsUnit(const MatrixCT& m,double eps)
 
 
 
-void MatrixProductSite::Refine(const MatrixCT& Heff,const Epsilons& eps)
+void MPSSite::Refine(const MatrixCT& Heff,const Epsilons& eps)
 {
     assert(!isFrozen);
     assert(Heff.GetNumRows()==Heff.GetNumCols());
@@ -354,43 +354,43 @@ void MatrixProductSite::Refine(const MatrixCT& Heff,const Epsilons& eps)
     Update(itsEigenSolver.GetEigenVector(1));
 }
 
-void MatrixProductSite::Update(const VectorCT& newAs)
+void MPSSite::Update(const VectorCT& newAs)
 {
     Vector3<eType> As(itsd,itsD1,itsD2,newAs); //Unflatten
     for (int m=0; m<itsd; m++)
         for (int i1=1; i1<=itsD1; i1++)
             for (int i2=1; i2<=itsD2; i2++)
-                itsAs[m](i1,i2)=As(m,i1,i2);
+                itsMs[m](i1,i2)=As(m,i1,i2);
 
     itsNumUpdates++;
 }
 
-void MatrixProductSite::UpdateCache(const SiteOperator* so, const Vector3T& HLeft, const Vector3T& HRight)
+void MPSSite::UpdateCache(const SiteOperator* so, const Vector3T& HLeft, const Vector3T& HRight)
 {
     itsHLeft_Cache=IterateLeft_F(so,HLeft);
     itsHRightCache=IterateRightF(so,HRight);
 }
 
-void MatrixProductSite::UpdateCache(const MatrixProductSite* Psi2,const MatrixCT& Left, const MatrixCT& Right)
+void MPSSite::UpdateCache(const MPSSite* Psi2,const MatrixCT& Left, const MatrixCT& Right)
 {
     itsLeft_Cache =IterateLeft_F(Psi2,Left);
     itsRightCache =IterateRightF(Psi2,Right);
 }
 
 // Get this site as close to psi as possible.  In the docs this site is psi^tilda
-void MatrixProductSite::Optimize(const MatrixProductSite* psi, const MatrixCT& L, const MatrixCT& R)
+void MPSSite::Optimize(const MPSSite* psi, const MatrixCT& L, const MatrixCT& R)
 {
     assert(itsd==psi->itsd);
     cout.precision(10);
     for (int n=0; n<itsd;n++)
     {
-        MatrixCT Anew=ContractLRM(psi->itsAs[n],L,R);
+        MatrixCT Anew=ContractLRM(psi->itsMs[n],L,R);
 //        cout << "A-Anew " << std::fixed << Max(abs(itsAs[n]-Anew)) << endl;
-        itsAs[n]=Anew;
+        itsMs[n]=Anew;
         }
 }
 
-MatrixProductSite::MatrixCT MatrixProductSite::ContractLRM(const MatrixCT& M, const MatrixCT& L, const MatrixCT& R) const
+MPSSite::MatrixCT MPSSite::ContractLRM(const MatrixCT& M, const MatrixCT& L, const MatrixCT& R) const
 {
 //    cout << "D1,D2=" << itsD1 << " " << itsD2 << endl;
 //    cout << "ContractLRM L=" << L.GetLimits() << endl;
@@ -414,7 +414,7 @@ MatrixProductSite::MatrixCT MatrixProductSite::ContractLRM(const MatrixCT& M, co
     return M_tilde;
 }
 
-MatrixProductSite::MatrixCT MatrixProductSite::Contract_RM(const MatrixCT& R, const MatrixCT& M) const
+MPSSite::MatrixCT MPSSite::Contract_RM(const MatrixCT& R, const MatrixCT& M) const
 {
     assert(R.GetNumCols()==M.GetNumCols());
     assert(R.GetNumRows()==itsD2);

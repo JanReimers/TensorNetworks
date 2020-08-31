@@ -2,7 +2,7 @@
 #define TESTS_H_INCLUDED
 
 #include "gtest/gtest.h"
-#include "TensorNetworksImp/MatrixProductStateImp.H"
+#include "TensorNetworksImp/MPSImp.H"
 #include <iostream>
 #include <string>
 

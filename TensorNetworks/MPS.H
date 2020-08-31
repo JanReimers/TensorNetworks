@@ -17,18 +17,18 @@ class Epsilons;
 class IterationSchedule;
 class IterationScheduleLine;
 
-class MatrixProductState : public virtual MultiPlotable
+class MPS : public virtual MultiPlotable
 {
     typedef TensorNetworks::MatrixT  MatrixT;
     typedef TensorNetworks::MatrixCT MatrixCT;
     typedef TensorNetworks::ArrayT   ArrayT;
     typedef TensorNetworks::eType    eType;
     public:
-        MatrixProductState() {}
-        virtual ~MatrixProductState() {}
+        MPS() {}
+        virtual ~MPS() {}
         virtual void InitializeWith(TensorNetworks::State)=0;
         virtual void Freeze(int isite,double s)=0;
-        virtual MatrixProductState* Clone() const=0;
+        virtual MPS* Clone() const=0;
 //--------------------------------------------------------------------------------------
 //
 //  Normalization members with and without SVD compression
@@ -48,12 +48,12 @@ class MatrixProductState : public virtual MultiPlotable
 //
 //  Vary this MPS to be as close as possible to Psi2 by minimizing ||this-Psi2||^2
 //
-        virtual void Optimize(const MatrixProductState* Psi2,const IterationScheduleLine&,LRPSupervisor*)=0; // Minimize ||this-Psi2||^2
+        virtual void Optimize(const MPS* Psi2,const IterationScheduleLine&,LRPSupervisor*)=0; // Minimize ||this-Psi2||^2
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions
 //
-        virtual double   GetOverlap     (const MatrixProductState* Psi2) const=0; //<this|Psi2>
+        virtual double   GetOverlap     (const MPS* Psi2) const=0; //<this|Psi2>
         virtual double   GetExpectation (const Operator* o) const=0;
         virtual eType    GetExpectationC(const Operator* o) const=0; //For non hermitian operators, S+, S-. Sy
         virtual double   GetExpectation (const Operator* o1,const Operator* o2) const=0;
@@ -64,9 +64,9 @@ class MatrixProductState : public virtual MultiPlotable
 //  The overloaded operator is just syntatic suger, not sure how usefull it will be
 //
         virtual void                 ApplyInPlace(const Operator* o)      =0;
-        virtual MatrixProductState*  Apply       (const Operator* o) const=0;
+        virtual MPS*  Apply       (const Operator* o) const=0;
 
-        friend MatrixProductState* operator*(const Operator& o, const MatrixProductState& psi)
+        friend MPS* operator*(const Operator& o, const MPS& psi)
         {
             return psi.Apply(&o);
         }

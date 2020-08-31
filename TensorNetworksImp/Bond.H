@@ -5,7 +5,7 @@
 #include "TensorNetworksImp/Typedefs.H"
 #include "oml/vector.h"
 
-class MatrixProductSite;
+class MPSSite;
 
 class Bond
 {
@@ -15,7 +15,7 @@ class Bond
         Bond(double eps);
         virtual ~Bond();
         void CloneState(const Bond* b2);
-        void SetSites(MatrixProductSite* left, MatrixProductSite* right);
+        void SetSites(MPSSite* left, MPSSite* right);
 
         void SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,const MatrixCT& UV);
 
@@ -30,7 +30,7 @@ class Bond
         //
         //  lr is the normalization direction.  For normalization we need to access the right bond.
         //
-        MatrixProductSite* GetSite(TensorNetworks::Direction lr)
+        MPSSite* GetSite(TensorNetworks::Direction lr)
         {
             return lr==TensorNetworks::DLeft ? itsRightSite : itsLeft_Site;
         }
@@ -40,8 +40,8 @@ class Bond
         double itsBondEntropy;
         double itsMinSV;
         int    itsRank;
-        MatrixProductSite* itsLeft_Site;
-        MatrixProductSite* itsRightSite;
+        MPSSite* itsLeft_Site;
+        MPSSite* itsRightSite;
 
 };
 

@@ -33,7 +33,7 @@ public:
     double eps;
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
     Hamiltonian*         itsH;
-    MatrixProductState*  itsMPS;
+    MPS*                 itsMPS;
     Epsilons             itsEps;
 };
 
