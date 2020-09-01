@@ -1,4 +1,6 @@
 
+- mpsImp line 372   GetEOLeft_Iterate(h,1,true);  //This does nothing because of the 1 ???
+- Does MPSImp need an Epsilons member?
 - Move LRPSupervisor to MPS constructor so we don't have to pollute the function signatures with it
 - Dont calculate <E^2>-<E>^2 for each IterationScheduleLine.
 - GetNormStat(isite) should return a char, keep # iterations separate.

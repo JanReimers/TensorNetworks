@@ -2,6 +2,7 @@
 
 #include "TensorNetworksImp/MPSImp.H"
 #include "TensorNetworks/Epsilons.H"
+#include "TensorNetworks/LRPSupervisor.H"
 
 #include "oml/stream.h"
 #include "oml/numeric.h"
@@ -21,7 +22,7 @@ public:
     typedef TensorNetworks::MatrixCT MatrixT;
     SVDTesting()
     : itsEps()
-    , mps(10,1,2,itsEps)
+    , mps(10,1,2,itsEps,new LRPSupervisor())
     , eps(1.0e-13)
     {
         StreamableObject::SetToPretty();

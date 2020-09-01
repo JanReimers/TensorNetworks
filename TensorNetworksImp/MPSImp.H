@@ -37,7 +37,7 @@ private:
 //  Conctruction and initialization zone
 //
 public:
-        MPSImp(int L, double S, int D,const Epsilons& eps);
+        MPSImp(int L, double S, int D,const Epsilons& eps,LRPSupervisor*);
         MPSImp(const MPSImp& mps);
 
         virtual ~MPSImp();
@@ -57,22 +57,22 @@ public:
 //
 //  Normalization members with and without SVD compression
 //
-        virtual void Normalize(TensorNetworks::Direction LR,LRPSupervisor*);
-        virtual void Normalize(int isite,LRPSupervisor*); //Mixed Canonical normalization
+        virtual void Normalize(TensorNetworks::Direction LR);
+        virtual void Normalize(int isite); //Mixed Canonical normalization
 
-        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,int      Dmax,LRPSupervisor*);
-        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,double epsMin,LRPSupervisor*);
+        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,int      Dmax);
+        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,double epsMin);
 //--------------------------------------------------------------------------------------
 //
 // Find ground state
 //
-        virtual double FindVariationalGroundState(const Hamiltonian* H,const IterationSchedule&    ,LRPSupervisor*);
-        virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&    ,LRPSupervisor*);
+        virtual double FindVariationalGroundState(const Hamiltonian* H,const IterationSchedule&);
+        virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&);
 //--------------------------------------------------------------------------------------
 //
 //  Vary this MPS to be as close as possible to Psi2 by minimizing ||this-Psi2||^2
 //
-        virtual void Optimize(const MPS* Psi2,const IterationScheduleLine&,LRPSupervisor*); // Minimize ||this-Psi2||^2
+        virtual void Optimize(const MPS* Psi2,const IterationScheduleLine&); // Minimize ||this-Psi2||^2
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions
@@ -92,8 +92,8 @@ public:
 //
 //    One site density matrix and expectation calculations
 //
-        OneSiteDMs CalculateOneSiteDMs(LRPSupervisor*);
-        TwoSiteDMs CalculateTwoSiteDMs(LRPSupervisor*);
+        OneSiteDMs CalculateOneSiteDMs();
+        TwoSiteDMs CalculateTwoSiteDMs();
 //--------------------------------------------------------------------------------------
 //
 //    Reporting
@@ -124,13 +124,13 @@ private:
 //
 //  For groound state search
 //
-        double FindVariationalGroundState(const Hamiltonian*,const IterationScheduleLine&,LRPSupervisor*);
-        double FindiTimeGroundState      (const Hamiltonian*,const IterationScheduleLine&,LRPSupervisor*);
-        void   Refine(TensorNetworks::Direction lr,const Hamiltonian*,LRPSupervisor*,const Epsilons&,int isite); //Minimize energy WRT the Ms in one site.
-        double Sweep (TensorNetworks::Direction lr,const Hamiltonian*,LRPSupervisor*,const Epsilons&);
+        double FindVariationalGroundState(const Hamiltonian*,const IterationScheduleLine&);
+        double FindiTimeGroundState      (const Hamiltonian*,const IterationScheduleLine&);
+        void   Refine(TensorNetworks::Direction lr,const Hamiltonian*,const Epsilons&,int isite); //Minimize energy WRT the Ms in one site.
+        double Sweep (TensorNetworks::Direction lr,const Hamiltonian*,const Epsilons&);
         void   UpdateBondData(int isite);
-        void   NormalizeSite(TensorNetworks::Direction lr,int isite,LRPSupervisor*);
-        void   NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,int Dmax, double epsMin, LRPSupervisor*);
+        void   NormalizeSite             (TensorNetworks::Direction lr,int isite);
+        void   NormalizeAndCompressSite  (TensorNetworks::Direction lr,int isite,int Dmax, double epsMin);
         void   SetCanonicalBondDimensions(TensorNetworks::Direction lr);
 //-------------------------------------------------------------------------------------
 //
@@ -138,21 +138,21 @@ private:
 //
         Matrix6T GetHeffIterate(const Hamiltonian* h,int isite) const;
 
-        void     LoadHeffCaches(const Hamiltonian* h,LRPSupervisor*);
+        void     LoadHeffCaches(const Hamiltonian* h);
         Vector3T GetHeffCache(TensorNetworks::Direction lr,int isite) const;
-        Vector3T GetEOLeft_Iterate(const Operator* o,LRPSupervisor*,int isite,bool cache=false) const;
-        Vector3T GetEORightIterate(const Operator* o,LRPSupervisor*,int isite,bool cache=false) const;
+        Vector3T GetEOLeft_Iterate(const Operator* o,int isite,bool cache=false) const;
+        Vector3T GetEORightIterate(const Operator* o,int isite,bool cache=false) const;
 
         Matrix4T CalculateTwoSiteDM(int ia,int ib) const;
 //--------------------------------------------------------------------
 //
 //  Used for ||Psi1-Psi2||^2 optimizations.
 //
-        double   Sweep (TensorNetworks::Direction lr,const MPS* Psi2,LRPSupervisor*);
-        void LoadCaches(const MPS* Psi2,LRPSupervisor* supervisor);
+        double   Sweep (TensorNetworks::Direction lr,const MPS* Psi2);
+        void LoadCaches(const MPS* Psi2);
         MatrixCT GetRLCache(TensorNetworks::Direction lr,int isite) const;
-        MatrixCT GetEOLeft_Iterate(const MPS* Psi2,LRPSupervisor*,int isite,bool cache=false) const;
-        MatrixCT GetEORightIterate(const MPS* Psi2,LRPSupervisor*,int isite,bool cache=false) const;
+        MatrixCT GetEOLeft_Iterate(const MPS* Psi2,int isite,bool cache=false) const;
+        MatrixCT GetEORightIterate(const MPS* Psi2,int isite,bool cache=false) const;
 
 //
 //  Loop Control
@@ -198,9 +198,10 @@ private:
         int    itsNSweep;
         int    itsSelectedSite; //Selected site for plots which show lots of data for one site.
 
-        Epsilons    itsEpsilons;
-        BondsType   itsBonds;
-        SitesType   itsSites;
+        Epsilons       itsEpsilons;
+        LRPSupervisor* itsSupervisor;
+        BondsType      itsBonds;
+        SitesType      itsSites;
 
         UniformMesh*  itsSitesMesh;
         Mesh*         itsBondsMesh;

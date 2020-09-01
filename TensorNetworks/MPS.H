@@ -33,22 +33,22 @@ class MPS : public virtual MultiPlotable
 //
 //  Normalization members with and without SVD compression
 //
-        virtual void Normalize(TensorNetworks::Direction LR,LRPSupervisor*)=0;
-        virtual void Normalize(int isite,LRPSupervisor*)=0; //Mixed Canonical normalization
+        virtual void Normalize(TensorNetworks::Direction LR)=0;
+        virtual void Normalize(int isite)=0; //Mixed Canonical normalization
 
-        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,int      Dmax,LRPSupervisor*)=0;
-        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,double epsMin,LRPSupervisor*)=0;
+        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,int      Dmax)=0;
+        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,double epsMin)=0;
 //--------------------------------------------------------------------------------------
 //
 // Find ground state.  Return <E^2>-<E>^2
 //
-        virtual double FindVariationalGroundState(const Hamiltonian* H,const IterationSchedule&,LRPSupervisor*)=0;
-        virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&,LRPSupervisor*)=0;
+        virtual double FindVariationalGroundState(const Hamiltonian* H,const IterationSchedule&)=0;
+        virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&)=0;
 //--------------------------------------------------------------------------------------
 //
 //  Vary this MPS to be as close as possible to Psi2 by minimizing ||this-Psi2||^2
 //
-        virtual void Optimize(const MPS* Psi2,const IterationScheduleLine&,LRPSupervisor*)=0; // Minimize ||this-Psi2||^2
+        virtual void Optimize(const MPS* Psi2,const IterationScheduleLine&)=0; // Minimize ||this-Psi2||^2
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions
@@ -74,8 +74,8 @@ class MPS : public virtual MultiPlotable
 //
 //    One and two site density matrix and expectation calculations
 //
-        virtual OneSiteDMs CalculateOneSiteDMs(LRPSupervisor*)=0;
-        virtual TwoSiteDMs CalculateTwoSiteDMs(LRPSupervisor*)=0;
+        virtual OneSiteDMs CalculateOneSiteDMs()=0;
+        virtual TwoSiteDMs CalculateTwoSiteDMs()=0;
 
 //--------------------------------------------------------------------------------------
 //

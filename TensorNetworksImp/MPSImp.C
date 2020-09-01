@@ -38,7 +38,7 @@ int GetD2(int a, int L, int d, int DMax)
 //
 //  Init/construction zone
 //
-MPSImp::MPSImp(int L, double S, int D,const Epsilons& eps)
+MPSImp::MPSImp(int L, double S, int D,const Epsilons& eps,LRPSupervisor* s)
     : itsL(L)
     , itsDmax(D)
     , itsS(S)
@@ -46,6 +46,7 @@ MPSImp::MPSImp(int L, double S, int D,const Epsilons& eps)
     , itsNSweep(0)
     , itsSelectedSite(1)
     , itsEpsilons(eps)
+    , itsSupervisor(s)
     , itsSitesMesh(0)
     , itsBondsMesh(0)
 {
@@ -71,6 +72,7 @@ MPSImp::MPSImp(const MPSImp& mps)
     , itsNSweep      (mps.itsNSweep)
     , itsSelectedSite(mps.itsSelectedSite)
     , itsEpsilons    (mps.itsEpsilons)
+    , itsSupervisor  (mps.itsSupervisor->Clone())
     , itsSitesMesh   (0)
     , itsBondsMesh   (0)
 {
@@ -164,53 +166,53 @@ c_str SiteMessage(const std::string& message,int isite)
 //
 //   Normalization routines
 //
-void MPSImp::Normalize(TensorNetworks::Direction LR,LRPSupervisor* Supervisor)
+void MPSImp::Normalize(TensorNetworks::Direction LR)
 {
     ForLoop(LR)
-    NormalizeSite(LR,ia,Supervisor);
+    NormalizeSite(LR,ia);
 }
 
 
-void MPSImp::NormalizeSite(TensorNetworks::Direction lr,int isite,LRPSupervisor* super)
+void MPSImp::NormalizeSite(TensorNetworks::Direction lr,int isite)
 {
     CheckSiteNumber(isite);
     std::string lrs=lr==TensorNetworks::DLeft ? "Left" : "Right";
-    super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize site ",isite),isite);
+    itsSupervisor->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize site ",isite),isite);
 //    cout << "SVD " << lrs << " site " << isite << endl;
     itsSites[isite]->SVDNormalize(lr);
-    super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize update Bond data ",isite),isite);
+    itsSupervisor->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize update Bond data ",isite),isite);
     int bond_index=isite+( lr==TensorNetworks::DLeft ? 0 :-1);
     if (bond_index<itsL && bond_index>=1)
         UpdateBondData(bond_index);
 }
 
-void MPSImp::NormalizeAndCompress(TensorNetworks::Direction LR,int      Dmax,LRPSupervisor* s)
+void MPSImp::NormalizeAndCompress(TensorNetworks::Direction LR,int      Dmax)
 {
 //    SetCanonicalBondDimensions(Invert(LR)); //Sweep backwards and set proper bond dimensions
     ForLoop(LR)
-    NormalizeAndCompressSite(LR,ia,Dmax,0.0,s);
+    NormalizeAndCompressSite(LR,ia,Dmax,0.0);
     itsDmax=Dmax;
 }
 
-void MPSImp::NormalizeAndCompress(TensorNetworks::Direction LR,double epsMin,LRPSupervisor* s)
+void MPSImp::NormalizeAndCompress(TensorNetworks::Direction LR,double epsMin)
 {
     ForLoop(LR)
-    NormalizeAndCompressSite(LR,ia,0,epsMin,s);
+    NormalizeAndCompressSite(LR,ia,0,epsMin);
     assert(false); //We need a way to set Dmax
 //    itsDmax=Dmax;
 //    SetCanonicalBondDimensions(Invert(LR)); //Sweep backwards and set proper bond dimensions
 }
 
-void MPSImp::NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,int Dmax, double epsMin, LRPSupervisor* super)
+void MPSImp::NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,int Dmax, double epsMin)
 {
     CheckSiteNumber(isite);
 //    cout << "----- Normalize and Compress site " << isite << " " << GetNormStatus() << " -----" << endl;
     std::string lrs=lr==TensorNetworks::DLeft ? "Left" : "Right";
-    super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize site ",isite),isite);
+    itsSupervisor->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize site ",isite),isite);
     //cout << "SVD " << lrs << " site " << isite << endl;
     itsSites[isite]->SVDNormalize(lr,Dmax,epsMin);
 
-    super->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize update Bond data ",isite),isite);
+    itsSupervisor->DoneOneStep(2,SiteMessage("SVD "+lrs+" Normalize update Bond data ",isite),isite);
     int bond_index=isite+( lr==TensorNetworks::DLeft ? 0 :-1);
     if (bond_index<itsL && bond_index>=1)
         UpdateBondData(bond_index);
@@ -219,14 +221,14 @@ void MPSImp::NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,int
 //
 //  Mixed canonical  A*A*A*A...A*M(isite)*B*B...B*B
 //
-void MPSImp::Normalize(int isite,LRPSupervisor* super)
+void MPSImp::Normalize(int isite)
 {
     CheckSiteNumber(isite);
     if (isite>1)
     {
         for (int ia=1; ia<isite; ia++)
         {
-            NormalizeSite(TensorNetworks::DLeft,ia,super);
+            NormalizeSite(TensorNetworks::DLeft,ia);
         }
 //        itsSites[isite]->ReshapeFromLeft(rank);
     }
@@ -235,7 +237,7 @@ void MPSImp::Normalize(int isite,LRPSupervisor* super)
     {
         for (int ia=itsL; ia>isite; ia--)
         {
-            NormalizeSite(TensorNetworks::DRight,ia,super);
+            NormalizeSite(TensorNetworks::DRight,ia);
         }
 //        itsSites[isite]->ReshapeFromRight(rank);
     }
@@ -270,42 +272,42 @@ void MPSImp::UpdateBondData(int isite)
 //
 // Find ground state
 //
-double MPSImp::FindVariationalGroundState(const Hamiltonian* H,const IterationSchedule& is,LRPSupervisor* supervisor)
+double MPSImp::FindVariationalGroundState(const Hamiltonian* H,const IterationSchedule& is)
 {
     double dE=0;
     for (is.begin(); !is.end(); is++)
-        dE=FindVariationalGroundState(H,*is,supervisor);
+        dE=FindVariationalGroundState(H,*is);
     return dE;
 }
 
-double MPSImp::FindVariationalGroundState(const Hamiltonian* hamiltonian, const IterationScheduleLine& isl,LRPSupervisor* Supervisor)
+double MPSImp::FindVariationalGroundState(const Hamiltonian* hamiltonian, const IterationScheduleLine& isl)
 {
-    Supervisor->ReadyToStart("Right normalize");
-    Normalize(TensorNetworks::DRight,Supervisor);
-    Supervisor->DoneOneStep(0,"Load L&R caches");
-    LoadHeffCaches(hamiltonian,Supervisor);
+    itsSupervisor->ReadyToStart("Right normalize");
+    Normalize(TensorNetworks::DRight);
+    itsSupervisor->DoneOneStep(0,"Load L&R caches");
+    LoadHeffCaches(hamiltonian);
 
     double E1=0;
     for (int in=0; in<isl.itsMaxGSSweepIterations; in++)
     {
-        Supervisor->DoneOneStep(0,"Sweep Right");
-        E1=Sweep(TensorNetworks::DLeft,hamiltonian,Supervisor,isl.itsEps);  //This actually sweeps to the right, but leaves left normalized sites in its wake
-        Supervisor->DoneOneStep(0,"Sweep Left");
-        E1=Sweep(TensorNetworks::DRight,hamiltonian,Supervisor,isl.itsEps);
+        itsSupervisor->DoneOneStep(0,"Sweep Right");
+        E1=Sweep(TensorNetworks::DLeft,hamiltonian,isl.itsEps);  //This actually sweeps to the right, but leaves left normalized sites in its wake
+        itsSupervisor->DoneOneStep(0,"Sweep Left");
+        E1=Sweep(TensorNetworks::DRight,hamiltonian,isl.itsEps);
         if (GetMaxDeltaE()<isl.itsEps.itsDelatEnergy1Epsilon) break;
     }
-    Supervisor->DoneOneStep(0,"Contracting <E^2>"); //Supervisor will update the graphs
+    itsSupervisor->DoneOneStep(0,"Contracting <E^2>"); //Supervisor will update the graphs
     double E2=GetExpectation(hamiltonian,hamiltonian);
     return E2-E1*E1;
 }
 
-double MPSImp::Sweep(TensorNetworks::Direction lr,const Hamiltonian* h,LRPSupervisor* Supervisor,const Epsilons& eps)
+double MPSImp::Sweep(TensorNetworks::Direction lr,const Hamiltonian* h,const Epsilons& eps)
 {
     int iter=0;
     ForLoop(lr)
     {
         CheckSiteNumber(ia);
-        Refine(lr,h,Supervisor,eps,ia);
+        Refine(lr,h,eps,ia);
         if (weHaveGraphs())
         {
             double de=fabs(itsSites[ia]->GetIterDE());
@@ -317,7 +319,7 @@ double MPSImp::Sweep(TensorNetworks::Direction lr,const Hamiltonian* h,LRPSuperv
         iter++; //ia doesn;t always count upwards, but this guy does.
     }
     itsNSweep++;
-    Supervisor->DoneOneStep(0,"Calculating Expectation <E>"); //Supervisor will update the graphs
+    itsSupervisor->DoneOneStep(0,"Calculating Expectation <E>"); //Supervisor will update the graphs
     double E1=GetExpectation(h);
     if (weHaveGraphs())
     {
@@ -327,21 +329,21 @@ double MPSImp::Sweep(TensorNetworks::Direction lr,const Hamiltonian* h,LRPSuperv
 }
 
 
-void MPSImp::Refine(TensorNetworks::Direction lr,const Hamiltonian *h,LRPSupervisor* Supervisor,const Epsilons& eps,int isite)
+void MPSImp::Refine(TensorNetworks::Direction lr,const Hamiltonian *h,const Epsilons& eps,int isite)
 {
 //    assert(CheckNormalized(isite,eps.itsNormalizationEpsilon));
     CheckSiteNumber(isite);
     assert(IsRLNormalized(isite));
     if (!itsSites[isite]->IsFrozen())
     {
-        Supervisor->DoneOneStep(2,"Calculating Heff",isite); //Supervisor will update the graphs
+        itsSupervisor->DoneOneStep(2,"Calculating Heff",isite); //Supervisor will update the graphs
         Matrix6T Heff6=GetHeffIterate(h,isite); //New iterative version
-        Supervisor->DoneOneStep(2,"Running eigen solver",isite); //Supervisor will update the graphs
+        itsSupervisor->DoneOneStep(2,"Running eigen solver",isite); //Supervisor will update the graphs
         itsSites[isite]->Refine(Heff6.Flatten(),eps);
     }
     itsSiteEnergies[isite]=itsSites[isite]->GetSiteEnergy();
     itsSiteEGaps   [isite]=itsSites[isite]->GetEGap      ();
-    NormalizeSite(lr,isite,Supervisor);
+    NormalizeSite(lr,isite);
     itsSites[isite]->UpdateCache(h->GetSiteOperator(isite),
                                  GetHeffCache(TensorNetworks::DLeft,isite-1),
                                  GetHeffCache(TensorNetworks::DRight,isite+1));
@@ -366,11 +368,10 @@ MPSImp::Matrix6T MPSImp::GetHeffIterate   (const Hamiltonian* h,int isite) const
     return itsSites[isite]->GetHeff(h->GetSiteOperator(isite),Lcache,Rcache);
 }
 
-void MPSImp::LoadHeffCaches(const Hamiltonian* h,LRPSupervisor* supervisor)
+void MPSImp::LoadHeffCaches(const Hamiltonian* h)
 {
-    assert(supervisor);
-    GetEOLeft_Iterate(h,supervisor,1,true);  //This does nothing because of the 1 ???
-    GetEORightIterate(h,supervisor,1,true);
+    GetEOLeft_Iterate(h,1,true);  //This does nothing because of the 1 ???
+    GetEORightIterate(h,1,true);
 }
 
 double  MPSImp::GetMaxDeltaE() const
@@ -384,15 +385,15 @@ double  MPSImp::GetMaxDeltaE() const
     return MaxDeltaE;
 }
 
-double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule& is,LRPSupervisor* supervisor)
+double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule& is)
 {
     double dE=0;
     for (is.begin(); !is.end(); is++)
-        dE=FindiTimeGroundState(H,*is,supervisor);
+        dE=FindiTimeGroundState(H,*is);
     return dE;
 }
 
-double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationScheduleLine& isl,LRPSupervisor* supervisor)
+double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationScheduleLine& isl)
 {
     double E1=GetExpectation(H)/(itsL-1);
     cout << isl << endl;
@@ -408,12 +409,12 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
         //
         //  Compress in both directions
         //
-        NormalizeAndCompress(TensorNetworks::DLeft ,isl.itsDmax,supervisor);
-        NormalizeAndCompress(TensorNetworks::DRight,isl.itsDmax,supervisor);
+        NormalizeAndCompress(TensorNetworks::DLeft ,isl.itsDmax);
+        NormalizeAndCompress(TensorNetworks::DRight,isl.itsDmax);
         //
         // Now optimise this to be as close as possible to Psi2
         //
-        Optimize(Psi2,isl,supervisor);
+        Optimize(Psi2,isl);
         //
         //  Check energy convergence
         //
@@ -433,18 +434,18 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
 //  Vary this MPS to be as close as possible to Psi2 by minimizing ||this-Psi2||^2
 //
 void MPSImp::Optimize
-(const MPS* Psi2,const IterationScheduleLine& isl,LRPSupervisor* Supervisor)
+(const MPS* Psi2,const IterationScheduleLine& isl)
 {
-    LoadCaches(Psi2,Supervisor);
+    LoadCaches(Psi2);
 
     for (int in=0; in<isl.itsMaxOptimizeIterations; in++)
     {
-        Supervisor->DoneOneStep(0,"Sweep Right");
-        double O1=Sweep(TensorNetworks::DLeft,Psi2,Supervisor);  //This actually sweeps to the right, but leaves left normalized sites in its wake
+        itsSupervisor->DoneOneStep(0,"Sweep Right");
+        double O1=Sweep(TensorNetworks::DLeft,Psi2);  //This actually sweeps to the right, but leaves left normalized sites in its wake
 
 //        cout << "Left  " << in << " Norm error=" << O1 << endl;
-        Supervisor->DoneOneStep(0,"Sweep Left");
-        double O2=Sweep(TensorNetworks::DRight,Psi2,Supervisor);
+        itsSupervisor->DoneOneStep(0,"Sweep Left");
+        double O2=Sweep(TensorNetworks::DRight,Psi2);
 //        cout << "Right " << in << " Norm error=" << O2 << endl;
         //cout << "Norm change=" << O2-O1 << endl;
         if (fabs(O2-O1)<=isl.itsEps.itsDelatNormEpsilon) break;
@@ -459,7 +460,7 @@ void MPSImp::Optimize
 //    Supervisor->DoneOneStep(0,"Contracting <E^2>"); //Supervisor will update the graphs
 }
 
-double MPSImp::Sweep(TensorNetworks::Direction lr,const MPS* Psi2,LRPSupervisor* Supervisor)
+double MPSImp::Sweep(TensorNetworks::Direction lr,const MPS* Psi2)
 {
     int iter=0;
     const MPSImp* psi2Imp=dynamic_cast<const MPSImp*>(Psi2);
@@ -472,13 +473,13 @@ double MPSImp::Sweep(TensorNetworks::Direction lr,const MPS* Psi2,LRPSupervisor*
 //        cout << "----- Opimizing site " << ia << " " << GetNormStatus() << " -----" << endl;
 
         assert(IsRLNormalized(ia));
-        assert(GetRLCache(TensorNetworks::DLeft,ia-1)==GetEOLeft_Iterate(Psi2,Supervisor,ia,false));
-        assert(GetRLCache(TensorNetworks::DRight,ia+1)==GetEORightIterate(Psi2,Supervisor,ia,false));
+        assert(GetRLCache(TensorNetworks::DLeft ,ia-1)==GetEOLeft_Iterate(Psi2,ia,false));
+        assert(GetRLCache(TensorNetworks::DRight,ia+1)==GetEORightIterate(Psi2,ia,false));
         itsSites[ia]->Optimize(psi2Imp->itsSites[ia],
                                GetRLCache(TensorNetworks::DLeft,ia-1),
                                GetRLCache(TensorNetworks::DRight,ia+1));
         MTrace=itsSites[ia]->IterateF(lr,MTrace);
-        NormalizeSite(lr,ia,Supervisor);
+        NormalizeSite(lr,ia);
         itsSites[ia]->UpdateCache(psi2Imp->itsSites[ia],
                                   GetRLCache(TensorNetworks::DLeft,ia-1),
                                   GetRLCache(TensorNetworks::DRight,ia+1));
@@ -494,7 +495,6 @@ double MPSImp::Sweep(TensorNetworks::Direction lr,const MPS* Psi2,LRPSupervisor*
     double IM=imag(MTrace(1,1));
     if (fabs(IM)>1e-10)
         cout << "Warning: MatrixProductState::Sweep Imag(M)=" << IM << endl;
-    Supervisor->DoneOneStep(0,"Calculating Expectation <E>"); //Supervisor will update the graphs
     return 1.0-real(MTrace(1,1));
 }
 
@@ -507,11 +507,10 @@ MPSImp::MatrixCT MPSImp::GetRLCache (TensorNetworks::Direction lr,int isite) con
     return RL;
 }
 
-void MPSImp::LoadCaches(const MPS* Psi2,LRPSupervisor* supervisor)
+void MPSImp::LoadCaches(const MPS* Psi2)
 {
-    assert(supervisor);
-    GetEOLeft_Iterate(Psi2,supervisor,itsL,true);
-    GetEORightIterate(Psi2,supervisor,   1,true);
+    GetEOLeft_Iterate(Psi2,itsL,true);
+    GetEORightIterate(Psi2,   1,true);
 }
 
 
@@ -581,7 +580,7 @@ void  MPSImp::ApplyInPlace(const Operator* o)
 
 MPS*  MPSImp::Apply(const Operator* o) const
 {
-    MPSImp* psiPrime=new MPSImp(itsL,itsS,1,itsEpsilons);
+    MPSImp* psiPrime=new MPSImp(itsL,itsS,1,itsEpsilons,itsSupervisor->Clone());
     SiteLoop(ia)
     {
 //        cout << "------------- Site " << ia << "-----------------" << endl;
@@ -639,15 +638,14 @@ bool MPSImp::IsRLNormalized(int isite) const
 //
 //  Used to calculate Hamiltonian L&R caches for Heff calcultions.
 //
-MPSImp::Vector3T MPSImp::GetEOLeft_Iterate(const Operator* o,LRPSupervisor* supervisor,int isite, bool cache) const
+MPSImp::Vector3T MPSImp::GetEOLeft_Iterate(const Operator* o,int isite, bool cache) const
 {
 //    CheckSiteNumber(isite);  this function accepts out of bounds site numbers
-    assert(supervisor);
     Vector3T F(1,1,1,1);
     F(1,1,1)=eType(1.0);
     for (int ia=1; ia<isite; ia++)
     {
-        supervisor->DoneOneStep(1,SiteMessage("Calculating L cache for site ",ia));
+        itsSupervisor->DoneOneStep(1,SiteMessage("Calculating L cache for site ",ia));
         F=itsSites[ia]->IterateLeft_F(o->GetSiteOperator(ia),F,cache);
     }
     return F;
@@ -655,15 +653,14 @@ MPSImp::Vector3T MPSImp::GetEOLeft_Iterate(const Operator* o,LRPSupervisor* supe
 //
 //  Used to calculate Hamiltonian L&R caches for Heff calcultions.
 //
-MPSImp::Vector3T MPSImp::GetEORightIterate(const Operator* o,LRPSupervisor* supervisor,int isite, bool cache) const
+MPSImp::Vector3T MPSImp::GetEORightIterate(const Operator* o,int isite, bool cache) const
 {
 //    CheckSiteNumber(isite); this function accepts out of bounds site numbers
-    assert(supervisor);
     Vector3T F(1,1,1,1);
     F(1,1,1)=eType(1.0);
     for (int ia=itsL; ia>isite; ia--)
     {
-        supervisor->DoneOneStep(1,SiteMessage("Calculating R cache for site ",ia));
+        itsSupervisor->DoneOneStep(1,SiteMessage("Calculating R cache for site ",ia));
         F=itsSites[ia]->IterateRightF(o->GetSiteOperator(ia),F,cache);
     }
     return F;
@@ -671,10 +668,9 @@ MPSImp::Vector3T MPSImp::GetEORightIterate(const Operator* o,LRPSupervisor* supe
 //
 //  Used to calculate  L&R caches for <psi_tilde|psi> calcultions.
 //
-MPSImp::MatrixCT MPSImp::GetEOLeft_Iterate(const MPS* psi2,LRPSupervisor* supervisor,int isite, bool cache) const
+MPSImp::MatrixCT MPSImp::GetEOLeft_Iterate(const MPS* psi2,int isite, bool cache) const
 {
 //    CheckSiteNumber(isite);  this function accepts out of bounds site numbers
-    assert(supervisor);
     const MPSImp* psi2Imp=dynamic_cast<const MPSImp*>(psi2);
     assert(psi2Imp);
 
@@ -682,7 +678,7 @@ MPSImp::MatrixCT MPSImp::GetEOLeft_Iterate(const MPS* psi2,LRPSupervisor* superv
     F(1,1)=eType(1.0);
     for (int ia=1; ia<isite; ia++)
     {
-        supervisor->DoneOneStep(1,SiteMessage("Calculating L cache for site ",ia));
+        itsSupervisor->DoneOneStep(1,SiteMessage("Calculating L cache for site ",ia));
         F=itsSites[ia]->IterateLeft_F(psi2Imp->itsSites[ia],F,cache);
     }
     return F;
@@ -690,32 +686,31 @@ MPSImp::MatrixCT MPSImp::GetEOLeft_Iterate(const MPS* psi2,LRPSupervisor* superv
 //
 //  Used to calculate  L&R caches for <psi_tilde|psi> calcultions.
 //
-MPSImp::MatrixCT MPSImp::GetEORightIterate(const MPS* psi2,LRPSupervisor* supervisor,int isite, bool cache) const
+MPSImp::MatrixCT MPSImp::GetEORightIterate(const MPS* psi2,int isite, bool cache) const
 {
 //    CheckSiteNumber(isite); this function accepts out of bounds site numbers
-    assert(supervisor);
     const MPSImp* psi2Imp=dynamic_cast<const MPSImp*>(psi2);
     assert(psi2Imp);
     MatrixCT F(1,1);
     F(1,1)=eType(1.0);
     for (int ia=itsL; ia>isite; ia--)
     {
-        supervisor->DoneOneStep(1,SiteMessage("Calculating R cache for site ",ia));
+        itsSupervisor->DoneOneStep(1,SiteMessage("Calculating R cache for site ",ia));
         F=itsSites[ia]->IterateRightF(psi2Imp->itsSites[ia],F,cache);
     }
     return F;
 }
 
 
-OneSiteDMs MPSImp::CalculateOneSiteDMs(LRPSupervisor* supervisor)
+OneSiteDMs MPSImp::CalculateOneSiteDMs()
 {
     OneSiteDMs ret(itsL,itsd);
-    Normalize(TensorNetworks::DRight,supervisor);
+    Normalize(TensorNetworks::DRight);
     SiteLoop(ia)
     {
-        supervisor->DoneOneStep(2,SiteMessage("Calculate ro(mn) site: ",ia),ia);
+        itsSupervisor->DoneOneStep(2,SiteMessage("Calculate ro(mn) site: ",ia),ia);
         ret.Insert(ia,itsSites[ia]->CalculateOneSiteDM());
-        NormalizeSite(TensorNetworks::DLeft,ia,supervisor);
+        NormalizeSite(TensorNetworks::DLeft,ia);
     }
     return ret;
 }
@@ -750,18 +745,18 @@ MPSImp::Matrix4T MPSImp::CalculateTwoSiteDM(int ia,int ib) const
 }
 
 
-TwoSiteDMs MPSImp::CalculateTwoSiteDMs(LRPSupervisor* supervisor)
+TwoSiteDMs MPSImp::CalculateTwoSiteDMs()
 {
-    Normalize(TensorNetworks::DRight,supervisor);
+    Normalize(TensorNetworks::DRight);
     TwoSiteDMs ret(itsL,itsd);
     SiteLoop(ia)
     for (int ib=ia+1; ib<=itsL; ib++)
     {
         Matrix4T ro=CalculateTwoSiteDM(ia,ib);
         ret.Insert(ia,ib,ro);
-        NormalizeSite(TensorNetworks::DLeft,ia,supervisor);
+        NormalizeSite(TensorNetworks::DLeft,ia);
     }
     // Normalize the last to keep things tidy
-    NormalizeSite(TensorNetworks::DLeft,itsL,supervisor);
+    NormalizeSite(TensorNetworks::DLeft,itsL);
     return ret;
 }

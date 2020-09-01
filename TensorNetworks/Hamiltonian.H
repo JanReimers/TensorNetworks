@@ -10,6 +10,7 @@ class MPS;
 class MPO;
 class FullState;
 class Epsilons;
+class LRPSupervisor;
 
 class Hamiltonian : public virtual Operator
 {
@@ -22,7 +23,7 @@ class Hamiltonian : public virtual Operator
         virtual int Getd() const=0; //Dimension of the one site Hilbert space
 
         //  Creates an MPS or operators with the correct lattice size and spin space.
-        virtual MPS* CreateMPS     (int D,const Epsilons&) const=0;
+        virtual MPS* CreateMPS     (int D,const Epsilons&, LRPSupervisor*) const=0;
         //  Create full lattice of operators
         virtual Operator*           CreateOperator(const OperatorWRepresentation*) const=0;
         //  Create full lattice of unit operators

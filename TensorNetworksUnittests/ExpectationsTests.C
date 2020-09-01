@@ -43,13 +43,13 @@ public:
         delete itsH;
         delete itsMPS;
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsMPS=itsH->CreateMPS(D,itsEps);
+        itsMPS=itsH->CreateMPS(D,itsEps,itsLRPSupervisor);
         itsMPS->InitializeWith(TensorNetworks::Random);
 
         TensorNetworks::TrotterOrder o=TensorNetworks::FirstOrder;
         IterationSchedule is;
         is.Insert({20,0,8,0.0,o,itsEps});
-        itsMPS->FindVariationalGroundState(itsH,is,itsLRPSupervisor);
+        itsMPS->FindVariationalGroundState(itsH,is);
     }
 
 
@@ -91,7 +91,7 @@ TEST_F(ExpectationsTesting,TestOneSiteDMs)
     int L=9,D=4;
     double S=0.5;
     Setup(L,S,D);
-    OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs(itsLRPSupervisor);
+    OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs();
     OneSiteDMs::ExpectationT traces=ro1.GetTraces();
     double eps=1e-14;
     for (int ia=1;ia<=L;ia++)
@@ -127,7 +127,7 @@ TEST_F(ExpectationsTesting,TestOneSiteExpectations)
 
     SpinCalculator sc(S);
 
-    OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs(itsLRPSupervisor);
+    OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs();
     OneSiteDMs::ExpectationT Sx=ro1.Contract(sc.GetSx());
     OneSiteDMs::ExpectationT Sy=ro1.Contract(sc.GetSy());
     OneSiteDMs::ExpectationT Sz=ro1.Contract(sc.GetSz());
@@ -169,14 +169,14 @@ TEST_F(ExpectationsTesting,TestFreezeL9S1D2)
         itsEps.itsDelatEnergy1Epsilon=1e-9;
         is.Insert({maxIter,0,0,0.0,o,itsEps});
 
-    int nSweep=itsMPS->FindVariationalGroundState(itsH,is,new LRPSupervisor());
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.45317425 ,1e-7);
     EXPECT_LT(nSweep,maxIter);
 
     SpinCalculator sc(S);
-    OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs(itsLRPSupervisor);
+    OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs();
     OneSiteDMs::ExpectationT Sx=ro1.Contract(sc.GetSx());
     OneSiteDMs::ExpectationT Sy=ro1.Contract(sc.GetSy());
     OneSiteDMs::ExpectationT Sz=ro1.Contract(sc.GetSz());
@@ -331,7 +331,7 @@ TEST_F(ExpectationsTesting,TestTwoSiteDMs)
 
 
 
-    TwoSiteDMs ros=itsMPS->CalculateTwoSiteDMs(itsLRPSupervisor);
+    TwoSiteDMs ros=itsMPS->CalculateTwoSiteDMs();
     TwoSiteDMs::ExpectationT traces=ros.GetTraces();
     TwoSiteDMs::ExpectationT VNs=ros.GetVNEntropies();
      for (int ia=1; ia<L; ia++)
@@ -361,7 +361,7 @@ TEST_F(ExpectationsTesting,TestTwoSiteDMs)
             EXPECT_NEAR(SzSz(ia,ib),SzSz_mpo(ia,ib),eps);
         }
 
-    OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs(itsLRPSupervisor);
+    OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs();
 //    OneSiteDMs::ExpectationT Sx=ro1.Contract(sc.GetSx());
 //    OneSiteDMs::ExpectationT Sy=ro1.Contract(sc.GetSy());
 //    OneSiteDMs::ExpectationT Sz=ro1.Contract(sc.GetSz());

@@ -17,6 +17,7 @@ class LRPSupervisor
 
         virtual void ReadyToStart(c_str /*currentOperation*/) {};
         virtual void DoneOneStep(int /*level*/,c_str /*currentOperation*/, int isite=-1) {(void)isite;} //comment name to avoid warning
+        virtual LRPSupervisor* Clone() const {return new LRPSupervisor();}
 };
 
 #endif // LRPSUPERVISOR_H

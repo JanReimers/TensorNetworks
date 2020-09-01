@@ -18,6 +18,7 @@ public:
     : eps(1.0e-13)
     , itsFactory(TensorNetworks::Factory::GetFactory())
     , itsEps()
+    , itsSupervisor(new LRPSupervisor())
     {
         StreamableObject::SetToPretty();
 
@@ -26,7 +27,7 @@ public:
     void Setup(int L, double S, int D)
     {
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsMPS=itsH->CreateMPS(D,itsEps);
+        itsMPS=itsH->CreateMPS(D,itsEps,itsSupervisor);
     }
 
 
@@ -35,6 +36,7 @@ public:
     Hamiltonian*         itsH;
     MPS*                 itsMPS;
     Epsilons             itsEps;
+    LRPSupervisor*       itsSupervisor;
 };
 
 
@@ -42,7 +44,7 @@ TEST_F(GroundStateTesting,TestIdentityOperator)
 {
     Setup(10,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::DLeft,new LRPSupervisor());
+    itsMPS->Normalize(TensorNetworks::DLeft);
     OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
     Operator* IO=itsH->CreateOperator(IWO);
     double S=itsMPS->GetExpectation(IO);
@@ -64,7 +66,7 @@ TEST_F(GroundStateTesting,TestSweepL9S1D2)
     IterationSchedule is;
     is.Insert({maxIter,0,0,0.9,o,eps});
 
-    int nSweep=itsMPS->FindVariationalGroundState(itsH,is,new LRPSupervisor());
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.45317425,1e-7);
@@ -87,7 +89,7 @@ TEST_F(GroundStateTesting,TestSweepL9S1D8)
     IterationSchedule is;
     is.Insert({maxIter,0,0,0.9,o,eps});
 
-    int nSweep=itsMPS->FindVariationalGroundState(itsH,is,new LRPSupervisor());
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.46703753,1e-7);
@@ -106,7 +108,7 @@ TEST_F(GroundStateTesting,TestSweepL9S5D2)
     TensorNetworks::TrotterOrder o=TensorNetworks::FirstOrder;
     IterationSchedule is;
     is.Insert({maxIter,0,0,0.9,o,eps});
-    int nSweep=itsMPS->FindVariationalGroundState(itsH,is,new LRPSupervisor());
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-7.025661 ,1e-7);
@@ -126,7 +128,7 @@ TEST_F(GroundStateTesting,TestFreezeL9S1D2)
     TensorNetworks::TrotterOrder o=TensorNetworks::FirstOrder;
     IterationSchedule is;
     is.Insert({maxIter,0,0,0.9,o,eps});
-    int nSweep=itsMPS->FindVariationalGroundState(itsH,is,new LRPSupervisor());
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.45317425 ,1e-7);
@@ -171,7 +173,7 @@ TEST_F(GroundStateTesting,TestSweepL19S1D8)
 
     StopWatch sw;
     sw.Start();
-    int nSweep=itsMPS->FindVariationalGroundState(itsH,is,new LRPSupervisor());
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
     sw.Stop();
     cout << "FindGroundState for L=" << L << ", S=" << S << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
 

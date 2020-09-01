@@ -36,7 +36,7 @@ public:
     void Setup(int L, double S, int D)
     {
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsMPS=itsH->CreateMPS(D,itsEps);
+        itsMPS=itsH->CreateMPS(D,itsEps,itsSupervisor);
     }
 
 
@@ -54,11 +54,11 @@ TEST_F(ImaginaryTimeTesting,TestApplyIdentity)
 {
     int D=1;
     Setup(3,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D,itsEps);
+    MPS* Psi1=itsH->CreateMPS(D,itsEps,itsSupervisor);
     Psi1->InitializeWith(TensorNetworks::Neel);
     double E1=Psi1->GetExpectation(itsH);
-    Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
-    Psi1->Normalize(TensorNetworks::DLeft ,itsSupervisor);
+    Psi1->Normalize(TensorNetworks::DRight);
+    Psi1->Normalize(TensorNetworks::DLeft );
     EXPECT_NEAR(Psi1->GetExpectation(itsH) ,E1,eps);
 
     OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
@@ -91,9 +91,9 @@ TEST_F(ImaginaryTimeTesting,TestMPPOCombine)
     //
     //  Make a random normalized wave function
     //
-    MPS* Psi1=itsH->CreateMPS(D,itsEps);
+    MPS* Psi1=itsH->CreateMPS(D,itsEps,itsSupervisor);
     Psi1->InitializeWith(TensorNetworks::Random);
-    Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
+    Psi1->Normalize(TensorNetworks::DRight);
     //
     //  Psi2 = W*Psi1
     //
@@ -137,10 +137,10 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt0)
     int D=8,L=9;
     double dt=0.0,epsSVD=1e-5                                                                                                                                                                                                        ;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D,itsEps);
+    MPS* Psi1=itsH->CreateMPS(D,itsEps,itsSupervisor);
     Psi1->InitializeWith(TensorNetworks::Random);
-    Psi1->Normalize(TensorNetworks::DLeft ,itsSupervisor);
-    Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
+    Psi1->Normalize(TensorNetworks::DLeft );
+    Psi1->Normalize(TensorNetworks::DRight);
 
     //Since dt=0 W should be unit operator.
     MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
@@ -165,10 +165,10 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05)
     int D=8,L=9;
     double dt=0.05,epsSVD=1e-5                                                                                                                                                                                                        ;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D,itsEps);
+    MPS* Psi1=itsH->CreateMPS(D,itsEps,itsSupervisor);
     Psi1->InitializeWith(TensorNetworks::Random);
-    Psi1->Normalize(TensorNetworks::DLeft ,itsSupervisor);
-    Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
+    Psi1->Normalize(TensorNetworks::DLeft );
+    Psi1->Normalize(TensorNetworks::DRight);
 
     //Since dt=0 W should be unit operator.
     MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
@@ -221,10 +221,10 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 {
     int D=8,L=9;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D,itsEps);
+    MPS* Psi1=itsH->CreateMPS(D,itsEps,itsSupervisor);
 //    Psi1->Report(cout);
     Psi1->InitializeWith(TensorNetworks::Random);
-    Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
+    Psi1->Normalize(TensorNetworks::DRight);
     double E1=Psi1->GetExpectation(itsH);
     cout << "E1=" << std::fixed << E1 << endl;
     cout << "Psi1 overlap=" << Psi1->GetOverlap(Psi1) << endl;
@@ -252,7 +252,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
     is.Insert({500,6,8,0.002,FirstOrder,eps});
     cout << is;
 
-    Psi1->FindiTimeGroundState(itsH,is,itsSupervisor);
+    Psi1->FindiTimeGroundState(itsH,is);
 
     double E2=Psi1->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46703753,1e-5);
@@ -267,10 +267,10 @@ TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
 {
     int D=8,L=9;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D,itsEps);
+    MPS* Psi1=itsH->CreateMPS(D,itsEps,itsSupervisor);
 //    Psi1->Report(cout);
     Psi1->InitializeWith(TensorNetworks::Random);
-    Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
+    Psi1->Normalize(TensorNetworks::DRight);
     double E1=Psi1->GetExpectation(itsH);
     cout << "E1=" << std::fixed << E1 << endl;
     cout << "Psi1 overlap=" << Psi1->GetOverlap(Psi1) << endl;
@@ -291,7 +291,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
 
     cout << is;
 
-    Psi1->FindiTimeGroundState(itsH,is,itsSupervisor);
+    Psi1->FindiTimeGroundState(itsH,is);
 
     double E2=Psi1->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46703753,1e-7);
@@ -303,10 +303,10 @@ TEST_F(ImaginaryTimeTesting,TestITimeFourthOrderTrotter)
 {
     int D=8,L=9;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D,itsEps);
+    MPS* Psi1=itsH->CreateMPS(D,itsEps,itsSupervisor);
 //    Psi1->Report(cout);
     Psi1->InitializeWith(TensorNetworks::Random);
-    Psi1->Normalize(TensorNetworks::DRight,itsSupervisor);
+    Psi1->Normalize(TensorNetworks::DRight);
     double E1=Psi1->GetExpectation(itsH);
     cout << "E1=" << std::fixed << E1 << endl;
     cout << "Psi1 overlap=" << Psi1->GetOverlap(Psi1) << endl;
@@ -327,7 +327,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFourthOrderTrotter)
 
     cout << is;
 
-    Psi1->FindiTimeGroundState(itsH,is,itsSupervisor);
+    Psi1->FindiTimeGroundState(itsH,is);
 
     double E2=Psi1->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46703753,1e-7);

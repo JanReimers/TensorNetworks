@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "Tests.H"
 #include "TensorNetworks/Epsilons.H"
+#include "TensorNetworks/LRPSupervisor.H"
 #include "oml/stream.h"
 #include "oml/random.h"
 #include <complex>
@@ -23,7 +24,7 @@ public:
     void Setup(int L, double  S, int D)
     {
         delete itsMPS;
-        itsMPS=new MPSImp(L,S,D,itsEps);
+        itsMPS=new MPSImp(L,S,D,itsEps, new LRPSupervisor());
     }
 
 
