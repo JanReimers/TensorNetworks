@@ -66,9 +66,8 @@ public:
 //
 // Find ground state
 //
-        virtual double FindGroundState(const Hamiltonian* H,int maxIter, const Epsilons& eps,LRPSupervisor*);
-        virtual double FindGroundState(const Hamiltonian* H,const IterationSchedule&    ,LRPSupervisor*);
-        virtual double FindGroundState(const Hamiltonian* H,const IterationScheduleLine&,LRPSupervisor*);
+        virtual double FindVariationalGroundState(const Hamiltonian* H,const IterationSchedule&    ,LRPSupervisor*);
+        virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&    ,LRPSupervisor*);
 //--------------------------------------------------------------------------------------
 //
 //  Vary this MPS to be as close as possible to Psi2 by minimizing ||this-Psi2||^2
@@ -125,13 +124,15 @@ private:
 //
 //  For groound state search
 //
-        void     Refine(TensorNetworks::Direction lr,const Hamiltonian *h,LRPSupervisor*,const Epsilons& eps,int isite); //Minimize energy WRT the Ms in one site.
-        double   Sweep (TensorNetworks::Direction lr,const Hamiltonian* h,LRPSupervisor*,const Epsilons& eps);
-        void     UpdateBondData(int isite);
-        void     NormalizeSite(TensorNetworks::Direction lr,int isite,LRPSupervisor*);
-        void     NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,int Dmax, double epsMin, LRPSupervisor*);
-        void     SetCanonicalBondDimensions(TensorNetworks::Direction lr);
-//--------------------------------------------------------------------------------------
+        double FindVariationalGroundState(const Hamiltonian*,const IterationScheduleLine&,LRPSupervisor*);
+        double FindiTimeGroundState      (const Hamiltonian*,const IterationScheduleLine&,LRPSupervisor*);
+        void   Refine(TensorNetworks::Direction lr,const Hamiltonian*,LRPSupervisor*,const Epsilons&,int isite); //Minimize energy WRT the Ms in one site.
+        double Sweep (TensorNetworks::Direction lr,const Hamiltonian*,LRPSupervisor*,const Epsilons&);
+        void   UpdateBondData(int isite);
+        void   NormalizeSite(TensorNetworks::Direction lr,int isite,LRPSupervisor*);
+        void   NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,int Dmax, double epsMin, LRPSupervisor*);
+        void   SetCanonicalBondDimensions(TensorNetworks::Direction lr);
+//-------------------------------------------------------------------------------------
 //
 // Calc Heff, calc L&R caches
 //

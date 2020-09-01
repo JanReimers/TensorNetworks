@@ -270,7 +270,15 @@ void MPSImp::UpdateBondData(int isite)
 //
 // Find ground state
 //
-double MPSImp::FindGroundState(const Hamiltonian* hamiltonian, int maxIter, const Epsilons& eps,LRPSupervisor* Supervisor)
+double MPSImp::FindVariationalGroundState(const Hamiltonian* H,const IterationSchedule& is,LRPSupervisor* supervisor)
+{
+    double dE=0;
+    for (is.begin(); !is.end(); is++)
+        dE=FindVariationalGroundState(H,*is,supervisor);
+    return dE;
+}
+
+double MPSImp::FindVariationalGroundState(const Hamiltonian* hamiltonian, const IterationScheduleLine& isl,LRPSupervisor* Supervisor)
 {
     Supervisor->ReadyToStart("Right normalize");
     Normalize(TensorNetworks::DRight,Supervisor);
@@ -278,13 +286,13 @@ double MPSImp::FindGroundState(const Hamiltonian* hamiltonian, int maxIter, cons
     LoadHeffCaches(hamiltonian,Supervisor);
 
     double E1=0;
-    for (int in=0; in<maxIter; in++)
+    for (int in=0; in<isl.itsMaxGSSweepIterations; in++)
     {
         Supervisor->DoneOneStep(0,"Sweep Right");
-        E1=Sweep(TensorNetworks::DLeft,hamiltonian,Supervisor,eps);  //This actually sweeps to the right, but leaves left normalized sites in its wake
+        E1=Sweep(TensorNetworks::DLeft,hamiltonian,Supervisor,isl.itsEps);  //This actually sweeps to the right, but leaves left normalized sites in its wake
         Supervisor->DoneOneStep(0,"Sweep Left");
-        E1=Sweep(TensorNetworks::DRight,hamiltonian,Supervisor,eps);
-        if (GetMaxDeltaE()<eps.itsDelatEnergy1Epsilon) break;
+        E1=Sweep(TensorNetworks::DRight,hamiltonian,Supervisor,isl.itsEps);
+        if (GetMaxDeltaE()<isl.itsEps.itsDelatEnergy1Epsilon) break;
     }
     Supervisor->DoneOneStep(0,"Contracting <E^2>"); //Supervisor will update the graphs
     double E2=GetExpectation(hamiltonian,hamiltonian);
@@ -376,15 +384,15 @@ double  MPSImp::GetMaxDeltaE() const
     return MaxDeltaE;
 }
 
-double MPSImp::FindGroundState(const Hamiltonian* H,const IterationSchedule& is,LRPSupervisor* supervisor)
+double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule& is,LRPSupervisor* supervisor)
 {
     double dE=0;
     for (is.begin(); !is.end(); is++)
-        dE=FindGroundState(H,*is,supervisor);
+        dE=FindiTimeGroundState(H,*is,supervisor);
     return dE;
 }
 
-double MPSImp::FindGroundState(const Hamiltonian* H,const IterationScheduleLine& isl,LRPSupervisor* supervisor)
+double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationScheduleLine& isl,LRPSupervisor* supervisor)
 {
     double E1=GetExpectation(H)/(itsL-1);
     cout << isl << endl;

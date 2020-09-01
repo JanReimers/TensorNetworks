@@ -131,7 +131,7 @@
 		<Unit filename="TensorNetworks/IterationSchedule.H" />
 		<Unit filename="TensorNetworks/LRPSupervisor.H" />
 		<Unit filename="TensorNetworks/MPO.H" />
-		<Unit filename="TensorNetworks/MatrixProductState.H" />
+		<Unit filename="TensorNetworks/MPS.H" />
 		<Unit filename="TensorNetworks/MultiPlotable.H" />
 		<Unit filename="TensorNetworks/Operator.H" />
 		<Unit filename="TensorNetworks/OperatorWRepresentation.H" />
@@ -161,18 +161,18 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/LapackSVD.H" />
-		<Unit filename="TensorNetworksImp/MatrixProductSite.C">
+		<Unit filename="TensorNetworksImp/MPSImp.C">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="TensorNetworksImp/MatrixProductSite.H" />
-		<Unit filename="TensorNetworksImp/MatrixProductSite_Contractions.C">
+		<Unit filename="TensorNetworksImp/MPSImp.H" />
+		<Unit filename="TensorNetworksImp/MPSImp_Plotting.C">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="TensorNetworksImp/MatrixProductStateImp.C">
+		<Unit filename="TensorNetworksImp/MPSSite.C">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="TensorNetworksImp/MatrixProductStateImp.H" />
-		<Unit filename="TensorNetworksImp/MatrixProductStateImp_Plotting.C">
+		<Unit filename="TensorNetworksImp/MPSSite.H" />
+		<Unit filename="TensorNetworksImp/MPSSite_Contractions.C">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/MultiPlotableImp.C">

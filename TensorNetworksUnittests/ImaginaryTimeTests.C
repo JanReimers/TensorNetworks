@@ -2,7 +2,6 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/IterationSchedule.H"
-//#include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/LRPSupervisor.H"
@@ -253,7 +252,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
     is.Insert({500,6,8,0.002,FirstOrder,eps});
     cout << is;
 
-    Psi1->FindGroundState(itsH,is,itsSupervisor);
+    Psi1->FindiTimeGroundState(itsH,is,itsSupervisor);
 
     double E2=Psi1->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46703753,1e-5);
@@ -292,7 +291,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
 
     cout << is;
 
-    Psi1->FindGroundState(itsH,is,itsSupervisor);
+    Psi1->FindiTimeGroundState(itsH,is,itsSupervisor);
 
     double E2=Psi1->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46703753,1e-7);
@@ -328,7 +327,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFourthOrderTrotter)
 
     cout << is;
 
-    Psi1->FindGroundState(itsH,is,itsSupervisor);
+    Psi1->FindiTimeGroundState(itsH,is,itsSupervisor);
 
     double E2=Psi1->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46703753,1e-7);

@@ -2,7 +2,7 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/LRPSupervisor.H"
-#include "TensorNetworks/Epsilons.H"
+#include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 #include "Operators/MPO_OneSite.H"
 #include "Operators/MPO_TwoSite.H"
@@ -42,10 +42,14 @@ public:
     {
         delete itsH;
         delete itsMPS;
-       itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
         itsMPS=itsH->CreateMPS(D,itsEps);
         itsMPS->InitializeWith(TensorNetworks::Random);
-        itsMPS->FindGroundState(itsH,20,itsEps,itsLRPSupervisor);
+
+        TensorNetworks::TrotterOrder o=TensorNetworks::FirstOrder;
+        IterationSchedule is;
+        is.Insert({20,0,8,0.0,o,itsEps});
+        itsMPS->FindVariationalGroundState(itsH,is,itsLRPSupervisor);
     }
 
 
@@ -158,7 +162,14 @@ TEST_F(ExpectationsTesting,TestFreezeL9S1D2)
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Freeze(L,S); //Site 0 spin up
-    int nSweep=itsMPS->FindGroundState(itsH,maxIter,1e-9,new LRPSupervisor());
+
+
+        TensorNetworks::TrotterOrder o=TensorNetworks::FirstOrder;
+        IterationSchedule is;
+        itsEps.itsDelatEnergy1Epsilon=1e-9;
+        is.Insert({maxIter,0,0,0.0,o,itsEps});
+
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is,new LRPSupervisor());
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.45317425 ,1e-7);

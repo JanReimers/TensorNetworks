@@ -4352,7 +4352,18 @@ Dimension of local Hilbert space
 \begin_inset Text
 
 \begin_layout Plain Layout
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
 d
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -4400,7 +4411,18 @@ MPS bond dimension
 \begin_inset Text
 
 \begin_layout Plain Layout
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
 D
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -4448,7 +4470,18 @@ MPO bond dimension
 \begin_inset Text
 
 \begin_layout Plain Layout
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
 Dw
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -4492,7 +4525,18 @@ Lattice extent
 \begin_inset Text
 
 \begin_layout Plain Layout
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
 L
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -4540,7 +4584,18 @@ Lattice site
 \begin_inset Text
 
 \begin_layout Plain Layout
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
 ia, ib
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -4593,7 +4648,18 @@ Local site quantum number
 \begin_inset Text
 
 \begin_layout Plain Layout
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
 n,m,na,ma,nb,mb
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset

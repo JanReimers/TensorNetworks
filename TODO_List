@@ -1,10 +1,12 @@
 
--GetNormStat(isite) should return a char, keep # iterations separate.
+- Move LRPSupervisor to MPS constructor so we don't have to pollute the function signatures with it
+- Dont calculate <E^2>-<E>^2 for each IterationScheduleLine.
+- GetNormStat(isite) should return a char, keep # iterations separate.
 - Convergence Schedule Both methods might benifit from Hamiltonian parameter variations.  For example
         -Jxy  Turn these on gradually to find GS, Hamiltonian nees to supply a list paramater names and ranges.
         -Jz
         -Might need to identify parameters with strings "Jxy"
-- Support iterations schedule for variational GS search
+- Done Support iterations schedule for variational GS search
 - Support dynamic tuning of D in iteration schedule.
 - Take out support for two operator contrations.  Now that we can combine and compress MPOs we don;t need it for <E^2>.
 - Spin space trotter decomp
