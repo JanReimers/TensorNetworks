@@ -2,7 +2,6 @@
 
 #include "TensorNetworksImp/MPSImp.H"
 #include "TensorNetworks/Epsilons.H"
-#include "TensorNetworks/LRPSupervisor.H"
 
 #include "oml/stream.h"
 #include "oml/numeric.h"

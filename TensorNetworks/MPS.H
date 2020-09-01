@@ -12,7 +12,7 @@
 
 class Operator;
 class Hamiltonian;
-class LRPSupervisor;
+class TNSLogger;
 class Epsilons;
 class IterationSchedule;
 class IterationScheduleLine;

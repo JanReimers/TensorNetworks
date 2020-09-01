@@ -27,7 +27,7 @@ class Hamiltonian_1D_NN_Heisenberg
         virtual int GetL () const {return itsL;}
         virtual int Getd () const {return 2*itsS+1;}
 
-        virtual MPS*       CreateMPS         (int D,double normEps=1e-12, LRPSupervisor* s=0) const;
+        virtual MPS*       CreateMPS         (int D,double normEps=1e-12, TNSLogger* s=0) const;
         virtual MPO*       CreateUnitOperator() const;
         virtual Operator*  CreateOperator    (const OperatorWRepresentation*) const;
         virtual MPO*       CreateOperator    (double dt, TensorNetworks::TrotterOrder) const;

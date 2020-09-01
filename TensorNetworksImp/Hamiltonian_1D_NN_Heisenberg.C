@@ -168,7 +168,7 @@ TensorNetworks::Matrix4T Hamiltonian_1D_NN_Heisenberg::BuildLocalMatrix() const
 //  Create states.  Why are these here?  Because the Hamiltonian is the
 //  only thing that knows L,S,Dw
 //
-MPS* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,double normEps, LRPSupervisor* s) const
+MPS* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,double normEps, TNSLogger* s) const
 {
     return new MPSImp(itsL,itsS,D,normEps,s);
 }

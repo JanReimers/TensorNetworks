@@ -4,7 +4,6 @@
 #include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
-#include "TensorNetworks/LRPSupervisor.H"
 
 #include "oml/stream.h"
 #include "oml/stopw.h"
@@ -17,8 +16,6 @@ public:
     GroundStateTesting()
     : eps(1.0e-13)
     , itsFactory(TensorNetworks::Factory::GetFactory())
-    , itsEps()
-    , itsSupervisor(new LRPSupervisor())
     {
         StreamableObject::SetToPretty();
 
@@ -35,8 +32,6 @@ public:
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
     Hamiltonian*         itsH;
     MPS*                 itsMPS;
-    Epsilons             itsEps;
-    LRPSupervisor*       itsSupervisor;
 };
 
 

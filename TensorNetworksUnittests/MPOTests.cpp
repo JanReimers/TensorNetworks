@@ -3,8 +3,6 @@
 #include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
-#include "TensorNetworks/LRPSupervisor.H"
-#include "TensorNetworks/Epsilons.H"
 
 #include "oml/stream.h"
 #include "oml/vector_io.h"
@@ -21,8 +19,6 @@ public:
     MPOTesting()
         : eps(1.0e-13)
         , itsFactory(TensorNetworks::Factory::GetFactory())
-        , itsSupervisor( new LRPSupervisor())
-        , itsEps()
 
     {
         assert(itsFactory);
@@ -54,8 +50,6 @@ public:
     Hamiltonian*                   itsH;
     OperatorWRepresentation*       itsWRep;
     MPS*                           itsMPS;
-    LRPSupervisor*                 itsSupervisor;
-    Epsilons                       itsEps;
 };
 
 

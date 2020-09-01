@@ -1,7 +1,6 @@
 #include "gtest/gtest.h"
 #include "Tests.H"
 #include "TensorNetworks/Epsilons.H"
-#include "TensorNetworks/LRPSupervisor.H"
 #include "oml/stream.h"
 #include "oml/random.h"
 #include <complex>
@@ -11,7 +10,6 @@ class MatrixProductTesting : public ::testing::Test
 public:
     MatrixProductTesting()
     : itsMPS(0)
-    , itsEps()
     , eps(1.0e-10)
     {
         Setup(10,0.5,2);
@@ -38,9 +36,6 @@ public:
     }
 
     MPSImp*     itsMPS;
-    Epsilons itsEps;
-
-
     double eps;
 };
 

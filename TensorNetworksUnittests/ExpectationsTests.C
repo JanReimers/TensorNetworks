@@ -1,7 +1,6 @@
 #include "Tests.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/Factory.H"
-#include "TensorNetworks/LRPSupervisor.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 #include "Operators/MPO_OneSite.H"
@@ -24,7 +23,6 @@ public:
         : itsFactory(TensorNetworks::Factory::GetFactory())
         , itsH(0)
         , itsMPS(0)
-        , itsLRPSupervisor(new LRPSupervisor())
         , itsEps()
     {
         StreamableObject::SetToPretty();
@@ -33,7 +31,6 @@ public:
     ~ExpectationsTesting()
     {
         delete itsFactory;
-        delete itsLRPSupervisor;
         delete itsH;
         delete itsMPS;
     }
@@ -56,7 +53,6 @@ public:
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
     Hamiltonian*         itsH;
     MPS*                 itsMPS;
-    LRPSupervisor*       itsLRPSupervisor;
     Epsilons             itsEps;
 };
 

@@ -1,7 +1,6 @@
 #include "Tests.H"
 
 #include "TensorNetworksImp/MPSImp.H"
-#include "TensorNetworks/LRPSupervisor.H"
 #include "TensorNetworks/Epsilons.H"
 
 #include "oml/stream.h"
@@ -15,8 +14,6 @@ public:
     MPSNormTesting()
     : itsMPS(0)
     , eps(1.0e-10)
-    , itsSupervisor( new LRPSupervisor())
-    , itsEps()
     {
         StreamableObject::SetToPretty();
         Setup(10,1,2);
@@ -35,8 +32,6 @@ public:
 
     MPSImp*                itsMPS;
     double                 eps;
-    LRPSupervisor*         itsSupervisor;
-    Epsilons               itsEps;
 };
 
 

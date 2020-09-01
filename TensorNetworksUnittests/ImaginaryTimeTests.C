@@ -4,8 +4,6 @@
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
-#include "TensorNetworks/LRPSupervisor.H"
-#include "TensorNetworks/Epsilons.H"
 #include "Operators/MPO_SpatialTrotter.H"
 
 #include "oml/matrix.h"
@@ -26,8 +24,6 @@ public:
     ImaginaryTimeTesting()
     : eps(1.0e-13)
     , itsFactory(TensorNetworks::Factory::GetFactory())
-    , itsEps()
-    , itsSupervisor(new LRPSupervisor())
     {
         StreamableObject::SetToPretty();
 
@@ -44,8 +40,6 @@ public:
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
     Hamiltonian*         itsH;
     MPS*                 itsMPS;
-    Epsilons             itsEps;
-    LRPSupervisor*       itsSupervisor;
 };
 
 
