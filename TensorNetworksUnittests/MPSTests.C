@@ -24,7 +24,7 @@ public:
     void Setup(int L, double  S, int D)
     {
         delete itsMPS;
-        itsMPS=new MPSImp(L,S,D,itsEps, new LRPSupervisor());
+        itsMPS=new MPSImp(L,S,D);
     }
 
 

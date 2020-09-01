@@ -37,7 +37,7 @@ private:
 //  Conctruction and initialization zone
 //
 public:
-        MPSImp(int L, double S, int D,const Epsilons& eps,LRPSupervisor*);
+        MPSImp(int L, double S, int D,double normEps=1e-12,LRPSupervisor* s=0);
         MPSImp(const MPSImp& mps);
 
         virtual ~MPSImp();
@@ -198,7 +198,7 @@ private:
         int    itsNSweep;
         int    itsSelectedSite; //Selected site for plots which show lots of data for one site.
 
-        Epsilons       itsEpsilons;
+        double         itsNormEps;
         LRPSupervisor* itsSupervisor;
         BondsType      itsBonds;
         SitesType      itsSites;

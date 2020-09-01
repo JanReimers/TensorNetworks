@@ -28,7 +28,7 @@ public:
     void Setup(int L, double S, int D)
     {
         delete itsMPS;
-        itsMPS=new MPSImp(L,S,D,itsEps,itsSupervisor);
+        itsMPS=new MPSImp(L,S,D);
     }
 
     typedef TensorNetworks::MatrixCT MatrixCT;

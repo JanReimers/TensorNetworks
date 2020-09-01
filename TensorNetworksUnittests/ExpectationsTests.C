@@ -43,7 +43,7 @@ public:
         delete itsH;
         delete itsMPS;
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsMPS=itsH->CreateMPS(D,itsEps,itsLRPSupervisor);
+        itsMPS=itsH->CreateMPS(D);
         itsMPS->InitializeWith(TensorNetworks::Random);
 
         TensorNetworks::TrotterOrder o=TensorNetworks::FirstOrder;

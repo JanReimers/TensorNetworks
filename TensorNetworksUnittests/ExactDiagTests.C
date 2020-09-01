@@ -19,7 +19,7 @@ public:
         , itsH(0)
         , itsSched({1000,0,8,0.0,TensorNetworks::FirstOrder,Epsilons(1e-10)})
     {
-        itsSched.itsEps.itsDelatEnergy1Epsilon=1e-15;
+        itsSched.itsEps.itsDelatEnergy1Epsilon=2e-15;
         itsSched.itsEps.itsEigenSolverEpsilon=1e-15;
 
         StreamableObject::SetToPretty();

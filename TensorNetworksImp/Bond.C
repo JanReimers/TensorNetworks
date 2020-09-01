@@ -3,15 +3,13 @@
 #include "oml/vector_io.h"
 #include <iostream>
 
-Bond::Bond(double eps)
-    : itsEps(eps)
-    , itsBondEntropy(0.0)
+Bond::Bond()
+    : itsBondEntropy(0.0)
     , itsMinSV(0.0)
     , itsRank(0)
     , itsLeft_Site(0)
     , itsRightSite(0)
 {
-    assert(itsEps>=0.0);
 }
 
 Bond::~Bond()

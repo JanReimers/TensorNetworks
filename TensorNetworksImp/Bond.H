@@ -12,7 +12,7 @@ class Bond
      typedef TensorNetworks::VectorT  VectorT;
      typedef TensorNetworks::MatrixCT MatrixCT;
    public:
-        Bond(double eps);
+        Bond();
         virtual ~Bond();
         void CloneState(const Bond* b2);
         void SetSites(MPSSite* left, MPSSite* right);
@@ -36,7 +36,6 @@ class Bond
         }
 
         Array<double> itsSingularValues;
-        double itsEps; //SVs < eps are considered zero
         double itsBondEntropy;
         double itsMinSV;
         int    itsRank;

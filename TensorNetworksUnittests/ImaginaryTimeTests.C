@@ -36,7 +36,7 @@ public:
     void Setup(int L, double S, int D)
     {
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsMPS=itsH->CreateMPS(D,itsEps,itsSupervisor);
+        itsMPS=itsH->CreateMPS(D);
     }
 
 
@@ -54,7 +54,7 @@ TEST_F(ImaginaryTimeTesting,TestApplyIdentity)
 {
     int D=1;
     Setup(3,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D,itsEps,itsSupervisor);
+    MPS* Psi1=itsH->CreateMPS(D);
     Psi1->InitializeWith(TensorNetworks::Neel);
     double E1=Psi1->GetExpectation(itsH);
     Psi1->Normalize(TensorNetworks::DRight);
@@ -91,7 +91,7 @@ TEST_F(ImaginaryTimeTesting,TestMPPOCombine)
     //
     //  Make a random normalized wave function
     //
-    MPS* Psi1=itsH->CreateMPS(D,itsEps,itsSupervisor);
+    MPS* Psi1=itsH->CreateMPS(D);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight);
     //
@@ -137,7 +137,7 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt0)
     int D=8,L=9;
     double dt=0.0,epsSVD=1e-5                                                                                                                                                                                                        ;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D,itsEps,itsSupervisor);
+    MPS* Psi1=itsH->CreateMPS(D);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DLeft );
     Psi1->Normalize(TensorNetworks::DRight);
@@ -165,7 +165,7 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05)
     int D=8,L=9;
     double dt=0.05,epsSVD=1e-5                                                                                                                                                                                                        ;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D,itsEps,itsSupervisor);
+    MPS* Psi1=itsH->CreateMPS(D);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DLeft );
     Psi1->Normalize(TensorNetworks::DRight);
@@ -221,7 +221,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 {
     int D=8,L=9;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D,itsEps,itsSupervisor);
+    MPS* Psi1=itsH->CreateMPS(D);
 //    Psi1->Report(cout);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight);
@@ -267,7 +267,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
 {
     int D=8,L=9;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D,itsEps,itsSupervisor);
+    MPS* Psi1=itsH->CreateMPS(D);
 //    Psi1->Report(cout);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight);
@@ -303,7 +303,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFourthOrderTrotter)
 {
     int D=8,L=9;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D,itsEps,itsSupervisor);
+    MPS* Psi1=itsH->CreateMPS(D);
 //    Psi1->Report(cout);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight);

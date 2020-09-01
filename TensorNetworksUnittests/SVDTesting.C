@@ -22,7 +22,7 @@ public:
     typedef TensorNetworks::MatrixCT MatrixT;
     SVDTesting()
     : itsEps()
-    , mps(10,1,2,itsEps,new LRPSupervisor())
+    , mps(10,1,2)
     , eps(1.0e-13)
     {
         StreamableObject::SetToPretty();

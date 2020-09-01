@@ -38,14 +38,14 @@ int GetD2(int a, int L, int d, int DMax)
 //
 //  Init/construction zone
 //
-MPSImp::MPSImp(int L, double S, int D,const Epsilons& eps,LRPSupervisor* s)
+MPSImp::MPSImp(int L, double S, int D,double normEps,LRPSupervisor* s)
     : itsL(L)
     , itsDmax(D)
     , itsS(S)
     , itsd(2*S+1)
     , itsNSweep(0)
     , itsSelectedSite(1)
-    , itsEpsilons(eps)
+    , itsNormEps(normEps)
     , itsSupervisor(s)
     , itsSitesMesh(0)
     , itsBondsMesh(0)
@@ -59,6 +59,9 @@ MPSImp::MPSImp(int L, double S, int D,const Epsilons& eps,LRPSupervisor* s)
     assert(itsS>=0.5);
     assert(itsDmax>0);
 
+    if (itsSupervisor==0)
+        itsSupervisor=new LRPSupervisor();
+
     InitSitesAndBonds();
     InitPlotting();
 
@@ -71,7 +74,7 @@ MPSImp::MPSImp(const MPSImp& mps)
     , itsd           (mps.itsd)
     , itsNSweep      (mps.itsNSweep)
     , itsSelectedSite(mps.itsSelectedSite)
-    , itsEpsilons    (mps.itsEpsilons)
+    , itsNormEps     (mps.itsNormEps)
     , itsSupervisor  (mps.itsSupervisor->Clone())
     , itsSitesMesh   (0)
     , itsBondsMesh   (0)
@@ -91,7 +94,7 @@ void MPSImp::InitSitesAndBonds()
     //
     itsBonds.push_back(0);  //Dummy space holder. We want this array to be 1 based.
     for (int i=1; i<itsL; i++)
-        itsBonds.push_back(new Bond(itsEpsilons.itsMPSCompressEpsilon));
+        itsBonds.push_back(new Bond());
     //
     //  Create Sites
     //
@@ -580,7 +583,7 @@ void  MPSImp::ApplyInPlace(const Operator* o)
 
 MPS*  MPSImp::Apply(const Operator* o) const
 {
-    MPSImp* psiPrime=new MPSImp(itsL,itsS,1,itsEpsilons,itsSupervisor->Clone());
+    MPSImp* psiPrime=new MPSImp(itsL,itsS,1,itsNormEps,itsSupervisor->Clone());
     SiteLoop(ia)
     {
 //        cout << "------------- Site " << ia << "-----------------" << endl;
@@ -610,7 +613,7 @@ void MPSImp::Report(std::ostream& os) const
 std::string MPSImp::GetNormStatus(int isite) const
 {
     CheckSiteNumber(isite);
-    return itsSites[isite]->GetNormStatus(itsEpsilons.itsNormalizationEpsilon);
+    return itsSites[isite]->GetNormStatus(itsNormEps);
 }
 
 std::string MPSImp::GetNormStatus() const
@@ -618,7 +621,7 @@ std::string MPSImp::GetNormStatus() const
     std::string ret(itsL,' ');
     SiteLoop(ia)
     {
-        ret[ia-1]=itsSites[ia]->GetNormStatus(itsEpsilons.itsNormalizationEpsilon)[0];
+        ret[ia-1]=itsSites[ia]->GetNormStatus(itsNormEps)[0];
     }
     return ret;
 }
@@ -628,9 +631,9 @@ bool MPSImp::IsRLNormalized(int isite) const
 {
     bool ret=true;
     for (int ia=1; ia<isite; ia++)
-        ret=ret&&itsSites[ia]->GetNormStatus(itsEpsilons.itsNormalizationEpsilon)[0]=='A';
+        ret=ret&&itsSites[ia]->GetNormStatus(itsNormEps)[0]=='A';
     for (int ia=isite+1; ia<=itsL; ia++)
-        ret=ret&&itsSites[ia]->GetNormStatus(itsEpsilons.itsNormalizationEpsilon)[0]=='B';
+        ret=ret&&itsSites[ia]->GetNormStatus(itsNormEps)[0]=='B';
 
     if (!ret) cout << "Unormailzed state " << GetNormStatus() << endl;
     return ret;

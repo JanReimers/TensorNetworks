@@ -33,7 +33,7 @@ public:
     {
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
         itsWRep=dynamic_cast<OperatorWRepresentation*>(itsH);
-        itsMPS=itsH->CreateMPS(D,itsEps,itsSupervisor);
+        itsMPS=itsH->CreateMPS(D);
     }
     double ENeel(double S) const;
     //Matrix6T GetHeff(int isite) const {return GetMPSImp()->GetHeff(itsH,isite);}
