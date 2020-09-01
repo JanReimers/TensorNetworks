@@ -57,9 +57,8 @@ TEST_F(GroundStateTesting,TestSweepL9S1D2)
 
     Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-9;
-    TensorNetworks::TrotterOrder o=TensorNetworks::FirstOrder;
     IterationSchedule is;
-    is.Insert({maxIter,0,0,0.9,o,eps});
+    is.Insert({maxIter,D,eps});
 
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
 
@@ -80,9 +79,8 @@ TEST_F(GroundStateTesting,TestSweepL9S1D8)
 
     Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-9;
-    TensorNetworks::TrotterOrder o=TensorNetworks::FirstOrder;
     IterationSchedule is;
-    is.Insert({maxIter,0,0,0.9,o,eps});
+    is.Insert({maxIter,D,eps});
 
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
 
@@ -100,9 +98,8 @@ TEST_F(GroundStateTesting,TestSweepL9S5D2)
 
     Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-9;
-    TensorNetworks::TrotterOrder o=TensorNetworks::FirstOrder;
     IterationSchedule is;
-    is.Insert({maxIter,0,0,0.9,o,eps});
+    is.Insert({maxIter,D,eps});
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
 
     double E=itsMPS->GetExpectation(itsH);
@@ -120,9 +117,8 @@ TEST_F(GroundStateTesting,TestFreezeL9S1D2)
 
     Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-9;
-    TensorNetworks::TrotterOrder o=TensorNetworks::FirstOrder;
     IterationSchedule is;
-    is.Insert({maxIter,0,0,0.9,o,eps});
+    is.Insert({maxIter,D,eps});
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
 
     double E=itsMPS->GetExpectation(itsH);
@@ -164,7 +160,7 @@ TEST_F(GroundStateTesting,TestSweepL19S1D8)
     eps.itsDelatEnergy1Epsilon=1e-9;
     TensorNetworks::TrotterOrder o=TensorNetworks::FirstOrder;
     IterationSchedule is;
-    is.Insert({maxIter,0,0,0.9,o,eps});
+    is.Insert({maxIter,D,eps});
 
     StopWatch sw;
     sw.Start();

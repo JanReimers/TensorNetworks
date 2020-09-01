@@ -8,7 +8,7 @@ namespace TensorNetworks
     enum State       {Product,Random,Neel};
     enum SpinOperator{Sx,Sy,Sz,Sp,Sm};
     enum Trotter     {Odd,Even,TrotterX,TrotterY,TrotterZ};
-    enum TrotterOrder{FirstOrder,SecondOrder,FourthOrder};
+    enum TrotterOrder{None,FirstOrder,SecondOrder,FourthOrder};
 };
 
 #endif // ENUMS_H

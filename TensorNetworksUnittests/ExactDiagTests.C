@@ -17,7 +17,7 @@ public:
     ExactDiagTesting()
         : itsFactory(TensorNetworks::Factory::GetFactory())
         , itsH(0)
-        , itsSched({1000,0,8,0.0,TensorNetworks::FirstOrder,Epsilons(1e-10)})
+        , itsSched({1000,8,Epsilons(1e-10)})
     {
         itsSched.itsEps.itsDelatEnergy1Epsilon=2e-15;
         itsSched.itsEps.itsEigenSolverEpsilon=1e-15;

@@ -43,9 +43,8 @@ public:
         itsMPS=itsH->CreateMPS(D);
         itsMPS->InitializeWith(TensorNetworks::Random);
 
-        TensorNetworks::TrotterOrder o=TensorNetworks::FirstOrder;
         IterationSchedule is;
-        is.Insert({20,0,8,0.0,o,itsEps});
+        is.Insert({20,8,itsEps});
         itsMPS->FindVariationalGroundState(itsH,is);
     }
 
@@ -160,10 +159,9 @@ TEST_F(ExpectationsTesting,TestFreezeL9S1D2)
     itsMPS->Freeze(L,S); //Site 0 spin up
 
 
-        TensorNetworks::TrotterOrder o=TensorNetworks::FirstOrder;
-        IterationSchedule is;
-        itsEps.itsDelatEnergy1Epsilon=1e-9;
-        is.Insert({maxIter,0,0,0.0,o,itsEps});
+    IterationSchedule is;
+    itsEps.itsDelatEnergy1Epsilon=1e-9;
+    is.Insert({maxIter,D,itsEps});
 
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
 

@@ -168,7 +168,7 @@ TensorNetworks::Matrix4T Hamiltonian_1D_NN_Heisenberg::BuildLocalMatrix() const
 //  Create states.  Why are these here?  Because the Hamiltonian is the
 //  only thing that knows L,S,Dw
 //
-MPS* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,double normEps, TNSLogger* s) const
+MPS* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,double normEps , TNSLogger* s) const
 {
     return new MPSImp(itsL,itsS,D,normEps,s);
 }
@@ -189,6 +189,11 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::Tro
     Matrix4T H12=BuildLocalMatrix(); //Full H matrix for two sites 1&2
     switch (order)
     {
+        case TensorNetworks::None :
+        {
+            assert(false);
+            break;
+        }
         case TensorNetworks::FirstOrder :
         {
             MPO_SpatialTrotter Wodd (dt,TensorNetworks::Odd ,itsL,Getd(),H12);

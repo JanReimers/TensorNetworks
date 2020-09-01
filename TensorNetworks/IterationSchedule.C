@@ -1,6 +1,46 @@
 #include "IterationSchedule.H"
 #include <iostream>
 #include <iomanip>
+#include <cassert>
+
+IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,const Epsilons& eps)
+    : itsMaxGSSweepIterations(maxiter)
+    , itsMaxOptimizeIterations(0) //not used for variational
+    , itsDmax(Dmax)
+    , itsdt(0.0)  //not used for variational
+    , itsTrotterOrder(TensorNetworks::None) //not used for variational
+    , itsEps(eps)
+{
+    assert(itsMaxGSSweepIterations>0);
+    assert(itsDmax>0);
+}
+
+IterationScheduleLine::IterationScheduleLine(int maxiter,double dt,TOrder o,const Epsilons& eps)
+    : itsMaxGSSweepIterations(maxiter)
+    , itsMaxOptimizeIterations(0)
+    , itsDmax(0)
+    , itsdt(dt)
+    , itsTrotterOrder(o)
+    , itsEps(eps)
+{
+    assert(itsMaxGSSweepIterations>0);
+    assert(itsdt>0);
+    assert(o!=TensorNetworks::None);
+}
+
+IterationScheduleLine::IterationScheduleLine(int maxiter,int maxOptIter,double dt,TOrder o,const Epsilons& eps)
+    : itsMaxGSSweepIterations(maxiter)
+    , itsMaxOptimizeIterations(maxOptIter)
+    , itsDmax(0)
+    , itsdt(dt)
+    , itsTrotterOrder(o)
+    , itsEps(eps)
+{
+    assert(itsMaxGSSweepIterations>0);
+    assert(itsdt>0);
+    assert(o!=TensorNetworks::None);
+}
+
 
 std::ostream& operator<<(std::ostream& os,const IterationScheduleLine& il)
 {

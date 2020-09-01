@@ -1,5 +1,5 @@
 
-- IterationScheduleLine make abridged constructors for variation and iTime.
+- Done IterationScheduleLine make abridged constructors for variation and iTime.
 - Done Rename TNSLogger to Logger
 - mpsImp line 372   GetEOLeft_Iterate(h,1,true);  //This does nothing because of the 1 ???
 - Done Does MPSImp need an Epsilons member?
@@ -13,7 +13,7 @@
         -Might need to identify parameters with strings "Jxy"
 - Done Support iterations schedule for variational GS search
 - Support dynamic tuning of D in iteration schedule.
-- Take out support for two operator contrations.  Now that we can combine and compress MPOs we don;t need it for <E^2>.
+- Take out support for two operator contractions.  Now that we can combine and compress MPOs we don;t need it for <E^2>.
 - Spin space trotter decomp
 - Infinite methods iMPS, iTEBD, iDMRG
     -iMPS class with small unit cell
