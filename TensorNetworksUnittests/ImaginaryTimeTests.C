@@ -206,7 +206,7 @@ TEST_F(ImaginaryTimeTesting,MPOCompressFourthOrderTrotter)
     Setup(L,0.5,D);
 
     MPO* W=itsH->CreateOperator(dt,TensorNetworks::FourthOrder);
-
+    EXPECT_EQ(W->GetMaxDw(),16);
 
 }
 

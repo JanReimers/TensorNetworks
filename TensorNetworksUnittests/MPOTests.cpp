@@ -2,6 +2,7 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworks/SiteOperator.H"
+#include "TensorNetworks/MPO.H"
 #include "TensorNetworks/Factory.H"
 
 #include "oml/stream.h"
@@ -227,28 +228,70 @@ TEST_F(MPOTesting,TestEoldEnew)
     EXPECT_NEAR(std::real(EL),Enew,100*eps);
 }
 
-
-TEST_F(MPOTesting,TestGetExpectation2_I_I)
+TEST_F(MPOTesting,TestMPOCombineForH2)
 {
-    int L=10,D=2;
-    double S=0.5;
-    Setup(L,S,D);
+    int L=10,D=8;
+    Setup(L,0.5,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
-    OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
-    Operator* IO=itsH->CreateOperator(IWO);
+    int Dw=itsH->GetMaxDw();
+    MPO* H1=itsH->CreateUnitOperator();
+    H1->Combine(itsH);
+    MPO* H2=itsH->CreateUnitOperator();
+    H2->Combine(itsH);
+    H2->Combine(itsH);
+    EXPECT_EQ(H1->GetMaxDw(),Dw);
+    EXPECT_EQ(H2->GetMaxDw(),Dw*Dw);
+    delete H1;
+    delete H2;
+}
 
-    double E1=itsMPS->GetExpectation(itsH);
-    double I1=itsMPS->GetExpectation(IO);
-    double II=itsMPS->GetExpectation(IO,IO);
-    double IE=itsMPS->GetExpectation(IO,itsH);
-    double EI=itsMPS->GetExpectation(itsH,IO);
-    double EE=itsMPS->GetExpectation(itsH,itsH);
-    EXPECT_NEAR(I1,1.0,eps);
-    EXPECT_NEAR(II,1.0,eps);
-    EXPECT_NEAR(IE,E1,eps);
-    EXPECT_NEAR(EI,E1,eps);
-    (void)EE; //Nothing to test this against right now
+TEST_F(MPOTesting,TestMPOCompressForH2)
+{
+    int L=10,D=8;
+    Setup(L,0.5,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::DRight);
+    MPO* H1=itsH->CreateUnitOperator();
+    H1->Combine(itsH);
+    MPO* H2=itsH->CreateUnitOperator();
+    H2->Combine(itsH);
+    H2->Combine(itsH);
+    H2->Compress(0,1e-13);
+    EXPECT_EQ(H2->GetMaxDw(),9);
+    delete H1;
+    delete H2;
+}
+
+TEST_F(MPOTesting,TestHamiltonianCreateH2)
+{
+    int L=10,D=8;
+    Setup(L,0.5,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::DRight);
+    MPO* H2=itsH->CreateH2Operator();
+    EXPECT_EQ(H2->GetMaxDw(),9);
+    delete H2;
+}
+
+TEST_F(MPOTesting,TestMPOCompressForE2)
+{
+    int L=10,D=8;
+    Setup(L,0.5,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::DRight);
+    MPO* H1=itsH->CreateUnitOperator();
+    H1->Combine(itsH);
+    MPO* H2=itsH->CreateUnitOperator();
+    H2->Combine(itsH);
+    H2->Combine(itsH);
+    double E2a=itsMPS->GetExpectation(H2);
+    H2->Compress(0,1e-13);
+    EXPECT_EQ(H2->GetMaxDw(),9);
+    double E2b=itsMPS->GetExpectation(H2);
+    EXPECT_NEAR(E2a,E2b,1e-13);
+    delete H1;
+    delete H2;
 }
 
 #ifndef DEBUG
@@ -262,7 +305,9 @@ TEST_F(MPOTesting,TestTimingE2_S5D4)
     itsMPS->Normalize(TensorNetworks::DRight);
     StopWatch sw;
     sw.Start();
-    double EE=itsMPS->GetExpectation(itsH,itsH);
+    MPO* H2=itsH->CreateH2Operator();
+    double EE=itsMPS->GetExpectation(H2);
+    delete H2;
     sw.Stop();
     cout << "<E^2> contraction for L=" << L << ", S=" << S << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
     (void)EE; //Avoid warning
@@ -276,7 +321,9 @@ TEST_F(MPOTesting,TestTimingE2_S1D16)
     itsMPS->Normalize(TensorNetworks::DRight);
     StopWatch sw;
     sw.Start();
-    double EE=itsMPS->GetExpectation(itsH,itsH);
+    MPO* H2=itsH->CreateH2Operator();
+    double EE=itsMPS->GetExpectation(H2);
+    delete H2;
     sw.Stop();
     cout << "<E^2> contraction for L=" << L << ", S=" << S << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
     (void)EE; //Avoid warning

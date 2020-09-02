@@ -61,7 +61,6 @@ class MPSSite
         MatrixCT IterateF     (TensorNetworks::Direction lr ,const MatrixCT& M) const;
         Vector3T IterateLeft_F(const SiteOperator*      so  ,const Vector3T& Fam1,bool cache=false);
         Vector3T IterateRightF(const SiteOperator*      so  ,const Vector3T& Fam1,bool cache=false);
-        Vector4T IterateLeft_F(const SiteOperator*      so1 ,const SiteOperator* so2, const Vector4T& Fam1) const;
 
 //---------------------------------------------------------------------------------
 //
@@ -147,10 +146,6 @@ private:
     eType ContractWFB  (int m, int w1, int i2, int j1, const SiteOperator* so, const Vector3T& Fap1) const;
     eType ContractFB   (int n, int w2, int i2, int j1,                         const Vector3T& Fap1) const;
 
-    eType ContractAWWFA(int w2,int v2, int i2, int j2, const SiteOperator* so1, const SiteOperator* so2, const Vector4T& Fam1) const;
-    eType ContractWWFA (int m, int w2, int v2, int i1, int j2, const SiteOperator* so1, const SiteOperator* so2, const Vector4T& Fam1) const;
-    eType ContractWFA  (int o, int w1, int v2, int i1, int j2, const SiteOperator* so, const Vector4T& Fam1) const;
-    eType ContractFA   (int n, int w1, int v1, int i1, int j2,                         const Vector4T& Fam1) const;
     eType ContractWR   (int w1,int i2, int j2,const MatrixT& W, int Dw2, const Vector3T& R) const;
 
     MatrixCT ContractCA(int n2, const MatrixCT& C) const;

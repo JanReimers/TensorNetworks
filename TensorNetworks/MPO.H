@@ -13,6 +13,7 @@ class MPO : public virtual Operator
         MPO() {};
         virtual ~MPO() {};
 
+        virtual int    GetMaxDw() const=0;
         virtual void   Combine(const Operator* O2)=0;
         virtual double Compress(int Dmax, double minSV)=0;
         virtual void   Report(std::ostream&) const=0;

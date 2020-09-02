@@ -19,8 +19,9 @@ class Hamiltonian : public virtual Operator
     public:
         Hamiltonian() {}
         virtual ~Hamiltonian() {}
-        virtual int GetL() const=0; //# of lattice sites
-        virtual int Getd() const=0; //Dimension of the one site Hilbert space
+        virtual int GetL    () const=0; //# of lattice sites
+        virtual int Getd    () const=0; //Dimension of the one site Hilbert space
+        virtual int GetMaxDw() const=0;
 
         //  Creates an MPS or operators with the correct lattice size and spin space.
         virtual MPS* CreateMPS     (int D,double normEps=1e-12, TNSLogger* =0) const=0;
@@ -28,6 +29,7 @@ class Hamiltonian : public virtual Operator
         virtual Operator*           CreateOperator(const OperatorWRepresentation*) const=0;
         //  Create full lattice of unit operators
         virtual MPO*                CreateUnitOperator() const=0;
+        virtual MPO*                CreateH2Operator  () const;
         //  Create and exp(-dt*H) time evolution operator of a certain order in tau.
         virtual MPO*                CreateOperator(double dt, TensorNetworks::TrotterOrder) const=0;
         // Get a 2 site local matrix of order p^2 x p^2

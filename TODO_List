@@ -1,18 +1,13 @@
 
-- Done IterationScheduleLine make abridged constructors for variation and iTime.
-- Done Rename TNSLogger to Logger
-- Done mpsImp line 372   GetEOLeft_Iterate(h,1,true);  //This does nothing because of the 1 ???
-- Done Does MPSImp need an Epsilons member?
-    NOt really it only uses itsNormalizationEpsilon
-- Done Move TNSLogger to MPS constructor so we don't have to pollute the function signatures with it
-- Dont calculate <E^2>-<E>^2 for each IterationScheduleLine.
-- Done GetNormStat(isite) should return a char, keep # iterations separate.
 - Convergence Schedule Both methods might benifit from Hamiltonian parameter variations.  For example
         -Jxy  Turn these on gradually to find GS, Hamiltonian nees to supply a list paramater names and ranges.
         -Jz
         -Might need to identify parameters with strings "Jxy"
-- Done Support iterations schedule for variational GS search
+- Only calculate <E2>-<E>2 after end of it sched
+- Pick one Apply(op) and ApplyInPlace(op)
+- Should non hermition operator have distinct type?
 - Support dynamic tuning of D in iteration schedule.
+- Make ab SVDCompress interface.  Derived classes can implement different policies doe deciding which Svs to throw awat etc.
 - Take out support for two operator contractions.  Now that we can combine and compress MPOs we don;t need it for <E^2>.
 - Spin space trotter decomp
 - Infinite methods iMPS, iTEBD, iDMRG
@@ -48,6 +43,15 @@
         7) one or two (or N!) site updates. Part of convergence schedule?
         8) Report windows (HTML table?) with columns in the report(ostream) method
 
+- Done IterationScheduleLine make abridged constructors for variation and iTime.
+- Done Rename TNSLogger to Logger
+- Done mpsImp line 372   GetEOLeft_Iterate(h,1,true);  //This does nothing because of the 1 ???
+- Done Does MPSImp need an Epsilons member?
+    NOt really it only uses itsNormalizationEpsilon
+- Done Move TNSLogger to MPS constructor so we don't have to pollute the function signatures with it
+- Dont calculate <E^2>-<E>^2 for each IterationScheduleLine.
+- Done GetNormStat(isite) should return a char, keep # iterations separate.
+- Done Support iterations schedule for variational GS search
 -Done Convergence schedule,  increase D, drop epsilons, drop tau for imaginary time evolution
     -Can we use one schedule for 1) variational and 2) imaginary time GS searches?
     - Variational needs: Eps.DE, Eps.Eigen, Eps.<E^2>-<E>^2 NIter, Dmax

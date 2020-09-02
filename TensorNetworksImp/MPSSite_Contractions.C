@@ -149,33 +149,6 @@ MPSSite::MatrixCT MPSSite::GetNorm(TensorNetworks::Direction lr) const
     }
     return ret;
 }
-//
-//  Sum_id A^t(id) * A(id)
-//
-/*MatrixProductSite::MatrixCT MatrixProductSite::GetLeftNorm() const
-{
-    MatrixCT ret(itsD2,itsD2);
-    Fill(ret,std::complex<double>(0.0));
-    for (cpIterT id=itsAs.begin(); id!=itsAs.end(); id++)
-    {
-        ret+=conj(Transpose((*id)))*(*id);
-    }
-    return ret;
-}
-
-//
-//  Sum_id A(id)*A^t(id)
-//
-MatrixProductSite::MatrixCT MatrixProductSite::GetRightNorm() const
-{
-    MatrixCT ret(itsD1,itsD1);
-    Fill(ret,std::complex<double>(0.0));
-    for (cpIterT id=itsAs.begin(); id!=itsAs.end(); id++)
-        ret+=(*id)*conj(Transpose((*id)));
-    return ret;
-}
-
-*/
 MPSSite::Matrix6T MPSSite::
 GetHeff(const SiteOperator* mops,const Vector3T& L,const Vector3T& R) const
 {
@@ -312,20 +285,6 @@ MPSSite::Vector3T MPSSite::IterateLeft_F(const SiteOperator* so, const Vector3T&
     return F;
 }
 
-MPSSite::Vector4T MPSSite::IterateLeft_F(const SiteOperator* so1, const SiteOperator* so2, const Vector4T& Fam1) const
-{
-    const Dw12& Dws1=so1->GetDw12();
-    const Dw12& Dws2=so2->GetDw12();
-
-    Vector4T F(Dws1.Dw2,Dws2.Dw2,itsD2,itsD2,1);
-    for (int w2=1; w2<=Dws1.Dw2; w2++)
-        for (int v2=1; v2<=Dws2.Dw2; v2++)
-            for (int i2=1; i2<=itsD2; i2++)
-                for (int j2=1; j2<=itsD2; j2++)
-                    F(w2,v2,i2,j2)=ContractAWWFA(w2,v2,i2,j2,so1,so2,Fam1);
-    return F;
-}
-
 MPSSite::eType MPSSite::ContractAWFA(int w2, int i2, int j2, const SiteOperator* so, const Vector3T& Fam1) const
 {
     eType awfa(0.0);
@@ -335,67 +294,6 @@ MPSSite::eType MPSSite::ContractAWFA(int w2, int i2, int j2, const SiteOperator*
 
     return awfa;
 }
-
-MPSSite::eType MPSSite::
-ContractAWWFA(int w2, int v2, int i2, int j2, const SiteOperator* so1, const SiteOperator* so2,const Vector4T& Fam1) const
-{
-    eType awwfa(0.0);
-    for (int m=0; m<itsd; m++)
-        for (int i1=1; i1<=itsD1; i1++)
-            awwfa+=conj(itsMs[m](i1,i2))*ContractWWFA(m,w2,v2,i1,j2,so1,so2,Fam1);
-
-    return awwfa;
-}
-
-MPSSite::eType MPSSite::ContractWWFA(int m, int w2, int v2, int i1, int j2, const SiteOperator* so1, const SiteOperator* so2, const Vector4T& Fam1) const
-{
-    const Dw12& Dws1=so1->GetDw12();
-    eType wwfa(0.0);
-    for (int o=0; o<itsd; o++)
-    {
-        const MatrixT& Wmo=so1->GetW(m,o);
-        assert(Wmo.GetNumRows()==Dws1.Dw1);
-        for (int w1=1; w1<Dws1.w1_first(w2); w1++)
-            assert(Wmo(w1,w2)==0);
-        for (int w1=Dws1.w1_first(w2); w1<=Dws1.Dw1; w1++)
-            if (Wmo(w1,w2)!=0.0)
-            {
-                assert(fabs(Wmo(w1,w2))>0.0); //Make sure -0 doesn't slip through the gate
-                wwfa+=Wmo(w1,w2)*ContractWFA(o,w1,v2,i1,j2,so2,Fam1);
-            }
-    }
-    return wwfa;
-}
-
-MPSSite::eType MPSSite::ContractWFA(int o, int w1, int v2, int i1, int j2, const SiteOperator* so, const Vector4T& Fam1) const
-{
-    const Dw12& Dvs1=so->GetDw12();
-    eType wfa(0.0);
-    for (int n=0; n<itsd; n++)
-    {
-        const MatrixT& Won=so->GetW(o,n);
-        assert(Won.GetNumRows()==Dvs1.Dw1);
-        for (int v1=1; v1<Dvs1.w1_first(v2); v1++)
-            assert(Won(v1,v2)==0);
-        for (int v1=Dvs1.w1_first(v2); v1<=Dvs1.Dw1; v1++)
-            if (Won(v1,v2)!=0.0)
-            {
-                assert(fabs(Won(v1,v2))>0.0); //Make sure -0 doesn't slip through the gate
-                wfa+=Won(v1,v2)*ContractFA(n,w1,v1,i1,j2,Fam1);
-            }
-    }
-    return wfa;
-}
-
-MPSSite::eType MPSSite::ContractFA(int n, int w1, int v1, int i1, int j2, const Vector4T& Fam1) const
-{
-    eType fa(0.0);
-    for (int j1=1; j1<=itsD1; j1++)
-        fa+=Fam1(w1,v1,i1,j1)*itsMs[n](j1,j2);
-    return fa;
-}
-
-
 
 MPSSite::eType MPSSite::ContractWFA(int m, int w2, int i1, int j2, const SiteOperator* so, const Vector3T& Fam1) const
 {
@@ -475,38 +373,6 @@ MPSSite::eType MPSSite::ContractFB(int n, int w2, int i2, int j1, const Vector3T
     return fb;
 }
 
-
-//Left
-/*void MatrixProductSite::Contract(const VectorT& s, const MatrixCT& Vdagger)
-{
-    int N1=s.GetHigh(); //N1=0 on the first site.
-    if (N1>0 && N1<itsD1) itsD1=N1; //The contraction below will automatically reshape the As.
-
-    for (int in=0; in<itsd; in++)
-    {
-        MatrixCT temp=Contract1(s,Vdagger*itsAs[in]);
-        itsAs[in].SetLimits(0,0);
-        itsAs[in]=temp; //Shallow copy
-//        cout << "A[" << in << "]=" << itsAs[in] << endl;
-        assert(itsAs[in].GetNumRows()==itsD1); //Verify shape is correct;
-    }
-}
-
-// Right
-void MatrixProductSite::Contract(const MatrixCT& U, const VectorT& s)
-{
-    int N1=s.GetHigh(); //N1=0 on the first site.
-    if (N1>0 && N1<itsD2)
-        itsD2=N1; //The contraction below will automatically reshape the As.
-    for (int in=0; in<itsd; in++)
-    {
-        MatrixCT temp=Contract1(itsAs[in]*U,s);
-        itsAs[in].SetLimits(0,0);
-        itsAs[in]=temp; //Shallow copy
-        assert(itsAs[in].GetNumCols()==itsD2); //Verify shape is correct;
-    }
-}
-*/
 void MPSSite::Contract(TensorNetworks::Direction lr,const VectorT& s, const MatrixCT& UV)
 {
     switch (lr)

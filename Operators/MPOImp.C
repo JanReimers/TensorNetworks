@@ -73,6 +73,17 @@ double MPOImp::Compress(int Dmax, double minSv)
     return percent;
 }
 
+int MPOImp::GetMaxDw() const
+{
+    int Dw=0;
+    for (int ia=1;ia<itsL;ia++)
+    {
+        Dw=Max(Dw,itsSites[ia]->GetDw12().Dw2);
+    }
+    return Dw;
+}
+
+
 void MPOImp::Report(std::ostream& os) const
 {
     os << "Matrix Product Operator for " << itsL << " sites, p=" << itsd << endl;

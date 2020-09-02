@@ -56,7 +56,6 @@ class MPS : public virtual MultiPlotable
         virtual double   GetOverlap     (const MPS* Psi2) const=0; //<this|Psi2>
         virtual double   GetExpectation (const Operator* o) const=0;
         virtual eType    GetExpectationC(const Operator* o) const=0; //For non hermitian operators, S+, S-. Sy
-        virtual double   GetExpectation (const Operator* o1,const Operator* o2) const=0;
 //--------------------------------------------------------------------------------------
 //
 //  Operate on MPS with an MPO:  |Psi> -> O|Psi>.

@@ -167,7 +167,7 @@ void SiteOperatorImp::Compress(TensorNetworks::Direction lr,int DwMax, double sM
 //    cout << "U*s*Trans(V)=" << MatrixT(A*Contract1(s,VT))<< endl;
 //    cout << "U*s*Trans(V)=" << Max(abs(MatrixT(Contract1(A,s)*VT-Acopy))) << endl;
 //    cout << "U*s*Trans(V)=" << Max(abs(MatrixT(A*Contract1(s,VT)-Acopy))) << endl;
-    assert(Max(abs(MatrixT(Contract1(A,s)*VT-Acopy)))<sMin);
+    assert(Max(abs(MatrixT(Contract1(A,s)*VT-Acopy)))<1e-12);
     //
     //  Rescaling
     //

@@ -158,7 +158,6 @@ TEST_F(GroundStateTesting,TestSweepL19S1D8)
 
     Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-9;
-    TensorNetworks::TrotterOrder o=TensorNetworks::FirstOrder;
     IterationSchedule is;
     is.Insert({maxIter,D,eps});
 

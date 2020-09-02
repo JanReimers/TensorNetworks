@@ -277,10 +277,13 @@ void MPSImp::UpdateBondData(int isite)
 //
 double MPSImp::FindVariationalGroundState(const Hamiltonian* H,const IterationSchedule& is)
 {
-    double dE=0;
+    double E1=0;
     for (is.begin(); !is.end(); is++)
-        dE=FindVariationalGroundState(H,*is);
-    return dE;
+        E1=FindVariationalGroundState(H,*is);
+    MPO* H2=H->CreateH2Operator();
+    double E2=GetExpectation(H2);
+    delete H2;
+    return E2-E1*E1;
 }
 
 double MPSImp::FindVariationalGroundState(const Hamiltonian* hamiltonian, const IterationScheduleLine& isl)
@@ -299,9 +302,7 @@ double MPSImp::FindVariationalGroundState(const Hamiltonian* hamiltonian, const 
         E1=Sweep(TensorNetworks::DRight,hamiltonian,isl.itsEps);
         if (GetMaxDeltaE()<isl.itsEps.itsDelatEnergy1Epsilon) break;
     }
-    itsLogger->DoneOneStep(0,"Contracting <E^2>"); //Logger will update the graphs
-    double E2=GetExpectation(hamiltonian,hamiltonian);
-    return E2-E1*E1;
+    return E1;
 }
 
 double MPSImp::Sweep(TensorNetworks::Direction lr,const Hamiltonian* h,const Epsilons& eps)
@@ -390,10 +391,14 @@ double  MPSImp::GetMaxDeltaE() const
 
 double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule& is)
 {
-    double dE=0;
+    double E1=0;
     for (is.begin(); !is.end(); is++)
-        dE=FindiTimeGroundState(H,*is);
-    return dE;
+        E1=FindiTimeGroundState(H,*is);
+
+    MPO* H2=H->CreateH2Operator();
+    double E2=GetExpectation(H2);
+    delete H2;
+    return E2-E1*E1;
 }
 
 double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationScheduleLine& isl)
@@ -428,8 +433,7 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
         E1=Enew;
         if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon) break;
     }
-    double E2=GetExpectation(H,H);
-    return E2-E1*E1;
+    return E1;
 }
 
 //--------------------------------------------------------------------------------------
@@ -559,19 +563,6 @@ MPSImp::eType   MPSImp::GetExpectationC(const Operator* o) const
     return F(1,1,1);
 }
 
-double   MPSImp::GetExpectation(const Operator* o1,const Operator* o2) const
-{
-    Vector4T F(1,1,1,1,1);
-    F(1,1,1,1)=eType(1.0);
-    SiteLoop(ia)
-    F=itsSites[ia]->IterateLeft_F(o1->GetSiteOperator(ia),o2->GetSiteOperator(ia),F);
-
-    double iE=std::imag(F(1,1,1,1));
-    if (fabs(iE)>1e-10)
-        cout << "Warning: MatrixProductState::GetExpectation Imag(E)=" << std::imag(F(1,1,1,1)) << endl;
-
-    return std::real(F(1,1,1,1));
-}
 
 
 void  MPSImp::ApplyInPlace(const Operator* o)
