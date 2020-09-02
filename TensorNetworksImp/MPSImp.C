@@ -373,8 +373,8 @@ MPSImp::Matrix6T MPSImp::GetHeffIterate   (const Hamiltonian* h,int isite) const
 
 void MPSImp::LoadHeffCaches(const Hamiltonian* h)
 {
-    GetEOLeft_Iterate(h,1,true);  //This does nothing because of the 1 ???
-    GetEORightIterate(h,1,true);
+    CalcHeffLeft (h,itsL,true);  //This does nothing because of the 1 ???
+    CalcHeffRight(h,1   ,true);
 }
 
 double  MPSImp::GetMaxDeltaE() const
@@ -475,8 +475,8 @@ double MPSImp::Sweep(TensorNetworks::Direction lr,const MPS* Psi2)
 //        cout << "----- Opimizing site " << ia << " " << GetNormStatus() << " -----" << endl;
 
         assert(IsRLNormalized(ia));
-        assert(GetRLCache(TensorNetworks::DLeft ,ia-1)==GetEOLeft_Iterate(Psi2,ia,false));
-        assert(GetRLCache(TensorNetworks::DRight,ia+1)==GetEORightIterate(Psi2,ia,false));
+        assert(GetRLCache(TensorNetworks::DLeft ,ia-1)==CalcHeffLeft(Psi2,ia,false));
+        assert(GetRLCache(TensorNetworks::DRight,ia+1)==CalcHeffRight(Psi2,ia,false));
         itsSites[ia]->Optimize(psi2Imp->itsSites[ia],
                                GetRLCache(TensorNetworks::DLeft,ia-1),
                                GetRLCache(TensorNetworks::DRight,ia+1));
@@ -511,8 +511,8 @@ MPSImp::MatrixCT MPSImp::GetRLCache (TensorNetworks::Direction lr,int isite) con
 
 void MPSImp::LoadCaches(const MPS* Psi2)
 {
-    GetEOLeft_Iterate(Psi2,itsL,true);
-    GetEORightIterate(Psi2,   1,true);
+    CalcHeffLeft(Psi2,itsL,true);
+    CalcHeffRight(Psi2,   1,true);
 }
 
 
@@ -640,7 +640,7 @@ bool MPSImp::IsRLNormalized(int isite) const
 //
 //  Used to calculate Hamiltonian L&R caches for Heff calcultions.
 //
-MPSImp::Vector3T MPSImp::GetEOLeft_Iterate(const Operator* o,int isite, bool cache) const
+MPSImp::Vector3T MPSImp::CalcHeffLeft(const Operator* o,int isite, bool cache) const
 {
 //    CheckSiteNumber(isite);  this function accepts out of bounds site numbers
     Vector3T F(1,1,1,1);
@@ -655,7 +655,7 @@ MPSImp::Vector3T MPSImp::GetEOLeft_Iterate(const Operator* o,int isite, bool cac
 //
 //  Used to calculate Hamiltonian L&R caches for Heff calcultions.
 //
-MPSImp::Vector3T MPSImp::GetEORightIterate(const Operator* o,int isite, bool cache) const
+MPSImp::Vector3T MPSImp::CalcHeffRight(const Operator* o,int isite, bool cache) const
 {
 //    CheckSiteNumber(isite); this function accepts out of bounds site numbers
     Vector3T F(1,1,1,1);
@@ -670,7 +670,7 @@ MPSImp::Vector3T MPSImp::GetEORightIterate(const Operator* o,int isite, bool cac
 //
 //  Used to calculate  L&R caches for <psi_tilde|psi> calcultions.
 //
-MPSImp::MatrixCT MPSImp::GetEOLeft_Iterate(const MPS* psi2,int isite, bool cache) const
+MPSImp::MatrixCT MPSImp::CalcHeffLeft(const MPS* psi2,int isite, bool cache) const
 {
 //    CheckSiteNumber(isite);  this function accepts out of bounds site numbers
     const MPSImp* psi2Imp=dynamic_cast<const MPSImp*>(psi2);
@@ -688,7 +688,7 @@ MPSImp::MatrixCT MPSImp::GetEOLeft_Iterate(const MPS* psi2,int isite, bool cache
 //
 //  Used to calculate  L&R caches for <psi_tilde|psi> calcultions.
 //
-MPSImp::MatrixCT MPSImp::GetEORightIterate(const MPS* psi2,int isite, bool cache) const
+MPSImp::MatrixCT MPSImp::CalcHeffRight(const MPS* psi2,int isite, bool cache) const
 {
 //    CheckSiteNumber(isite); this function accepts out of bounds site numbers
     const MPSImp* psi2Imp=dynamic_cast<const MPSImp*>(psi2);

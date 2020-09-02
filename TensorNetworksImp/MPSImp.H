@@ -140,8 +140,8 @@ private:
 
         void     LoadHeffCaches(const Hamiltonian* h);
         Vector3T GetHeffCache(TensorNetworks::Direction lr,int isite) const;
-        Vector3T GetEOLeft_Iterate(const Operator* o,int isite,bool cache=false) const;
-        Vector3T GetEORightIterate(const Operator* o,int isite,bool cache=false) const;
+        Vector3T CalcHeffLeft(const Operator* o,int isite,bool cache=false) const;
+        Vector3T CalcHeffRight(const Operator* o,int isite,bool cache=false) const;
 
         Matrix4T CalculateTwoSiteDM(int ia,int ib) const;
 //--------------------------------------------------------------------
@@ -151,8 +151,8 @@ private:
         double   Sweep (TensorNetworks::Direction lr,const MPS* Psi2);
         void LoadCaches(const MPS* Psi2);
         MatrixCT GetRLCache(TensorNetworks::Direction lr,int isite) const;
-        MatrixCT GetEOLeft_Iterate(const MPS* Psi2,int isite,bool cache=false) const;
-        MatrixCT GetEORightIterate(const MPS* Psi2,int isite,bool cache=false) const;
+        MatrixCT CalcHeffLeft(const MPS* Psi2,int isite,bool cache=false) const;
+        MatrixCT CalcHeffRight(const MPS* Psi2,int isite,bool cache=false) const;
 
 //
 //  Loop Control
