@@ -98,10 +98,10 @@ public:
 //
 //    Reporting
 //
-        virtual std::string GetNormStatus(int isite) const;
-        virtual std::string GetNormStatus() const;
-        virtual bool IsRLNormalized(int isite) const; //  AAA..AMBB..BBB form at one site.
-        virtual void Report(std::ostream&) const;
+        virtual char         GetNormStatus(int isite) const;
+        virtual std::string  GetNormStatus(         ) const;
+        virtual void            Report(std::ostream&) const;
+        virtual bool        IsRLNormalized(int isite) const; //  AAA..AMBB..BBB form at one site.
 //--------------------------------------------------------------------------------------
 //
 //      Multi Plotting interace

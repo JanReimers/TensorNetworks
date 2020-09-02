@@ -609,7 +609,7 @@ void MPSImp::Report(std::ostream& os) const
     }
 }
 
-std::string MPSImp::GetNormStatus(int isite) const
+char MPSImp::GetNormStatus(int isite) const
 {
     CheckSiteNumber(isite);
     return itsSites[isite]->GetNormStatus(itsNormEps);
@@ -620,7 +620,7 @@ std::string MPSImp::GetNormStatus() const
     std::string ret(itsL,' ');
     SiteLoop(ia)
     {
-        ret[ia-1]=itsSites[ia]->GetNormStatus(itsNormEps)[0];
+        ret[ia-1]=itsSites[ia]->GetNormStatus(itsNormEps);
     }
     return ret;
 }
@@ -630,9 +630,9 @@ bool MPSImp::IsRLNormalized(int isite) const
 {
     bool ret=true;
     for (int ia=1; ia<isite; ia++)
-        ret=ret&&itsSites[ia]->GetNormStatus(itsNormEps)[0]=='A';
+        ret=ret&&itsSites[ia]->GetNormStatus(itsNormEps)=='A';
     for (int ia=isite+1; ia<=itsL; ia++)
-        ret=ret&&itsSites[ia]->GetNormStatus(itsNormEps)[0]=='B';
+        ret=ret&&itsSites[ia]->GetNormStatus(itsNormEps)=='B';
 
     if (!ret) cout << "Unormailzed state " << GetNormStatus() << endl;
     return ret;
@@ -723,9 +723,9 @@ MPSImp::Matrix4T MPSImp::CalculateTwoSiteDM(int ia,int ib) const
     CheckSiteNumber(ib);
 #ifdef DEBUG
     for (int is=1; is<ia; is++)
-        assert(GetNormStatus(is)[0]=='A');
+        assert(GetNormStatus(is)=='A');
     for (int is=ib+1; is<=itsL; is++)
-        assert(GetNormStatus(is)[0]=='B');
+        assert(GetNormStatus(is)=='B');
 #endif
     Matrix4T ret(itsd,itsd,itsd,itsd,1);
     ret.Fill(eType(0.0));

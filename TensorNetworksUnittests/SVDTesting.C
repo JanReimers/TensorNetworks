@@ -152,7 +152,7 @@ TEST_F(SVDTesting,OML_EigenSolverComplexHermitian)
     EXPECT_EQ(ierr,0);
     Mtype diag=Transpose(conj(Ah))*Mcopy*Ah;
     for (int i=1;i<=N;i++) diag(i,i)-=w(i);
-    EXPECT_NEAR(Max(abs(diag)),0.0,eps);
+    EXPECT_NEAR(Max(abs(diag)),0.0,2*eps);
 }
 
 

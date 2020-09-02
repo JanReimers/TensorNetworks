@@ -265,7 +265,7 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr, int Dmax, double epsMin
             break;
         }
     }
-    assert(GetNormStatus(1e-12)[0]!='M');
+    assert(GetNormStatus(1e-12)!='M');
     GetBond(lr)->SVDTransfer(lr,s,UV);
 }
 
@@ -274,25 +274,24 @@ void MPSSite::Rescale(double norm)
     for (int n=0; n<itsd; n++) itsMs[n]/=norm;
 }
 
-std::string MPSSite::GetNormStatus(double eps) const
+char MPSSite::GetNormStatus(double eps) const
 {
 //    StreamableObject::SetToPretty();
 //    for (int id=0;id<itsd; id++)
 //        cout << "A[" << id << "]=" << itsAs[id] << endl;
-    std::string ret;
+    char ret;
     if (IsNormalized(TensorNetworks::DLeft,eps))
     {
         if (IsNormalized(TensorNetworks::DRight,eps))
-            ret="I"; //This should be rare
+            ret='I'; //This should be rare
         else
-            ret="A";
+            ret='A';
     }
     else if (IsNormalized(TensorNetworks::DRight,eps))
-        ret="B";
+        ret='B';
     else
-        ret="M";
+        ret='M';
 
-    ret+=std::to_string(itsNumUpdates);
     return ret;
 }
 

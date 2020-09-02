@@ -96,8 +96,8 @@ class MPSSite
 //
 //  Statusreporting
 //
-        std::string GetNormStatus(double eps) const;
-        void        Report(std::ostream&) const;
+        char GetNormStatus(double eps) const;
+        void Report    (std::ostream&) const;
 
 //-----------------------------------------------------------------------------------
 //

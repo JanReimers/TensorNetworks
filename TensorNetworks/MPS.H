@@ -81,9 +81,10 @@ class MPS : public virtual MultiPlotable
 //
 //    Reporting
 //
-        virtual std::string GetNormStatus(int isite) const=0;
-        virtual std::string GetNormStatus() const=0;
-        virtual void Report(std::ostream&) const=0;
+        virtual char        GetNormStatus (int isite) const=0;
+        virtual std::string GetNormStatus (         ) const=0;
+        virtual void        Report    (std::ostream&) const=0;
+        virtual bool        IsRLNormalized(int isite) const=0; //  AAA..AMBB..BBB form at one site.
 };
 
 #endif // MATRIXPRODUCTSTATE_H

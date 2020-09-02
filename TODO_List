@@ -6,7 +6,7 @@
     NOt really it only uses itsNormalizationEpsilon
 - Done Move TNSLogger to MPS constructor so we don't have to pollute the function signatures with it
 - Dont calculate <E^2>-<E>^2 for each IterationScheduleLine.
-- GetNormStat(isite) should return a char, keep # iterations separate.
+- Done GetNormStat(isite) should return a char, keep # iterations separate.
 - Convergence Schedule Both methods might benifit from Hamiltonian parameter variations.  For example
         -Jxy  Turn these on gradually to find GS, Hamiltonian nees to supply a list paramater names and ranges.
         -Jz
