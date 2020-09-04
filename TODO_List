@@ -1,14 +1,14 @@
 
-- Convergence Schedule Both methods might benifit from Hamiltonian parameter variations.  For example
-        -Jxy  Turn these on gradually to find GS, Hamiltonian nees to supply a list paramater names and ranges.
-        -Jz
-        -Might need to identify parameters with strings "Jxy"
-- Only calculate <E2>-<E>2 after end of it sched
-- Pick one Apply(op) and ApplyInPlace(op)
+- Done Split up mega files MSPImp.C and MPSSite.C
 - Should non hermition operator have distinct type?
+    Not clear how to go about this.
+    Do we really need separate Operator and MPO interfaces?
 - Support dynamic tuning of D in iteration schedule.
+    -If D jumps from 4 to 8 do increments by 1''s or jump directly?
+    -If jump directly the user needs fill in lots of IterationScheduleLine's
+    -Or may IterationSchedule. Insert can detect this and auto insert lines
+        -This my surprise users.
 - Make ab SVDCompress interface.  Derived classes can implement different policies doe deciding which Svs to throw awat etc.
-- Take out support for two operator contractions.  Now that we can combine and compress MPOs we don;t need it for <E^2>.
 - Spin space trotter decomp
 - Infinite methods iMPS, iTEBD, iDMRG
     -iMPS class with small unit cell
@@ -25,6 +25,10 @@
 - Play with iTensor for 2D systems.
     -Try one tetrahedon.
 
+- Convergence Schedule Both methods might benifit from Hamiltonian parameter variations.  For example
+        -Jxy  Turn these on gradually to find GS, Hamiltonian nees to supply a list paramater names and ranges.
+        -Jz
+        -Might need to identify parameters with strings "Jxy"
 
 -GUI
     Control panel
@@ -43,6 +47,8 @@
         7) one or two (or N!) site updates. Part of convergence schedule?
         8) Report windows (HTML table?) with columns in the report(ostream) method
 
+- Done Only calculate <E2>-<E>2 after end of it sched
+- Done Take out support for two operator contractions.  Now that we can combine and compress MPOs we don;t need it for <E^2>.
 - Done IterationScheduleLine make abridged constructors for variation and iTime.
 - Done Rename TNSLogger to Logger
 - Done mpsImp line 372   GetEOLeft_Iterate(h,1,true);  //This does nothing because of the 1 ???

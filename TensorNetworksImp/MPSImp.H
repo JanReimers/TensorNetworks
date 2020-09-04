@@ -28,9 +28,9 @@ private:
         typedef TensorNetworks::MatrixCT  MatrixCT;
         typedef TensorNetworks::VectorCT  VectorCT;
         typedef TensorNetworks::Matrix6CT Matrix6T;
-        typedef TensorNetworks::Vector3CT Vector3T;
-        typedef TensorNetworks::Vector4CT Vector4T;
-        typedef TensorNetworks::Matrix4CT Matrix4T;
+        typedef TensorNetworks::Vector3CT Vector3CT;
+        typedef TensorNetworks::Vector4CT Vector4CT;
+        typedef TensorNetworks::Matrix4CT Matrix4CT;
         typedef TensorNetworks::eType     eType;
 //--------------------------------------------------------------------------------------
 //
@@ -119,6 +119,11 @@ private:
 
         void InitSitesAndBonds();
         void InitPlotting();
+        static int GetD1(int a, int L, int d, int DMax);
+        static int GetD2(int a, int L, int d, int DMax);
+        static c_str SiteMessage(const std::string& message,int isite);
+
+
 //--------------------------------------------------------------------------------------
 //
 //  For groound state search
@@ -138,11 +143,11 @@ private:
         Matrix6T GetHeffIterate(const Hamiltonian* h,int isite) const;
 
         void     LoadHeffCaches(const Hamiltonian* h);
-        Vector3T GetHeffCache(TensorNetworks::Direction lr,int isite) const;
-        Vector3T CalcHeffLeft(const Operator* o,int isite,bool cache=false) const;
-        Vector3T CalcHeffRight(const Operator* o,int isite,bool cache=false) const;
+        Vector3CT GetHeffCache(TensorNetworks::Direction lr,int isite) const;
+        Vector3CT CalcHeffLeft(const Operator* o,int isite,bool cache=false) const;
+        Vector3CT CalcHeffRight(const Operator* o,int isite,bool cache=false) const;
 
-        Matrix4T CalculateTwoSiteDM(int ia,int ib) const;
+        Matrix4CT CalculateTwoSiteDM(int ia,int ib) const;
 //--------------------------------------------------------------------
 //
 //  Used for ||Psi1-Psi2||^2 optimizations.
@@ -221,5 +226,16 @@ private:
         static const int n_graphs;
 
 };
+
+#define SiteLoop(ia) for (int ia=1;ia<=itsL;ia++)
+#define ForLoop(LR) for (int ia=GetStart(LR);ia!=GetStop(LR);ia+=GetIncrement(LR))
+
+#define CheckSiteNumber(ia)\
+    assert(ia>=1);\
+    assert(ia<=itsL);\
+
+#define CheckBondNumber(ib)\
+    assert(ib>=1);\
+    assert(ib<itsL);\
 
 #endif // MATRIXPRODUCTSTATEIMP_H

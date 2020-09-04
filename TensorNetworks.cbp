@@ -124,18 +124,21 @@
 		<Unit filename="TensorNetworks/Epsilons.H" />
 		<Unit filename="TensorNetworks/Factory.H" />
 		<Unit filename="TensorNetworks/FullState.H" />
+		<Unit filename="TensorNetworks/Hamiltonian.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="TensorNetworks/Hamiltonian.H" />
 		<Unit filename="TensorNetworks/IterationSchedule.C">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworks/IterationSchedule.H" />
-		<Unit filename="TensorNetworks/LRPSupervisor.H" />
 		<Unit filename="TensorNetworks/MPO.H" />
 		<Unit filename="TensorNetworks/MPS.H" />
 		<Unit filename="TensorNetworks/MultiPlotable.H" />
 		<Unit filename="TensorNetworks/Operator.H" />
 		<Unit filename="TensorNetworks/OperatorWRepresentation.H" />
 		<Unit filename="TensorNetworks/SiteOperator.H" />
+		<Unit filename="TensorNetworks/TNSLogger.H" />
 		<Unit filename="TensorNetworks/Typedefs.H" />
 		<Unit filename="TensorNetworks/VNEntropy.C">
 			<Option compilerVar="CC" />

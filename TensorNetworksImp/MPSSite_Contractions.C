@@ -522,6 +522,43 @@ void MPSSite::Contract(dVectorT& newAs,const SiteOperator* so)
 
 }
 
+MPSSite::MatrixCT MPSSite::ContractLRM(const MatrixCT& M, const MatrixCT& L, const MatrixCT& R) const
+{
+//    cout << "D1,D2=" << itsD1 << " " << itsD2 << endl;
+//    cout << "ContractLRM L=" << L.GetLimits() << endl;
+//    cout << "ContractLRM R=" << R.GetLimits() << endl;
+    assert(R.GetNumRows()==itsD2);
+    assert(L.GetNumRows()==itsD1);
+
+    MatrixCT RM=Contract_RM(R,M);
+    assert(RM.GetNumCols()==L.GetNumCols());
+    assert(RM.GetNumRows()==itsD2);
+
+    MatrixCT M_tilde(itsD1,itsD2);
+    Fill(M_tilde,eType(0.0));
+
+//    cout << "ContractLRM RM=" << RM.GetLimits() << endl;
+    for (int i1=1; i1<=itsD1; i1++)
+        for (int i2=1; i2<=itsD2; i2++)
+            for (int j1=1; j1<=L.GetNumCols(); j1++)
+                M_tilde(i1,i2)+=L(i1,j1)*RM(i2,j1);
+
+    return M_tilde;
+}
+
+MPSSite::MatrixCT MPSSite::Contract_RM(const MatrixCT& R, const MatrixCT& M) const
+{
+    assert(R.GetNumCols()==M.GetNumCols());
+    assert(R.GetNumRows()==itsD2);
+    MatrixCT RM(R.GetNumRows(),M.GetNumRows());
+    Fill(RM,eType(0.0));
+    for (int i2=1; i2<=R.GetNumRows(); i2++)
+        for (int j1=1; j1<=M.GetNumRows(); j1++)
+            for (int j2=1; j2<=R.GetNumCols(); j2++)
+                RM(i2,j1)+=R(i2,j2)*M(j1,j2);
+    return RM;
+}
+
 void  MPSSite::ApplyInPlace(const SiteOperator* so)
 {
     dVectorT newAs;

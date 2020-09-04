@@ -57,7 +57,7 @@ TEST_F(ImaginaryTimeTesting,TestApplyIdentity)
 
     OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
     Operator* IO=itsH->CreateOperator(IWO);
-    MPS* Psi2=Psi1->Apply(IO);
+    MPS* Psi2=*IO**Psi1;
     EXPECT_NEAR(Psi2->GetExpectation(itsH) ,E1,eps);
     delete Psi1;
     delete Psi2;

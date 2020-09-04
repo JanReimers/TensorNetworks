@@ -54,7 +54,7 @@ class MPS : public virtual MultiPlotable
 //    Overlap and expectation contractions
 //
         virtual double   GetOverlap     (const MPS* Psi2) const=0; //<this|Psi2>
-        virtual double   GetExpectation (const Operator* o) const=0;
+        virtual double   GetExpectation (const Operator* o) const=0; //This one checks the answer is real, the ..C version allows comples return values.
         virtual eType    GetExpectationC(const Operator* o) const=0; //For non hermitian operators, S+, S-. Sy
 //--------------------------------------------------------------------------------------
 //
@@ -62,13 +62,9 @@ class MPS : public virtual MultiPlotable
 //  In general this will increase the bond dimension from D to D*Dw
 //  The overloaded operator is just syntatic suger, not sure how usefull it will be
 //
-        virtual void                 ApplyInPlace(const Operator* o)      =0;
+        virtual void  ApplyInPlace(const Operator* o)      =0;
         virtual MPS*  Apply       (const Operator* o) const=0;
 
-        friend MPS* operator*(const Operator& o, const MPS& psi)
-        {
-            return psi.Apply(&o);
-        }
 //--------------------------------------------------------------------------------------
 //
 //    One and two site density matrix and expectation calculations
@@ -85,5 +81,10 @@ class MPS : public virtual MultiPlotable
         virtual void        Report    (std::ostream&) const=0;
         virtual bool        IsRLNormalized(int isite) const=0; //  AAA..AMBB..BBB form at one site.
 };
+
+inline MPS* operator*(const Operator& o, const MPS& psi)
+{
+    return psi.Apply(&o);
+}
 
 #endif // MATRIXPRODUCTSTATE_H
