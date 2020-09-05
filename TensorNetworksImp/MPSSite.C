@@ -151,6 +151,23 @@ void MPSSite::Freeze(double Sz)
     itsIterDE=0.0;
 }
 
+void MPSSite::NewBondDimensions(int D1, int D2, bool saveData)
+{
+    assert(D1>0);
+    assert(D2>0);
+    if (itsD1==D1 && itsD2==D2) return;
+    for (int in=0; in<itsd; in++)
+    {
+        itsMs[in].SetLimits(D1,D2,saveData);
+        for (int i1=itsD1;i1<=D1;i1++)
+            for (int i2=itsD2;i2<=D2;i2++)
+                itsMs[in](i1,i2)=eType(0.0);
+    }
+    itsD1=D1;
+    itsD2=D2;
+}
+
+
 
 char MPSSite::GetNormStatus(double eps) const
 {

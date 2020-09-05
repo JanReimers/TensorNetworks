@@ -30,6 +30,7 @@ class MPSSite
         void InitializeWith(TensorNetworks::State,int sgn);
         void Freeze(double s);
         void CloneState(const MPSSite* psi2);
+        void NewBondDimensions(int D1, int D2, bool saveData=false);
 
 //--------------------------------------------------------------------------------------
 //
@@ -109,10 +110,9 @@ private:
     TensorNetworks::Position WhereAreWe() const {return itsPosition;}
 
     MatrixCT GetNorm(TensorNetworks::Direction lr) const;
-    MatrixCT Reshape(TensorNetworks::Direction lr);
-    void     Reshape(TensorNetworks::Direction lr,const MatrixCT& UV);
+    MatrixCT NewBondDimensions(TensorNetworks::Direction lr);
+    void     NewBondDimensions(TensorNetworks::Direction lr,const MatrixCT& UV);
     void     Rescale(double norm);
-    void     Reshape(int D1, int D2, bool saveData=false);
     void     Update      (const VectorCT& newAs);
 
     static bool     IsUnit(const MatrixCT& m,double eps);

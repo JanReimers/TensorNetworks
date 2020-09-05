@@ -16,6 +16,7 @@ class Bond
         virtual ~Bond();
         void CloneState(const Bond* b2);
         void SetSites(MPSSite* left, MPSSite* right);
+        void NewBondDimension(int D);
 
         void SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,const MatrixCT& UV);
 

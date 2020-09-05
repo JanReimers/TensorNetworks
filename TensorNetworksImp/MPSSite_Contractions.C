@@ -12,7 +12,7 @@ using std::cout;
 using std::endl;
 
 
-MPSSite::MatrixCT  MPSSite::Reshape(TensorNetworks::Direction lr)
+MPSSite::MatrixCT  MPSSite::NewBondDimensions(TensorNetworks::Direction lr)
 {
     MatrixCT A;
     switch (lr)
@@ -41,18 +41,9 @@ MPSSite::MatrixCT  MPSSite::Reshape(TensorNetworks::Direction lr)
     return A;
 }
 
-void MPSSite::Reshape(int D1, int D2, bool saveData)
-{
-    assert(D1>0);
-    assert(D2>0);
-    if (itsD1==D1 && itsD2==D2) return;
-    itsD1=D1;
-    itsD2=D2;
-    for (int in=0; in<itsd; in++)
-        itsMs[in].SetLimits(itsD1,itsD2,saveData);
-}
 
-void  MPSSite::Reshape(TensorNetworks::Direction lr,const MatrixCT& UV)
+
+void  MPSSite::NewBondDimensions(TensorNetworks::Direction lr,const MatrixCT& UV)
 {
     switch (lr)
     {
@@ -61,7 +52,7 @@ void  MPSSite::Reshape(TensorNetworks::Direction lr,const MatrixCT& UV)
         //  If U has less columns than the As then we need to reshape the whole site.
         //  Typically this will happen at the edges of the lattice.
         //
-        if (UV.GetNumCols()<itsD2) Reshape(itsD1,UV.GetNumCols());//This throws away the old data
+        if (UV.GetNumCols()<itsD2) NewBondDimensions(itsD1,UV.GetNumCols());//This throws away the old data
         int i2_1=1;
         for (int in=0; in<itsd; in++)
             for (int i1=1; i1<=itsD1; i1++,i2_1++)
@@ -74,7 +65,7 @@ void  MPSSite::Reshape(TensorNetworks::Direction lr,const MatrixCT& UV)
         //  If Vdagger has less row than the As then we need to reshape the whole site.
         //  Typically this will happen at the edges of the lattice.
         //
-        if (UV.GetNumRows()<itsD1) Reshape(UV.GetNumRows(),itsD2,false);//This throws away the old data
+        if (UV.GetNumRows()<itsD1) NewBondDimensions(UV.GetNumRows(),itsD2,false);//This throws away the old data
         int i2_2=1;
         for (int in=0; in<itsd; in++)
             for (int i2=1; i2<=itsD2; i2++,i2_2++)
@@ -149,6 +140,7 @@ MPSSite::MatrixCT MPSSite::GetNorm(TensorNetworks::Direction lr) const
     }
     return ret;
 }
+
 MPSSite::Matrix6T MPSSite::
 GetHeff(const SiteOperator* mops,const Vector3T& L,const Vector3T& R) const
 {
@@ -383,7 +375,7 @@ void MPSSite::Contract(TensorNetworks::Direction lr,const VectorT& s, const Matr
         if (N1>0 && N1<itsD2)
         {
             if (itsMs[0].GetNumCols()!=UV.GetNumRows())
-                Reshape(itsD1,N1,true);
+                NewBondDimensions(itsD1,N1,true);
             else
                 itsD2=N1; //The contraction below will automatically reshape the As.
         }
@@ -403,7 +395,7 @@ void MPSSite::Contract(TensorNetworks::Direction lr,const VectorT& s, const Matr
         if (N1>0 && N1<itsD1)
         {
             if (itsMs[0].GetNumRows()!=UV.GetNumCols())
-                Reshape(N1,itsD2,true);
+                NewBondDimensions(N1,itsD2,true);
             else
                 itsD1=N1; //The contraction below will automatically reshape the As.
         }

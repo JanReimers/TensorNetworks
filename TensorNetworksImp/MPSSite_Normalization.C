@@ -20,7 +20,7 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr)
         assert(itsRightBond);
         assert(itsD1==1);
         int newD2=Max(itsRightBond->GetRank(),itsd); //Don't shrink below p
-        if (newD2<itsD2) Reshape(itsD1,newD2,true); //But also don't grow D2
+        if (newD2<itsD2) NewBondDimensions(itsD1,newD2,true); //But also don't grow D2
         Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
         return;
     }
@@ -29,14 +29,14 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr)
         assert(itsLeft_Bond);
         assert(itsD2==1);
         int newD1=Max(itsLeft_Bond->GetRank(),itsd); //Don't shrink below p
-        if (newD1<itsD1) Reshape(newD1,itsD2,true); //But also don't grow D1
+        if (newD1<itsD1) NewBondDimensions(newD1,itsD2,true); //But also don't grow D1
         Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
         return;
     }
 
     //We are in the bulk
     VectorT s; // This get passed from one site to the next.
-    MatrixCT A=Reshape(lr);
+    MatrixCT A=NewBondDimensions(lr);
     int N=Min(A.GetNumRows(),A.GetNumCols());
     s.SetLimits(N);
     MatrixCT V(N,A.GetNumCols());
@@ -49,13 +49,13 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr)
     case TensorNetworks::DRight:
     {
         UV=A;
-        Reshape(lr,Transpose(conj(V)));  //A is now Vdagger
+        NewBondDimensions(lr,Transpose(conj(V)));  //A is now Vdagger
         break;
     }
     case TensorNetworks::DLeft:
     {
         UV=Transpose(conj(V)); //Set Vdagger
-        Reshape(lr,A);  //A is now U
+        NewBondDimensions(lr,A);  //A is now U
         break;
     }
     }
@@ -69,7 +69,7 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr, int Dmax, double epsMin
     {
         assert(itsRightBond);
         int newD2=itsRightBond->GetRank();
-        Reshape(itsD1,newD2,true);
+        NewBondDimensions(itsD1,newD2,true);
         Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
         return;
     }
@@ -77,14 +77,14 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr, int Dmax, double epsMin
     {
         assert(itsLeft_Bond);
         int newD1=itsLeft_Bond->GetRank();
-        Reshape(newD1,itsD2,true);
+        NewBondDimensions(newD1,itsD2,true);
         Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
         return;
     }
 
     //We are in the bulk
     VectorT s; // This get passed from one site to the next.
-    MatrixCT A=Reshape(lr);
+    MatrixCT A=NewBondDimensions(lr);
     int N=Min(A.GetNumRows(),A.GetNumCols());
     s.SetLimits(N);
     MatrixCT V(N,A.GetNumCols());
@@ -116,13 +116,13 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr, int Dmax, double epsMin
         case TensorNetworks::DRight:
         {
             UV=A;
-            Reshape(lr,Transpose(conj(V)));  //A is now Vdagger
+            NewBondDimensions(lr,Transpose(conj(V)));  //A is now Vdagger
             break;
         }
         case TensorNetworks::DLeft:
         {
             UV=Transpose(conj(V)); //Set Vdagger
-            Reshape(lr,A);  //A is now U
+            NewBondDimensions(lr,A);  //A is now U
             break;
         }
     }
@@ -142,7 +142,7 @@ bool MPSSite::SetCanonicalBondDimensions(int maxAllowedD1,int maxAllowedD2)
     {
         assert(itsD1>=maxAllowedD1);
         assert(itsD2>=maxAllowedD2);
-        Reshape(maxAllowedD1,maxAllowedD2,true);
+        NewBondDimensions(maxAllowedD1,maxAllowedD2,true);
         reshape=true;
     }
     return reshape;

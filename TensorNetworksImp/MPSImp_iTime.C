@@ -70,11 +70,11 @@ void MPSImp::Optimize
 
     for (int in=0; in<isl.itsMaxOptimizeIterations; in++)
     {
-        itsLogger->DoneOneStep(0,"Sweep Right");
+        itsLogger->LogInfo(0,"Sweep Right");
         double O1=Sweep(TensorNetworks::DLeft,Psi2);  //This actually sweeps to the right, but leaves left normalized sites in its wake
 
 //        cout << "Left  " << in << " Norm error=" << O1 << endl;
-        itsLogger->DoneOneStep(0,"Sweep Left");
+        itsLogger->LogInfo(0,"Sweep Left");
         double O2=Sweep(TensorNetworks::DRight,Psi2);
 //        cout << "Right " << in << " Norm error=" << O2 << endl;
         //cout << "Norm change=" << O2-O1 << endl;
@@ -172,7 +172,7 @@ void  MPSImp::ApplyInPlace(const Operator* o)
 
 MPS*  MPSImp::Apply(const Operator* o) const
 {
-    MPSImp* psiPrime=new MPSImp(itsL,itsS,1,itsNormEps,itsLogger->Clone());
+    MPSImp* psiPrime=new MPSImp(itsL,itsS,1,itsNormEps,itsLogger);
     SiteLoop(ia)
     {
 //        cout << "------------- Site " << ia << "-----------------" << endl;

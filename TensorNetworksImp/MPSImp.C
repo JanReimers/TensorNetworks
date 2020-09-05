@@ -56,7 +56,7 @@ MPSImp::MPSImp(const MPSImp& mps)
     , itsNSweep      (mps.itsNSweep)
     , itsSelectedSite(mps.itsSelectedSite)
     , itsNormEps     (mps.itsNormEps)
-    , itsLogger  (mps.itsLogger->Clone())
+    , itsLogger      (mps.itsLogger)
     , itsSitesMesh   (0)
     , itsBondsMesh   (0)
 {
@@ -133,6 +133,32 @@ void MPSImp::Freeze(int isite,double s)
 
 
 
+void MPSImp::IncreaseBondDimensions(int D)
+{
+    int Dideal=1;
+    int ia=1;
+    for (; ia<=itsL/2; ia++)
+    {
+        int D1=Min(Dideal,D);
+        int D2=Min(Dideal*itsd,D);
+        itsSites[ia]->NewBondDimensions(D1,D2,true);
+        assert(ia<itsL);
+        itsBonds[ia]->NewBondDimension(D2);
+        Dideal*=itsd;
+    }
+    Dideal=1;
+    for (int ib=itsL; ib>=ia; ib--)
+    {
+        int D2=Min(Dideal,D);
+        int D1=Min(Dideal*itsd,D);
+        itsSites[ib]->NewBondDimensions(D1,D2,true); //Very important to save data
+        assert(ib>1);
+        itsBonds[ib-1]->NewBondDimension(D1);
+        Dideal*=itsd;
+    }
+
+    itsDmax=D;
+}
 
 
 //--------------------------------------------------------------------------------------
@@ -180,11 +206,17 @@ bool MPSImp::IsRLNormalized(int isite) const
 {
     bool ret=true;
     for (int ia=1; ia<isite; ia++)
-        ret=ret&&itsSites[ia]->GetNormStatus(itsNormEps)=='A';
+    {
+        char n=itsSites[ia]->GetNormStatus(itsNormEps);
+        ret=ret&& (n=='A' || n=='I');
+    }
     for (int ia=isite+1; ia<=itsL; ia++)
-        ret=ret&&itsSites[ia]->GetNormStatus(itsNormEps)=='B';
+    {
+        char n=itsSites[ia]->GetNormStatus(itsNormEps);
+        ret=ret&& (n=='B' || n=='I');
+    }
 
-    if (!ret) cout << "Unormailzed state " << GetNormStatus() << endl;
+    if (!ret) cout << "Unormalized state " << GetNormStatus() << endl;
     return ret;
 }
 

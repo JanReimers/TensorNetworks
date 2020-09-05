@@ -2,6 +2,7 @@
 #define TNSLOGGER_H
 
 #include "Misc/c_str.H"
+#include <memory>
 //
 //  LOgger for a long running process (LRP).  The public interface is for use by
 //  the LRP, it simply calls ReadyToStart at the begining and then
@@ -16,8 +17,20 @@ class TNSLogger
         virtual ~TNSLogger() {};
 
         virtual void ReadyToStart(c_str /*currentOperation*/) {};
-        virtual void DoneOneStep(int /*level*/,c_str /*currentOperation*/, int isite=-1) {(void)isite;} //comment name to avoid warning
-        virtual TNSLogger* Clone() const {return new TNSLogger();}
+        virtual void LogInfo(int level,c_str message) {(void)level;} //comment name to avoid warning
+        virtual void LogInfo(int level,int site,c_str message) {(void)level;} //comment name to avoid warning
+
+        void LogInfo(int level,int site,const std::string& message) {LogInfo(level,site,message.c_str());} //comment name to avoid warning
+        void LogInfo(int level,const std::string& message) {LogInfo(level,message.c_str());} //comment name to avoid warning
+
+        template<typename... Args>
+        void LogInfoV(int level,c_str fmt, const Args &... args)
+        {
+            size_t size = snprintf( nullptr, 0, fmt,args...) + 1; // Extra space for '\0'
+            std::unique_ptr<char[]> buf( new char[ size ] );
+            snprintf( buf.get(), size, fmt, args ... );
+            LogInfo(level,buf.get());
+        }
 };
 
 #endif // TNSLOGGER_H

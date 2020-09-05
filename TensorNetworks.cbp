@@ -15,6 +15,7 @@
 				<Option createDefFile="1" />
 				<Compiler>
 					<Add option="-Wall" />
+					<Add option="-std=c++11" />
 					<Add option="-g" />
 					<Add option="-DDEBUG" />
 					<Add directory="Operators" />
@@ -80,6 +81,7 @@
 		<Unit filename="Containers/TwoSiteDMs.H" />
 		<Unit filename="Containers/Vector3.H" />
 		<Unit filename="Containers/Vector4.H" />
+		<Unit filename="Install" />
 		<Unit filename="Operators/IdentityOperator.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -168,7 +170,19 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/MPSImp.H" />
+		<Unit filename="TensorNetworksImp/MPSImp_ExpectationsAndDMs.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/MPSImp_Normalization.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="TensorNetworksImp/MPSImp_Plotting.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/MPSImp_Variational.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/MPSImp_iTime.C">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/MPSSite.C">
@@ -176,6 +190,15 @@
 		</Unit>
 		<Unit filename="TensorNetworksImp/MPSSite.H" />
 		<Unit filename="TensorNetworksImp/MPSSite_Contractions.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/MPSSite_Normalization.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/MPSSite_Variational.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/MPSSite_iTIme.C">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/MultiPlotableImp.C">
@@ -186,6 +209,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/PrimeEigenSolver.H" />
+		<Unit filename="TensorNetworksImp/SPDLogger.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/SPDLogger.H" />
 		<Unit filename="TensorNetworksImp/SpinCalculator.C">
 			<Option compilerVar="CC" />
 		</Unit>

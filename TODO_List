@@ -1,13 +1,8 @@
 
-- Done Split up mega files MSPImp.C and MPSSite.C
-- Should non hermition operator have distinct type?
-    Not clear how to go about this.
-    Do we really need separate Operator and MPO interfaces?
-- Support dynamic tuning of D in iteration schedule.
-    -If D jumps from 4 to 8 do increments by 1''s or jump directly?
-    -If jump directly the user needs fill in lots of IterationScheduleLine's
-    -Or may IterationSchedule. Insert can detect this and auto insert lines
-        -This my surprise users.
+- Done Integrate spdlogger as one derived imp for TNSLogger
+    -UNfortunately we can't' use spdlogger advanced formatting when wrapping through an abs interface
+     spd uses variadic templates instead of the old C variadic arguments framework, which means
+     everything needs to be inline.
 - Make ab SVDCompress interface.  Derived classes can implement different policies doe deciding which Svs to throw awat etc.
 - Spin space trotter decomp
 - Infinite methods iMPS, iTEBD, iDMRG
@@ -21,7 +16,6 @@
             stored on the bonds.
             Can we reuse the MPS class for this?  All contractions need to be modified to incorporate
             the SVs from the bonds.
--Dynamically add lattice site, pseudo DMRG
 - Play with iTensor for 2D systems.
     -Try one tetrahedon.
 
@@ -47,10 +41,19 @@
         7) one or two (or N!) site updates. Part of convergence schedule?
         8) Report windows (HTML table?) with columns in the report(ostream) method
 
+- Done Split up mega files MSPImp.C and MPSSite.C
+- Should non hermition operator have distinct type?
+    Not clear how to go about this.
+    Do we really need separate Operator and MPO interfaces?
+- Done Support dynamic tuning of D in iteration schedule.
+    -If D jumps from 4 to 8 do increments by 1''s or jump directly?
+    -If jump directly the user needs fill in lots of IterationScheduleLine's
+    -Or may IterationSchedule. Insert can detect this and auto insert lines
+        -This my surprise users.
 - Done Only calculate <E2>-<E>2 after end of it sched
 - Done Take out support for two operator contractions.  Now that we can combine and compress MPOs we don;t need it for <E^2>.
 - Done IterationScheduleLine make abridged constructors for variation and iTime.
-- Done Rename TNSLogger to Logger
+- Done Rename LRPSupervisor TNSLogger
 - Done mpsImp line 372   GetEOLeft_Iterate(h,1,true);  //This does nothing because of the 1 ???
 - Done Does MPSImp need an Epsilons member?
     NOt really it only uses itsNormalizationEpsilon
@@ -77,6 +80,7 @@
     -For L=5 D>=9 works, but that is the 2^L Hilbert space
     -For L=6 D=12 and D=27 works
     -For L=9 Hard to find a D that converges
+    -These all work great if you slowly increment D.
 Bugs:
     -log(DE) stops plotting L=6, S=1 D=?
     -Bond Entropy missing points L=6 D=?
@@ -84,6 +88,7 @@ Bugs:
 -Why Eigen values of Sus tensor <S^a*S^b>-<S^a>*<S^b> are not equal they always look like (e1,e1,e2) or (e1,e2,e2).
 -Why optimize site 1, just leave it a |up> and take out global SU(2) invariance
     is this related to poor convergence for S>1/2 ??
+    How to handle left or right normalization with a frozen spin?
 -Why is dE~10e-15 for sites 1&2 on right sweep and sites L-1,L-2 on left sweep?
     is this related to poor convergence for S>1/2 ??
 -Why does MPS compression convergence criteria (Sholwock page 132 yield wierd numbers)

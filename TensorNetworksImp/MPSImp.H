@@ -122,7 +122,7 @@ private:
         static int GetD1(int a, int L, int d, int DMax);
         static int GetD2(int a, int L, int d, int DMax);
         static c_str SiteMessage(const std::string& message,int isite);
-
+        void IncreaseBondDimensions(int D);
 
 //--------------------------------------------------------------------------------------
 //
@@ -131,7 +131,7 @@ private:
         double FindVariationalGroundState(const Hamiltonian*,const IterationScheduleLine&);
         double FindiTimeGroundState      (const Hamiltonian*,const IterationScheduleLine&);
         void   Refine(TensorNetworks::Direction lr,const Hamiltonian*,const Epsilons&,int isite); //Minimize energy WRT the Ms in one site.
-        double Sweep (TensorNetworks::Direction lr,const Hamiltonian*,const Epsilons&);
+        void   Sweep (TensorNetworks::Direction lr,const Hamiltonian*,const Epsilons&);
         void   UpdateBondData(int isite);
         void   NormalizeSite             (TensorNetworks::Direction lr,int isite);
         void   NormalizeAndCompressSite  (TensorNetworks::Direction lr,int isite,int Dmax, double epsMin);

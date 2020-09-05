@@ -45,7 +45,7 @@ OneSiteDMs MPSImp::CalculateOneSiteDMs()
     Normalize(TensorNetworks::DRight);
     SiteLoop(ia)
     {
-        itsLogger->DoneOneStep(2,SiteMessage("Calculate ro(mn) site: ",ia),ia);
+        itsLogger->LogInfo(2,ia,"Calculate ro(mn)");
         ret.Insert(ia,itsSites[ia]->CalculateOneSiteDM());
         NormalizeSite(TensorNetworks::DLeft,ia);
     }

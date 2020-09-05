@@ -9,6 +9,12 @@ Non GUI
             shange -O -O2
         make
         sudo make install
+    spdlog
+        https://github.com/gabime/spdlog
+        Download zip
+        cmake
+        make
+        sudo make install
     sudo apt install gfortran
     sudo apt-get install libblas-dev liblapack-dev
     sudo ldconfig

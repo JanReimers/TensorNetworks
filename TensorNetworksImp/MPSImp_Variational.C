@@ -17,59 +17,74 @@ using std::endl;
 //
 double MPSImp::FindVariationalGroundState(const Hamiltonian* H,const IterationSchedule& is)
 {
-    double E1=0;
-    for (is.begin(); !is.end(); is++)
-        E1=FindVariationalGroundState(H,*is);
-    MPO* H2=H->CreateH2Operator();
-    double E2=GetExpectation(H2);
-    delete H2;
-    return E2-E1*E1;
-}
-
-double MPSImp::FindVariationalGroundState(const Hamiltonian* hamiltonian, const IterationScheduleLine& isl)
-{
     itsLogger->ReadyToStart("Right normalize");
     Normalize(TensorNetworks::DRight);
-    itsLogger->DoneOneStep(0,"Load L&R caches");
-    LoadHeffCaches(hamiltonian);
+    itsLogger->LogInfo(1,"Load L&R caches");
+    LoadHeffCaches(H);
 
-    double E1=0;
-    for (int in=0; in<isl.itsMaxGSSweepIterations; in++)
-    {
-        itsLogger->DoneOneStep(0,"Sweep Right");
-        E1=Sweep(TensorNetworks::DLeft,hamiltonian,isl.itsEps);  //This actually sweeps to the right, but leaves left normalized sites in its wake
-        itsLogger->DoneOneStep(0,"Sweep Left");
-        E1=Sweep(TensorNetworks::DRight,hamiltonian,isl.itsEps);
-        if (GetMaxDeltaE()<isl.itsEps.itsDelatEnergy1Epsilon) break;
-    }
-    return E1;
+    double DE2=0;
+    for (is.begin(); !is.end(); is++)
+        DE2=FindVariationalGroundState(H,*is);
+    return DE2;
 }
 
-double MPSImp::Sweep(TensorNetworks::Direction lr,const Hamiltonian* h,const Epsilons& eps)
+double MPSImp::FindVariationalGroundState(const Hamiltonian* H, const IterationScheduleLine& isl)
+{
+    assert(itsDmax<=isl.itsDmax);
+    MPO* H2=H->CreateH2Operator();
+    double DE2=0;
+    for (int D=itsDmax;D<=isl.itsDmax;D++)
+    {
+        if (D>itsDmax)
+        {
+            IncreaseBondDimensions(D);
+            Normalize(TensorNetworks::DRight);
+            LoadHeffCaches(H);
+        }
+        int in=0;
+        for (; in<isl.itsMaxGSSweepIterations; in++)
+        {
+            itsLogger->LogInfo(1,"Sweep Right");
+            Sweep(TensorNetworks::DLeft,H,isl.itsEps);  //This actually sweeps to the right, but leaves left normalized sites in its wake
+            itsLogger->LogInfo(1,"Sweep Left");
+            Sweep(TensorNetworks::DRight,H,isl.itsEps);
+            double dE=GetMaxDeltaE();
+            //cout << "dE=" << dE << endl;
+            if (dE<isl.itsEps.itsDelatEnergy1Epsilon) break;
+        }
+        in++;
+
+        double E1=GetExpectation(H);
+        double E2=GetExpectation(H2);
+        DE2=E2-E1*E1;
+        itsLogger->LogInfoV(0,"Variational GS D=%4d, %4d iterations, <E>=%.9f, <E^2>-<E>^2=%.2e",D,in,E1,DE2);
+        if (weHaveGraphs())
+        {
+            AddPoint("Iter E/J",Plotting::Point(itsNSweep,E1));
+        }
+    }
+    delete H2;
+    return DE2;
+}
+
+void MPSImp::Sweep(TensorNetworks::Direction lr,const Hamiltonian* h,const Epsilons& eps)
 {
     int iter=0;
     ForLoop(lr)
     {
         CheckSiteNumber(ia);
         Refine(lr,h,eps,ia);
+        double de=fabs(itsSites[ia]->GetIterDE());
         if (weHaveGraphs())
         {
-            double de=fabs(itsSites[ia]->GetIterDE());
-            //cout << "ia,diter,de=" << ia << " " << diter << " " << de << endl;
             if (de<1e-16) de=1e-16;
             double diter=itsNSweep+static_cast<double>(iter)/(itsL-1); //Fractional iter count for log(dE) plot
+            //cout << "ia,diter,de=" << ia << " " << diter << " " << de << endl;
             AddPoint("Iter log(dE/J)",Plotting::Point(diter,log10(de)));
         }
         iter++; //ia doesn;t always count upwards, but this guy does.
     }
     itsNSweep++;
-    itsLogger->DoneOneStep(0,"Calculating Expectation <E>"); //Logger will update the graphs
-    double E1=GetExpectation(h);
-    if (weHaveGraphs())
-    {
-        AddPoint("Iter E/J",Plotting::Point(itsNSweep,E1));
-    }
-    return E1;
 }
 
 
@@ -80,9 +95,9 @@ void MPSImp::Refine(TensorNetworks::Direction lr,const Hamiltonian *h,const Epsi
     assert(IsRLNormalized(isite));
     if (!itsSites[isite]->IsFrozen())
     {
-        itsLogger->DoneOneStep(2,"Calculating Heff",isite); //Logger will update the graphs
+        itsLogger->LogInfo(2,isite,"Calculating Heff"); //Logger will update the graphs
         Matrix6T Heff6=GetHeffIterate(h,isite); //New iterative version
-        itsLogger->DoneOneStep(2,"Running eigen solver",isite); //Logger will update the graphs
+        itsLogger->LogInfo(2,isite,"Running eigen solver"); //Logger will update the graphs
         itsSites[isite]->Refine(Heff6.Flatten(),eps);
     }
     itsSiteEnergies[isite]=itsSites[isite]->GetSiteEnergy();
@@ -128,7 +143,7 @@ MPSImp::Vector3CT MPSImp::CalcHeffLeft(const Operator* o,int isite, bool cache) 
     F(1,1,1)=eType(1.0);
     for (int ia=1; ia<isite; ia++)
     {
-        itsLogger->DoneOneStep(1,SiteMessage("Calculating L cache for site ",ia));
+        itsLogger->LogInfo(1,SiteMessage("Calculating L cache for site ",ia));
         F=itsSites[ia]->IterateLeft_F(o->GetSiteOperator(ia),F,cache);
     }
     return F;
@@ -143,7 +158,7 @@ MPSImp::Vector3CT MPSImp::CalcHeffRight(const Operator* o,int isite, bool cache)
     F(1,1,1)=eType(1.0);
     for (int ia=itsL; ia>isite; ia--)
     {
-        itsLogger->DoneOneStep(1,SiteMessage("Calculating R cache for site ",ia));
+        itsLogger->LogInfo(1,SiteMessage("Calculating R cache for site ",ia));
         F=itsSites[ia]->IterateRightF(o->GetSiteOperator(ia),F,cache);
     }
     return F;
@@ -161,7 +176,7 @@ MPSImp::MatrixCT MPSImp::CalcHeffLeft(const MPS* psi2,int isite, bool cache) con
     F(1,1)=eType(1.0);
     for (int ia=1; ia<isite; ia++)
     {
-        itsLogger->DoneOneStep(1,SiteMessage("Calculating L cache for site ",ia));
+        itsLogger->LogInfo(1,SiteMessage("Calculating L cache for site ",ia));
         F=itsSites[ia]->IterateLeft_F(psi2Imp->itsSites[ia],F,cache);
     }
     return F;
@@ -178,7 +193,7 @@ MPSImp::MatrixCT MPSImp::CalcHeffRight(const MPS* psi2,int isite, bool cache) co
     F(1,1)=eType(1.0);
     for (int ia=itsL; ia>isite; ia--)
     {
-        itsLogger->DoneOneStep(1,SiteMessage("Calculating R cache for site ",ia));
+        itsLogger->LogInfo(1,SiteMessage("Calculating R cache for site ",ia));
         F=itsSites[ia]->IterateRightF(psi2Imp->itsSites[ia],F,cache);
     }
     return F;

@@ -33,6 +33,16 @@ void Bond::SetSites(MPSSite* left, MPSSite* right)
     assert(itsRightSite);
 }
 
+void Bond::NewBondDimension(int D)
+{
+    assert(D>=1);
+    assert(itsRank==itsSingularValues.size());
+    itsSingularValues.SetSize(D,true);
+    for (int i=itsRank;i<D;i++)
+        itsSingularValues[i]=0.0;
+    itsRank=D;
+}
+
 void Bond::SetSingularValues(const VectorT& s)
 {
     //std::cout << "SingularValues=" << s << std::endl;

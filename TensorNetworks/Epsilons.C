@@ -1,5 +1,6 @@
 #include "TensorNetworks/Epsilons.H"
 #include <iostream>
+#include <sstream>
 #include <iomanip>
 
 Epsilons::Epsilons(double default_eps)

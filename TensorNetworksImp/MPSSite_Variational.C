@@ -18,6 +18,7 @@ void MPSSite::Refine(const MatrixCT& Heff,const Epsilons& eps)
     assert(!isFrozen);
     assert(Heff.GetNumRows()==Heff.GetNumCols());
     int N=Heff.GetNumRows();
+    //cout << "Heff N=" << N << endl;
     Vector<double>  eigenValues(N);
     itsEigenSolver.Solve(Heff,2,eps); //Get lowest two eigen values/states
 
