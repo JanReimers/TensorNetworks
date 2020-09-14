@@ -67,10 +67,12 @@ class MPSSite
 //
 // Normalization
 //
-        void SVDNormalize(TensorNetworks::Direction lr);//  Returns rank of singular values.
-        void SVDNormalize(TensorNetworks::Direction lr,int Dmax,double espMin);//  Returns rank of singular values.
+        void SVDNormalize(TensorNetworks::Direction lr);
+        void SVDNormalize(TensorNetworks::Direction lr,int Dmax,double espMin);
         bool IsNormalized(TensorNetworks::Direction lr,double eps) const;
         bool SetCanonicalBondDimensions(int D1,int D2);
+        void Canonicalize(TensorNetworks::Direction lr);
+
 //--------------------------------------------------------------------------------------
 //
 //  Vary this site to be as close as possible to Site by minimizing ||this-Psi2||^2
@@ -127,6 +129,8 @@ private:
 
 
     friend class MatrixProductTesting;
+    friend class iTEBDStateImp;
+
     typedef std::vector<MatrixCT>     dVectorT;
     typedef dVectorT::      iterator  dIterT;
     typedef dVectorT::const_iterator cdIterT;
@@ -136,6 +140,7 @@ private:
 //  Internal contraction function
 //
     void Contract(TensorNetworks::Direction lr,const VectorT& s, const MatrixCT& UV);
+    void Contract(TensorNetworks::Direction lr,const MatrixCT& UV);
     static MatrixCT  Contract1(const VectorT &  s, const MatrixCT& VA);
     static MatrixCT  Contract1(const MatrixCT& AU, const VectorT & s );
 

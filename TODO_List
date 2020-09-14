@@ -1,4 +1,6 @@
 
+- Refactor - Normalize and NormalizeAndCompress should be merged  DMax=0, eps=0 means no compress?
+- Refactor - separate all plotting code in MPSImp and MPState
 - Done Integrate spdlogger as one derived imp for TNSLogger
     -UNfortunately we can't' use spdlogger advanced formatting when wrapping through an abs interface
      spd uses variadic templates instead of the old C variadic arguments framework, which means

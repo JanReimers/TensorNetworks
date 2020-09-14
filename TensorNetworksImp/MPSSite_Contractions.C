@@ -415,6 +415,55 @@ void MPSSite::Contract(TensorNetworks::Direction lr,const VectorT& s, const Matr
     }
 }
 
+void MPSSite::Contract(TensorNetworks::Direction lr,const MatrixCT& UV)
+{
+    switch (lr)
+    {
+    case TensorNetworks::DRight:
+    {
+        int N1=UV.GetNumCols(); //N1=0 on the first site.
+        if (N1>0 && N1<itsD2)
+        {
+            if (itsMs[0].GetNumCols()!=UV.GetNumRows())
+                NewBondDimensions(itsD1,N1,true);
+            else
+                itsD2=N1; //The contraction below will automatically reshape the As.
+        }
+        for (int in=0; in<itsd; in++)
+        {
+            assert(itsMs[in].GetNumCols()==UV.GetNumRows());
+            MatrixCT temp=itsMs[in]*UV;
+            itsMs[in].SetLimits(0,0);
+            itsMs[in]=temp; //Shallow copy
+            assert(itsMs[in].GetNumCols()==itsD2); //Verify shape is correct;
+        }
+        break;
+    }
+    case TensorNetworks::DLeft:
+    {
+        int N1=UV.GetNumRows(); //N1=0 on the first site.
+        if (N1>0 && N1<itsD1)
+        {
+            if (itsMs[0].GetNumRows()!=UV.GetNumCols())
+                NewBondDimensions(N1,itsD2,true);
+            else
+                itsD1=N1; //The contraction below will automatically reshape the As.
+        }
+
+        for (int in=0; in<itsd; in++)
+        {
+            assert(UV.GetNumCols()==itsMs[in].GetNumRows());
+            MatrixCT temp=UV*itsMs[in];
+            itsMs[in].SetLimits(0,0);
+            itsMs[in]=temp; //Shallow copy
+            //        cout << "A[" << in << "]=" << itsAs[in] << endl;
+            assert(itsMs[in].GetNumRows()==itsD1); //Verify shape is correct;
+        }
+        break;
+    }
+
+    }
+}
 
 
 MPSSite::MatrixCT MPSSite::CalculateOneSiteDM()

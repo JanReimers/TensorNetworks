@@ -68,6 +68,31 @@ MPSImp::MPSImp(const MPSImp& mps)
         itsBonds[ia]->CloneState(mps.itsBonds[ia]); //Transfer wave function data
 }
 
+MPSImp::MPSImp(int L, double S, int D,TensorNetworks::Direction lr,double normEps,TNSLogger* s)
+    : itsL(L)
+    , itsDmax(D)
+    , itsS(S)
+    , itsd(2*S+1)
+    , itsNSweep(0)
+    , itsSelectedSite(1)
+    , itsNormEps(normEps)
+    , itsLogger(s)
+    , itsSitesMesh(0)
+    , itsBondsMesh(0)
+{
+    assert(itsL>0);
+#ifdef DEBUG
+    double ipart;
+    double frac=std::modf(2.0*itsS,&ipart);
+    assert(frac==0.0);
+#endif
+    assert(itsS>=0.5);
+    assert(itsDmax>0);
+
+    if (itsLogger==0)
+        itsLogger=new TNSLogger();
+
+}
 void MPSImp::InitSitesAndBonds()
 {
     //

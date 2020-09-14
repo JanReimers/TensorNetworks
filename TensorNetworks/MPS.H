@@ -7,8 +7,8 @@
 #include "Containers/OneSiteDMs.H"
 #include "Containers/TwoSiteDMs.H"
 #include <string>
-#include <vector>
-#include <iostream>
+//#include <vector>
+#include <iosfwd>
 
 class Operator;
 class Hamiltonian;

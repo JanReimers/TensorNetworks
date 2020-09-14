@@ -148,3 +148,32 @@ bool MPSSite::SetCanonicalBondDimensions(int maxAllowedD1,int maxAllowedD2)
     return reshape;
 }
 
+void MPSSite::Canonicalize(TensorNetworks::Direction lr)
+{
+    MatrixCT A=NewBondDimensions(lr);
+    int N=Min(A.GetNumRows(),A.GetNumCols());
+    VectorT s(N); // This get passed from one site to the next.
+    MatrixCT V(N,A.GetNumCols());
+    CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
+
+    MatrixCT UV;// This get transferred through the bond to a neighbouring site.
+
+    switch (lr)
+    {
+    case TensorNetworks::DRight:
+    {
+        UV=A;
+        NewBondDimensions(lr,Transpose(conj(V)));  //A is now Vdagger
+        break;
+    }
+    case TensorNetworks::DLeft:
+    {
+        UV=Transpose(conj(V)); //Set Vdagger
+        NewBondDimensions(lr,A);  //A is now U
+        break;
+    }
+    }
+    GetBond(lr)->CanonicalTransfer(lr,s,UV);
+}
+
+

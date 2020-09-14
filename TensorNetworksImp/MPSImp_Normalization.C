@@ -39,7 +39,7 @@ int MPSImp::GetD2(int a, int L, int d, int DMax)
 void MPSImp::Normalize(TensorNetworks::Direction LR)
 {
     ForLoop(LR)
-    NormalizeSite(LR,ia);
+        NormalizeSite(LR,ia);
 }
 
 
@@ -48,13 +48,19 @@ void MPSImp::NormalizeSite(TensorNetworks::Direction lr,int isite)
     CheckSiteNumber(isite);
     std::string lrs=lr==TensorNetworks::DLeft ? "Left" : "Right";
     itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize site ");
-//    cout << "SVD " << lrs << " site " << isite << endl;
     itsSites[isite]->SVDNormalize(lr);
     itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize update Bond data ");
     int bond_index=isite+( lr==TensorNetworks::DLeft ? 0 :-1);
     if (bond_index<itsL && bond_index>=1)
         UpdateBondData(bond_index);
 }
+
+void MPSImp::CanonicalizeSite(TensorNetworks::Direction lr,int isite)
+{
+    CheckSiteNumber(isite);
+    itsSites[isite]->Canonicalize(lr);
+}
+
 
 void MPSImp::UpdateBondData(int isite)
 {

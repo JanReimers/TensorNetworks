@@ -1,0 +1,128 @@
+#include "TensorNetworksImp/iTEBDStateImp.H"
+#include "TensorNetworksImp/Bond.H"
+#include "oml/cnumeric.h"
+
+iTEBDStateImp::iTEBDStateImp(int L,double S, int D,double normEps,TNSLogger* s)
+    : MPSImp(L,S,D,TensorNetworks::DLeft,normEps,s)
+{
+    InitSitesAndBonds();
+}
+
+iTEBDStateImp::~iTEBDStateImp()
+{
+    itsBonds[0]=0; //Avoid double deletion in optr_vector destructor
+    //dtor
+}
+
+
+void iTEBDStateImp::InitSitesAndBonds()
+{
+    //
+    //  Create bond objects
+    //
+    itsBonds.push_back(0);  //Dummy space holder. We want this array to be 1 based.
+    for (int i=1; i<=itsL; i++)
+        itsBonds.push_back(new Bond());
+    itsBonds[0]=itsBonds[itsL];  //Periodic boundary conditions
+    //
+    //  Create Sites
+    //
+    itsSites.push_back(0);  //Dummy space holder. We want this array to be 1 based.
+    for (int i=1; i<=itsL-1; i++)
+        itsSites.push_back(new MPSSite(TensorNetworks::PBulk,itsBonds[i-1],itsBonds[i],itsd,itsDmax,itsDmax));
+    itsSites.push_back(new MPSSite(TensorNetworks::PRight,itsBonds[itsL-1],itsBonds[0],itsd,itsDmax,itsDmax));
+    //
+    //  Tell each bond about its left and right sites.
+    //
+    for (int i=1; i<=itsL; i++)
+        itsBonds[i]->SetSites(itsSites[i],itsSites[GetModSite(i+1)]);
+}
+
+void iTEBDStateImp::InitializeWith(TensorNetworks::State s)
+{
+    MPSImp::InitializeWith(s);
+}
+
+
+void iTEBDStateImp::Normalize(TensorNetworks::Direction LR)
+{
+    ForLoop(LR)
+        MPSImp::CanonicalizeSite(LR,ia);
+}
+
+//void iTEBDStateImp::NormalizeAndCompress(TensorNetworks::Direction LR,int Dmax,double epsMin);
+int iTEBDStateImp::GetModSite(int isite)
+{
+    int modSite=((isite-1)%itsL)+1;
+    assert(modSite>=1);
+    assert(modSite<=itsL);
+    return modSite;
+}
+
+void iTEBDStateImp::Apply(int isite,const Matrix4T& expH)
+{
+    MPSSite* siteA=itsSites[GetModSite(isite  )];
+    Bond*    bondA=siteA->itsRightBond;
+    MPSSite* siteB=itsSites[GetModSite(isite+1)];
+    Bond*    bondB=siteB->itsRightBond;
+    assert(siteA);
+    assert(siteB);
+    assert(bondA);
+    assert(bondB);
+    assert(siteA!=siteB);
+    assert(bondA!=bondB);
+    MPSSite::dVectorT& MA(siteA->itsMs);
+    MPSSite::dVectorT& MB(siteB->itsMs);
+    Array<double> lambdaA=bondA->GetSVs();
+    Array<double> lambdaB=bondB->GetSVs();
+    //
+    //  New we need to contract   Theta(nA,i1,nB,i3) =
+    //                         sB(i1)*MA(mA,i1,i2)*sA(i2)*MB(mB,i2,i3)*sB(i3)
+    //                                   |                   |
+    //                              expH(mA,nA,              mB,nB)
+    //
+    Matrix4CT Theta(itsd,itsDmax,itsd,itsDmax,0);
+    Fill(Theta.Flatten(),eType(0.0));
+    for (int na=0;na<itsd;na++)
+    for (int nb=0;nb<itsd;nb++)
+        for (int i1=1;i1<=itsDmax;i1++)
+            for (int i3=1;i3<=itsDmax;i3++)
+            {
+                eType t(0.0);
+                for (int ma=0;ma<itsd;ma++)
+                for (int mb=0;mb<itsd;mb++)
+                for (int i2=1;i2<=itsDmax;i2++)
+                    t+=lambdaB[i1-1]*MA[ma](i1,i2)*lambdaA[i2-1]*MB[mb](i2,i3)*lambdaB[i3-1]*expH(ma,na,mb,nb);
+                Theta(na,i1-1,nb,i3-1)=t;
+            }
+
+    //
+    //  Now SVD Theta
+    //
+    MatrixCT ThetaF=Theta.Flatten();
+    assert(ThetaF.GetNumRows()==ThetaF.GetNumCols());
+    int N=ThetaF.GetNumRows();
+    VectorT  s(N);
+    MatrixCT VT(N,N);
+//    cout << "Before Compress Dw1 Dw2 A=" << itsDw12.Dw1 << " " << itsDw12.Dw2 << " "<< A << endl;
+    CSVDecomp(ThetaF,s,VT);
+    cout << "s=" << s;
+    int nai1=1;
+    for (int na=0;na<itsd;na++)
+        for (int i1=1;i1<=itsDmax;i1++,nai1++)
+            for (int i2=1;i2<=itsDmax;i2++)
+                MA[na](i1,i2)=ThetaF(nai1,i2)/lambdaB[i1-1];
+    int nbi2=1;
+    for (int nb=0;nb<itsd;nb++)
+        for (int i2=1;i2<=itsDmax;i2++,nbi2++)
+            for (int i3=1;i3<=itsDmax;i3++)
+                MB[nb](i2,i3)=VT(nbi2,i3)/lambdaB[i3-1];
+
+   bondA->SetSingularValues(s);
+
+}
+
+void iTEBDStateImp::Report(std::ostream& os) const
+{
+    MPSImp::Report(os);
+}

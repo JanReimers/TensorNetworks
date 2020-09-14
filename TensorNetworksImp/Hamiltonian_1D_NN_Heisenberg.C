@@ -1,5 +1,6 @@
 #include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
 #include "TensorNetworksImp/MPSImp.H"
+#include "TensorNetworksImp/iTEBDStateImp.H"
 #include "TensorNetworksImp/FullStateImp.H"
 #include "Operators/MPO_LRB.H"
 #include "Operators/MPOImp.H"
@@ -172,6 +173,12 @@ MPS* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,double normEps , TNSLogger* s
 {
     return new MPSImp(itsL,itsS,D,normEps,s);
 }
+
+iTEBDState* Hamiltonian_1D_NN_Heisenberg::CreateiTEBDState(int D,double normEps, TNSLogger*s) const
+{
+    return new iTEBDStateImp(itsL,itsS,D,normEps,s);
+}
+
 
 MPO* Hamiltonian_1D_NN_Heisenberg::CreateUnitOperator() const
 {

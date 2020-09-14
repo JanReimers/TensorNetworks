@@ -75,3 +75,10 @@ void Bond::SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,const Matri
     assert(GetSite(lr));
     GetSite(lr)->Contract(lr,s,UV);
 }
+
+void Bond::CanonicalTransfer(TensorNetworks::Direction lr,const VectorT& s,const MatrixCT& UV)
+{
+    SetSingularValues(s);
+    assert(GetSite(lr));
+    GetSite(lr)->Contract(lr,UV);
+}

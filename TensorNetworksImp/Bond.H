@@ -18,7 +18,8 @@ class Bond
         void SetSites(MPSSite* left, MPSSite* right);
         void NewBondDimension(int D);
 
-        void SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,const MatrixCT& UV);
+        void SVDTransfer      (TensorNetworks::Direction lr,const VectorT& s,const MatrixCT& UV);
+        void CanonicalTransfer(TensorNetworks::Direction lr,const VectorT& s,const MatrixCT& UV);
 
         double GetBondEntropy() const {return itsBondEntropy;}
         double GetMinSV      () const {return itsMinSV;}
@@ -27,6 +28,7 @@ class Bond
     protected:
 
     private:
+        friend class iTEBDStateImp;
         void SetSingularValues(const VectorT& s);
         //
         //  lr is the normalization direction.  For normalization we need to access the right bond.

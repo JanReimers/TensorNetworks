@@ -9,6 +9,7 @@ class OperatorWRepresentation;
 class MPS;
 class MPO;
 class FullState;
+class iTEBDState;
 class Epsilons;
 class TNSLogger;
 
@@ -24,7 +25,9 @@ class Hamiltonian : public virtual Operator
         virtual int GetMaxDw() const=0;
 
         //  Creates an MPS or operators with the correct lattice size and spin space.
-        virtual MPS* CreateMPS     (int D,double normEps=1e-12, TNSLogger* =0) const=0;
+        virtual MPS*        CreateMPS       (int D,double normEps=1e-12, TNSLogger* =0) const=0;
+        virtual iTEBDState* CreateiTEBDState(int D,double normEps=1e-12, TNSLogger* =0) const=0;
+
         //  Create full lattice of operators
         virtual Operator*           CreateOperator(const OperatorWRepresentation*) const=0;
         //  Create full lattice of unit operators
@@ -36,6 +39,8 @@ class Hamiltonian : public virtual Operator
         virtual Matrix4T            BuildLocalMatrix() const=0;
         // Create an exact (full) wave function abject suitable for this Hamiltonian
         virtual FullState*          CreateFullState () const=0;
+
+        static Matrix4T ExponentH(double dt,const Matrix4T& H12);
 };
 
 #endif //HAMILTONIAN_H

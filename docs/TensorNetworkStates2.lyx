@@ -3609,12 +3609,178 @@ noprefix "false"
 
 \end_inset
 
- adapted for a repeating unit cell
+ adapted for a repeating unit 2-site cell
 \begin_inset Formula 
 \[
-\ldots\left(\Gamma^{n_{1}}\lambda^{[1]}\Gamma^{n_{2}}\lambda^{[2]}\right)\ldots
+\ldots\left(\Gamma^{n_{A}}\lambda^{A}\Gamma^{n_{B}}\lambda^{B}\right)\ldots
 \]
 
+\end_inset
+
+For the time evolution we will have two Trotter gates 
+\begin_inset Formula $U^{AB}=e^{-\tau H^{AB}}$
+\end_inset
+
+ and 
+\begin_inset Formula $U^{BA}$
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename iTEBD-1.png
+	lyxscale 150
+	scale 150
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Vidals-original-iTEBD"
+
+\end_inset
+
+Vidals original iTEBD algorithm for a 1D lattice with a two site unit cell
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The algorithm is shown in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Vidals-original-iTEBD"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for the 
+\begin_inset Formula $U^{AB}$
+\end_inset
+
+gate.
+ We see that the first step involves contracting 
+\begin_inset Formula $\lambda^{B}$
+\end_inset
+
+ on the left into 
+\begin_inset Formula $\Gamma^{n_{A}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\lambda^{A}$
+\end_inset
+
+ on the right into 
+\begin_inset Formula $\Gamma^{n_{B}}$
+\end_inset
+
+.
+ So we should write out the steps in more detail as follows
+\end_layout
+
+\begin_layout Enumerate
+Start with the structure 
+\begin_inset Formula $\lambda^{B}\Gamma^{n_{a}}\lambda^{A}\Gamma^{n_{b}}\lambda^{B}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+For 
+\begin_inset Formula $A^{n_{a}}=\lambda^{B}\Gamma^{n_{a}}$
+\end_inset
+
+, 
+\begin_inset Formula $B^{n_{b}}=\Gamma^{n_{b}}\lambda^{B}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Constract 
+\begin_inset Formula $\varTheta_{i_{a}i_{b}}^{m_{a}m_{b}}=\sum_{n_{a}n_{b}k}A_{i_{a}k}^{n_{a}}\lambda_{k}^{A}B_{ki_{b}}^{n_{b}}U_{m_{a}m_{b}}^{n_{a}n_{b}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+SVD 
+\begin_inset Formula $\varTheta_{i_{a}i_{b}}^{m_{a}m_{b}}=\sum_{k=1}^{dD}U_{\left(i_{a}m_{a}\right),k}s_{k}\left(V^{\dagger}\right)_{k,\left(i_{b}m_{b}\right)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Do SVD compression the throw out 
+\begin_inset Formula $\left(d-1\right)D$
+\end_inset
+
+ columns of 
+\begin_inset Formula $U$
+\end_inset
+
+ and rows of 
+\begin_inset Formula $V^{\dagger}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Now 
+\begin_inset Formula $\tilde{\lambda}^{A}=s_{k}$
+\end_inset
+
+, 
+\begin_inset Formula $\tilde{\Gamma}_{i_{a}i_{a+1}}^{n_{a}}=\frac{1}{\lambda_{i_{a}}^{B}}U_{\left(i_{a}n_{a}\right),i_{a+1}}$
+\end_inset
+
+, 
+\begin_inset Formula $\tilde{\Gamma}_{i_{b-1}i_{b}}^{n_{b}}=\left(V^{\dagger}\right)_{i_{b-1},\left(i_{b}n_{b}\right)}\frac{1}{\lambda_{i_{b}}^{B}}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Enumerate
+This leave us witht he structure 
+\begin_inset Formula $\lambda^{B}\tilde{\Gamma}^{n_{a}}\tilde{\lambda}^{A}\tilde{\Gamma}^{n_{b}}\lambda^{B}$
+\end_inset
+
+ with everything but 
+\begin_inset Formula $\lambda^{B}$
+\end_inset
+
+ updated.
+\end_layout
+
+\begin_layout Enumerate
+Repeat steps 2-7 with the structure 
+\begin_inset Formula $\tilde{\lambda}^{A}\tilde{\Gamma}^{n_{b}}\lambda^{B}\tilde{\Gamma}^{n_{a}}\tilde{\lambda}^{A}$
 \end_inset
 
 

@@ -21,7 +21,7 @@ class MPSImp
 //
 //  Typedefs for various containers
 //
-private:
+protected:
         typedef TensorNetworks::MatrixT   MatrixT;
         typedef TensorNetworks::VectorT   VectorT;
         typedef TensorNetworks:: ArrayT   ArrayT;
@@ -49,16 +49,17 @@ public:
 //
 //  Access to information
 //
-        int     GetL        () const {return itsL;}
-        int     Getp        () const {return itsd;}
-        double  GetMaxDeltaE() const;
+        virtual int     GetL        () const {return itsL;}
+        virtual int     Getp        () const {return itsd;}
+        virtual double  GetMaxDeltaE() const;
 
 //--------------------------------------------------------------------------------------
 //
 //  Normalization members with and without SVD compression
 //
         virtual void Normalize(TensorNetworks::Direction LR);
-        virtual void Normalize(int isite); //Mixed Canonical normalization
+        virtual void Normalize       (int isite); //Mixed Canonical normalization
+        virtual void CanonicalizeSite(TensorNetworks::Direction LR, int isite); //...lambda-Gamma-lambda-Gamma-lambda...
 
         virtual void NormalizeAndCompress(TensorNetworks::Direction LR,int      Dmax);
         virtual void NormalizeAndCompress(TensorNetworks::Direction LR,double epsMin);
@@ -108,6 +109,33 @@ public:
         virtual void MakeAllGraphs();
         virtual void Insert(Plotting::MultiGraph* graphs);
         virtual void Select(int index);
+
+
+protected:
+    // COnstructor used for iTEBD
+        MPSImp(int L, double S, int D,TensorNetworks::Direction lr,double normEps=1e-12,TNSLogger* s=0);
+//--------------------------------------------------------------------------------------
+//
+//  Loop Control
+//
+        int GetStart(TensorNetworks::Direction lr) const
+        {
+            return lr==TensorNetworks::DLeft ? 1 : itsL;
+        }
+        int GetStop(TensorNetworks::Direction lr) const
+        { //These need to be one beyond, like stl iterators
+            return lr==TensorNetworks::DLeft ? itsL+1 : 0;
+        }
+        int GetIncrement(TensorNetworks::Direction lr) const
+        {
+            return lr==TensorNetworks::DLeft ? 1 : -1;
+        }
+
+        TensorNetworks::Direction Invert(TensorNetworks::Direction lr)
+        {
+            return lr==TensorNetworks::DLeft ?  TensorNetworks::DRight : TensorNetworks::DLeft;
+        }
+
 //--------------------------------------------------------------------------------------
 //
 //  Allows unit test classes inside.
@@ -158,33 +186,13 @@ private:
         MatrixCT CalcHeffLeft(const MPS* Psi2,int isite,bool cache=false) const;
         MatrixCT CalcHeffRight(const MPS* Psi2,int isite,bool cache=false) const;
 
-//
-//  Loop Control
-//
-        int GetStart(TensorNetworks::Direction lr) const
-        {
-            return lr==TensorNetworks::DLeft ? 1 : itsL;
-        }
-        int GetStop(TensorNetworks::Direction lr) const
-        { //These need to be one beyond, like stl iterators
-            return lr==TensorNetworks::DLeft ? itsL+1 : 0;
-        }
-        int GetIncrement(TensorNetworks::Direction lr) const
-        {
-            return lr==TensorNetworks::DLeft ? 1 : -1;
-        }
-
-        TensorNetworks::Direction Invert(TensorNetworks::Direction lr)
-        {
-            return lr==TensorNetworks::DLeft ?  TensorNetworks::DRight : TensorNetworks::DLeft;
-        }
 
 //--------------------------------------------------------------------------------------
 //
 //  Iterator Typedefs
 //
         typedef optr_vector<MPSSite*> SitesType;
-        typedef optr_vector<Bond*>              BondsType;
+        typedef optr_vector<Bond*>    BondsType;
         typedef SitesType::      iterator  SIter;
         typedef SitesType::const_iterator cSIter;
         typedef SitesType::      reverse_iterator  rSIter;
@@ -194,7 +202,7 @@ private:
 //
 //  Data members
 //
-
+    protected:
         int    itsL;   //Number of lattice sites
         int    itsDmax; //Maximum bond dimension
         double itsS;  //2*S, avoid storing floats for S=n/2
@@ -202,10 +210,10 @@ private:
         int    itsNSweep;
         int    itsSelectedSite; //Selected site for plots which show lots of data for one site.
 
-        double         itsNormEps;
+        double     itsNormEps;
         TNSLogger* itsLogger;
-        BondsType      itsBonds;
-        SitesType      itsSites;
+        BondsType  itsBonds;
+        SitesType  itsSites;
 
         UniformMesh*  itsSitesMesh;
         Mesh*         itsBondsMesh;

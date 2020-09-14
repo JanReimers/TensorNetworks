@@ -194,7 +194,9 @@ void MPSSite::Report(std::ostream& os) const
 {
     os << std::setprecision(3)
        << std::setw(4) << itsD1
-       << std::setw(4)  << itsD2 << std::fixed
+       << std::setw(4)  << itsD2
+       << std::setw(2)  << GetNormStatus(1e-12)
+       << std::fixed
        << std::setw(5)  << itsNumUpdates << "      "
        << std::setprecision(7)
        << std::setw(9)  << itsEmin << "     " << std::setprecision(4)
