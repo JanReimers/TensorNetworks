@@ -59,6 +59,7 @@
 			<Add library="oml" />
 			<Add library="gtest" />
 			<Add library="primme" />
+			<Add library="arpack" />
 			<Add library="lapack" />
 			<Add library="blas" />
 			<Add library="gfortran" />
@@ -91,6 +92,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Tests.H" />
+		<Unit filename="iTEBDTests.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="main.C">
 			<Option compilerVar="CC" />
 		</Unit>

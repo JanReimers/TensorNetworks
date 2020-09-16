@@ -1,5 +1,7 @@
 
 - Refactor - Normalize and NormalizeAndCompress should be merged  DMax=0, eps=0 means no compress?
+    The tricky part here is that MPS interface inherits from MultiPlotable
+    So we need split that off and have MPS with no plotting and MPSWithPlotting
 - Refactor - separate all plotting code in MPSImp and MPState
 - Done Integrate spdlogger as one derived imp for TNSLogger
     -UNfortunately we can't' use spdlogger advanced formatting when wrapping through an abs interface

@@ -21,6 +21,7 @@
 					<Add directory="Operators" />
 					<Add directory="TensorNetworks" />
 					<Add directory="TensorNetworksImp" />
+					<Add directory="NumericalMethods" />
 				</Compiler>
 				<Linker>
 					<Add directory="../Debug" />
@@ -41,6 +42,7 @@
 					<Add directory="Operators" />
 					<Add directory="TensorNetworks" />
 					<Add directory="TensorNetworksImp" />
+					<Add directory="NumericalMethods" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />
@@ -82,6 +84,18 @@
 		<Unit filename="Containers/Vector3.H" />
 		<Unit filename="Containers/Vector4.H" />
 		<Unit filename="Install" />
+		<Unit filename="NumericalMethods/ArpackEigenSolver.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="NumericalMethods/ArpackEigenSolver.H" />
+		<Unit filename="NumericalMethods/LapackSVD.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="NumericalMethods/LapackSVD.H" />
+		<Unit filename="NumericalMethods/PrimeEigenSolver.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="NumericalMethods/PrimeEigenSolver.H" />
 		<Unit filename="Operators/IdentityOperator.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -166,10 +180,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H" />
-		<Unit filename="TensorNetworksImp/LapackSVD.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworksImp/LapackSVD.H" />
 		<Unit filename="TensorNetworksImp/MPSImp.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -209,10 +219,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/MultiPlotableImp.H" />
-		<Unit filename="TensorNetworksImp/PrimeEigenSolver.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworksImp/PrimeEigenSolver.H" />
 		<Unit filename="TensorNetworksImp/SPDLogger.C">
 			<Option compilerVar="CC" />
 		</Unit>

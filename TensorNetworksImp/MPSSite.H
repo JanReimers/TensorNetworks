@@ -3,7 +3,7 @@
 
 #include "TensorNetworks/Enums.H"
 #include "TensorNetworksImp/Typedefs.H"
-#include "TensorNetworksImp/PrimeEigenSolver.H"
+#include "NumericalMethods/PrimeEigenSolver.H"
 #include <vector>
 
 class SiteOperator;

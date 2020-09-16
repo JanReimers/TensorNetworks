@@ -2,7 +2,7 @@
 #include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "oml/minmax.h"
-#include "TensorNetworksImp/LapackSVD.H"
+#include "NumericalMethods/LapackSVD.H"
 #include <complex>
 
 //

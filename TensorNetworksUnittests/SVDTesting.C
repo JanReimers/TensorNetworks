@@ -2,7 +2,7 @@
 
 #include "TensorNetworksImp/MPSImp.H"
 #include "TensorNetworks/Epsilons.H"
-
+#include "NumericalMethods/ArpackEigenSolver.H"
 #include "oml/stream.h"
 #include "oml/numeric.h"
 #include "oml/cnumeric.h"
@@ -82,7 +82,7 @@ DMatrix<T2> ContractVstar(const Vector<T>& s, const DMatrix<T2>& Vstar)
 }
 
 
-
+/*
 TEST_F(SVDTesting,SVDComplexMatrix_10x10)
 {
     int N=10;
@@ -401,6 +401,22 @@ TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_100x100)
     EXPECT_NEAR(Max(fabs(V*VT-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
 }
+*/
+TEST_F(SVDTesting,ArpackEigenSolver)
+{
+    int N=100,Nev=4;
+    typedef DMatrix<eType> Mtype;
+    Mtype A(N,N),UnitMatrix(N,N);
+    FillRandom(A);
+    itsEps.itsEigenSolverEpsilon=1e-14;
+    ArpackEigenSolver solver;
 
+    auto [D,U]=solver.Solve(A,Nev,eps);
 
-
+    for (int i=1;i<=Nev;i++)
+    {
+        Vector<eType> residuals=A*U.GetColumn(i)-D(i)*U.GetColumn(i);
+        double res=Max(abs(residuals));
+        EXPECT_NEAR(res,0.0,15*itsEps.itsEigenSolverEpsilon);
+    }
+}

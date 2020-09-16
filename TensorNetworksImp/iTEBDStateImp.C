@@ -1,6 +1,7 @@
 #include "TensorNetworksImp/iTEBDStateImp.H"
 #include "TensorNetworksImp/Bond.H"
 #include "oml/cnumeric.h"
+#include <iomanip>
 
 iTEBDStateImp::iTEBDStateImp(int L,double S, int D,double normEps,TNSLogger* s)
     : MPSImp(L,S,D,TensorNetworks::DLeft,normEps,s)
@@ -106,7 +107,7 @@ void iTEBDStateImp::Apply(int isite,const Matrix4T& expH)
     MatrixCT VT(N,N);
 //    cout << "Before Compress Dw1 Dw2 A=" << itsDw12.Dw1 << " " << itsDw12.Dw2 << " "<< A << endl;
     CSVDecomp(ThetaF,s,VT);
-    cout << "s=" << s;
+    cout << std::scientific << std::setprecision(1) << "s=" << s << endl;
     int nai1=1;
     for (int na=0;na<itsd;na++)
         for (int i1=1;i1<=itsDmax;i1++,nai1++)

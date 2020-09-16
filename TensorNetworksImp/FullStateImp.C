@@ -2,7 +2,7 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworksImp/StateIterator.H"
-#include "TensorNetworksImp/PrimeEigenSolver.H"
+#include "NumericalMethods/PrimeEigenSolver.H"
 #include "Containers/SparseMatrix.H"
 #include "oml/random.h"
 #include "oml/array_io.h"

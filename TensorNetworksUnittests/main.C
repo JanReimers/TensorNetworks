@@ -5,7 +5,7 @@
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
-//    testing::GTEST_FLAG(filter) = "SVDTesting*";
+    testing::GTEST_FLAG(filter) = "SVDTesting*";
 //    testing::GTEST_FLAG(filter) = "MatrixProductTesting*";
 //    testing::GTEST_FLAG(filter) = "MPSNormTesting*";
 //    testing::GTEST_FLAG(filter) = "MPOTesting*";
@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 //    testing::GTEST_FLAG(filter) = "ExpectationsTesting*";
 //    testing::GTEST_FLAG(filter) = "ExactDiagTesting*";
 //    testing::GTEST_FLAG(filter) = "ImaginaryTimeTesting*";
-    testing::GTEST_FLAG(filter) = "iTEBDTesting*";
+//    testing::GTEST_FLAG(filter) = "iTEBDTesting*";
 //    testing::GTEST_FLAG(filter) = "ITensorTesting*";
 
     return RUN_ALL_TESTS();
