@@ -40,36 +40,33 @@ TEST_F(SVDTesting,SVDComplexMatrix_10x10)
 {
     int N=10;
     typedef DMatrix<eType> Mtype;
-    Mtype A(N,N),V(N,N),UnitMatrix(N,N);
-    Vector<double>  s(N);
+    Mtype A(N,N),UnitMatrix(N,N);
     FillRandom(A);
-    Mtype Mcopy(A);
     Unit(UnitMatrix);
-    CSVDecomp(A,s,V); //Solve A=U*s*conj(V)
-    Mtype Vdagger=Transpose(conj(V));
-    EXPECT_NEAR(Max(abs(Transpose(conj(A))*A-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(abs(V*Vdagger-UnitMatrix)),0.0,eps);
-    Mtype Vstar=conj(V);
-    DiagonalMatrix<double> ds(s);
-    EXPECT_NEAR(Max(abs(A*ds*Transpose(Vstar)-Mcopy)),0.0,eps);
 
+    auto [U,s,V]=CSVDecomp(A); //Solve A=U*s*conj(V)
+
+    Mtype Vdagger=Transpose(conj(V));
+    EXPECT_NEAR(Max(abs(Transpose(conj(U))*U-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(abs(V*Vdagger-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(abs(U*s*Vdagger-A)),0.0,eps);
 }
+
 
 TEST_F(SVDTesting,OML_SVDRandomComplexMatrix_10x5)
 {
     int M=10,N=5;
     typedef DMatrix<eType> Mtype;
-    Mtype A(M,N),V(N,N),UnitMatrix(N,N);
-    Vector<double>  s(N);
+    Mtype A(M,N),UnitMatrix(N,N);
     FillRandom(A);
-    Mtype Mcopy(A);
     Unit(UnitMatrix);
-    CSVDecomp(A,s,V);
-    EXPECT_NEAR(Max(abs(Transpose(conj(A))*A-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(abs(V*Transpose(conj(V))-UnitMatrix)),0.0,eps);
-    Mtype Vstar=conj(V);
-    DiagonalMatrix<double> ds(s);
-    EXPECT_NEAR(Max(abs(A*ds*Transpose(Vstar)-Mcopy)),0.0,eps);
+
+    auto [U,s,V]=CSVDecomp(A);
+
+    Mtype Vdagger=Transpose(conj(V));
+    EXPECT_NEAR(Max(abs(Transpose(conj(U))*U-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(abs(V*Vdagger-UnitMatrix)),0.0,eps);
+    EXPECT_NEAR(Max(abs(U*s*Vdagger-A)),0.0,eps);
 }
 
 
@@ -77,18 +74,16 @@ TEST_F(SVDTesting,OML_SVDRandomComplexMatrix_5x10)
 {
     int M=5,N=10;
     typedef DMatrix<eType> Mtype;
-    Mtype A(M,N),V(M,N),UnitMatrix(M,M);
-    Vector<double>  s(M);
+    Mtype A(M,N),UnitMatrix(M,M);
     FillRandom(A);
-    Mtype Mcopy(A);
     Unit(UnitMatrix);
-    CSVDecomp(A,s,V);
-    Mtype Vstar=conj(V);
-    Mtype Vdagger=Transpose(Vstar);
-    DiagonalMatrix<double> ds(s);
-    EXPECT_NEAR(Max(abs(Transpose(conj(A))*A-UnitMatrix)),0.0,eps);
+
+    auto [U,s,V]=CSVDecomp(A);
+
+    Mtype Vdagger=Transpose(conj(V));
+    EXPECT_NEAR(Max(abs(Transpose(conj(U))*U-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(abs(Vdagger*V-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(abs(A*ds*Transpose(Vstar)-Mcopy)),0.0,eps);
+    EXPECT_NEAR(Max(abs(U*s*Vdagger-A)),0.0,eps);
 }
 
 TEST_F(SVDTesting,OML_EigenSolverComplexHermitian)
