@@ -6,6 +6,7 @@
 #include "oml/cnumeric.h"
 #include "oml/vector_io.h"
 #include "oml/random.h"
+#include "oml/diagonalmatrix.h"
 #include <iostream>
 
 using std::cout;
@@ -74,40 +75,6 @@ void  MPSSite::NewBondDimensions(TensorNetworks::Direction lr,const MatrixCT& UV
         break;
     }
     }
-}
-
-//
-//  Anew(j,i) =  s(j)*VA(j,k)
-//
-MPSSite::MatrixCT MPSSite::Contract1(const VectorT& s, const MatrixCT& VA)
-{
-    int N1=VA.GetNumRows();
-    int N2=VA.GetNumCols();
-    assert(s.GetHigh()==N1);
-
-    MatrixCT Anew(N1,N2);
-    for(int i2=1; i2<=N2; i2++)
-        for(int i1=1; i1<=N1; i1++)
-            Anew(i1,i2)=s(i1)*VA(i1,i2);
-
-    return Anew;
-}
-
-//
-//  Anew(j,i) =  s(j)*VA(j,k)
-//
-MPSSite::MatrixCT MPSSite::Contract1(const MatrixCT& AU,const VectorT& s)
-{
-    int N1=AU.GetNumRows();
-    int N2=AU.GetNumCols();
-    assert(s.GetHigh()==N2);
-
-    MatrixCT Anew(N1,N2);
-    for(int i2=1; i2<=N2; i2++)
-        for(int i1=1; i1<=N1; i1++)
-            Anew(i1,i2)=AU(i1,i2)*s(i2);
-
-    return Anew;
 }
 
 MPSSite::MatrixCT MPSSite::GetNorm(TensorNetworks::Direction lr) const
@@ -367,6 +334,7 @@ MPSSite::eType MPSSite::ContractFB(int n, int w2, int i2, int j1, const Vector3T
 
 void MPSSite::Contract(TensorNetworks::Direction lr,const VectorT& s, const MatrixCT& UV)
 {
+    DiagonalMatrix<double> ds(s);
     switch (lr)
     {
     case TensorNetworks::DRight:
@@ -382,7 +350,7 @@ void MPSSite::Contract(TensorNetworks::Direction lr,const VectorT& s, const Matr
         for (int in=0; in<itsd; in++)
         {
             assert(itsMs[in].GetNumCols()==UV.GetNumRows());
-            MatrixCT temp=Contract1(itsMs[in]*UV,s);
+            MatrixCT temp=itsMs[in]*UV*ds;
             itsMs[in].SetLimits(0,0);
             itsMs[in]=temp; //Shallow copy
             assert(itsMs[in].GetNumCols()==itsD2); //Verify shape is correct;
@@ -403,7 +371,7 @@ void MPSSite::Contract(TensorNetworks::Direction lr,const VectorT& s, const Matr
         for (int in=0; in<itsd; in++)
         {
             assert(UV.GetNumCols()==itsMs[in].GetNumRows());
-            MatrixCT temp=Contract1(s,UV*itsMs[in]);
+            MatrixCT temp=ds*UV*itsMs[in];
             itsMs[in].SetLimits(0,0);
             itsMs[in]=temp; //Shallow copy
             //        cout << "A[" << in << "]=" << itsAs[in] << endl;

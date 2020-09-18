@@ -141,8 +141,6 @@ private:
 //
     void Contract(TensorNetworks::Direction lr,const VectorT& s, const MatrixCT& UV);
     void Contract(TensorNetworks::Direction lr,const MatrixCT& UV);
-    static MatrixCT  Contract1(const VectorT &  s, const MatrixCT& VA);
-    static MatrixCT  Contract1(const MatrixCT& AU, const VectorT & s );
 
     eType ContractAWFA (int w2,int i2, int j2,         const SiteOperator* so, const Vector3T& Fam1) const;
     eType ContractWFA  (int m, int w2, int i1, int j2, const SiteOperator* so, const Vector3T& Fam1) const;

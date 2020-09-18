@@ -9,6 +9,7 @@
 #include "oml/random.h"
 #include "oml/vector_io.h"
 #include "oml/array_io.h"
+#include "oml/diagonalmatrix.h"
 #include <complex>
 #include <iostream>
 
@@ -35,54 +36,6 @@ public:
 
 };
 
-
-
-template <class T,class T2>
-DMatrix<T2> contract(const DMatrix<T2> U, const Vector<T>& s, const DMatrix<T2>& V)
-{
-    assert(U.GetNumCols()==V.GetNumCols());
-    assert(U.GetNumCols()==s.GetHigh());
-    int ni=U.GetNumRows();
-    int nk=U.GetNumCols();
-    int nj=V.GetNumRows();
-    DMatrix<T2> M(ni,nj);
-    Fill(M,T2(0.0));
-    for(int i=1;i<=ni;i++)
-        for(int j=1;j<=nj;j++)
-            for(int k=1;k<=nk;k++)
-            {
-                M(i,j)+=U(i,k)*s(k)*V(j,k);
-            }
-    return M;
-}
-
-template <class T,class T2>
-DMatrix<T2> ConstractsVT(const Vector<T>& s, const DMatrix<T2>& VT)
-{
-    assert(VT.GetNumRows()==s.GetHigh());
-    int nk=s.GetHigh();
-    int nj=VT.GetNumCols();
-    DMatrix<T2> Vs(nk,nj);
-    for(int j=1;j<=nj;j++)
-        for(int k=1;k<=nk;k++)
-            Vs(k,j)=s(k)*VT(k,j);
-    return Vs;
-}
-template <class T,class T2>
-DMatrix<T2> ContractVstar(const Vector<T>& s, const DMatrix<T2>& Vstar)
-{
-    assert(Vstar.GetNumCols()==s.GetHigh());
-    int nk=s.GetHigh();
-    int nj=Vstar.GetNumRows();
-    DMatrix<T2> Vs(nk,nj);
-    for(int j=1;j<=nj;j++)
-        for(int k=1;k<=nk;k++)
-            Vs(k,j)=s(k)*Vstar(j,k);
-    return Vs;
-}
-
-
-/*
 TEST_F(SVDTesting,SVDComplexMatrix_10x10)
 {
     int N=10;
@@ -97,8 +50,8 @@ TEST_F(SVDTesting,SVDComplexMatrix_10x10)
     EXPECT_NEAR(Max(abs(Transpose(conj(A))*A-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(abs(V*Vdagger-UnitMatrix)),0.0,eps);
     Mtype Vstar=conj(V);
-    EXPECT_NEAR(Max(abs(A*ContractVstar(s,Vstar)-Mcopy)),0.0,eps);
-    EXPECT_NEAR(Max(abs(contract(A,s,Vstar)-Mcopy)),0.0,eps);
+    DiagonalMatrix<double> ds(s);
+    EXPECT_NEAR(Max(abs(A*ds*Transpose(Vstar)-Mcopy)),0.0,eps);
 
 }
 
@@ -115,8 +68,8 @@ TEST_F(SVDTesting,OML_SVDRandomComplexMatrix_10x5)
     EXPECT_NEAR(Max(abs(Transpose(conj(A))*A-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(abs(V*Transpose(conj(V))-UnitMatrix)),0.0,eps);
     Mtype Vstar=conj(V);
-    EXPECT_NEAR(Max(abs(contract(A,s,Vstar)-Mcopy)),0.0,eps);
-    EXPECT_NEAR(Max(abs(A*ContractVstar(s,Vstar)-Mcopy)),0.0,eps);
+    DiagonalMatrix<double> ds(s);
+    EXPECT_NEAR(Max(abs(A*ds*Transpose(Vstar)-Mcopy)),0.0,eps);
 }
 
 
@@ -132,10 +85,10 @@ TEST_F(SVDTesting,OML_SVDRandomComplexMatrix_5x10)
     CSVDecomp(A,s,V);
     Mtype Vstar=conj(V);
     Mtype Vdagger=Transpose(Vstar);
+    DiagonalMatrix<double> ds(s);
     EXPECT_NEAR(Max(abs(Transpose(conj(A))*A-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(abs(Vdagger*V-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(abs(contract(A,s,Vstar)-Mcopy)),0.0,eps);
-    EXPECT_NEAR(Max(abs(A*ContractVstar(s,Vstar)-Mcopy)),0.0,eps);
+    EXPECT_NEAR(Max(abs(A*ds*Transpose(Vstar)-Mcopy)),0.0,eps);
 }
 
 TEST_F(SVDTesting,OML_EigenSolverComplexHermitian)
@@ -174,7 +127,7 @@ TEST_F(SVDTesting,SparseMatrixClass)
     cout << "Density=" << sm.GetDensity() << "%" << endl;
 }
 
-#include "TensorNetworksImp/PrimeEigenSolver.H"
+#include "NumericalMethods/PrimeEigenSolver.H"
 
 TEST_F(SVDTesting,Prime_EigenSolverSparseComplexHermitian200x200)
 {
@@ -262,12 +215,13 @@ TEST_F(SVDTesting,Prime_SVDComplex4004Matrix_1x4)
 //    cout << "U*s*VT" <<  Mtype(M*ConstractsVT(s,VT))-Mcopy << endl;
     EXPECT_NEAR(Max(abs(Transpose(M)*M-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(abs(VT*V-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(abs(M*ConstractsVT(s,VT)-Mcopy)),0.0,eps);
+    DiagonalMatrix ds(s);
+    EXPECT_NEAR(Max(abs(M*ds*VT-Mcopy)),0.0,eps);
 }
 
 
 
-#include "TensorNetworksImp/LapackSVD.H"
+#include "NumericalMethods/LapackSVD.H"
 
 TEST_F(SVDTesting,LAPACK_SVDReal4004Matrix_1x4a)
 {
@@ -285,9 +239,10 @@ TEST_F(SVDTesting,LAPACK_SVDReal4004Matrix_1x4a)
 
     LaSVDecomp(A,s,VT);
     Mtype V=Transpose(VT);
+    DiagonalMatrix ds(s);
     EXPECT_NEAR(Max(fabs(Transpose(A)*A-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*ds*VT-Acopy)),0.0,eps);
 }
 
 TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_1x4a)
@@ -302,9 +257,10 @@ TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_1x4a)
 
     LaSVDecomp(A,s,VT);
     Mtype V=Transpose(VT);
+    DiagonalMatrix ds(s);
     EXPECT_NEAR(Max(fabs(Transpose(A)*A-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*ds*VT-Acopy)),0.0,eps);
 }
 
 TEST_F(SVDTesting,LAPACK_SVDReal4004Matrix_4x1a)
@@ -322,9 +278,10 @@ TEST_F(SVDTesting,LAPACK_SVDReal4004Matrix_4x1a)
 
     LaSVDecomp(A,s,VT);
     Mtype V=Transpose(VT);
+    DiagonalMatrix ds(s);
     EXPECT_NEAR(Max(fabs(Transpose(A)*A-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*ds*VT-Acopy)),0.0,eps);
 }
 
 
@@ -342,9 +299,10 @@ TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_4x1a)
 
     LaSVDecomp(A,s,VT);
     Mtype V=Transpose(VT);
+    DiagonalMatrix ds(s);
     EXPECT_NEAR(Max(fabs(Transpose(A)*A-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*ds*VT-Acopy)),0.0,eps);
 }
 
 
@@ -361,9 +319,10 @@ TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_200x3a)
 
     LaSVDecomp(A,s,VT);
     Mtype V=Transpose(VT);
+    DiagonalMatrix ds(s);
     EXPECT_NEAR(Max(fabs(Transpose(A)*A-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*ds*VT-Acopy)),0.0,eps);
 }
 
 TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_3x200a)
@@ -378,9 +337,10 @@ TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_3x200a)
 
     LaSVDecomp(A,s,VT);
     Mtype V=Transpose(VT);
+    DiagonalMatrix ds(s);
     EXPECT_NEAR(Max(fabs(Transpose(A)*A-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*ds*VT-Acopy)),0.0,eps);
 }
 
 TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_100x100)
@@ -395,13 +355,14 @@ TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_100x100)
 
     LaSVDecomp(A,s,VT);
     Mtype V=Transpose(VT);
+    DiagonalMatrix ds(s);
     EXPECT_NEAR(Max(fabs(Transpose(A)*A-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(fabs(A*Transpose(A)-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(fabs(VT*V-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(fabs(V*VT-UnitMatrix)),0.0,eps);
-    EXPECT_NEAR(Max(fabs(A*ConstractsVT(s,VT)-Acopy)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(A*ds*VT-Acopy)),0.0,eps);
 }
-*/
+
 TEST_F(SVDTesting,ArpackEigenSolver)
 {
     int N=100,Nev=4;
@@ -413,32 +374,63 @@ TEST_F(SVDTesting,ArpackEigenSolver)
 
     auto [D,U]=solver.Solve(A,Nev,eps);
 
-//    for (int i=1;i<=Nev;i++)
-//    {
-//        Vector<eType> residuals=A*U.GetColumn(i)-D(i)*U.GetColumn(i);
-//        double res=Max(abs(residuals));
-//        EXPECT_NEAR(res,0.0,15*itsEps.itsEigenSolverEpsilon);
-//    }
+    for (int i=1;i<=Nev;i++)
+    {
+        Vector<eType> residuals=A*U.GetColumn(i)-D(i)*U.GetColumn(i);
+        double res=Max(abs(residuals));
+        EXPECT_NEAR(res,0.0,15*itsEps.itsEigenSolverEpsilon);
+    }
 }
 
-#include "oml/diagonalmatrix.h"
 
-TEST_F(SVDTesting,omlDiagonalMatrix)
+TEST_F(SVDTesting,omlDiagonalMatrix_double)
 {
     int N=10;
     Vector<double> v(N);
     Fill(v,-1.);
-    cout << v << endl;
     DiagonalMatrix<double> d(v);
-    cout << d << endl;
     DMatrix<double> M(N,N);
     FillRandom(M);
     DMatrix<double> Md=M*d;
-    cout << M+Md << endl;
+    EXPECT_NEAR(Max(abs(M+Md)),0.0,eps);
     DMatrix<double> dM=d*M;
-    cout << M+dM << endl;
+    EXPECT_NEAR(Max(abs(M+dM)),0.0,eps);
     DMatrix<double> dMdMdM=d*M*d*M*d*M;
-    cout << M*M*M+dMdMdM << endl;
+    EXPECT_NEAR(Max(abs(M*M*M+dMdMdM)),0.0,eps);
 
 }
+
+TEST_F(SVDTesting,omlDiagonalMatrix_complex)
+{
+    int N=10;
+    Vector<eType> v(N);
+    Fill(v,eType(-1.0));
+    DiagonalMatrix<eType> d(v);
+    DMatrix<eType> M(N,N);
+    FillRandom(M);
+    DMatrix<eType> Md=M*d;
+    EXPECT_NEAR(Max(abs(M+Md)),0.0,eps);
+    DMatrix<eType> dM=d*M;
+    EXPECT_NEAR(Max(abs(M+dM)),0.0,eps);
+    DMatrix<eType> dMdMdM=d*M*d*M*d*M;
+    EXPECT_NEAR(Max(abs(M*M*M+dMdMdM)),0.0,eps);
+
+}
+TEST_F(SVDTesting,omlDiagonalMatrix_complex_double)
+{
+    int N=10;
+    Vector<double> v(N);
+    Fill(v,-1.0);
+    DiagonalMatrix<double> d(v);
+    DMatrix<eType> M(N,N);
+    FillRandom(M);
+    DMatrix<eType> Md=M*d;
+    EXPECT_NEAR(Max(abs(M+Md)),0.0,eps);
+    DMatrix<eType> dM=d*M;
+    EXPECT_NEAR(Max(abs(M+dM)),0.0,eps);
+    DMatrix<eType> dMdMdM=d*M*d*M*d*M;
+    EXPECT_NEAR(Max(abs(M*M*M+dMdMdM)),0.0,eps);
+
+}
+
 
