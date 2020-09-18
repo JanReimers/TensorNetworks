@@ -86,8 +86,8 @@ void iTEBDStateImp::Apply(int isite,const Matrix4T& expH)
     assert(bondA!=bondB);
     MPSSite::dVectorT& MA(siteA->itsMs);
     MPSSite::dVectorT& MB(siteB->itsMs);
-    Array<double> lambdaA=bondA->GetSVs();
-    Array<double> lambdaB=bondB->GetSVs();
+    Vector<double> lambdaA=bondA->GetSVs();
+    Vector<double> lambdaB=bondB->GetSVs();
     //
     //  New we need to contract   Theta(nA,i1,nB,i3) =
     //                         sB(i1)*MA(mA,i1,i2)*sA(i2)*MB(mB,i2,i3)*sB(i3)
@@ -105,7 +105,7 @@ void iTEBDStateImp::Apply(int isite,const Matrix4T& expH)
                 for (int ma=0;ma<itsd;ma++)
                 for (int mb=0;mb<itsd;mb++)
                 for (int i2=1;i2<=itsDmax;i2++)
-                    t+=lambdaB[i1-1]*MA[ma](i1,i2)*lambdaA[i2-1]*MB[mb](i2,i3)*lambdaB[i3-1]*expH(ma,na,mb,nb);
+                    t+=lambdaB(i1)*MA[ma](i1,i2)*lambdaA(i2)*MB[mb](i2,i3)*lambdaB(i3)*expH(ma,na,mb,nb);
                 Theta(na,i1-1,nb,i3-1)=t;
             }
 
@@ -124,12 +124,12 @@ void iTEBDStateImp::Apply(int isite,const Matrix4T& expH)
     for (int na=0;na<itsd;na++)
         for (int i1=1;i1<=itsDmax;i1++,nai1++)
             for (int i2=1;i2<=itsDmax;i2++)
-                MA[na](i1,i2)=ThetaF(nai1,i2)/lambdaB[i1-1];
+                MA[na](i1,i2)=ThetaF(nai1,i2)/lambdaB(i1);
     int nbi2=1;
     for (int nb=0;nb<itsd;nb++)
         for (int i2=1;i2<=itsDmax;i2++,nbi2++)
             for (int i3=1;i3<=itsDmax;i3++)
-                MB[nb](i2,i3)=VT(nbi2,i3)/lambdaB[i3-1];
+                MB[nb](i2,i3)=VT(nbi2,i3)/lambdaB(i3);
 
    bondA->SetSingularValues(s);
 

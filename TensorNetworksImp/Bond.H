@@ -24,7 +24,7 @@ class Bond
         double GetBondEntropy() const {return itsBondEntropy;}
         double GetMinSV      () const {return itsMinSV;}
         int    GetRank       () const {return itsRank;}
-        Array<double> GetSVs () const {return itsSingularValues;}
+        Vector<double> GetSVs () const {return itsSingularValues;}
     protected:
 
     private:
@@ -38,7 +38,7 @@ class Bond
             return lr==TensorNetworks::DLeft ? itsRightSite : itsLeft_Site;
         }
 
-        Array<double> itsSingularValues;
+        Vector<double> itsSingularValues;
         double itsBondEntropy;
         double itsMinSV;
         int    itsRank;

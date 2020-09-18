@@ -228,7 +228,7 @@ private:
         ArrayT itsBondEntropies; // Sum(s^2*ln(s^2)) for each bond
         ArrayT itsBondMinSVs;    // smallest singluar value for each bond
         ArrayT itsBondRanks;     // Effective rank based on non zero singular values
-        ArrayT itssSelectedEntropySpectrum; //full spectrum of SVs for a selected site.
+        VectorT itssSelectedEntropySpectrum; //full spectrum of SVs for a selected site.
 
         static GraphDefinition theGraphs[];
         static const int n_graphs;

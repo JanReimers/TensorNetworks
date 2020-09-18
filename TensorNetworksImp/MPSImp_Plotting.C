@@ -24,7 +24,7 @@ void MPSImp::InitPlotting()
     itsBondEntropies.SetSize(itsL);
     itsBondMinSVs   .SetSize(itsL);
     itsBondRanks    .SetSize(itsL);
-    itssSelectedEntropySpectrum.SetSize(itsDmax);
+    itssSelectedEntropySpectrum.SetLimits(itsDmax);
 
     Fill(itsSiteEnergies ,0.0);
     Fill(itsSiteEGaps    ,0.0);
@@ -64,13 +64,14 @@ void MPSImp::InitPlotting()
         (*itsBondsPMesh,"Bond Rank","Rank",NamedUnit("none","Rank"),PureNumber(1.0),itsBondRanks, Plotting::Red)
         ,Plotting::Circle,false
     );
-    itsSVMeshPMesh->Insert
+    // Todo: Get this to compile.
+/*    itsSVMeshPMesh->Insert
     (
-        new TPlotableMeshClient<PureNumber,Array<double> >
+        new TPlotableMeshClient<PureNumber,Vector<double> >
         (*itsSVMeshPMesh,"Singular Values","SVs",NamedUnit("none","SVs"),PureNumber(1.0),itssSelectedEntropySpectrum, Plotting::Red)
         ,Plotting::Circle,false
     );
-
+*/
 }
 
 
