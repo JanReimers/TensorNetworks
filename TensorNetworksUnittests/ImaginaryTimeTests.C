@@ -288,7 +288,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
     Psi1->FindiTimeGroundState(itsH,is);
 
     double E2=Psi1->GetExpectation(itsH);
-    EXPECT_NEAR(E2/(L-1),-0.46703753,1e-7);
+    EXPECT_NEAR(E2/(L-1),-0.467040178,1e-7);
 
     delete Psi1;
 }
@@ -324,7 +324,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFourthOrderTrotter)
     Psi1->FindiTimeGroundState(itsH,is);
 
     double E2=Psi1->GetExpectation(itsH);
-    EXPECT_NEAR(E2/(L-1),-0.46703753,1e-7);
+    EXPECT_NEAR(E2/(L-1),-0.46704019232164307,1e-7);
 
     delete Psi1;
 }

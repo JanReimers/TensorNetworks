@@ -60,6 +60,18 @@ int iTEBDStateImp::GetModSite(int isite)
     return modSite;
 }
 
+//iTEBDStateImp::VectorT&  iTEBDStateImp::GetLambda(int isite)
+//{
+//    MPSSite* site=itsSites[GetModSite(isite  )];
+//    assert(site);
+//    Bond*    bond=site->itsRightBond;
+//    assert(bond);
+//    return bond->GetSVs();
+//}
+//iTEBDStateImp::MatrixCT& iTEBDStateImp::GetGamma (int isite,int n)
+//{
+//}
+
 void iTEBDStateImp::Apply(int isite,const Matrix4T& expH)
 {
     MPSSite* siteA=itsSites[GetModSite(isite  )];

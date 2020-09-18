@@ -1,8 +1,14 @@
 
-- Refactor - Normalize and NormalizeAndCompress should be merged  DMax=0, eps=0 means no compress?
+- Add deltaD to interation schedule and using when increment D in GS searches.
+- Refactor: Bonds store SVs in a zero based Array. Change to 1 based vector
+- We need a convenient way to do contractions over singular values using OML Matrix
+  multiplications.  THis means we need the singular values stored in a diagonal array,
+  with efficient op* functions.
+- Refactor: Use multiple return values for PRIMME and LApack SVD.
+- Refactor: Normalize and NormalizeAndCompress should be merged  DMax=0, eps=0 means no compress?
+- Refactor: separate all plotting code in MPSImp and MPState
     The tricky part here is that MPS interface inherits from MultiPlotable
     So we need split that off and have MPS with no plotting and MPSWithPlotting
-- Refactor - separate all plotting code in MPSImp and MPState
 - Done Integrate spdlogger as one derived imp for TNSLogger
     -UNfortunately we can't' use spdlogger advanced formatting when wrapping through an abs interface
      spd uses variadic templates instead of the old C variadic arguments framework, which means
@@ -21,7 +27,8 @@
             Can we reuse the MPS class for this?  All contractions need to be modified to incorporate
             the SVs from the bonds.
 - Play with iTensor for 2D systems.
-    -Try one tetrahedon.
+    -Done Try one tetrahedon.
+    -Try iPEPS with iTEBD GS and Corner transfer matrix for contractions.
 
 - Convergence Schedule Both methods might benifit from Hamiltonian parameter variations.  For example
         -Jxy  Turn these on gradually to find GS, Hamiltonian nees to supply a list paramater names and ranges.

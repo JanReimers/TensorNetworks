@@ -44,7 +44,7 @@ public:
         itsMPS->InitializeWith(TensorNetworks::Random);
 
         IterationSchedule is;
-        is.Insert({20,8,itsEps});
+        is.Insert({20,D,itsEps});
         itsMPS->FindVariationalGroundState(itsH,is);
     }
 

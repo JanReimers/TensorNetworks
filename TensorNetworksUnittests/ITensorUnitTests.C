@@ -109,11 +109,11 @@ TEST_F(ITensorTesting,Test3SiteHamiltonian)
 
 
     auto [U,Evs] = diagHermitian(H);
-    PrintData(U);
-    PrintData(Evs);
+//    PrintData(U);
+//    PrintData(Evs);
 
     auto expH=expHermitian(H);
-    PrintData(expH);
+//    PrintData(expH);
 
 }
 TEST_F(ITensorTesting,Test4SiteHamiltonian)
@@ -145,11 +145,11 @@ TEST_F(ITensorTesting,Test4SiteHamiltonian)
 
 
     auto [U,Evs] = diagHermitian(H);
-    PrintData(U);
-    PrintData(Evs);
+//    PrintData(U);
+//    PrintData(Evs);
 
     auto expH=expHermitian(H);
-    PrintData(expH);
+//    PrintData(expH);
 
 }
 
