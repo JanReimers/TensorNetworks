@@ -34,32 +34,24 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr)
         return;
     }
 
-    //We are in the bulk
-    VectorT s; // This get passed from one site to the next.
-    MatrixCT A=NewBondDimensions(lr);
-    int N=Min(A.GetNumRows(),A.GetNumCols());
-    s.SetLimits(N);
-    MatrixCT V(N,A.GetNumCols());
-    CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
-
-    MatrixCT UV;// This get transferred through the bond to a neighbouring site.
+    auto [U,s,V]=CSVDecomp(ReshapeBeforeSVD(lr)); //Solves A=U * s * Vdagger  returns V not Vdagger
+    MatrixCT Vdagger=Transpose(conj(V));
 
     switch (lr)
     {
-    case TensorNetworks::DRight:
-    {
-        UV=A;
-        NewBondDimensions(lr,Transpose(conj(V)));  //A is now Vdagger
-        break;
+        case TensorNetworks::DRight:
+        {
+            GetBond(lr)->SVDTransfer(lr,s.GetDiagonal(),U);
+            ReshapeAfter_SVD(lr,Vdagger);
+            break;
+        }
+        case TensorNetworks::DLeft:
+        {
+            GetBond(lr)->SVDTransfer(lr,s.GetDiagonal(),Vdagger);
+            ReshapeAfter_SVD(lr,U);
+            break;
+        }
     }
-    case TensorNetworks::DLeft:
-    {
-        UV=Transpose(conj(V)); //Set Vdagger
-        NewBondDimensions(lr,A);  //A is now U
-        break;
-    }
-    }
-    GetBond(lr)->SVDTransfer(lr,s,UV);
 }
 
 void MPSSite::SVDNormalize(TensorNetworks::Direction lr, int Dmax, double epsMin)
@@ -82,52 +74,47 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr, int Dmax, double epsMin
         return;
     }
 
-    //We are in the bulk
-    VectorT s; // This get passed from one site to the next.
-    MatrixCT A=NewBondDimensions(lr);
-    int N=Min(A.GetNumRows(),A.GetNumCols());
-    s.SetLimits(N);
-    MatrixCT V(N,A.GetNumCols());
-    CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
+    auto [U,s,V]=CSVDecomp(ReshapeBeforeSVD(lr)); //Solves A=U * s * Vdagger  returns V not Vdagger
+    int N=s.GetNumRows();
+
     // At this point we have N singular values but we only Dmax of them or only the ones >=epsMin;
     int D=Dmax>0 ? Min(N,Dmax) : N; //Ignore Dmax if it is 0
     // Shrink so that all s(is<=D)>=epsMin;
     for (int is=D; is>=1; is--)
-        if (s(is)>epsMin)
+        if (s(is,is)>epsMin)
         {
             D=is;
             break;
         }
 //    cout << "Smin=" << s(D) << "  Sum of rejected singular values=" << Sum(s.SubVector(D+1,s.size())) << endl;
 //    cout << "Before compression Sum s=" << Sum(s) << endl;
-    double Sums=Sum(s);
+    double Sums=Sum(s.GetDiagonal());
     assert(Sums>0.0);
     s.SetLimits(D,true);  // Resize s
-    A.SetLimits(A.GetNumRows(),D,true);
+    U.SetLimits(U.GetNumRows(),D,true);
     V.SetLimits(V.GetNumRows(),D,true);
-    assert(Sum(s)>0.0);
-    double rescaleS=Sums/Sum(s);
+    assert(Sum(s.GetDiagonal())>0.0);
+    double rescaleS=Sums/Sum(s.GetDiagonal());
     s*=rescaleS;
 //    cout << "After compression  Sum s=" << Sum(s) << endl;
 
-    MatrixCT UV;// This get transferred through the bond to a neighbouring site.
+    MatrixCT Vdagger=Transpose(conj(V));
     switch (lr)
     {
         case TensorNetworks::DRight:
         {
-            UV=A;
-            NewBondDimensions(lr,Transpose(conj(V)));  //A is now Vdagger
+            GetBond(lr)->SVDTransfer(lr,s.GetDiagonal(),U);
+            ReshapeAfter_SVD(lr,Vdagger);  //A is now Vdagger
             break;
         }
         case TensorNetworks::DLeft:
         {
-            UV=Transpose(conj(V)); //Set Vdagger
-            NewBondDimensions(lr,A);  //A is now U
+            GetBond(lr)->SVDTransfer(lr,s.GetDiagonal(),Vdagger);
+            ReshapeAfter_SVD(lr,U);  //A is now U
             break;
         }
     }
     assert(GetNormStatus(1e-12)!='M');
-    GetBond(lr)->SVDTransfer(lr,s,UV);
 }
 
 void MPSSite::Rescale(double norm)
@@ -150,7 +137,7 @@ bool MPSSite::SetCanonicalBondDimensions(int maxAllowedD1,int maxAllowedD2)
 
 void MPSSite::Canonicalize(TensorNetworks::Direction lr)
 {
-    MatrixCT A=NewBondDimensions(lr);
+    MatrixCT A=ReshapeBeforeSVD(lr);
     int N=Min(A.GetNumRows(),A.GetNumCols());
     VectorT s(N); // This get passed from one site to the next.
     MatrixCT V(N,A.GetNumCols());
@@ -163,13 +150,13 @@ void MPSSite::Canonicalize(TensorNetworks::Direction lr)
     case TensorNetworks::DRight:
     {
         UV=A;
-        NewBondDimensions(lr,Transpose(conj(V)));  //A is now Vdagger
+        ReshapeAfter_SVD(lr,Transpose(conj(V)));  //A is now Vdagger
         break;
     }
     case TensorNetworks::DLeft:
     {
         UV=Transpose(conj(V)); //Set Vdagger
-        NewBondDimensions(lr,A);  //A is now U
+        ReshapeAfter_SVD(lr,A);  //A is now U
         break;
     }
     }

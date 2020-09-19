@@ -13,7 +13,7 @@ using std::cout;
 using std::endl;
 
 
-MPSSite::MatrixCT  MPSSite::NewBondDimensions(TensorNetworks::Direction lr)
+MPSSite::MatrixCT  MPSSite::ReshapeBeforeSVD(TensorNetworks::Direction lr)
 {
     MatrixCT A;
     switch (lr)
@@ -44,7 +44,7 @@ MPSSite::MatrixCT  MPSSite::NewBondDimensions(TensorNetworks::Direction lr)
 
 
 
-void  MPSSite::NewBondDimensions(TensorNetworks::Direction lr,const MatrixCT& UV)
+void  MPSSite::ReshapeAfter_SVD(TensorNetworks::Direction lr,const MatrixCT& UV)
 {
     switch (lr)
     {

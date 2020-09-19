@@ -112,8 +112,8 @@ private:
     TensorNetworks::Position WhereAreWe() const {return itsPosition;}
 
     MatrixCT GetNorm(TensorNetworks::Direction lr) const;
-    MatrixCT NewBondDimensions(TensorNetworks::Direction lr);
-    void     NewBondDimensions(TensorNetworks::Direction lr,const MatrixCT& UV);
+    MatrixCT ReshapeBeforeSVD(TensorNetworks::Direction lr);
+    void     ReshapeAfter_SVD(TensorNetworks::Direction lr,const MatrixCT& UV);
     void     Rescale(double norm);
     void     Update      (const VectorCT& newAs);
 
