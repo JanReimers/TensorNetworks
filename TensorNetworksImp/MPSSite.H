@@ -19,6 +19,7 @@ class MPSSite
     typedef TensorNetworks::VectorCT  VectorCT;
     typedef TensorNetworks::MatrixT   MatrixT;
     typedef TensorNetworks::VectorT   VectorT;
+    typedef DiagonalMatrix<double>   DiagonalMatrixT;
     typedef TensorNetworks::eType     eType;
     public:
 //--------------------------------------------------------------------------------------
@@ -139,8 +140,8 @@ private:
 //
 //  Internal contraction function
 //
-    void Contract(TensorNetworks::Direction lr,const VectorT& s, const MatrixCT& UV);
-    void Contract(TensorNetworks::Direction lr,const MatrixCT& UV);
+    void SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixT& s, const MatrixCT& UV);
+    void SVDTransfer(TensorNetworks::Direction lr,const MatrixCT& UV);
 
     eType ContractAWFA (int w2,int i2, int j2,         const SiteOperator* so, const Vector3T& Fam1) const;
     eType ContractWFA  (int m, int w2, int i1, int j2, const SiteOperator* so, const Vector3T& Fam1) const;

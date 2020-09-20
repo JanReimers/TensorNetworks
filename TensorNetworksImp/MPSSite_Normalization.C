@@ -41,13 +41,13 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr)
     {
         case TensorNetworks::DRight:
         {
-            GetBond(lr)->SVDTransfer(lr,s.GetDiagonal(),U);
+            GetBond(lr)->SVDTransfer(lr,s,U);
             ReshapeAfter_SVD(lr,Vdagger);
             break;
         }
         case TensorNetworks::DLeft:
         {
-            GetBond(lr)->SVDTransfer(lr,s.GetDiagonal(),Vdagger);
+            GetBond(lr)->SVDTransfer(lr,s,Vdagger);
             ReshapeAfter_SVD(lr,U);
             break;
         }
@@ -103,13 +103,13 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr, int Dmax, double epsMin
     {
         case TensorNetworks::DRight:
         {
-            GetBond(lr)->SVDTransfer(lr,s.GetDiagonal(),U);
+            GetBond(lr)->SVDTransfer(lr,s,U);
             ReshapeAfter_SVD(lr,Vdagger);  //A is now Vdagger
             break;
         }
         case TensorNetworks::DLeft:
         {
-            GetBond(lr)->SVDTransfer(lr,s.GetDiagonal(),Vdagger);
+            GetBond(lr)->SVDTransfer(lr,s,Vdagger);
             ReshapeAfter_SVD(lr,U);  //A is now U
             break;
         }
@@ -160,7 +160,7 @@ void MPSSite::Canonicalize(TensorNetworks::Direction lr)
         break;
     }
     }
-    GetBond(lr)->CanonicalTransfer(lr,s,UV);
+    GetBond(lr)->CanonicalTransfer(lr,DiagonalMatrix(s),UV);
 }
 
 

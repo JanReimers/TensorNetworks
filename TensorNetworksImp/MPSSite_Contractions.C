@@ -332,14 +332,13 @@ MPSSite::eType MPSSite::ContractFB(int n, int w2, int i2, int j1, const Vector3T
     return fb;
 }
 
-void MPSSite::Contract(TensorNetworks::Direction lr,const VectorT& s, const MatrixCT& UV)
+void MPSSite::SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixT& s, const MatrixCT& UV)
 {
-    DiagonalMatrix<double> ds(s);
     switch (lr)
     {
     case TensorNetworks::DRight:
     {
-        int N1=s.GetHigh(); //N1=0 on the first site.
+        int N1=s.GetNumRows(); //N1=0 on the first site.
         if (N1>0 && N1<itsD2)
         {
             if (itsMs[0].GetNumCols()!=UV.GetNumRows())
@@ -350,7 +349,7 @@ void MPSSite::Contract(TensorNetworks::Direction lr,const VectorT& s, const Matr
         for (int in=0; in<itsd; in++)
         {
             assert(itsMs[in].GetNumCols()==UV.GetNumRows());
-            MatrixCT temp=itsMs[in]*UV*ds;
+            MatrixCT temp=itsMs[in]*UV*s;
             itsMs[in].SetLimits(0,0);
             itsMs[in]=temp; //Shallow copy
             assert(itsMs[in].GetNumCols()==itsD2); //Verify shape is correct;
@@ -359,7 +358,7 @@ void MPSSite::Contract(TensorNetworks::Direction lr,const VectorT& s, const Matr
     }
     case TensorNetworks::DLeft:
     {
-        int N1=s.GetHigh(); //N1=0 on the first site.
+        int N1=s.GetNumRows(); //N1=0 on the first site.
         if (N1>0 && N1<itsD1)
         {
             if (itsMs[0].GetNumRows()!=UV.GetNumCols())
@@ -371,7 +370,7 @@ void MPSSite::Contract(TensorNetworks::Direction lr,const VectorT& s, const Matr
         for (int in=0; in<itsd; in++)
         {
             assert(UV.GetNumCols()==itsMs[in].GetNumRows());
-            MatrixCT temp=ds*UV*itsMs[in];
+            MatrixCT temp=s*UV*itsMs[in];
             itsMs[in].SetLimits(0,0);
             itsMs[in]=temp; //Shallow copy
             //        cout << "A[" << in << "]=" << itsAs[in] << endl;
@@ -383,7 +382,7 @@ void MPSSite::Contract(TensorNetworks::Direction lr,const VectorT& s, const Matr
     }
 }
 
-void MPSSite::Contract(TensorNetworks::Direction lr,const MatrixCT& UV)
+void MPSSite::SVDTransfer(TensorNetworks::Direction lr,const MatrixCT& UV)
 {
     switch (lr)
     {

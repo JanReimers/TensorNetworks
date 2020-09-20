@@ -29,10 +29,11 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
     double E1=GetExpectation(H)/(itsL-1);
     cout << isl << endl;
     cout.precision(5);
-    cout << "E=" << std::fixed << E1 << endl;
+//    cout << "E=" << std::fixed << E1 << endl;
     MPO* W =H->CreateOperator(isl.itsdt,isl.itsTrotterOrder);
-    double percent=W->Compress(0,isl.itsEps.itsMPOCompressEpsilon);
-    cout << "FindGroundState dt=" << isl.itsdt << " " << percent << "% compresstion" << endl;
+    W->Compress(0,isl.itsEps.itsMPOCompressEpsilon);
+//    double percent=W->Compress(0,isl.itsEps.itsMPOCompressEpsilon);
+//    cout << "FindGroundState dt=" << isl.itsdt << " " << percent << "% compresstion" << endl;
     for (int niter=1; niter<isl.itsMaxGSSweepIterations; niter++)
     {
         ApplyInPlace(W); //this now has large D_2 = D_1*Dw
@@ -52,10 +53,11 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
         double Enew=GetExpectation(H)/(itsL-1);
         delete Psi2;
         double dE=Enew-E1;
-        cout << "n=" << niter << "  E=" << std::fixed << Enew << std::scientific << "  dE=" << dE << endl;
+        //cout << "n=" << niter << "  E=" << std::fixed << Enew << std::scientific << "  dE=" << dE << endl;
         E1=Enew;
         if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon) break;
     }
+    cout << "dt=" << isl.itsdt << "  E=" << std::fixed << E1 << endl;
     return E1;
 }
 

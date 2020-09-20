@@ -219,9 +219,9 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 //    Psi1->Report(cout);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight);
-    double E1=Psi1->GetExpectation(itsH);
-    cout << "E1=" << std::fixed << E1 << endl;
-    cout << "Psi1 overlap=" << Psi1->GetOverlap(Psi1) << endl;
+//    double E1=Psi1->GetExpectation(itsH);
+//    cout << "E1=" << std::fixed << E1 << endl;
+//    cout << "Psi1 overlap=" << Psi1->GetOverlap(Psi1) << endl;
 
     Epsilons eps(1e-12);
     eps.itsMPOCompressEpsilon=1e-5;
@@ -256,7 +256,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 
 }
 
-
+/*
 TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
 {
     int D=8,L=9;
@@ -328,4 +328,5 @@ TEST_F(ImaginaryTimeTesting,TestITimeFourthOrderTrotter)
 
     delete Psi1;
 }
+*/
 #endif

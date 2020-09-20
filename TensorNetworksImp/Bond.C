@@ -1,6 +1,7 @@
 #include "Bond.H"
 #include "TensorNetworksImp/MPSSite.H"
 #include "oml/vector_io.h"
+#include "oml/diagonalmatrix.h"
 #include <iostream>
 
 Bond::Bond()
@@ -43,22 +44,22 @@ void Bond::NewBondDimension(int D)
     itsRank=D;
 }
 
-void Bond::SetSingularValues(const VectorT& s)
+void Bond::SetSingularValues(const DiagonalMatrixT& s)
 {
     //std::cout << "SingularValues=" << s << std::endl;
-    int N=s.size();
+    int N=s.GetNumRows();
     itsSingularValues.SetLimits(N);
-    itsSingularValues=s;
+    itsSingularValues=s.GetDiagonal();
 
     itsRank=N;
-    itsMinSV=s(N);
+    itsMinSV=itsSingularValues(N);
     itsBondEntropy=0.0;
 
     for (int i=1;i<=N;i++)
     {
-        double s2=s(i)*s(i);
+        double s2=itsSingularValues(i)*itsSingularValues(i);
         if (s2>0.0) itsBondEntropy-=s2*log(s2);
-        if (fabs(s(i))<1e-12)
+        if (fabs(itsSingularValues(i))<1e-12)
         {
             //cout << "Auto rank reduction s=" << s << endl;
             itsRank--;
@@ -70,16 +71,16 @@ void Bond::SetSingularValues(const VectorT& s)
 //
 //  Direction is the normaliztions direction, which i opposite to the direction that UV gets tranferred.
 //
-void Bond::SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,const MatrixCT& UV)
+void Bond::SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixT& s,const MatrixCT& UV)
 {
     SetSingularValues(s);
     assert(GetSite(lr));
-    GetSite(lr)->Contract(lr,s,UV);
+    GetSite(lr)->SVDTransfer(lr,s,UV);
 }
 
-void Bond::CanonicalTransfer(TensorNetworks::Direction lr,const VectorT& s,const MatrixCT& UV)
+void Bond::CanonicalTransfer(TensorNetworks::Direction lr,const DiagonalMatrixT& s,const MatrixCT& UV)
 {
     SetSingularValues(s);
     assert(GetSite(lr));
-    GetSite(lr)->Contract(lr,UV);
+    GetSite(lr)->SVDTransfer(lr,UV);
 }
