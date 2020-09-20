@@ -10,14 +10,14 @@ using std::endl;
 //
 template <class T> class Vector4
 {
-    typedef Vector<T> VectorT;
+    typedef Vector<T> VectorRT;
     public:
         Vector4()
          : M1(0),M2(0),M3(0),M4(0), itsmnLow(1)
          , itsData(0)
         {}
 
-        Vector4(int _M1,int _M2,int _M3, int _M4, const VectorT& v, int mnLow=0)
+        Vector4(int _M1,int _M2,int _M3, int _M4, const VectorRT& v, int mnLow=0)
          : M1(_M1),M2(_M2),M3(_M3),M4(_M4), itsmnLow(1-mnLow)
          , itsData(v)
         {
@@ -68,7 +68,7 @@ template <class T> class Vector4
 
         void ClearLimits() {itsData.SetLimits(0,0);}
 
-        VectorT& Flatten() {return itsData;}
+        VectorRT& Flatten() {return itsData;}
 
         friend std::ostream& operator<<(std::ostream& os,const Vector4& m) {return os << m.itsData;}
 
@@ -78,7 +78,7 @@ template <class T> class Vector4
     private:
         int M1,M2,M3,M4;
         int itsmnLow;
-        VectorT itsData;
+        VectorRT itsData;
 };
 
 #endif // VECTOR4_H

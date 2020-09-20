@@ -17,9 +17,9 @@ class MPSSite
     typedef TensorNetworks::Vector4CT Vector4T;
     typedef TensorNetworks::MatrixCT  MatrixCT;
     typedef TensorNetworks::VectorCT  VectorCT;
-    typedef TensorNetworks::MatrixT   MatrixT;
-    typedef TensorNetworks::VectorT   VectorT;
-    typedef DiagonalMatrix<double>   DiagonalMatrixT;
+    typedef TensorNetworks::MatrixRT  MatrixRT;
+    typedef TensorNetworks::VectorRT  VectorRT;
+    typedef TensorNetworks::DiagonalMatrixRT DiagonalMatrixRT;
     typedef TensorNetworks::eType     eType;
     public:
 //--------------------------------------------------------------------------------------
@@ -140,7 +140,7 @@ private:
 //
 //  Internal contraction function
 //
-    void SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixT& s, const MatrixCT& UV);
+    void SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s, const MatrixCT& UV);
     void SVDTransfer(TensorNetworks::Direction lr,const MatrixCT& UV);
 
     eType ContractAWFA (int w2,int i2, int j2,         const SiteOperator* so, const Vector3T& Fam1) const;
@@ -150,7 +150,7 @@ private:
     eType ContractWFB  (int m, int w1, int i2, int j1, const SiteOperator* so, const Vector3T& Fap1) const;
     eType ContractFB   (int n, int w2, int i2, int j1,                         const Vector3T& Fap1) const;
 
-    eType ContractWR   (int w1,int i2, int j2,const MatrixT& W, int Dw2, const Vector3T& R) const;
+    eType ContractWR   (int w1,int i2, int j2,const MatrixRT& W, int Dw2, const Vector3T& R) const;
 
     MatrixCT ContractCA(int n2, const MatrixCT& C) const;
     void     Contract(dVectorT& newAs,const SiteOperator* so);

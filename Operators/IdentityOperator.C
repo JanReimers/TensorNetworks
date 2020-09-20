@@ -12,9 +12,9 @@ IdentityOperator::~IdentityOperator()
 {
 }
 
-TensorNetworks::MatrixT IdentityOperator::GetW (TensorNetworks::Position lbr,int m, int n) const
+TensorNetworks::MatrixRT IdentityOperator::GetW (TensorNetworks::Position lbr,int m, int n) const
 {
-    TensorNetworks::MatrixT W(1,1);
+    TensorNetworks::MatrixRT W(1,1);
     W(1,1)=m==n ? 1.0 : 0.0;
     return W;
 }

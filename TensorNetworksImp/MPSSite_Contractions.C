@@ -118,7 +118,7 @@ GetHeff(const SiteOperator* mops,const Vector3T& L,const Vector3T& R) const
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)
         {
-            const MatrixT& W=mops->GetW(m,n);
+            const MatrixRT& W=mops->GetW(m,n);
             assert(W.GetNumRows()==Dws.Dw1);
             Vector3T WR(Dws.Dw1,itsD2,itsD2,1);
             for (int w1=1; w1<=Dws.Dw1; w1++)
@@ -143,7 +143,7 @@ GetHeff(const SiteOperator* mops,const Vector3T& L,const Vector3T& R) const
 }
 
 eType MPSSite::
-ContractWR(int w1, int i2, int j2,const MatrixT& W, int Dw2,const Vector3T& R) const
+ContractWR(int w1, int i2, int j2,const MatrixRT& W, int Dw2,const Vector3T& R) const
 {
     eType WR(0.0);
     for (int w2=1; w2<=Dw2; w2++)
@@ -260,7 +260,7 @@ MPSSite::eType MPSSite::ContractWFA(int m, int w2, int i1, int j2, const SiteOpe
     eType wfa(0.0);
     for (int n=0; n<itsd; n++)
     {
-        const MatrixT& Wmn=so->GetW(m,n);
+        const MatrixRT& Wmn=so->GetW(m,n);
         assert(Wmn.GetNumRows()==Dws1.Dw1);
         for (int w1=1; w1<Dws1.w1_first(w2); w1++)
             assert(Wmn(w1,w2)==0);
@@ -312,7 +312,7 @@ MPSSite::eType MPSSite::ContractWFB(int m, int w1, int i2, int j1, const SiteOpe
     eType wfb(0.0);
     for (int n=0; n<itsd; n++)
     {
-        const MatrixT& Wmn=so->GetW(m,n);
+        const MatrixRT& Wmn=so->GetW(m,n);
         assert(Wmn.GetNumCols()==Dws.Dw2);
         for (int w2=1; w2<=Dws.w2_last(w1); w2++)
             if (Wmn(w1,w2)!=0.0)
@@ -332,7 +332,7 @@ MPSSite::eType MPSSite::ContractFB(int n, int w2, int i2, int j1, const Vector3T
     return fb;
 }
 
-void MPSSite::SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixT& s, const MatrixCT& UV)
+void MPSSite::SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s, const MatrixCT& UV)
 {
     switch (lr)
     {
@@ -512,7 +512,7 @@ void MPSSite::Contract(dVectorT& newAs,const SiteOperator* so)
         Fill(newAs[n],eType(0.0));
         for (int m=0; m<itsd; m++)
         {
-            const MatrixT& W=so->GetW(n,m);
+            const MatrixRT& W=so->GetW(n,m);
             assert(W.GetNumRows()==Dws.Dw1);
             assert(W.GetNumCols()==Dws.Dw2);
             int i1=1; //i1=(w1,j1)

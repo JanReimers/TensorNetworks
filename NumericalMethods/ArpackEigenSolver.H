@@ -7,7 +7,7 @@ class Epsilons;
 
 class ArpackEigenSolver
 {
-    typedef TensorNetworks::VectorT  VectorT;
+    typedef TensorNetworks::VectorRT  VectorRT;
     typedef TensorNetworks::VectorCT VectorCT;
     typedef TensorNetworks::MatrixCT MatrixCT;
 public:

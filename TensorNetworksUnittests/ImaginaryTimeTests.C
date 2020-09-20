@@ -19,7 +19,7 @@ using TensorNetworks::FourthOrder;
 class ImaginaryTimeTesting : public ::testing::Test
 {
 public:
-    typedef TensorNetworks::MatrixT MatrixT;
+    typedef TensorNetworks::MatrixRT MatrixRT;
 
     ImaginaryTimeTesting()
     : eps(1.0e-13)

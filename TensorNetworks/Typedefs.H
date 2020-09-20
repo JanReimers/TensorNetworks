@@ -14,10 +14,10 @@ namespace TensorNetworks
 {
     typedef std::complex<double> eType;
     typedef DMatrix  <eType>   MatrixCT;
-    typedef DMatrix  <double>  MatrixT;
-    typedef Vector   <double>  VectorT;
+    typedef DMatrix  <double>  MatrixRT;
+    typedef Vector   <double>  VectorRT;
     typedef Matrix4  <double>  Matrix4T;
-    typedef Array    <double>  ArrayT;
+    typedef Array    <double>  ArrayRT;
 };
 
 #endif //_TYPEDEFS_H_

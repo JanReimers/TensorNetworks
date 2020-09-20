@@ -19,7 +19,7 @@ using std::setw;
 class iTEBDTesting : public ::testing::Test
 {
 public:
-    typedef TensorNetworks::MatrixT MatrixT;
+    typedef TensorNetworks::MatrixRT MatrixRT;
     typedef TensorNetworks::Matrix4T Matrix4T;
 
     iTEBDTesting()

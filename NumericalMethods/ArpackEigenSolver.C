@@ -69,7 +69,7 @@ std::tuple<ArpackEigenSolver::VectorCT,ArpackEigenSolver::MatrixCT> ArpackEigenS
 
     VectorCT  residuals(N),Workd(3*N),Workl(Lworkl);
     MatrixCT  V(N,Ncv);
-    VectorT   rwork(Ncv);
+    VectorRT   rwork(Ncv);
     Vector<int> iParam(11);
     iParam(1)=1; //ISHIFT
     iParam(3)=MaxIter;

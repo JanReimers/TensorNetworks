@@ -14,7 +14,7 @@ class SpinCalculator
 {
         typedef std::complex<double> complx;
         typedef DMatrix<complx> MatrixCT;
-        typedef DMatrix<double> MatrixT;
+        typedef DMatrix<double> MatrixRT;
         typedef Matrix4<complx> Matrix4CT;
         typedef Matrix4<double> Matrix4T;
         typedef double(SpinCalculator::*dfp)(int,int) const;
@@ -32,11 +32,11 @@ class SpinCalculator
         //
         //  Matrix versions
         //
-        MatrixT  GetSm (int lowerIndex=1) const;
-        MatrixT  GetSp (int lowerIndex=1) const;
-        MatrixT  GetSx (int lowerIndex=1) const;
+        MatrixRT  GetSm (int lowerIndex=1) const;
+        MatrixRT  GetSp (int lowerIndex=1) const;
+        MatrixRT  GetSx (int lowerIndex=1) const;
         MatrixCT GetSy (int lowerIndex=1) const;
-        MatrixT  GetSz (int lowerIndex=1) const;
+        MatrixRT  GetSz (int lowerIndex=1) const;
         //
         //  Two site Matrix versions
         //

@@ -5,8 +5,8 @@
 #include "oml/numeric.h"
 
 
-typedef TensorNetworks::VectorT VectorT;
-typedef TensorNetworks::MatrixT MatrixT;
+typedef TensorNetworks::VectorRT VectorRT;
+typedef TensorNetworks::MatrixRT MatrixRT;
 
 
 
@@ -29,9 +29,9 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,i
     //  Diagonalize H12 in order to caluclate exp(-t*H)
     //
     //cout << "H12=" << H12 << endl;
-    MatrixT U12=H12.Flatten();
-    VectorT evs=Diagonalize(U12);
-    VectorT expEvs=exp(-dt*evs);
+    MatrixRT U12=H12.Flatten();
+    VectorRT evs=Diagonalize(U12);
+    VectorRT expEvs=exp(-dt*evs);
     Matrix4T expH(d,d,d,d,0);
     Fill(expH.Flatten(),0.0);
     int i1=1,N=U12.GetNumRows();
@@ -47,8 +47,8 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,i
 
     //cout << "expH=" << expH << endl;
 
-    VectorT s(N);
-    MatrixT U(expH.Flatten()),V(expH.Flatten().GetLimits());
+    VectorRT s(N);
+    MatrixRT U(expH.Flatten()),V(expH.Flatten().GetLimits());
     SVDecomp (U,s,V);
 
     //cout << "U=" << U << endl;

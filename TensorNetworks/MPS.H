@@ -19,9 +19,9 @@ class IterationScheduleLine;
 
 class MPS : public virtual MultiPlotable
 {
-    typedef TensorNetworks::MatrixT  MatrixT;
+    typedef TensorNetworks::MatrixRT MatrixRT;
     typedef TensorNetworks::MatrixCT MatrixCT;
-    typedef TensorNetworks::ArrayT   ArrayT;
+    typedef TensorNetworks::ArrayRT  ArrayRT;
     typedef TensorNetworks::eType    eType;
     public:
         MPS() {}

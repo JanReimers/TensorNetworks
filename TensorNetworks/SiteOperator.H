@@ -13,7 +13,7 @@ class IterationScheduleLine;
 class SiteOperator
 {
 public:
-    typedef TensorNetworks::MatrixT MatrixT;
+    typedef TensorNetworks::MatrixRT MatrixRT;
 
     SiteOperator() {};
     virtual ~SiteOperator() {};
@@ -21,7 +21,7 @@ public:
     //
     //  Generate MPO matrices.  m,n are quantum numbers for <m|Oa|n>
     //
-    virtual const MatrixT& GetW(int m, int n) const=0;
+    virtual const MatrixRT& GetW(int m, int n) const=0;
     //
     //  Contract MPOs together
     //

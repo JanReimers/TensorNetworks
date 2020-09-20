@@ -34,7 +34,7 @@ class iTEBDStateImp : public virtual iTEBDState,
 
     protected:
         int GetModSite(int isite);
-        VectorT&  GetLambda(int isite);
+        VectorRT&  GetLambda(int isite);
         MatrixCT& GetGamma (int isite,int n);
 
     private:

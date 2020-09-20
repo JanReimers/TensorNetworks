@@ -10,7 +10,7 @@ using std::endl;
 //
 template <class T> class Matrix6
 {
-    typedef DMatrix<T> MatrixT;
+    typedef DMatrix<T> MatrixRT;
     public:
         Matrix6(int _M1,int _M2,int _M3, int _N1, int _N2, int _N3, int mnLow=0)
          : M1(_M1),M2(_M2),M3(_M3),N1(_N1),N2(_N2),N3(_N3), itsmnLow(1-mnLow)
@@ -77,7 +77,7 @@ template <class T> class Matrix6
 
         void ClearLimits() {itsData.SetLimits(0,0);}
 
-        MatrixT& Flatten() {return itsData;}
+        MatrixRT& Flatten() {return itsData;}
 
         friend std::ostream& operator<<(std::ostream& os,const Matrix6& m) {return os << m.itsData;}
 
@@ -99,7 +99,7 @@ template <class T> class Matrix6
     private:
         int M1,M2,M3,N1,N2,N3;
         int itsmnLow;
-        MatrixT itsData;
+        MatrixRT itsData;
 };
 
 #endif // MATRIX6_H

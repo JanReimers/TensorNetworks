@@ -14,13 +14,13 @@ MPO* Hamiltonian::CreateH2Operator  () const
 
 TensorNetworks::Matrix4T Hamiltonian::ExponentH(double dt,const Matrix4T& H12)
 {
-    TensorNetworks::MatrixT U12=H12.Flatten();
+    TensorNetworks::MatrixRT U12=H12.Flatten();
     int N=U12.GetNumRows();
     assert(N==U12.GetNumCols());
     int d=sqrt(N);
     assert(d*d==N);
-    TensorNetworks::VectorT evs=Diagonalize(U12);
-    TensorNetworks::VectorT expEvs=exp(-dt*evs);
+    TensorNetworks::VectorRT evs=Diagonalize(U12);
+    TensorNetworks::VectorRT expEvs=exp(-dt*evs);
     TensorNetworks::Matrix4T expH(d,d,d,d,0);
     Fill(expH.Flatten(),0.0);
     int i1=1;

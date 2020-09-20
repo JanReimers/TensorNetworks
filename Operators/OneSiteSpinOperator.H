@@ -11,7 +11,7 @@ class OneSiteSpinOperator  : public virtual OperatorWRepresentation
         OneSiteSpinOperator(double S, TensorNetworks::SpinOperator);
         virtual ~OneSiteSpinOperator();
 
-        virtual MatrixT GetW   (TensorNetworks::Position,int m, int n) const;
+        virtual MatrixRT GetW   (TensorNetworks::Position,int m, int n) const;
         virtual Dw12    GetDw12(TensorNetworks::Position) const {return itsDw12;}
     private:
         double itsS;

@@ -11,15 +11,15 @@ class OperatorWRepresentation;
 
 class SiteOperatorImp : public virtual SiteOperator
 {
-        typedef TensorNetworks::VectorT VectorT;
+        typedef TensorNetworks::VectorRT VectorRT;
     public:
         SiteOperatorImp(TensorNetworks::Position  lbr, const OperatorWRepresentation* O,int d);
-        SiteOperatorImp(TensorNetworks::Direction lr , const MatrixT& U, const VectorT& expEvs, int d);
+        SiteOperatorImp(TensorNetworks::Direction lr , const MatrixRT& U, const VectorRT& expEvs, int d);
         virtual ~SiteOperatorImp();
         void SetNeighbours(SiteOperator* left, SiteOperator* right);
 
         virtual const Dw12&    GetDw12() const {return itsDw12;}
-        virtual const MatrixT& GetW(int m, int n) const
+        virtual const MatrixRT& GetW(int m, int n) const
         {
             return itsWs(m+1,n+1);
         }
@@ -38,17 +38,17 @@ class SiteOperatorImp : public virtual SiteOperator
     private:
         friend class MPOTesting;
 //        typedef TensorNetworks::MatrixCT MatrixCT;
-        MatrixT& GetW(int m, int n) {return itsWs(m+1,n+1);}
-        void SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,const MatrixT& UV);
-        static MatrixT  Contract1(const VectorT & s, const MatrixT& VA);
-        static MatrixT  Contract1(const MatrixT& AU, const VectorT & s);
+        MatrixRT& GetW(int m, int n) {return itsWs(m+1,n+1);}
+        void SVDTransfer(TensorNetworks::Direction lr,const VectorRT& s,const MatrixRT& UV);
+        static MatrixRT  Contract1(const VectorRT & s, const MatrixRT& VA);
+        static MatrixRT  Contract1(const MatrixRT& AU, const VectorRT & s);
 
 
-        MatrixT  Reshape(TensorNetworks::Direction lr);
+        MatrixRT  Reshape(TensorNetworks::Direction lr);
         void     Reshape(int D1, int D2, bool saveData=false);
-        void     Reshape(TensorNetworks::Direction lr,const MatrixT& UV);
+        void     Reshape(TensorNetworks::Direction lr,const MatrixRT& UV);
 
-        typedef DMatrix<TensorNetworks::MatrixT> TensorT;
+        typedef DMatrix<TensorNetworks::MatrixRT> TensorT;
 
         int itsd; //2*S+1
         Dw12 itsDw12;

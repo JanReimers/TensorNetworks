@@ -10,7 +10,7 @@ using std::endl;
 //
 template <class T> class Matrix4
 {
-    typedef DMatrix<T> MatrixT;
+    typedef DMatrix<T> MatrixRT;
     public:
         Matrix4(int Dw1,int D1, int Dw2, int D2, int wLow=1)
          : itsDw1(Dw1), itsD1(D1), itsDw2(Dw2), itsD2(D2), itswLow(1-wLow)
@@ -39,8 +39,8 @@ template <class T> class Matrix4
             return itsData(index1(w1,i1),index2(w2,i2));;
         }
 
-              MatrixT& Flatten()       {return itsData;}
-        const MatrixT& Flatten() const {return itsData;}
+              MatrixRT& Flatten()       {return itsData;}
+        const MatrixRT& Flatten() const {return itsData;}
         void Fill(const T& fill) {::Fill(itsData,fill);}
         bool IsHermitian(double eps) const
         {
@@ -57,7 +57,7 @@ template <class T> class Matrix4
 
     private:
         int itsDw1,itsD1,itsDw2,itsD2, itswLow;
-        MatrixT itsData;
+        MatrixRT itsData;
 };
 
 #endif // MATRIX4_H

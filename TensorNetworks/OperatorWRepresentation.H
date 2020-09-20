@@ -14,11 +14,11 @@ class OperatorWRepresentation
 {
     public:
         typedef double ElementT;
-        typedef TensorNetworks::MatrixT MatrixT;
+        typedef TensorNetworks::MatrixRT MatrixRT;
         OperatorWRepresentation() {}
         virtual ~OperatorWRepresentation() {}
 
-        virtual MatrixT GetW   (TensorNetworks::Position,int m, int n) const=0;
+        virtual MatrixRT GetW   (TensorNetworks::Position,int m, int n) const=0;
         virtual Dw12    GetDw12(TensorNetworks::Position) const=0;
 };
 

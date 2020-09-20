@@ -60,7 +60,7 @@ int iTEBDStateImp::GetModSite(int isite)
     return modSite;
 }
 
-iTEBDStateImp::VectorT&  iTEBDStateImp::GetLambda(int isite)
+iTEBDStateImp::VectorRT&  iTEBDStateImp::GetLambda(int isite)
 {
     MPSSite* site=itsSites[GetModSite(isite  )];
     assert(site);
@@ -121,7 +121,7 @@ void iTEBDStateImp::Apply(int isite,const Matrix4T& expH)
     MatrixCT ThetaF=Theta.Flatten();
     assert(ThetaF.GetNumRows()==ThetaF.GetNumCols());
     int N=ThetaF.GetNumRows();
-    VectorT  s(N);
+    VectorRT  s(N);
     MatrixCT VT(N,N);
 //    cout << "Before Compress Dw1 Dw2 A=" << itsDw12.Dw1 << " " << itsDw12.Dw2 << " "<< A << endl;
     CSVDecomp(ThetaF,s,VT);
@@ -137,7 +137,7 @@ void iTEBDStateImp::Apply(int isite,const Matrix4T& expH)
             for (int i3=1;i3<=itsDmax;i3++)
                 MB[nb](i2,i3)=VT(nbi2,i3)/lambdaB(i3);
 
-   bondA->SetSingularValues(DiagonalMatrix<double>(s));
+   bondA->SetSingularValues(TensorNetworks::DiagonalMatrixRT(s));
 
 }
 

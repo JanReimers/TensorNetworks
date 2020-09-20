@@ -24,7 +24,7 @@ SiteOperatorImp::SiteOperatorImp(TensorNetworks::Position lbr, const OperatorWRe
 //
 // Build from a trotter decomp.
 //
-SiteOperatorImp::SiteOperatorImp(TensorNetworks::Direction lr,const MatrixT& U, const VectorT& s, int d)
+SiteOperatorImp::SiteOperatorImp(TensorNetworks::Direction lr,const MatrixRT& U, const VectorRT& s, int d)
     : itsd(d)
     , itsDw12()
     , itsWs(d,d)
@@ -43,7 +43,7 @@ SiteOperatorImp::SiteOperatorImp(TensorNetworks::Direction lr,const MatrixT& U, 
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++,i1++)
             {
-                itsWs(m+1,n+1)=MatrixT(1,Dw);
+                itsWs(m+1,n+1)=MatrixRT(1,Dw);
                 for (int w=1; w<=Dw; w++)
                     itsWs(m+1,n+1)(1,w)=U(i1,w)*sqrt(s(w));
                 //cout << "Left itsWs(" << m << "," << n << ") = " << itsWs(m+1,n+1) << endl;
@@ -64,7 +64,7 @@ SiteOperatorImp::SiteOperatorImp(TensorNetworks::Direction lr,const MatrixT& U, 
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++,i2++)
             {
-                itsWs(m+1,n+1)=MatrixT(Dw,1);
+                itsWs(m+1,n+1)=MatrixRT(Dw,1);
                 for (int w=1; w<=Dw; w++)
                     itsWs(m+1,n+1)(w,1)=U(i2,w)*sqrt(s(w));
                 //cout << "Right itsWs(" << m << "," << n << ") = " << itsWs(m+1,n+1) << endl;
@@ -112,12 +112,12 @@ void SiteOperatorImp::Combine(const SiteOperator* O2)
     for (int m=0; m<itsd; m++)
         for (int o=0; o<itsd; o++)
         {
-            MatrixT Wmo(Dw.Dw1,Dw.Dw2);
+            MatrixRT Wmo(Dw.Dw1,Dw.Dw2);
             Fill(Wmo,0.0);
             for (int n=0; n<itsd; n++)
             {
-                const MatrixT& W1=GetW(m,n);
-                const MatrixT& W2=O2->GetW(n,o);
+                const MatrixRT& W1=GetW(m,n);
+                const MatrixRT& W2=O2->GetW(n,o);
                 int w1=1;
                 for (int w11=1; w11<=itsDw12.Dw1; w11++)
                     for (int w12=1; w12<=   O2Dw.Dw1; w12++,w1++)
@@ -135,7 +135,7 @@ void SiteOperatorImp::Combine(const SiteOperator* O2)
 }
 
 using TensorNetworks::MatrixCT;
-using TensorNetworks::VectorT;
+using TensorNetworks::VectorRT;
 
 void SiteOperatorImp::Compress(TensorNetworks::Direction lr,int DwMax, double sMin)
 {
@@ -146,12 +146,12 @@ void SiteOperatorImp::Compress(TensorNetworks::Direction lr,int DwMax, double sM
     assert(sMin>=0.0);
     assert(!(DwMax==0 && sMin==0.0));
 
-    MatrixT  A=Reshape(lr);
-    MatrixT  Acopy=A;
+    MatrixRT  A=Reshape(lr);
+    MatrixRT  Acopy=A;
     int      M=A.GetNumRows(),N=A.GetNumCols();
     int      mn=Min(M,N);
-    VectorT  s(mn);
-    MatrixT  VT(N,N);
+    VectorRT  s(mn);
+    MatrixRT  VT(N,N);
 //    cout << "Before Compress Dw1 Dw2 A=" << itsDw12.Dw1 << " " << itsDw12.Dw2 << " "<< A << endl;
     LaSVDecomp(A,s,VT); //Solves A=U * s * Vdagger  returns V not Vdagger
     //if (V.GetNumCols()!=s.size())
@@ -167,7 +167,7 @@ void SiteOperatorImp::Compress(TensorNetworks::Direction lr,int DwMax, double sM
 //    cout << "U*s*Trans(V)=" << MatrixT(A*Contract1(s,VT))<< endl;
 //    cout << "U*s*Trans(V)=" << Max(abs(MatrixT(Contract1(A,s)*VT-Acopy))) << endl;
 //    cout << "U*s*Trans(V)=" << Max(abs(MatrixT(A*Contract1(s,VT)-Acopy))) << endl;
-    assert(Max(abs(MatrixT(Contract1(A,s)*VT-Acopy)))<1e-12);
+    assert(Max(abs(MatrixRT(Contract1(A,s)*VT-Acopy)))<1e-12);
     //
     //  Rescaling
     //
@@ -209,9 +209,9 @@ void SiteOperatorImp::Compress(TensorNetworks::Direction lr,int DwMax, double sM
 //    cout << "After Compress U s V =" << A << s << VT << endl;
 //    cout << "U*s*Trans(V)=" << Max(abs(MatrixT(Contract1(A,s)*VT-Acopy))) << endl;
 //    cout << "U*s*Trans(V)=" << Max(abs(MatrixT(A*Contract1(s,VT)-Acopy))) << endl;
-    assert(Max(abs(MatrixT(Contract1(A,s)*VT-Acopy)))<10*sMin);
+    assert(Max(abs(MatrixRT(Contract1(A,s)*VT-Acopy)))<10*sMin);
 
-    MatrixT UV;// This get transferred through the bond to a neighbouring site.
+    MatrixRT UV;// This get transferred through the bond to a neighbouring site.
     switch (lr)
     {
         case TensorNetworks::DRight:
@@ -235,9 +235,9 @@ void SiteOperatorImp::Compress(TensorNetworks::Direction lr,int DwMax, double sM
 
 }
 
-TensorNetworks::MatrixT SiteOperatorImp::Reshape(TensorNetworks::Direction lr)
+TensorNetworks::MatrixRT SiteOperatorImp::Reshape(TensorNetworks::Direction lr)
 {
-    MatrixT A;
+    MatrixRT A;
     switch (lr)
     {
     case TensorNetworks::DLeft:
@@ -247,7 +247,7 @@ TensorNetworks::MatrixT SiteOperatorImp::Reshape(TensorNetworks::Direction lr)
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
             {
-                const MatrixT& W=GetW(m,n);
+                const MatrixRT& W=GetW(m,n);
                 for (int w1=1; w1<=itsDw12.Dw1; w1++,w++)
                     for (int w2=1; w2<=itsDw12.Dw2; w2++)
                         A(w,w2)=W(w1,w2);
@@ -261,7 +261,7 @@ TensorNetworks::MatrixT SiteOperatorImp::Reshape(TensorNetworks::Direction lr)
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
             {
-                const MatrixT& W=GetW(m,n);
+                const MatrixRT& W=GetW(m,n);
                 for (int w2=1; w2<=itsDw12.Dw2; w2++,w++)
                    for (int w1=1; w1<=itsDw12.Dw1; w1++)
                         A(w1,w)=W(w1,w2);
@@ -286,7 +286,7 @@ void SiteOperatorImp::Reshape(int D1, int D2, bool saveData)
 
 }
 
-void  SiteOperatorImp::Reshape(TensorNetworks::Direction lr,const MatrixT& UV)
+void  SiteOperatorImp::Reshape(TensorNetworks::Direction lr,const MatrixRT& UV)
 {
     switch (lr)
     {
@@ -300,7 +300,7 @@ void  SiteOperatorImp::Reshape(TensorNetworks::Direction lr,const MatrixT& UV)
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
             {
-                MatrixT& W=GetW(m,n);
+                MatrixRT& W=GetW(m,n);
                 for (int w1=1; w1<=itsDw12.Dw1; w1++,w++)
                     for (int w2=1; w2<=itsDw12.Dw2; w2++)
                         W(w1,w2)=UV(w,w2);
@@ -317,7 +317,7 @@ void  SiteOperatorImp::Reshape(TensorNetworks::Direction lr,const MatrixT& UV)
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
             {
-                MatrixT& W=GetW(m,n);
+                MatrixRT& W=GetW(m,n);
                 for (int w2=1; w2<=itsDw12.Dw2; w2++,w++)
                     for (int w1=1; w1<=itsDw12.Dw1; w1++)
                         W(w1,w2)=UV(w1,w);
@@ -327,7 +327,7 @@ void  SiteOperatorImp::Reshape(TensorNetworks::Direction lr,const MatrixT& UV)
     }
 }
 
-void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,const MatrixT& UV)
+void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const VectorRT& s,const MatrixRT& UV)
 {
 //    cout << "SVD transfer s=" << s << " UV=" << UV << endl;
     switch (lr)
@@ -345,9 +345,9 @@ void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
             {
-                MatrixT& W=GetW(m,n);
+                MatrixRT& W=GetW(m,n);
                 assert(W.GetNumCols()==UV.GetNumRows());
-                MatrixT temp=Contract1(W*UV,s);
+                MatrixRT temp=Contract1(W*UV,s);
                 W.SetLimits(0,0);
                 W=temp; //Shallow copy
 //                cout << "SVD transfer W(" << m << "," << n << ")=" << W << endl;
@@ -369,9 +369,9 @@ void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
             {
-                MatrixT& W=GetW(m,n);
+                MatrixRT& W=GetW(m,n);
                 assert(UV.GetNumCols()==W.GetNumRows());
-                MatrixT temp=Contract1(s,UV*W);
+                MatrixRT temp=Contract1(s,UV*W);
                 W.SetLimits(0,0);
                 W=temp; //Shallow copy
 //                cout << "SVD transfer W(" << m << "," << n << ")=" << W << endl;
@@ -387,13 +387,13 @@ void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const VectorT& s,
 //
 //  Anew(j,i) =  s(j)*VA(j,k)
 //
-SiteOperatorImp::MatrixT SiteOperatorImp::Contract1(const VectorT& s, const MatrixT& VA)
+SiteOperatorImp::MatrixRT SiteOperatorImp::Contract1(const VectorRT& s, const MatrixRT& VA)
 {
     int N1=VA.GetNumRows();
     int N2=VA.GetNumCols();
     assert(s.GetHigh()==N1);
 
-    MatrixT Anew(N1,N2);
+    MatrixRT Anew(N1,N2);
     for(int i2=1; i2<=N2; i2++)
         for(int i1=1; i1<=N1; i1++)
             Anew(i1,i2)=s(i1)*VA(i1,i2);
@@ -404,13 +404,13 @@ SiteOperatorImp::MatrixT SiteOperatorImp::Contract1(const VectorT& s, const Matr
 //
 //  Anew(j,i) =  s(j)*VA(j,k)
 //
-SiteOperatorImp::MatrixT SiteOperatorImp::Contract1(const MatrixT& AU,const VectorT& s)
+SiteOperatorImp::MatrixRT SiteOperatorImp::Contract1(const MatrixRT& AU,const VectorRT& s)
 {
     int N1=AU.GetNumRows();
     int N2=AU.GetNumCols();
     assert(s.GetHigh()==N2);
 
-    MatrixT Anew(N1,N2);
+    MatrixRT Anew(N1,N2);
     for(int i2=1; i2<=N2; i2++)
         for(int i1=1; i1<=N1; i1++)
             Anew(i1,i2)=AU(i1,i2)*s(i2);

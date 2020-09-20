@@ -89,25 +89,25 @@ template <class M,class F1, class F2> M SpinCalculator::BuildMatrix(int lowerInd
     return ret;
 }
 
-SpinCalculator::MatrixT  SpinCalculator::GetSm (int lowerIndex) const
+SpinCalculator::MatrixRT  SpinCalculator::GetSm (int lowerIndex) const
 {
-    return BuildMatrix<MatrixT,dfp>(lowerIndex,&SpinCalculator::GetSm);
+    return BuildMatrix<MatrixRT,dfp>(lowerIndex,&SpinCalculator::GetSm);
 }
-SpinCalculator::MatrixT  SpinCalculator::GetSp (int lowerIndex) const
+SpinCalculator::MatrixRT  SpinCalculator::GetSp (int lowerIndex) const
 {
-    return BuildMatrix<MatrixT,dfp>(lowerIndex,&SpinCalculator::GetSp);
+    return BuildMatrix<MatrixRT,dfp>(lowerIndex,&SpinCalculator::GetSp);
 }
-SpinCalculator::MatrixT  SpinCalculator::GetSx (int lowerIndex) const
+SpinCalculator::MatrixRT  SpinCalculator::GetSx (int lowerIndex) const
 {
-    return BuildMatrix<MatrixT,dfp>(lowerIndex,&SpinCalculator::GetSx);
+    return BuildMatrix<MatrixRT,dfp>(lowerIndex,&SpinCalculator::GetSx);
 }
 SpinCalculator::MatrixCT SpinCalculator::GetSy (int lowerIndex) const
 {
     return BuildMatrix<MatrixCT,cfp>(lowerIndex,&SpinCalculator::GetSy);
 }
-SpinCalculator::MatrixT  SpinCalculator::GetSz (int lowerIndex) const
+SpinCalculator::MatrixRT  SpinCalculator::GetSz (int lowerIndex) const
 {
-    return BuildMatrix<MatrixT,dfp>(lowerIndex,&SpinCalculator::GetSz);
+    return BuildMatrix<MatrixRT,dfp>(lowerIndex,&SpinCalculator::GetSz);
 }
 
 SpinCalculator::Matrix4T  SpinCalculator::GetSxSx (int lowerIndex) const

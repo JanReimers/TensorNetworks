@@ -75,9 +75,9 @@ double Hamiltonian_1D_NN_Heisenberg::I(int m, int n) const
     return ret;
 }
 
-TensorNetworks::MatrixT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Position lbr,int m, int n) const
+TensorNetworks::MatrixRT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Position lbr,int m, int n) const
 {
-    TensorNetworks::MatrixT W;
+    TensorNetworks::MatrixRT W;
     SpinCalculator sc(itsS);
 
     switch (lbr)
@@ -223,7 +223,7 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::Tro
             //
             //  At this order we must compress as we go or we risk consuming all memory
             //
-            TensorNetworks::VectorT ts(5);
+            TensorNetworks::VectorRT ts(5);
             ts(1)=dt/(4-pow(4.0,1.0/3.0));
             ts(2)=ts(1);
             ts(3)=dt-2*ts(1)-2*ts(2);

@@ -139,7 +139,7 @@ void MPSSite::Canonicalize(TensorNetworks::Direction lr)
 {
     MatrixCT A=ReshapeBeforeSVD(lr);
     int N=Min(A.GetNumRows(),A.GetNumCols());
-    VectorT s(N); // This get passed from one site to the next.
+    VectorRT s(N); // This get passed from one site to the next.
     MatrixCT V(N,A.GetNumCols());
     CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
 

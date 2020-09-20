@@ -17,9 +17,9 @@ OneSiteSpinOperator::~OneSiteSpinOperator()
 {
 }
 
-TensorNetworks::MatrixT OneSiteSpinOperator::GetW (TensorNetworks::Position lbr,int m, int n) const
+TensorNetworks::MatrixRT OneSiteSpinOperator::GetW (TensorNetworks::Position lbr,int m, int n) const
 {
-    TensorNetworks::MatrixT W(1,1);
+    TensorNetworks::MatrixRT W(1,1);
     SpinCalculator sc(itsS);
 
     switch(itsOperator)

@@ -1,11 +1,11 @@
 
+- Done Refactor: if a complex matrix is MatrixCT then a real matrix should MatrixRT
 - Add deltaD to interation schedule and using when increment D in GS searches.
-- Refactor: Bonds store SVs in a zero based Array. Change to 1 based vector
-- We need a convenient way to do contractions over singular values using OML Matrix
+- Done: Refactor: Bonds store SVs in a zero based Array. Change to 1 based vector
+- Done We need a convenient way to do contractions over singular values using OML Matrix
   multiplications.  THis means we need the singular values stored in a diagonal array,
   with efficient op* functions.
-- Refactor: Use multiple return values for PRIMME and LApack SVD.
-- Refactor: Normalize and NormalizeAndCompress should be merged  DMax=0, eps=0 means no compress?
+- Done Refactor: Use multiple return values for PRIMME and LApack SVD.
 - Refactor: separate all plotting code in MPSImp and MPState
     The tricky part here is that MPS interface inherits from MultiPlotable
     So we need split that off and have MPS with no plotting and MPSWithPlotting
@@ -14,6 +14,7 @@
      spd uses variadic templates instead of the old C variadic arguments framework, which means
      everything needs to be inline.
 - Make ab SVDCompress interface.  Derived classes can implement different policies doe deciding which Svs to throw awat etc.
+    - Refactor: Normalize and NormalizeAndCompress should be merged  DMax=0, eps=0 means no compress?
 - Spin space trotter decomp
 - Infinite methods iMPS, iTEBD, iDMRG
     -iMPS class with small unit cell

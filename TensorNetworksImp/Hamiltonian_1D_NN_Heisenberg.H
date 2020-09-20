@@ -38,7 +38,7 @@ class Hamiltonian_1D_NN_Heisenberg
         //
         //  OperatorWRepresentation interface
         //
-        virtual MatrixT GetW   (TensorNetworks::Position,int m, int n) const;
+        virtual MatrixRT GetW   (TensorNetworks::Position,int m, int n) const;
         virtual Dw12    GetDw12(TensorNetworks::Position lbr) const;
 
     private:

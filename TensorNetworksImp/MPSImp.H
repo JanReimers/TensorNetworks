@@ -22,9 +22,9 @@ class MPSImp
 //  Typedefs for various containers
 //
 protected:
-        typedef TensorNetworks::MatrixT   MatrixT;
-        typedef TensorNetworks::VectorT   VectorT;
-        typedef TensorNetworks:: ArrayT   ArrayT;
+        typedef TensorNetworks::MatrixRT  MatrixRT;
+        typedef TensorNetworks::VectorRT  VectorRT;
+        typedef TensorNetworks:: ArrayRT   ArrayRT;
         typedef TensorNetworks::MatrixCT  MatrixCT;
         typedef TensorNetworks::VectorCT  VectorCT;
         typedef TensorNetworks::Matrix6CT Matrix6T;
@@ -223,12 +223,12 @@ private:
         PlotableMesh* itsBondsPMesh;
         PlotableMesh* itsSVMeshPMesh;
 
-        ArrayT itsSiteEnergies;  //Minimum eigen value of Heff on each site.
-        ArrayT itsSiteEGaps;     //Gap to second eigen value on each site.
-        ArrayT itsBondEntropies; // Sum(s^2*ln(s^2)) for each bond
-        ArrayT itsBondMinSVs;    // smallest singluar value for each bond
-        ArrayT itsBondRanks;     // Effective rank based on non zero singular values
-        VectorT itssSelectedEntropySpectrum; //full spectrum of SVs for a selected site.
+        ArrayRT itsSiteEnergies;  //Minimum eigen value of Heff on each site.
+        ArrayRT itsSiteEGaps;     //Gap to second eigen value on each site.
+        ArrayRT itsBondEntropies; // Sum(s^2*ln(s^2)) for each bond
+        ArrayRT itsBondMinSVs;    // smallest singluar value for each bond
+        ArrayRT itsBondRanks;     // Effective rank based on non zero singular values
+        VectorRT itssSelectedEntropySpectrum; //full spectrum of SVs for a selected site.
 
         static GraphDefinition theGraphs[];
         static const int n_graphs;

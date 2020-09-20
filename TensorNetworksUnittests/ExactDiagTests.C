@@ -6,13 +6,13 @@
 #include "TensorNetworksImp/StateIterator.H"
 #include "oml/numeric.h"
 
-using TensorNetworks::MatrixT;
+using TensorNetworks::MatrixRT;
 
 class ExactDiagTesting : public ::testing::Test
 {
 public:
     typedef std::complex<double> complx;
-    typedef TensorNetworks:: ArrayT  ArrayT;
+    typedef TensorNetworks:: ArrayRT  ArrayRT;
 
     ExactDiagTesting()
         : itsFactory(TensorNetworks::Factory::GetFactory())
@@ -37,7 +37,7 @@ public:
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
     }
 
-    TensorNetworks::MatrixT GetH(double S)
+    TensorNetworks::MatrixRT GetH(double S)
     {
         Setup(2,S);
         return itsH->BuildLocalMatrix().Flatten();
@@ -62,7 +62,7 @@ TEST_F(ExactDiagTesting,TestStateIterator)
 TEST_F(ExactDiagTesting,TestHabS12)
 {
     Setup(10,0.5);
-    MatrixT Hab=itsH->BuildLocalMatrix().Flatten();
+    MatrixRT Hab=itsH->BuildLocalMatrix().Flatten();
     //cout << "Hab=" << Hab << endl;
     EXPECT_EQ(ToString(Hab),"(1:4),(1:4) \n[ 0.25 0 0 0 ]\n[ 0 -0.25 0.5 0 ]\n[ 0 0.5 -0.25 0 ]\n[ 0 0 0 0.25 ]\n");
 }
@@ -71,41 +71,41 @@ TEST_F(ExactDiagTesting,TestHabS12)
 TEST_F(ExactDiagTesting,TestHabS1)
 {
     Setup(10,1.0);
-    MatrixT Hab=itsH->BuildLocalMatrix().Flatten();
+    MatrixRT Hab=itsH->BuildLocalMatrix().Flatten();
     EXPECT_EQ(ToString(Hab),"(1:9),(1:9) \n[ 1 0 0 0 0 0 0 0 0 ]\n[ 0 0 0 1 0 0 0 0 0 ]\n[ 0 0 -1 0 1 0 0 0 0 ]\n[ 0 1 0 0 0 0 0 0 0 ]\n[ 0 0 1 0 0 0 1 0 0 ]\n[ 0 0 0 0 0 0 0 1 0 ]\n[ 0 0 0 0 1 0 -1 0 0 ]\n[ 0 0 0 0 0 1 0 0 0 ]\n[ 0 0 0 0 0 0 0 0 1 ]\n");
 }
 
 TEST_F(ExactDiagTesting,TestHabS32)
 {
     Setup(10,1.5);
-    TensorNetworks::MatrixT Hab=itsH->BuildLocalMatrix().Flatten();
+    TensorNetworks::MatrixRT Hab=itsH->BuildLocalMatrix().Flatten();
     EXPECT_EQ(ToString(Hab),"(1:16),(1:16) \n[ 2.25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ]\n[ 0 0.75 0 0 1.5 0 0 0 0 0 0 0 0 0 0 0 ]\n[ 0 0 -0.75 0 0 1.73205 0 0 0 0 0 0 0 0 0 0 ]\n[ 0 0 0 -2.25 0 0 1.5 0 0 0 0 0 0 0 0 0 ]\n[ 0 1.5 0 0 0.75 0 0 0 0 0 0 0 0 0 0 0 ]\n[ 0 0 1.73205 0 0 0.25 0 0 1.73205 0 0 0 0 0 0 0 ]\n[ 0 0 0 1.5 0 0 -0.25 0 0 2 0 0 0 0 0 0 ]\n[ 0 0 0 0 0 0 0 -0.75 0 0 1.73205 0 0 0 0 0 ]\n[ 0 0 0 0 0 1.73205 0 0 -0.75 0 0 0 0 0 0 0 ]\n[ 0 0 0 0 0 0 2 0 0 -0.25 0 0 1.5 0 0 0 ]\n[ 0 0 0 0 0 0 0 1.73205 0 0 0.25 0 0 1.73205 0 0 ]\n[ 0 0 0 0 0 0 0 0 0 0 0 0.75 0 0 1.5 0 ]\n[ 0 0 0 0 0 0 0 0 0 1.5 0 0 -2.25 0 0 0 ]\n[ 0 0 0 0 0 0 0 0 0 0 1.73205 0 0 -0.75 0 0 ]\n[ 0 0 0 0 0 0 0 0 0 0 0 1.5 0 0 0.75 0 ]\n[ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2.25 ]\n");
 }
 
 TEST_F(ExactDiagTesting,TestEvsS12)
 {
-    TensorNetworks::MatrixT H=GetH(1.0/2.0);
+    TensorNetworks::MatrixRT H=GetH(1.0/2.0);
     Vector<double> evs=Diagonalize(H);
     EXPECT_EQ(ToString(evs),"(1:4){ -0.75 0.25 0.25 0.25 }");
 }
 
 TEST_F(ExactDiagTesting,TestEvsS22)
 {
-    TensorNetworks::MatrixT H=GetH(2.0/2.0);
+    TensorNetworks::MatrixRT H=GetH(2.0/2.0);
     Vector<double> evs=Diagonalize(H);
     EXPECT_EQ(ToString(evs),"(1:9){ -2 -1 -1 -1 1 1 1 1 1 }");
 }
 
 TEST_F(ExactDiagTesting,TestEvsS32)
 {
-    TensorNetworks::MatrixT H=GetH(3.0/2.0);
+    TensorNetworks::MatrixRT H=GetH(3.0/2.0);
     Vector<double> evs=Diagonalize(H);
     EXPECT_EQ(ToString(evs),"(1:16){ -3.75 -2.75 -2.75 -2.75 -0.75 -0.75 -0.75 -0.75 -0.75 2.25 2.25 2.25 2.25 2.25 2.25 2.25 }");
 }
 
 TEST_F(ExactDiagTesting,TestEvsS42)
 {
-    TensorNetworks::MatrixT H=GetH(4.0/2.0);
+    TensorNetworks::MatrixRT H=GetH(4.0/2.0);
     Vector<double> evs=Diagonalize(H);
     int N=evs.size();
     for (int i=1;i<=N;i++)
@@ -115,7 +115,7 @@ TEST_F(ExactDiagTesting,TestEvsS42)
 
 TEST_F(ExactDiagTesting,TestEvsS52)
 {
-    TensorNetworks::MatrixT H=GetH(5.0/2.0);
+    TensorNetworks::MatrixRT H=GetH(5.0/2.0);
     Vector<double> evs=Diagonalize(H);
     EXPECT_EQ(ToString(evs),"(1:36){ -8.75 -7.75 -7.75 -7.75 -5.75 -5.75 -5.75 -5.75 -5.75 -2.75 -2.75 -2.75 -2.75 -2.75 -2.75 -2.75 1.25 1.25 1.25 1.25 1.25 1.25 1.25 1.25 1.25 6.25 6.25 6.25 6.25 6.25 6.25 6.25 6.25 6.25 6.25 6.25 }");
 }

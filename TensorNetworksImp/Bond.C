@@ -44,7 +44,7 @@ void Bond::NewBondDimension(int D)
     itsRank=D;
 }
 
-void Bond::SetSingularValues(const DiagonalMatrixT& s)
+void Bond::SetSingularValues(const DiagonalMatrixRT& s)
 {
     //std::cout << "SingularValues=" << s << std::endl;
     int N=s.GetNumRows();
@@ -71,14 +71,14 @@ void Bond::SetSingularValues(const DiagonalMatrixT& s)
 //
 //  Direction is the normaliztions direction, which i opposite to the direction that UV gets tranferred.
 //
-void Bond::SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixT& s,const MatrixCT& UV)
+void Bond::SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s,const MatrixCT& UV)
 {
     SetSingularValues(s);
     assert(GetSite(lr));
     GetSite(lr)->SVDTransfer(lr,s,UV);
 }
 
-void Bond::CanonicalTransfer(TensorNetworks::Direction lr,const DiagonalMatrixT& s,const MatrixCT& UV)
+void Bond::CanonicalTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s,const MatrixCT& UV)
 {
     SetSingularValues(s);
     assert(GetSite(lr));

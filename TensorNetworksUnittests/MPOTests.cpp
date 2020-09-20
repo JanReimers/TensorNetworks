@@ -13,7 +13,7 @@ class MPOTesting : public ::testing::Test
 {
 public:
     typedef TensorNetworks::Matrix6CT Matrix6CT;
-    typedef TensorNetworks::MatrixT   MatrixT;
+    typedef TensorNetworks::MatrixRT  MatrixRT;
     typedef TensorNetworks::MatrixCT  MatrixCT;
     typedef TensorNetworks::Vector3CT Vector3CT;
     typedef TensorNetworks::eType     eType;
@@ -38,7 +38,7 @@ public:
     Vector3CT CalcHeffRight(int isite,bool cache=false) const {return GetMPSImp()->CalcHeffRight(itsH,isite,cache);}
     void LoadHeffCaches() {GetMPSImp()->LoadHeffCaches(itsH);}
 
-    MatrixT GetW(int isite, int m, int n) {return itsH->GetSiteOperator(isite)->GetW(m,n);}
+    MatrixRT GetW(int isite, int m, int n) {return itsH->GetSiteOperator(isite)->GetW(m,n);}
 
           MPSImp* GetMPSImp()       {return dynamic_cast<      MPSImp*>(itsMPS);}
     const MPSImp* GetMPSImp() const {return dynamic_cast<const MPSImp*>(itsMPS);}

@@ -9,9 +9,10 @@ class MPSSite;
 
 class Bond
 {
-     typedef TensorNetworks::VectorT  VectorT;
+     typedef TensorNetworks::VectorRT  VectorRT;
      typedef TensorNetworks::MatrixCT MatrixCT;
-     typedef DiagonalMatrix<double>   DiagonalMatrixT;
+     typedef TensorNetworks::DiagonalMatrixRT DiagonalMatrixRT;
+
    public:
         Bond();
         virtual ~Bond();
@@ -19,8 +20,8 @@ class Bond
         void SetSites(MPSSite* left, MPSSite* right);
         void NewBondDimension(int D);
 
-        void SVDTransfer      (TensorNetworks::Direction lr,const DiagonalMatrixT& s,const MatrixCT& UV);
-        void CanonicalTransfer(TensorNetworks::Direction lr,const DiagonalMatrixT& s,const MatrixCT& UV);
+        void SVDTransfer      (TensorNetworks::Direction lr,const DiagonalMatrixRT& s,const MatrixCT& UV);
+        void CanonicalTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s,const MatrixCT& UV);
 
         double GetBondEntropy() const {return itsBondEntropy;}
         double GetMinSV      () const {return itsMinSV;}
@@ -30,7 +31,7 @@ class Bond
 
     private:
         friend class iTEBDStateImp;
-        void SetSingularValues(const DiagonalMatrixT& s);
+        void SetSingularValues(const DiagonalMatrixRT& s);
         //
         //  lr is the normalization direction.  For normalization we need to access the right bond.
         //

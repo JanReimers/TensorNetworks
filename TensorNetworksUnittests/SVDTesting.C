@@ -19,7 +19,9 @@ using std::endl;
 class SVDTesting : public ::testing::Test
 {
 public:
-    typedef TensorNetworks::MatrixCT MatrixT;
+    typedef TensorNetworks::MatrixCT MatrixCT;
+    typedef TensorNetworks::MatrixRT MatrixRT;
+    typedef TensorNetworks::DiagonalMatrixRT DiagonalMatrixRT;
     SVDTesting()
     : itsEps()
     , mps(10,1,2)
@@ -39,7 +41,7 @@ public:
 TEST_F(SVDTesting,SVDComplexMatrix_10x10)
 {
     int N=10;
-    typedef DMatrix<eType> Mtype;
+    typedef MatrixCT Mtype;
     Mtype A(N,N),UnitMatrix(N,N);
     FillRandom(A);
     Unit(UnitMatrix);
@@ -56,7 +58,7 @@ TEST_F(SVDTesting,SVDComplexMatrix_10x10)
 TEST_F(SVDTesting,OML_SVDRandomComplexMatrix_10x5)
 {
     int M=10,N=5;
-    typedef DMatrix<eType> Mtype;
+    typedef MatrixCT Mtype;
     Mtype A(M,N),UnitMatrix(N,N);
     FillRandom(A);
     Unit(UnitMatrix);
@@ -73,7 +75,7 @@ TEST_F(SVDTesting,OML_SVDRandomComplexMatrix_10x5)
 TEST_F(SVDTesting,OML_SVDRandomComplexMatrix_5x10)
 {
     int M=5,N=10;
-    typedef DMatrix<eType> Mtype;
+    typedef MatrixCT Mtype;
     Mtype A(M,N),UnitMatrix(M,M);
     FillRandom(A);
     Unit(UnitMatrix);
@@ -89,7 +91,7 @@ TEST_F(SVDTesting,OML_SVDRandomComplexMatrix_5x10)
 TEST_F(SVDTesting,OML_EigenSolverComplexHermitian)
 {
     int N=50;
-    typedef DMatrix<eType> Mtype;
+    typedef MatrixCT Mtype;
     Mtype A(N,N);//,V(M,N),UnitMatrix(M,M);
     Vector<double>  w(N);
     FillRandom(A);
@@ -109,7 +111,7 @@ TEST_F(SVDTesting,OML_EigenSolverComplexHermitian)
 TEST_F(SVDTesting,SparseMatrixClass)
 {
     int N=20;
-    typedef DMatrix<eType> Mtype;
+    typedef MatrixCT Mtype;
     Mtype A(N,N);
     FillRandom(A);
     for (int i=0;i<N*N;i++)
@@ -127,7 +129,7 @@ TEST_F(SVDTesting,SparseMatrixClass)
 TEST_F(SVDTesting,Prime_EigenSolverSparseComplexHermitian200x200)
 {
     int N=200,Ne=10;
-    typedef DMatrix<eType> Mtype;
+    typedef MatrixCT Mtype;
     Mtype A(N,N);
     FillRandom(A);
     for (int i=0;i<1.0*N*N;i++)
@@ -159,7 +161,7 @@ TEST_F(SVDTesting,Prime_EigenSolverSparseComplexHermitian200x200)
 TEST_F(SVDTesting,Prime_EigenSolverDenseComplexHermitian200x200)
 {
     int N=200,Ne=10;
-    typedef DMatrix<eType> Mtype;
+    typedef MatrixCT Mtype;
     Mtype A(N,N);
     FillRandom(A);
     for (int i=0;i<0.5*N*N;i++)
@@ -192,7 +194,7 @@ TEST_F(SVDTesting,Prime_EigenSolverDenseComplexHermitian200x200)
 TEST_F(SVDTesting,Prime_SVDComplex4004Matrix_1x4)
 {
     int N1=1,N2=4;
-    typedef DMatrix<eType> Mtype;
+    typedef MatrixCT Mtype;
     Mtype M(N1,N2),V(N2,N1),UnitMatrix(N1,N1);
     Vector<double>  s(N1);
     M(1,1)=4.0;
@@ -221,7 +223,7 @@ TEST_F(SVDTesting,Prime_SVDComplex4004Matrix_1x4)
 TEST_F(SVDTesting,LAPACK_SVDReal4004Matrix_1x4a)
 {
     int M=1,N=4,mn=Min(M,N);
-    typedef DMatrix<double> Mtype;
+    typedef MatrixRT Mtype;
     Mtype A(M,N),VT(N,N),UnitMatrix(M,M);
     Vector<double>  s(mn);
     //FillRandom(A);
@@ -243,7 +245,7 @@ TEST_F(SVDTesting,LAPACK_SVDReal4004Matrix_1x4a)
 TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_1x4a)
 {
     int M=1,N=4,mn=Min(M,N);
-    typedef DMatrix<double> Mtype;
+    typedef MatrixRT Mtype;
     Mtype A(M,N),VT(N,N),UnitMatrix(M,M);
     Vector<double>  s(mn);
     FillRandom(A);
@@ -261,7 +263,7 @@ TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_1x4a)
 TEST_F(SVDTesting,LAPACK_SVDReal4004Matrix_4x1a)
 {
     int M=4,N=1,mn=Min(M,N);
-    typedef DMatrix<double> Mtype;
+    typedef MatrixRT Mtype;
     Mtype A(M,N),VT(N,N),UnitMatrix(M,M);
     Vector<double>  s(mn);
     A(1,1)=4;
@@ -285,7 +287,7 @@ TEST_F(SVDTesting,LAPACK_SVDReal4004Matrix_4x1a)
 TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_4x1a)
 {
     int M=4,N=1,mn=Min(M,N);
-    typedef DMatrix<double> Mtype;
+    typedef MatrixRT Mtype;
     Mtype A(M,N),VT(N,N),UnitMatrix(M,M);
     Vector<double>  s(mn);
     FillRandom(A);
@@ -305,7 +307,7 @@ TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_4x1a)
 TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_200x3a)
 {
     int M=200,N=3,mn=Min(M,N);
-    typedef DMatrix<double> Mtype;
+    typedef MatrixRT Mtype;
     Mtype A(M,N),VT(N,N),UnitMatrix(M,M);
     Vector<double>  s(mn);
     FillRandom(A);
@@ -323,7 +325,7 @@ TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_200x3a)
 TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_3x200a)
 {
     int M=3,N=200,mn=Min(M,N);
-    typedef DMatrix<double> Mtype;
+    typedef MatrixRT Mtype;
     Mtype A(M,N),VT(N,N),UnitMatrix(M,M);
     Vector<double>  s(mn);
     FillRandom(A);
@@ -341,7 +343,7 @@ TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_3x200a)
 TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_100x100)
 {
     int M=100,N=100,mn=Min(M,N);
-    typedef DMatrix<double> Mtype;
+    typedef MatrixRT Mtype;
     Mtype A(M,N),VT(N,N),UnitMatrix(M,M);
     Vector<double>  s(mn);
     FillRandom(A);
@@ -361,7 +363,7 @@ TEST_F(SVDTesting,LAPACK_SVDRealRandomMatrix_100x100)
 TEST_F(SVDTesting,ArpackEigenSolver)
 {
     int N=100,Nev=4;
-    typedef DMatrix<eType> Mtype;
+    typedef MatrixCT Mtype;
     Mtype A(N,N),UnitMatrix(N,N);
     FillRandom(A);
     itsEps.itsEigenSolverEpsilon=1e-14;
@@ -383,14 +385,14 @@ TEST_F(SVDTesting,omlDiagonalMatrix_double)
     int N=10;
     Vector<double> v(N);
     Fill(v,-1.);
-    DiagonalMatrix<double> d(v);
-    DMatrix<double> M(N,N);
+    DiagonalMatrixRT d(v);
+    MatrixRT M(N,N);
     FillRandom(M);
-    DMatrix<double> Md=M*d;
+    MatrixRT Md=M*d;
     EXPECT_NEAR(Max(abs(M+Md)),0.0,eps);
-    DMatrix<double> dM=d*M;
+    MatrixRT dM=d*M;
     EXPECT_NEAR(Max(abs(M+dM)),0.0,eps);
-    DMatrix<double> dMdMdM=d*M*d*M*d*M;
+    MatrixRT dMdMdM=d*M*d*M*d*M;
     EXPECT_NEAR(Max(abs(M*M*M+dMdMdM)),0.0,eps);
 
 }
@@ -401,13 +403,13 @@ TEST_F(SVDTesting,omlDiagonalMatrix_complex)
     Vector<eType> v(N);
     Fill(v,eType(-1.0));
     DiagonalMatrix<eType> d(v);
-    DMatrix<eType> M(N,N);
+    MatrixCT M(N,N);
     FillRandom(M);
-    DMatrix<eType> Md=M*d;
+    MatrixCT Md=M*d;
     EXPECT_NEAR(Max(abs(M+Md)),0.0,eps);
-    DMatrix<eType> dM=d*M;
+    MatrixCT dM=d*M;
     EXPECT_NEAR(Max(abs(M+dM)),0.0,eps);
-    DMatrix<eType> dMdMdM=d*M*d*M*d*M;
+    MatrixCT dMdMdM=d*M*d*M*d*M;
     EXPECT_NEAR(Max(abs(M*M*M+dMdMdM)),0.0,eps);
 
 }
@@ -417,13 +419,13 @@ TEST_F(SVDTesting,omlDiagonalMatrix_complex_double)
     Vector<double> v(N);
     Fill(v,-1.0);
     DiagonalMatrix<double> d(v);
-    DMatrix<eType> M(N,N);
+    MatrixCT M(N,N);
     FillRandom(M);
-    DMatrix<eType> Md=M*d;
+    MatrixCT Md=M*d;
     EXPECT_NEAR(Max(abs(M+Md)),0.0,eps);
-    DMatrix<eType> dM=d*M;
+    MatrixCT dM=d*M;
     EXPECT_NEAR(Max(abs(M+dM)),0.0,eps);
-    DMatrix<eType> dMdMdM=d*M*d*M*d*M;
+    MatrixCT dMdMdM=d*M*d*M*d*M;
     EXPECT_NEAR(Max(abs(M*M*M+dMdMdM)),0.0,eps);
 
 }
