@@ -140,7 +140,8 @@ TEST_F(GroundStateTesting,TestSweepL6S1GrowD27)
     Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-6;
     IterationSchedule is;
-    is.Insert({30,Dend,eps});
+    is.Insert({30,9,1,eps});
+    is.Insert({30,Dend,6,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
     is.Insert({30,Dend,eps});
     eps.itsDelatEnergy1Epsilon=1e-8;
@@ -157,7 +158,7 @@ TEST_F(GroundStateTesting,TestSweepL6S1GrowD27)
     EXPECT_NEAR(E/(L-1), -1.4740549939 ,1e-8);
 }
 
-/*
+
 
 TEST_F(GroundStateTesting,TestSweepL7S1GrowD27)
 {
@@ -169,7 +170,8 @@ TEST_F(GroundStateTesting,TestSweepL7S1GrowD27)
     Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-6;
     IterationSchedule is;
-    is.Insert({30,Dend,eps});
+    is.Insert({30,9,1,eps});
+    is.Insert({30,Dend,6,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
     is.Insert({30,Dend,eps});
     eps.itsDelatEnergy1Epsilon=1e-8;
@@ -196,7 +198,8 @@ TEST_F(GroundStateTesting,TestSweepL8S1GrowD27)
     Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-6;
     IterationSchedule is;
-    is.Insert({30,Dend,eps});
+    is.Insert({30,9,1,eps});
+    is.Insert({30,Dend,6,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
     is.Insert({30,Dend,eps});
     eps.itsDelatEnergy1Epsilon=1e-8;
@@ -213,7 +216,7 @@ TEST_F(GroundStateTesting,TestSweepL8S1GrowD27)
     EXPECT_NEAR(E/(L-1), -1.4463763812511536,1e-8);
 }
 
-*/
+
 /*
 TEST_F(GroundStateTesting,TestSweepL19S5D5)
 {

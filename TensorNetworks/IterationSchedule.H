@@ -14,6 +14,7 @@ struct IterationScheduleLine
     // Use these constructors for variational GS searches
     //
     IterationScheduleLine(int maxiter,int Dmax,const Epsilons&);
+    IterationScheduleLine(int maxiter,int Dmax,int DeltaD,const Epsilons&);
     //
     // Use these constructors for iTime GS searches
     //
@@ -23,6 +24,7 @@ struct IterationScheduleLine
     int      itsMaxGSSweepIterations;  // Primary # of sweeps for variational GS search or i-time evolution
     int      itsMaxOptimizeIterations; // For post SVD compress optimization iterations
     int      itsDmax;                  // Max bond dimension
+    int      itsDeltaD;                // Bond dimension increment
     double   itsdt;                    // Delta tau for i-time evolution
     TOrder   itsTrotterOrder;          // Order for descrete time steps/
     Epsilons itsEps;                   // Struct of various epsilons.

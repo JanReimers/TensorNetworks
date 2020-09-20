@@ -1,6 +1,7 @@
 
+- Profile iTime GS search, see if we need to optimize some contractions.
 - Done Refactor: if a complex matrix is MatrixCT then a real matrix should MatrixRT
-- Add deltaD to interation schedule and using when increment D in GS searches.
+- Done Add deltaD to interation schedule and using when increment D in GS searches.
 - Done: Refactor: Bonds store SVs in a zero based Array. Change to 1 based vector
 - Done We need a convenient way to do contractions over singular values using OML Matrix
   multiplications.  THis means we need the singular values stored in a diagonal array,

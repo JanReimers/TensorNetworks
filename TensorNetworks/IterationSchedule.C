@@ -3,10 +3,11 @@
 #include <iomanip>
 #include <cassert>
 
-IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,const Epsilons& eps)
+IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax, const Epsilons& eps)
     : itsMaxGSSweepIterations(maxiter)
     , itsMaxOptimizeIterations(0) //not used for variational
     , itsDmax(Dmax)
+    , itsDeltaD(1)
     , itsdt(0.0)  //not used for variational
     , itsTrotterOrder(TensorNetworks::None) //not used for variational
     , itsEps(eps)
@@ -15,10 +16,25 @@ IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,const Epsilons
     assert(itsDmax>0);
 }
 
+IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,int DD, const Epsilons& eps)
+    : itsMaxGSSweepIterations(maxiter)
+    , itsMaxOptimizeIterations(0) //not used for variational
+    , itsDmax(Dmax)
+    , itsDeltaD(DD)
+    , itsdt(0.0)  //not used for variational
+    , itsTrotterOrder(TensorNetworks::None) //not used for variational
+    , itsEps(eps)
+{
+    assert(itsMaxGSSweepIterations>0);
+    assert(itsDmax>0);
+    assert(DD>0);
+}
+
 IterationScheduleLine::IterationScheduleLine(int maxiter,double dt,TOrder o,const Epsilons& eps)
     : itsMaxGSSweepIterations(maxiter)
     , itsMaxOptimizeIterations(0)
     , itsDmax(0)
+    , itsDeltaD(1)
     , itsdt(dt)
     , itsTrotterOrder(o)
     , itsEps(eps)
