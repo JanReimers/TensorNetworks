@@ -1,6 +1,7 @@
 #include "TensorNetworksImp/MPSSite.H"
 #include "TensorNetworksImp/Bond.H"
 #include "TensorNetworks/SiteOperator.H"
+#include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/Dw12.H"
 #include "oml/minmax.h"
 #include "oml/cnumeric.h"
@@ -13,6 +14,11 @@ using std::cout;
 using std::endl;
 
 void MPSSite::SVDNormalize(TensorNetworks::Direction lr)
+{
+    SVDNormalize(lr,NULL);
+}
+
+void MPSSite::SVDNormalize(TensorNetworks::Direction lr, SVCompressor* comp)
 {
     // Handle edge cases first
     if (lr==TensorNetworks::DRight && !itsLeft_Bond)
@@ -36,69 +42,8 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr)
 
     auto [U,s,V]=CSVDecomp(ReshapeBeforeSVD(lr)); //Solves A=U * s * Vdagger  returns V not Vdagger
     MatrixCT Vdagger=Transpose(conj(V));
-
-    switch (lr)
-    {
-        case TensorNetworks::DRight:
-        {
-            GetBond(lr)->SVDTransfer(lr,s,U);
-            ReshapeAfter_SVD(lr,Vdagger);
-            break;
-        }
-        case TensorNetworks::DLeft:
-        {
-            GetBond(lr)->SVDTransfer(lr,s,Vdagger);
-            ReshapeAfter_SVD(lr,U);
-            break;
-        }
-    }
-}
-
-void MPSSite::SVDNormalize(TensorNetworks::Direction lr, int Dmax, double epsMin)
-{
-    // Handle edge cases first
-    if (lr==TensorNetworks::DRight && !itsLeft_Bond)
-    {
-        assert(itsRightBond);
-        int newD2=itsRightBond->GetRank();
-        NewBondDimensions(itsD1,newD2,true);
-        Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
-        return;
-    }
-    if(lr==TensorNetworks::DLeft && !itsRightBond)
-    {
-        assert(itsLeft_Bond);
-        int newD1=itsLeft_Bond->GetRank();
-        NewBondDimensions(newD1,itsD2,true);
-        Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
-        return;
-    }
-
-    auto [U,s,V]=CSVDecomp(ReshapeBeforeSVD(lr)); //Solves A=U * s * Vdagger  returns V not Vdagger
-    int N=s.GetNumRows();
-
-    // At this point we have N singular values but we only Dmax of them or only the ones >=epsMin;
-    int D=Dmax>0 ? Min(N,Dmax) : N; //Ignore Dmax if it is 0
-    // Shrink so that all s(is<=D)>=epsMin;
-    for (int is=D; is>=1; is--)
-        if (s(is,is)>epsMin)
-        {
-            D=is;
-            break;
-        }
-//    cout << "Smin=" << s(D) << "  Sum of rejected singular values=" << Sum(s.SubVector(D+1,s.size())) << endl;
-//    cout << "Before compression Sum s=" << Sum(s) << endl;
-    double Sums=Sum(s.GetDiagonal());
-    assert(Sums>0.0);
-    s.SetLimits(D,true);  // Resize s
-    U.SetLimits(U.GetNumRows(),D,true);
-    V.SetLimits(V.GetNumRows(),D,true);
-    assert(Sum(s.GetDiagonal())>0.0);
-    double rescaleS=Sums/Sum(s.GetDiagonal());
-    s*=rescaleS;
-//    cout << "After compression  Sum s=" << Sum(s) << endl;
-
-    MatrixCT Vdagger=Transpose(conj(V));
+    if (comp) comp->Compress(U,s,Vdagger);
+//    cout << "Limits for U,s,Vdagger=" << U.GetLimits() << " " << s.GetLimits() << " " << Vdagger.GetLimits() << endl;
     switch (lr)
     {
         case TensorNetworks::DRight:

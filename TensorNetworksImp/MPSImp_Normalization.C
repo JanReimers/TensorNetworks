@@ -3,6 +3,7 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/IterationSchedule.H"
+#include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/TNSLogger.H"
 #include "Containers/Matrix4.H"
 #include "Functions/Mesh/PlotableMesh.H"
@@ -45,6 +46,7 @@ void MPSImp::Normalize(TensorNetworks::Direction LR)
 
 void MPSImp::NormalizeSite(TensorNetworks::Direction lr,int isite)
 {
+//    NormalizeAndCompressSite(lr,isite,NULL);
     CheckSiteNumber(isite);
     std::string lrs=lr==TensorNetworks::DLeft ? "Left" : "Right";
     itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize site ");
@@ -72,31 +74,22 @@ void MPSImp::UpdateBondData(int isite)
         itssSelectedEntropySpectrum=itsBonds[isite]->GetSVs();
 }
 
-void MPSImp::NormalizeAndCompress(TensorNetworks::Direction LR,int      Dmax)
+void MPSImp::NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressor* comp)
 {
 //    SetCanonicalBondDimensions(Invert(LR)); //Sweep backwards and set proper bond dimensions
     ForLoop(LR)
-    NormalizeAndCompressSite(LR,ia,Dmax,0.0);
-    itsDmax=Dmax;
+        NormalizeAndCompressSite(LR,ia,comp);
+    if (comp) itsDmax=comp->GetDmax();
 }
 
-void MPSImp::NormalizeAndCompress(TensorNetworks::Direction LR,double epsMin)
-{
-    ForLoop(LR)
-    NormalizeAndCompressSite(LR,ia,0,epsMin);
-    assert(false); //We need a way to set Dmax
-//    itsDmax=Dmax;
-//    SetCanonicalBondDimensions(Invert(LR)); //Sweep backwards and set proper bond dimensions
-}
-
-void MPSImp::NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,int Dmax, double epsMin)
+void MPSImp::NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,SVCompressor* comp)
 {
     CheckSiteNumber(isite);
 //    cout << "----- Normalize and Compress site " << isite << " " << GetNormStatus() << " -----" << endl;
     std::string lrs=lr==TensorNetworks::DLeft ? "Left" : "Right";
     itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize site ");
     //cout << "SVD " << lrs << " site " << isite << endl;
-    itsSites[isite]->SVDNormalize(lr,Dmax,epsMin);
+    itsSites[isite]->SVDNormalize(lr,comp);
 
     itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize update Bond data ");
     int bond_index=isite+( lr==TensorNetworks::DLeft ? 0 :-1);

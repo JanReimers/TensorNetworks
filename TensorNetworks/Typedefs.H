@@ -18,6 +18,8 @@ namespace TensorNetworks
     typedef Vector   <double>  VectorRT;
     typedef Matrix4  <double>  Matrix4T;
     typedef Array    <double>  ArrayRT;
+
+    typedef DiagonalMatrix<double> DiagonalMatrixRT;
 };
 
 #endif //_TYPEDEFS_H_

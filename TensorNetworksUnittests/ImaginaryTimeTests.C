@@ -225,25 +225,26 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 
     Epsilons eps(1e-12);
     eps.itsMPOCompressEpsilon=1e-5;
+    eps.itsDelatNormEpsilon=1e-5;
+    eps.itsMPSCompressEpsilon=0;
 
     IterationSchedule is;
-    eps.itsDelatNormEpsilon=1e-5;
     eps.itsDelatEnergy1Epsilon=1e-3;
-    is.Insert({50,0,0.5,FirstOrder,eps});
+    is.Insert({50,D,0,0.5,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({500,0,0.2,FirstOrder,eps});
+    is.Insert({500,D,0,0.2,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({500,1,0.1,FirstOrder,eps});
+    is.Insert({500,D,1,0.1,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({500,2,0.05,FirstOrder,eps});
+    is.Insert({500,D,2,0.05,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
-    is.Insert({500,3,0.02,FirstOrder,eps});
+    is.Insert({500,D,3,0.02,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({500,4,0.01,FirstOrder,eps});
+    is.Insert({500,D,4,0.01,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=3e-9;
-    is.Insert({500,5,0.005,FirstOrder,eps});
+    is.Insert({500,D,5,0.005,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-9;
-    is.Insert({500,6,0.002,FirstOrder,eps});
+    is.Insert({500,D,6,0.002,FirstOrder,eps});
     cout << is;
 
     Psi1->FindiTimeGroundState(itsH,is);
@@ -255,6 +256,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 
 
 }
+
 
 /*
 TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)

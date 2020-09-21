@@ -18,8 +18,8 @@ struct IterationScheduleLine
     //
     // Use these constructors for iTime GS searches
     //
-    IterationScheduleLine(int maxiter,double dt,TOrder,const Epsilons&);
-    IterationScheduleLine(int maxiter,int maxOptIter,double dt,TOrder,const Epsilons&);
+    IterationScheduleLine(int maxiter,int Dmax,double dt,TOrder,const Epsilons&);
+    IterationScheduleLine(int maxiter,int Dmax,int maxOptIter,double dt,TOrder,const Epsilons&);
 
     int      itsMaxGSSweepIterations;  // Primary # of sweeps for variational GS search or i-time evolution
     int      itsMaxOptimizeIterations; // For post SVD compress optimization iterations

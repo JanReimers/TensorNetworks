@@ -154,6 +154,7 @@
 		<Unit filename="TensorNetworks/MultiPlotable.H" />
 		<Unit filename="TensorNetworks/Operator.H" />
 		<Unit filename="TensorNetworks/OperatorWRepresentation.H" />
+		<Unit filename="TensorNetworks/SVCompressor.H" />
 		<Unit filename="TensorNetworks/SiteOperator.H" />
 		<Unit filename="TensorNetworks/TNSLogger.H" />
 		<Unit filename="TensorNetworks/Typedefs.H" />
@@ -224,6 +225,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/SPDLogger.H" />
+		<Unit filename="TensorNetworksImp/SVCompressorImp.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/SVCompressorImp.H" />
 		<Unit filename="TensorNetworksImp/SpinCalculator.C">
 			<Option compilerVar="CC" />
 		</Unit>

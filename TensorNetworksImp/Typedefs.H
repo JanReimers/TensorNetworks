@@ -21,8 +21,6 @@ namespace TensorNetworks
         typedef Vector <eType > VectorCT;
         typedef Array  <eType >  ArrayCT;
 
-        typedef DiagonalMatrix<double> DiagonalMatrixRT;
-
         typedef Matrix6<eType>  Matrix6CT;
         typedef Matrix4<eType>  Matrix4CT;
         typedef Vector3<eType>  Vector3CT;

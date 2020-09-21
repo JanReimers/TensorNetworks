@@ -1,4 +1,8 @@
 
+- The freeze idea didn;t because normalization is current sweeping through the frozen Site
+    If we freeze site one, then left normalization needs to start at site 2
+    and the right sweeps we need to stop at site two since we can;t SVD transfer to site 1.
+- Refactor: Have SVD routines return Vdagger instead of V
 - Profile iTime GS search, see if we need to optimize some contractions.
 - Done Refactor: if a complex matrix is MatrixCT then a real matrix should MatrixRT
 - Done Add deltaD to interation schedule and using when increment D in GS searches.

@@ -4,6 +4,7 @@
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/TNSLogger.H"
+#include "TensorNetworksImp/SVCompressorImp.H"
 #include "Containers/Matrix4.H"
 #include "Functions/Mesh/PlotableMesh.H"
 #include <iostream>
@@ -26,23 +27,26 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
 
 double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationScheduleLine& isl)
 {
+    SVCompressor* compressor=new SVCompressorImp(isl.itsDmax,isl.itsEps.itsMPSCompressEpsilon);
+
     double E1=GetExpectation(H)/(itsL-1);
-    cout << isl << endl;
-    cout.precision(5);
+//    cout << isl << endl;
+//    cout.precision(5);
 //    cout << "E=" << std::fixed << E1 << endl;
     MPO* W =H->CreateOperator(isl.itsdt,isl.itsTrotterOrder);
     W->Compress(0,isl.itsEps.itsMPOCompressEpsilon);
 //    double percent=W->Compress(0,isl.itsEps.itsMPOCompressEpsilon);
 //    cout << "FindGroundState dt=" << isl.itsdt << " " << percent << "% compresstion" << endl;
-    for (int niter=1; niter<isl.itsMaxGSSweepIterations; niter++)
+    int niter=1;
+    for (; niter<isl.itsMaxGSSweepIterations; niter++)
     {
         ApplyInPlace(W); //this now has large D_2 = D_1*Dw
         MPS* Psi2=Clone(); //Make copy of the uncompressed Psi
         //
         //  Compress in both directions
         //
-        NormalizeAndCompress(TensorNetworks::DLeft ,isl.itsDmax);
-        NormalizeAndCompress(TensorNetworks::DRight,isl.itsDmax);
+        NormalizeAndCompress(TensorNetworks::DLeft ,compressor);
+        NormalizeAndCompress(TensorNetworks::DRight,compressor);
         //
         // Now optimise this to be as close as possible to Psi2
         //
@@ -57,7 +61,8 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
         E1=Enew;
         if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon) break;
     }
-    cout << "dt=" << isl.itsdt << "  E=" << std::fixed << E1 << endl;
+    cout << "Niter,dt,E = " << niter << " " << isl.itsdt << " " << std::fixed << E1 << endl;
+    delete compressor;
     return E1;
 }
 

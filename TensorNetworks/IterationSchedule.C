@@ -30,10 +30,10 @@ IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,int DD, const 
     assert(DD>0);
 }
 
-IterationScheduleLine::IterationScheduleLine(int maxiter,double dt,TOrder o,const Epsilons& eps)
+IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,double dt,TOrder o,const Epsilons& eps)
     : itsMaxGSSweepIterations(maxiter)
     , itsMaxOptimizeIterations(0)
-    , itsDmax(0)
+    , itsDmax(Dmax)
     , itsDeltaD(1)
     , itsdt(dt)
     , itsTrotterOrder(o)
@@ -44,10 +44,10 @@ IterationScheduleLine::IterationScheduleLine(int maxiter,double dt,TOrder o,cons
     assert(o!=TensorNetworks::None);
 }
 
-IterationScheduleLine::IterationScheduleLine(int maxiter,int maxOptIter,double dt,TOrder o,const Epsilons& eps)
+IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,int maxOptIter,double dt,TOrder o,const Epsilons& eps)
     : itsMaxGSSweepIterations(maxiter)
     , itsMaxOptimizeIterations(maxOptIter)
-    , itsDmax(0)
+    , itsDmax(Dmax)
     , itsdt(dt)
     , itsTrotterOrder(o)
     , itsEps(eps)

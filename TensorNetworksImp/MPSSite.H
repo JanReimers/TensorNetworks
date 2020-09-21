@@ -8,6 +8,7 @@
 
 class SiteOperator;
 class Bond;
+class SVCompressor;
 
 class MPSSite
 {
@@ -69,7 +70,7 @@ class MPSSite
 // Normalization
 //
         void SVDNormalize(TensorNetworks::Direction lr);
-        void SVDNormalize(TensorNetworks::Direction lr,int Dmax,double espMin);
+        void SVDNormalize(TensorNetworks::Direction lr,SVCompressor*);
         bool IsNormalized(TensorNetworks::Direction lr,double eps) const;
         bool SetCanonicalBondDimensions(int D1,int D2);
         void Canonicalize(TensorNetworks::Direction lr);
