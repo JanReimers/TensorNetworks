@@ -3,20 +3,24 @@
 
 #include "TensorNetworks/Typedefs.H"
 
-class SVCompressor
+template <class T> class SVCompressor
 {
     protected:
-        typedef TensorNetworks::MatrixRT MatrixRT;
-        typedef TensorNetworks::MatrixCT MatrixCT;
         typedef TensorNetworks::DiagonalMatrixRT DiagonalMatrixRT;
 
     public:
+        typedef DMatrix<T> MatrixT;
+
         SVCompressor() {};
         virtual ~SVCompressor() {};
 
-        virtual int GetDmax() const=0;
+        virtual int  GetDmax() const=0;
+        virtual bool Donly  () const=0;
         // Returns integrated weight of discarded vector space.
-        virtual double Compress(MatrixCT& U, DiagonalMatrixRT& s, MatrixCT& Vdagger)=0;
+        virtual double Compress(MatrixT& U, DiagonalMatrixRT& s, MatrixT& Vdagger)=0;
 };
+
+typedef SVCompressor<TensorNetworks::eType> SVCompressorC;
+typedef SVCompressor<double               > SVCompressorR;
 
 #endif // SVCOMPRESSOR_H

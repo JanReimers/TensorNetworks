@@ -74,15 +74,15 @@ void MPSImp::UpdateBondData(int isite)
         itssSelectedEntropySpectrum=itsBonds[isite]->GetSVs();
 }
 
-void MPSImp::NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressor* comp)
+void MPSImp::NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC* comp)
 {
 //    SetCanonicalBondDimensions(Invert(LR)); //Sweep backwards and set proper bond dimensions
     ForLoop(LR)
         NormalizeAndCompressSite(LR,ia,comp);
-    if (comp) itsDmax=comp->GetDmax();
+    if (comp && comp->Donly()) itsDmax=comp->GetDmax();
 }
 
-void MPSImp::NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,SVCompressor* comp)
+void MPSImp::NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,SVCompressorC* comp)
 {
     CheckSiteNumber(isite);
 //    cout << "----- Normalize and Compress site " << isite << " " << GetNormStatus() << " -----" << endl;

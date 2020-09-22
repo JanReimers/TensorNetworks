@@ -18,7 +18,7 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr)
     SVDNormalize(lr,NULL);
 }
 
-void MPSSite::SVDNormalize(TensorNetworks::Direction lr, SVCompressor* comp)
+void MPSSite::SVDNormalize(TensorNetworks::Direction lr, SVCompressorC* comp)
 {
     // Handle edge cases first
     if (lr==TensorNetworks::DRight && !itsLeft_Bond)

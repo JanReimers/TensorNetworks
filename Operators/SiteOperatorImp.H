@@ -12,6 +12,7 @@ class OperatorWRepresentation;
 class SiteOperatorImp : public virtual SiteOperator
 {
         typedef TensorNetworks::VectorRT VectorRT;
+        typedef TensorNetworks::DiagonalMatrixRT DiagonalMatrixRT;
     public:
         SiteOperatorImp(TensorNetworks::Position  lbr, const OperatorWRepresentation* O,int d);
         SiteOperatorImp(TensorNetworks::Direction lr , const MatrixRT& U, const VectorRT& expEvs, int d);
@@ -30,7 +31,7 @@ class SiteOperatorImp : public virtual SiteOperator
         //
         //  SVD compress and normalize to reduce Dw
         //
-        virtual void Compress(TensorNetworks::Direction,int Dmax, double minSV);
+        virtual void Compress(TensorNetworks::Direction,SVCompressorR*);
 
        virtual void Report(std::ostream&) const;
     protected:
@@ -39,9 +40,9 @@ class SiteOperatorImp : public virtual SiteOperator
         friend class MPOTesting;
 //        typedef TensorNetworks::MatrixCT MatrixCT;
         MatrixRT& GetW(int m, int n) {return itsWs(m+1,n+1);}
-        void SVDTransfer(TensorNetworks::Direction lr,const VectorRT& s,const MatrixRT& UV);
-        static MatrixRT  Contract1(const VectorRT & s, const MatrixRT& VA);
-        static MatrixRT  Contract1(const MatrixRT& AU, const VectorRT & s);
+        void SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV);
+//        static MatrixRT  Contract1(const VectorRT & s, const MatrixRT& VA);
+//        static MatrixRT  Contract1(const MatrixRT& AU, const VectorRT & s);
 
 
         MatrixRT  Reshape(TensorNetworks::Direction lr);

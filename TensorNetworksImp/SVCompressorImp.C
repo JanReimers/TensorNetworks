@@ -1,17 +1,17 @@
 #include "SVCompressorImp.H"
 #include "oml/diagonalmatrix.h"
 
-SVCompressorImp::SVCompressorImp(int Dmax, double eps)
+template <class T> SVCompressorImp<T>::SVCompressorImp(int Dmax, double eps)
 : itsDmax(Dmax)
 , itsSVeps(eps)
 {
 }
 
-SVCompressorImp::~SVCompressorImp()
+template <class T> SVCompressorImp<T>::~SVCompressorImp()
 {
 }
 
-double SVCompressorImp::Compress(MatrixCT& U, DiagonalMatrixRT& s, MatrixCT& Vdagger)
+template <class T> double SVCompressorImp<T>::Compress(MatrixT& U, DiagonalMatrixRT& s, MatrixT& Vdagger)
 {
     int N=s.GetNumRows();
     int D=N;
@@ -64,3 +64,5 @@ double SVCompressorImp::Compress(MatrixCT& U, DiagonalMatrixRT& s, MatrixCT& Vda
     return integratedS2;
 }
 
+template class SVCompressorImp<TensorNetworks::eType>;
+template class SVCompressorImp<double>;

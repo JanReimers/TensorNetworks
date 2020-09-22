@@ -1,6 +1,6 @@
 #include "LapackSVD.H"
-#include "oml/matrix.h"
 #include "oml/dmatrix.h"
+#include "oml/diagonalmatrix.h"
 #include "oml/vector.h"
 #include "oml/minmax.h"
 //
@@ -21,7 +21,7 @@ template <class TM> void LaSVDecomp(TM& A, Vector<double>& s, TM& VT)
     assert(VT.GetNumCols()==N);
 
     //
-    //  Diced how much work space lapack needs
+    //  Decide how much work space lapack needs
     //
     int info=0,lwork=-1;
     Vector<double> work(1);
@@ -43,5 +43,35 @@ template <class TM> void LaSVDecomp(TM& A, Vector<double>& s, TM& VT)
     return;
 }
 
-template void LaSVDecomp< Matrix<double> >( Matrix<double>& A, Vector<double>& s,  Matrix<double>& VT);
+std::tuple<DMatrix<double>,DiagonalMatrix<double>,DMatrix<double>> LaSVDecomp(const DMatrix<double>& A)
+{
+    int M=A.GetNumRows(),N=A.GetNumCols(),mn=Min(M,N);
+
+    //
+    //  Diced how much work space lapack needs
+    //
+    int info=0,lwork=-1;
+    Vector<double> s(mn),work(1);
+    DMatrix<double> U(A),VT(N,N);
+    char jobu='O',jobv='A';
+    //
+    //  Initial call to see how much work space is needed
+    //
+    dgesvd_(&jobu,&jobv,&M,&N,&U(1,1),&M,&s(1),0,&M,&VT(1,1),&N,&work(1),&lwork,&info);
+    lwork=work(1);
+    work.SetLimits(lwork);
+    //
+    //  Now do the actual SVD work
+    //
+    dgesvd_(&jobu,&jobv,&M,&N,&U(1,1),&M,&s(1),0,&M,&VT(1,1),&N,&work(1),&lwork,&info);
+    assert(info==0);
+    //
+    //  Now fix up the matrix limits
+    //
+    U .SetLimits(M,mn,true); //Throw away last N-mn columns
+    VT.SetLimits(mn,N,true); // Throw away last N-mn rows
+    DiagonalMatrix<double> ds(s);
+    return std::make_tuple(U,ds,VT);
+}
+
 template void LaSVDecomp<DMatrix<double> >(DMatrix<double>& A, Vector<double>& s, DMatrix<double>& VT);

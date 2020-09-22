@@ -2,6 +2,7 @@
 #define SITEOPERATOR_H
 
 #include "TensorNetworks/Typedefs.H"
+#include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/Enums.H"
 
 class Dw12;
@@ -29,7 +30,7 @@ public:
     //
     //  SVD compress and normalize to reduce Dw
     //
-    virtual void Compress(TensorNetworks::Direction,int Dmax, double minSV)=0;
+    virtual void Compress(TensorNetworks::Direction,SVCompressorR*)=0;
 
     virtual void Report(std::ostream&) const=0;
 

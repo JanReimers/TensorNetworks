@@ -4,6 +4,7 @@
 #include "TensorNetworks/Enums.H"
 #include "TensorNetworks/Typedefs.H"
 #include "TensorNetworks/MultiPlotable.H"
+#include "TensorNetworks/SVCompressor.H"
 #include "Containers/OneSiteDMs.H"
 #include "Containers/TwoSiteDMs.H"
 #include <string>
@@ -16,7 +17,6 @@ class TNSLogger;
 class Epsilons;
 class IterationSchedule;
 class IterationScheduleLine;
-class SVCompressor;
 
 class MPS : public virtual MultiPlotable
 {
@@ -37,7 +37,7 @@ class MPS : public virtual MultiPlotable
         virtual void Normalize(TensorNetworks::Direction LR)=0;
         virtual void Normalize(int isite)=0; //Mixed Canonical normalization
 
-        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressor*)=0;
+        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC*)=0;
 //--------------------------------------------------------------------------------------
 //
 // Find ground state.  Return <E^2>-<E>^2

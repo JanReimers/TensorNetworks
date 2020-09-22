@@ -238,7 +238,7 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::Tro
                 U.Combine(&Weven);
                 U.Combine(&Wodd);
                 W->Combine(&U);
-                W->Compress(0,1e-6*dt);
+                W->Compress(0,1e-5);
             }
             break;
         }

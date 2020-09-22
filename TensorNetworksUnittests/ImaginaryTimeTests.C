@@ -121,7 +121,6 @@ TEST_F(ImaginaryTimeTesting,TestIterationSchedule)
     IterationSchedule is;
     is.Insert(l1);
     is.Insert({10,5,0.1,TensorNetworks::FirstOrder,eps});
-    cout << is;
 
 }
 
@@ -129,7 +128,7 @@ TEST_F(ImaginaryTimeTesting,TestIterationSchedule)
 TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt0)
 {
     int D=8,L=9;
-    double dt=0.0,epsSVD=1e-5                                                                                                                                                                                                        ;
+    double dt=0.0,epsSVD=1e-12;                                                                                                                                                                                                        ;
     Setup(L,0.5,D);
     MPS* Psi1=itsH->CreateMPS(D);
     Psi1->InitializeWith(TensorNetworks::Random);
@@ -141,7 +140,6 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt0)
 
     MPS* Psi2=Psi1->Apply(W);
     EXPECT_NEAR(Psi1->GetOverlap(Psi2),1.0,eps);
-
     W->Compress(0,epsSVD);
     MPS* Psi3=Psi1->Apply(W);
     EXPECT_NEAR(Psi1->GetOverlap(Psi3),1.0,1e-7);
@@ -154,10 +152,10 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt0)
     delete W;
 }
 
-TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05)
+TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05_FixedEps)
 {
     int D=8,L=9;
-    double dt=0.05,epsSVD=1e-5                                                                                                                                                                                                        ;
+    double dt=0.05,epsSVD=1e-3;                                                                                                                                                                                                     ;
     Setup(L,0.5,D);
     MPS* Psi1=itsH->CreateMPS(D);
     Psi1->InitializeWith(TensorNetworks::Random);
@@ -168,25 +166,76 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05)
     MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
 
     MPS* Psi2=Psi1->Apply(W);
+//    W->Report(cout);
     W->Compress(0,epsSVD);
+    W->Compress(0,epsSVD); //Apparently one pass is insufficient to reach a fixed point.
+//    W->Report(cout);
     MPS* Psi3=Psi1->Apply(W);
 //    EXPECT_NEAR(Psi3->GetOverlap(Psi3),1.0,1e-6);
 //
     W->Compress(0,epsSVD);
 //    W->Report(cout);
+//    W->Report(cout);
     MPS* Psi4=Psi1->Apply(W);
 
 
     double O23=Psi2->GetOverlap(Psi3);
-    cout << std::fixed << std::setprecision(9) << "O23=" << O23 << endl;
+//    cout << std::fixed << std::setprecision(9) << "O23=" << O23 << endl;
     double O24=Psi2->GetOverlap(Psi4);
-    cout << "O24=" << O24 << endl;
+//    cout << "O24=" << O24 << endl;
     double O34=Psi3->GetOverlap(Psi4);
-    cout << "O34=" << O34 << endl;
+//    cout << "O34=" << O34 << endl;
     double O33=Psi3->GetOverlap(Psi3);
-    cout << "O33=" << O33 << endl;
+//    cout << "O33=" << O33 << endl;
     double O44=Psi4->GetOverlap(Psi4);
-    cout << "O44=" << O44 << endl;
+//    cout << "O44=" << O44 << endl;
+    EXPECT_NEAR(O23,O24,eps);
+    EXPECT_NEAR(O34,O44,eps); //The confirm that a second compression on W is a no-op.
+    EXPECT_NEAR(O33,O44,eps);
+
+    delete Psi4;
+    delete Psi3;
+    delete Psi2;
+    delete Psi1;
+    delete W;
+}
+
+TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05_FixedDw)
+{
+    int D=8,L=9,DwMax=4;
+    double dt=0.05,epsSVD=1e-14;                                                                                                                                                                                                     ;
+    Setup(L,0.5,D);
+    MPS* Psi1=itsH->CreateMPS(D);
+    Psi1->InitializeWith(TensorNetworks::Random);
+    Psi1->Normalize(TensorNetworks::DLeft );
+    Psi1->Normalize(TensorNetworks::DRight);
+
+    //Since dt=0 W should be unit operator.
+    MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
+
+    MPS* Psi2=Psi1->Apply(W);
+//    W->Report(cout);
+    W->Compress(DwMax,epsSVD);
+//    W->Report(cout);
+    MPS* Psi3=Psi1->Apply(W);
+//    EXPECT_NEAR(Psi3->GetOverlap(Psi3),1.0,1e-6);
+//
+    W->Compress(DwMax,epsSVD);
+//    W->Report(cout);
+//    W->Report(cout);
+    MPS* Psi4=Psi1->Apply(W);
+
+
+    double O23=Psi2->GetOverlap(Psi3);
+//    cout << std::fixed << std::setprecision(9) << "O23=" << O23 << endl;
+    double O24=Psi2->GetOverlap(Psi4);
+//    cout << "O24=" << O24 << endl;
+    double O34=Psi3->GetOverlap(Psi4);
+//    cout << "O34=" << O34 << endl;
+    double O33=Psi3->GetOverlap(Psi3);
+//    cout << "O33=" << O33 << endl;
+    double O44=Psi4->GetOverlap(Psi4);
+//    cout << "O44=" << O44 << endl;
     EXPECT_NEAR(O23,O24,eps);
     EXPECT_NEAR(O34,O44,eps); //The confirm that a second compression on W is a no-op.
     EXPECT_NEAR(O33,O44,eps);
@@ -211,9 +260,10 @@ TEST_F(ImaginaryTimeTesting,MPOCompressFourthOrderTrotter)
 }
 
 #ifndef DEBUG
+
 TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 {
-    int D=8,L=9;
+    int D=4,L=9;
     Setup(L,0.5,D);
     MPS* Psi1=itsH->CreateMPS(D);
 //    Psi1->Report(cout);
@@ -245,12 +295,12 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
     is.Insert({500,D,5,0.005,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-9;
     is.Insert({500,D,6,0.002,FirstOrder,eps});
-    cout << is;
+//    cout << is;
 
     Psi1->FindiTimeGroundState(itsH,is);
 
     double E2=Psi1->GetExpectation(itsH);
-    EXPECT_NEAR(E2/(L-1),-0.46703753,1e-5);
+    EXPECT_NEAR(E2/(L-1),-0.46664265599414939,1e-5);
 
     delete Psi1;
 
@@ -258,77 +308,78 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 }
 
 
-/*
+
+
+
 TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
 {
-    int D=8,L=9;
+    int D=4,L=9;
     Setup(L,0.5,D);
     MPS* Psi1=itsH->CreateMPS(D);
-//    Psi1->Report(cout);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight);
-    double E1=Psi1->GetExpectation(itsH);
-    cout << "E1=" << std::fixed << E1 << endl;
-    cout << "Psi1 overlap=" << Psi1->GetOverlap(Psi1) << endl;
 
     Epsilons eps(1e-12);
-    eps.itsMPOCompressEpsilon=1e-5;
+    eps.itsMPOCompressEpsilon=1e-8;
+    eps.itsMPSCompressEpsilon=0.0; //Just Dmax for compression
+    eps.itsDelatNormEpsilon=1e-5;
 
     IterationSchedule is;
-    eps.itsDelatNormEpsilon=1e-5;
     eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({50,0,0.5,SecondOrder,eps});
+    eps.itsMPSCompressEpsilon=0.0; //Just Dmax for compression
+    is.Insert({50 ,D,0,0.5,SecondOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({500,1,0.2,SecondOrder,eps});
+    is.Insert({500,D,1,0.2,SecondOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({500,3,0.1,SecondOrder,eps});
+    is.Insert({500,D,3,0.1,SecondOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-9;
-    is.Insert({500,5,0.05,SecondOrder,eps});
+    is.Insert({500,D,5,0.05,SecondOrder,eps});
+    is.Insert({500,D,5,0.02,SecondOrder,eps});
+    is.Insert({500,D,5,0.01,SecondOrder,eps});
 
-    cout << is;
+ //   cout << is;
 
     Psi1->FindiTimeGroundState(itsH,is);
 
     double E2=Psi1->GetExpectation(itsH);
-    EXPECT_NEAR(E2/(L-1),-0.467040178,1e-7);
+    EXPECT_NEAR(E2/(L-1),-0.46664265599414939,1e-7);
 
     delete Psi1;
 }
 
 TEST_F(ImaginaryTimeTesting,TestITimeFourthOrderTrotter)
 {
-    int D=8,L=9;
+    int D=4,L=9;
     Setup(L,0.5,D);
     MPS* Psi1=itsH->CreateMPS(D);
-//    Psi1->Report(cout);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight);
-    double E1=Psi1->GetExpectation(itsH);
-    cout << "E1=" << std::fixed << E1 << endl;
-    cout << "Psi1 overlap=" << Psi1->GetOverlap(Psi1) << endl;
 
     Epsilons eps(1e-12);
     eps.itsMPOCompressEpsilon=1e-8;
+    eps.itsMPSCompressEpsilon=0.0;
+    eps.itsDelatNormEpsilon=1e-5;
 
     IterationSchedule is;
-    eps.itsDelatNormEpsilon=1e-5;
     eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({50,0,0.5,FourthOrder,eps});
+    is.Insert({50,D,0,0.5,FourthOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({500,1,0.2,FourthOrder,eps});
+    is.Insert({500,D,1,0.2,FourthOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({500,3,0.1,FourthOrder,eps});
+    is.Insert({500,D,3,0.1,FourthOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-9;
-    is.Insert({500,5,0.05,FourthOrder,eps});
+    is.Insert({500,D,5,0.05,FourthOrder,eps});
+    is.Insert({500,D,5,0.02,FourthOrder,eps});
+    is.Insert({500,D,5,0.01,FourthOrder,eps});
 
-    cout << is;
+//    cout << is;
 
     Psi1->FindiTimeGroundState(itsH,is);
 
     double E2=Psi1->GetExpectation(itsH);
-    EXPECT_NEAR(E2/(L-1),-0.46704019232164307,1e-7);
+    EXPECT_NEAR(E2/(L-1),-0.46664265599414939,1e-7);
 
     delete Psi1;
 }
-*/
+
 #endif

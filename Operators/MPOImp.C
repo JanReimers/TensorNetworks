@@ -1,6 +1,7 @@
 #include "Operators/MPOImp.H"
 #include "Operators/SiteOperatorImp.H"
 #include "Operators/IdentityOperator.H"
+#include "TensorNetworksImp/SVMPOCompressor.H"
 #include "oml/vector_io.h"
 
 MPOImp::MPOImp(int L, double S)
@@ -53,23 +54,25 @@ void MPOImp::Combine(const Operator* O2)
 
 double MPOImp::Compress(int Dmax, double minSv)
 {
+    SVMPOCompressor* compressor=new SVMPOCompressor(Dmax,minSv);
     Vector<int> oldDws(itsL),newDws(itsL);
     for (int ia=1;ia<itsL;ia++)
     {
         oldDws(ia)=itsSites[ia]->GetDw12().Dw2;
 //        cout << "Site " << ia << " ";
-        itsSites[ia]->Compress(TensorNetworks::DLeft ,Dmax,minSv);
+        itsSites[ia]->Compress(TensorNetworks::DLeft ,compressor);
     }
     oldDws(itsL)=0;
 //    Report(cout);
     for (int ia=itsL;ia>1;ia--)
     {
-        itsSites[ia]->Compress(TensorNetworks::DRight,Dmax,minSv);
+        itsSites[ia]->Compress(TensorNetworks::DRight,compressor);
         newDws(ia)=itsSites[ia]->GetDw12().Dw1;
     }
     newDws(1)=0;
     double percent=100-(100.0*Sum(newDws))/static_cast<double>(Sum(oldDws));
 //    cout << "% compression=" << std::fixed << std::setprecision(2) << percent << endl;
+    delete compressor;
     return percent;
 }
 

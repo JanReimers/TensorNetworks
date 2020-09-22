@@ -16,6 +16,7 @@ using std::endl;
 double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule& is)
 {
     double E1=0;
+    assert(this->itsDmax>0);
     for (is.begin(); !is.end(); is++)
         E1=FindiTimeGroundState(H,*is);
 
@@ -27,7 +28,8 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
 
 double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationScheduleLine& isl)
 {
-    SVCompressor* compressor=new SVCompressorImp(isl.itsDmax,isl.itsEps.itsMPSCompressEpsilon);
+    assert(isl.itsDmax>0 || isl.itsEps.itsMPSCompressEpsilon>0);
+    SVCompressorC* compressor=new SVCompressorImpC(isl.itsDmax,isl.itsEps.itsMPSCompressEpsilon);
 
     double E1=GetExpectation(H)/(itsL-1);
 //    cout << isl << endl;
@@ -38,6 +40,7 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
 //    double percent=W->Compress(0,isl.itsEps.itsMPOCompressEpsilon);
 //    cout << "FindGroundState dt=" << isl.itsdt << " " << percent << "% compresstion" << endl;
     int niter=1;
+    assert(this->itsDmax>0);
     for (; niter<isl.itsMaxGSSweepIterations; niter++)
     {
         ApplyInPlace(W); //this now has large D_2 = D_1*Dw
@@ -46,6 +49,7 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
         //  Compress in both directions
         //
         NormalizeAndCompress(TensorNetworks::DLeft ,compressor);
+        assert(this->itsDmax>0);
         NormalizeAndCompress(TensorNetworks::DRight,compressor);
         //
         // Now optimise this to be as close as possible to Psi2

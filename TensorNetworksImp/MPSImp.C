@@ -60,6 +60,7 @@ MPSImp::MPSImp(const MPSImp& mps)
     , itsSitesMesh   (0)
     , itsBondsMesh   (0)
 {
+    assert(itsDmax>0);
     InitSitesAndBonds();
     InitPlotting();
     for (int ia=1; ia<=itsL; ia++)
@@ -132,6 +133,7 @@ MPSImp::~MPSImp()
 
 MPS* MPSImp::Clone() const
 {
+    assert(this->itsDmax>0);
     return new MPSImp(*this);
 }
 

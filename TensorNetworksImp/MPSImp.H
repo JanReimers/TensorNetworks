@@ -61,7 +61,7 @@ public:
         virtual void Normalize       (int isite); //Mixed Canonical normalization
         virtual void CanonicalizeSite(TensorNetworks::Direction LR, int isite); //...lambda-Gamma-lambda-Gamma-lambda...
 
-        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressor*);
+        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC*);
  //       virtual void NormalizeAndCompress(TensorNetworks::Direction LR,int      Dmax);
  //       virtual void NormalizeAndCompress(TensorNetworks::Direction LR,double epsMin);
 //--------------------------------------------------------------------------------------
@@ -163,7 +163,7 @@ private:
         void   Sweep (TensorNetworks::Direction lr,const Hamiltonian*,const Epsilons&);
         void   UpdateBondData(int isite);
         void   NormalizeSite             (TensorNetworks::Direction lr,int isite);
-        void   NormalizeAndCompressSite  (TensorNetworks::Direction lr,int isite,SVCompressor*);
+        void   NormalizeAndCompressSite  (TensorNetworks::Direction lr,int isite,SVCompressorC*);
         void   SetCanonicalBondDimensions(TensorNetworks::Direction lr);
 //-------------------------------------------------------------------------------------
 //

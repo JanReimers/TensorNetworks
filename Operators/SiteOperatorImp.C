@@ -137,98 +137,51 @@ void SiteOperatorImp::Combine(const SiteOperator* O2)
 using TensorNetworks::MatrixCT;
 using TensorNetworks::VectorRT;
 
-void SiteOperatorImp::Compress(TensorNetworks::Direction lr,int DwMax, double sMin)
+void SiteOperatorImp::Compress(TensorNetworks::Direction lr,SVCompressorR* comp)
 {
-    //assert(sMin>=0.0);
-    //  If DwMax==0 then only use sMin.  If sMin==0.0 then only use DwMax
-    //
-    assert(DwMax>=0);
-    assert(sMin>=0.0);
-    assert(!(DwMax==0 && sMin==0.0));
-
+    assert(comp);
     MatrixRT  A=Reshape(lr);
-    MatrixRT  Acopy=A;
-    int      M=A.GetNumRows(),N=A.GetNumCols();
-    int      mn=Min(M,N);
-    VectorRT  s(mn);
-    MatrixRT  VT(N,N);
-//    cout << "Before Compress Dw1 Dw2 A=" << itsDw12.Dw1 << " " << itsDw12.Dw2 << " "<< A << endl;
-    LaSVDecomp(A,s,VT); //Solves A=U * s * Vdagger  returns V not Vdagger
-    //if (V.GetNumCols()!=s.size())
-    //{
-    //    MatrixT VT=Transpose(V);
-    //    V.SetLimits(0,0);
-    //    V=VT;
-   // }
 
-
- //   cout << "SVD U s V =" << A << s << VT << endl;
-//    cout << "U*s*Trans(V)=" << MatrixT(Contract1(A,s)*VT) << endl;
-//    cout << "U*s*Trans(V)=" << MatrixT(A*Contract1(s,VT))<< endl;
-//    cout << "U*s*Trans(V)=" << Max(abs(MatrixT(Contract1(A,s)*VT-Acopy))) << endl;
-//    cout << "U*s*Trans(V)=" << Max(abs(MatrixT(A*Contract1(s,VT)-Acopy))) << endl;
-    assert(Max(abs(MatrixRT(Contract1(A,s)*VT-Acopy)))<1e-12);
+    auto [U,sm,VT]=LaSVDecomp(A); //Solves A=U * s * Vdagger  returns V not Vdagger
+//    VectorRT s=sm.GetDiagonal();
+//    cout << "error1=" << std::scientific << Max(abs(MatrixRT(U*sm*VT-A))) << endl;
+//    assert(Max(abs(MatrixRT(U*sm*VT-A)))<1e-10);
     //
     //  Rescaling
     //
-    double s_avg=Sum(s)/s.size();
-    s*=1.0/s_avg;
+    double s_avg=Sum(sm.GetDiagonal())/sm.size();
+    sm*=1.0/s_avg;
      switch (lr)
     {
         case TensorNetworks::DLeft:
-            A*=s_avg;
+            U*=s_avg;
             break;
         case TensorNetworks::DRight:
             VT*=s_avg;
             break;
     }
 
-    // At this point we have N singular values but we only Dmax of them or only the ones >=epsMin;
-    int D=DwMax>0 ? Min(mn,DwMax) : mn; //Ignore Dmax if it is 0
-    // Shrink so that all s(is<=D)>=epsMin;
-    for (int is=D; is>=1; is--)
-        if (s(is)>=sMin)
-        {
-            D=is;
-            break;
-        }
-    if (D<s.size())
-    {
-//        cout << "Smin=" << s(D) << "  Sum of rejected singular values=" << Sum(s.SubVector(D+1,s.size())) << endl;
-//        cout << "S=" << s << endl;
-    }
-    double Sums=Sum(s);
-    assert(Sums>0.0);
-    s.SetLimits(D,true);  // Resize s
-    A.SetLimits(A.GetNumRows(),D,true);
-    VT.SetLimits(D,VT.GetNumCols(),true);
-    assert(Sum(s)>0.0);
-    double rescaleS=Sums/Sum(s);
-    s*=rescaleS;
-
-//    cout << "After Compress U s V =" << A << s << VT << endl;
-//    cout << "U*s*Trans(V)=" << Max(abs(MatrixT(Contract1(A,s)*VT-Acopy))) << endl;
-//    cout << "U*s*Trans(V)=" << Max(abs(MatrixT(A*Contract1(s,VT)-Acopy))) << endl;
-    assert(Max(abs(MatrixRT(Contract1(A,s)*VT-Acopy)))<10*sMin);
-
+    comp->Compress(U,sm,VT);
+//    cout << "error2=" << Max(abs(MatrixRT(U*sm*VT-A))) << endl;
+//    s=sm.GetDiagonal();
     MatrixRT UV;// This get transferred through the bond to a neighbouring site.
     switch (lr)
     {
         case TensorNetworks::DRight:
         {
-            UV=A;
+            UV=U;
 
             //cout << "After compress V=" << " "<< V << endl;
             Reshape(lr,VT);  //A is now Vdagger
-            if (itsLeft_Neighbour) itsLeft_Neighbour->SVDTransfer(lr,s,UV);
+            if (itsLeft_Neighbour) itsLeft_Neighbour->SVDTransfer(lr,sm,UV);
             break;
         }
         case TensorNetworks::DLeft:
         {
             UV=VT; //Set Vdagger
 //            cout << "After compress A=" << " "<< A << endl;
-            Reshape(lr,A);  //A is now U
-            if (itsRightNeighbour) itsRightNeighbour->SVDTransfer(lr,s,UV);
+            Reshape(lr,U);  //A is now U
+            if (itsRightNeighbour) itsRightNeighbour->SVDTransfer(lr,sm,UV);
             break;
         }
     }
@@ -327,14 +280,14 @@ void  SiteOperatorImp::Reshape(TensorNetworks::Direction lr,const MatrixRT& UV)
     }
 }
 
-void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const VectorRT& s,const MatrixRT& UV)
+void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV)
 {
 //    cout << "SVD transfer s=" << s << " UV=" << UV << endl;
     switch (lr)
     {
     case TensorNetworks::DRight:
     {
-        int N1=s.GetHigh(); //N1=0 on the first site.
+        int N1=s.GetNumRows(); //N1=0 on the first site.
         if (N1>0 && N1!=itsDw12.Dw2)
         {
             if (GetW(0,0).GetNumCols()!=UV.GetNumRows())
@@ -347,7 +300,7 @@ void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const VectorRT& s
             {
                 MatrixRT& W=GetW(m,n);
                 assert(W.GetNumCols()==UV.GetNumRows());
-                MatrixRT temp=Contract1(W*UV,s);
+                MatrixRT temp=W*UV*s;
                 W.SetLimits(0,0);
                 W=temp; //Shallow copy
 //                cout << "SVD transfer W(" << m << "," << n << ")=" << W << endl;
@@ -357,7 +310,7 @@ void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const VectorRT& s
     }
     case TensorNetworks::DLeft:
     {
-        int N1=s.GetHigh(); //N1=0 on the first site.
+        int N1=s.GetNumRows(); //N1=0 on the first site.
         if (N1>0 && N1!=itsDw12.Dw1)
         {
             if (GetW(0,0).GetNumRows()!=UV.GetNumCols())
@@ -371,7 +324,7 @@ void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const VectorRT& s
             {
                 MatrixRT& W=GetW(m,n);
                 assert(UV.GetNumCols()==W.GetNumRows());
-                MatrixRT temp=Contract1(s,UV*W);
+                MatrixRT temp=s*UV*W;
                 W.SetLimits(0,0);
                 W=temp; //Shallow copy
 //                cout << "SVD transfer W(" << m << "," << n << ")=" << W << endl;
@@ -384,7 +337,7 @@ void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const VectorRT& s
 
 }
 
-//
+/*//
 //  Anew(j,i) =  s(j)*VA(j,k)
 //
 SiteOperatorImp::MatrixRT SiteOperatorImp::Contract1(const VectorRT& s, const MatrixRT& VA)
@@ -417,7 +370,7 @@ SiteOperatorImp::MatrixRT SiteOperatorImp::Contract1(const MatrixRT& AU,const Ve
 
     return Anew;
 }
-
+*/
 void SiteOperatorImp::Report(std::ostream& os) const
 {
     os << itsDw12.Dw1 << " " << itsDw12.Dw2;

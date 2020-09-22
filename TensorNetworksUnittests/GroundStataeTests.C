@@ -92,6 +92,25 @@ TEST_F(GroundStateTesting,TestSweepL9S1D8)
     EXPECT_LT(nSweep,maxIter);
 }
 
+TEST_F(GroundStateTesting,TestSweepL9S1D4)
+{
+    int L=9,D=4,maxIter=100;
+    double S=0.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+
+    Epsilons eps(1e-12);
+    eps.itsDelatEnergy1Epsilon=1e-10;
+    IterationSchedule is;
+    is.Insert({maxIter,D,eps});
+
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+
+    double E=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E/(L-1),-0.46664265599414939,1e-7);
+    EXPECT_LT(nSweep,maxIter);
+}
+
 TEST_F(GroundStateTesting,TestSweepL9S5D2)
 {
     int L=9,D=2,maxIter=100;

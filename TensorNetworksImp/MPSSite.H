@@ -2,13 +2,13 @@
 #define MATRIXPRODUCTSITE_H
 
 #include "TensorNetworks/Enums.H"
+#include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworksImp/Typedefs.H"
 #include "NumericalMethods/PrimeEigenSolver.H"
 #include <vector>
 
 class SiteOperator;
 class Bond;
-class SVCompressor;
 
 class MPSSite
 {
@@ -70,7 +70,7 @@ class MPSSite
 // Normalization
 //
         void SVDNormalize(TensorNetworks::Direction lr);
-        void SVDNormalize(TensorNetworks::Direction lr,SVCompressor*);
+        void SVDNormalize(TensorNetworks::Direction lr,SVCompressorC*);
         bool IsNormalized(TensorNetworks::Direction lr,double eps) const;
         bool SetCanonicalBondDimensions(int D1,int D2);
         void Canonicalize(TensorNetworks::Direction lr);
