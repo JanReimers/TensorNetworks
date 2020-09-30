@@ -18,10 +18,6 @@
 					<Add option="-std=c++17" />
 					<Add option="-g" />
 					<Add option="-DDEBUG" />
-					<Add directory="Operators" />
-					<Add directory="TensorNetworks" />
-					<Add directory="TensorNetworksImp" />
-					<Add directory="NumericalMethods" />
 				</Compiler>
 				<Linker>
 					<Add directory="../Debug" />
@@ -40,17 +36,15 @@
 					<Add option="-std=c++17" />
 					<Add option="-pg" />
 					<Add option="-DNDEBUG" />
-					<Add directory="Operators" />
-					<Add directory="TensorNetworks" />
-					<Add directory="TensorNetworksImp" />
-					<Add directory="NumericalMethods" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />
+					<Add directory="../Release" />
 				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-std=c++17" />
 			<Add option="-fPIC" />
 			<Add option="-DHAVE_CONFIG_H" />
 			<Add directory="./" />
@@ -229,6 +223,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/SVCompressorImp.H" />
+		<Unit filename="TensorNetworksImp/SVMPOCompressor.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/SVMPOCompressor.H" />
 		<Unit filename="TensorNetworksImp/SpinCalculator.C">
 			<Option compilerVar="CC" />
 		</Unit>
