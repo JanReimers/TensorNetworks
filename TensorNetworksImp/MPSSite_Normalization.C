@@ -40,8 +40,7 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr, SVCompressorC* comp)
         return;
     }
 
-    auto [U,s,V]=CSVDecomp(ReshapeBeforeSVD(lr)); //Solves A=U * s * Vdagger  returns V not Vdagger
-    MatrixCT Vdagger=Transpose(conj(V));
+    auto [U,s,Vdagger]=oml_CSVDecomp(ReshapeBeforeSVD(lr)); //Solves A=U * s * Vdagger  returns V not Vdagger
     if (comp) comp->Compress(U,s,Vdagger);
 //    cout << "Limits for U,s,Vdagger=" << U.GetLimits() << " " << s.GetLimits() << " " << Vdagger.GetLimits() << endl;
     switch (lr)
@@ -83,29 +82,26 @@ bool MPSSite::SetCanonicalBondDimensions(int maxAllowedD1,int maxAllowedD2)
 void MPSSite::Canonicalize(TensorNetworks::Direction lr)
 {
     MatrixCT A=ReshapeBeforeSVD(lr);
-    int N=Min(A.GetNumRows(),A.GetNumCols());
-    VectorRT s(N); // This get passed from one site to the next.
-    MatrixCT V(N,A.GetNumCols());
-    CSVDecomp(A,s,V); //Solves A=U * s * Vdagger  returns V not Vdagger
-
-    MatrixCT UV;// This get transferred through the bond to a neighbouring site.
+//    int N=Min(A.GetNumRows(),A.GetNumCols());
+//    VectorRT s(N); // This get passed from one site to the next.
+//    MatrixCT V(N,A.GetNumCols());
+    auto [U,s,Vdagger]=oml_CSVDecomp(A); //Solves A=U * s * Vdagger  returns V not Vdagger
 
     switch (lr)
     {
-    case TensorNetworks::DRight:
-    {
-        UV=A;
-        ReshapeAfter_SVD(lr,Transpose(conj(V)));  //A is now Vdagger
-        break;
+        case TensorNetworks::DRight:
+        {
+            GetBond(lr)->CanonicalTransfer(lr,s,U);
+            ReshapeAfter_SVD(lr,Vdagger);  //A is now Vdagger
+            break;
+        }
+        case TensorNetworks::DLeft:
+        {
+            GetBond(lr)->CanonicalTransfer(lr,s,Vdagger);
+            ReshapeAfter_SVD(lr,U);  //A is now U
+            break;
+        }
     }
-    case TensorNetworks::DLeft:
-    {
-        UV=Transpose(conj(V)); //Set Vdagger
-        ReshapeAfter_SVD(lr,A);  //A is now U
-        break;
-    }
-    }
-    GetBond(lr)->CanonicalTransfer(lr,DiagonalMatrix(s),UV);
 }
 
 

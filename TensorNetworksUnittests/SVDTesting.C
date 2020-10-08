@@ -38,7 +38,7 @@ public:
 
 };
 
-TEST_F(SVDTesting,SVDComplexMatrix_10x10)
+TEST_F(SVDTesting,oml_SVDComplexMatrix_10x10)
 {
     int N=10;
     typedef MatrixCT Mtype;
@@ -46,16 +46,16 @@ TEST_F(SVDTesting,SVDComplexMatrix_10x10)
     FillRandom(A);
     Unit(UnitMatrix);
 
-    auto [U,s,V]=CSVDecomp(A); //Solve A=U*s*conj(V)
+    auto [U,s,Vdagger]=oml_CSVDecomp(A); //Solve A=U*s*conj(V)
 
-    Mtype Vdagger=Transpose(conj(V));
+    Mtype V=Transpose(conj(Vdagger));
     EXPECT_NEAR(Max(abs(Transpose(conj(U))*U-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(abs(V*Vdagger-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(abs(U*s*Vdagger-A)),0.0,eps);
 }
 
 
-TEST_F(SVDTesting,OML_SVDRandomComplexMatrix_10x5)
+TEST_F(SVDTesting,oml_SVDRandomComplexMatrix_10x5)
 {
     int M=10,N=5;
     typedef MatrixCT Mtype;
@@ -63,16 +63,16 @@ TEST_F(SVDTesting,OML_SVDRandomComplexMatrix_10x5)
     FillRandom(A);
     Unit(UnitMatrix);
 
-    auto [U,s,V]=CSVDecomp(A);
+    auto [U,s,Vdagger]=oml_CSVDecomp(A);
 
-    Mtype Vdagger=Transpose(conj(V));
+    Mtype V=Transpose(conj(Vdagger));
     EXPECT_NEAR(Max(abs(Transpose(conj(U))*U-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(abs(V*Vdagger-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(abs(U*s*Vdagger-A)),0.0,eps);
 }
 
 
-TEST_F(SVDTesting,OML_SVDRandomComplexMatrix_5x10)
+TEST_F(SVDTesting,oml_SVDRandomComplexMatrix_5x10)
 {
     int M=5,N=10;
     typedef MatrixCT Mtype;
@@ -80,9 +80,9 @@ TEST_F(SVDTesting,OML_SVDRandomComplexMatrix_5x10)
     FillRandom(A);
     Unit(UnitMatrix);
 
-    auto [U,s,V]=CSVDecomp(A);
+    auto [U,s,Vdagger]=oml_CSVDecomp(A);
 
-    Mtype Vdagger=Transpose(conj(V));
+    Mtype V=Transpose(conj(Vdagger));
     EXPECT_NEAR(Max(abs(Transpose(conj(U))*U-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(abs(Vdagger*V-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(abs(U*s*Vdagger-A)),0.0,eps);
@@ -191,29 +191,26 @@ TEST_F(SVDTesting,Prime_EigenSolverDenseComplexHermitian200x200)
 }
 
 
-TEST_F(SVDTesting,Prime_SVDComplex4004Matrix_1x4)
+TEST_F(SVDTesting,oml_SVDComplex4004Matrix_1x4)
 {
     int N1=1,N2=4;
     typedef MatrixCT Mtype;
-    Mtype M(N1,N2),V(N2,N1),UnitMatrix(N1,N1);
-    Vector<double>  s(N1);
+    Mtype M(N1,N2),UnitMatrix(N1,N1);
     M(1,1)=4.0;
     M(1,2)=0.0;
     M(1,3)=0.0;
     M(1,4)=4.0;
-    Mtype Mcopy(M);
     Unit(UnitMatrix);
-    CSVDecomp(M,s,V); //Solve M=U*s*VT
-    Mtype VT=Transpose(V);
+    auto [U,s,VT]=oml_CSVDecomp(M); //Solve M=U*s*VT
 
 //    cout << "U S VT=" << M << " " << s << " " << VT << endl;
 //    cout << "Mcopy=" << Mcopy << endl;
 //    cout << "ConstractsVT(s,VT)=" << ConstractsVT(s,VT) << endl;
 //    cout << "U*s*VT" <<  Mtype(M*ConstractsVT(s,VT))-Mcopy << endl;
-    EXPECT_NEAR(Max(abs(Transpose(M)*M-UnitMatrix)),0.0,eps);
+    Mtype V=Transpose(VT);
+    EXPECT_NEAR(Max(abs(Transpose(U)*U-UnitMatrix)),0.0,eps);
     EXPECT_NEAR(Max(abs(VT*V-UnitMatrix)),0.0,eps);
-    DiagonalMatrix ds(s);
-    EXPECT_NEAR(Max(abs(M*ds*VT-Mcopy)),0.0,eps);
+    EXPECT_NEAR(Max(abs(U*s*VT-M)),0.0,eps);
 }
 
 

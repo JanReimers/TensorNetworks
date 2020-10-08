@@ -1,20 +1,9 @@
 #include "Tests.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/iTEBDState.H"
-//#include "TensorNetworks/IterationSchedule.H"
-//#include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
-//#include "Operators/MPO_SpatialTrotter.H"
-
-//#include "oml/matrix.h"
-//#include "oml/stream.h"
-//#include "oml/stopw.h"
 
 using std::setw;
-//using TensorNetworks::TrotterOrder;
-//using TensorNetworks::FirstOrder;
-//using TensorNetworks::SecondOrder;
-//using TensorNetworks::FourthOrder;
 
 class iTEBDTesting : public ::testing::Test
 {

@@ -1,25 +1,22 @@
+Try:
+
+echo "options rt2800pci nohwcrypt=1" | sudo tee /etc/modprobe.d/rt2800pcifix.conf > /dev/null
+
+Reboot to test. If it is no good then run:
+
+sudo rm etc/modprobe.d/rt2800pcifix.conf
+
+Then reboot
+sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
+
 
 - The freeze idea didn;t because normalization is current sweeping through the frozen Site
     If we freeze site one, then left normalization needs to start at site 2
     and the right sweeps we need to stop at site two since we can;t SVD transfer to site 1.
-- Refactor: Have SVD routines return Vdagger instead of V
 - Profile iTime GS search, see if we need to optimize some contractions.
-- Done Refactor: if a complex matrix is MatrixCT then a real matrix should MatrixRT
-- Done Add deltaD to interation schedule and using when increment D in GS searches.
-- Done: Refactor: Bonds store SVs in a zero based Array. Change to 1 based vector
-- Done We need a convenient way to do contractions over singular values using OML Matrix
-  multiplications.  THis means we need the singular values stored in a diagonal array,
-  with efficient op* functions.
-- Done Refactor: Use multiple return values for PRIMME and LApack SVD.
 - Refactor: separate all plotting code in MPSImp and MPState
     The tricky part here is that MPS interface inherits from MultiPlotable
     So we need split that off and have MPS with no plotting and MPSWithPlotting
-- Done Integrate spdlogger as one derived imp for TNSLogger
-    -UNfortunately we can't' use spdlogger advanced formatting when wrapping through an abs interface
-     spd uses variadic templates instead of the old C variadic arguments framework, which means
-     everything needs to be inline.
-- Make ab SVDCompress interface.  Derived classes can implement different policies doe deciding which Svs to throw awat etc.
-    - Refactor: Normalize and NormalizeAndCompress should be merged  DMax=0, eps=0 means no compress?
 - Spin space trotter decomp
 - Infinite methods iMPS, iTEBD, iDMRG
     -iMPS class with small unit cell
@@ -58,6 +55,18 @@
         7) one or two (or N!) site updates. Part of convergence schedule?
         8) Report windows (HTML table?) with columns in the report(ostream) method
 
+- Done: Refactor: Have SVD routines return Vdagger instead of V
+- Done: Make ab SVDCompress interface.  Derived classes can implement different policies doe deciding which Svs to throw awat etc.
+    - Done: Refactor: Normalize and NormalizeAndCompress should be merged  DMax=0, eps=0 means no compress?
+- Done Refactor: Use multiple return values for PRIMME and LApack SVD.
+- Done Integrate spdlogger as one derived imp for TNSLogger
+    -UNfortunately we can't' use spdlogger advanced formatting when wrapping through an abs interface
+     spd uses variadic templates instead of the old C variadic arguments framework, which means
+     everything needs to be inline.
+- Done Refactor: if a complex matrix is MatrixCT then a real matrix should MatrixRT
+- Done Add deltaD to interation schedule and using when increment D in GS searches.
+- Done: Refactor: Bonds store SVs in a zero based Array. Change to 1 based vector
+- Done We need a convenient way to do contractions over singular values using OML Matrix
 - Done Split up mega files MSPImp.C and MPSSite.C
 - Should non hermition operator have distinct type?
     Not clear how to go about this.

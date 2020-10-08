@@ -120,24 +120,21 @@ void iTEBDStateImp::Apply(int isite,const Matrix4T& expH)
     //
     MatrixCT ThetaF=Theta.Flatten();
     assert(ThetaF.GetNumRows()==ThetaF.GetNumCols());
-    int N=ThetaF.GetNumRows();
-    VectorRT  s(N);
-    MatrixCT VT(N,N);
 //    cout << "Before Compress Dw1 Dw2 A=" << itsDw12.Dw1 << " " << itsDw12.Dw2 << " "<< A << endl;
-    CSVDecomp(ThetaF,s,VT);
-    cout << std::scientific << std::setprecision(1) << "s=" << s << endl;
+    auto [U,s,Vdagger]=oml_CSVDecomp(ThetaF);
+    cout << std::scientific << std::setprecision(1) << "s=" << s.GetDiagonal() << endl;
     int nai1=1;
     for (int na=0;na<itsd;na++)
         for (int i1=1;i1<=itsDmax;i1++,nai1++)
             for (int i2=1;i2<=itsDmax;i2++)
-                MA[na](i1,i2)=ThetaF(nai1,i2)/lambdaB(i1);
+                MA[na](i1,i2)=U(nai1,i2)/lambdaB(i1);
     int nbi2=1;
     for (int nb=0;nb<itsd;nb++)
         for (int i2=1;i2<=itsDmax;i2++,nbi2++)
             for (int i3=1;i3<=itsDmax;i3++)
-                MB[nb](i2,i3)=VT(nbi2,i3)/lambdaB(i3);
+                MB[nb](i2,i3)=Vdagger(nbi2,i3)/lambdaB(i3);
 
-   bondA->SetSingularValues(TensorNetworks::DiagonalMatrixRT(s));
+   bondA->SetSingularValues(s);
 
 }
 
