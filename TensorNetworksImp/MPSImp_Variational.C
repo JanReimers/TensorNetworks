@@ -58,10 +58,7 @@ double MPSImp::FindVariationalGroundState(const Hamiltonian* H, const IterationS
         double E2=GetExpectation(H2);
         DE2=E2-E1*E1;
         itsLogger->LogInfoV(0,"Variational GS D=%4d, %4d iterations, <E>=%.9f, <E^2>-<E>^2=%.2e",D,in,E1,DE2);
-        if (weHaveGraphs())
-        {
-            AddPoint("Iter E/J",Plotting::Point(itsNSweep,E1));
-        }
+        IterationEnergy(E1);
     }
     delete H2;
     return DE2;
@@ -75,13 +72,7 @@ void MPSImp::Sweep(TensorNetworks::Direction lr,const Hamiltonian* h,const Epsil
         CheckSiteNumber(ia);
         Refine(lr,h,eps,ia);
         double de=fabs(itsSites[ia]->GetIterDE());
-        if (weHaveGraphs())
-        {
-            if (de<1e-16) de=1e-16;
-            double diter=itsNSweep+static_cast<double>(iter)/(itsL-1); //Fractional iter count for log(dE) plot
-            //cout << "ia,diter,de=" << ia << " " << diter << " " << de << endl;
-            AddPoint("Iter log(dE/J)",Plotting::Point(diter,log10(de)));
-        }
+        IterationDeltaE(iter,de);
         iter++; //ia doesn;t always count upwards, but this guy does.
     }
     itsNSweep++;
@@ -100,8 +91,7 @@ void MPSImp::Refine(TensorNetworks::Direction lr,const Hamiltonian *h,const Epsi
         itsLogger->LogInfo(2,isite,"Running eigen solver"); //Logger will update the graphs
         itsSites[isite]->Refine(Heff6.Flatten(),eps);
     }
-    itsSiteEnergies[isite]=itsSites[isite]->GetSiteEnergy();
-    itsSiteEGaps   [isite]=itsSites[isite]->GetEGap      ();
+    UpdateEnergyData(isite);
     NormalizeSite(lr,isite);
     itsSites[isite]->UpdateCache(h->GetSiteOperator(isite),
                                  GetHeffCache(TensorNetworks::DLeft,isite-1),

@@ -4,19 +4,12 @@
 #include "TensorNetworks/MPS.H"
 #include "TensorNetworks/Epsilons.H"
 #include "TensorNetworksImp/MPSSite.H"
-#include "TensorNetworksImp/MultiPlotableImp.H"
-#include "Functions/Mesh/TMesh.H"
 #include "Misc/ptr_vector.h"
 
-class PlotableMesh;
 class IterationScheduleLine;
 
-class MPSImp
-: public virtual MPS
-, public virtual MultiPlotable
-, private MultiPlotableImp
+class MPSImp : public virtual MPS
 {
-    public:
 //--------------------------------------------------------------------------------------
 //
 //  Typedefs for various containers
@@ -34,7 +27,7 @@ protected:
         typedef TensorNetworks::eType     eType;
 //--------------------------------------------------------------------------------------
 //
-//  Conctruction and initialization zone
+//  Construction and initialization zone
 //
 public:
         MPSImp(int L, double S, int D,double normEps=1e-12,TNSLogger* s=0);
@@ -62,8 +55,6 @@ public:
         virtual void CanonicalizeSite(TensorNetworks::Direction LR, int isite); //...lambda-Gamma-lambda-Gamma-lambda...
 
         virtual void NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC*);
- //       virtual void NormalizeAndCompress(TensorNetworks::Direction LR,int      Dmax);
- //       virtual void NormalizeAndCompress(TensorNetworks::Direction LR,double epsMin);
 //--------------------------------------------------------------------------------------
 //
 // Find ground state
@@ -87,7 +78,7 @@ public:
 //  Operate on MPS with an MPO:  |Psi> -> O|Psi>.
 //  In general this will increase the bond dimension from D to D*Dw
 //
-        virtual void                 ApplyInPlace(const Operator* o);
+        virtual void  ApplyInPlace(const Operator* o);
         virtual MPS*  Apply       (const Operator* o) const;
 //--------------------------------------------------------------------------------------
 //
@@ -103,17 +94,9 @@ public:
         virtual std::string  GetNormStatus(         ) const;
         virtual void            Report(std::ostream&) const;
         virtual bool        IsRLNormalized(int isite) const; //  AAA..AMBB..BBB form at one site.
-//--------------------------------------------------------------------------------------
-//
-//      Multi Plotting interace
-//
-        virtual void MakeAllGraphs();
-        virtual void Insert(Plotting::MultiGraph* graphs);
-        virtual void Select(int index);
-
 
 protected:
-    // COnstructor used for iTEBD
+    // Constructor used for iTEBD
         MPSImp(int L, double S, int D,TensorNetworks::Direction lr,double normEps=1e-12,TNSLogger* s=0);
 //--------------------------------------------------------------------------------------
 //
@@ -147,7 +130,6 @@ private:
         friend class MatrixProductTesting;
 
         void InitSitesAndBonds();
-        void InitPlotting();
         static int GetD1(int a, int L, int d, int DMax);
         static int GetD2(int a, int L, int d, int DMax);
         static c_str SiteMessage(const std::string& message,int isite);
@@ -155,16 +137,23 @@ private:
 
 //--------------------------------------------------------------------------------------
 //
-//  For groound state search
+//  For ground state search
 //
         double FindVariationalGroundState(const Hamiltonian*,const IterationScheduleLine&);
         double FindiTimeGroundState      (const Hamiltonian*,const IterationScheduleLine&);
         void   Refine(TensorNetworks::Direction lr,const Hamiltonian*,const Epsilons&,int isite); //Minimize energy WRT the Ms in one site.
         void   Sweep (TensorNetworks::Direction lr,const Hamiltonian*,const Epsilons&);
-        void   UpdateBondData(int isite);
         void   NormalizeSite             (TensorNetworks::Direction lr,int isite);
         void   NormalizeAndCompressSite  (TensorNetworks::Direction lr,int isite,SVCompressorC*);
         void   SetCanonicalBondDimensions(TensorNetworks::Direction lr);
+//-------------------------------------------------------------------------------------
+//
+//  hooks for derived classes to do live updates for UI interfaces or graphs
+//
+        virtual void   UpdateBondData(int isite) {};
+        virtual void   UpdateEnergyData(int isite) {};
+        virtual void   IterationDeltaE(int iter,double de){};
+        virtual void   IterationEnergy(double E){};
 //-------------------------------------------------------------------------------------
 //
 // Calc Heff, calc L&R caches
@@ -209,31 +198,11 @@ private:
         double itsS;  //2*S, avoid storing floats for S=n/2
         int    itsd;   //Number ot states for the spin on each site = 2S+1
         int    itsNSweep;
-        int    itsSelectedSite; //Selected site for plots which show lots of data for one site.
 
         double     itsNormEps;
         TNSLogger* itsLogger;
         BondsType  itsBonds;
         SitesType  itsSites;
-
-        UniformMesh*  itsSitesMesh;
-        Mesh*         itsBondsMesh;
-        UniformMesh*  itsSVMesh;
-
-        PlotableMesh* itsSitesPMesh;
-        PlotableMesh* itsBondsPMesh;
-        PlotableMesh* itsSVMeshPMesh;
-
-        ArrayRT itsSiteEnergies;  //Minimum eigen value of Heff on each site.
-        ArrayRT itsSiteEGaps;     //Gap to second eigen value on each site.
-        ArrayRT itsBondEntropies; // Sum(s^2*ln(s^2)) for each bond
-        ArrayRT itsBondMinSVs;    // smallest singluar value for each bond
-        ArrayRT itsBondRanks;     // Effective rank based on non zero singular values
-        VectorRT itssSelectedEntropySpectrum; //full spectrum of SVs for a selected site.
-
-        static GraphDefinition theGraphs[];
-        static const int n_graphs;
-
 };
 
 #define SiteLoop(ia) for (int ia=1;ia<=itsL;ia++)

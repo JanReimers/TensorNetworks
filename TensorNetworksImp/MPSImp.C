@@ -5,15 +5,11 @@
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/TNSLogger.H"
 #include "Containers/Matrix4.H"
-#include "Functions/Mesh/PlotableMesh.H"
 #include <iostream>
 #include <iomanip>
 
 using std::cout;
 using std::endl;
-
-
-
 
 //-------------------------------------------------------------------------------
 //
@@ -25,11 +21,8 @@ MPSImp::MPSImp(int L, double S, int D,double normEps,TNSLogger* s)
     , itsS(S)
     , itsd(2*S+1)
     , itsNSweep(0)
-    , itsSelectedSite(1)
     , itsNormEps(normEps)
     , itsLogger(s)
-    , itsSitesMesh(0)
-    , itsBondsMesh(0)
 {
     assert(itsL>0);
 #ifdef DEBUG
@@ -44,8 +37,6 @@ MPSImp::MPSImp(int L, double S, int D,double normEps,TNSLogger* s)
         itsLogger=new TNSLogger();
 
     InitSitesAndBonds();
-    InitPlotting();
-
 }
 
 MPSImp::MPSImp(const MPSImp& mps)
@@ -54,15 +45,11 @@ MPSImp::MPSImp(const MPSImp& mps)
     , itsS           (mps.itsS)
     , itsd           (mps.itsd)
     , itsNSweep      (mps.itsNSweep)
-    , itsSelectedSite(mps.itsSelectedSite)
     , itsNormEps     (mps.itsNormEps)
     , itsLogger      (mps.itsLogger)
-    , itsSitesMesh   (0)
-    , itsBondsMesh   (0)
 {
     assert(itsDmax>0);
     InitSitesAndBonds();
-    InitPlotting();
     for (int ia=1; ia<=itsL; ia++)
         itsSites[ia]->CloneState(mps.itsSites[ia]); //Transfer wave function data
     for (int ia=1; ia<itsL; ia++)
@@ -75,11 +62,8 @@ MPSImp::MPSImp(int L, double S, int D,TensorNetworks::Direction lr,double normEp
     , itsS(S)
     , itsd(2*S+1)
     , itsNSweep(0)
-    , itsSelectedSite(1)
     , itsNormEps(normEps)
     , itsLogger(s)
-    , itsSitesMesh(0)
-    , itsBondsMesh(0)
 {
     assert(itsL>0);
 #ifdef DEBUG
@@ -124,11 +108,6 @@ void MPSImp::InitSitesAndBonds()
 
 MPSImp::~MPSImp()
 {
-//    cout << "MatrixProductStateImp destructor." << endl;
-    delete itsBondsPMesh;
-    delete itsSitesPMesh;
-    delete itsBondsMesh;
-    delete itsSitesMesh;
 }
 
 MPS* MPSImp::Clone() const

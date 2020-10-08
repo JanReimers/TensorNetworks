@@ -1,12 +1,3 @@
-Try:
-
-echo "options rt2800pci nohwcrypt=1" | sudo tee /etc/modprobe.d/rt2800pcifix.conf > /dev/null
-
-Reboot to test. If it is no good then run:
-
-sudo rm etc/modprobe.d/rt2800pcifix.conf
-
-Then reboot
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
 
@@ -14,9 +5,6 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     If we freeze site one, then left normalization needs to start at site 2
     and the right sweeps we need to stop at site two since we can;t SVD transfer to site 1.
 - Profile iTime GS search, see if we need to optimize some contractions.
-- Refactor: separate all plotting code in MPSImp and MPState
-    The tricky part here is that MPS interface inherits from MultiPlotable
-    So we need split that off and have MPS with no plotting and MPSWithPlotting
 - Spin space trotter decomp
 - Infinite methods iMPS, iTEBD, iDMRG
     -iMPS class with small unit cell
@@ -55,6 +43,9 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
         7) one or two (or N!) site updates. Part of convergence schedule?
         8) Report windows (HTML table?) with columns in the report(ostream) method
 
+- Done: Refactor: separate all plotting code in MPSImp and MPState
+    The tricky part here is that MPS interface inherits from MultiPlotable
+    So we need split that off and have MPS with no plotting and MPSWithPlotting
 - Done: Refactor: Have SVD routines return Vdagger instead of V
 - Done: Make ab SVDCompress interface.  Derived classes can implement different policies doe deciding which Svs to throw awat etc.
     - Done: Refactor: Normalize and NormalizeAndCompress should be merged  DMax=0, eps=0 means no compress?

@@ -3,12 +3,10 @@
 
 #include "TensorNetworks/Enums.H"
 #include "TensorNetworks/Typedefs.H"
-#include "TensorNetworks/MultiPlotable.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "Containers/OneSiteDMs.H"
 #include "Containers/TwoSiteDMs.H"
 #include <string>
-//#include <vector>
 #include <iosfwd>
 
 class Operator;
@@ -18,7 +16,7 @@ class Epsilons;
 class IterationSchedule;
 class IterationScheduleLine;
 
-class MPS : public virtual MultiPlotable
+class MPS
 {
     typedef TensorNetworks::MatrixRT MatrixRT;
     typedef TensorNetworks::MatrixCT MatrixCT;

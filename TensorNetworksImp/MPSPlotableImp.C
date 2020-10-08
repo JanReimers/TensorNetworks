@@ -1,14 +1,69 @@
-#include "TensorNetworksImp/MPSImp.H"
+#include "TensorNetworksImp/MPSPlotableImp.H"
 #include "TensorNetworksImp/Bond.H"
 #include "Functions/Mesh/PlotableMesh.H"
 #include "Plotting/Factory.H"
 #include "Plotting/MultiGraph.H"
 #include "Misc/Dimension.H"
 
+#include <iostream>
+#include <iomanip>
+
 using Dimensions::PureNumber;
 
+using std::cout;
+using std::endl;
 
-void MPSImp::InitPlotting()
+//-------------------------------------------------------------------------------
+//
+//  Init/construction zone
+//
+MPSPlotableImp::MPSPlotableImp(int L, double S, int D,double normEps,TNSLogger* logger)
+    : MPSImp(L,S,D,normEps,logger)
+    , itsSelectedSite(1)
+    , itsSitesMesh(0)
+    , itsBondsMesh(0)
+{
+    InitPlotting();
+}
+
+MPSPlotableImp::MPSPlotableImp(const MPSPlotableImp& mps)
+    : MPSImp(mps)
+    , itsSelectedSite(mps.itsSelectedSite)
+    , itsSitesMesh   (0)
+    , itsBondsMesh   (0)
+{
+    InitPlotting();
+}
+
+//Used for iTEBD states
+/*MPSPlotableImp::MPSPlotableImp(int L, double S, int D,TensorNetworks::Direction lr,double normEps,TNSLogger* logger)
+    : MPSImp(L,S,D,lr,normEps,logger)
+    , itsSelectedSite(1)
+    , itsSitesMesh(0)
+    , itsBondsMesh(0)
+{
+    InitPlotting();
+}
+*/
+
+MPSPlotableImp::~MPSPlotableImp()
+{
+//    cout << "MatrixProductStateImp destructor." << endl;
+    delete itsBondsPMesh;
+    delete itsSitesPMesh;
+    delete itsBondsMesh;
+    delete itsSitesMesh;
+}
+
+MPS* MPSPlotableImp::Clone() const
+{
+    assert(this->itsDmax>0);
+    return new MPSPlotableImp(*this);
+}
+
+
+
+void MPSPlotableImp::InitPlotting()
 {
     Range rsites(1.0,itsL);
     itsSitesMesh=new UniformMesh(rsites,1.0);
@@ -74,9 +129,43 @@ void MPSImp::InitPlotting()
 */
 }
 
+void MPSPlotableImp::UpdateBondData(int isite)
+{
+    CheckBondNumber(isite);
+    itsBondEntropies[isite]=itsBonds[isite]->GetBondEntropy();
+    itsBondMinSVs   [isite]=log10(itsBonds[isite]->GetMinSV());
+    itsBondRanks    [isite]=itsBonds[isite]->GetRank();
+    if (isite==itsSelectedSite)
+        itssSelectedEntropySpectrum=itsBonds[isite]->GetSVs();
+
+}
+void MPSPlotableImp::UpdateEnergyData(int isite)
+{
+    itsSiteEnergies[isite]=itsSites[isite]->GetSiteEnergy();
+    itsSiteEGaps   [isite]=itsSites[isite]->GetEGap      ();
+}
+
+void MPSPlotableImp::IterationDeltaE(int iter,double dE)
+{
+    if (weHaveGraphs())
+    {
+        if (dE<1e-16) dE=1e-16;
+        double diter=itsNSweep+static_cast<double>(iter)/(itsL-1); //Fractional iter count for log(dE) plot
+        //cout << "ia,diter,de=" << ia << " " << diter << " " << de << endl;
+        AddPoint("Iter log(dE/J)",Plotting::Point(diter,log10(dE)));
+    }
+
+}
+
+void MPSPlotableImp::IterationEnergy(double E)
+{
+    if (weHaveGraphs())
+        AddPoint("Iter E/J",Plotting::Point(itsNSweep,E));
+}
 
 
-GraphDefinition MPSImp::theGraphs[]=
+
+GraphDefinition MPSPlotableImp::theGraphs[]=
 {
     {"Site E/J"         ,"none"     ,"none"  ,"Sites"     ,"Lattice Site #"},
     {"Site Egap/J"      ,"none"     ,"none"  ,"Sites"     ,"Lattice Site #"},
@@ -88,10 +177,10 @@ GraphDefinition MPSImp::theGraphs[]=
     {"Iter log(dE/J)"   ,"none"     ,"none"  ,"Iterations","Iteration #"},
 };
 
-const int MPSImp::n_graphs=sizeof(MPSImp::theGraphs)/sizeof(GraphDefinition);
+const int MPSPlotableImp::n_graphs=sizeof(MPSPlotableImp::theGraphs)/sizeof(GraphDefinition);
 
 
-void MPSImp::MakeAllGraphs()
+void MPSPlotableImp::MakeAllGraphs()
 {
     NamedUnit Xunits("none","Iteration #");
     Plotting::Line* l=0;
@@ -134,7 +223,7 @@ void MPSImp::MakeAllGraphs()
     assert(ia>=1);\
     assert(ia<=itsL);\
 
-void MPSImp::Select(int index)
+void MPSPlotableImp::Select(int index)
 {
     CheckSiteNumber(index);
     if (itsSelectedSite!=index)
@@ -142,7 +231,7 @@ void MPSImp::Select(int index)
     itsSelectedSite=index;
 }
 
-void MPSImp::Insert(Plotting::MultiGraph* graphs)
+void MPSPlotableImp::Insert(Plotting::MultiGraph* graphs)
 {
     graphs->InsertLayer("Iterations");
     graphs->InsertLayer("Sites");

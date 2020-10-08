@@ -63,17 +63,6 @@ void MPSImp::CanonicalizeSite(TensorNetworks::Direction lr,int isite)
     itsSites[isite]->Canonicalize(lr);
 }
 
-
-void MPSImp::UpdateBondData(int isite)
-{
-    CheckBondNumber(isite);
-    itsBondEntropies[isite]=itsBonds[isite]->GetBondEntropy();
-    itsBondMinSVs   [isite]=log10(itsBonds[isite]->GetMinSV());
-    itsBondRanks    [isite]=itsBonds[isite]->GetRank();
-    if (isite==itsSelectedSite)
-        itssSelectedEntropySpectrum=itsBonds[isite]->GetSVs();
-}
-
 void MPSImp::NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC* comp)
 {
 //    SetCanonicalBondDimensions(Invert(LR)); //Sweep backwards and set proper bond dimensions

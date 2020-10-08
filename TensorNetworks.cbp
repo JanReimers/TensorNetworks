@@ -145,6 +145,7 @@
 		<Unit filename="TensorNetworks/IterationSchedule.H" />
 		<Unit filename="TensorNetworks/MPO.H" />
 		<Unit filename="TensorNetworks/MPS.H" />
+		<Unit filename="TensorNetworks/MPSPlotable.H" />
 		<Unit filename="TensorNetworks/MultiPlotable.H" />
 		<Unit filename="TensorNetworks/Operator.H" />
 		<Unit filename="TensorNetworks/OperatorWRepresentation.H" />
@@ -186,15 +187,16 @@
 		<Unit filename="TensorNetworksImp/MPSImp_Normalization.C">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="TensorNetworksImp/MPSImp_Plotting.C">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="TensorNetworksImp/MPSImp_Variational.C">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/MPSImp_iTime.C">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="TensorNetworksImp/MPSPlotableImp.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/MPSPlotableImp.H" />
 		<Unit filename="TensorNetworksImp/MPSSite.C">
 			<Option compilerVar="CC" />
 		</Unit>
