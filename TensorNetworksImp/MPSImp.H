@@ -50,9 +50,8 @@ public:
 //
 //  Normalization members with and without SVD compression
 //
-        virtual void Normalize(TensorNetworks::Direction LR);
-        virtual void Normalize       (int isite); //Mixed Canonical normalization
-        virtual void CanonicalizeSite(TensorNetworks::Direction LR, int isite); //...lambda-Gamma-lambda-Gamma-lambda...
+        virtual void MixedCanonical(int isite); //Mixed Canonical normalization
+        virtual void CanonicalizeSite(TensorNetworks::Direction LR, int isite,SVCompressorC*); //...lambda-Gamma-lambda-Gamma-lambda...
 
         virtual void NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC*);
 //--------------------------------------------------------------------------------------

@@ -69,11 +69,10 @@ class MPSSite
 //
 // Normalization
 //
-        void SVDNormalize(TensorNetworks::Direction lr);
         void SVDNormalize(TensorNetworks::Direction lr,SVCompressorC*);
+        void Canonicalize(TensorNetworks::Direction lr,SVCompressorC*);
         bool IsNormalized(TensorNetworks::Direction lr,double eps) const;
         bool SetCanonicalBondDimensions(int D1,int D2);
-        void Canonicalize(TensorNetworks::Direction lr);
 
 //--------------------------------------------------------------------------------------
 //

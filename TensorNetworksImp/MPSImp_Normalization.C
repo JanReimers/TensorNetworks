@@ -37,30 +37,23 @@ int MPSImp::GetD2(int a, int L, int d, int DMax)
 //
 //   Normalization routines
 //
-void MPSImp::Normalize(TensorNetworks::Direction LR)
-{
-    ForLoop(LR)
-        NormalizeSite(LR,ia);
-}
-
 
 void MPSImp::NormalizeSite(TensorNetworks::Direction lr,int isite)
 {
-//    NormalizeAndCompressSite(lr,isite,NULL);
     CheckSiteNumber(isite);
     std::string lrs=lr==TensorNetworks::DLeft ? "Left" : "Right";
     itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize site ");
-    itsSites[isite]->SVDNormalize(lr);
+    itsSites[isite]->SVDNormalize(lr,NULL);
     itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize update Bond data ");
     int bond_index=isite+( lr==TensorNetworks::DLeft ? 0 :-1);
     if (bond_index<itsL && bond_index>=1)
         UpdateBondData(bond_index);
 }
 
-void MPSImp::CanonicalizeSite(TensorNetworks::Direction lr,int isite)
+void MPSImp::CanonicalizeSite(TensorNetworks::Direction lr,int isite,SVCompressorC* comp)
 {
     CheckSiteNumber(isite);
-    itsSites[isite]->Canonicalize(lr);
+    itsSites[isite]->Canonicalize(lr,comp);
 }
 
 void MPSImp::NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC* comp)
@@ -89,7 +82,7 @@ void MPSImp::NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,SVC
 //
 //  Mixed canonical  A*A*A*A...A*M(isite)*B*B...B*B
 //
-void MPSImp::Normalize(int isite)
+void MPSImp::MixedCanonical(int isite)
 {
     CheckSiteNumber(isite);
     if (isite>1)

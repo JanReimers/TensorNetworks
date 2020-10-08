@@ -32,9 +32,9 @@ class MPS
 //
 //  Normalization members with and without SVD compression
 //
-        virtual void Normalize(TensorNetworks::Direction LR)=0;
-        virtual void Normalize(int isite)=0; //Mixed Canonical normalization
+        virtual void MixedCanonical(int isite)=0; //Mixed Canonical normalization
 
+        virtual void Normalize(TensorNetworks::Direction LR);
         virtual void NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC*)=0;
 //--------------------------------------------------------------------------------------
 //

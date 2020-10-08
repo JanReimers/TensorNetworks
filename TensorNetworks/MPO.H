@@ -5,7 +5,7 @@
 #include <iosfwd>
 
 //
-//  MPO is an operator but it can alse has the combine capability.
+//  MPO is an operator but it also has the combine and compress capabilities.
 //
 class MPO : public virtual Operator
 {

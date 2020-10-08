@@ -13,11 +13,6 @@
 using std::cout;
 using std::endl;
 
-void MPSSite::SVDNormalize(TensorNetworks::Direction lr)
-{
-    SVDNormalize(lr,NULL);
-}
-
 void MPSSite::SVDNormalize(TensorNetworks::Direction lr, SVCompressorC* comp)
 {
     // Handle edge cases first
@@ -79,13 +74,14 @@ bool MPSSite::SetCanonicalBondDimensions(int maxAllowedD1,int maxAllowedD2)
     return reshape;
 }
 
-void MPSSite::Canonicalize(TensorNetworks::Direction lr)
+void MPSSite::Canonicalize(TensorNetworks::Direction lr,SVCompressorC* comp)
 {
     MatrixCT A=ReshapeBeforeSVD(lr);
 //    int N=Min(A.GetNumRows(),A.GetNumCols());
 //    VectorRT s(N); // This get passed from one site to the next.
 //    MatrixCT V(N,A.GetNumCols());
     auto [U,s,Vdagger]=oml_CSVDecomp(A); //Solves A=U * s * Vdagger  returns V not Vdagger
+    if (comp) comp->Compress(U,s,Vdagger);
 
     switch (lr)
     {

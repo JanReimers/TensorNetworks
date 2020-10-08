@@ -27,8 +27,8 @@ class iTEBDStateImp : public virtual iTEBDState,
 //
 //  Normalization members with and without SVD compression
 //
-        virtual void Normalize(TensorNetworks::Direction LR);
-//        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,int Dmax,double epsMin);
+        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC*);
+
         virtual void Apply(int isite,const Matrix4T& expH);
         virtual void        Report    (std::ostream&) const;
 

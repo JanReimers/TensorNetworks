@@ -45,10 +45,11 @@ void iTEBDStateImp::InitializeWith(TensorNetworks::State s)
 }
 
 
-void iTEBDStateImp::Normalize(TensorNetworks::Direction LR)
+
+void iTEBDStateImp::NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC* comp)
 {
     ForLoop(LR)
-        MPSImp::CanonicalizeSite(LR,ia);
+        MPSImp::CanonicalizeSite(LR,ia,comp);
 }
 
 //void iTEBDStateImp::NormalizeAndCompress(TensorNetworks::Direction LR,int Dmax,double epsMin);

@@ -1,6 +1,11 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
-
+- Tidy up test names
+    -SVDTesting should be LinAlgebraTesting
+    -Prefix with numbers or somehow tell gtest the run order
+- Imaginary checks in GetOverlap should /itsL
+- MPO should use SVCompressorR instead Dmax, eps
+- Put all TNS classes in the TNS namespace so we dont have prefix all types and enums
 - The freeze idea didn;t because normalization is current sweeping through the frozen Site
     If we freeze site one, then left normalization needs to start at site 2
     and the right sweeps we need to stop at site two since we can;t SVD transfer to site 1.
@@ -26,23 +31,9 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
         -Jz
         -Might need to identify parameters with strings "Jxy"
 
--GUI
-    Control panel
-        Play/Pause in one button.  Use icons?
-    Status bar. ModelName (from H), L,S, D, iter#, E, CPU & meminfo (use psutils)
--Plotting support log axes in wxdriver.
--Plot correlations
-    Two site correlation calcultion is expensive, so we need a way for the user to eneable and disable them
-    This brings up layout issues.  We need screen realestate for
-        1) COntrol of current step update detail levels
-        2) COntrol of what gets calculated, Correlations, propgator, gradE
-        3) Exporting graphs to grace
-        4) Saving a "project"
-        5) COnvergence schedule editor (listview?)
-        6) Freezing one site to remove SU(N) degeneracy
-        7) one or two (or N!) site updates. Part of convergence schedule?
-        8) Report windows (HTML table?) with columns in the report(ostream) method
-
+- Done: Clean up normalize interfaces.  use NULL compressor to indicate no compression.
+    -Only provide two version and the abstract interface level.
+    -NormalizeAndCompress should return error.
 - Done: Refactor: separate all plotting code in MPSImp and MPState
     The tricky part here is that MPS interface inherits from MultiPlotable
     So we need split that off and have MPS with no plotting and MPSWithPlotting
