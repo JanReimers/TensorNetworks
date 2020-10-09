@@ -5,18 +5,20 @@
 #include "TensorNetworks/Typedefs.H"
 #include "TensorNetworks/Enums.H"
 
-class OperatorWRepresentation;
-class MPS;
-class MPO;
-class FullState;
-class iTEBDState;
-class Epsilons;
-class TNSLogger;
+
+namespace TensorNetworks
+{
+    class TNSLogger;
+    class MPO;
+    class MPS;
+    class FullState;
+    class iTEBDState;
+    class OperatorWRepresentation;
+    class Epsilons;
+
 
 class Hamiltonian : public virtual Operator
 {
-    protected:
-        typedef TensorNetworks::Matrix4T Matrix4T;
     public:
         Hamiltonian() {}
         virtual ~Hamiltonian() {}
@@ -34,13 +36,15 @@ class Hamiltonian : public virtual Operator
         virtual MPO*                CreateUnitOperator() const=0;
         virtual MPO*                CreateH2Operator  () const;
         //  Create and exp(-dt*H) time evolution operator of a certain order in tau.
-        virtual MPO*                CreateOperator(double dt, TensorNetworks::TrotterOrder) const=0;
+        virtual MPO*                CreateOperator(double dt, TrotterOrder) const=0;
         // Get a 2 site local matrix of order p^2 x p^2
-        virtual Matrix4T            BuildLocalMatrix() const=0;
+        virtual Matrix4RT           BuildLocalMatrix() const=0;
         // Create an exact (full) wave function abject suitable for this Hamiltonian
         virtual FullState*          CreateFullState () const=0;
 
-        static Matrix4T ExponentH(double dt,const Matrix4T& H12);
+        static Matrix4RT ExponentH(double dt,const Matrix4RT& H12);
 };
+
+} //namespace
 
 #endif //HAMILTONIAN_H

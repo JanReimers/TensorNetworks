@@ -1,6 +1,9 @@
 #include "SpinCalculator.H"
 #include <cmath>
 
+namespace TensorNetworks
+{
+
 SpinCalculator::SpinCalculator(double S)
     : itsS(S)
     , itsd(2*S+1)
@@ -145,4 +148,6 @@ SpinCalculator::Matrix4CT SpinCalculator::GetSzSy (int lowerIndex) const
 SpinCalculator::Matrix4T  SpinCalculator::GetSzSz (int lowerIndex) const
 {
     return BuildMatrix<Matrix4T,dfp,dfp>(lowerIndex,&SpinCalculator::GetSz,&SpinCalculator::GetSz);
+}
+
 }

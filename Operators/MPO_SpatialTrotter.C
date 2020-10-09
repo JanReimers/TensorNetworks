@@ -4,17 +4,14 @@
 #include "Operators/IdentityOperator.H"
 #include "oml/numeric.h"
 
-
-typedef TensorNetworks::VectorRT VectorRT;
-typedef TensorNetworks::MatrixRT MatrixRT;
-
-
+namespace TensorNetworks
+{
 
 //
 //  THe local two site Hamiltonian H12 should be stored as H12(m1,m2,n1,n2);
 //   Whem flatted to H(m,n) where m=(m1,m2) n=(n1,n2) it is hermitian and diagonalizable.
 //
-MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,int L, int d, const Matrix4T& H12)
+MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, int d, const Matrix4RT& H12)
     : itsOddEven(type)
     , itsL(L)
     , itsd(d)
@@ -22,7 +19,7 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,i
     , itsRightSite(0)
     , itsUnit_Site(0)
 {
-    assert(itsOddEven==TensorNetworks::Odd || itsOddEven==TensorNetworks::Even);
+    assert(itsOddEven==Odd || itsOddEven==Even);
     assert(itsL>1);
     assert(itsd>1);
     //
@@ -32,7 +29,7 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,i
     MatrixRT U12=H12.Flatten();
     VectorRT evs=Diagonalize(U12);
     VectorRT expEvs=exp(-dt*evs);
-    Matrix4T expH(d,d,d,d,0);
+    Matrix4RT expH(d,d,d,d,0);
     Fill(expH.Flatten(),0.0);
     int i1=1,N=U12.GetNumRows();
     for (int m1=0; m1<d; m1++)
@@ -62,9 +59,9 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,i
     assert(evs.size()==itsd*itsd);
     OperatorWRepresentation* IdentityWOp=new IdentityOperator();
 
-    itsLeft_Site=new SiteOperatorImp(TensorNetworks::DLeft,U,s,itsd);
-    itsRightSite=new SiteOperatorImp(TensorNetworks::DRight,V,s,itsd);
-    itsUnit_Site=new SiteOperatorImp(TensorNetworks::PBulk,IdentityWOp,itsd);
+    itsLeft_Site=new SiteOperatorImp(DLeft,U,s,itsd);
+    itsRightSite=new SiteOperatorImp(DRight,V,s,itsd);
+    itsUnit_Site=new SiteOperatorImp(PBulk,IdentityWOp,itsd);
 
     delete IdentityWOp;
 }
@@ -84,7 +81,7 @@ const SiteOperator* MPO_SpatialTrotter::GetSiteOperator(int isite) const
     assert(isite<=itsL);
     const SiteOperator* ret=0;
 
-    if (itsOddEven==TensorNetworks::Odd)
+    if (itsOddEven==Odd)
     {
         if (itsL%2 && isite==itsL)
         {
@@ -119,3 +116,4 @@ const SiteOperator* MPO_SpatialTrotter::GetSiteOperator(int isite) const
     return ret;
 }
 
+}

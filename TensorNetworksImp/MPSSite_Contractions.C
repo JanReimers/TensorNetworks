@@ -12,13 +12,15 @@
 using std::cout;
 using std::endl;
 
+namespace TensorNetworks
+{
 
-MPSSite::MatrixCT  MPSSite::ReshapeBeforeSVD(TensorNetworks::Direction lr)
+MatrixCT  MPSSite::ReshapeBeforeSVD(Direction lr)
 {
     MatrixCT A;
     switch (lr)
     {
-    case TensorNetworks::DLeft:
+    case DLeft:
     {
         A.SetLimits(itsd*itsD1,itsD2);
         int i2_1=1;
@@ -28,7 +30,7 @@ MPSSite::MatrixCT  MPSSite::ReshapeBeforeSVD(TensorNetworks::Direction lr)
                     A(i2_1,i2)=itsMs[in](i1,i2);
         break;
     }
-    case TensorNetworks::DRight:
+    case DRight:
     {
         A.SetLimits(itsD1,itsd*itsD2);
         int i2_2=1;
@@ -44,11 +46,11 @@ MPSSite::MatrixCT  MPSSite::ReshapeBeforeSVD(TensorNetworks::Direction lr)
 
 
 
-void  MPSSite::ReshapeAfter_SVD(TensorNetworks::Direction lr,const MatrixCT& UV)
+void  MPSSite::ReshapeAfter_SVD(Direction lr,const MatrixCT& UV)
 {
     switch (lr)
     {
-    case TensorNetworks::DLeft:
+    case DLeft:
     {
         //  If U has less columns than the As then we need to reshape the whole site.
         //  Typically this will happen at the edges of the lattice.
@@ -61,7 +63,7 @@ void  MPSSite::ReshapeAfter_SVD(TensorNetworks::Direction lr,const MatrixCT& UV)
                     itsMs[in](i1,i2)=UV(i2_1,i2);
         break;
     }
-    case TensorNetworks::DRight:
+    case DRight:
     {
         //  If Vdagger has less row than the As then we need to reshape the whole site.
         //  Typically this will happen at the edges of the lattice.
@@ -77,12 +79,12 @@ void  MPSSite::ReshapeAfter_SVD(TensorNetworks::Direction lr,const MatrixCT& UV)
     }
 }
 
-MPSSite::MatrixCT MPSSite::GetNorm(TensorNetworks::Direction lr) const
+MatrixCT MPSSite::GetNorm(Direction lr) const
 {
     MatrixCT ret;
     switch(lr)
     {
-    case TensorNetworks::DLeft:
+    case DLeft:
     {
         ret.SetLimits(itsD2,itsD2);
         Fill(ret,std::complex<double>(0.0));
@@ -93,7 +95,7 @@ MPSSite::MatrixCT MPSSite::GetNorm(TensorNetworks::Direction lr) const
             ret+=conj(Transpose((*id)))*(*id);
         break;
     }
-    case TensorNetworks::DRight:
+    case DRight:
     {
         ret.SetLimits(itsD1,itsD1);
         Fill(ret,std::complex<double>(0.0));
@@ -108,8 +110,8 @@ MPSSite::MatrixCT MPSSite::GetNorm(TensorNetworks::Direction lr) const
     return ret;
 }
 
-MPSSite::Matrix6T MPSSite::
-GetHeff(const SiteOperator* mops,const Vector3T& L,const Vector3T& R) const
+Matrix6CT MPSSite::
+GetHeff(const SiteOperator* mops,const Vector3CT& L,const Vector3CT& R) const
 {
     assert(mops);
     Matrix6<eType> Heff(itsd,itsD1,itsD2,itsd,itsD1,itsD2);
@@ -120,7 +122,7 @@ GetHeff(const SiteOperator* mops,const Vector3T& L,const Vector3T& R) const
         {
             const MatrixRT& W=mops->GetW(m,n);
             assert(W.GetNumRows()==Dws.Dw1);
-            Vector3T WR(Dws.Dw1,itsD2,itsD2,1);
+            Vector3CT WR(Dws.Dw1,itsD2,itsD2,1);
             for (int w1=1; w1<=Dws.Dw1; w1++)
                 for (int i2=1; i2<=itsD2; i2++)
                     for (int j2=1; j2<=itsD2; j2++)
@@ -143,7 +145,7 @@ GetHeff(const SiteOperator* mops,const Vector3T& L,const Vector3T& R) const
 }
 
 eType MPSSite::
-ContractWR(int w1, int i2, int j2,const MatrixRT& W, int Dw2,const Vector3T& R) const
+ContractWR(int w1, int i2, int j2,const MatrixRT& W, int Dw2,const Vector3CT& R) const
 {
     eType WR(0.0);
     for (int w2=1; w2<=Dw2; w2++)
@@ -152,7 +154,7 @@ ContractWR(int w1, int i2, int j2,const MatrixRT& W, int Dw2,const Vector3T& R) 
     return WR;
 }
 
-MPSSite::MatrixCT MPSSite::IterateLeft_F(const MPSSite* Psi2, const MatrixCT& Fam1,bool cache) const
+MatrixCT MPSSite::IterateLeft_F(const MPSSite* Psi2, const MatrixCT& Fam1,bool cache) const
 {
 //    cout << "IterateLeft_F D1,D2,DwD1,DwD2,Fam=" << itsAs[0].GetLimits() << " " << Psi2->itsAs[0].GetLimits() << " " << Fam1.GetLimits() << endl;
     assert(Fam1.GetNumRows()==      itsD1);
@@ -170,7 +172,7 @@ MPSSite::MatrixCT MPSSite::IterateLeft_F(const MPSSite* Psi2, const MatrixCT& Fa
     return F;
 }
 
-MPSSite::MatrixCT MPSSite::IterateRightF(const MPSSite* Psi2, const MatrixCT& Fap1,bool cache) const
+MatrixCT MPSSite::IterateRightF(const MPSSite* Psi2, const MatrixCT& Fap1,bool cache) const
 {
 //    cout << "IterateRightF D1,D2,DwD1,DwD2,Fap=" << itsAs[0].GetLimits() << " " << Psi2->itsAs[0].GetLimits() << " " << Fap1.GetLimits() << endl;
     MatrixCT F(itsD1,Psi2->itsD1);
@@ -192,11 +194,11 @@ MPSSite::MatrixCT MPSSite::IterateRightF(const MPSSite* Psi2, const MatrixCT& Fa
     return F;
 }
 
-MPSSite::MatrixCT MPSSite::IterateF(TensorNetworks::Direction lr ,const MatrixCT& Mold) const
+MatrixCT MPSSite::IterateF(Direction lr ,const MatrixCT& Mold) const
 {
 //    cout << "IterateF D1,D2 Mold=" << itsD1 << "," << itsD2 << " " << Mold.GetLimits() << endl;
     MatrixCT M;
-    if (lr==TensorNetworks::DLeft)
+    if (lr==DLeft)
     {
         assert(Mold.GetNumRows()>=itsD1);
         assert(Mold.GetNumCols()>=itsD1);
@@ -217,7 +219,7 @@ MPSSite::MatrixCT MPSSite::IterateF(TensorNetworks::Direction lr ,const MatrixCT
     }
     else
     {
-        assert(lr==TensorNetworks::DRight);
+        assert(lr==DRight);
         assert(Mold.GetNumRows()==itsD2);
         assert(Mold.GetNumCols()==itsD2);
         M.SetLimits(itsD1,itsD1);
@@ -232,10 +234,10 @@ MPSSite::MatrixCT MPSSite::IterateF(TensorNetworks::Direction lr ,const MatrixCT
     return M;
 }
 
-MPSSite::Vector3T MPSSite::IterateLeft_F(const SiteOperator* so, const Vector3T& Fam1,bool cache)
+Vector3CT MPSSite::IterateLeft_F(const SiteOperator* so, const Vector3CT& Fam1,bool cache)
 {
     int Dw2=so->GetDw12().Dw2;
-    Vector3T F(Dw2,itsD2,itsD2,1);
+    Vector3CT F(Dw2,itsD2,itsD2,1);
     for (int w2=1; w2<=Dw2; w2++)
         for (int i2=1; i2<=itsD2; i2++)
             for (int j2=1; j2<=itsD2; j2++)
@@ -244,7 +246,7 @@ MPSSite::Vector3T MPSSite::IterateLeft_F(const SiteOperator* so, const Vector3T&
     return F;
 }
 
-MPSSite::eType MPSSite::ContractAWFA(int w2, int i2, int j2, const SiteOperator* so, const Vector3T& Fam1) const
+eType MPSSite::ContractAWFA(int w2, int i2, int j2, const SiteOperator* so, const Vector3CT& Fam1) const
 {
     eType awfa(0.0);
     for (int m=0; m<itsd; m++)
@@ -254,7 +256,7 @@ MPSSite::eType MPSSite::ContractAWFA(int w2, int i2, int j2, const SiteOperator*
     return awfa;
 }
 
-MPSSite::eType MPSSite::ContractWFA(int m, int w2, int i1, int j2, const SiteOperator* so, const Vector3T& Fam1) const
+eType MPSSite::ContractWFA(int m, int w2, int i1, int j2, const SiteOperator* so, const Vector3CT& Fam1) const
 {
     const Dw12& Dws1=so->GetDw12();
     eType wfa(0.0);
@@ -274,7 +276,7 @@ MPSSite::eType MPSSite::ContractWFA(int m, int w2, int i1, int j2, const SiteOpe
     return wfa;
 }
 
-MPSSite::eType MPSSite::ContractFA(int n, int w1, int i1, int j2, const Vector3T& Fam1) const
+eType MPSSite::ContractFA(int n, int w1, int i1, int j2, const Vector3CT& Fam1) const
 {
     eType fa(0.0);
     for (int j1=1; j1<=itsD1; j1++)
@@ -284,10 +286,10 @@ MPSSite::eType MPSSite::ContractFA(int n, int w1, int i1, int j2, const Vector3T
 
 
 
-MPSSite::Vector3T MPSSite::IterateRightF(const SiteOperator* so, const Vector3T& Fap1, bool cache)
+Vector3CT MPSSite::IterateRightF(const SiteOperator* so, const Vector3CT& Fap1, bool cache)
 {
     int Dw1=so->GetDw12().Dw1;;
-    Vector3T F(Dw1,itsD1,itsD1,1);
+    Vector3CT F(Dw1,itsD1,itsD1,1);
     for (int w1=1; w1<=Dw1; w1++)
         for (int i1=1; i1<=itsD1; i1++)
             for (int j1=1; j1<=itsD1; j1++)
@@ -296,7 +298,7 @@ MPSSite::Vector3T MPSSite::IterateRightF(const SiteOperator* so, const Vector3T&
     return F;
 }
 
-MPSSite::eType MPSSite::ContractBWFB(int w1, int i1, int j1, const SiteOperator* so, const Vector3T& Fap1) const
+eType MPSSite::ContractBWFB(int w1, int i1, int j1, const SiteOperator* so, const Vector3CT& Fap1) const
 {
     eType bwfb(0.0);
     for (int m=0; m<itsd; m++)
@@ -306,7 +308,7 @@ MPSSite::eType MPSSite::ContractBWFB(int w1, int i1, int j1, const SiteOperator*
     return bwfb;
 }
 
-MPSSite::eType MPSSite::ContractWFB(int m, int w1, int i2, int j1, const SiteOperator* so, const Vector3T& Fap1) const
+eType MPSSite::ContractWFB(int m, int w1, int i2, int j1, const SiteOperator* so, const Vector3CT& Fap1) const
 {
     const Dw12& Dws=so->GetDw12();
     eType wfb(0.0);
@@ -324,7 +326,7 @@ MPSSite::eType MPSSite::ContractWFB(int m, int w1, int i2, int j1, const SiteOpe
     return wfb;
 }
 
-MPSSite::eType MPSSite::ContractFB(int n, int w2, int i2, int j1, const Vector3T& Fap1) const
+eType MPSSite::ContractFB(int n, int w2, int i2, int j1, const Vector3CT& Fap1) const
 {
     eType fb(0.0);
     for (int j2=1; j2<=itsD2; j2++)
@@ -332,11 +334,11 @@ MPSSite::eType MPSSite::ContractFB(int n, int w2, int i2, int j1, const Vector3T
     return fb;
 }
 
-void MPSSite::SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s, const MatrixCT& UV)
+void MPSSite::SVDTransfer(Direction lr,const DiagonalMatrixRT& s, const MatrixCT& UV)
 {
     switch (lr)
     {
-    case TensorNetworks::DRight:
+    case DRight:
     {
         int N1=s.GetNumRows(); //N1=0 on the first site.
         if (N1>0 && N1<itsD2)
@@ -356,7 +358,7 @@ void MPSSite::SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s
         }
         break;
     }
-    case TensorNetworks::DLeft:
+    case DLeft:
     {
         int N1=s.GetNumRows(); //N1=0 on the first site.
         if (N1>0 && N1<itsD1)
@@ -382,11 +384,11 @@ void MPSSite::SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s
     }
 }
 
-void MPSSite::SVDTransfer(TensorNetworks::Direction lr,const MatrixCT& UV)
+void MPSSite::SVDTransfer(Direction lr,const MatrixCT& UV)
 {
     switch (lr)
     {
-    case TensorNetworks::DRight:
+    case DRight:
     {
         int N1=UV.GetNumCols(); //N1=0 on the first site.
         if (N1>0 && N1<itsD2)
@@ -406,7 +408,7 @@ void MPSSite::SVDTransfer(TensorNetworks::Direction lr,const MatrixCT& UV)
         }
         break;
     }
-    case TensorNetworks::DLeft:
+    case DLeft:
     {
         int N1=UV.GetNumRows(); //N1=0 on the first site.
         if (N1>0 && N1<itsD1)
@@ -433,7 +435,7 @@ void MPSSite::SVDTransfer(TensorNetworks::Direction lr,const MatrixCT& UV)
 }
 
 
-MPSSite::MatrixCT MPSSite::CalculateOneSiteDM()
+MatrixCT MPSSite::CalculateOneSiteDM()
 {
     MatrixCT ro(itsd,itsd); //These can't be zero based if we want run them through eigen routines, which are hard ocded for 1 based matricies
     Fill(ro,eType(0.0));
@@ -445,7 +447,7 @@ MPSSite::MatrixCT MPSSite::CalculateOneSiteDM()
     return ro;
 }
 
-MPSSite::MatrixCT MPSSite::InitializeTwoSiteDM(int m, int n)
+MatrixCT MPSSite::InitializeTwoSiteDM(int m, int n)
 {
     MatrixCT C(itsD2,itsD2);
     Fill(C,eType(0.0));
@@ -456,7 +458,7 @@ MPSSite::MatrixCT MPSSite::InitializeTwoSiteDM(int m, int n)
     return C;
 }
 
-MPSSite::MatrixCT MPSSite::IterateTwoSiteDM(MatrixCT& Cmn)
+MatrixCT MPSSite::IterateTwoSiteDM(MatrixCT& Cmn)
 {
     MatrixCT ret(itsD2,itsD2);
     Fill(ret,eType(0.0));
@@ -471,7 +473,7 @@ MPSSite::MatrixCT MPSSite::IterateTwoSiteDM(MatrixCT& Cmn)
     return ret;
 }
 
-MPSSite::MatrixCT MPSSite::ContractCA(int n2, const MatrixCT& Cmn) const
+MatrixCT MPSSite::ContractCA(int n2, const MatrixCT& Cmn) const
 {
     MatrixCT ret(itsD1,itsD2);
     Fill(ret,eType(0.0));
@@ -482,7 +484,7 @@ MPSSite::MatrixCT MPSSite::ContractCA(int n2, const MatrixCT& Cmn) const
     return ret;
 }
 
-MPSSite::MatrixCT MPSSite::FinializeTwoSiteDM(const MatrixCT & Cmn)
+MatrixCT MPSSite::FinializeTwoSiteDM(const MatrixCT & Cmn)
 {
     MatrixCT ret(itsd,itsd);
     Fill(ret,eType(0.0));
@@ -530,7 +532,7 @@ void MPSSite::Contract(dVectorT& newAs,const SiteOperator* so)
 
 }
 
-MPSSite::MatrixCT MPSSite::ContractLRM(const MatrixCT& M, const MatrixCT& L, const MatrixCT& R) const
+MatrixCT MPSSite::ContractLRM(const MatrixCT& M, const MatrixCT& L, const MatrixCT& R) const
 {
 //    cout << "D1,D2=" << itsD1 << " " << itsD2 << endl;
 //    cout << "ContractLRM L=" << L.GetLimits() << endl;
@@ -554,7 +556,7 @@ MPSSite::MatrixCT MPSSite::ContractLRM(const MatrixCT& M, const MatrixCT& L, con
     return M_tilde;
 }
 
-MPSSite::MatrixCT MPSSite::Contract_RM(const MatrixCT& R, const MatrixCT& M) const
+MatrixCT MPSSite::Contract_RM(const MatrixCT& R, const MatrixCT& M) const
 {
     assert(R.GetNumCols()==M.GetNumCols());
     assert(R.GetNumRows()==itsD2);
@@ -587,3 +589,4 @@ void  MPSSite::Apply(const SiteOperator* so, MPSSite* psiPrime)
     psiPrime->itsD2=itsD2*Dws.Dw2;
 }
 
+} //namespace

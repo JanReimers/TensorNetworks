@@ -17,7 +17,7 @@ public:
     GroundStateTesting()
     : eps(1.0e-13)
     , itsFactory(TensorNetworks::Factory::GetFactory())
-    , itsLogger(new SPDLogger(0))
+    , itsLogger(new TensorNetworks::SPDLogger(0))
     {
         StreamableObject::SetToPretty();
 
@@ -32,9 +32,9 @@ public:
 
     double eps;
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
-    Hamiltonian*         itsH;
-    MPS*                 itsMPS;
-    TNSLogger*           itsLogger;
+    TensorNetworks::Hamiltonian*         itsH;
+    TensorNetworks::MPS* itsMPS;
+    TensorNetworks::TNSLogger*           itsLogger;
 };
 
 
@@ -43,8 +43,8 @@ TEST_F(GroundStateTesting,TestIdentityOperator)
     Setup(10,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DLeft);
-    OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
-    Operator* IO=itsH->CreateOperator(IWO);
+    TensorNetworks::OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
+    TensorNetworks::Operator* IO=itsH->CreateOperator(IWO);
     double S=itsMPS->GetExpectation(IO);
     EXPECT_NEAR(S,1.0,eps);
 
@@ -58,9 +58,9 @@ TEST_F(GroundStateTesting,TestSweepL9S1D2)
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
 
-    Epsilons eps(1e-12);
+    TensorNetworks::Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-9;
-    IterationSchedule is;
+    TensorNetworks::IterationSchedule is;
     is.Insert({maxIter,D,eps});
 
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
@@ -80,9 +80,9 @@ TEST_F(GroundStateTesting,TestSweepL9S1D8)
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
 
-    Epsilons eps(1e-12);
+    TensorNetworks::Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-9;
-    IterationSchedule is;
+    TensorNetworks::IterationSchedule is;
     is.Insert({maxIter,D,eps});
 
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
@@ -99,9 +99,9 @@ TEST_F(GroundStateTesting,TestSweepL9S1D4)
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
 
-    Epsilons eps(1e-12);
+    TensorNetworks::Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-10;
-    IterationSchedule is;
+    TensorNetworks::IterationSchedule is;
     is.Insert({maxIter,D,eps});
 
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
@@ -118,9 +118,9 @@ TEST_F(GroundStateTesting,TestSweepL9S5D2)
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
 
-    Epsilons eps(1e-12);
+    TensorNetworks::Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-9;
-    IterationSchedule is;
+    TensorNetworks::IterationSchedule is;
     is.Insert({maxIter,D,eps});
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
 
@@ -137,9 +137,9 @@ TEST_F(GroundStateTesting,TestFreezeL9S1D2)
     itsMPS->InitializeWith(TensorNetworks::Neel);
     itsMPS->Freeze(1,0.5); //Site 0 spin up
 
-    Epsilons eps(1e-12);
+    TensorNetworks:: Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-9;
-    IterationSchedule is;
+    TensorNetworks::IterationSchedule is;
     is.Insert({maxIter,D,eps});
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
 
@@ -156,9 +156,9 @@ TEST_F(GroundStateTesting,TestSweepL6S1GrowD27)
     Setup(L,S,Dstart);
     itsMPS->InitializeWith(TensorNetworks::Random);
 
-    Epsilons eps(1e-12);
+    TensorNetworks::Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-6;
-    IterationSchedule is;
+    TensorNetworks::IterationSchedule is;
     is.Insert({30,9,1,eps});
     is.Insert({30,Dend,6,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
@@ -186,9 +186,9 @@ TEST_F(GroundStateTesting,TestSweepL7S1GrowD27)
     Setup(L,S,Dstart);
     itsMPS->InitializeWith(TensorNetworks::Random);
 
-    Epsilons eps(1e-12);
+    TensorNetworks::Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-6;
-    IterationSchedule is;
+    TensorNetworks::IterationSchedule is;
     is.Insert({30,9,1,eps});
     is.Insert({30,Dend,6,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
@@ -214,9 +214,9 @@ TEST_F(GroundStateTesting,TestSweepL8S1GrowD27)
     Setup(L,S,Dstart);
     itsMPS->InitializeWith(TensorNetworks::Random);
 
-    Epsilons eps(1e-12);
+    TensorNetworks::Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-6;
-    IterationSchedule is;
+    TensorNetworks::IterationSchedule is;
     is.Insert({30,9,1,eps});
     is.Insert({30,Dend,6,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
@@ -278,9 +278,9 @@ TEST_F(GroundStateTesting,TestSweepL19S1D8)
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
 
-    Epsilons eps(1e-12);
+    TensorNetworks::Epsilons eps(1e-12);
     eps.itsDelatEnergy1Epsilon=1e-9;
-    IterationSchedule is;
+    TensorNetworks::IterationSchedule is;
     is.Insert({maxIter,D,eps});
 
     StopWatch sw;

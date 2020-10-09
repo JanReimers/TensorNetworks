@@ -6,25 +6,20 @@
 #include "TensorNetworksImp/MPSSite.H"
 #include "Misc/ptr_vector.h"
 
+
+//namespace
+//{
+    class MPOTesting;
+    class MPSNormTesting;
+    class MatrixProductTesting;
+//}
+
+namespace TensorNetworks
+{
 class IterationScheduleLine;
 
 class MPSImp : public virtual MPS
 {
-//--------------------------------------------------------------------------------------
-//
-//  Typedefs for various containers
-//
-protected:
-        typedef TensorNetworks::MatrixRT  MatrixRT;
-        typedef TensorNetworks::VectorRT  VectorRT;
-        typedef TensorNetworks:: ArrayRT   ArrayRT;
-        typedef TensorNetworks::MatrixCT  MatrixCT;
-        typedef TensorNetworks::VectorCT  VectorCT;
-        typedef TensorNetworks::Matrix6CT Matrix6T;
-        typedef TensorNetworks::Vector3CT Vector3CT;
-        typedef TensorNetworks::Vector4CT Vector4CT;
-        typedef TensorNetworks::Matrix4CT Matrix4CT;
-        typedef TensorNetworks::eType     eType;
 //--------------------------------------------------------------------------------------
 //
 //  Construction and initialization zone
@@ -35,7 +30,7 @@ public:
 
         virtual ~MPSImp();
 
-        virtual void InitializeWith(TensorNetworks::State);
+        virtual void InitializeWith(State);
         virtual void Freeze(int isite,double s);
         virtual MPS* Clone() const;
 //--------------------------------------------------------------------------------------
@@ -51,9 +46,9 @@ public:
 //  Normalization members with and without SVD compression
 //
         virtual void MixedCanonical(int isite); //Mixed Canonical normalization
-        virtual void CanonicalizeSite(TensorNetworks::Direction LR, int isite,SVCompressorC*); //...lambda-Gamma-lambda-Gamma-lambda...
+        virtual void CanonicalizeSite(Direction LR, int isite,SVCompressorC*); //...lambda-Gamma-lambda-Gamma-lambda...
 
-        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC*);
+        virtual void NormalizeAndCompress(Direction LR,SVCompressorC*);
 //--------------------------------------------------------------------------------------
 //
 // Find ground state
@@ -96,27 +91,27 @@ public:
 
 protected:
     // Constructor used for iTEBD
-        MPSImp(int L, double S, int D,TensorNetworks::Direction lr,double normEps=1e-12,TNSLogger* s=0);
+        MPSImp(int L, double S, int D,Direction lr,double normEps=1e-12,TNSLogger* s=0);
 //--------------------------------------------------------------------------------------
 //
 //  Loop Control
 //
-        int GetStart(TensorNetworks::Direction lr) const
+        int GetStart(Direction lr) const
         {
-            return lr==TensorNetworks::DLeft ? 1 : itsL;
+            return lr==DLeft ? 1 : itsL;
         }
-        int GetStop(TensorNetworks::Direction lr) const
+        int GetStop(Direction lr) const
         { //These need to be one beyond, like stl iterators
-            return lr==TensorNetworks::DLeft ? itsL+1 : 0;
+            return lr==DLeft ? itsL+1 : 0;
         }
-        int GetIncrement(TensorNetworks::Direction lr) const
+        int GetIncrement(Direction lr) const
         {
-            return lr==TensorNetworks::DLeft ? 1 : -1;
+            return lr==DLeft ? 1 : -1;
         }
 
-        TensorNetworks::Direction Invert(TensorNetworks::Direction lr)
+        Direction Invert(Direction lr)
         {
-            return lr==TensorNetworks::DLeft ?  TensorNetworks::DRight : TensorNetworks::DLeft;
+            return lr==DLeft ?  DRight : DLeft;
         }
 
 //--------------------------------------------------------------------------------------
@@ -124,9 +119,9 @@ protected:
 //  Allows unit test classes inside.
 //
 private:
-        friend class MPOTesting;
-        friend class MPSNormTesting;
-        friend class MatrixProductTesting;
+        friend class ::MPOTesting;
+        friend class ::MPSNormTesting;
+        friend class ::MatrixProductTesting;
 
         void InitSitesAndBonds();
         static int GetD1(int a, int L, int d, int DMax);
@@ -140,11 +135,11 @@ private:
 //
         double FindVariationalGroundState(const Hamiltonian*,const IterationScheduleLine&);
         double FindiTimeGroundState      (const Hamiltonian*,const IterationScheduleLine&);
-        void   Refine(TensorNetworks::Direction lr,const Hamiltonian*,const Epsilons&,int isite); //Minimize energy WRT the Ms in one site.
-        void   Sweep (TensorNetworks::Direction lr,const Hamiltonian*,const Epsilons&);
-        void   NormalizeSite             (TensorNetworks::Direction lr,int isite);
-        void   NormalizeAndCompressSite  (TensorNetworks::Direction lr,int isite,SVCompressorC*);
-        void   SetCanonicalBondDimensions(TensorNetworks::Direction lr);
+        void   Refine(Direction lr,const Hamiltonian*,const Epsilons&,int isite); //Minimize energy WRT the Ms in one site.
+        void   Sweep (Direction lr,const Hamiltonian*,const Epsilons&);
+        void   NormalizeSite             (Direction lr,int isite);
+        void   NormalizeAndCompressSite  (Direction lr,int isite,SVCompressorC*);
+        void   SetCanonicalBondDimensions(Direction lr);
 //-------------------------------------------------------------------------------------
 //
 //  hooks for derived classes to do live updates for UI interfaces or graphs
@@ -157,10 +152,10 @@ private:
 //
 // Calc Heff, calc L&R caches
 //
-        Matrix6T GetHeffIterate(const Hamiltonian* h,int isite) const;
+        Matrix6CT GetHeffIterate(const Hamiltonian* h,int isite) const;
 
         void     LoadHeffCaches(const Hamiltonian* h);
-        Vector3CT GetHeffCache(TensorNetworks::Direction lr,int isite) const;
+        Vector3CT GetHeffCache(Direction lr,int isite) const;
         Vector3CT CalcHeffLeft(const Operator* o,int isite,bool cache=false) const;
         Vector3CT CalcHeffRight(const Operator* o,int isite,bool cache=false) const;
 
@@ -169,9 +164,9 @@ private:
 //
 //  Used for ||Psi1-Psi2||^2 optimizations.
 //
-        double   Sweep (TensorNetworks::Direction lr,const MPS* Psi2);
+        double   Sweep (Direction lr,const MPS* Psi2);
         void LoadCaches(const MPS* Psi2);
-        MatrixCT GetRLCache(TensorNetworks::Direction lr,int isite) const;
+        MatrixCT GetRLCache(Direction lr,int isite) const;
         MatrixCT CalcHeffLeft(const MPS* Psi2,int isite,bool cache=false) const;
         MatrixCT CalcHeffRight(const MPS* Psi2,int isite,bool cache=false) const;
 
@@ -202,8 +197,9 @@ private:
         TNSLogger* itsLogger;
         BondsType  itsBonds;
         SitesType  itsSites;
-};
+}; // class
 
+} //namespace
 #define SiteLoop(ia) for (int ia=1;ia<=itsL;ia++)
 #define ForLoop(LR) for (int ia=GetStart(LR);ia!=GetStop(LR);ia+=GetIncrement(LR))
 

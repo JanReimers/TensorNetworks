@@ -13,6 +13,9 @@
 using std::cout;
 using std::endl;
 
+namespace TensorNetworks
+{
+
 int MPSImp::GetD1(int a, int L, int d, int DMax)
 {
     int D=DMax;
@@ -38,25 +41,25 @@ int MPSImp::GetD2(int a, int L, int d, int DMax)
 //   Normalization routines
 //
 
-void MPSImp::NormalizeSite(TensorNetworks::Direction lr,int isite)
+void MPSImp::NormalizeSite(Direction lr,int isite)
 {
     CheckSiteNumber(isite);
-    std::string lrs=lr==TensorNetworks::DLeft ? "Left" : "Right";
+    std::string lrs=lr==DLeft ? "Left" : "Right";
     itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize site ");
     itsSites[isite]->SVDNormalize(lr,NULL);
     itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize update Bond data ");
-    int bond_index=isite+( lr==TensorNetworks::DLeft ? 0 :-1);
+    int bond_index=isite+( lr==DLeft ? 0 :-1);
     if (bond_index<itsL && bond_index>=1)
         UpdateBondData(bond_index);
 }
 
-void MPSImp::CanonicalizeSite(TensorNetworks::Direction lr,int isite,SVCompressorC* comp)
+void MPSImp::CanonicalizeSite(Direction lr,int isite,SVCompressorC* comp)
 {
     CheckSiteNumber(isite);
     itsSites[isite]->Canonicalize(lr,comp);
 }
 
-void MPSImp::NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC* comp)
+void MPSImp::NormalizeAndCompress(Direction LR,SVCompressorC* comp)
 {
 //    SetCanonicalBondDimensions(Invert(LR)); //Sweep backwards and set proper bond dimensions
     ForLoop(LR)
@@ -64,17 +67,17 @@ void MPSImp::NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC* co
     if (comp && comp->Donly()) itsDmax=comp->GetDmax();
 }
 
-void MPSImp::NormalizeAndCompressSite(TensorNetworks::Direction lr,int isite,SVCompressorC* comp)
+void MPSImp::NormalizeAndCompressSite(Direction lr,int isite,SVCompressorC* comp)
 {
     CheckSiteNumber(isite);
 //    cout << "----- Normalize and Compress site " << isite << " " << GetNormStatus() << " -----" << endl;
-    std::string lrs=lr==TensorNetworks::DLeft ? "Left" : "Right";
+    std::string lrs=lr==DLeft ? "Left" : "Right";
     itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize site ");
     //cout << "SVD " << lrs << " site " << isite << endl;
     itsSites[isite]->SVDNormalize(lr,comp);
 
     itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize update Bond data ");
-    int bond_index=isite+( lr==TensorNetworks::DLeft ? 0 :-1);
+    int bond_index=isite+( lr==DLeft ? 0 :-1);
     if (bond_index<itsL && bond_index>=1)
         UpdateBondData(bond_index);
 }
@@ -89,7 +92,7 @@ void MPSImp::MixedCanonical(int isite)
     {
         for (int ia=1; ia<isite; ia++)
         {
-            NormalizeSite(TensorNetworks::DLeft,ia);
+            NormalizeSite(DLeft,ia);
         }
 //        itsSites[isite]->ReshapeFromLeft(rank);
     }
@@ -98,17 +101,17 @@ void MPSImp::MixedCanonical(int isite)
     {
         for (int ia=itsL; ia>isite; ia--)
         {
-            NormalizeSite(TensorNetworks::DRight,ia);
+            NormalizeSite(DRight,ia);
         }
 //        itsSites[isite]->ReshapeFromRight(rank);
     }
 }
 
-void MPSImp::SetCanonicalBondDimensions(TensorNetworks::Direction LR)
+void MPSImp::SetCanonicalBondDimensions(Direction LR)
 {
     assert(false); //Make sure we are not using this right now.
-    int D1= LR==TensorNetworks::DLeft ? 1    : itsd;
-    int D2= LR==TensorNetworks::DLeft ? itsd : 1   ;
+    int D1= LR==DLeft ? 1    : itsd;
+    int D2= LR==DLeft ? itsd : 1   ;
 
     ForLoop(LR)
     {
@@ -118,3 +121,5 @@ void MPSImp::SetCanonicalBondDimensions(TensorNetworks::Direction LR)
         D2*=itsd;
     }
 }
+
+}; // namespace

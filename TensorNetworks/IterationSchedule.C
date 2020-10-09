@@ -3,13 +3,16 @@
 #include <iomanip>
 #include <cassert>
 
+namespace TensorNetworks
+{
+
 IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax, const Epsilons& eps)
     : itsMaxGSSweepIterations(maxiter)
     , itsMaxOptimizeIterations(0) //not used for variational
     , itsDmax(Dmax)
     , itsDeltaD(1)
     , itsdt(0.0)  //not used for variational
-    , itsTrotterOrder(TensorNetworks::None) //not used for variational
+    , itsTrotterOrder(None) //not used for variational
     , itsEps(eps)
 {
     assert(itsMaxGSSweepIterations>0);
@@ -22,7 +25,7 @@ IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,int DD, const 
     , itsDmax(Dmax)
     , itsDeltaD(DD)
     , itsdt(0.0)  //not used for variational
-    , itsTrotterOrder(TensorNetworks::None) //not used for variational
+    , itsTrotterOrder(None) //not used for variational
     , itsEps(eps)
 {
     assert(itsMaxGSSweepIterations>0);
@@ -41,7 +44,7 @@ IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,double dt,TOrd
 {
     assert(itsMaxGSSweepIterations>0);
     assert(itsdt>0);
-    assert(o!=TensorNetworks::None);
+    assert(o!=None);
 }
 
 IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,int maxOptIter,double dt,TOrder o,const Epsilons& eps)
@@ -54,7 +57,7 @@ IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,int maxOptIter
 {
     assert(itsMaxGSSweepIterations>0);
     assert(itsdt>0);
-    assert(o!=TensorNetworks::None);
+    assert(o!=None);
 }
 
 
@@ -79,3 +82,5 @@ std::ostream& operator<<(std::ostream& os,IterationSchedule& is)
         os << is.itsCurrentLine << " " << *is << std::endl;
     return os;
 }
+
+} //namespace

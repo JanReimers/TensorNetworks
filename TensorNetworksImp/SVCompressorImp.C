@@ -1,6 +1,9 @@
 #include "SVCompressorImp.H"
 #include "oml/diagonalmatrix.h"
 
+namespace TensorNetworks
+{
+
 template <class T> SVCompressorImp<T>::SVCompressorImp(int Dmax, double eps)
 : itsDmax(Dmax)
 , itsSVeps(eps)
@@ -64,5 +67,7 @@ template <class T> double SVCompressorImp<T>::Compress(MatrixT& U, DiagonalMatri
     return integratedS2;
 }
 
-template class SVCompressorImp<TensorNetworks::eType>;
+template class SVCompressorImp<eType>;
 template class SVCompressorImp<double>;
+
+}

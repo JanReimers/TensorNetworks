@@ -3,12 +3,13 @@
 
 #include "TensorNetworks/SVCompressor.H"
 
+namespace TensorNetworks
+{
+
 template <class T> class SVCompressorImp : public virtual SVCompressor<T>
 {
-    public:
         typedef typename SVCompressor<T>::MatrixT MatrixT;
-        typedef typename SVCompressor<T>::DiagonalMatrixRT DiagonalMatrixRT;
-
+    public:
         SVCompressorImp(int Dmax, double eps);
         virtual ~SVCompressorImp();
 
@@ -22,8 +23,8 @@ template <class T> class SVCompressorImp : public virtual SVCompressor<T>
         double itsSVeps;
 };
 
-typedef SVCompressorImp<TensorNetworks::eType> SVCompressorImpC;
+typedef SVCompressorImp<eType> SVCompressorImpC;
 typedef SVCompressorImp<double               > SVCompressorImpR;
-
+}
 
 #endif // SVCOMPRESSORIMP_H

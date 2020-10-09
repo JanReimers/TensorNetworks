@@ -13,10 +13,13 @@
 using std::cout;
 using std::endl;
 
-void MPSSite::SVDNormalize(TensorNetworks::Direction lr, SVCompressorC* comp)
+namespace TensorNetworks
+{
+
+void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
 {
     // Handle edge cases first
-    if (lr==TensorNetworks::DRight && !itsLeft_Bond)
+    if (lr==DRight && !itsLeft_Bond)
     {
         assert(itsRightBond);
         assert(itsD1==1);
@@ -25,7 +28,7 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr, SVCompressorC* comp)
         Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
         return;
     }
-    if(lr==TensorNetworks::DLeft && !itsRightBond)
+    if(lr==DLeft && !itsRightBond)
     {
         assert(itsLeft_Bond);
         assert(itsD2==1);
@@ -40,13 +43,13 @@ void MPSSite::SVDNormalize(TensorNetworks::Direction lr, SVCompressorC* comp)
 //    cout << "Limits for U,s,Vdagger=" << U.GetLimits() << " " << s.GetLimits() << " " << Vdagger.GetLimits() << endl;
     switch (lr)
     {
-        case TensorNetworks::DRight:
+        case DRight:
         {
             GetBond(lr)->SVDTransfer(lr,s,U);
             ReshapeAfter_SVD(lr,Vdagger);  //A is now Vdagger
             break;
         }
-        case TensorNetworks::DLeft:
+        case DLeft:
         {
             GetBond(lr)->SVDTransfer(lr,s,Vdagger);
             ReshapeAfter_SVD(lr,U);  //A is now U
@@ -74,7 +77,7 @@ bool MPSSite::SetCanonicalBondDimensions(int maxAllowedD1,int maxAllowedD2)
     return reshape;
 }
 
-void MPSSite::Canonicalize(TensorNetworks::Direction lr,SVCompressorC* comp)
+void MPSSite::Canonicalize(Direction lr,SVCompressorC* comp)
 {
     MatrixCT A=ReshapeBeforeSVD(lr);
 //    int N=Min(A.GetNumRows(),A.GetNumCols());
@@ -85,13 +88,13 @@ void MPSSite::Canonicalize(TensorNetworks::Direction lr,SVCompressorC* comp)
 
     switch (lr)
     {
-        case TensorNetworks::DRight:
+        case DRight:
         {
             GetBond(lr)->CanonicalTransfer(lr,s,U);
             ReshapeAfter_SVD(lr,Vdagger);  //A is now Vdagger
             break;
         }
-        case TensorNetworks::DLeft:
+        case DLeft:
         {
             GetBond(lr)->CanonicalTransfer(lr,s,Vdagger);
             ReshapeAfter_SVD(lr,U);  //A is now U
@@ -100,4 +103,4 @@ void MPSSite::Canonicalize(TensorNetworks::Direction lr,SVCompressorC* comp)
     }
 }
 
-
+} //namespace

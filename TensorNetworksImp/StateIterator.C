@@ -1,5 +1,8 @@
 #include "StateIterator.H"
 
+namespace TensorNetworks
+{
+
 StateIterator::StateIterator(int L, int d)
     : itsL(L)
     , itsdmax(d-1)
@@ -67,3 +70,4 @@ int StateIterator::GetIndex(const Vector<int>& state) const
     return ret; //0 based of Array type used for amplitudes
 }
 
+} // namespace

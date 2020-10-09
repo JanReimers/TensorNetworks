@@ -7,9 +7,12 @@
 #include <vector>
 #include <iosfwd>
 
+namespace TensorNetworks
+{
+
 struct IterationScheduleLine
 {
-    typedef  TensorNetworks::TrotterOrder  TOrder;
+    typedef  TrotterOrder  TOrder;
     //
     // Use these constructors for variational GS searches
     //
@@ -34,7 +37,7 @@ struct IterationScheduleLine
 
 class IterationSchedule
 {
-        typedef  TensorNetworks::TrotterOrder  TOrder;
+        typedef  TrotterOrder  TOrder;
     public:
         IterationSchedule() : itsCurrentLine(0) {};
         void Insert(const IterationScheduleLine& l) {itsLines.push_back(l);}
@@ -53,5 +56,7 @@ class IterationSchedule
         mutable unsigned int itsCurrentLine;
         std::vector<IterationScheduleLine> itsLines;
 };
+
+}
 
 #endif // ITERATIONSCHEDULE_H

@@ -1,6 +1,9 @@
 #include "SVMPOCompressor.H"
 #include "oml/diagonalmatrix.h"
 
+namespace TensorNetworks
+{
+
 SVMPOCompressor::SVMPOCompressor(int Dmax, double eps)
 : SVCompressorImp(Dmax,eps)
 {
@@ -19,7 +22,7 @@ double SVMPOCompressor::Compress(MatrixT& U, DiagonalMatrixRT& sm, MatrixT& VT)
     assert(itsSVeps>=0.0);
     assert(!(itsDmax==0 && itsSVeps==0.0));
 
-    typedef TensorNetworks::VectorRT VectorRT;
+    typedef VectorRT VectorRT;
     VectorRT s=sm.GetDiagonal();
     MatrixT A=U*sm*VT;
     int      M=A.GetNumRows(),N=A.GetNumCols();
@@ -52,3 +55,4 @@ double SVMPOCompressor::Compress(MatrixT& U, DiagonalMatrixRT& sm, MatrixT& VT)
     return 0.0;
 }
 
+} // namespace

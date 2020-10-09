@@ -1,6 +1,8 @@
 #include "TensorNetworks/Dw12.H"
-//#include "oml/vector_io.h"
-//#include <iostream>
+
+namespace TensorNetworks
+{
+
  Dw12::Dw12()
     : Dw1(0)
     , Dw2(0)
@@ -38,3 +40,4 @@
     //assert(Max(w2_last )==Dw2);
 }
 
+} //namespace

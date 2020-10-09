@@ -53,7 +53,7 @@ void matvec(int N, const TensorNetworks::MatrixCT& A, const std::complex<double>
     }
 }
 
-std::tuple<ArpackEigenSolver::VectorCT,ArpackEigenSolver::MatrixCT> ArpackEigenSolver::Solve(const MatrixCT& A, int Nev,const Epsilons& eps)
+std::tuple<ArpackEigenSolver::VectorCT,ArpackEigenSolver::MatrixCT> ArpackEigenSolver::Solve(const MatrixCT& A, int Nev,const TensorNetworks::Epsilons& eps)
 {
     int N=A.GetNumRows();
     assert(N==A.GetNumCols());

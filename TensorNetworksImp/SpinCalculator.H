@@ -6,6 +6,9 @@
 #include <complex>
 #include <cassert>
 
+namespace TensorNetworks
+{
+
 //
 //  The best place to look these up for general S is
 //    http://easyspin.org/easyspin/documentation/spinoperators.html
@@ -67,5 +70,5 @@ inline double SpinCalculator::ConvertToSpin(int n) const
     return s;
 }
 
-
+}
 #endif // SPINCALCULATOR_H

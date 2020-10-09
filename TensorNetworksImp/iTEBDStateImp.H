@@ -4,6 +4,9 @@
 #include "TensorNetworks/iTEBDState.H"
 #include "TensorNetworksImp/MPSImp.H"
 
+namespace TensorNetworks
+{
+
 //--------------------------------------------------------------------------------
 //
 //  Implement Vidals  ....Lambda-Gamma-Lambda-Gamma-Lambda... canonical form.
@@ -16,7 +19,7 @@ class iTEBDStateImp : public virtual iTEBDState,
     public:
         iTEBDStateImp(int L,double S, int D,double normEps=1e-12,TNSLogger* s=0);
         virtual ~iTEBDStateImp();
-        virtual void InitializeWith(TensorNetworks::State);
+        virtual void InitializeWith(State);
  //--------------------------------------------------------------------------------------
 //
 //  Access to information
@@ -27,10 +30,10 @@ class iTEBDStateImp : public virtual iTEBDState,
 //
 //  Normalization members with and without SVD compression
 //
-        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC*);
+        virtual void NormalizeAndCompress(Direction LR,SVCompressorC*);
 
-        virtual void Apply(int isite,const Matrix4T& expH);
-        virtual void        Report    (std::ostream&) const;
+        virtual void Apply(int isite,const Matrix4RT& expH);
+        virtual void Report(std::ostream&) const;
 
     protected:
         int GetModSite(int isite);
@@ -39,10 +42,7 @@ class iTEBDStateImp : public virtual iTEBDState,
 
     private:
         void InitSitesAndBonds();
-
-        // MPSImp::itsBonds; is used to store sing values, or lambda's, Schmidt weights.
-        // MPSImp::itsSites; is used to store Gamma matrices
-
 };
 
+}
 #endif // ITEBDSTATEIMP_H

@@ -16,7 +16,7 @@ namespace TensorNetworks
     typedef DMatrix  <eType>   MatrixCT;
     typedef DMatrix  <double>  MatrixRT;
     typedef Vector   <double>  VectorRT;
-    typedef Matrix4  <double>  Matrix4T;
+    typedef Matrix4  <double>  Matrix4RT;
     typedef Array    <double>  ArrayRT;
 
     typedef DiagonalMatrix<double> DiagonalMatrixRT;

@@ -9,7 +9,7 @@ class iTEBDTesting : public ::testing::Test
 {
 public:
     typedef TensorNetworks::MatrixRT MatrixRT;
-    typedef TensorNetworks::Matrix4T Matrix4T;
+    typedef TensorNetworks::Matrix4RT Matrix4RT;
 
     iTEBDTesting()
     : eps(1.0e-13)
@@ -28,8 +28,8 @@ public:
 
     double eps;
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
-    Hamiltonian*         itsH;
-    iTEBDState*          itsState;
+    TensorNetworks::Hamiltonian*         itsH;
+    TensorNetworks::iTEBDState*          itsState;
 };
 
 
@@ -43,7 +43,7 @@ TEST_F(iTEBDTesting,TestApplyIdentity)
     itsState->Normalize(TensorNetworks::DLeft);
     itsState->Report(cout);
 
-    Matrix4T expH=Hamiltonian::ExponentH(dt,itsH->BuildLocalMatrix());
+    Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,itsH->BuildLocalMatrix());
     itsState->Apply(1,expH);
     itsState->Apply(2,expH);
     itsState->Report(cout);

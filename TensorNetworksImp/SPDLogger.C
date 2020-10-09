@@ -1,5 +1,8 @@
 #include "SPDLogger.H"
 
+namespace TensorNetworks
+{
+
 SPDLogger::SPDLogger(int level)
     : itsLevel(level)
 {
@@ -32,21 +35,4 @@ void SPDLogger::LogInfo(int level,int site, c_str message)
     }
 }
 
-/*void SPDLogger::LogInfo(int level,c_str message, int isite)
-{
-//    if  (isite>0)
-//    {
-//        if (level>3)
-//            spdlog::debug("Site {}, {}",isite,message);
-//        else
-//            spdlog::info ("Site {}, {}",isite,message);
-//    }
-//    else
-//    {
-//        if (level>3)
-//            spdlog::debug("{}",message);
-//        else
-//            spdlog::info ("{}",message);
-//    }
-}
-*/
+} // namespace

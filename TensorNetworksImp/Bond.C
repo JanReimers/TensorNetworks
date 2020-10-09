@@ -4,6 +4,9 @@
 #include "oml/diagonalmatrix.h"
 #include <iostream>
 
+namespace TensorNetworks
+{
+
 Bond::Bond()
     : itsBondEntropy(0.0)
     , itsMinSV(0.0)
@@ -71,16 +74,18 @@ void Bond::SetSingularValues(const DiagonalMatrixRT& s)
 //
 //  Direction is the normaliztions direction, which i opposite to the direction that UV gets tranferred.
 //
-void Bond::SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s,const MatrixCT& UV)
+void Bond::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixCT& UV)
 {
     SetSingularValues(s);
     assert(GetSite(lr));
     GetSite(lr)->SVDTransfer(lr,s,UV);
 }
 
-void Bond::CanonicalTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s,const MatrixCT& UV)
+void Bond::CanonicalTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixCT& UV)
 {
     SetSingularValues(s);
     assert(GetSite(lr));
     GetSite(lr)->SVDTransfer(lr,UV);
 }
+
+} //namespace

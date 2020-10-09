@@ -11,6 +11,8 @@
 #include "Misc/ptr_vector.h"
 #include <string>
 
+namespace TensorNetworks
+{
 
 struct GraphDefinition
 {
@@ -87,4 +89,5 @@ private:
   Plotting::MultiGraph*                  itsMultiGraph;
 };
 
+}
 #endif //_MultiPlotableImp_H_

@@ -4,8 +4,11 @@
 #include "TensorNetworks/Typedefs.H"
 #include <iosfwd>
 
+
+namespace TensorNetworks
+{
+    class Hamiltonian;
 class Epsilons;
-class Hamiltonian;
 class IterationScheduleLine;
 
 //--------------------------------------------------------------------------------
@@ -14,8 +17,6 @@ class IterationScheduleLine;
 //
 class FullState
 {
-    protected:
-        typedef TensorNetworks::eType eType;
     public:
         FullState() {}
         virtual ~FullState() {}
@@ -35,4 +36,5 @@ class FullState
 
 };
 
+}
 #endif // FULLSTATE_H

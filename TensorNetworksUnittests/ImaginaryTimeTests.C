@@ -38,8 +38,8 @@ public:
 
     double eps;
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
-    Hamiltonian*         itsH;
-    MPS*                 itsMPS;
+    TensorNetworks::Hamiltonian*         itsH;
+    TensorNetworks::MPS* itsMPS;
 };
 
 
@@ -48,16 +48,16 @@ TEST_F(ImaginaryTimeTesting,TestApplyIdentity)
 {
     int D=1;
     Setup(3,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D);
+    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
     Psi1->InitializeWith(TensorNetworks::Neel);
     double E1=Psi1->GetExpectation(itsH);
     Psi1->Normalize(TensorNetworks::DRight);
     Psi1->Normalize(TensorNetworks::DLeft );
     EXPECT_NEAR(Psi1->GetExpectation(itsH) ,E1,eps);
 
-    OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
-    Operator* IO=itsH->CreateOperator(IWO);
-    MPS* Psi2=*IO**Psi1;
+    TensorNetworks::OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
+    TensorNetworks::Operator* IO=itsH->CreateOperator(IWO);
+    TensorNetworks::MPS* Psi2=*IO**Psi1;
     EXPECT_NEAR(Psi2->GetExpectation(itsH) ,E1,eps);
     delete Psi1;
     delete Psi2;
@@ -70,28 +70,28 @@ TEST_F(ImaginaryTimeTesting,TestMPPOCombine)
     double S=0.5,dt=0.05000;
     Setup(L,S,D);
 
-    TensorNetworks::Matrix4T H12=itsH->BuildLocalMatrix(); //Full H matrix for two sites 1&2
+    TensorNetworks::Matrix4RT H12=itsH->BuildLocalMatrix(); //Full H matrix for two sites 1&2
 
     // Create some Trotter 2nd order operators
-    MPO_SpatialTrotter W_Odd (dt/2.0,TensorNetworks::Odd ,L,2*S+1,H12);
-    MPO_SpatialTrotter W_Even(dt    ,TensorNetworks::Even,L,2*S+1,H12);
+    TensorNetworks::MPO_SpatialTrotter W_Odd (dt/2.0,TensorNetworks::Odd ,L,2*S+1,H12);
+    TensorNetworks::MPO_SpatialTrotter W_Even(dt    ,TensorNetworks::Even,L,2*S+1,H12);
     //
     //  Now combine three trotters into one
     //
-    MPO* W=itsH->CreateUnitOperator();
+    TensorNetworks::MPO* W=itsH->CreateUnitOperator();
     W->Combine(&W_Odd);
     W->Combine(&W_Even);
     W->Combine(&W_Odd);
     //
     //  Make a random normalized wave function
     //
-    MPS* Psi1=itsH->CreateMPS(D);
+    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight);
     //
     //  Psi2 = W*Psi1
     //
-    MPS* Psi2=Psi1->Apply(W);
+    TensorNetworks::MPS* Psi2=Psi1->Apply(W);
     //
     //  Psi1 = W_Odd * W_Even * W_Odd * Psi1
     //
@@ -115,10 +115,10 @@ TEST_F(ImaginaryTimeTesting,TestMPPOCombine)
 }
 TEST_F(ImaginaryTimeTesting,TestIterationSchedule)
 {
-    Epsilons eps(1e-12);
-    IterationScheduleLine l1={10,5,0.2,TensorNetworks::FirstOrder,eps};
+    TensorNetworks::Epsilons eps(1e-12);
+    TensorNetworks::IterationScheduleLine l1={10,5,0.2,TensorNetworks::FirstOrder,eps};
 
-    IterationSchedule is;
+    TensorNetworks::IterationSchedule is;
     is.Insert(l1);
     is.Insert({10,5,0.1,TensorNetworks::FirstOrder,eps});
 
@@ -130,18 +130,18 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt0)
     int D=8,L=9;
     double dt=0.0,epsSVD=1e-12;                                                                                                                                                                                                        ;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D);
+    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DLeft );
     Psi1->Normalize(TensorNetworks::DRight);
 
     //Since dt=0 W should be unit operator.
-    MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
+    TensorNetworks::MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
 
-    MPS* Psi2=Psi1->Apply(W);
+    TensorNetworks::MPS* Psi2=Psi1->Apply(W);
     EXPECT_NEAR(Psi1->GetOverlap(Psi2),1.0,eps);
     W->Compress(0,epsSVD);
-    MPS* Psi3=Psi1->Apply(W);
+    TensorNetworks::MPS* Psi3=Psi1->Apply(W);
     EXPECT_NEAR(Psi1->GetOverlap(Psi3),1.0,1e-7);
     EXPECT_NEAR(Psi2->GetOverlap(Psi3),1.0,1e-7);
     EXPECT_NEAR(Psi3->GetOverlap(Psi3),1.0,1e-6);
@@ -157,26 +157,26 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05_FixedEps)
     int D=8,L=9;
     double dt=0.05,epsSVD=1e-3;                                                                                                                                                                                                     ;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D);
+    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DLeft );
     Psi1->Normalize(TensorNetworks::DRight);
 
     //Since dt=0 W should be unit operator.
-    MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
+    TensorNetworks::MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
 
-    MPS* Psi2=Psi1->Apply(W);
+    TensorNetworks::MPS* Psi2=Psi1->Apply(W);
 //    W->Report(cout);
     W->Compress(0,epsSVD);
     W->Compress(0,epsSVD); //Apparently one pass is insufficient to reach a fixed point.
 //    W->Report(cout);
-    MPS* Psi3=Psi1->Apply(W);
+    TensorNetworks::MPS* Psi3=Psi1->Apply(W);
 //    EXPECT_NEAR(Psi3->GetOverlap(Psi3),1.0,1e-6);
 //
     W->Compress(0,epsSVD);
 //    W->Report(cout);
 //    W->Report(cout);
-    MPS* Psi4=Psi1->Apply(W);
+    TensorNetworks::MPS* Psi4=Psi1->Apply(W);
 
 
     double O23=Psi2->GetOverlap(Psi3);
@@ -205,25 +205,25 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05_FixedDw)
     int D=8,L=9,DwMax=4;
     double dt=0.05,epsSVD=1e-14;                                                                                                                                                                                                     ;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D);
+    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DLeft );
     Psi1->Normalize(TensorNetworks::DRight);
 
     //Since dt=0 W should be unit operator.
-    MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
+    TensorNetworks::MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
 
-    MPS* Psi2=Psi1->Apply(W);
+    TensorNetworks::MPS* Psi2=Psi1->Apply(W);
 //    W->Report(cout);
     W->Compress(DwMax,epsSVD);
 //    W->Report(cout);
-    MPS* Psi3=Psi1->Apply(W);
+    TensorNetworks::MPS* Psi3=Psi1->Apply(W);
 //    EXPECT_NEAR(Psi3->GetOverlap(Psi3),1.0,1e-6);
 //
     W->Compress(DwMax,epsSVD);
 //    W->Report(cout);
 //    W->Report(cout);
-    MPS* Psi4=Psi1->Apply(W);
+    TensorNetworks::MPS* Psi4=Psi1->Apply(W);
 
 
     double O23=Psi2->GetOverlap(Psi3);
@@ -254,7 +254,7 @@ TEST_F(ImaginaryTimeTesting,MPOCompressFourthOrderTrotter)
     double dt=0.1;
     Setup(L,0.5,D);
 
-    MPO* W=itsH->CreateOperator(dt,TensorNetworks::FourthOrder);
+    TensorNetworks::MPO* W=itsH->CreateOperator(dt,TensorNetworks::FourthOrder);
     EXPECT_EQ(W->GetMaxDw(),16);
 
 }
@@ -265,7 +265,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 {
     int D=4,L=9;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D);
+    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
 //    Psi1->Report(cout);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight);
@@ -273,12 +273,12 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 //    cout << "E1=" << std::fixed << E1 << endl;
 //    cout << "Psi1 overlap=" << Psi1->GetOverlap(Psi1) << endl;
 
-    Epsilons eps(1e-12);
+    TensorNetworks::Epsilons eps(1e-12);
     eps.itsMPOCompressEpsilon=1e-5;
     eps.itsDelatNormEpsilon=1e-5;
     eps.itsMPSCompressEpsilon=0;
 
-    IterationSchedule is;
+    TensorNetworks::IterationSchedule is;
     eps.itsDelatEnergy1Epsilon=1e-3;
     is.Insert({50,D,0,0.5,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-5;
@@ -315,16 +315,16 @@ TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
 {
     int D=4,L=9;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D);
+    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight);
 
-    Epsilons eps(1e-12);
+    TensorNetworks::Epsilons eps(1e-12);
     eps.itsMPOCompressEpsilon=1e-8;
     eps.itsMPSCompressEpsilon=0.0; //Just Dmax for compression
     eps.itsDelatNormEpsilon=1e-5;
 
-    IterationSchedule is;
+    TensorNetworks::IterationSchedule is;
     eps.itsDelatEnergy1Epsilon=1e-5;
     eps.itsMPSCompressEpsilon=0.0; //Just Dmax for compression
     is.Insert({50 ,D,0,0.5,SecondOrder,eps});
@@ -351,16 +351,16 @@ TEST_F(ImaginaryTimeTesting,TestITimeFourthOrderTrotter)
 {
     int D=4,L=9;
     Setup(L,0.5,D);
-    MPS* Psi1=itsH->CreateMPS(D);
+    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
     Psi1->InitializeWith(TensorNetworks::Random);
     Psi1->Normalize(TensorNetworks::DRight);
 
-    Epsilons eps(1e-12);
+    TensorNetworks::Epsilons eps(1e-12);
     eps.itsMPOCompressEpsilon=1e-8;
     eps.itsMPSCompressEpsilon=0.0;
     eps.itsDelatNormEpsilon=1e-5;
 
-    IterationSchedule is;
+    TensorNetworks::IterationSchedule is;
     eps.itsDelatEnergy1Epsilon=1e-5;
     is.Insert({50,D,0,0.5,FourthOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-6;

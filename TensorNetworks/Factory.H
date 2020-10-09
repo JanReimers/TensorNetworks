@@ -3,12 +3,12 @@
 
 #include "Misc/FactoryBase.H"
 
-class Hamiltonian;
-class OperatorWRepresentation;
-class Operator;
 
 namespace TensorNetworks
 {
+class Operator;
+class Hamiltonian;
+class OperatorWRepresentation;
 
 class Factory
 {

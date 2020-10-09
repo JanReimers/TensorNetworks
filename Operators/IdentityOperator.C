@@ -1,5 +1,7 @@
 #include "Operators/IdentityOperator.H"
 
+namespace TensorNetworks
+{
 
 IdentityOperator::IdentityOperator()
  : itsDw12(1,1,Vector<int>(1),Vector<int>(1))
@@ -12,9 +14,11 @@ IdentityOperator::~IdentityOperator()
 {
 }
 
-TensorNetworks::MatrixRT IdentityOperator::GetW (TensorNetworks::Position lbr,int m, int n) const
+MatrixRT IdentityOperator::GetW (Position lbr,int m, int n) const
 {
-    TensorNetworks::MatrixRT W(1,1);
+    MatrixRT W(1,1);
     W(1,1)=m==n ? 1.0 : 0.0;
     return W;
+}
+
 }

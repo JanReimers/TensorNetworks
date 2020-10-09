@@ -7,6 +7,8 @@
 #include "oml/random.h"
 #include "oml/array_io.h"
 
+namespace TensorNetworks
+{
 
 FullStateImp::FullStateImp(int L, double S)
     : itsL(L)
@@ -26,12 +28,10 @@ FullStateImp::FullStateImp(int L, double S)
     assert(itsN>0);
     itsAmplitudes .SetSize(itsN);
     FillRandom(itsAmplitudes);
-    //ctor
 }
 
 FullStateImp::~FullStateImp()
 {
-    //dtor
 }
 
 std::ostream& FullStateImp::Dump(std::ostream& os) const
@@ -44,7 +44,7 @@ std::ostream& FullStateImp::Dump(std::ostream& os) const
 
     for (StateIterator is(itsL,itsd); !is.end(); is++)
     {
-        TensorNetworks::eType a=itsAmplitudes[is.GetLinearIndex()];
+        eType a=itsAmplitudes[is.GetLinearIndex()];
         double anorm=sqrt(real(conj(a)*a));
         if (anorm>1e-8)
         {
@@ -65,20 +65,20 @@ std::ostream& FullStateImp::Dump(std::ostream& os) const
 
 
 
-double FullStateImp::Contract(const Matrix4T& Hlocal)
+double FullStateImp::Contract(const Matrix4RT& Hlocal)
 {
     assert(Hlocal.Flatten().GetNumRows()==itsd*itsd);
     assert(Hlocal.Flatten().GetNumCols()==itsd*itsd);
 
     ArrayCT newAmplitudes(itsAmplitudes.size());
-    Fill(newAmplitudes,TensorNetworks::eType(0.0));
+    Fill(newAmplitudes,eType(0.0));
     for (int ia=1; ia<=itsL-1; ia++)
     {
         ContractLocal(ia,Hlocal,newAmplitudes,itsAmplitudes);
     }
 
     // Evaluate E=<psi|H|psi>
-    TensorNetworks::eType Ec=Dot(conj(itsAmplitudes),newAmplitudes);
+    eType Ec=Dot(conj(itsAmplitudes),newAmplitudes);
     assert(fabs(imag(Ec))<1e-14);
     itsE=real(Ec);
     // Scale out the eigen value
@@ -91,13 +91,13 @@ double FullStateImp::Contract(const Matrix4T& Hlocal)
     return deltaPsi;
 }
 
-FullStateImp::ArrayCT FullStateImp::Contract(const Matrix4T& Hlocal,const ArrayCT& oldAmpliudes) const
+ArrayCT FullStateImp::Contract(const Matrix4RT& Hlocal,const ArrayCT& oldAmpliudes) const
 {
     assert(Hlocal.Flatten().GetNumRows()==itsd*itsd);
     assert(Hlocal.Flatten().GetNumCols()==itsd*itsd);
 
     ArrayCT newAmplitudes(itsAmplitudes.size());
-    Fill(newAmplitudes,TensorNetworks::eType(0.0));
+    Fill(newAmplitudes,eType(0.0));
     for (int ia=1; ia<=itsL-1; ia++)
     {
         ContractLocal(ia,Hlocal,newAmplitudes,oldAmpliudes);
@@ -107,7 +107,7 @@ FullStateImp::ArrayCT FullStateImp::Contract(const Matrix4T& Hlocal,const ArrayC
 }
 
 
-void FullStateImp::ContractLocal(int isite, const Matrix4T& Hlocal, ArrayCT& newAmplitudes, const ArrayCT& oldAmpliudes) const
+void FullStateImp::ContractLocal(int isite, const Matrix4RT& Hlocal, ArrayCT& newAmplitudes, const ArrayCT& oldAmpliudes) const
 {
     assert(isite>0);
     assert(isite<=itsL);
@@ -117,7 +117,7 @@ void FullStateImp::ContractLocal(int isite, const Matrix4T& Hlocal, ArrayCT& new
         int na=QNs(isite);
         int nb=QNs(isite+1);
         Vector<int> mstate=QNs;
-        TensorNetworks::eType c(0.0);
+        eType c(0.0);
         for (int ma=0; ma<itsd; ma++)
             for (int mb=0; mb<itsd; mb++)
             {
@@ -135,11 +135,11 @@ void FullStateImp::ContractLocal(int isite, const Matrix4T& Hlocal, ArrayCT& new
 
 void FullStateImp::Normalize(ArrayCT& amplitudes)
 {
-    TensorNetworks::eType E=Dot(conj(amplitudes),amplitudes);
+    eType E=Dot(conj(amplitudes),amplitudes);
     assert(real(E)>0.0);
     assert(fabs(imag(E))<1e-14);
     amplitudes/=sqrt(E);
-    TensorNetworks::eType phase(1.0,0.0);
+    eType phase(1.0,0.0);
     for (int i=1; i<itsN; i++)
     {
         double r=std::fabs(amplitudes[i]);
@@ -158,7 +158,7 @@ double FullStateImp::PowerIterate(const IterationScheduleLine& sched,const Hamil
 {
     Normalize(itsAmplitudes);
     double E=0;
-    Matrix4T Hlocal=H.BuildLocalMatrix();
+    Matrix4RT Hlocal=H.BuildLocalMatrix();
 //    os.setf(std::ios::floatfield,std::ios::fixed);
     if (!quite)
     {
@@ -182,13 +182,13 @@ double FullStateImp::PowerIterate(const IterationScheduleLine& sched,const Hamil
 
 double FullStateImp::FindGroundState(const IterationScheduleLine& sched,const Hamiltonian& H,bool quite)
 {
-    Matrix4T Hlocal=H.BuildLocalMatrix();
+    Matrix4RT Hlocal=H.BuildLocalMatrix();
     double E=0;
     int Neig=1;
     PrimeEigenSolver<eType> solver;
     solver.Solve(Hlocal,this,Neig,sched.itsEps);
     itsE=solver.GetEigenValues()(1);
-    const TensorNetworks::VectorCT amplitudes=solver.GetEigenVector(1);
+    const VectorCT amplitudes=solver.GetEigenVector(1);
     for (int i=1;i<=itsN;i++) itsAmplitudes[i-1]=amplitudes(i);
     Normalize(itsAmplitudes);
     return E;
@@ -198,12 +198,14 @@ double FullStateImp::FindGroundState(const IterationScheduleLine& sched,const Ha
 //  Called from the Lanczos M*v routine. Do yvec=H*xvec; where H=sum{Hlocal(ia,ia+1}
 //  This is a const member function so we don't use the member amplitudes.
 //
-void FullStateImp::DoHContraction (int N, eType* xvec, eType* yvec, const Matrix4T& Hlocal) const
+void FullStateImp::DoHContraction (int N, eType* xvec, eType* yvec, const Matrix4RT& Hlocal) const
 {
     assert(N==itsN);
     ArrayCT oldAmplitudes(itsN);
     for (int i=0;i<itsN;i++) oldAmplitudes[i]=xvec[i];
     ArrayCT newAmplitudes=Contract(Hlocal,oldAmplitudes);
     for (int i=0;i<itsN;i++) yvec[i]=newAmplitudes[i];
+}
+
 }
 

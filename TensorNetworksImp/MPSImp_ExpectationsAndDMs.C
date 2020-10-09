@@ -12,6 +12,8 @@
 using std::cout;
 using std::endl;
 
+namespace TensorNetworks
+{
 
 double   MPSImp::GetExpectation   (const Operator* o) const
 {
@@ -27,7 +29,7 @@ double   MPSImp::GetExpectation   (const Operator* o) const
     return std::real(F(1,1,1));
 }
 
-MPSImp::eType   MPSImp::GetExpectationC(const Operator* o) const
+eType   MPSImp::GetExpectationC(const Operator* o) const
 {
     Vector3CT F(1,1,1,1);
     F(1,1,1)=eType(1.0);
@@ -42,17 +44,17 @@ MPSImp::eType   MPSImp::GetExpectationC(const Operator* o) const
 OneSiteDMs MPSImp::CalculateOneSiteDMs()
 {
     OneSiteDMs ret(itsL,itsd);
-    Normalize(TensorNetworks::DRight);
+    Normalize(DRight);
     SiteLoop(ia)
     {
         itsLogger->LogInfo(2,ia,"Calculate ro(mn)");
         ret.Insert(ia,itsSites[ia]->CalculateOneSiteDM());
-        NormalizeSite(TensorNetworks::DLeft,ia);
+        NormalizeSite(DLeft,ia);
     }
     return ret;
 }
 
-MPSImp::Matrix4CT MPSImp::CalculateTwoSiteDM(int ia,int ib) const
+Matrix4CT MPSImp::CalculateTwoSiteDM(int ia,int ib) const
 {
     CheckSiteNumber(ia);
     CheckSiteNumber(ib);
@@ -84,16 +86,18 @@ MPSImp::Matrix4CT MPSImp::CalculateTwoSiteDM(int ia,int ib) const
 
 TwoSiteDMs MPSImp::CalculateTwoSiteDMs()
 {
-    Normalize(TensorNetworks::DRight);
+    Normalize(DRight);
     TwoSiteDMs ret(itsL,itsd);
     SiteLoop(ia)
     for (int ib=ia+1; ib<=itsL; ib++)
     {
         Matrix4CT ro=CalculateTwoSiteDM(ia,ib);
         ret.Insert(ia,ib,ro);
-        NormalizeSite(TensorNetworks::DLeft,ia);
+        NormalizeSite(DLeft,ia);
     }
     // Normalize the last to keep things tidy
-    NormalizeSite(TensorNetworks::DLeft,itsL);
+    NormalizeSite(DLeft,itsL);
     return ret;
 }
+
+}; // namespace

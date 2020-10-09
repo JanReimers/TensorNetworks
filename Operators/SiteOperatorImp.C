@@ -5,10 +5,13 @@
 #include "NumericalMethods/LapackSVD.H"
 #include <complex>
 
+namespace TensorNetworks
+{
+
 //
 //  Build from a W rep opbject
 //
-SiteOperatorImp::SiteOperatorImp(TensorNetworks::Position lbr, const OperatorWRepresentation* H,int d)
+SiteOperatorImp::SiteOperatorImp(Position lbr, const OperatorWRepresentation* H,int d)
     : itsd(d)
     , itsDw12(H->GetDw12(lbr))
     , itsWs(d,d)
@@ -24,13 +27,13 @@ SiteOperatorImp::SiteOperatorImp(TensorNetworks::Position lbr, const OperatorWRe
 //
 // Build from a trotter decomp.
 //
-SiteOperatorImp::SiteOperatorImp(TensorNetworks::Direction lr,const MatrixRT& U, const VectorRT& s, int d)
+SiteOperatorImp::SiteOperatorImp(Direction lr,const MatrixRT& U, const VectorRT& s, int d)
     : itsd(d)
     , itsDw12()
     , itsWs(d,d)
 {
     int Dw=s.size();
-    if (lr==TensorNetworks::DLeft)
+    if (lr==DLeft)
     {
         // Build up w limits
         Vector<int> first(Dw);
@@ -51,7 +54,7 @@ SiteOperatorImp::SiteOperatorImp(TensorNetworks::Direction lr,const MatrixRT& U,
                 assert(itsWs(m+1,n+1).GetNumCols()==itsDw12.Dw2);
             }
     }
-    else if (lr==TensorNetworks::DRight)
+    else if (lr==DRight)
     {
         // Build up w limits
         Vector<int> first(1);
@@ -134,10 +137,7 @@ void SiteOperatorImp::Combine(const SiteOperator* O2)
     itsDw12=Dw;
 }
 
-using TensorNetworks::MatrixCT;
-using TensorNetworks::VectorRT;
-
-void SiteOperatorImp::Compress(TensorNetworks::Direction lr,SVCompressorR* comp)
+void SiteOperatorImp::Compress(Direction lr,SVCompressorR* comp)
 {
     assert(comp);
     MatrixRT  A=Reshape(lr);
@@ -153,10 +153,10 @@ void SiteOperatorImp::Compress(TensorNetworks::Direction lr,SVCompressorR* comp)
     sm*=1.0/s_avg;
      switch (lr)
     {
-        case TensorNetworks::DLeft:
+        case DLeft:
             U*=s_avg;
             break;
-        case TensorNetworks::DRight:
+        case DRight:
             VT*=s_avg;
             break;
     }
@@ -167,7 +167,7 @@ void SiteOperatorImp::Compress(TensorNetworks::Direction lr,SVCompressorR* comp)
     MatrixRT UV;// This get transferred through the bond to a neighbouring site.
     switch (lr)
     {
-        case TensorNetworks::DRight:
+        case DRight:
         {
             UV=U;
 
@@ -176,7 +176,7 @@ void SiteOperatorImp::Compress(TensorNetworks::Direction lr,SVCompressorR* comp)
             if (itsLeft_Neighbour) itsLeft_Neighbour->SVDTransfer(lr,sm,UV);
             break;
         }
-        case TensorNetworks::DLeft:
+        case DLeft:
         {
             UV=VT; //Set Vdagger
 //            cout << "After compress A=" << " "<< A << endl;
@@ -188,12 +188,12 @@ void SiteOperatorImp::Compress(TensorNetworks::Direction lr,SVCompressorR* comp)
 
 }
 
-TensorNetworks::MatrixRT SiteOperatorImp::Reshape(TensorNetworks::Direction lr)
+MatrixRT SiteOperatorImp::Reshape(Direction lr)
 {
     MatrixRT A;
     switch (lr)
     {
-    case TensorNetworks::DLeft:
+    case DLeft:
     {
         A.SetLimits(itsd*itsd*itsDw12.Dw1,itsDw12.Dw2);
         int w=1;
@@ -207,7 +207,7 @@ TensorNetworks::MatrixRT SiteOperatorImp::Reshape(TensorNetworks::Direction lr)
             }
         break;
     }
-    case TensorNetworks::DRight:
+    case DRight:
     {
         A.SetLimits(itsDw12.Dw1,itsd*itsd*itsDw12.Dw2);
         int w=1;
@@ -239,11 +239,11 @@ void SiteOperatorImp::Reshape(int D1, int D2, bool saveData)
 
 }
 
-void  SiteOperatorImp::Reshape(TensorNetworks::Direction lr,const MatrixRT& UV)
+void  SiteOperatorImp::Reshape(Direction lr,const MatrixRT& UV)
 {
     switch (lr)
     {
-    case TensorNetworks::DLeft:
+    case DLeft:
     {
         //  If U has less columns than the Ws then we need to reshape the whole site.
         //  Typically this will happen at the edges of the lattice.
@@ -260,7 +260,7 @@ void  SiteOperatorImp::Reshape(TensorNetworks::Direction lr,const MatrixRT& UV)
             }
         break;
     }
-    case TensorNetworks::DRight:
+    case DRight:
     {
         //  If Vdagger has less rows than the Ws then we need to reshape the whole site.
         //  Typically this will happen at the edges of the lattice.
@@ -280,12 +280,12 @@ void  SiteOperatorImp::Reshape(TensorNetworks::Direction lr,const MatrixRT& UV)
     }
 }
 
-void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV)
+void SiteOperatorImp::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV)
 {
 //    cout << "SVD transfer s=" << s << " UV=" << UV << endl;
     switch (lr)
     {
-    case TensorNetworks::DRight:
+    case DRight:
     {
         int N1=s.GetNumRows(); //N1=0 on the first site.
         if (N1>0 && N1!=itsDw12.Dw2)
@@ -308,7 +308,7 @@ void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const DiagonalMat
             }
         break;
     }
-    case TensorNetworks::DLeft:
+    case DLeft:
     {
         int N1=s.GetNumRows(); //N1=0 on the first site.
         if (N1>0 && N1!=itsDw12.Dw1)
@@ -337,44 +337,12 @@ void SiteOperatorImp::SVDTransfer(TensorNetworks::Direction lr,const DiagonalMat
 
 }
 
-/*//
-//  Anew(j,i) =  s(j)*VA(j,k)
-//
-SiteOperatorImp::MatrixRT SiteOperatorImp::Contract1(const VectorRT& s, const MatrixRT& VA)
-{
-    int N1=VA.GetNumRows();
-    int N2=VA.GetNumCols();
-    assert(s.GetHigh()==N1);
-
-    MatrixRT Anew(N1,N2);
-    for(int i2=1; i2<=N2; i2++)
-        for(int i1=1; i1<=N1; i1++)
-            Anew(i1,i2)=s(i1)*VA(i1,i2);
-
-    return Anew;
-}
-
-//
-//  Anew(j,i) =  s(j)*VA(j,k)
-//
-SiteOperatorImp::MatrixRT SiteOperatorImp::Contract1(const MatrixRT& AU,const VectorRT& s)
-{
-    int N1=AU.GetNumRows();
-    int N2=AU.GetNumCols();
-    assert(s.GetHigh()==N2);
-
-    MatrixRT Anew(N1,N2);
-    for(int i2=1; i2<=N2; i2++)
-        for(int i1=1; i1<=N1; i1++)
-            Anew(i1,i2)=AU(i1,i2)*s(i2);
-
-    return Anew;
-}
-*/
 void SiteOperatorImp::Report(std::ostream& os) const
 {
     os << itsDw12.Dw1 << " " << itsDw12.Dw2;
 }
+
+} //namespace
 //---------------------------------------------------------------------------------
 //
 //  Make template instance

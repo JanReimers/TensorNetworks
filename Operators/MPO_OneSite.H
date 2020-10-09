@@ -5,8 +5,12 @@
 #include "TensorNetworks/Enums.H"
 #include "Misc/ptr_vector.h"
 
-class SiteOperator;
+
+namespace TensorNetworks
+{
+
 class OperatorWRepresentation;
+class SiteOperator;
 
 //
 //  Represent an MPO for one site only. The rest of the sites are just identity operators.
@@ -14,7 +18,7 @@ class OperatorWRepresentation;
 class MPO_OneSite : public virtual Operator
 {
     public:
-        MPO_OneSite(int L, double S ,int isite, TensorNetworks::SpinOperator);
+        MPO_OneSite(int L, double S ,int isite, SpinOperator);
         virtual ~MPO_OneSite();
 
         virtual int   GetL() const {return itsL;}
@@ -37,4 +41,5 @@ class MPO_OneSite : public virtual Operator
         SiteOperator* itsIndentityOperator;
 };
 
+}
 #endif // MPO_OneSIte_H

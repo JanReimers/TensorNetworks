@@ -11,6 +11,9 @@
 using std::cout;
 using std::endl;
 
+namespace TensorNetworks
+{
+
 //-------------------------------------------------------------------------------
 //
 //  Init/construction zone
@@ -56,7 +59,7 @@ MPSImp::MPSImp(const MPSImp& mps)
         itsBonds[ia]->CloneState(mps.itsBonds[ia]); //Transfer wave function data
 }
 
-MPSImp::MPSImp(int L, double S, int D,TensorNetworks::Direction lr,double normEps,TNSLogger* s)
+MPSImp::MPSImp(int L, double S, int D,Direction lr,double normEps,TNSLogger* s)
     : itsL(L)
     , itsDmax(D)
     , itsS(S)
@@ -90,12 +93,12 @@ void MPSImp::InitSitesAndBonds()
     //  Create Sites
     //
     itsSites.push_back(0);  //Dummy space holder. We want this array to be 1 based.
-    itsSites.push_back(new MPSSite(TensorNetworks::PLeft,NULL,itsBonds[1],itsd,
+    itsSites.push_back(new MPSSite(PLeft,NULL,itsBonds[1],itsd,
                        GetD1(1,itsL,itsd,itsDmax),GetD2(1,itsL,itsd,itsDmax)));
     for (int i=2; i<=itsL-1; i++)
-        itsSites.push_back(new MPSSite(TensorNetworks::PBulk,itsBonds[i-1],itsBonds[i],itsd,
+        itsSites.push_back(new MPSSite(PBulk,itsBonds[i-1],itsBonds[i],itsd,
                            GetD1(i,itsL,itsd,itsDmax),GetD2(i,itsL,itsd,itsDmax)));
-    itsSites.push_back(new MPSSite(TensorNetworks::PRight,itsBonds[itsL-1],NULL,itsd,
+    itsSites.push_back(new MPSSite(PRight,itsBonds[itsL-1],NULL,itsd,
                        GetD1(itsL,itsL,itsd,itsDmax),GetD2(itsL,itsL,itsd,itsDmax)));
     //
     //  Tell each bond about its left and right sites.
@@ -120,7 +123,7 @@ MPS* MPSImp::Clone() const
 
 
 
-void MPSImp::InitializeWith(TensorNetworks::State state)
+void MPSImp::InitializeWith(State state)
 {
     int sgn=1;
     SiteLoop(ia)
@@ -226,3 +229,4 @@ bool MPSImp::IsRLNormalized(int isite) const
     return ret;
 }
 
+}; // namespace

@@ -7,6 +7,9 @@
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 
+namespace TensorNetworks
+{
+
 class MPO;
 
 //
@@ -17,7 +20,6 @@ class Hamiltonian_1D_NN_Heisenberg
     , public virtual OperatorWRepresentation
     , public MPO_LRB
 {
-        typedef Hamiltonian::Matrix4T Matrix4T;
     public:
         Hamiltonian_1D_NN_Heisenberg(int L, double S, double Jxy,double Jz, double hz);
         virtual ~Hamiltonian_1D_NN_Heisenberg();
@@ -32,14 +34,14 @@ class Hamiltonian_1D_NN_Heisenberg
         virtual iTEBDState* CreateiTEBDState  (int D,double normEps=1e-12, TNSLogger* =0) const;
         virtual MPO*        CreateUnitOperator() const;
         virtual Operator*   CreateOperator    (const OperatorWRepresentation*) const;
-        virtual MPO*        CreateOperator    (double dt, TensorNetworks::TrotterOrder) const;
-        virtual Matrix4T    BuildLocalMatrix  () const;
+        virtual MPO*        CreateOperator    (double dt, TrotterOrder) const;
+        virtual Matrix4RT   BuildLocalMatrix  () const;
         virtual FullState*  CreateFullState   () const;
         //
         //  OperatorWRepresentation interface
         //
-        virtual MatrixRT GetW   (TensorNetworks::Position,int m, int n) const;
-        virtual Dw12    GetDw12(TensorNetworks::Position lbr) const;
+        virtual MatrixRT GetW   (Position,int m, int n) const;
+        virtual Dw12     GetDw12(Position lbr) const;
 
     private:
         double GetH(int ma,int na,int mb,int nb,const SpinCalculator& sc) const
@@ -55,5 +57,6 @@ class Hamiltonian_1D_NN_Heisenberg
         double itsJxy,itsJz,itshz; //NN coupling constants and external field
         Dw12 itsDw12s[3]; //Dw2[w1] for left bulk and right
 };
+}
 
 #endif // HAMILTONIAN_1D_NN_HEISENBERG_H

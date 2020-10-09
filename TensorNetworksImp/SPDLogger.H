@@ -4,6 +4,9 @@
 #include "TensorNetworks/TNSLogger.H"
 #include "spdlog/spdlog.h"
 
+namespace TensorNetworks
+{
+
 class SPDLogger : public virtual TNSLogger
 {
     public:
@@ -19,4 +22,5 @@ class SPDLogger : public virtual TNSLogger
         int itsLevel;
 };
 
+}
 #endif // SPDLOGGER_H

@@ -4,6 +4,8 @@
 #include "TensorNetworks/Enums.H"
 #include "TensorNetworks/Typedefs.H"
 #include "TensorNetworks/Operator.H"
+namespace TensorNetworks
+{
 
 //
 //  MPO for spatial trotter decomposition for odd and even sites.
@@ -15,9 +17,8 @@
 //
 class MPO_SpatialTrotter : public virtual Operator
 {
-        typedef TensorNetworks::Matrix4T Matrix4T;
     public:
-        MPO_SpatialTrotter(double dt, TensorNetworks::Trotter type,int L, int d, const Matrix4T& Hlocal);
+        MPO_SpatialTrotter(double dt, Trotter type,int L, int d, const Matrix4RT& Hlocal);
         virtual ~MPO_SpatialTrotter();
 
         virtual int   GetL() const {return itsL;}
@@ -27,7 +28,7 @@ class MPO_SpatialTrotter : public virtual Operator
 
     private:
 
-        TensorNetworks::Trotter itsOddEven;
+        Trotter itsOddEven;
         int itsL;   //Number of lattice sites
         int itsd;   //Number ot states for the spin on each site = 2S+1
         SiteOperator* itsLeft_Site; //Left  site of pair
@@ -36,4 +37,5 @@ class MPO_SpatialTrotter : public virtual Operator
 
 };
 
+}
 #endif // MPO_SPATIALTROTTER_H

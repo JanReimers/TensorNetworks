@@ -4,6 +4,9 @@
 #include "TensorNetworks/MPO.H"
 #include "Misc/ptr_vector.h"
 
+namespace TensorNetworks
+{
+
 //
 //  General MPO with possibly independent operators on each site
 //
@@ -38,4 +41,5 @@ class MPOImp : public virtual MPO
 
 };
 
+}
 #endif // MPO_H

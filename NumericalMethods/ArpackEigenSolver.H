@@ -3,7 +3,10 @@
 
 #include "TensorNetworksImp/Typedefs.H"
 
+namespace TensorNetworks
+{
 class Epsilons;
+}
 
 class ArpackEigenSolver
 {
@@ -15,7 +18,7 @@ public:
     virtual ~ArpackEigenSolver();
 
     //Return value is: (EigenValues,EigenVectors)
-    std::tuple<VectorCT,MatrixCT> Solve(const MatrixCT&, int NumEigenValues,const Epsilons& eps);
+    std::tuple<VectorCT,MatrixCT> Solve(const MatrixCT&, int NumEigenValues,const TensorNetworks::Epsilons& eps);
 
 
 private:

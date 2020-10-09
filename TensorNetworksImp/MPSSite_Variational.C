@@ -12,6 +12,8 @@
 using std::cout;
 using std::endl;
 
+namespace TensorNetworks
+{
 
 void MPSSite::Refine(const MatrixCT& Heff,const Epsilons& eps)
 {
@@ -41,8 +43,10 @@ void MPSSite::Update(const VectorCT& newAs)
     itsNumUpdates++;
 }
 
-void MPSSite::UpdateCache(const SiteOperator* so, const Vector3T& HLeft, const Vector3T& HRight)
+void MPSSite::UpdateCache(const SiteOperator* so, const Vector3CT& HLeft, const Vector3CT& HRight)
 {
     itsHLeft_Cache=IterateLeft_F(so,HLeft);
     itsHRightCache=IterateRightF(so,HRight);
 }
+
+} //namespace

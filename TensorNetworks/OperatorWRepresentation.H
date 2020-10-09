@@ -4,6 +4,9 @@
 #include "TensorNetworks/Enums.H"
 #include "TensorNetworks/Typedefs.H"
 
+namespace TensorNetworks
+{
+
 class Dw12;
 //
 //  The implementation of this class calculates the <m|W|n> matrix elements
@@ -14,12 +17,12 @@ class OperatorWRepresentation
 {
     public:
         typedef double ElementT;
-        typedef TensorNetworks::MatrixRT MatrixRT;
         OperatorWRepresentation() {}
         virtual ~OperatorWRepresentation() {}
 
-        virtual MatrixRT GetW   (TensorNetworks::Position,int m, int n) const=0;
-        virtual Dw12    GetDw12(TensorNetworks::Position) const=0;
+        virtual MatrixRT GetW   (Position,int m, int n) const=0;
+        virtual Dw12     GetDw12(Position) const=0;
 };
 
+}
 #endif // OPERATORWREPRESENTATION_H

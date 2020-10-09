@@ -5,14 +5,15 @@
 #include "TensorNetworksImp/Typedefs.H"
 #include "oml/vector.h"
 
-class MPSSite;
+
+namespace TensorNetworks
+{
+    class iTEBDStateImp;
+    class MPSSite;
+
 
 class Bond
 {
-     typedef TensorNetworks::VectorRT  VectorRT;
-     typedef TensorNetworks::MatrixCT MatrixCT;
-     typedef TensorNetworks::DiagonalMatrixRT DiagonalMatrixRT;
-
    public:
         Bond();
         virtual ~Bond();
@@ -20,8 +21,8 @@ class Bond
         void SetSites(MPSSite* left, MPSSite* right);
         void NewBondDimension(int D);
 
-        void SVDTransfer      (TensorNetworks::Direction lr,const DiagonalMatrixRT& s,const MatrixCT& UV);
-        void CanonicalTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s,const MatrixCT& UV);
+        void SVDTransfer      (Direction lr,const DiagonalMatrixRT& s,const MatrixCT& UV);
+        void CanonicalTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixCT& UV);
 
         double GetBondEntropy() const {return itsBondEntropy;}
         double GetMinSV      () const {return itsMinSV;}
@@ -35,9 +36,9 @@ class Bond
         //
         //  lr is the normalization direction.  For normalization we need to access the right bond.
         //
-        MPSSite* GetSite(TensorNetworks::Direction lr)
+        MPSSite* GetSite(Direction lr)
         {
-            return lr==TensorNetworks::DLeft ? itsRightSite : itsLeft_Site;
+            return lr==DLeft ? itsRightSite : itsLeft_Site;
         }
 
         Vector<double> itsSingularValues;
@@ -48,5 +49,5 @@ class Bond
         MPSSite* itsRightSite;
 
 };
-
+}
 #endif // BOND_H

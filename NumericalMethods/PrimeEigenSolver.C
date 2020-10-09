@@ -14,8 +14,8 @@ void    PsiMatvec(void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *block
 
 template<class T> const SparseMatrix<T>* PrimeEigenSolver<T>::theSparseMatrix = 0;
 template<class T> const      DMatrix<T>* PrimeEigenSolver<T>::theDenseMatrix = 0;
-static const FullStateImp*             theFullState;
-static const TensorNetworks::Matrix4T* theHlocal;
+static const TensorNetworks::FullStateImp* theFullState;
+static const TensorNetworks::Matrix4RT*    theHlocal;
 
 
 template <class T> PrimeEigenSolver<T>::PrimeEigenSolver()
@@ -31,7 +31,7 @@ template <class T> PrimeEigenSolver<T>::~PrimeEigenSolver()
 }
 
 #include <iostream>
-template <class T> int PrimeEigenSolver<T>::Solve(const DMatrix<T>& m, int NumEigenValues,const Epsilons& eps)
+template <class T> int PrimeEigenSolver<T>::Solve(const DMatrix<T>& m, int NumEigenValues,const TensorNetworks::Epsilons& eps)
 {
     assert(&m);
     assert(m.GetNumRows()==m.GetNumCols());
@@ -116,7 +116,7 @@ template <class T> int PrimeEigenSolver<T>::SolveDense(int NumEigenValues,double
 }
 
 template <class T> int PrimeEigenSolver<T>::Solve
-(const Matrix4T& Hlocal, const FullStateImp* Psi, int NumEigenValues,const Epsilons& eps)
+(const Matrix4T& Hlocal, const TensorNetworks::FullStateImp* Psi, int NumEigenValues,const TensorNetworks::Epsilons& eps)
 {
     assert(Psi);
     theFullState=Psi;  //Used by the M*v call back

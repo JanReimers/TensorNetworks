@@ -3,10 +3,14 @@
 
 #include "TensorNetworksImp/SVCompressorImp.H"
 
+namespace TensorNetworks
+{
+
 class SVMPOCompressor
     : public virtual SVCompressorR
     , private SVCompressorImpR
 {
+        typedef typename SVCompressorR::MatrixT MatrixT;
     public:
         SVMPOCompressor(int Dmax, double eps);
         virtual ~SVMPOCompressor();
@@ -19,4 +23,5 @@ class SVMPOCompressor
     private:
 };
 
+}
 #endif // SVMPOCOMPRESSOR_H

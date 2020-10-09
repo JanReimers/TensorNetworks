@@ -29,7 +29,7 @@ public:
     void Setup(int L, double S, int D)
     {
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsWRep=dynamic_cast<OperatorWRepresentation*>(itsH);
+        itsWRep=dynamic_cast<TensorNetworks::OperatorWRepresentation*>(itsH);
         itsMPS=itsH->CreateMPS(D);
     }
     double ENeel(double S) const;
@@ -40,14 +40,14 @@ public:
 
     MatrixRT GetW(int isite, int m, int n) {return itsH->GetSiteOperator(isite)->GetW(m,n);}
 
-          MPSImp* GetMPSImp()       {return dynamic_cast<      MPSImp*>(itsMPS);}
-    const MPSImp* GetMPSImp() const {return dynamic_cast<const MPSImp*>(itsMPS);}
+          TensorNetworks::MPSImp* GetMPSImp()       {return dynamic_cast<      TensorNetworks::MPSImp*>(itsMPS);}
+    const TensorNetworks::MPSImp* GetMPSImp() const {return dynamic_cast<const TensorNetworks::MPSImp*>(itsMPS);}
 
     double eps;
     const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
-    Hamiltonian*                   itsH;
-    OperatorWRepresentation*       itsWRep;
-    MPS*                           itsMPS;
+    TensorNetworks::Hamiltonian*                   itsH;
+    TensorNetworks::OperatorWRepresentation*       itsWRep;
+    TensorNetworks::MPS*           itsMPS;
 };
 
 
@@ -235,9 +235,9 @@ TEST_F(MPOTesting,TestMPOCombineForH2)
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
     int Dw=itsH->GetMaxDw();
-    MPO* H1=itsH->CreateUnitOperator();
+    TensorNetworks::MPO* H1=itsH->CreateUnitOperator();
     H1->Combine(itsH);
-    MPO* H2=itsH->CreateUnitOperator();
+    TensorNetworks::MPO* H2=itsH->CreateUnitOperator();
     H2->Combine(itsH);
     H2->Combine(itsH);
     EXPECT_EQ(H1->GetMaxDw(),Dw);
@@ -252,9 +252,9 @@ TEST_F(MPOTesting,TestMPOCompressForH2)
     Setup(L,0.5,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
-    MPO* H1=itsH->CreateUnitOperator();
+    TensorNetworks::MPO* H1=itsH->CreateUnitOperator();
     H1->Combine(itsH);
-    MPO* H2=itsH->CreateUnitOperator();
+    TensorNetworks::MPO* H2=itsH->CreateUnitOperator();
     H2->Combine(itsH);
     H2->Combine(itsH);
     H2->Compress(0,1e-13);
@@ -269,7 +269,7 @@ TEST_F(MPOTesting,TestHamiltonianCreateH2)
     Setup(L,0.5,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
-    MPO* H2=itsH->CreateH2Operator();
+    TensorNetworks::MPO* H2=itsH->CreateH2Operator();
     EXPECT_EQ(H2->GetMaxDw(),9);
     delete H2;
 }
@@ -280,9 +280,9 @@ TEST_F(MPOTesting,TestMPOCompressForE2)
     Setup(L,0.5,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
-    MPO* H1=itsH->CreateUnitOperator();
+    TensorNetworks::MPO* H1=itsH->CreateUnitOperator();
     H1->Combine(itsH);
-    MPO* H2=itsH->CreateUnitOperator();
+    TensorNetworks::MPO* H2=itsH->CreateUnitOperator();
     H2->Combine(itsH);
     H2->Combine(itsH);
     double E2a=itsMPS->GetExpectation(H2);
@@ -305,7 +305,7 @@ TEST_F(MPOTesting,TestTimingE2_S5D4)
     itsMPS->Normalize(TensorNetworks::DRight);
     StopWatch sw;
     sw.Start();
-    MPO* H2=itsH->CreateH2Operator();
+    TensorNetworks::MPO* H2=itsH->CreateH2Operator();
     double EE=itsMPS->GetExpectation(H2);
     delete H2;
     sw.Stop();
@@ -321,7 +321,7 @@ TEST_F(MPOTesting,TestTimingE2_S1D16)
     itsMPS->Normalize(TensorNetworks::DRight);
     StopWatch sw;
     sw.Start();
-    MPO* H2=itsH->CreateH2Operator();
+    TensorNetworks::MPO* H2=itsH->CreateH2Operator();
     double EE=itsMPS->GetExpectation(H2);
     delete H2;
     sw.Stop();

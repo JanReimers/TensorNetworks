@@ -25,12 +25,12 @@ public:
     void Setup(int L, double S, int D)
     {
         delete itsMPS;
-        itsMPS=new MPSImp(L,S,D);
+        itsMPS=new TensorNetworks::MPSImp(L,S,D);
     }
 
     typedef TensorNetworks::MatrixCT MatrixCT;
 
-    MPSImp*                itsMPS;
+    TensorNetworks::MPSImp* itsMPS;
     double                 eps;
 };
 
@@ -46,7 +46,7 @@ std::string ExpectedNorm(int isite,int L)
     return ret;
 }
 
-std::string BuildNormString(const MPSImp* mps,int L)
+std::string BuildNormString(const TensorNetworks::MPSImp* mps,int L)
 {
     std::string ret;
     for (int ia=1;ia<=L;ia++) ret+=mps->GetNormStatus(ia);

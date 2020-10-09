@@ -3,6 +3,9 @@
 
 #include "Misc/c_str.H"
 #include <memory>
+
+namespace TensorNetworks
+{
 //
 //  LOgger for a long running process (LRP).  The public interface is for use by
 //  the LRP, it simply calls ReadyToStart at the begining and then
@@ -33,4 +36,5 @@ class TNSLogger
         }
 };
 
+}
 #endif // TNSLOGGER_H

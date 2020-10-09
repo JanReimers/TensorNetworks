@@ -1,6 +1,10 @@
 #include "Operators/MPO_LRB.H"
 #include "Operators/SiteOperatorImp.H"
 
+namespace TensorNetworks
+{
+
+
 MPO_LRB::MPO_LRB(int L, double S)
     : itsL(L)
     , itsd(2*S+1)
@@ -37,17 +41,18 @@ void MPO_LRB::Init(const OperatorWRepresentation* O)
     //
     //  Load W matrices for the left edge,bulk and right edge
     //
-    SiteOperator* left =new SiteOperatorImp(TensorNetworks::PLeft,O,itsd);
-    SiteOperator* bulk =new SiteOperatorImp(TensorNetworks::PBulk,O,itsd);
-    SiteOperator* right=new SiteOperatorImp(TensorNetworks::PRight,O,itsd);
+    SiteOperator* left =new SiteOperatorImp(PLeft,O,itsd);
+    SiteOperator* bulk =new SiteOperatorImp(PBulk,O,itsd);
+    SiteOperator* right=new SiteOperatorImp(PRight,O,itsd);
     itsSites.push_back(left );     //Left edge
     itsSites.push_back(bulk );     //bulk
     itsSites.push_back(right);     //Right edge
 }
 
-TensorNetworks::Position MPO_LRB::GetPosition(int isite) const
+Position MPO_LRB::GetPosition(int isite) const
 {
-    return isite==1 ? TensorNetworks::PLeft :
-           (isite==itsL ? TensorNetworks::PRight : TensorNetworks::PBulk);
+    return isite==1 ? PLeft :
+           (isite==itsL ? PRight : PBulk);
 }
 
+}

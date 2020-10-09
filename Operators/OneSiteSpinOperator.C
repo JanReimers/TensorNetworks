@@ -1,9 +1,11 @@
 #include "Operators/OneSiteSpinOperator.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 
+namespace TensorNetworks
+{
 
 
-OneSiteSpinOperator::OneSiteSpinOperator(double S, TensorNetworks::SpinOperator o)
+OneSiteSpinOperator::OneSiteSpinOperator(double S, SpinOperator o)
 : itsS(S)
 , itsd(2*S+1)
 , itsOperator(o)
@@ -17,40 +19,42 @@ OneSiteSpinOperator::~OneSiteSpinOperator()
 {
 }
 
-TensorNetworks::MatrixRT OneSiteSpinOperator::GetW (TensorNetworks::Position lbr,int m, int n) const
+MatrixRT OneSiteSpinOperator::GetW (Position lbr,int m, int n) const
 {
-    TensorNetworks::MatrixRT W(1,1);
+    MatrixRT W(1,1);
     SpinCalculator sc(itsS);
 
     switch(itsOperator)
     {
-        case TensorNetworks::Sx:
+        case Sx:
         {
             W(1,1)=sc.GetSx(m,n);
             break;
         }
-        case TensorNetworks::Sy:
+        case Sy:
         {
             // THis return a pure imaginary matrix whihc we don;t support yet
             //W(1,1)=sc.GetSy(m,n);
             assert(false);
             break;
         }
-        case TensorNetworks::Sz:
+        case Sz:
         {
             W(1,1)=sc.GetSz(m,n);
             break;
         }
-        case TensorNetworks::Sp:
+        case Sp:
         {
             W(1,1)=sc.GetSp(m,n);
             break;
         }
-        case TensorNetworks::Sm:
+        case Sm:
         {
             W(1,1)=sc.GetSm(m,n);
             break;
         }
     }
     return W;
+}
+
 }

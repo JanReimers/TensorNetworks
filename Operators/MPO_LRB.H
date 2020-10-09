@@ -5,8 +5,11 @@
 #include "TensorNetworks/Enums.H"
 #include "Misc/ptr_vector.h"
 
-class SiteOperator;
+
+namespace TensorNetworks
+{
 class OperatorWRepresentation;
+class SiteOperator;
 
 //
 //  Represent an MPO with Left/Bulk/Right structure.  What this means is that we only need store
@@ -30,7 +33,7 @@ class MPO_LRB : public virtual Operator
         void Init(const OperatorWRepresentation* O); //Derived classes must call this from constructor,
 
     private:
-        TensorNetworks::Position GetPosition(int isite) const;
+        Position GetPosition(int isite) const;
         friend class MPOTesting;
 
         typedef optr_vector<SiteOperator*> SitesType;
@@ -44,5 +47,7 @@ class MPO_LRB : public virtual Operator
         //
         SitesType itsSites;
 };
+
+}
 
 #endif // MATRIXPRODUCTOPERATOR_H

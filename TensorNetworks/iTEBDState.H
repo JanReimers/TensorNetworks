@@ -6,16 +6,16 @@
 #include "TensorNetworks/SVCompressor.H"
 #include <iosfwd>
 
+namespace TensorNetworks
+{
 
 class iTEBDState
 {
-    protected:
-        typedef TensorNetworks::Matrix4T Matrix4T;
     public:
         iTEBDState() {};
         virtual ~iTEBDState() {};
 
-        virtual void InitializeWith(TensorNetworks::State)=0;
+        virtual void InitializeWith(State)=0;
  //--------------------------------------------------------------------------------------
 //
 //  Access to information
@@ -26,15 +26,13 @@ class iTEBDState
 //
 //  Normalization members with and without SVD compression
 //
-        virtual void Normalize(TensorNetworks::Direction LR);
-        virtual void NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC*)=0;
+        virtual void Normalize(Direction LR);
+        virtual void NormalizeAndCompress(Direction LR,SVCompressorC*)=0;
 
         virtual void Report    (std::ostream&) const=0;
-        virtual void Apply(int isite,const Matrix4T& expH)=0;
-
-    protected:
-
-    private:
+        virtual void Apply(int isite,const Matrix4RT& expH)=0;
 };
+
+}
 
 #endif // ITEBDSTATE_H

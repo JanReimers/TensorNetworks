@@ -4,6 +4,9 @@
 #include "TensorNetworksImp/SVMPOCompressor.H"
 #include "oml/vector_io.h"
 
+namespace TensorNetworks
+{
+
 MPOImp::MPOImp(int L, double S)
     : itsL(L)
     , itsd(2*S+1)
@@ -15,10 +18,10 @@ MPOImp::MPOImp(int L, double S)
 //
     OperatorWRepresentation* IdentityWOp=new IdentityOperator();
     itsSites.push_back(0); //Start count sites at index 1
-    itsSites.push_back(new SiteOperatorImp(TensorNetworks::PLeft,IdentityWOp,itsd));
+    itsSites.push_back(new SiteOperatorImp(PLeft,IdentityWOp,itsd));
     for (int ia=2;ia<=itsL-1;ia++)
-          itsSites.push_back(new SiteOperatorImp(TensorNetworks::PBulk,IdentityWOp,itsd));
-    itsSites.push_back(new SiteOperatorImp(TensorNetworks::PRight,IdentityWOp,itsd));
+          itsSites.push_back(new SiteOperatorImp(PBulk,IdentityWOp,itsd));
+    itsSites.push_back(new SiteOperatorImp(PRight,IdentityWOp,itsd));
 //
 //  Loop again and set neighbours.  Each site needs to know its neighbours in order to
 //  carry out SVD tranfers, A[1]->U*s*VT, A=U, s*VT -> Transfered to next site.
@@ -60,13 +63,13 @@ double MPOImp::Compress(int Dmax, double minSv)
     {
         oldDws(ia)=itsSites[ia]->GetDw12().Dw2;
 //        cout << "Site " << ia << " ";
-        itsSites[ia]->Compress(TensorNetworks::DLeft ,compressor);
+        itsSites[ia]->Compress(DLeft ,compressor);
     }
     oldDws(itsL)=0;
 //    Report(cout);
     for (int ia=itsL;ia>1;ia--)
     {
-        itsSites[ia]->Compress(TensorNetworks::DRight,compressor);
+        itsSites[ia]->Compress(DRight,compressor);
         newDws(ia)=itsSites[ia]->GetDw12().Dw1;
     }
     newDws(1)=0;
@@ -97,3 +100,5 @@ void MPOImp::Report(std::ostream& os) const
         os << endl;
     }
 }
+
+} //namespace

@@ -7,15 +7,16 @@
 #include "TensorNetworksImp/Typedefs.H"
 
 
+namespace TensorNetworks
+{
+
 class OperatorWRepresentation;
 
 class SiteOperatorImp : public virtual SiteOperator
 {
-        typedef TensorNetworks::VectorRT VectorRT;
-        typedef TensorNetworks::DiagonalMatrixRT DiagonalMatrixRT;
     public:
-        SiteOperatorImp(TensorNetworks::Position  lbr, const OperatorWRepresentation* O,int d);
-        SiteOperatorImp(TensorNetworks::Direction lr , const MatrixRT& U, const VectorRT& expEvs, int d);
+        SiteOperatorImp(Position  lbr, const OperatorWRepresentation* O,int d);
+        SiteOperatorImp(Direction lr , const MatrixRT& U, const VectorRT& expEvs, int d);
         virtual ~SiteOperatorImp();
         void SetNeighbours(SiteOperator* left, SiteOperator* right);
 
@@ -31,25 +32,20 @@ class SiteOperatorImp : public virtual SiteOperator
         //
         //  SVD compress and normalize to reduce Dw
         //
-        virtual void Compress(TensorNetworks::Direction,SVCompressorR*);
+        virtual void Compress(Direction,SVCompressorR*);
 
-       virtual void Report(std::ostream&) const;
-    protected:
+        virtual void Report(std::ostream&) const;
 
     private:
         friend class MPOTesting;
-//        typedef TensorNetworks::MatrixCT MatrixCT;
         MatrixRT& GetW(int m, int n) {return itsWs(m+1,n+1);}
-        void SVDTransfer(TensorNetworks::Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV);
-//        static MatrixRT  Contract1(const VectorRT & s, const MatrixRT& VA);
-//        static MatrixRT  Contract1(const MatrixRT& AU, const VectorRT & s);
+        void SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV);
 
-
-        MatrixRT  Reshape(TensorNetworks::Direction lr);
+        MatrixRT Reshape(Direction lr);
         void     Reshape(int D1, int D2, bool saveData=false);
-        void     Reshape(TensorNetworks::Direction lr,const MatrixRT& UV);
+        void     Reshape(Direction lr,const MatrixRT& UV);
 
-        typedef DMatrix<TensorNetworks::MatrixRT> TensorT;
+        typedef DMatrix<MatrixRT> TensorT;
 
         int itsd; //2*S+1
         Dw12 itsDw12;
@@ -59,4 +55,5 @@ class SiteOperatorImp : public virtual SiteOperator
         SiteOperatorImp* itsRightNeighbour;
 };
 
+}
 #endif // MPOSITE_H

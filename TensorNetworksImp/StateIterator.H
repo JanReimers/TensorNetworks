@@ -3,6 +3,9 @@
 
 #include "oml/vector_io.h"
 
+namespace TensorNetworks
+{
+
 class StateIterator
 {
     public:
@@ -31,4 +34,5 @@ class StateIterator
         mutable Vector<int> itsQuantumNumbers; //Vector of quantum numbers |n_1,n_2...n_L>
 };
 
+}
 #endif // STATEITERATOR_H

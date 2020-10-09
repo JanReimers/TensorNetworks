@@ -1,6 +1,10 @@
 #include "iTEBDState.H"
+namespace TensorNetworks
+{
 
-void iTEBDState::Normalize(TensorNetworks::Direction lr)
+void iTEBDState::Normalize(Direction lr)
 {
     NormalizeAndCompress(lr,0);
+}
+
 }

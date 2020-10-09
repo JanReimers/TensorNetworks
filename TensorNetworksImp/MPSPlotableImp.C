@@ -13,6 +13,9 @@ using Dimensions::PureNumber;
 using std::cout;
 using std::endl;
 
+namespace TensorNetworks
+{
+
 //-------------------------------------------------------------------------------
 //
 //  Init/construction zone
@@ -36,7 +39,7 @@ MPSPlotableImp::MPSPlotableImp(const MPSPlotableImp& mps)
 }
 
 //Used for iTEBD states
-/*MPSPlotableImp::MPSPlotableImp(int L, double S, int D,TensorNetworks::Direction lr,double normEps,TNSLogger* logger)
+/*MPSPlotableImp::MPSPlotableImp(int L, double S, int D,Direction lr,double normEps,TNSLogger* logger)
     : MPSImp(L,S,D,lr,normEps,logger)
     , itsSelectedSite(1)
     , itsSitesMesh(0)
@@ -239,3 +242,4 @@ void MPSPlotableImp::Insert(Plotting::MultiGraph* graphs)
     MultiPlotableImp::Insert(graphs);
 }
 
+} // namespace

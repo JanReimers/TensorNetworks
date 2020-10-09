@@ -5,6 +5,10 @@
 #include "TensorNetworks/Enums.H"
 #include "Misc/ptr_vector.h"
 
+
+namespace TensorNetworks
+{
+
 class SiteOperator;
 class OperatorWRepresentation;
 
@@ -14,7 +18,7 @@ class OperatorWRepresentation;
 class MPO_TwoSite : public virtual Operator
 {
     public:
-        MPO_TwoSite(int L, double S ,int isite1,int isite2, TensorNetworks::SpinOperator so1,TensorNetworks::SpinOperator so2);
+        MPO_TwoSite(int L, double S ,int isite1,int isite2, SpinOperator so1,SpinOperator so2);
         virtual ~MPO_TwoSite();
 
         virtual int   GetL() const {return itsL;}
@@ -40,5 +44,7 @@ class MPO_TwoSite : public virtual Operator
         SiteOperator* itsSite2Operator;
         SiteOperator* itsIndentityOperator;
 };
+
+}
 
 #endif // MPO_TwoSite_H

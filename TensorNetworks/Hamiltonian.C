@@ -3,6 +3,9 @@
 
 #include "oml/numeric.h"
 
+namespace TensorNetworks
+{
+
 MPO* Hamiltonian::CreateH2Operator  () const
 {
     MPO* H2=CreateUnitOperator();
@@ -12,16 +15,16 @@ MPO* Hamiltonian::CreateH2Operator  () const
     return H2;
 }
 
-TensorNetworks::Matrix4T Hamiltonian::ExponentH(double dt,const Matrix4T& H12)
+Matrix4RT Hamiltonian::ExponentH(double dt,const Matrix4RT& H12)
 {
-    TensorNetworks::MatrixRT U12=H12.Flatten();
+    MatrixRT U12=H12.Flatten();
     int N=U12.GetNumRows();
     assert(N==U12.GetNumCols());
     int d=sqrt(N);
     assert(d*d==N);
-    TensorNetworks::VectorRT evs=Diagonalize(U12);
-    TensorNetworks::VectorRT expEvs=exp(-dt*evs);
-    TensorNetworks::Matrix4T expH(d,d,d,d,0);
+    VectorRT evs=Diagonalize(U12);
+    VectorRT expEvs=exp(-dt*evs);
+    Matrix4RT expH(d,d,d,d,0);
     Fill(expH.Flatten(),0.0);
     int i1=1;
     for (int m1=0; m1<d; m1++)
@@ -34,4 +37,6 @@ TensorNetworks::Matrix4T Hamiltonian::ExponentH(double dt,const Matrix4T& H12)
                         expH(m1,n1,m2,n2)+=U12(i1,k)*expEvs(k)*U12(i2,k);
         }
     return expH;
+}
+
 }

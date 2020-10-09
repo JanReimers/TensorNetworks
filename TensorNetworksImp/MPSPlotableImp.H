@@ -9,6 +9,9 @@
 
 class PlotableMesh;
 
+namespace TensorNetworks
+{
+
 class MPSPlotableImp
 : public virtual MPSPlotable
 , public virtual MultiPlotable
@@ -69,4 +72,5 @@ private:
 
 };
 
+}
 #endif // MPSPLOTABLEIMP_H

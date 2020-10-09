@@ -3,11 +3,11 @@
 
 #include "TensorNetworks/Typedefs.H"
 
+namespace TensorNetworks
+{
+
 template <class T> class SVCompressor
 {
-    protected:
-        typedef TensorNetworks::DiagonalMatrixRT DiagonalMatrixRT;
-
     public:
         typedef DMatrix<T> MatrixT;
 
@@ -20,7 +20,8 @@ template <class T> class SVCompressor
         virtual double Compress(MatrixT& U, DiagonalMatrixRT& s, MatrixT& Vdagger)=0;
 };
 
-typedef SVCompressor<TensorNetworks::eType> SVCompressorC;
+typedef SVCompressor<eType> SVCompressorC;
 typedef SVCompressor<double               > SVCompressorR;
 
+}
 #endif // SVCOMPRESSOR_H

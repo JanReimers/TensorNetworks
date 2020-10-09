@@ -3,7 +3,11 @@
 #include "Operators/OneSiteSpinOperator.H"
 #include "Operators/IdentityOperator.H"
 
-MPO_TwoSite::MPO_TwoSite(int L, double S ,int isite1,int isite2, TensorNetworks::SpinOperator so1, TensorNetworks::SpinOperator so2)
+namespace TensorNetworks
+{
+
+
+MPO_TwoSite::MPO_TwoSite(int L, double S ,int isite1,int isite2, SpinOperator so1, SpinOperator so2)
     : itsL(L)
     , itsd(2*S+1)
     , itsSite1Index(isite1)
@@ -11,9 +15,9 @@ MPO_TwoSite::MPO_TwoSite(int L, double S ,int isite1,int isite2, TensorNetworks:
     , itsSpin1WOp(new OneSiteSpinOperator(S,so1))
     , itsSpin2WOp(new OneSiteSpinOperator(S,so2))
     , itsIdentityWOp(new IdentityOperator())
-    , itsSite1Operator(new SiteOperatorImp(TensorNetworks::PBulk,itsSpin1WOp,itsd))
-    , itsSite2Operator(new SiteOperatorImp(TensorNetworks::PBulk,itsSpin2WOp,itsd))
-    , itsIndentityOperator(new SiteOperatorImp(TensorNetworks::PBulk,itsIdentityWOp,itsd))
+    , itsSite1Operator(new SiteOperatorImp(PBulk,itsSpin1WOp,itsd))
+    , itsSite2Operator(new SiteOperatorImp(PBulk,itsSpin2WOp,itsd))
+    , itsIndentityOperator(new SiteOperatorImp(PBulk,itsIdentityWOp,itsd))
 {
 
 }
@@ -29,4 +33,5 @@ MPO_TwoSite::~MPO_TwoSite()
    delete itsSpin1WOp;
 }
 
+} //namespace
 

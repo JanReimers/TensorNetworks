@@ -12,7 +12,10 @@
 using std::cout;
 using std::endl;
 
-MPSSite::MPSSite(TensorNetworks::Position lbr, Bond* leftBond, Bond* rightBond,int d, int D1, int D2)
+namespace TensorNetworks
+{
+
+MPSSite::MPSSite(Position lbr, Bond* leftBond, Bond* rightBond,int d, int D1, int D2)
     : itsLeft_Bond(leftBond)
     , itsRightBond(rightBond)
     , itsd(d)
@@ -30,11 +33,11 @@ MPSSite::MPSSite(TensorNetworks::Position lbr, Bond* leftBond, Bond* rightBond,i
     , itsIterDE(1.0)
     , itsPosition(lbr)
 {
-    if (lbr==TensorNetworks::PLeft)
+    if (lbr==PLeft)
     {
         assert(itsRightBond);
     }
-    if (lbr==TensorNetworks::PRight)
+    if (lbr==PRight)
     {
         assert(itsLeft_Bond);
     }
@@ -75,16 +78,16 @@ void MPSSite::CloneState(const MPSSite* psi2)
 //  This is a tricker than one might expect.  In particular I can't get the OBC vectors
 //  to be both left and right normalized
 //
-void MPSSite::InitializeWith(TensorNetworks::State state,int sgn)
+void MPSSite::InitializeWith(State state,int sgn)
 {
     switch (state)
     {
-    case TensorNetworks::Product :
+    case Product :
     {
-        TensorNetworks::Position lbr=WhereAreWe();
+        Position lbr=WhereAreWe();
         switch(lbr)
         {
-        case  TensorNetworks::PLeft :
+        case  PLeft :
         {
             int i=1;
             for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++,i++)
@@ -92,7 +95,7 @@ void MPSSite::InitializeWith(TensorNetworks::State state,int sgn)
                     (*id)(1,i)=std::complex<double>(sgn); //Left normalized
             break;
         }
-        case TensorNetworks::PRight :
+        case PRight :
         {
             int i=1;
             for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++,i++)
@@ -100,7 +103,7 @@ void MPSSite::InitializeWith(TensorNetworks::State state,int sgn)
                     (*id)(i,1)=std::complex<double>(sgn);  //Left normalized
             break;
         }
-        case TensorNetworks::PBulk :
+        case PBulk :
         {
             for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++)
                 for (int i=1; i<=Min(itsD1,itsD2); i++)
@@ -110,7 +113,7 @@ void MPSSite::InitializeWith(TensorNetworks::State state,int sgn)
         }
         break;
     }
-    case TensorNetworks::Random :
+    case Random :
     {
         for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++)
         {
@@ -119,7 +122,7 @@ void MPSSite::InitializeWith(TensorNetworks::State state,int sgn)
         }
         break;
     }
-    case TensorNetworks::Neel :
+    case Neel :
     {
         for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++)
             Fill(*id,eType(0.0));
@@ -175,14 +178,14 @@ char MPSSite::GetNormStatus(double eps) const
 //    for (int id=0;id<itsd; id++)
 //        cout << "A[" << id << "]=" << itsAs[id] << endl;
     char ret;
-    if (IsNormalized(TensorNetworks::DLeft,eps))
+    if (IsNormalized(DLeft,eps))
     {
-        if (IsNormalized(TensorNetworks::DRight,eps))
+        if (IsNormalized(DRight,eps))
             ret='I'; //This should be rare
         else
             ret='A';
     }
-    else if (IsNormalized(TensorNetworks::DRight,eps))
+    else if (IsNormalized(DRight,eps))
         ret='B';
     else
         ret='M';
@@ -205,7 +208,7 @@ void MPSSite::Report(std::ostream& os) const
        ;
 }
 
-bool MPSSite::IsNormalized(TensorNetworks::Direction lr,double eps) const
+bool MPSSite::IsNormalized(Direction lr,double eps) const
 {
     return IsUnit(GetNorm(lr),eps);
 }
@@ -219,4 +222,4 @@ bool MPSSite::IsUnit(const MatrixCT& m,double eps)
     return Max(abs(m-I))<eps;
 }
 
-
+} //namespace

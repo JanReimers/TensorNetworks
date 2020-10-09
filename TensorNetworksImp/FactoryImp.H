@@ -6,7 +6,7 @@
 namespace TensorNetworks
 {
 
-class FactoryImp : public virtual TensorNetworks::Factory
+class FactoryImp : public virtual Factory
 {
 public:
     FactoryImp() {}

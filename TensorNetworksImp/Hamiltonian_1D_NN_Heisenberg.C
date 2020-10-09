@@ -12,6 +12,9 @@
 using std::cout;
 using std::endl;
 
+namespace TensorNetworks
+{
+
 Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, double Jxy,double Jz, double hz)
     : MPO_LRB(L,S)
     , itsL(L)
@@ -53,9 +56,9 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
 
 
 
-    itsDw12s[TensorNetworks::PLeft ]=Dw12(1,5,w1_first_1x5,w2_last_1x5);
-    itsDw12s[TensorNetworks::PBulk ]=Dw12(5,5,w1_first_5x5,w2_last_5x5);
-    itsDw12s[TensorNetworks::PRight]=Dw12(5,1,w1_first_5x1,w2_last_5x1);
+    itsDw12s[PLeft ]=Dw12(1,5,w1_first_1x5,w2_last_1x5);
+    itsDw12s[PBulk ]=Dw12(5,5,w1_first_5x5,w2_last_5x5);
+    itsDw12s[PRight]=Dw12(5,1,w1_first_5x1,w2_last_5x1);
 
     Init(this);
 
@@ -75,9 +78,9 @@ double Hamiltonian_1D_NN_Heisenberg::I(int m, int n) const
     return ret;
 }
 
-TensorNetworks::MatrixRT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Position lbr,int m, int n) const
+MatrixRT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int n) const
 {
-    TensorNetworks::MatrixRT W;
+    MatrixRT W;
     SpinCalculator sc(itsS);
 
     switch (lbr)
@@ -85,7 +88,7 @@ TensorNetworks::MatrixRT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Pos
 //
 //  Implement W=[ 0, Jxy/2*S-, Jxy/2*S+, JzSz, 1 ]
 //
-    case TensorNetworks::PLeft:
+    case PLeft:
     {
         W.SetLimits(1,Dw);
         W(1,1)=itshz*sc.GetSz(m,n);
@@ -101,7 +104,7 @@ TensorNetworks::MatrixRT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Pos
 //      [ Sz      0        0      0    0 ]
 //      [ hzSz  Jxy/2*S- Jxy/2*S+ JzSz 1 ]
 //
-    case TensorNetworks::PBulk :
+    case PBulk :
     {
         W.SetLimits(Dw,Dw);
         Fill(W,ElementT(0.0));
@@ -123,7 +126,7 @@ TensorNetworks::MatrixRT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Pos
 //      [ Sz ]
 //      [ 0  ]
 //
-    case  TensorNetworks::PRight :
+    case  PRight :
     {
 
         W.SetLimits(Dw,1);
@@ -138,7 +141,7 @@ TensorNetworks::MatrixRT Hamiltonian_1D_NN_Heisenberg::GetW (TensorNetworks::Pos
     return W;
 }
 
-Dw12 Hamiltonian_1D_NN_Heisenberg::GetDw12(TensorNetworks::Position lbr) const
+Dw12 Hamiltonian_1D_NN_Heisenberg::GetDw12(Position lbr) const
 {
     assert(lbr>=0);
     assert(lbr<3);
@@ -149,11 +152,11 @@ Dw12 Hamiltonian_1D_NN_Heisenberg::GetDw12(TensorNetworks::Position lbr) const
 //
 //  Build the a local (2 site for NN interactions) Hamiltonian Matrix
 //
-TensorNetworks::Matrix4T Hamiltonian_1D_NN_Heisenberg::BuildLocalMatrix() const
+Matrix4RT Hamiltonian_1D_NN_Heisenberg::BuildLocalMatrix() const
 {
     SpinCalculator sc(itsS);
     int d=Getd();
-    Matrix4T H12(d,d,d,d,0);
+    Matrix4RT H12(d,d,d,d,0);
     for (int n1=0;n1<d;n1++)
         for (int n2=0;n2<d;n2++)
             for (int m1=0;m1<d;m1++)
@@ -190,40 +193,40 @@ Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(const OperatorWRepresenta
     return new MPO_LRB(Wrep,itsL,itsS);
 }
 
-MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::TrotterOrder order) const
+MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TrotterOrder order) const
 {
     MPO* W=new MPOImp(itsL,itsS);
-    Matrix4T H12=BuildLocalMatrix(); //Full H matrix for two sites 1&2
+    Matrix4RT H12=BuildLocalMatrix(); //Full H matrix for two sites 1&2
     switch (order)
     {
-        case TensorNetworks::None :
+        case None :
         {
             assert(false);
             break;
         }
-        case TensorNetworks::FirstOrder :
+        case FirstOrder :
         {
-            MPO_SpatialTrotter Wodd (dt,TensorNetworks::Odd ,itsL,Getd(),H12);
-            MPO_SpatialTrotter Weven(dt,TensorNetworks::Even,itsL,Getd(),H12);
+            MPO_SpatialTrotter Wodd (dt,Odd ,itsL,Getd(),H12);
+            MPO_SpatialTrotter Weven(dt,Even,itsL,Getd(),H12);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             break;
         }
-        case TensorNetworks::SecondOrder :
+        case SecondOrder :
         {
-            MPO_SpatialTrotter Wodd (dt/2.0,TensorNetworks::Odd ,itsL,Getd(),H12);
-            MPO_SpatialTrotter Weven(dt,TensorNetworks::Even,itsL,Getd(),H12);
+            MPO_SpatialTrotter Wodd (dt/2.0,Odd ,itsL,Getd(),H12);
+            MPO_SpatialTrotter Weven(dt,Even,itsL,Getd(),H12);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             W->Combine(&Wodd);
             break;
         }
-        case TensorNetworks::FourthOrder :
+        case FourthOrder :
         {
             //
             //  At this order we must compress as we go or we risk consuming all memory
             //
-            TensorNetworks::VectorRT ts(5);
+            VectorRT ts(5);
             ts(1)=dt/(4-pow(4.0,1.0/3.0));
             ts(2)=ts(1);
             ts(3)=dt-2*ts(1)-2*ts(2);
@@ -232,8 +235,8 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::Tro
             for (int it=1;it<=5;it++)
             {
                 MPOImp U(itsL,itsS);
-                MPO_SpatialTrotter Wodd (ts(it)/2.0,TensorNetworks::Odd ,itsL,Getd(),H12);
-                MPO_SpatialTrotter Weven(ts(it)    ,TensorNetworks::Even,itsL,Getd(),H12);
+                MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,itsL,Getd(),H12);
+                MPO_SpatialTrotter Weven(ts(it)    ,Even,itsL,Getd(),H12);
                 U.Combine(&Wodd);
                 U.Combine(&Weven);
                 U.Combine(&Wodd);
@@ -242,7 +245,7 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TensorNetworks::Tro
             }
             break;
         }
-    } //End swtich
+    } //End switch
 
     return W;
 }
@@ -253,3 +256,5 @@ FullState* Hamiltonian_1D_NN_Heisenberg::CreateFullState () const
  }
 
 
+
+}

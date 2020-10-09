@@ -32,8 +32,8 @@ public:
     }
 
 
-    Epsilons               itsEps;
-    MPSImp mps;
+    TensorNetworks::Epsilons               itsEps;
+    TensorNetworks::MPSImp mps;
     double eps;
 
 };

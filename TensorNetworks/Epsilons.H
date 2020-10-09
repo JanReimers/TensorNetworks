@@ -3,6 +3,8 @@
 
 #include <iosfwd>
 
+namespace TensorNetworks
+{
 //
 //  Simple struct for passing many epsilons down through the call hierarchy
 //
@@ -22,4 +24,5 @@ struct Epsilons
     static std::string Header();
 };
 
+}
 #endif // EPSILONS_H

@@ -3,6 +3,9 @@
 #include <sstream>
 #include <iomanip>
 
+namespace TensorNetworks
+{
+
 Epsilons::Epsilons(double default_eps)
     : itsDelatEnergy1Epsilon        (default_eps)
     , itsDelatEnergy2Epsilon        (default_eps)
@@ -37,4 +40,6 @@ std::string Epsilons::Header()
     std::ostringstream os;
     os << " <E>    <E^2>-<E>^2 1-<|>  Eigen  Norm    SVD1  SVD2   Sparse" << std::ends;
     return os.str();
+}
+
 }

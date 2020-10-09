@@ -3,8 +3,11 @@
 #include "oml/cnumeric.h"
 #include <iomanip>
 
+namespace TensorNetworks
+{
+
 iTEBDStateImp::iTEBDStateImp(int L,double S, int D,double normEps,TNSLogger* s)
-    : MPSImp(L,S,D,TensorNetworks::DLeft,normEps,s)
+    : MPSImp(L,S,D,DLeft,normEps,s)
 {
     InitSitesAndBonds();
 }
@@ -30,8 +33,8 @@ void iTEBDStateImp::InitSitesAndBonds()
     //
     itsSites.push_back(0);  //Dummy space holder. We want this array to be 1 based.
     for (int i=1; i<=itsL-1; i++)
-        itsSites.push_back(new MPSSite(TensorNetworks::PBulk,itsBonds[i-1],itsBonds[i],itsd,itsDmax,itsDmax));
-    itsSites.push_back(new MPSSite(TensorNetworks::PRight,itsBonds[itsL-1],itsBonds[0],itsd,itsDmax,itsDmax));
+        itsSites.push_back(new MPSSite(PBulk,itsBonds[i-1],itsBonds[i],itsd,itsDmax,itsDmax));
+    itsSites.push_back(new MPSSite(PRight,itsBonds[itsL-1],itsBonds[0],itsd,itsDmax,itsDmax));
     //
     //  Tell each bond about its left and right sites.
     //
@@ -39,20 +42,20 @@ void iTEBDStateImp::InitSitesAndBonds()
         itsBonds[i]->SetSites(itsSites[i],itsSites[GetModSite(i+1)]);
 }
 
-void iTEBDStateImp::InitializeWith(TensorNetworks::State s)
+void iTEBDStateImp::InitializeWith(State s)
 {
     MPSImp::InitializeWith(s);
 }
 
 
 
-void iTEBDStateImp::NormalizeAndCompress(TensorNetworks::Direction LR,SVCompressorC* comp)
+void iTEBDStateImp::NormalizeAndCompress(Direction LR,SVCompressorC* comp)
 {
     ForLoop(LR)
         MPSImp::CanonicalizeSite(LR,ia,comp);
 }
 
-//void iTEBDStateImp::NormalizeAndCompress(TensorNetworks::Direction LR,int Dmax,double epsMin);
+//void iTEBDStateImp::NormalizeAndCompress(Direction LR,int Dmax,double epsMin);
 int iTEBDStateImp::GetModSite(int isite)
 {
     int modSite=((isite-1)%itsL)+1;
@@ -61,7 +64,7 @@ int iTEBDStateImp::GetModSite(int isite)
     return modSite;
 }
 
-iTEBDStateImp::VectorRT&  iTEBDStateImp::GetLambda(int isite)
+VectorRT&  iTEBDStateImp::GetLambda(int isite)
 {
     MPSSite* site=itsSites[GetModSite(isite  )];
     assert(site);
@@ -70,7 +73,7 @@ iTEBDStateImp::VectorRT&  iTEBDStateImp::GetLambda(int isite)
     return bond->itsSingularValues;
 }
 
-iTEBDStateImp::MatrixCT& iTEBDStateImp::GetGamma (int isite,int n)
+MatrixCT& iTEBDStateImp::GetGamma (int isite,int n)
 {
     assert(n>=0);
     assert(n<itsd);
@@ -79,7 +82,7 @@ iTEBDStateImp::MatrixCT& iTEBDStateImp::GetGamma (int isite,int n)
     return site->itsMs[n];
 }
 
-void iTEBDStateImp::Apply(int isite,const Matrix4T& expH)
+void iTEBDStateImp::Apply(int isite,const Matrix4RT& expH)
 {
     MPSSite* siteA=itsSites[GetModSite(isite  )];
     Bond*    bondA=siteA->itsRightBond;
@@ -142,4 +145,6 @@ void iTEBDStateImp::Apply(int isite,const Matrix4T& expH)
 void iTEBDStateImp::Report(std::ostream& os) const
 {
     MPSImp::Report(os);
+}
+
 }

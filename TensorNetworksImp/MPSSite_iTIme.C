@@ -12,6 +12,8 @@
 using std::cout;
 using std::endl;
 
+namespace TensorNetworks
+{
 
 void MPSSite::UpdateCache(const MPSSite* Psi2,const MatrixCT& Left, const MatrixCT& Right)
 {
@@ -32,3 +34,4 @@ void MPSSite::Optimize(const MPSSite* psi, const MatrixCT& L, const MatrixCT& R)
         }
 }
 
+} //namespace

@@ -2,6 +2,9 @@
 #define DW12_H
 #include "oml/vector.h"
 
+namespace TensorNetworks
+{
+
 //
 //  W matrices are lower triangular and in addition not dense below the diagonal
 //  If contractions know Dw2(w1) and Dw1(w2) then we can skip most of the zero elements.
@@ -18,4 +21,5 @@ struct Dw12
     Vector<int> w2_last; //Dw2 as a function of w1
 };
 
+}
 #endif //DW12_H

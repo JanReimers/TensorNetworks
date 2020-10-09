@@ -9,6 +9,9 @@
 #include <iostream>
 #include <cstdlib>
 
+namespace TensorNetworks
+{
+
 typedef optr_map   <std::string,Plotting::Graph*>::iterator  GITER;
 typedef  ptr_vector<            Plotting::Graph*>::iterator OGITER;
 typedef optr_map   <std::string,Plotting::BufferedLine*>::      iterator  LITER;
@@ -169,4 +172,6 @@ void MultiPlotableImp::ReplotActiveGraph(bool InGUIThread)
 {
     if (itsMultiGraph)
         itsMultiGraph->ReplotActiveGraph(InGUIThread);
+}
+
 }

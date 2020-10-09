@@ -13,6 +13,9 @@
 using std::cout;
 using std::endl;
 
+namespace TensorNetworks
+{
+
 double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule& is)
 {
     double E1=0;
@@ -48,9 +51,9 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
         //
         //  Compress in both directions
         //
-        NormalizeAndCompress(TensorNetworks::DLeft ,compressor);
+        NormalizeAndCompress(DLeft ,compressor);
         assert(this->itsDmax>0);
-        NormalizeAndCompress(TensorNetworks::DRight,compressor);
+        NormalizeAndCompress(DRight,compressor);
         //
         // Now optimise this to be as close as possible to Psi2
         //
@@ -82,11 +85,11 @@ void MPSImp::Optimize
     for (int in=0; in<isl.itsMaxOptimizeIterations; in++)
     {
         itsLogger->LogInfo(0,"Sweep Right");
-        double O1=Sweep(TensorNetworks::DLeft,Psi2);  //This actually sweeps to the right, but leaves left normalized sites in its wake
+        double O1=Sweep(DLeft,Psi2);  //This actually sweeps to the right, but leaves left normalized sites in its wake
 
 //        cout << "Left  " << in << " Norm error=" << O1 << endl;
         itsLogger->LogInfo(0,"Sweep Left");
-        double O2=Sweep(TensorNetworks::DRight,Psi2);
+        double O2=Sweep(DRight,Psi2);
 //        cout << "Right " << in << " Norm error=" << O2 << endl;
         //cout << "Norm change=" << O2-O1 << endl;
         if (fabs(O2-O1)<=isl.itsEps.itsDelatNormEpsilon) break;
@@ -100,7 +103,7 @@ void MPSImp::Optimize
 
 }
 
-double MPSImp::Sweep(TensorNetworks::Direction lr,const MPS* Psi2)
+double MPSImp::Sweep(Direction lr,const MPS* Psi2)
 {
     int iter=0;
     const MPSImp* psi2Imp=dynamic_cast<const MPSImp*>(Psi2);
@@ -113,16 +116,16 @@ double MPSImp::Sweep(TensorNetworks::Direction lr,const MPS* Psi2)
 //        cout << "----- Opimizing site " << ia << " " << GetNormStatus() << " -----" << endl;
 
         assert(IsRLNormalized(ia));
-        assert(GetRLCache(TensorNetworks::DLeft ,ia-1)==CalcHeffLeft(Psi2,ia,false));
-        assert(GetRLCache(TensorNetworks::DRight,ia+1)==CalcHeffRight(Psi2,ia,false));
+        assert(GetRLCache(DLeft ,ia-1)==CalcHeffLeft(Psi2,ia,false));
+        assert(GetRLCache(DRight,ia+1)==CalcHeffRight(Psi2,ia,false));
         itsSites[ia]->Optimize(psi2Imp->itsSites[ia],
-                               GetRLCache(TensorNetworks::DLeft,ia-1),
-                               GetRLCache(TensorNetworks::DRight,ia+1));
+                               GetRLCache(DLeft,ia-1),
+                               GetRLCache(DRight,ia+1));
         MTrace=itsSites[ia]->IterateF(lr,MTrace);
         NormalizeSite(lr,ia);
         itsSites[ia]->UpdateCache(psi2Imp->itsSites[ia],
-                                  GetRLCache(TensorNetworks::DLeft,ia-1),
-                                  GetRLCache(TensorNetworks::DRight,ia+1));
+                                  GetRLCache(DLeft,ia-1),
+                                  GetRLCache(DRight,ia+1));
 
         iter++; //ia doesn;t always count upwards, but this guy does.
     }
@@ -138,7 +141,7 @@ double MPSImp::Sweep(TensorNetworks::Direction lr,const MPS* Psi2)
     return 1.0-real(MTrace(1,1));
 }
 
-MPSImp::MatrixCT MPSImp::GetRLCache (TensorNetworks::Direction lr,int isite) const
+MatrixCT MPSImp::GetRLCache (Direction lr,int isite) const
 {
     //CheckSiteNumber(isite); this function accepts out of range site numbers
     MatrixCT RL(1,1);
@@ -193,3 +196,4 @@ MPS*  MPSImp::Apply(const Operator* o) const
     return psiPrime;
 }
 
+}; // namespace
