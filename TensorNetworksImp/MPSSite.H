@@ -1,9 +1,7 @@
 #ifndef MATRIXPRODUCTSITE_H
 #define MATRIXPRODUCTSITE_H
 
-#include "TensorNetworks/Enums.H"
-#include "TensorNetworks/SVCompressor.H"
-#include "TensorNetworksImp/Typedefs.H"
+#include "TensorNetworksImp/Namespace.H"
 #include "NumericalMethods/PrimeEigenSolver.H"
 #include <vector>
 
@@ -12,9 +10,6 @@ class MatrixProductTesting;
 
 namespace TensorNetworks
 {
-class SiteOperator;
-class iTEBDStateImp;
-class Bond;
 
 class MPSSite
 {

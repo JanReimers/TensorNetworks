@@ -3,8 +3,13 @@
 #include "TensorNetworks/Epsilons.H"
 
 #include "arpack/arpackdef.h"
+#include "oml/dmatrix.h"
 #include <tuple>
-#include <complex>
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
 //
 //  Hand modified version of arpack.h with the horrible C-style __complex__ crap removed.
 //  This code uses the fork arpack-ng https://github.com/opencollab/arpack-ng
@@ -29,6 +34,8 @@ extern "C"
     void sseupd_c(bool rvec, char const* howmny, a_int const* select, float*                d, float* z, a_int ldz, float sigma, char const* bmat, a_int n, char const* which, a_int nev, float tol, float* resid, a_int ncv, float* v, a_int ldv, a_int* iparam, a_int* ipntr, float* workd, float* workl, a_int lworkl, a_int* info);
     void zneupd_c(bool rvec, char const* howmny, a_int const* select, std::complex<double>* d, std::complex<double>* z, a_int ldz, std::complex<double> sigma, std::complex<double>* workev, char const* bmat, a_int n, char const* which, a_int nev, double tol, std::complex<double>* resid, a_int ncv, std::complex<double>* v, a_int ldv, a_int* iparam, a_int* ipntr, std::complex<double>* workd, std::complex<double>* workl, a_int lworkl, double* rwork, a_int* info);
 }
+
+typedef TensorNetworks::VectorRT  VectorRT;
 
 
 ArpackEigenSolver::ArpackEigenSolver()

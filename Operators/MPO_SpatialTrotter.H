@@ -1,8 +1,7 @@
 #ifndef MPO_SPATIALTROTTER_H
 #define MPO_SPATIALTROTTER_H
 
-#include "TensorNetworks/Enums.H"
-#include "TensorNetworks/Typedefs.H"
+#include "TensorNetworks/Namespace.H"
 #include "TensorNetworks/Operator.H"
 namespace TensorNetworks
 {

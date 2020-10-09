@@ -2,7 +2,6 @@
 #define ONESITEDMS_H
 
 #include "oml/dmatrix.h"
-#include "oml/smatrix.h"
 #include "oml/vector.h"
 #include <complex>
 //---------------------------------------------------------------------------------------

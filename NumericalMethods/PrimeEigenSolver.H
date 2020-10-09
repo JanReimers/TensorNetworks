@@ -1,15 +1,9 @@
 #ifndef PRIMEEIGENSOLVER_H
 #define PRIMEEIGENSOLVER_H
 
+#include "TensorNetworksImp/Namespace.H"
 #include "Containers/SparseMatrix.H"
-#include "TensorNetworks/Typedefs.H"
 
-
-namespace TensorNetworks
-{
-class Epsilons;
-class FullStateImp;
-}
 //
 //  Solve sparse eigen systems using the PRIMME library
 //  For efficiency client code should keep and instance of PrimeEigenSolver alive

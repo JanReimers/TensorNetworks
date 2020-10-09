@@ -1,15 +1,12 @@
 #ifndef FULLSTATE_H
 #define FULLSTATE_H
 
-#include "TensorNetworks/Typedefs.H"
+#include "TensorNetworks/Namespace.H"
 #include <iosfwd>
 
 
 namespace TensorNetworks
 {
-    class Hamiltonian;
-class Epsilons;
-class IterationScheduleLine;
 
 //--------------------------------------------------------------------------------
 //

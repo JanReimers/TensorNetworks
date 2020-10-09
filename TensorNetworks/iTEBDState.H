@@ -1,9 +1,7 @@
 #ifndef ITEBDSTATE_H
 #define ITEBDSTATE_H
 
-#include "TensorNetworks/Enums.H"
-#include "TensorNetworks/Typedefs.H"
-#include "TensorNetworks/SVCompressor.H"
+#include "TensorNetworks/Namespace.H"
 #include <iosfwd>
 
 namespace TensorNetworks

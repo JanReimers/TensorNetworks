@@ -1,10 +1,11 @@
 #ifndef OPERATOR_H
 #define OPERATOR_H
 
+#include "TensorNetworks/Namespace.H"
+
 namespace TensorNetworks
 {
 
-class SiteOperator;
 class Operator
 {
     public:

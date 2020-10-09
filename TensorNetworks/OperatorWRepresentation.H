@@ -1,13 +1,11 @@
 #ifndef OPERATORWREPRESENTATION_H
 #define OPERATORWREPRESENTATION_H
 
-#include "TensorNetworks/Enums.H"
-#include "TensorNetworks/Typedefs.H"
+#include "TensorNetworks/Namespace.H"
 
 namespace TensorNetworks
 {
 
-class Dw12;
 //
 //  The implementation of this class calculates the <m|W|n> matrix elements
 //  directly so don't use this in hot loops.  Use SiteOperator instead, which caches

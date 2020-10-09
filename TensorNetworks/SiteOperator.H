@@ -1,15 +1,10 @@
 #ifndef SITEOPERATOR_H
 #define SITEOPERATOR_H
 
-#include "TensorNetworks/Typedefs.H"
-#include "TensorNetworks/SVCompressor.H"
-#include "TensorNetworks/Enums.H"
-
+#include "TensorNetworks/Namespace.H"
 
 namespace TensorNetworks
 {
-class Dw12;
-class IterationScheduleLine;
 
 //
 //  The implementation of this class cache all the  <m|W|n> matrix elements

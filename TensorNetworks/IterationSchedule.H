@@ -1,8 +1,8 @@
 #ifndef ITERATIONSCHEDULE_H
 #define ITERATIONSCHEDULE_H
 
+#include "TensorNetworks/Namespace.H"
 #include "TensorNetworks/Epsilons.H"
-#include "TensorNetworks/Enums.H"
 
 #include <vector>
 #include <iosfwd>
@@ -12,7 +12,6 @@ namespace TensorNetworks
 
 struct IterationScheduleLine
 {
-    typedef  TrotterOrder  TOrder;
     //
     // Use these constructors for variational GS searches
     //
@@ -21,15 +20,15 @@ struct IterationScheduleLine
     //
     // Use these constructors for iTime GS searches
     //
-    IterationScheduleLine(int maxiter,int Dmax,double dt,TOrder,const Epsilons&);
-    IterationScheduleLine(int maxiter,int Dmax,int maxOptIter,double dt,TOrder,const Epsilons&);
+    IterationScheduleLine(int maxiter,int Dmax,double dt,TrotterOrder,const Epsilons&);
+    IterationScheduleLine(int maxiter,int Dmax,int maxOptIter,double dt,TrotterOrder,const Epsilons&);
 
     int      itsMaxGSSweepIterations;  // Primary # of sweeps for variational GS search or i-time evolution
     int      itsMaxOptimizeIterations; // For post SVD compress optimization iterations
     int      itsDmax;                  // Max bond dimension
     int      itsDeltaD;                // Bond dimension increment
     double   itsdt;                    // Delta tau for i-time evolution
-    TOrder   itsTrotterOrder;          // Order for descrete time steps/
+    TrotterOrder   itsTrotterOrder;          // Order for descrete time steps/
     Epsilons itsEps;                   // Struct of various epsilons.
 
     friend std::ostream& operator<<(std::ostream&,const IterationScheduleLine&);
@@ -37,7 +36,6 @@ struct IterationScheduleLine
 
 class IterationSchedule
 {
-        typedef  TrotterOrder  TOrder;
     public:
         IterationSchedule() : itsCurrentLine(0) {};
         void Insert(const IterationScheduleLine& l) {itsLines.push_back(l);}

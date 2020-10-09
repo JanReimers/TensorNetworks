@@ -1,4 +1,5 @@
 #include "Operators/IdentityOperator.H"
+#include "oml/dmatrix.h"
 
 namespace TensorNetworks
 {

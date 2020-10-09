@@ -1,6 +1,6 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/MPO.H"
-
+#include "Containers/Matrix4.H"
 #include "oml/numeric.h"
 
 namespace TensorNetworks

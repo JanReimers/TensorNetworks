@@ -1,18 +1,12 @@
 #ifndef ARPACKEIGENSOLVER_H
 #define ARPACKEIGENSOLVER_H
 
-#include "TensorNetworksImp/Typedefs.H"
-
-namespace TensorNetworks
-{
-class Epsilons;
-}
+#include "TensorNetworks/Namespace.H"
 
 class ArpackEigenSolver
 {
-    typedef TensorNetworks::VectorRT  VectorRT;
-    typedef TensorNetworks::VectorCT VectorCT;
     typedef TensorNetworks::MatrixCT MatrixCT;
+    typedef TensorNetworks::VectorCT VectorCT;
 public:
     ArpackEigenSolver();
     virtual ~ArpackEigenSolver();

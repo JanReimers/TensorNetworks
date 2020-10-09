@@ -1,16 +1,13 @@
 #ifndef MATRIXPRODUCTOPERATOR_H
 #define MATRIXPRODUCTOPERATOR_H
 
+#include "TensorNetworks/Namespace.H"
 #include "TensorNetworks/Operator.H"
-#include "TensorNetworks/Enums.H"
 #include "Misc/ptr_vector.h"
 
 
 namespace TensorNetworks
 {
-class OperatorWRepresentation;
-class SiteOperator;
-
 //
 //  Represent an MPO with Left/Bulk/Right structure.  What this means is that we only need store
 //  separate W matrices for the left, bulk and right locations.

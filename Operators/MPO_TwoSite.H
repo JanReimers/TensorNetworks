@@ -1,17 +1,13 @@
 #ifndef MPO_TwoSite_H
 #define MPO_TwoSite_H
 
+#include "TensorNetworks/Namespace.H"
 #include "TensorNetworks/Operator.H"
-#include "TensorNetworks/Enums.H"
 #include "Misc/ptr_vector.h"
 
 
 namespace TensorNetworks
 {
-
-class SiteOperator;
-class OperatorWRepresentation;
-
 //
 //  Represent an MPO for one site only. The rest of the sites are just identity operators.
 //

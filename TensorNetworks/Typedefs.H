@@ -1,10 +1,13 @@
 #ifndef _TYPEDEFS_H_
 #define _TYPEDEFS_H_
 
-#include "oml/dmatrix.h"
-#include "Containers/Matrix4.H"
-#include <utility>
+#include <complex>
 
+template <class T> class DMatrix;
+template <class T> class DiagonalMatrix;
+template <class T> class Vector;
+template <class T> class Array;
+template <class T> class Matrix4;
 
 //--------------------------------------------------------------------------------------
 //
@@ -16,6 +19,7 @@ namespace TensorNetworks
     typedef DMatrix  <eType>   MatrixCT;
     typedef DMatrix  <double>  MatrixRT;
     typedef Vector   <double>  VectorRT;
+    typedef Vector   <eType>   VectorCT;
     typedef Matrix4  <double>  Matrix4RT;
     typedef Array    <double>  ArrayRT;
 

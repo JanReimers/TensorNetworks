@@ -1,21 +1,12 @@
 #ifndef HAMILTONIAN_H
 #define HAMILTONIAN_H
 
+#include "TensorNetworks/Namespace.H"
 #include "TensorNetworks/Operator.H"
-#include "TensorNetworks/Typedefs.H"
-#include "TensorNetworks/Enums.H"
 
 
 namespace TensorNetworks
 {
-    class TNSLogger;
-    class MPO;
-    class MPS;
-    class FullState;
-    class iTEBDState;
-    class OperatorWRepresentation;
-    class Epsilons;
-
 
 class Hamiltonian : public virtual Operator
 {

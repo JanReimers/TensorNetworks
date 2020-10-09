@@ -1,9 +1,7 @@
 #ifndef MATRIXPRODUCTSTATE_H
 #define MATRIXPRODUCTSTATE_H
 
-#include "TensorNetworks/Enums.H"
-#include "TensorNetworks/Typedefs.H"
-#include "TensorNetworks/SVCompressor.H"
+#include "TensorNetworks/Namespace.H"
 #include "Containers/OneSiteDMs.H"
 #include "Containers/TwoSiteDMs.H"
 #include <string>
@@ -12,13 +10,6 @@
 
 namespace TensorNetworks
 {
-
-class Epsilons;
-class IterationSchedule;
-class IterationScheduleLine;
-class Operator;
-class Hamiltonian;
-class TNSLogger;
 
 class MPS
 {

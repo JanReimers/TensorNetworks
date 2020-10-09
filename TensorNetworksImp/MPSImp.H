@@ -7,16 +7,13 @@
 #include "Misc/ptr_vector.h"
 
 
-//namespace
-//{
-    class MPOTesting;
-    class MPSNormTesting;
-    class MatrixProductTesting;
-//}
+// Required forward decs, for friend decs below
+class MPOTesting;
+class MPSNormTesting;
+class MatrixProductTesting;
 
 namespace TensorNetworks
 {
-class IterationScheduleLine;
 
 class MPSImp : public virtual MPS
 {

@@ -9,9 +9,6 @@
 
 namespace TensorNetworks
 {
-
-class MPO;
-
 //
 //  H=Sum(a=1..L,J*Sa*Sa+1) where Sa spin S operator on site a
 //

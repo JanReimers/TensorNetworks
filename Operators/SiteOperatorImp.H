@@ -1,17 +1,14 @@
 #ifndef MPOSITE_H
 #define MPOSITE_H
 
+#include "TensorNetworks/Namespace.H"
 #include "TensorNetworks/SiteOperator.H"
-#include "TensorNetworks/Enums.H"
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworksImp/Typedefs.H"
 
 
 namespace TensorNetworks
 {
-
-class OperatorWRepresentation;
-
 class SiteOperatorImp : public virtual SiteOperator
 {
     public:

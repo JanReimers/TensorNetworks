@@ -1,7 +1,7 @@
 #ifndef SVCOMPRESSOR_H
 #define SVCOMPRESSOR_H
 
-#include "TensorNetworks/Typedefs.H"
+#include "TensorNetworks/Namespace.H"
 
 namespace TensorNetworks
 {
@@ -20,8 +20,6 @@ template <class T> class SVCompressor
         virtual double Compress(MatrixT& U, DiagonalMatrixRT& s, MatrixT& Vdagger)=0;
 };
 
-typedef SVCompressor<eType> SVCompressorC;
-typedef SVCompressor<double               > SVCompressorR;
 
 }
 #endif // SVCOMPRESSOR_H

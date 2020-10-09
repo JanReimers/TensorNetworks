@@ -1,16 +1,12 @@
 #ifndef BOND_H
 #define BOND_H
 
-#include "TensorNetworks/Enums.H"
-#include "TensorNetworksImp/Typedefs.H"
+#include "TensorNetworksImp/Namespace.H"
 #include "oml/vector.h"
 
 
 namespace TensorNetworks
 {
-    class iTEBDStateImp;
-    class MPSSite;
-
 
 class Bond
 {

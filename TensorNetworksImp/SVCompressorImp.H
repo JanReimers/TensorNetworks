@@ -23,8 +23,8 @@ template <class T> class SVCompressorImp : public virtual SVCompressor<T>
         double itsSVeps;
 };
 
-typedef SVCompressorImp<eType> SVCompressorImpC;
-typedef SVCompressorImp<double               > SVCompressorImpR;
+typedef SVCompressorImp<eType > SVCompressorImpC;
+typedef SVCompressorImp<double> SVCompressorImpR;
 }
 
 #endif // SVCOMPRESSORIMP_H

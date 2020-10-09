@@ -1,6 +1,7 @@
 #include "Operators/SiteOperatorImp.H"
 #include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworks/IterationSchedule.H"
+#include "TensorNetworks/SVCompressor.H"
 #include "oml/minmax.h"
 #include "NumericalMethods/LapackSVD.H"
 #include <complex>
@@ -9,7 +10,7 @@ namespace TensorNetworks
 {
 
 //
-//  Build from a W rep opbject
+//  Build from a W rep object
 //
 SiteOperatorImp::SiteOperatorImp(Position lbr, const OperatorWRepresentation* H,int d)
     : itsd(d)
