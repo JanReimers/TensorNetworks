@@ -1,17 +1,6 @@
 #include "TensorNetworksImp/MPSImp.H"
-#include "TensorNetworksImp/Bond.H"
-#include "TensorNetworks/Hamiltonian.H"
-#include "TensorNetworks/MPO.H"
-#include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/TNSLogger.H"
-#include "Containers/Matrix4.H"
-#include "Functions/Mesh/PlotableMesh.H"
-#include <iostream>
-#include <iomanip>
-
-using std::cout;
-using std::endl;
 
 namespace TensorNetworks
 {

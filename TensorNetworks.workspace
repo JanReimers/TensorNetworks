@@ -1,44 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="Workspace">
-		<Project filename="../oml/oml.cbp" />
-		<Project filename="../Misc/Misc.cbp" />
-		<Project filename="../Misc/wxMisc.cbp">
-			<Depends filename="../Misc/Misc.cbp" />
-		</Project>
-		<Project filename="../Plotting/Plotting.cbp" />
-		<Project filename="../Plotting/wxPlotting.cbp">
-			<Depends filename="../Misc/wxMisc.cbp" />
-			<Depends filename="../Plotting/Plotting.cbp" />
-		</Project>
-		<Project filename="../Plotting/PyPlotting.cbp">
-			<Depends filename="../Misc/wxMisc.cbp" />
-			<Depends filename="../Plotting/wxPlotting.cbp" />
-		</Project>
-		<Project filename="../Functions/Functions.cbp" />
+		<Project filename="oml/oml.cbp" />
 		<Project filename="TensorNetworks.cbp">
-			<Depends filename="../Misc/Misc.cbp" />
-			<Depends filename="../Plotting/wxPlotting.cbp" />
-			<Depends filename="../Functions/Functions.cbp" />
+			<Depends filename="oml/oml.cbp" />
 		</Project>
 		<Project filename="TensorNetworksUnittests/TensorNetworksUnittests.cbp">
 			<Depends filename="TensorNetworks.cbp" />
-			<Depends filename="../oml/oml.cbp" />
 		</Project>
 		<Project filename="PyTensorNetworks/PyTensorNetworks.cbp">
-			<Depends filename="../oml/oml.cbp" />
-			<Depends filename="../Misc/Misc.cbp" />
-			<Depends filename="../Misc/wxMisc.cbp" />
-			<Depends filename="../Plotting/Plotting.cbp" />
-			<Depends filename="../Plotting/wxPlotting.cbp" />
-			<Depends filename="../Functions/Functions.cbp" />
 			<Depends filename="TensorNetworks.cbp" />
 		</Project>
 		<Project filename="wxMPSUnitTests.cbp">
-			<Depends filename="../Plotting/wxPlotting.cbp" />
-			<Depends filename="../Functions/Functions.cbp" />
 			<Depends filename="TensorNetworks.cbp" />
 		</Project>
-		<Project filename="Tetrahedra/Tetrahedra.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

@@ -1,0 +1,10 @@
+
+Debug/
+
+*.layout
+
+*.depend
+
+obj/
+
+Release/

@@ -148,8 +148,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworks/MPS.H" />
-		<Unit filename="TensorNetworks/MPSPlotable.H" />
-		<Unit filename="TensorNetworks/MultiPlotable.H" />
 		<Unit filename="TensorNetworks/Namespace.H" />
 		<Unit filename="TensorNetworks/Operator.H" />
 		<Unit filename="TensorNetworks/OperatorWRepresentation.H" />
@@ -197,10 +195,6 @@
 		<Unit filename="TensorNetworksImp/MPSImp_iTime.C">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="TensorNetworksImp/MPSPlotableImp.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworksImp/MPSPlotableImp.H" />
 		<Unit filename="TensorNetworksImp/MPSSite.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -217,10 +211,6 @@
 		<Unit filename="TensorNetworksImp/MPSSite_iTIme.C">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="TensorNetworksImp/MultiPlotableImp.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworksImp/MultiPlotableImp.H" />
 		<Unit filename="TensorNetworksImp/Namespace.H" />
 		<Unit filename="TensorNetworksImp/SPDLogger.C">
 			<Option compilerVar="CC" />

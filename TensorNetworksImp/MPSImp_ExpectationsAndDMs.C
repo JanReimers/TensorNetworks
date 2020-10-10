@@ -1,16 +1,11 @@
 #include "TensorNetworksImp/MPSImp.H"
-#include "TensorNetworksImp/Bond.H"
-#include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/MPO.H"
-#include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/TNSLogger.H"
-#include "Containers/Matrix4.H"
-#include "Functions/Mesh/PlotableMesh.H"
-#include <iostream>
-#include <iomanip>
+//#include <iostream>
+//#include <iomanip>
 
-using std::cout;
-using std::endl;
+//using std::cout;
+//using std::endl;
 
 namespace TensorNetworks
 {
@@ -20,7 +15,7 @@ double   MPSImp::GetExpectation   (const Operator* o) const
     Vector3CT F(1,1,1,1);
     F(1,1,1)=eType(1.0);
     SiteLoop(ia)
-    F=itsSites[ia]->IterateLeft_F(o->GetSiteOperator(ia),F);
+        F=itsSites[ia]->IterateLeft_F(o->GetSiteOperator(ia),F);
 
     double iE=std::imag(F(1,1,1));
     if (fabs(iE)>1e-10)

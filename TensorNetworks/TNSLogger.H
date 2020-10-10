@@ -1,7 +1,7 @@
 #ifndef TNSLOGGER_H
 #define TNSLOGGER_H
 
-#include "Misc/c_str.H"
+#include "Containers/c_str.H"
 #include <memory>
 
 namespace TensorNetworks
