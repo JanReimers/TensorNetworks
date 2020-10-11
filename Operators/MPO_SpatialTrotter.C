@@ -2,6 +2,7 @@
 #include "TensorNetworksImp/Typedefs.H"
 #include "Operators/SiteOperatorImp.H"
 #include "Operators/IdentityOperator.H"
+#include "NumericalMethods/LapackSVD.H"
 #include "oml/numeric.h"
 
 namespace TensorNetworks
@@ -28,6 +29,7 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, int d, con
     //cout << "H12=" << H12 << endl;
     MatrixRT U12=H12.Flatten();
     VectorRT evs=Diagonalize(U12);
+    assert(evs.size()==itsd*itsd);
     VectorRT expEvs=exp(-dt*evs);
     Matrix4RT expH(d,d,d,d,0);
     Fill(expH.Flatten(),0.0);
@@ -41,26 +43,14 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, int d, con
                     for (int k=1; k<=N; k++)
                         expH(m1,n1,m2,n2)+=U12(i1,k)*expEvs(k)*U12(i2,k);
         }
-
-    //cout << "expH=" << expH << endl;
-
-    VectorRT s(N);
-    MatrixRT U(expH.Flatten()),V(expH.Flatten().GetLimits());
-    SVDecomp (U,s,V);
-
-    //cout << "U=" << U << endl;
-    //cout << "s=" << s << endl;
-    //cout << "V=" << V << endl;
-//    cout << "expEvs=" <<  expEvs << endl;
-    //
-    //  Now U is the matrix of eigen vectors
-    //
-
-    assert(evs.size()==itsd*itsd);
+//
+// Now SVD to factor exp(-dt*H)
+//
+    auto [U,sm,VT]=LaSVDecomp(expH.Flatten()); //Solves A=U * s * VT
     OperatorWRepresentation* IdentityWOp=new IdentityOperator();
 
-    itsLeft_Site=new SiteOperatorImp(DLeft,U,s,itsd);
-    itsRightSite=new SiteOperatorImp(DRight,V,s,itsd);
+    itsLeft_Site=new SiteOperatorImp(DLeft,U,sm,itsd);
+    itsRightSite=new SiteOperatorImp(DRight,VT,sm,itsd);
     itsUnit_Site=new SiteOperatorImp(PBulk,IdentityWOp,itsd);
 
     delete IdentityWOp;

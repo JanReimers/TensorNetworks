@@ -13,7 +13,7 @@ class SiteOperatorImp : public virtual SiteOperator
 {
     public:
         SiteOperatorImp(Position  lbr, const OperatorWRepresentation* O,int d);
-        SiteOperatorImp(Direction lr , const MatrixRT& U, const VectorRT& expEvs, int d);
+        SiteOperatorImp(Direction lr , const MatrixRT& U, const DiagonalMatrixRT& expEvs, int d);
         virtual ~SiteOperatorImp();
         void SetNeighbours(SiteOperator* left, SiteOperator* right);
 

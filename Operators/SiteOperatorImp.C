@@ -28,12 +28,12 @@ SiteOperatorImp::SiteOperatorImp(Position lbr, const OperatorWRepresentation* H,
 //
 // Build from a trotter decomp.
 //
-SiteOperatorImp::SiteOperatorImp(Direction lr,const MatrixRT& U, const VectorRT& s, int d)
+SiteOperatorImp::SiteOperatorImp(Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s, int d)
     : itsd(d)
     , itsDw12()
     , itsWs(d,d)
 {
-    int Dw=s.size();
+    int Dw=s.GetNumRows();
     if (lr==DLeft)
     {
         // Build up w limits
@@ -49,7 +49,7 @@ SiteOperatorImp::SiteOperatorImp(Direction lr,const MatrixRT& U, const VectorRT&
             {
                 itsWs(m+1,n+1)=MatrixRT(1,Dw);
                 for (int w=1; w<=Dw; w++)
-                    itsWs(m+1,n+1)(1,w)=U(i1,w)*sqrt(s(w));
+                    itsWs(m+1,n+1)(1,w)=U(i1,w)*sqrt(s(w,w));
                 //cout << "Left itsWs(" << m << "," << n << ") = " << itsWs(m+1,n+1) << endl;
                 assert(itsWs(m+1,n+1).GetNumRows()==itsDw12.Dw1);
                 assert(itsWs(m+1,n+1).GetNumCols()==itsDw12.Dw2);
@@ -70,7 +70,7 @@ SiteOperatorImp::SiteOperatorImp(Direction lr,const MatrixRT& U, const VectorRT&
             {
                 itsWs(m+1,n+1)=MatrixRT(Dw,1);
                 for (int w=1; w<=Dw; w++)
-                    itsWs(m+1,n+1)(w,1)=U(i2,w)*sqrt(s(w));
+                    itsWs(m+1,n+1)(w,1)=sqrt(s(w,w))*U(w,i2); //U is actually VT
                 //cout << "Right itsWs(" << m << "," << n << ") = " << itsWs(m+1,n+1) << endl;
                 assert(itsWs(m+1,n+1).GetNumRows()==itsDw12.Dw1);
                 assert(itsWs(m+1,n+1).GetNumCols()==itsDw12.Dw2);
@@ -143,7 +143,7 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
     assert(comp);
     MatrixRT  A=Reshape(lr);
 
-    auto [U,sm,VT]=LaSVDecomp(A); //Solves A=U * s * Vdagger  returns V not Vdagger
+    auto [U,sm,VT]=LaSVDecomp(A); //Solves A=U * s * VT
 //    VectorRT s=sm.GetDiagonal();
 //    cout << "error1=" << std::scientific << Max(abs(MatrixRT(U*sm*VT-A))) << endl;
 //    assert(Max(abs(MatrixRT(U*sm*VT-A)))<1e-10);
