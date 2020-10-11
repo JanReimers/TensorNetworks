@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/TensorNetworksUnittests" prefix_auto="1" extension_auto="1" />
+				<Option output="../Debug/TensorNetworksUnittests" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -19,11 +19,11 @@
 				</Compiler>
 				<Linker>
 					<Add library="itensor-g" />
-					<Add directory="../../Debug" />
+					<Add directory="../Debug" />
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/TensorNetworksUnittests" prefix_auto="1" extension_auto="1" />
+				<Option output="../Release/TensorNetworksUnittests" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -36,7 +36,7 @@
 				<Linker>
 					<Add option="-pg" />
 					<Add library="itensor" />
-					<Add directory="../../Release" />
+					<Add directory="../Release" />
 				</Linker>
 			</Target>
 		</Build>
@@ -46,16 +46,11 @@
 			<Add option="-m64" />
 			<Add option="-fexceptions" />
 			<Add directory="../" />
-			<Add directory="../../" />
-			<Add directory="../../Plotting" />
 			<Add directory="../../../Code/ITensor-3" />
 		</Compiler>
 		<Linker>
 			<Add option="-m64" />
 			<Add library="TensorNetworks" />
-			<Add library="Functions" />
-			<Add library="Plotting" />
-			<Add library="Misc" />
 			<Add library="oml" />
 			<Add library="gtest" />
 			<Add library="primme" />
