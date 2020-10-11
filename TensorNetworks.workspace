@@ -2,10 +2,12 @@
 <CodeBlocks_workspace_file>
 	<Workspace title="Workspace">
 		<Project filename="oml/oml.cbp" />
+		<Project filename="ITensor.cbp" />
 		<Project filename="TensorNetworks.cbp">
 			<Depends filename="oml/oml.cbp" />
 		</Project>
 		<Project filename="TensorNetworksUnittests/TensorNetworksUnittests.cbp">
+			<Depends filename="ITensor.cbp" />
 			<Depends filename="TensorNetworks.cbp" />
 		</Project>
 		<Project filename="PyTensorNetworks/PyTensorNetworks.cbp">

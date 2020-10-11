@@ -46,7 +46,7 @@
 			<Add option="-m64" />
 			<Add option="-fexceptions" />
 			<Add directory="../" />
-			<Add directory="../../../Code/ITensor-3" />
+			<Add directory="../ITensor" />
 		</Compiler>
 		<Linker>
 			<Add option="-m64" />
@@ -59,7 +59,7 @@
 			<Add library="blas" />
 			<Add library="gfortran" />
 			<Add library="pthread" />
-			<Add directory="../../../Code/ITensor-3/lib" />
+			<Add directory="../ITensor/lib" />
 		</Linker>
 		<Unit filename="ExactDiagTests.C">
 			<Option compilerVar="CC" />

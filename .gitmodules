@@ -1,3 +1,6 @@
 [submodule "oml"]
 	path = oml
 	url = https://github.com/JanReimers/oml
+[submodule "ITensor"]
+	path = ITensor
+	url = https://github.com/ITensor/ITensor
