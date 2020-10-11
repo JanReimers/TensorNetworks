@@ -27,9 +27,9 @@ public:
 
 
     double eps;
-    const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
-    TensorNetworks::Hamiltonian*         itsH;
-    TensorNetworks::iTEBDState*          itsState;
+    TensorNetworks::Factory*     itsFactory=TensorNetworks::Factory::GetFactory();
+    TensorNetworks::Hamiltonian* itsH;
+    TensorNetworks::iTEBDState*  itsState;
 };
 
 

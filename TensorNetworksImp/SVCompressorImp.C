@@ -16,7 +16,7 @@ template <class T> SVCompressorImp<T>::~SVCompressorImp()
 {
 }
 
-template <class T> double SVCompressorImp<T>::Compress(MatrixT& U, DiagonalMatrixRT& s, MatrixT& Vdagger)
+template <class T> double SVCompressorImp<T>::Compress(MatrixT& U, DiagonalMatrixRT& s, MatrixT& Vdagger) const
 {
     int N=s.GetNumRows();
     int D=N;

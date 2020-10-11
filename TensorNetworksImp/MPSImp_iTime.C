@@ -1,9 +1,9 @@
 #include "TensorNetworksImp/MPSImp.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/MPO.H"
+#include "TensorNetworks/Factory.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/TNSLogger.H"
-#include "TensorNetworksImp/SVCompressorImp.H"
 //#include <iostream>
 //#include <iomanip>
 
@@ -29,14 +29,15 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
 double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationScheduleLine& isl)
 {
     assert(isl.itsDmax>0 || isl.itsEps.itsMPSCompressEpsilon>0);
-    SVCompressorC* compressor=new SVCompressorImpC(isl.itsDmax,isl.itsEps.itsMPSCompressEpsilon);
+    SVCompressorC* mps_compressor=Factory::GetFactory()->MakeMPSCompressor(isl.itsDmax,isl.itsEps.itsMPSCompressEpsilon);
+    SVCompressorR* mpo_compressor=Factory::GetFactory()->MakeMPOCompressor(0          ,isl.itsEps.itsMPOCompressEpsilon);
 
     double E1=GetExpectation(H)/(itsL-1);
 //    cout << isl << endl;
 //    cout.precision(5);
 //    cout << "E=" << std::fixed << E1 << endl;
     MPO* W =H->CreateOperator(isl.itsdt,isl.itsTrotterOrder);
-    W->Compress(0,isl.itsEps.itsMPOCompressEpsilon);
+    W->Compress(mpo_compressor);
 //    double percent=W->Compress(0,isl.itsEps.itsMPOCompressEpsilon);
 //    cout << "FindGroundState dt=" << isl.itsdt << " " << percent << "% compresstion" << endl;
     int niter=1;
@@ -48,9 +49,9 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
         //
         //  Compress in both directions
         //
-        NormalizeAndCompress(DLeft ,compressor);
+        NormalizeAndCompress(DLeft ,mps_compressor);
         assert(this->itsDmax>0);
-        NormalizeAndCompress(DRight,compressor);
+        NormalizeAndCompress(DRight,mps_compressor);
         //
         // Now optimise this to be as close as possible to Psi2
         //
@@ -66,7 +67,8 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
         if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon) break;
     }
     cout << "Niter,dt,E = " << niter << " " << isl.itsdt << " " << std::fixed << E1 << endl;
-    delete compressor;
+    delete mpo_compressor;
+    delete mps_compressor;
     return E1;
 }
 

@@ -27,7 +27,7 @@ public:
     //
     //  SVD compress and normalize to reduce Dw
     //
-    virtual void Compress(Direction,SVCompressorR*)=0;
+    virtual void Compress(Direction,const SVCompressorR*)=0;
 
     virtual void Report(std::ostream&) const=0;
 

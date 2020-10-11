@@ -11,11 +11,13 @@ class Factory
 public:
     Factory() {}
     virtual ~Factory() {}
-    static const Factory* GetFactory();
+    static Factory* GetFactory();
 
-    virtual Hamiltonian*             Make1D_NN_HeisenbergHamiltonian(int L, double S, double Jxy, double Jz, double hz)const=0;
-    virtual Operator*                MakeOperator(const OperatorWRepresentation*, int L, double S) const=0;
-    virtual OperatorWRepresentation* MakeIdentityOperator() const=0;
+    virtual Hamiltonian*             Make1D_NN_HeisenbergHamiltonian(int L, double S, double Jxy, double Jz, double hz)=0;
+    virtual Operator*                MakeOperator(const OperatorWRepresentation*, int L, double S)=0;
+    virtual OperatorWRepresentation* MakeIdentityOperator()=0;
+    virtual SVCompressorR*           MakeMPOCompressor(int Dmax, double epsSV)=0;
+    virtual SVCompressorC*           MakeMPSCompressor(int Dmax, double epsSV)=0;
 };
 
 }; //namespace TensorNetworks

@@ -16,7 +16,7 @@ template <class T> class SVCompressorImp : public virtual SVCompressor<T>
         virtual int GetDmax() const {return itsDmax;}
         virtual bool Donly () const {return itsDmax>0 && itsSVeps==0.0;}
 
-        virtual double Compress(MatrixT& U, DiagonalMatrixRT& s, MatrixT& Vdagger);
+        virtual double Compress(MatrixT& U, DiagonalMatrixRT& s, MatrixT& Vdagger) const;
 
     protected:
         int    itsDmax;

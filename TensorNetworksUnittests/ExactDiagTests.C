@@ -44,7 +44,7 @@ public:
     }
 
 
-    const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
+    TensorNetworks::Factory*              itsFactory=TensorNetworks::Factory::GetFactory();
     TensorNetworks::Hamiltonian*          itsH;
     TensorNetworks::IterationScheduleLine itsSched;
 };
@@ -275,7 +275,7 @@ TEST_F(ExactDiagTesting,LanczosGroundStateL12S12)
     Setup(12,0.5);
     TensorNetworks::FullState* psi=itsH->CreateFullState();
     psi->FindGroundState(itsSched,*itsH);
-    EXPECT_NEAR(psi->GetE(),-5.1420906328405342,itsSched.itsEps.itsDelatEnergy1Epsilon);
+    EXPECT_NEAR(psi->GetE(),-5.1420906328405342,1.5*itsSched.itsEps.itsDelatEnergy1Epsilon);
 }
 
 

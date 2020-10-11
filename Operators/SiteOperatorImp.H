@@ -29,7 +29,7 @@ class SiteOperatorImp : public virtual SiteOperator
         //
         //  SVD compress and normalize to reduce Dw
         //
-        virtual void Compress(Direction,SVCompressorR*);
+        virtual void Compress(Direction,const SVCompressorR*);
 
         virtual void Report(std::ostream&) const;
 

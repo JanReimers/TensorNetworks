@@ -12,9 +12,11 @@ public:
     FactoryImp() {}
     virtual ~FactoryImp() {}
 
-    virtual Hamiltonian*             Make1D_NN_HeisenbergHamiltonian(int L, double S, double Jxy, double Jz, double hz) const;
-    virtual Operator*                MakeOperator(const OperatorWRepresentation*, int L, double S) const;
-    virtual OperatorWRepresentation* MakeIdentityOperator() const;
+    virtual Hamiltonian*             Make1D_NN_HeisenbergHamiltonian(int L, double S, double Jxy, double Jz, double hz);
+    virtual Operator*                MakeOperator(const OperatorWRepresentation*, int L, double S);
+    virtual OperatorWRepresentation* MakeIdentityOperator();
+    virtual SVCompressorR*           MakeMPOCompressor(int Dmax, double epsSV);
+    virtual SVCompressorC*           MakeMPSCompressor(int Dmax, double epsSV);
 };
 
 }; //namespace TensorNetworks

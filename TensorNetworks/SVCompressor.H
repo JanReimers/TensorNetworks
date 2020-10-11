@@ -17,7 +17,7 @@ template <class T> class SVCompressor
         virtual int  GetDmax() const=0;
         virtual bool Donly  () const=0;
         // Returns integrated weight of discarded vector space.
-        virtual double Compress(MatrixT& U, DiagonalMatrixRT& s, MatrixT& Vdagger)=0;
+        virtual double Compress(MatrixT& U, DiagonalMatrixRT& s, MatrixT& Vdagger) const=0;
 };
 
 

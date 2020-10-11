@@ -31,10 +31,10 @@ public:
 
 
     double eps;
-    const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
-    TensorNetworks::Hamiltonian*         itsH;
-    TensorNetworks::MPS* itsMPS;
-    TensorNetworks::TNSLogger*           itsLogger;
+    TensorNetworks::Factory*     itsFactory=TensorNetworks::Factory::GetFactory();
+    TensorNetworks::Hamiltonian* itsH;
+    TensorNetworks::MPS*         itsMPS;
+    TensorNetworks::TNSLogger*   itsLogger;
 };
 
 

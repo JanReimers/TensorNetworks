@@ -49,10 +49,10 @@ public:
     }
 
 
-    const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
-    TensorNetworks::Hamiltonian*         itsH;
-    TensorNetworks::MPS* itsMPS;
-    TensorNetworks::Epsilons             itsEps;
+    TensorNetworks::Factory*     itsFactory=TensorNetworks::Factory::GetFactory();
+    TensorNetworks::Hamiltonian* itsH;
+    TensorNetworks::MPS*         itsMPS;
+    TensorNetworks::Epsilons     itsEps;
 };
 
 

@@ -44,10 +44,10 @@ public:
     const TensorNetworks::MPSImp* GetMPSImp() const {return dynamic_cast<const TensorNetworks::MPSImp*>(itsMPS);}
 
     double eps;
-    const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
-    TensorNetworks::Hamiltonian*                   itsH;
-    TensorNetworks::OperatorWRepresentation*       itsWRep;
-    TensorNetworks::MPS*           itsMPS;
+    TensorNetworks::Factory*                 itsFactory=TensorNetworks::Factory::GetFactory();
+    TensorNetworks::Hamiltonian*             itsH;
+    TensorNetworks::OperatorWRepresentation* itsWRep;
+    TensorNetworks::MPS*                     itsMPS;
 };
 
 

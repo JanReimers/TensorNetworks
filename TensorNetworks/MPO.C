@@ -1,7 +1,8 @@
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
-#include "TensorNetworksImp/SVMPOCompressor.H"
+#include "TensorNetworks/Factory.H"
+#include "TensorNetworks/SVCompressor.H"
 #include "oml/vector.h"
 #include <cassert>
 
@@ -18,10 +19,18 @@ void MPO::Combine(const Operator* O2)
     }
 }
 
-double MPO::Compress(int Dmax, double minSv)
+double MPO::Compress(int Dmax, double epsSV)
+{
+    SVCompressorR* comp=Factory::GetFactory()->MakeMPOCompressor(Dmax,epsSV);
+    double percent=Compress(comp);
+    delete comp;
+    return percent;
+}
+
+
+double MPO::Compress(const SVCompressorR* compressor)
 {
     int L=GetL();
-    SVMPOCompressor* compressor=new SVMPOCompressor(Dmax,minSv);
     Vector<int> oldDws(L),newDws(L);
     for (int ia=1;ia<L;ia++)
     {
@@ -37,7 +46,6 @@ double MPO::Compress(int Dmax, double minSv)
     newDws(1)=0;
     double percent=100-(100.0*Sum(newDws))/static_cast<double>(Sum(oldDws));
 //    cout << "% compression=" << std::fixed << std::setprecision(2) << percent << endl;
-    delete compressor;
     return percent;
 }
 

@@ -37,9 +37,9 @@ public:
 
 
     double eps;
-    const TensorNetworks::Factory* itsFactory=TensorNetworks::Factory::GetFactory();
-    TensorNetworks::Hamiltonian*         itsH;
-    TensorNetworks::MPS* itsMPS;
+    TensorNetworks::Factory*     itsFactory=TensorNetworks::Factory::GetFactory();
+    TensorNetworks::Hamiltonian* itsH;
+    TensorNetworks::MPS*         itsMPS;
 };
 
 
@@ -203,7 +203,7 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05_FixedEps)
 TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05_FixedDw)
 {
     int D=8,L=9,DwMax=4;
-    double dt=0.05,epsSVD=1e-14;                                                                                                                                                                                                     ;
+    double dt=0.05,epsSVD=0;                                                                                                                                                                                                     ;
     Setup(L,0.5,D);
     TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
     Psi1->InitializeWith(TensorNetworks::Random);

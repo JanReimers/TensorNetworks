@@ -1,21 +1,24 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
+- Right now SVMPOCompressor is unused. Do we need a different policy for MPOs? If not remove SVMPOCompressor
 - Right now PrimeEigenSolver depends in FullStateImp, can be break this somewhow?
 - Fix MPS::Report columns
     why are they empty sometimes?
 - Reorg : Operators goes under Imp folder
     Create State under imp folder
 - Move multiplotable back to Plotting
+    -Pulled out of CB projects for now
 - replace eType with a better name, same length as double.
 - ExactDiagTesting make FullState member
 - Why use and Array instead of Vector for FullState?
-- Replace SVDecomp (U,s,V) in MPO_SpatialTrotter.C
 - Make a CheckHalfInteger function for S
 - Tidy up test names
     -SVDTesting should be LinAlgebraTesting
     -Prefix with numbers or somehow tell gtest the run order
 - Imaginary checks in GetOverlap should /itsL shows up in Imaginary time testing
-- MPO should use SVCompressorR instead Dmax, eps
+- Replace SVDecomp (U,s,V) in MPO_SpatialTrotter.C
+- Done: MPO should use SVCompressorR instead Dmax, eps
+    Support Dmax, eps as well for user convenience
 - The freeze idea didn;t work because normalization is current sweeping through the frozen Site
     If we freeze site one, then left normalization needs to start at site 2
     and the right sweeps we need to stop at site two since we can;t SVD transfer to site 1.

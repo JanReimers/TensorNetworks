@@ -138,7 +138,7 @@ void SiteOperatorImp::Combine(const SiteOperator* O2)
     itsDw12=Dw;
 }
 
-void SiteOperatorImp::Compress(Direction lr,SVCompressorR* comp)
+void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
 {
     assert(comp);
     MatrixRT  A=Reshape(lr);
