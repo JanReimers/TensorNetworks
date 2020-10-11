@@ -10,6 +10,26 @@
 namespace TensorNetworks
 {
 
+double   MPSImp::GetOverlap(const MPS* Psi2) const
+{
+    const MPSImp* Psi2Imp=dynamic_cast<const MPSImp*>(Psi2);
+    assert(Psi2Imp);
+
+    MatrixCT F(1,1);
+    F(1,1)=eType(1.0);
+    SiteLoop(ia)
+    F=itsSites[ia]->IterateLeft_F(Psi2Imp->itsSites[ia],F);
+
+    assert(F.GetLimits()==MatLimits(1,1));
+    double iO=std::imag(F(1,1))/itsL/itsL;
+    if (fabs(iO)>1e-10)
+        cout << "Warning: MatrixProductState::GetOverlap Imag(O)=" << iO << endl;
+
+    return std::real(F(1,1));
+}
+
+
+
 double   MPSImp::GetExpectation   (const Operator* o) const
 {
     Vector3CT F(1,1,1,1);
@@ -17,9 +37,9 @@ double   MPSImp::GetExpectation   (const Operator* o) const
     SiteLoop(ia)
         F=itsSites[ia]->IterateLeft_F(o->GetSiteOperator(ia),F);
 
-    double iE=std::imag(F(1,1,1));
+    double iE=std::imag(F(1,1,1))/itsL/itsL;
     if (fabs(iE)>1e-10)
-        cout << "Warning: MatrixProductState::GetExpectation Imag(E)=" << std::imag(F(1,1,1)) << endl;
+        cout << "Warning: MatrixProductState::GetExpectation Imag(E)=" << iE << endl;
 
     return std::real(F(1,1,1));
 }

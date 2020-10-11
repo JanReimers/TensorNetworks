@@ -2,6 +2,7 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/Factory.H"
+#include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/TNSLogger.H"
 //#include <iostream>
@@ -156,24 +157,6 @@ void MPSImp::LoadCaches(const MPS* Psi2)
 }
 
 
-
-double   MPSImp::GetOverlap(const MPS* Psi2) const
-{
-    const MPSImp* Psi2Imp=dynamic_cast<const MPSImp*>(Psi2);
-    assert(Psi2Imp);
-
-    MatrixCT F(1,1);
-    F(1,1)=eType(1.0);
-    SiteLoop(ia)
-    F=itsSites[ia]->IterateLeft_F(Psi2Imp->itsSites[ia],F);
-
-    assert(F.GetLimits()==MatLimits(1,1));
-    double iO=std::imag(F(1,1));
-    if (fabs(iO)>1e-10)
-        cout << "Warning: MatrixProductState::GetOverlap Imag(O)=" << std::imag(F(1,1)) << endl;
-
-    return std::real(F(1,1));
-}
 
 
 

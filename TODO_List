@@ -15,10 +15,6 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 - Tidy up test names
     -SVDTesting should be LinAlgebraTesting
     -Prefix with numbers or somehow tell gtest the run order
-- Imaginary checks in GetOverlap should /itsL shows up in Imaginary time testing
-- Replace SVDecomp (U,s,V) in MPO_SpatialTrotter.C
-- Done: MPO should use SVCompressorR instead Dmax, eps
-    Support Dmax, eps as well for user convenience
 - The freeze idea didn;t work because normalization is current sweeping through the frozen Site
     If we freeze site one, then left normalization needs to start at site 2
     and the right sweeps we need to stop at site two since we can;t SVD transfer to site 1.
@@ -44,6 +40,10 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
         -Jz
         -Might need to identify parameters with strings "Jxy"
 
+- Done: Imaginary checks in GetOverlap should /itsL^2, warning shows up in Imaginary time testing
+- Done: Replace SVDecomp (U,s,V) in MPO_SpatialTrotter.C
+- Done: MPO should use SVCompressorR instead Dmax, eps
+    Support Dmax, eps as well for user convenience
 - What is the purpose of an operator that is not an MPO?
     -Operator has no Combine or Compress capability as both of these functions
      require a full lattice of site operators to make sense.
