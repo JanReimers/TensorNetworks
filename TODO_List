@@ -1,6 +1,5 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
-- Clean up OneSiteDMs and TwositeDMs to just show an interface.
 - Right now PrimeEigenSolver depends in FullStateImp, can be break this somewhow?
 - Fix MPS::Report columns
     why are they empty sometimes?
@@ -42,6 +41,10 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
         -Jz
         -Might need to identify parameters with strings "Jxy"
 
+- What is the purpose of an operator that is not an MPO?
+    -Operator has no Combine or Compress capability as both of these functions
+     require a full lattice of site operators to make sense.
+- Not Worth it: Clean up OneSiteDMs and TwositeDMs to just show an interface.
 - Done: Put all TNS classes in the TNS namespace so we dont have prefix all types and enums
     - Done:Use namespace.H for all forward declarations
 - Done:  Clean up normalize interfaces.  use NULL compressor to indicate no compression.

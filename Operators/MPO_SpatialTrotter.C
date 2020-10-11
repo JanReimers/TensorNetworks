@@ -75,11 +75,11 @@ MPO_SpatialTrotter::~MPO_SpatialTrotter()
 //
 //  THis is non-trivial because we need return unit MPOs for special cases
 //
-const SiteOperator* MPO_SpatialTrotter::GetSiteOperator(int isite) const
+SiteOperator* MPO_SpatialTrotter::GetSiteOperator(int isite)
 {
     assert(isite>0);
     assert(isite<=itsL);
-    const SiteOperator* ret=0;
+    SiteOperator* ret=0;
 
     if (itsOddEven==Odd)
     {

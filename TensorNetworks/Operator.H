@@ -13,7 +13,11 @@ class Operator
         Operator() {};
         virtual ~Operator() {};
         virtual int   GetL() const=0;
-        virtual const SiteOperator* GetSiteOperator(int isite) const=0;
+        virtual const SiteOperator* GetSiteOperator(int isite) const
+        {
+            return const_cast<Operator*>(this)->GetSiteOperator(isite);
+        }
+        virtual       SiteOperator* GetSiteOperator(int isite)      =0;
 };
 
 }

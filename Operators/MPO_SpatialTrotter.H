@@ -21,7 +21,7 @@ class MPO_SpatialTrotter : public virtual Operator
         virtual ~MPO_SpatialTrotter();
 
         virtual int   GetL() const {return itsL;}
-        virtual const SiteOperator* GetSiteOperator(int isite) const;
+        virtual SiteOperator* GetSiteOperator(int isite);
 
     protected:
 

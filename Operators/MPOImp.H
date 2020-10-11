@@ -8,7 +8,11 @@ namespace TensorNetworks
 {
 
 //
-//  General MPO with possibly independent operators on each site
+//  All this class does is
+//    1) store a string MPOs, each with left and right neighbour links.
+//    2) serve up the site operators by site number
+//  All operator are initialized as unit operators with Dw=1.
+//  Non trivial MPOs are then created using the Combine function in MPO.H
 //
 class MPOImp : public virtual MPO
 {
@@ -17,17 +21,12 @@ class MPOImp : public virtual MPO
         virtual ~MPOImp();
 
         virtual int   GetL() const {return itsL;}
-        virtual const SiteOperator* GetSiteOperator(int isite) const
+        virtual SiteOperator* GetSiteOperator(int isite)
         {
             assert(isite>0);
             assert(isite<=itsL);
             return itsSites[isite];
         }
-
-        virtual int    GetMaxDw() const;
-        virtual void   Combine(const Operator* O2);
-        virtual double Compress(int Dmax, double minSV);
-        virtual void   Report(std::ostream&) const;
 
     protected:
 
@@ -35,8 +34,6 @@ class MPOImp : public virtual MPO
         typedef optr_vector<SiteOperator*> SitesType;
 
         int itsL;
-        int itsd;
-
         SitesType itsSites;
 
 };

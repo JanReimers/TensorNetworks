@@ -18,7 +18,7 @@ class MPO_OneSite : public virtual Operator
         virtual ~MPO_OneSite();
 
         virtual int   GetL() const {return itsL;}
-        const SiteOperator* GetSiteOperator(int isite) const
+        SiteOperator* GetSiteOperator(int isite)
         {
             assert(isite>=1);
             assert(isite<=itsL);
