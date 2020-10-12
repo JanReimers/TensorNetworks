@@ -3,19 +3,13 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 - For declare instead of include in Imp/Typedefs.H
 - Try and get wave function optimization convergence working
 - Add some EXPECTS for iTensor tests.
-- Done: Make unit tests faster (target < minutes).
-    Make a new target ReleaseLong for all the slow tests
 - Add an iTime test the is epsSv limited
 - Right now SVMPOCompressor is unused. Do we need a different policy for MPOs? If not remove SVMPOCompressor
 - Right now PrimeEigenSolver depends in FullStateImp, can be break this somewhow?
-- Done: Fix MPS::Report columns
-    why are they empty sometimes?
 - Reorg : Operators goes under Imp folder
     Create State under imp folder
 - Move multiplotable back to Plotting
     -Pulled out of CB projects for now
-- ExactDiagTesting make FullState member
-- Done: Why use and Array instead of Vector for FullState?
 - Tidy up test names
     -SVDTesting should be LinAlgebraTesting
     -Prefix with numbers or somehow tell gtest the run order
@@ -44,6 +38,12 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
         -Jz
         -Might need to identify parameters with strings "Jxy"
 
+- Done: Make unit tests faster (target < minutes).
+    Make a new target ReleaseLong for all the slow tests
+- Done: Fix MPS::Report columns
+    why are they empty sometimes?
+- Done: ExactDiagTesting make FullState member
+- Done: Why use and Array instead of Vector for FullState?
 - Done replace eType with a better name, same length as double.
 - Done: Make a CheckHalfInteger function for S
 - Done: Imaginary checks in GetOverlap should /itsL^2, warning shows up in Imaginary time testing
