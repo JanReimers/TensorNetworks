@@ -312,6 +312,10 @@ TEST_F(MPOTesting,TestTimingE2_S5D4)
     cout << "<E^2> contraction for L=" << L << ", S=" << S << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
     (void)EE; //Avoid warning
 }
+#endif
+
+#ifdef RunLongTests
+
 TEST_F(MPOTesting,TestTimingE2_S1D16)
 {
     int L=10,D=16;

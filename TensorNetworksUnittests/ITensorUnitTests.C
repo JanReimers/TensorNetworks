@@ -35,7 +35,7 @@ TEST_F(ITensorTesting,TestITensor)
     sites.push_back(ITensor(Index(d,"n3,Site"),bond13,bond23,bond34));
     sites.push_back(ITensor(Index(d,"n4,Site"),bond14,bond24,bond34));
 
-    PrintData(sites[0]);
+    //PrintData(sites[0]);
 }
 
 
@@ -105,7 +105,7 @@ TEST_F(ITensorTesting,Test3SiteHamiltonian)
     auto H23 = MakeH(s2,s3);
     auto H31 = MakeH(s3,s1);
     auto H=H12*I3+H23*I1+H31*I2;
-    PrintData(H);
+    //PrintData(H);
 
 
     auto [U,Evs] = diagHermitian(H);
@@ -141,7 +141,7 @@ TEST_F(ITensorTesting,Test4SiteHamiltonian)
     auto H24 = MakeH(s2,s4);
     auto H34 = MakeH(s3,s4);
     auto H=H12*I3*I4+H13*I2*I4+H14*I2*I3+H23*I1*I4+H24*I1*I3+H34*I1*I2;
-    PrintData(H);
+    //PrintData(H);
 
 
     auto [U,Evs] = diagHermitian(H);

@@ -17,7 +17,8 @@ public:
     GroundStateTesting()
     : eps(1.0e-13)
     , itsFactory(TensorNetworks::Factory::GetFactory())
-    , itsLogger(new TensorNetworks::SPDLogger(0))
+//    , itsLogger(new TensorNetworks::SPDLogger(0))
+    , itsLogger(new TensorNetworks::SPDLogger(-1))
     {
         StreamableObject::SetToPretty();
 
@@ -64,13 +65,13 @@ TEST_F(GroundStateTesting,TestSweepL9S1D2)
     is.Insert({maxIter,D,eps});
 
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
-    itsMPS->Report(cout);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.45317425,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }
 
+#ifndef DEBUG
 TEST_F(GroundStateTesting,TestSweepL9S1D8)
 {
     int L=9,D=8,maxIter=100;
@@ -84,12 +85,12 @@ TEST_F(GroundStateTesting,TestSweepL9S1D8)
     is.Insert({maxIter,D,eps});
 
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
-    itsMPS->Report(cout);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.46703753,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }
+#endif
 
 TEST_F(GroundStateTesting,TestSweepL9S1D4)
 {
@@ -104,29 +105,9 @@ TEST_F(GroundStateTesting,TestSweepL9S1D4)
     is.Insert({maxIter,D,eps});
 
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
-    itsMPS->Report(cout);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.46664265599414939,1e-7);
-    EXPECT_LT(nSweep,maxIter);
-}
-
-TEST_F(GroundStateTesting,TestSweepL9S5D2)
-{
-    int L=9,D=2,maxIter=100;
-    double S=2.5;
-    Setup(L,S,D);
-    itsMPS->InitializeWith(TensorNetworks::Random);
-
-    TensorNetworks::Epsilons eps(1e-12);
-    eps.itsDelatEnergy1Epsilon=1e-9;
-    TensorNetworks::IterationSchedule is;
-    is.Insert({maxIter,D,eps});
-    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
-    itsMPS->Report(cout);
-
-    double E=itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(E/(L-1),-7.025661 ,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }
 
@@ -143,7 +124,6 @@ TEST_F(GroundStateTesting,TestFreezeL9S1D2)
     TensorNetworks::IterationSchedule is;
     is.Insert({maxIter,D,eps});
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
-    itsMPS->Report(cout);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.45317425 ,1e-7);
@@ -151,6 +131,28 @@ TEST_F(GroundStateTesting,TestFreezeL9S1D2)
 }
 
 #ifndef DEBUG
+
+TEST_F(GroundStateTesting,TestSweepL9S5D2)
+{
+    int L=9,D=2,maxIter=100;
+    double S=2.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+
+    TensorNetworks::Epsilons eps(1e-12);
+    eps.itsDelatEnergy1Epsilon=1e-9;
+    TensorNetworks::IterationSchedule is;
+    is.Insert({maxIter,D,eps});
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+
+    double E=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E/(L-1),-7.025661 ,1e-7);
+    EXPECT_LT(nSweep,maxIter);
+}
+#endif
+
+#ifdef RunLongTests
+
 TEST_F(GroundStateTesting,TestSweepL6S1GrowD27)
 {
     int L=6,Dstart=2,Dend=27;
@@ -172,7 +174,6 @@ TEST_F(GroundStateTesting,TestSweepL6S1GrowD27)
 //    eps.itsDelatEnergy1Epsilon=1e-10;
 //    is.Insert({30,Dend,eps});
     itsMPS->FindVariationalGroundState(itsH,is);
-    itsMPS->Report(cout);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1), -1.4740549939 ,1e-8);
@@ -201,7 +202,6 @@ TEST_F(GroundStateTesting,TestSweepL7S1GrowD27)
 //    eps.itsDelatEnergy1Epsilon=1e-10;
 //    is.Insert({30,Dend,eps});
     itsMPS->FindVariationalGroundState(itsH,is);
-    itsMPS->Report(cout);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1), -1.4390886637843641 ,1e-8);
@@ -229,11 +229,10 @@ TEST_F(GroundStateTesting,TestSweepL8S1GrowD27)
 //    is.Insert({30,Dend,eps});
     itsMPS->FindVariationalGroundState(itsH,is);
 
-    itsMPS->Report(cout);
-
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1), -1.4463763812511536,1e-8);
 }
+#endif //RunLongTests
 
 
 /*
@@ -271,6 +270,9 @@ TEST_F(GroundStateTesting,TestSweepL19S5D5)
 }
 
 */
+
+#ifdef RunLongTests
+
 TEST_F(GroundStateTesting,TestSweepL19S1D8)
 {
     int L=19,D=8,maxIter=100;

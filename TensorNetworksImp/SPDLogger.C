@@ -16,7 +16,8 @@ SPDLogger::~SPDLogger()
 
 void SPDLogger::ReadyToStart(c_str message)
 {
-    spdlog::info("Start {}", message);
+    if (itsLevel>=0)
+        spdlog::info("Start {}", message);
 }
 
 void SPDLogger::LogInfo(int level,c_str message)

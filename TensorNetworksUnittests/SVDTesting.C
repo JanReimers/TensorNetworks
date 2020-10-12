@@ -123,7 +123,7 @@ TEST_F(SVDTesting,SparseMatrixClass)
         A(ir,ic)=0.0;
     }
     SparseMatrix<dcmplx> sm(A,1e-12);
-    cout << "Density=" << sm.GetDensity() << "%" << endl;
+//    cout << "Density=" << sm.GetDensity() << "%" << endl;
 }
 
 #include "NumericalMethods/PrimeEigenSolver.H"
@@ -160,6 +160,7 @@ TEST_F(SVDTesting,Prime_EigenSolverSparseComplexHermitian200x200)
     EXPECT_NEAR(Max(abs(diag)),0.0,100*eps);
 }
 
+#ifndef DEBUG
 TEST_F(SVDTesting,Prime_EigenSolverDenseComplexHermitian200x200)
 {
     int N=200,Ne=10;
@@ -192,6 +193,7 @@ TEST_F(SVDTesting,Prime_EigenSolverDenseComplexHermitian200x200)
     EXPECT_NEAR(Max(abs(diag)),0.0,100*eps);
 }
 
+#endif // DEBUG
 
 TEST_F(SVDTesting,oml_SVDComplex4004Matrix_1x4)
 {

@@ -63,10 +63,6 @@
 		<ExtraCommands>
 			<Add before="pwd" />
 		</ExtraCommands>
-		<Unit filename="CheckSpin.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="CheckSpin.H" />
 		<Unit filename="Containers/Matrix4.H" />
 		<Unit filename="Containers/Matrix6.H" />
 		<Unit filename="Containers/OneSiteDMs.C">
@@ -129,6 +125,10 @@
 		</Unit>
 		<Unit filename="Operators/SiteOperatorImp.H" />
 		<Unit filename="TODO_List" />
+		<Unit filename="TensorNetworks/CheckSpin.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworks/CheckSpin.H" />
 		<Unit filename="TensorNetworks/Dw12.C">
 			<Option compilerVar="CC" />
 		</Unit>

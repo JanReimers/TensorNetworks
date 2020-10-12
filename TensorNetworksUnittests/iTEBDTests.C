@@ -46,6 +46,6 @@ TEST_F(iTEBDTesting,TestApplyIdentity)
     Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,itsH->BuildLocalMatrix());
     itsState->Apply(1,expH);
     itsState->Apply(2,expH);
-    itsState->Report(cout);
+    //itsState->Report(cout);
 
 }

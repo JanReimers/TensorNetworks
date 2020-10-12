@@ -146,15 +146,13 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt0)
     EXPECT_NEAR(Psi2->GetOverlap(Psi3),1.0,1e-7);
     EXPECT_NEAR(Psi3->GetOverlap(Psi3),1.0,1e-6);
 
-    Psi1->Report(cout);
-    Psi2->Report(cout);
-    Psi3->Report(cout);
-
     delete Psi3;
     delete Psi2;
     delete Psi1;
     delete W;
 }
+
+#ifndef DEBUG
 
 TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05_FixedEps)
 {
@@ -263,7 +261,6 @@ TEST_F(ImaginaryTimeTesting,MPOCompressFourthOrderTrotter)
 
 }
 
-#ifndef DEBUG
 
 TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 {
@@ -295,26 +292,24 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
     is.Insert({500,D,3,0.02,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-8;
     is.Insert({500,D,4,0.01,FirstOrder,eps});
-    eps.itsDelatEnergy1Epsilon=3e-9;
-    is.Insert({500,D,5,0.005,FirstOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-9;
-    is.Insert({500,D,6,0.002,FirstOrder,eps});
+    //eps.itsDelatEnergy1Epsilon=3e-9;
+    //is.Insert({500,D,5,0.005,FirstOrder,eps});
+    //eps.itsDelatEnergy1Epsilon=1e-9;
+    //is.Insert({500,D,6,0.002,FirstOrder,eps});
 //    cout << is;
 
     Psi1->FindiTimeGroundState(itsH,is);
-    Psi1->Report(cout);
 
     double E2=Psi1->GetExpectation(itsH);
-    EXPECT_NEAR(E2/(L-1),-0.46664265599414939,1e-5);
+    EXPECT_NEAR(E2/(L-1),-0.46664265599414939,1e-4);
 
     delete Psi1;
 
 
 }
+#endif // DEBUG
 
-
-
-
+#ifdef RunLongTests
 
 TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
 {

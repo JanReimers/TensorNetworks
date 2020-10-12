@@ -39,6 +39,24 @@
 					<Add directory="../Release" />
 				</Linker>
 			</Target>
+			<Target title="Release Long">
+				<Option output="../ReleaseLong/TensorNetworksUnittests" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/ReleaseLong/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-std=c++17" />
+					<Add option="-pg" />
+					<Add option="-DRunLongTests" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg" />
+					<Add library="itensor" />
+					<Add directory="../Release" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />

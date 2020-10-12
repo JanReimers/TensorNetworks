@@ -97,8 +97,8 @@ std::tuple<ArpackEigenSolver::VectorCT,ArpackEigenSolver::MatrixCT> ArpackEigenS
             break;
 
     } while(true);
-    cout << "Info=" << INFO << endl;
-    cout << "nIter=" << iParam(3) << endl;
+    //cout << "Info=" << INFO << endl;
+    //cout << "nIter=" << iParam(3) << endl;
     assert(INFO==0);
     //
     //  Post processing to the eigen vectors.

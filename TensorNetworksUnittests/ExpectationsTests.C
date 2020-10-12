@@ -175,9 +175,9 @@ TEST_F(ExpectationsTesting,TestFreezeL9S1D2)
     OneSiteDMs::ExpectationT Sy=ro1.Contract(sc.GetSy());
     OneSiteDMs::ExpectationT Sz=ro1.Contract(sc.GetSz());
 
-    cout << "Sx=" << Sx << endl;
-    cout << "Sy=" << Sy << endl;
-    cout << "Sz=" << Sz << endl;
+//    cout << "Sx=" << Sx << endl;
+//    cout << "Sy=" << Sy << endl;
+//    cout << "Sz=" << Sz << endl;
 }
 
 
