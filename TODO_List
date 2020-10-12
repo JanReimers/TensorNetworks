@@ -1,19 +1,11 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
-- Forward declare instead of include in Imp/Typedefs.H
 - Try and get wave function optimization convergence working
 - Add some EXPECTS for iTensor tests.
 - Add an iTime test the is epsSv limited
-- Right now SVMPOCompressor is unused. Do we need a different policy for MPOs? If not remove SVMPOCompressor
 - Right now PrimeEigenSolver depends in FullStateImp, can be break this somewhow?
 - Reorg : Operators goes under Imp folder
     Create State under imp folder
-- Move multiplotable back to Plotting
-    -Pulled out of CB projects for now
-- Done: Tidy up test names
-    -SVDTesting should be LinAlgebraTesting
-    Not Possible: -Prefix with numbers or somehow tell gtest the run order
-        The seem to run an alphabetical order because of CB ordering that way, But we cannot rely on this
 - The freeze idea didn;t work because normalization is current sweeping through the frozen Site
     If we freeze site one, then left normalization needs to start at site 2
     and the right sweeps we need to stop at site two since we can;t SVD transfer to site 1.
@@ -34,11 +26,23 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     -Done Try one tetrahedon.
     -Try iPEPS with iTEBD GS and Corner transfer matrix for contractions.
 
+Backburner:
+- Right now SVMPOCompressor is unused. Do we need a different policy for MPOs? If not remove SVMPOCompressor
+- Move multiplotable back to Plotting
+    -Pulled out of CB projects for now
 - Convergence Schedule Both methods might benifit from Hamiltonian parameter variations.  For example
         -Jxy  Turn these on gradually to find GS, Hamiltonian nees to supply a list paramater names and ranges.
         -Jz
         -Might need to identify parameters with strings "Jxy"
 
+
+
+
+- Done: Forward declare instead of include in Imp/Typedefs.H
+- Done: Tidy up test names
+    -SVDTesting should be LinAlgebraTesting
+    Not Possible: -Prefix with numbers or somehow tell gtest the run order
+        The seem to run an alphabetical order because of CB ordering that way, But we cannot rely on this
 - Done: Make unit tests faster (target < minutes).
     Make a new target ReleaseLong for all the slow tests
 - Done: Fix MPS::Report columns

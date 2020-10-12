@@ -3,6 +3,7 @@
 
 #include "TensorNetworksImp/Namespace.H"
 #include "NumericalMethods/PrimeEigenSolver.H"
+#include "Containers/Vector3.H"
 #include <vector>
 
 class MPOTests;

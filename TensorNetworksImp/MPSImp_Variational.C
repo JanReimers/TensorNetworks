@@ -3,6 +3,7 @@
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/TNSLogger.H"
+#include "Containers/Matrix6.H"
 
 //--------------------------------------------------------------------------------------
 //

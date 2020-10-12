@@ -5,6 +5,7 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworksImp/Typedefs.H"
+#include "oml/dmatrix.h"
 
 
 namespace TensorNetworks

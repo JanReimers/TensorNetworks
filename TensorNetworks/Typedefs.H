@@ -6,7 +6,6 @@
 template <class T> class DMatrix;
 template <class T> class DiagonalMatrix;
 template <class T> class Vector;
-template <class T> class Array;
 template <class T> class Matrix4;
 
 //--------------------------------------------------------------------------------------
@@ -16,12 +15,11 @@ template <class T> class Matrix4;
 namespace TensorNetworks
 {
     typedef std::complex<double> dcmplx;
-    typedef DMatrix  <dcmplx>   MatrixCT;
+    typedef DMatrix  <dcmplx>  MatrixCT;
     typedef DMatrix  <double>  MatrixRT;
     typedef Vector   <double>  VectorRT;
-    typedef Vector   <dcmplx>   VectorCT;
+    typedef Vector   <dcmplx>  VectorCT;
     typedef Matrix4  <double>  Matrix4RT;
-    typedef Array    <double>  ArrayRT;
 
     typedef DiagonalMatrix<double> DiagonalMatrixRT;
 };

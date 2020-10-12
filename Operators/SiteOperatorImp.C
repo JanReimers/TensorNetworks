@@ -2,8 +2,10 @@
 #include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/SVCompressor.H"
-#include "oml/minmax.h"
 #include "NumericalMethods/LapackSVD.H"
+#include "Containers/Vector3.H"
+#include "oml/minmax.h"
+#include "oml/diagonalmatrix.h"
 #include <complex>
 
 namespace TensorNetworks

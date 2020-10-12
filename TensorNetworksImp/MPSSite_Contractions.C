@@ -2,6 +2,7 @@
 #include "TensorNetworksImp/Bond.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
+#include "Containers/Matrix6.H"
 #include "oml/minmax.h"
 #include "oml/cnumeric.h"
 #include "oml/vector_io.h"

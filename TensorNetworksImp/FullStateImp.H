@@ -3,6 +3,7 @@
 
 #include "TensorNetworks/FullState.H"
 #include "TensorNetworksImp/Typedefs.H"
+#include "oml/vector.h"
 
 namespace TensorNetworks
 {

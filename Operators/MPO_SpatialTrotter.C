@@ -1,8 +1,10 @@
 #include "MPO_SpatialTrotter.H"
 #include "TensorNetworksImp/Typedefs.H"
+#include "Containers/Matrix4.H"
 #include "Operators/SiteOperatorImp.H"
 #include "Operators/IdentityOperator.H"
 #include "NumericalMethods/LapackSVD.H"
+#include "oml/diagonalmatrix.h"
 #include "oml/numeric.h"
 
 namespace TensorNetworks

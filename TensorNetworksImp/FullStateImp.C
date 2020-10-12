@@ -2,9 +2,10 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworksImp/StateIterator.H"
+#include "TensorNetworks/CheckSpin.H"
 #include "NumericalMethods/PrimeEigenSolver.H"
 #include "Containers/SparseMatrix.H"
-#include "TensorNetworks/CheckSpin.H"
+#include "Containers/Matrix4.H"
 #include "oml/random.h"
 #include "oml/vector_io.h"
 
@@ -35,7 +36,7 @@ std::ostream& FullStateImp::Dump(std::ostream& os) const
     os.setf(std::ios::floatfield,std::ios::fixed);
     os.precision(9);
 
-    os << "Full wave function L=" << itsL << " S=" << itsS << " N=" << itsN << " E=" << itsE << endl;
+    os << "Full wave function L=" << itsL << " S=" << itsS << " N=" << itsN << " E=" << itsE << std::endl;
     os.precision(5);
 
     for (StateIterator is(itsL,itsd); !is.end(); is++)
@@ -44,16 +45,16 @@ std::ostream& FullStateImp::Dump(std::ostream& os) const
         double anorm=sqrt(real(conj(a)*a));
         if (anorm>1e-8)
         {
-            cout << "|";
+            os << "|";
             for (int ia=1; ia<=itsL; ia++)
             {
-                cout << is.GetQuantumNumbers()(ia);
-                if (ia<itsL) cout << ",";
+                os << is.GetQuantumNumbers()(ia);
+                if (ia<itsL) os << ",";
             }
-            cout << ">  " << anorm << " " << a << endl;
+            os << ">  " << anorm << " " << a << std::endl;
         }
     }
-    os << endl;
+    os << std::endl;
     return os;
 }
 

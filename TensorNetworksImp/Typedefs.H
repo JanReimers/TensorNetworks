@@ -2,13 +2,10 @@
 #define _IMPTYPEDEFS_H_
 
 #include "TensorNetworks/Typedefs.H"
-#include "Containers/Matrix6.H"
-#include "Containers/Matrix4.H"
-#include "Containers/Vector3.H"
-#include "Containers/Vector4.H"
-#include "oml/vector.h"
-#include "oml/dmatrix.h"
-#include "oml/diagonalmatrix.h"
+
+template <class T> class Matrix6;
+template <class T> class Vector3;
+template <class T> class Vector4;
 
 //--------------------------------------------------------------------------------------
 //
@@ -17,7 +14,7 @@
 namespace TensorNetworks
 {
         typedef Vector <double>  VectorRT;
-        typedef Matrix6<double> Matrix6RT;
+        typedef Matrix6<double>  Matrix6RT;
 
         typedef Matrix6<dcmplx>  Matrix6CT;
         typedef Matrix4<dcmplx>  Matrix4CT;

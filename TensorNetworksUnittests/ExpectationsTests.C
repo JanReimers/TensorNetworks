@@ -17,7 +17,6 @@ class ExpectationsTests : public ::testing::Test
 {
 public:
     typedef std::complex<double> complx;
-    typedef TensorNetworks:: ArrayRT  ArrayRT;
 
     ExpectationsTests()
         : itsFactory(TensorNetworks::Factory::GetFactory())

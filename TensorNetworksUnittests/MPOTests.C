@@ -4,6 +4,7 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/Factory.H"
+#include "Containers/Matrix6.H"
 
 #include "oml/stream.h"
 #include "oml/vector_io.h"
