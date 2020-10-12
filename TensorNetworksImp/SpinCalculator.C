@@ -1,4 +1,5 @@
-#include "SpinCalculator.H"
+#include "TensorNetworksImp/SpinCalculator.H"
+#include "TensorNetworks/CheckSpin.H"
 #include <cmath>
 
 namespace TensorNetworks
@@ -8,17 +9,11 @@ SpinCalculator::SpinCalculator(double S)
     : itsS(S)
     , itsd(2*S+1)
 {
-#ifdef DEBUG
-    double ipart;
-    double frac=std::modf(2.0*itsS,&ipart);
-    assert(frac==0.0);
-#endif
-    //ctor
+    assert(isValidSpin(S));
 }
 
 SpinCalculator::~SpinCalculator()
 {
-    //dtor
 }
 
 double SpinCalculator::GetSm (int m, int n) const

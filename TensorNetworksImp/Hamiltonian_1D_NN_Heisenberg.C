@@ -2,6 +2,7 @@
 #include "TensorNetworksImp/MPSImp.H"
 #include "TensorNetworksImp/iTEBDStateImp.H"
 #include "TensorNetworksImp/FullStateImp.H"
+#include "TensorNetworks/CheckSpin.H"
 #include "Operators/MPO_LRB.H"
 #include "Operators/MPOImp.H"
 #include "Operators/MPO_SpatialTrotter.H"
@@ -29,12 +30,7 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
 //    cout << "Jz=" << Jz << endl;
 //    cout << "hz=" << hz << endl;
     assert(itsL>=1);
-#ifdef DEBUG
-    double ipart;
-    double frac=std::modf(2.0*itsS,&ipart);
-    assert(frac==0.0);
-#endif
-    assert(itsS>=0.5);
+    assert(isValidSpin(S));
     assert(fabs(itsJxy)+fabs(Jz)>0.0);
 
     Vector<int> w1_first_1x5(5);

@@ -19,6 +19,7 @@
 					<Add option="-g" />
 					<Add option="-DDEBUG" />
 					<Add directory="TensorNetworksImp" />
+					<Add directory="./" />
 				</Compiler>
 				<Linker>
 					<Add directory="../Debug" />
@@ -38,6 +39,7 @@
 					<Add option="-pg" />
 					<Add option="-DNDEBUG" />
 					<Add directory="TensorNetworksImp" />
+					<Add directory="./" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />
@@ -61,6 +63,10 @@
 		<ExtraCommands>
 			<Add before="pwd" />
 		</ExtraCommands>
+		<Unit filename="CheckSpin.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CheckSpin.H" />
 		<Unit filename="Containers/Matrix4.H" />
 		<Unit filename="Containers/Matrix6.H" />
 		<Unit filename="Containers/OneSiteDMs.C">

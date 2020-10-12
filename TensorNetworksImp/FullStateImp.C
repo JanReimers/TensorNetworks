@@ -4,6 +4,7 @@
 #include "TensorNetworksImp/StateIterator.H"
 #include "NumericalMethods/PrimeEigenSolver.H"
 #include "Containers/SparseMatrix.H"
+#include "TensorNetworks/CheckSpin.H"
 #include "oml/random.h"
 #include "oml/array_io.h"
 
@@ -13,16 +14,11 @@ namespace TensorNetworks
 FullStateImp::FullStateImp(int L, double S)
     : itsL(L)
     , itsS(S)
+    , itsd(2*S+1)
     , itsE(0)
 {
     assert(itsL>0);
-#ifdef DEBUG
-    double ipart;
-    double frac=std::modf(2.0*itsS,&ipart);
-    assert(frac==0.0);
-#endif
-    assert(itsS>=0.5);
-    itsd=2*itsS+1;
+    assert(isValidSpin(S));
     assert(itsd>1);
     itsN=static_cast<long int>(std::pow(itsd,itsL));
     assert(itsN>0);

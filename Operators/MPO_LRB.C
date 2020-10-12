@@ -1,5 +1,6 @@
 #include "Operators/MPO_LRB.H"
 #include "Operators/SiteOperatorImp.H"
+#include "TensorNetworks/CheckSpin.H"
 
 namespace TensorNetworks
 {
@@ -9,23 +10,14 @@ MPO_LRB::MPO_LRB(int L, double S)
     : itsL(L)
     , itsd(2*S+1)
 {
-#ifdef DEBUG
-    double ipart;
-    double frac=std::modf(2.0*S,&ipart);
-    assert(frac==0.0);
-#endif
-    assert(S>=0.5);
+    assert(isValidSpin(S));
 }
 
 MPO_LRB::MPO_LRB(const OperatorWRepresentation* O,int L, double S)
     : itsL(L)
     , itsd(2*S+1)
 {
-#ifdef DEBUG
-    double ipart;
-    double frac=std::modf(2.0*S,&ipart);
-    assert(frac==0.0);
-#endif
+    assert(isValidSpin(S));
     assert(S>=0.5);
     Init(O);
 }

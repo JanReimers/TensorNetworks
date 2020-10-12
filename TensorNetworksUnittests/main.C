@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 //    testing::GTEST_FLAG(filter) = "GroundStateTesting*";
 //    testing::GTEST_FLAG(filter) = "ExpectationsTesting*";
 //    testing::GTEST_FLAG(filter) = "ExactDiagTesting*";
-    testing::GTEST_FLAG(filter) = "ImaginaryTimeTesting*";
+//    testing::GTEST_FLAG(filter) = "ImaginaryTimeTesting*";
 //    testing::GTEST_FLAG(filter) = "iTEBDTesting*";
 //    testing::GTEST_FLAG(filter) = "ITensorTesting*";
 

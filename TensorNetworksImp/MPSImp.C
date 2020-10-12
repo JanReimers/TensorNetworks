@@ -4,6 +4,7 @@
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/TNSLogger.H"
+#include "TensorNetworks/CheckSpin.H"
 #include "Containers/Matrix4.H"
 #include <iostream>
 #include <iomanip>
@@ -28,11 +29,7 @@ MPSImp::MPSImp(int L, double S, int D,double normEps,TNSLogger* s)
     , itsLogger(s)
 {
     assert(itsL>0);
-#ifdef DEBUG
-    double ipart;
-    double frac=std::modf(2.0*itsS,&ipart);
-    assert(frac==0.0);
-#endif
+    assert(isValidSpin(S));
     assert(itsS>=0.5);
     assert(itsDmax>0);
 
@@ -69,12 +66,7 @@ MPSImp::MPSImp(int L, double S, int D,Direction lr,double normEps,TNSLogger* s)
     , itsLogger(s)
 {
     assert(itsL>0);
-#ifdef DEBUG
-    double ipart;
-    double frac=std::modf(2.0*itsS,&ipart);
-    assert(frac==0.0);
-#endif
-    assert(itsS>=0.5);
+    assert(isValidSpin(S));
     assert(itsDmax>0);
 
     if (itsLogger==0)

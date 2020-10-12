@@ -2,6 +2,7 @@
 #include "TensorNetworksImp/Bond.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
+#include "TensorNetworks/CheckSpin.H"
 #include "oml/minmax.h"
 #include "oml/cnumeric.h"
 //#include "oml/vector_io.h"
@@ -139,11 +140,7 @@ void MPSSite::InitializeWith(State state,int sgn)
 void MPSSite::Freeze(double Sz)
 {
     isFrozen=true;
-#ifdef DEBUG
-    double ipart;
-    double frac=std::modf(2.0*Sz,&ipart);
-    assert(frac==0.0);
-#endif
+    assert(isValidSpin(Sz));
     double S=(static_cast<double>(itsd)-1.0)/2.0;
     int n=Sz+S;
     assert(n>=0);
