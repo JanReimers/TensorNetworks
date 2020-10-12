@@ -14,3 +14,7 @@ Release/
 TensorNetworksUnittests/gmon.out
 
 ReleaseLong/
+
+*.s
+
+*.cscope_file_list

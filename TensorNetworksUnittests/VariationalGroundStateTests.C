@@ -11,17 +11,23 @@
 
 using std::setw;
 
-class GroundStateTesting : public ::testing::Test
+class VariationalGroundStateTesting : public ::testing::Test
 {
 public:
-    GroundStateTesting()
+    VariationalGroundStateTesting()
     : eps(1.0e-13)
     , itsFactory(TensorNetworks::Factory::GetFactory())
-//    , itsLogger(new TensorNetworks::SPDLogger(0))
     , itsLogger(new TensorNetworks::SPDLogger(-1))
     {
         StreamableObject::SetToPretty();
+    }
 
+    ~VariationalGroundStateTesting()
+    {
+        delete itsFactory;
+        delete itsH;
+        delete itsMPS;
+        delete itsLogger;
     }
 
     void Setup(int L, double S, int D)
@@ -32,14 +38,14 @@ public:
 
 
     double eps;
-    TensorNetworks::Factory*     itsFactory=TensorNetworks::Factory::GetFactory();
+    TensorNetworks::Factory*     itsFactory;
     TensorNetworks::Hamiltonian* itsH;
     TensorNetworks::MPS*         itsMPS;
     TensorNetworks::TNSLogger*   itsLogger;
 };
 
 
-TEST_F(GroundStateTesting,TestIdentityOperator)
+TEST_F(VariationalGroundStateTesting,TestIdentityOperator)
 {
     Setup(10,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
@@ -52,7 +58,7 @@ TEST_F(GroundStateTesting,TestIdentityOperator)
 }
 
 
-TEST_F(GroundStateTesting,TestSweepL9S1D2)
+TEST_F(VariationalGroundStateTesting,TestSweepL9S1D2)
 {
     int L=9,D=2,maxIter=100;
     double S=0.5;
@@ -72,7 +78,7 @@ TEST_F(GroundStateTesting,TestSweepL9S1D2)
 }
 
 #ifndef DEBUG
-TEST_F(GroundStateTesting,TestSweepL9S1D8)
+TEST_F(VariationalGroundStateTesting,TestSweepL9S1D8)
 {
     int L=9,D=8,maxIter=100;
     double S=0.5;
@@ -92,7 +98,7 @@ TEST_F(GroundStateTesting,TestSweepL9S1D8)
 }
 #endif
 
-TEST_F(GroundStateTesting,TestSweepL9S1D4)
+TEST_F(VariationalGroundStateTesting,TestSweepL9S1D4)
 {
     int L=9,D=4,maxIter=100;
     double S=0.5;
@@ -111,7 +117,7 @@ TEST_F(GroundStateTesting,TestSweepL9S1D4)
     EXPECT_LT(nSweep,maxIter);
 }
 
-TEST_F(GroundStateTesting,TestFreezeL9S1D2)
+TEST_F(VariationalGroundStateTesting,TestFreezeL9S1D2)
 {
     int L=9,D=2,maxIter=100;
     double S=0.5;
@@ -132,7 +138,7 @@ TEST_F(GroundStateTesting,TestFreezeL9S1D2)
 
 #ifndef DEBUG
 
-TEST_F(GroundStateTesting,TestSweepL9S5D2)
+TEST_F(VariationalGroundStateTesting,TestSweepL9S5D2)
 {
     int L=9,D=2,maxIter=100;
     double S=2.5;
@@ -153,7 +159,7 @@ TEST_F(GroundStateTesting,TestSweepL9S5D2)
 
 #ifdef RunLongTests
 
-TEST_F(GroundStateTesting,TestSweepL6S1GrowD27)
+TEST_F(VariationalGroundStateTesting,TestSweepL6S1GrowD27)
 {
     int L=6,Dstart=2,Dend=27;
     double S=1.0;
@@ -181,7 +187,7 @@ TEST_F(GroundStateTesting,TestSweepL6S1GrowD27)
 
 
 
-TEST_F(GroundStateTesting,TestSweepL7S1GrowD27)
+TEST_F(VariationalGroundStateTesting,TestSweepL7S1GrowD27)
 {
     int L=7,Dstart=2,Dend=27;
     double S=1.0;
@@ -207,7 +213,7 @@ TEST_F(GroundStateTesting,TestSweepL7S1GrowD27)
     EXPECT_NEAR(E/(L-1), -1.4390886637843641 ,1e-8);
 }
 
-TEST_F(GroundStateTesting,TestSweepL8S1GrowD27)
+TEST_F(VariationalGroundStateTesting,TestSweepL8S1GrowD27)
 {
     int L=8,Dstart=2,Dend=27;
     double S=1.0;
@@ -273,7 +279,7 @@ TEST_F(GroundStateTesting,TestSweepL19S5D5)
 
 #ifdef RunLongTests
 
-TEST_F(GroundStateTesting,TestSweepL19S1D8)
+TEST_F(VariationalGroundStateTesting,TestSweepL19S1D8)
 {
     int L=19,D=8,maxIter=100;
     double S=0.5;
