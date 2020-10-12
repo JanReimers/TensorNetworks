@@ -27,10 +27,10 @@ class FullStateImp : public virtual FullState
         virtual std::ostream& Dump(std::ostream&) const;
 
     protected:
-        void    Normalize    (ArrayCT& amplitudes);
-        double  Contract     (const Matrix4RT& Hlocal); // do H*Psi and fix up Psi
-        ArrayCT Contract     (const Matrix4RT& Hlocal,const ArrayCT& oldAmpliudes) const; // just do H*Psi
-        void    ContractLocal(int ia, const Matrix4RT& Hlocal, ArrayCT& newAmplitudes, const ArrayCT& oldAmpliudes) const;
+        void     Normalize    (VectorCT& amplitudes);
+        double   Contract     (const Matrix4RT& Hlocal); // do H*Psi and fix up Psi
+        VectorCT Contract     (const Matrix4RT& Hlocal,const VectorCT& oldAmpliudes) const; // just do H*Psi
+        void     ContractLocal(int ia, const Matrix4RT& Hlocal, VectorCT& newAmplitudes, const VectorCT& oldAmpliudes) const;
 
 
     private:
@@ -39,7 +39,7 @@ class FullStateImp : public virtual FullState
         int      itsd;
         long int itsN; //p^L
         double   itsE; //Eigen energy from power iterations
-        ArrayCT  itsAmplitudes; //2^L monster array
+        VectorCT itsAmplitudes; //2^L monster array
 };
 
 }

@@ -6,7 +6,7 @@
 #include "Containers/SparseMatrix.H"
 #include "TensorNetworks/CheckSpin.H"
 #include "oml/random.h"
-#include "oml/array_io.h"
+#include "oml/vector_io.h"
 
 namespace TensorNetworks
 {
@@ -22,7 +22,7 @@ FullStateImp::FullStateImp(int L, double S)
     assert(itsd>1);
     itsN=static_cast<long int>(std::pow(itsd,itsL));
     assert(itsN>0);
-    itsAmplitudes .SetSize(itsN);
+    itsAmplitudes.SetLimits(itsN);
     FillRandom(itsAmplitudes);
 }
 
@@ -40,7 +40,7 @@ std::ostream& FullStateImp::Dump(std::ostream& os) const
 
     for (StateIterator is(itsL,itsd); !is.end(); is++)
     {
-        dcmplx a=itsAmplitudes[is.GetLinearIndex()];
+        dcmplx a=itsAmplitudes(is.GetLinearIndex());
         double anorm=sqrt(real(conj(a)*a));
         if (anorm>1e-8)
         {
@@ -66,7 +66,7 @@ double FullStateImp::Contract(const Matrix4RT& Hlocal)
     assert(Hlocal.Flatten().GetNumRows()==itsd*itsd);
     assert(Hlocal.Flatten().GetNumCols()==itsd*itsd);
 
-    ArrayCT newAmplitudes(itsAmplitudes.size());
+    VectorCT newAmplitudes(itsAmplitudes.size());
     Fill(newAmplitudes,dcmplx(0.0));
     for (int ia=1; ia<=itsL-1; ia++)
     {
@@ -87,12 +87,12 @@ double FullStateImp::Contract(const Matrix4RT& Hlocal)
     return deltaPsi;
 }
 
-ArrayCT FullStateImp::Contract(const Matrix4RT& Hlocal,const ArrayCT& oldAmpliudes) const
+VectorCT FullStateImp::Contract(const Matrix4RT& Hlocal,const VectorCT& oldAmpliudes) const
 {
     assert(Hlocal.Flatten().GetNumRows()==itsd*itsd);
     assert(Hlocal.Flatten().GetNumCols()==itsd*itsd);
 
-    ArrayCT newAmplitudes(itsAmplitudes.size());
+    VectorCT newAmplitudes(itsAmplitudes.size());
     Fill(newAmplitudes,dcmplx(0.0));
     for (int ia=1; ia<=itsL-1; ia++)
     {
@@ -103,7 +103,7 @@ ArrayCT FullStateImp::Contract(const Matrix4RT& Hlocal,const ArrayCT& oldAmpliud
 }
 
 
-void FullStateImp::ContractLocal(int isite, const Matrix4RT& Hlocal, ArrayCT& newAmplitudes, const ArrayCT& oldAmpliudes) const
+void FullStateImp::ContractLocal(int isite, const Matrix4RT& Hlocal, VectorCT& newAmplitudes, const VectorCT& oldAmpliudes) const
 {
     assert(isite>0);
     assert(isite<=itsL);
@@ -119,29 +119,29 @@ void FullStateImp::ContractLocal(int isite, const Matrix4RT& Hlocal, ArrayCT& ne
             {
                 mstate(isite  )=ma;
                 mstate(isite+1)=mb;
-                c+=Hlocal(ma,mb,na,nb)*oldAmpliudes[is.GetIndex(mstate)];
+                c+=Hlocal(ma,mb,na,nb)*oldAmpliudes(is.GetIndex(mstate));
             }
 //        cout << "stateVector=" << stateVector << endl;
 //        cout << "indexn+1,GetIndex=" << indexn+1 << " " << GetIndex(stateVector) << endl;
         assert(is.GetLinearIndex()==is.GetIndex(QNs));
-        newAmplitudes[is.GetLinearIndex()]+=c;
+        newAmplitudes(is.GetLinearIndex())+=c;
 
     }
 }
 
-void FullStateImp::Normalize(ArrayCT& amplitudes)
+void FullStateImp::Normalize(VectorCT& amplitudes)
 {
     dcmplx E=Dot(conj(amplitudes),amplitudes);
     assert(real(E)>0.0);
     assert(fabs(imag(E))<1e-14);
     amplitudes/=sqrt(E);
     dcmplx phase(1.0,0.0);
-    for (int i=1; i<itsN; i++)
+    for (int i=1; i<=itsN; i++)
     {
-        double r=std::fabs(amplitudes[i]);
+        double r=std::fabs(amplitudes(i));
         if (r>0.01)
         {
-            phase=conj(amplitudes[i])/r;
+            phase=conj(amplitudes(i))/r;
             break;
         }
     }
@@ -184,8 +184,7 @@ double FullStateImp::FindGroundState(const IterationScheduleLine& sched,const Ha
     PrimeEigenSolver<dcmplx> solver;
     solver.Solve(Hlocal,this,Neig,sched.itsEps);
     itsE=solver.GetEigenValues()(1);
-    const VectorCT amplitudes=solver.GetEigenVector(1);
-    for (int i=1;i<=itsN;i++) itsAmplitudes[i-1]=amplitudes(i);
+    itsAmplitudes=solver.GetEigenVector(1);
     Normalize(itsAmplitudes);
     return E;
 }
@@ -197,10 +196,10 @@ double FullStateImp::FindGroundState(const IterationScheduleLine& sched,const Ha
 void FullStateImp::DoHContraction (int N, dcmplx* xvec, dcmplx* yvec, const Matrix4RT& Hlocal) const
 {
     assert(N==itsN);
-    ArrayCT oldAmplitudes(itsN);
-    for (int i=0;i<itsN;i++) oldAmplitudes[i]=xvec[i];
-    ArrayCT newAmplitudes=Contract(Hlocal,oldAmplitudes);
-    for (int i=0;i<itsN;i++) yvec[i]=newAmplitudes[i];
+    VectorCT oldAmplitudes(itsN);
+    for (int i=1;i<=itsN;i++) oldAmplitudes(i)=xvec[i-1];
+    VectorCT newAmplitudes=Contract(Hlocal,oldAmplitudes);
+    for (int i=1;i<=itsN;i++) yvec[i-1]=newAmplitudes(i);
 }
 
 }

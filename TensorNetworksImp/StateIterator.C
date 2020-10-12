@@ -7,7 +7,7 @@ StateIterator::StateIterator(int L, int d)
     : itsL(L)
     , itsdmax(d-1)
     , itsNextSiteToIncrement(L)
-    , itsLinearIndex(0)
+    , itsLinearIndex(1)
     , itsQuantumNumbers(L)
 {
     assert(itsL>0);
@@ -23,7 +23,7 @@ StateIterator::~StateIterator()
 void StateIterator::Restart()
 {
     itsNextSiteToIncrement=itsL;
-    itsLinearIndex=0;
+    itsLinearIndex=1;
     Fill(itsQuantumNumbers,0);
 }
 
@@ -67,7 +67,7 @@ int StateIterator::GetIndex(const Vector<int>& state) const
     int ret=0,p=itsdmax+1;
     for (int ia=1; ia<=itsL; ia++)
         ret=p*ret+state(ia);
-    return ret; //0 based of Array type used for amplitudes
+    return ret+1; //1 based of Vector type used for amplitudes
 }
 
 } // namespace

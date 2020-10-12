@@ -9,7 +9,6 @@
 #include "oml/vector.h"
 #include "oml/dmatrix.h"
 #include "oml/diagonalmatrix.h"
-#include "oml/array.h"
 
 //--------------------------------------------------------------------------------------
 //
@@ -20,7 +19,6 @@ namespace TensorNetworks
         typedef Vector <double>  VectorRT;
         typedef Matrix6<double> Matrix6RT;
 
-        typedef Array  <dcmplx>    ArrayCT;
         typedef Matrix6<dcmplx>  Matrix6CT;
         typedef Matrix4<dcmplx>  Matrix4CT;
         typedef Vector3<dcmplx>  Vector3CT;

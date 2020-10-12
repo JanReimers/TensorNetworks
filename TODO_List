@@ -1,5 +1,6 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
+- For declare instead of include in Imp/Typedefs.H
 - Try and get wave function optimization convergence working
 - Add some EXPECTS for iTensor tests.
 - Done: Make unit tests faster (target < minutes).
@@ -14,7 +15,7 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 - Move multiplotable back to Plotting
     -Pulled out of CB projects for now
 - ExactDiagTesting make FullState member
-- Why use and Array instead of Vector for FullState?
+- Done: Why use and Array instead of Vector for FullState?
 - Tidy up test names
     -SVDTesting should be LinAlgebraTesting
     -Prefix with numbers or somehow tell gtest the run order
