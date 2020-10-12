@@ -34,7 +34,7 @@ template <class O> OneSiteDMs::ExpectationT OneSiteDMs::Contract(const O& op) co
     Fill(ret,0.0);
     for (int ia=1; ia<=itsL; ia++)
     {
-        eType ex(0.0);
+        dcmplx ex(0.0);
         const DMType& dm=itsDMs(ia);
 //            cout << "dm=" << dm << endl;
         for (int m1=1; m1<=itsd; m1++)
@@ -66,7 +66,7 @@ OneSiteDMs::ExpectationT OneSiteDMs::GetVNEntropies() const
     for (int ia=1; ia<=itsL; ia++)
     {
         //Vector<double> s=EigenValuesOnly<double,MatrixCT>(itsDMs(ia,ib).Flatten());
-        Vector<eType> s(itsDMs(ia).GetDiagonal());
+        Vector<dcmplx> s(itsDMs(ia).GetDiagonal());
 //            cout << "s(" << ia << "," << ib << ")=" << s << ", sum=" << Sum(s) << endl;
         ret(ia)=VNEntropyFromEVs(real(s));
     }

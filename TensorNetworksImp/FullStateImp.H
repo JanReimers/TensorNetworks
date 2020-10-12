@@ -22,7 +22,7 @@ class FullStateImp : public virtual FullState
 
         virtual double   PowerIterate   (const IterationScheduleLine&,const Hamiltonian&,bool quite=true);
         virtual double   FindGroundState(const IterationScheduleLine&,const Hamiltonian&,bool quite=true);
-        virtual void     DoHContraction (int N, eType* xvec, eType* yvec, const Matrix4RT& Hlocal) const;
+        virtual void     DoHContraction (int N, dcmplx* xvec, dcmplx* yvec, const Matrix4RT& Hlocal) const;
 
         virtual std::ostream& Dump(std::ostream&) const;
 

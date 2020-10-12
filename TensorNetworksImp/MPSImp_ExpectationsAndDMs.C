@@ -16,7 +16,7 @@ double   MPSImp::GetOverlap(const MPS* Psi2) const
     assert(Psi2Imp);
 
     MatrixCT F(1,1);
-    F(1,1)=eType(1.0);
+    F(1,1)=dcmplx(1.0);
     SiteLoop(ia)
     F=itsSites[ia]->IterateLeft_F(Psi2Imp->itsSites[ia],F);
 
@@ -33,7 +33,7 @@ double   MPSImp::GetOverlap(const MPS* Psi2) const
 double   MPSImp::GetExpectation   (const Operator* o) const
 {
     Vector3CT F(1,1,1,1);
-    F(1,1,1)=eType(1.0);
+    F(1,1,1)=dcmplx(1.0);
     SiteLoop(ia)
         F=itsSites[ia]->IterateLeft_F(o->GetSiteOperator(ia),F);
 
@@ -44,10 +44,10 @@ double   MPSImp::GetExpectation   (const Operator* o) const
     return std::real(F(1,1,1));
 }
 
-eType   MPSImp::GetExpectationC(const Operator* o) const
+dcmplx   MPSImp::GetExpectationC(const Operator* o) const
 {
     Vector3CT F(1,1,1,1);
-    F(1,1,1)=eType(1.0);
+    F(1,1,1)=dcmplx(1.0);
     SiteLoop(ia)
         F=itsSites[ia]->IterateLeft_F(o->GetSiteOperator(ia),F);
 
@@ -80,7 +80,7 @@ Matrix4CT MPSImp::CalculateTwoSiteDM(int ia,int ib) const
         assert(GetNormStatus(is)=='B');
 #endif
     Matrix4CT ret(itsd,itsd,itsd,itsd,1);
-    ret.Fill(eType(0.0));
+    ret.Fill(dcmplx(0.0));
     // Start the zipper
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)

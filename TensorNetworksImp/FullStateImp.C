@@ -40,7 +40,7 @@ std::ostream& FullStateImp::Dump(std::ostream& os) const
 
     for (StateIterator is(itsL,itsd); !is.end(); is++)
     {
-        eType a=itsAmplitudes[is.GetLinearIndex()];
+        dcmplx a=itsAmplitudes[is.GetLinearIndex()];
         double anorm=sqrt(real(conj(a)*a));
         if (anorm>1e-8)
         {
@@ -67,14 +67,14 @@ double FullStateImp::Contract(const Matrix4RT& Hlocal)
     assert(Hlocal.Flatten().GetNumCols()==itsd*itsd);
 
     ArrayCT newAmplitudes(itsAmplitudes.size());
-    Fill(newAmplitudes,eType(0.0));
+    Fill(newAmplitudes,dcmplx(0.0));
     for (int ia=1; ia<=itsL-1; ia++)
     {
         ContractLocal(ia,Hlocal,newAmplitudes,itsAmplitudes);
     }
 
     // Evaluate E=<psi|H|psi>
-    eType Ec=Dot(conj(itsAmplitudes),newAmplitudes);
+    dcmplx Ec=Dot(conj(itsAmplitudes),newAmplitudes);
     assert(fabs(imag(Ec))<1e-14);
     itsE=real(Ec);
     // Scale out the eigen value
@@ -93,7 +93,7 @@ ArrayCT FullStateImp::Contract(const Matrix4RT& Hlocal,const ArrayCT& oldAmpliud
     assert(Hlocal.Flatten().GetNumCols()==itsd*itsd);
 
     ArrayCT newAmplitudes(itsAmplitudes.size());
-    Fill(newAmplitudes,eType(0.0));
+    Fill(newAmplitudes,dcmplx(0.0));
     for (int ia=1; ia<=itsL-1; ia++)
     {
         ContractLocal(ia,Hlocal,newAmplitudes,oldAmpliudes);
@@ -113,7 +113,7 @@ void FullStateImp::ContractLocal(int isite, const Matrix4RT& Hlocal, ArrayCT& ne
         int na=QNs(isite);
         int nb=QNs(isite+1);
         Vector<int> mstate=QNs;
-        eType c(0.0);
+        dcmplx c(0.0);
         for (int ma=0; ma<itsd; ma++)
             for (int mb=0; mb<itsd; mb++)
             {
@@ -131,11 +131,11 @@ void FullStateImp::ContractLocal(int isite, const Matrix4RT& Hlocal, ArrayCT& ne
 
 void FullStateImp::Normalize(ArrayCT& amplitudes)
 {
-    eType E=Dot(conj(amplitudes),amplitudes);
+    dcmplx E=Dot(conj(amplitudes),amplitudes);
     assert(real(E)>0.0);
     assert(fabs(imag(E))<1e-14);
     amplitudes/=sqrt(E);
-    eType phase(1.0,0.0);
+    dcmplx phase(1.0,0.0);
     for (int i=1; i<itsN; i++)
     {
         double r=std::fabs(amplitudes[i]);
@@ -181,7 +181,7 @@ double FullStateImp::FindGroundState(const IterationScheduleLine& sched,const Ha
     Matrix4RT Hlocal=H.BuildLocalMatrix();
     double E=0;
     int Neig=1;
-    PrimeEigenSolver<eType> solver;
+    PrimeEigenSolver<dcmplx> solver;
     solver.Solve(Hlocal,this,Neig,sched.itsEps);
     itsE=solver.GetEigenValues()(1);
     const VectorCT amplitudes=solver.GetEigenVector(1);
@@ -194,7 +194,7 @@ double FullStateImp::FindGroundState(const IterationScheduleLine& sched,const Ha
 //  Called from the Lanczos M*v routine. Do yvec=H*xvec; where H=sum{Hlocal(ia,ia+1}
 //  This is a const member function so we don't use the member amplitudes.
 //
-void FullStateImp::DoHContraction (int N, eType* xvec, eType* yvec, const Matrix4RT& Hlocal) const
+void FullStateImp::DoHContraction (int N, dcmplx* xvec, dcmplx* yvec, const Matrix4RT& Hlocal) const
 {
     assert(N==itsN);
     ArrayCT oldAmplitudes(itsN);

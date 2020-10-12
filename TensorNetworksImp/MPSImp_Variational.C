@@ -99,7 +99,7 @@ Vector3CT MPSImp::GetHeffCache (Direction lr,int isite) const
 {
     //CheckSiteNumber(isite); this function accepts out of range site numbers
     Vector3CT H(1,1,1,1);
-    H(1,1,1)=eType(1.0);
+    H(1,1,1)=dcmplx(1.0);
     if (isite>=1 && isite<=itsL)  H=itsSites[isite]->GetHeffCache(lr);
     return H;
 }
@@ -126,7 +126,7 @@ Vector3CT MPSImp::CalcHeffLeft(const Operator* o,int isite, bool cache) const
 {
 //    CheckSiteNumber(isite);  this function accepts out of bounds site numbers
     Vector3CT F(1,1,1,1);
-    F(1,1,1)=eType(1.0);
+    F(1,1,1)=dcmplx(1.0);
     for (int ia=1; ia<isite; ia++)
     {
         itsLogger->LogInfo(1,SiteMessage("Calculating L cache for site ",ia));
@@ -141,7 +141,7 @@ Vector3CT MPSImp::CalcHeffRight(const Operator* o,int isite, bool cache) const
 {
 //    CheckSiteNumber(isite); this function accepts out of bounds site numbers
     Vector3CT F(1,1,1,1);
-    F(1,1,1)=eType(1.0);
+    F(1,1,1)=dcmplx(1.0);
     for (int ia=itsL; ia>isite; ia--)
     {
         itsLogger->LogInfo(1,SiteMessage("Calculating R cache for site ",ia));
@@ -159,7 +159,7 @@ MatrixCT MPSImp::CalcHeffLeft(const MPS* psi2,int isite, bool cache) const
     assert(psi2Imp);
 
     MatrixCT F(1,1);
-    F(1,1)=eType(1.0);
+    F(1,1)=dcmplx(1.0);
     for (int ia=1; ia<isite; ia++)
     {
         itsLogger->LogInfo(1,SiteMessage("Calculating L cache for site ",ia));
@@ -176,7 +176,7 @@ MatrixCT MPSImp::CalcHeffRight(const MPS* psi2,int isite, bool cache) const
     const MPSImp* psi2Imp=dynamic_cast<const MPSImp*>(psi2);
     assert(psi2Imp);
     MatrixCT F(1,1);
-    F(1,1)=eType(1.0);
+    F(1,1)=dcmplx(1.0);
     for (int ia=itsL; ia>isite; ia--)
     {
         itsLogger->LogInfo(1,SiteMessage("Calculating R cache for site ",ia));

@@ -18,7 +18,7 @@ namespace TensorNetworks
     class Dw12;
 
     template <class T> class SVCompressor;
-    typedef SVCompressor<eType > SVCompressorC;
+    typedef SVCompressor<dcmplx > SVCompressorC;
     typedef SVCompressor<double> SVCompressorR;
 
     class Epsilons;

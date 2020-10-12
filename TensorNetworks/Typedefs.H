@@ -15,11 +15,11 @@ template <class T> class Matrix4;
 //
 namespace TensorNetworks
 {
-    typedef std::complex<double> eType;
-    typedef DMatrix  <eType>   MatrixCT;
+    typedef std::complex<double> dcmplx;
+    typedef DMatrix  <dcmplx>   MatrixCT;
     typedef DMatrix  <double>  MatrixRT;
     typedef Vector   <double>  VectorRT;
-    typedef Vector   <eType>   VectorCT;
+    typedef Vector   <dcmplx>   VectorCT;
     typedef Matrix4  <double>  Matrix4RT;
     typedef Array    <double>  ArrayRT;
 

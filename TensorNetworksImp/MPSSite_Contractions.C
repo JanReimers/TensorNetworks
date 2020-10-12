@@ -114,7 +114,7 @@ Matrix6CT MPSSite::
 GetHeff(const SiteOperator* mops,const Vector3CT& L,const Vector3CT& R) const
 {
     assert(mops);
-    Matrix6<eType> Heff(itsd,itsD1,itsD2,itsd,itsD1,itsD2);
+    Matrix6<dcmplx> Heff(itsd,itsD1,itsD2,itsd,itsD1,itsD2);
     const Dw12& Dws=mops->GetDw12();
 
     for (int m=0; m<itsd; m++)
@@ -133,7 +133,7 @@ GetHeff(const SiteOperator* mops,const Vector3CT& L,const Vector3CT& R) const
                     for (int i2=1; i2<=itsD2; i2++)
                         for (int j2=1; j2<=itsD2; j2++)
                         {
-                            eType LWR(0.0);
+                            dcmplx LWR(0.0);
                             for (int w1=1; w1<=W.GetNumRows(); w1++)
                                 LWR+=L(w1,i1,j1)*WR(w1,i2,j2);
                             Heff(m,i1,i2,n,j1,j2)=LWR;
@@ -144,10 +144,10 @@ GetHeff(const SiteOperator* mops,const Vector3CT& L,const Vector3CT& R) const
 
 }
 
-eType MPSSite::
+dcmplx MPSSite::
 ContractWR(int w1, int i2, int j2,const MatrixRT& W, int Dw2,const Vector3CT& R) const
 {
-    eType WR(0.0);
+    dcmplx WR(0.0);
     for (int w2=1; w2<=Dw2; w2++)
         if (W(w1,w2)!=0.0)
             WR+=W(w1,w2)*R(w2,i2,j2);
@@ -160,7 +160,7 @@ MatrixCT MPSSite::IterateLeft_F(const MPSSite* Psi2, const MatrixCT& Fam1,bool c
     assert(Fam1.GetNumRows()==      itsD1);
     assert(Fam1.GetNumCols()==Psi2->itsD1);
     MatrixCT F(itsD2,Psi2->itsD2);
-    Fill(F,eType(0.0));
+    Fill(F,dcmplx(0.0));
     for (int m=0; m<itsd; m++)
         for (int i2=1; i2<=itsD2; i2++)
             for (int j2=1; j2<=Psi2->itsD2; j2++)
@@ -176,7 +176,7 @@ MatrixCT MPSSite::IterateRightF(const MPSSite* Psi2, const MatrixCT& Fap1,bool c
 {
 //    cout << "IterateRightF D1,D2,DwD1,DwD2,Fap=" << itsAs[0].GetLimits() << " " << Psi2->itsAs[0].GetLimits() << " " << Fap1.GetLimits() << endl;
     MatrixCT F(itsD1,Psi2->itsD1);
-    Fill(F,eType(0.0));
+    Fill(F,dcmplx(0.0));
 //    cout << "F=" << F.GetLimits() << " Fap1=" << Fap1.GetLimits() << endl;
     assert(Fap1.GetNumRows()>=      itsD2);
     assert(Fap1.GetNumCols()==Psi2->itsD2);
@@ -207,7 +207,7 @@ MatrixCT MPSSite::IterateF(Direction lr ,const MatrixCT& Mold) const
             cout << "D1,D2,Mold=" << itsD1 << " " << itsD2 << " " << Mold.GetLimits() << endl;
         }
         M.SetLimits(itsD2,itsD2);
-        Fill(M,eType(0.0));
+        Fill(M,dcmplx(0.0));
 //    cout << "F=" << F.GetLimits() << " Fap1=" << Fap1.GetLimits() << endl;
         for (int m=0; m<itsd; m++)
             for (int i2=1; i2<=itsD2; i2++)
@@ -223,7 +223,7 @@ MatrixCT MPSSite::IterateF(Direction lr ,const MatrixCT& Mold) const
         assert(Mold.GetNumRows()==itsD2);
         assert(Mold.GetNumCols()==itsD2);
         M.SetLimits(itsD1,itsD1);
-        Fill(M,eType(0.0));
+        Fill(M,dcmplx(0.0));
         for (int m=0; m<itsd; m++)
             for (int i1=1; i1<=itsD1; i1++)
                 for (int j1=1; j1<=itsD1; j1++)
@@ -246,9 +246,9 @@ Vector3CT MPSSite::IterateLeft_F(const SiteOperator* so, const Vector3CT& Fam1,b
     return F;
 }
 
-eType MPSSite::ContractAWFA(int w2, int i2, int j2, const SiteOperator* so, const Vector3CT& Fam1) const
+dcmplx MPSSite::ContractAWFA(int w2, int i2, int j2, const SiteOperator* so, const Vector3CT& Fam1) const
 {
-    eType awfa(0.0);
+    dcmplx awfa(0.0);
     for (int m=0; m<itsd; m++)
         for (int i1=1; i1<=itsD1; i1++)
             awfa+=conj(itsMs[m](i1,i2))*ContractWFA(m,w2,i1,j2,so,Fam1);
@@ -256,10 +256,10 @@ eType MPSSite::ContractAWFA(int w2, int i2, int j2, const SiteOperator* so, cons
     return awfa;
 }
 
-eType MPSSite::ContractWFA(int m, int w2, int i1, int j2, const SiteOperator* so, const Vector3CT& Fam1) const
+dcmplx MPSSite::ContractWFA(int m, int w2, int i1, int j2, const SiteOperator* so, const Vector3CT& Fam1) const
 {
     const Dw12& Dws1=so->GetDw12();
-    eType wfa(0.0);
+    dcmplx wfa(0.0);
     for (int n=0; n<itsd; n++)
     {
         const MatrixRT& Wmn=so->GetW(m,n);
@@ -276,9 +276,9 @@ eType MPSSite::ContractWFA(int m, int w2, int i1, int j2, const SiteOperator* so
     return wfa;
 }
 
-eType MPSSite::ContractFA(int n, int w1, int i1, int j2, const Vector3CT& Fam1) const
+dcmplx MPSSite::ContractFA(int n, int w1, int i1, int j2, const Vector3CT& Fam1) const
 {
-    eType fa(0.0);
+    dcmplx fa(0.0);
     for (int j1=1; j1<=itsD1; j1++)
         fa+=Fam1(w1,i1,j1)*itsMs[n](j1,j2);
     return fa;
@@ -298,9 +298,9 @@ Vector3CT MPSSite::IterateRightF(const SiteOperator* so, const Vector3CT& Fap1, 
     return F;
 }
 
-eType MPSSite::ContractBWFB(int w1, int i1, int j1, const SiteOperator* so, const Vector3CT& Fap1) const
+dcmplx MPSSite::ContractBWFB(int w1, int i1, int j1, const SiteOperator* so, const Vector3CT& Fap1) const
 {
-    eType bwfb(0.0);
+    dcmplx bwfb(0.0);
     for (int m=0; m<itsd; m++)
         for (int i2=1; i2<=itsD2; i2++)
             bwfb+=conj(itsMs[m](i1,i2))*ContractWFB(m,w1,i2,j1,so,Fap1);
@@ -308,10 +308,10 @@ eType MPSSite::ContractBWFB(int w1, int i1, int j1, const SiteOperator* so, cons
     return bwfb;
 }
 
-eType MPSSite::ContractWFB(int m, int w1, int i2, int j1, const SiteOperator* so, const Vector3CT& Fap1) const
+dcmplx MPSSite::ContractWFB(int m, int w1, int i2, int j1, const SiteOperator* so, const Vector3CT& Fap1) const
 {
     const Dw12& Dws=so->GetDw12();
-    eType wfb(0.0);
+    dcmplx wfb(0.0);
     for (int n=0; n<itsd; n++)
     {
         const MatrixRT& Wmn=so->GetW(m,n);
@@ -326,9 +326,9 @@ eType MPSSite::ContractWFB(int m, int w1, int i2, int j1, const SiteOperator* so
     return wfb;
 }
 
-eType MPSSite::ContractFB(int n, int w2, int i2, int j1, const Vector3CT& Fap1) const
+dcmplx MPSSite::ContractFB(int n, int w2, int i2, int j1, const Vector3CT& Fap1) const
 {
-    eType fb(0.0);
+    dcmplx fb(0.0);
     for (int j2=1; j2<=itsD2; j2++)
         fb+=Fap1(w2,i2,j2)*itsMs[n](j1,j2);
     return fb;
@@ -438,7 +438,7 @@ void MPSSite::SVDTransfer(Direction lr,const MatrixCT& UV)
 MatrixCT MPSSite::CalculateOneSiteDM()
 {
     MatrixCT ro(itsd,itsd); //These can't be zero based if we want run them through eigen routines, which are hard ocded for 1 based matricies
-    Fill(ro,eType(0.0));
+    Fill(ro,dcmplx(0.0));
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)
             for (int j1=1; j1<=itsD1; j1++)
@@ -450,7 +450,7 @@ MatrixCT MPSSite::CalculateOneSiteDM()
 MatrixCT MPSSite::InitializeTwoSiteDM(int m, int n)
 {
     MatrixCT C(itsD2,itsD2);
-    Fill(C,eType(0.0));
+    Fill(C,dcmplx(0.0));
     for (int i2=1; i2<=itsD2; i2++)
         for (int j2=1; j2<=itsD2; j2++)
             for (int i1=1; i1<=itsD1; i1++)
@@ -461,7 +461,7 @@ MatrixCT MPSSite::InitializeTwoSiteDM(int m, int n)
 MatrixCT MPSSite::IterateTwoSiteDM(MatrixCT& Cmn)
 {
     MatrixCT ret(itsD2,itsD2);
-    Fill(ret,eType(0.0));
+    Fill(ret,dcmplx(0.0));
     for (int n2=0; n2<itsd; n2++)
     {
         MatrixCT CAmn=ContractCA(n2,Cmn);
@@ -476,7 +476,7 @@ MatrixCT MPSSite::IterateTwoSiteDM(MatrixCT& Cmn)
 MatrixCT MPSSite::ContractCA(int n2, const MatrixCT& Cmn) const
 {
     MatrixCT ret(itsD1,itsD2);
-    Fill(ret,eType(0.0));
+    Fill(ret,dcmplx(0.0));
     for (int j2=1; j2<=itsD2; j2++)
         for (int i1=1; i1<=itsD1; i1++)
             for (int j1=1; j1<=itsD1; j1++)
@@ -487,7 +487,7 @@ MatrixCT MPSSite::ContractCA(int n2, const MatrixCT& Cmn) const
 MatrixCT MPSSite::FinializeTwoSiteDM(const MatrixCT & Cmn)
 {
     MatrixCT ret(itsd,itsd);
-    Fill(ret,eType(0.0));
+    Fill(ret,dcmplx(0.0));
     for (int n2=0; n2<itsd; n2++)
     {
         MatrixCT CAmn=ContractCA(n2,Cmn);
@@ -511,7 +511,7 @@ void MPSSite::Contract(dVectorT& newAs,const SiteOperator* so)
     for (int n=0; n<itsd; n++)
     {
         newAs.push_back(MatrixCT(newD1,newD2));
-        Fill(newAs[n],eType(0.0));
+        Fill(newAs[n],dcmplx(0.0));
         for (int m=0; m<itsd; m++)
         {
             const MatrixRT& W=so->GetW(n,m);
@@ -545,7 +545,7 @@ MatrixCT MPSSite::ContractLRM(const MatrixCT& M, const MatrixCT& L, const Matrix
     assert(RM.GetNumRows()==itsD2);
 
     MatrixCT M_tilde(itsD1,itsD2);
-    Fill(M_tilde,eType(0.0));
+    Fill(M_tilde,dcmplx(0.0));
 
 //    cout << "ContractLRM RM=" << RM.GetLimits() << endl;
     for (int i1=1; i1<=itsD1; i1++)
@@ -561,7 +561,7 @@ MatrixCT MPSSite::Contract_RM(const MatrixCT& R, const MatrixCT& M) const
     assert(R.GetNumCols()==M.GetNumCols());
     assert(R.GetNumRows()==itsD2);
     MatrixCT RM(R.GetNumRows(),M.GetNumRows());
-    Fill(RM,eType(0.0));
+    Fill(RM,dcmplx(0.0));
     for (int i2=1; i2<=R.GetNumRows(); i2++)
         for (int j1=1; j1<=M.GetNumRows(); j1++)
             for (int j2=1; j2<=R.GetNumCols(); j2++)

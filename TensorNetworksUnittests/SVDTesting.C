@@ -22,6 +22,8 @@ public:
     typedef TensorNetworks::MatrixCT MatrixCT;
     typedef TensorNetworks::MatrixRT MatrixRT;
     typedef TensorNetworks::DiagonalMatrixRT DiagonalMatrixRT;
+    typedef TensorNetworks::dcmplx dcmplx;
+
     SVDTesting()
     : itsEps()
     , mps(10,1,2)
@@ -120,7 +122,7 @@ TEST_F(SVDTesting,SparseMatrixClass)
         int ic=static_cast<int>(OMLRand<float>()*N)+1;
         A(ir,ic)=0.0;
     }
-    SparseMatrix<eType> sm(A,1e-12);
+    SparseMatrix<dcmplx> sm(A,1e-12);
     cout << "Density=" << sm.GetDensity() << "%" << endl;
 }
 
@@ -140,7 +142,7 @@ TEST_F(SVDTesting,Prime_EigenSolverSparseComplexHermitian200x200)
     }
     Mtype Ah=A+Transpose(conj(A)); //Make it hermitian
 
-    PrimeEigenSolver<eType> solver;
+    PrimeEigenSolver<dcmplx> solver;
     itsEps.itsEigenSolverEpsilon=1e-4;
     solver.Solve(Ah,Ne,itsEps);
     itsEps.itsEigenSolverEpsilon=1e-6;
@@ -172,7 +174,7 @@ TEST_F(SVDTesting,Prime_EigenSolverDenseComplexHermitian200x200)
     }
     Mtype Ah=A+Transpose(conj(A)); //Make it hermitian
 
-    PrimeEigenSolver<eType> solver;
+    PrimeEigenSolver<dcmplx> solver;
     itsEps.itsEigenSolverEpsilon=1e-4;
     solver.Solve(Ah,Ne,itsEps);
     itsEps.itsEigenSolverEpsilon=1e-6;
@@ -370,7 +372,7 @@ TEST_F(SVDTesting,ArpackEigenSolver)
 
     for (int i=1;i<=Nev;i++)
     {
-        Vector<eType> residuals=A*U.GetColumn(i)-D(i)*U.GetColumn(i);
+        Vector<dcmplx> residuals=A*U.GetColumn(i)-D(i)*U.GetColumn(i);
         double res=Max(abs(residuals));
         EXPECT_NEAR(res,0.0,15*itsEps.itsEigenSolverEpsilon);
     }
@@ -397,9 +399,9 @@ TEST_F(SVDTesting,omlDiagonalMatrix_double)
 TEST_F(SVDTesting,omlDiagonalMatrix_complex)
 {
     int N=10;
-    Vector<eType> v(N);
-    Fill(v,eType(-1.0));
-    DiagonalMatrix<eType> d(v);
+    Vector<dcmplx> v(N);
+    Fill(v,dcmplx(-1.0));
+    DiagonalMatrix<dcmplx> d(v);
     MatrixCT M(N,N);
     FillRandom(M);
     MatrixCT Md=M*d;

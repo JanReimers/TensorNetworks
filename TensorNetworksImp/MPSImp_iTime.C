@@ -109,7 +109,7 @@ double MPSImp::Sweep(Direction lr,const MPS* Psi2)
     const MPSImp* psi2Imp=dynamic_cast<const MPSImp*>(Psi2);
     assert(psi2Imp);
     MatrixCT MTrace(1,1);
-    MTrace(1,1)=eType(1.0);
+    MTrace(1,1)=dcmplx(1.0);
     ForLoop(lr)
     {
         CheckSiteNumber(ia);
@@ -145,7 +145,7 @@ MatrixCT MPSImp::GetRLCache (Direction lr,int isite) const
 {
     //CheckSiteNumber(isite); this function accepts out of range site numbers
     MatrixCT RL(1,1);
-    RL(1,1)=eType(1.0);
+    RL(1,1)=dcmplx(1.0);
     if (isite>=1 && isite<=itsL)  RL=itsSites[isite]->GetRLCache(lr);
     return RL;
 }

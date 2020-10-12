@@ -34,7 +34,7 @@ void MPSSite::Refine(const MatrixCT& Heff,const Epsilons& eps)
 
 void MPSSite::Update(const VectorCT& newAs)
 {
-    Vector3<eType> As(itsd,itsD1,itsD2,newAs); //Unflatten
+    Vector3<dcmplx> As(itsd,itsD1,itsD2,newAs); //Unflatten
     for (int m=0; m<itsd; m++)
         for (int i1=1; i1<=itsD1; i1++)
             for (int i2=1; i2<=itsD2; i2++)

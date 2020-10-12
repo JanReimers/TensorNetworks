@@ -16,7 +16,7 @@ public:
     typedef TensorNetworks::MatrixRT  MatrixRT;
     typedef TensorNetworks::MatrixCT  MatrixCT;
     typedef TensorNetworks::Vector3CT Vector3CT;
-    typedef TensorNetworks::eType     eType;
+    typedef TensorNetworks::dcmplx     dcmplx;
     MPOTesting()
         : eps(1.0e-13)
         , itsFactory(TensorNetworks::Factory::GetFactory())
@@ -161,9 +161,9 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D2)
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
     Vector3CT L3=CalcHeffLeft(L+1);
-    eType EL=L3(1,1,1);
+    dcmplx EL=L3(1,1,1);
     Vector3CT R3=CalcHeffRight(0);
-    eType ER=R3(1,1,1);
+    dcmplx ER=R3(1,1,1);
     EXPECT_NEAR(std::imag(EL),0.0,eps);
     EXPECT_NEAR(std::imag(ER),0.0,eps);
     EXPECT_NEAR(std::real(ER),std::real(EL),10*eps);
@@ -176,9 +176,9 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D1)
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
     Vector3CT L3=CalcHeffLeft(L+1);
-    eType EL=L3(1,1,1);
+    dcmplx EL=L3(1,1,1);
     Vector3CT R3=CalcHeffRight(0);
-    eType ER=R3(1,1,1);
+    dcmplx ER=R3(1,1,1);
     EXPECT_NEAR(std::imag(EL),0.0,eps);
     EXPECT_NEAR(std::imag(ER),0.0,eps);
     EXPECT_NEAR(std::real(ER),std::real(EL),10*eps);
@@ -191,9 +191,9 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D6)
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
     Vector3CT L3=CalcHeffLeft(L+1);
-    eType EL=L3(1,1,1);
+    dcmplx EL=L3(1,1,1);
     Vector3CT R3=CalcHeffRight(0);
-    eType ER=R3(1,1,1);
+    dcmplx ER=R3(1,1,1);
     EXPECT_NEAR(std::imag(EL),0.0,10*eps);
     EXPECT_NEAR(std::imag(ER),0.0,10*eps);
     EXPECT_NEAR(std::real(ER),std::real(EL),10*eps);
@@ -205,9 +205,9 @@ TEST_F(MPOTesting,TestGetLRIterateL10S5D2)
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
     Vector3CT L3=CalcHeffLeft(L+1);
-    eType EL=L3(1,1,1);
+    dcmplx EL=L3(1,1,1);
     Vector3CT R3=CalcHeffRight(0);
-    eType ER=R3(1,1,1);
+    dcmplx ER=R3(1,1,1);
     EXPECT_NEAR(std::imag(EL),0.0,100000*eps);
     EXPECT_NEAR(std::imag(ER),0.0,100000*eps);
     EXPECT_NEAR(std::real(ER),std::real(EL),100000*eps);
@@ -220,9 +220,9 @@ TEST_F(MPOTesting,TestEoldEnew)
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
     Vector3CT L3=CalcHeffLeft(L+1);
-    eType EL=L3(1,1,1);
+    dcmplx EL=L3(1,1,1);
     Vector3CT R3=CalcHeffRight(0);
-    eType ER=R3(1,1,1);
+    dcmplx ER=R3(1,1,1);
     double Enew=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(std::real(ER),Enew,100*eps);
     EXPECT_NEAR(std::real(EL),Enew,100*eps);

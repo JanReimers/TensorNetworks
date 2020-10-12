@@ -134,14 +134,14 @@ private:
     void SVDTransfer(Direction lr,const DiagonalMatrixRT& s, const MatrixCT& UV);
     void SVDTransfer(Direction lr,const MatrixCT& UV);
 
-    eType ContractAWFA (int w2,int i2, int j2,         const SiteOperator* so, const Vector3CT& Fam1) const;
-    eType ContractWFA  (int m, int w2, int i1, int j2, const SiteOperator* so, const Vector3CT& Fam1) const;
-    eType ContractFA   (int n, int w1, int i1, int j2,                         const Vector3CT& Fam1) const;
-    eType ContractBWFB (int w1,int i1, int j1,         const SiteOperator* so, const Vector3CT& Fap1) const;
-    eType ContractWFB  (int m, int w1, int i2, int j1, const SiteOperator* so, const Vector3CT& Fap1) const;
-    eType ContractFB   (int n, int w2, int i2, int j1,                         const Vector3CT& Fap1) const;
+    dcmplx ContractAWFA (int w2,int i2, int j2,         const SiteOperator* so, const Vector3CT& Fam1) const;
+    dcmplx ContractWFA  (int m, int w2, int i1, int j2, const SiteOperator* so, const Vector3CT& Fam1) const;
+    dcmplx ContractFA   (int n, int w1, int i1, int j2,                         const Vector3CT& Fam1) const;
+    dcmplx ContractBWFB (int w1,int i1, int j1,         const SiteOperator* so, const Vector3CT& Fap1) const;
+    dcmplx ContractWFB  (int m, int w1, int i2, int j1, const SiteOperator* so, const Vector3CT& Fap1) const;
+    dcmplx ContractFB   (int n, int w2, int i2, int j1,                         const Vector3CT& Fap1) const;
 
-    eType ContractWR   (int w1,int i2, int j2,const MatrixRT& W, int Dw2, const Vector3CT& R) const;
+    dcmplx ContractWR   (int w1,int i2, int j2,const MatrixRT& W, int Dw2, const Vector3CT& R) const;
 
     MatrixCT ContractCA(int n2, const MatrixCT& C) const;
     void     Contract(dVectorT& newAs,const SiteOperator* so);
@@ -156,7 +156,7 @@ private:
     dVectorT itsMs;   //We need a separate matrix for each of the p basis states on one site.
     Vector3CT itsHLeft_Cache,itsHRightCache; //L/R tensors for <Psi|H|Psi>
     mutable MatrixCT itsLeft_Cache ,itsRightCache;  //L/R matrices for <Psi|Psi>
-    PrimeEigenSolver<eType> itsEigenSolver;
+    PrimeEigenSolver<dcmplx> itsEigenSolver;
 
     int    itsNumUpdates;
     bool   isFrozen; //Don't refine this site.

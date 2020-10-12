@@ -63,7 +63,7 @@ public:
 //
         virtual double   GetOverlap     (const MPS* Psi2) const; //<this|Psi2>
         virtual double   GetExpectation (const Operator* o) const;
-        virtual eType    GetExpectationC(const Operator* o) const;
+        virtual dcmplx    GetExpectationC(const Operator* o) const;
 //--------------------------------------------------------------------------------------
 //
 //  Operate on MPS with an MPO:  |Psi> -> O|Psi>.

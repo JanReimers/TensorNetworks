@@ -105,13 +105,13 @@ void iTEBDStateImp::Apply(int isite,const Matrix4RT& expH)
     //                              expH(mA,nA,              mB,nB)
     //
     Matrix4CT Theta(itsd,itsDmax,itsd,itsDmax,0);
-    Fill(Theta.Flatten(),eType(0.0));
+    Fill(Theta.Flatten(),dcmplx(0.0));
     for (int na=0;na<itsd;na++)
     for (int nb=0;nb<itsd;nb++)
         for (int i1=1;i1<=itsDmax;i1++)
             for (int i3=1;i3<=itsDmax;i3++)
             {
-                eType t(0.0);
+                dcmplx t(0.0);
                 for (int ma=0;ma<itsd;ma++)
                 for (int mb=0;mb<itsd;mb++)
                 for (int i2=1;i2<=itsDmax;i2++)

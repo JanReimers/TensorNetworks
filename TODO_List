@@ -1,5 +1,7 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
+- Make unit tests faster (target < minutes).
+    Make a new target ReleaseLong for all the slow tests
 - Add an iTime test the is epsSv limited
 - Right now SVMPOCompressor is unused. Do we need a different policy for MPOs? If not remove SVMPOCompressor
 - Right now PrimeEigenSolver depends in FullStateImp, can be break this somewhow?
@@ -9,7 +11,7 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     Create State under imp folder
 - Move multiplotable back to Plotting
     -Pulled out of CB projects for now
-- replace eType with a better name, same length as double.
+- replace dcmplx with a better name, same length as double.
 - ExactDiagTesting make FullState member
 - Why use and Array instead of Vector for FullState?
 - Tidy up test names

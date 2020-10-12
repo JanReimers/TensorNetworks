@@ -126,7 +126,7 @@ void MPSSite::InitializeWith(State state,int sgn)
     case Neel :
     {
         for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++)
-            Fill(*id,eType(0.0));
+            Fill(*id,dcmplx(0.0));
         if (sgn== 1)
             itsMs[0     ](1,1)=1.0;
         if (sgn==-1)
@@ -146,7 +146,7 @@ void MPSSite::Freeze(double Sz)
     assert(n>=0);
     assert(n<itsd);
     for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++)
-        Fill(*id,eType(0.0));
+        Fill(*id,dcmplx(0.0));
     itsMs[n](1,1)=1.0;
     itsIterDE=0.0;
 }
@@ -161,7 +161,7 @@ void MPSSite::NewBondDimensions(int D1, int D2, bool saveData)
         itsMs[in].SetLimits(D1,D2,saveData);
         for (int i1=itsD1;i1<=D1;i1++)
             for (int i2=itsD2;i2<=D2;i2++)
-                itsMs[in](i1,i2)=eType(0.0);
+                itsMs[in](i1,i2)=dcmplx(0.0);
     }
     itsD1=D1;
     itsD2=D2;

@@ -44,7 +44,7 @@ public:
 //
     virtual double   GetOverlap     (const MPS* Psi2) const=0; //<this|Psi2>
     virtual double   GetExpectation (const Operator* o) const=0; //This one checks the answer is real, the ..C version allows comples return values.
-    virtual eType    GetExpectationC(const Operator* o) const=0; //For non hermitian operators, S+, S-. Sy
+    virtual dcmplx    GetExpectationC(const Operator* o) const=0; //For non hermitian operators, S+, S-. Sy
 //--------------------------------------------------------------------------------------
 //
 //  Operate on MPS with an MPO:  |Psi> -> O|Psi>.

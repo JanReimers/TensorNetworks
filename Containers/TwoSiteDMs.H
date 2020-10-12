@@ -11,10 +11,10 @@
 class TwoSiteDMs
 {
 public:
-    typedef std::complex<double> eType;
-    typedef Matrix4<eType> DMType;
+    typedef std::complex<double> dcmplx;
+    typedef Matrix4<dcmplx> DMType;
     typedef Matrix4<double> OperatorT;
-    typedef Matrix4<eType>  OperatorCT;
+    typedef Matrix4<dcmplx>  OperatorCT;
     typedef SMatrix<double> ExpectationT;
 
     TwoSiteDMs(int L,int d);
@@ -29,7 +29,7 @@ public:
 
 private:
     typedef SMatrix<DMType> DMsType;
-    typedef DMatrix<eType> MatrixCT;
+    typedef DMatrix<dcmplx> MatrixCT;
 
     int itsL;
     int itsd;

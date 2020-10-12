@@ -20,11 +20,11 @@ namespace TensorNetworks
         typedef Vector <double>  VectorRT;
         typedef Matrix6<double> Matrix6RT;
 
-        typedef Array  <eType>    ArrayCT;
-        typedef Matrix6<eType>  Matrix6CT;
-        typedef Matrix4<eType>  Matrix4CT;
-        typedef Vector3<eType>  Vector3CT;
-        typedef Vector4<eType>  Vector4CT;
+        typedef Array  <dcmplx>    ArrayCT;
+        typedef Matrix6<dcmplx>  Matrix6CT;
+        typedef Matrix4<dcmplx>  Matrix4CT;
+        typedef Vector3<dcmplx>  Vector3CT;
+        typedef Vector4<dcmplx>  Vector4CT;
 };
 
 #endif //_IMPTYPEDEFS_H_

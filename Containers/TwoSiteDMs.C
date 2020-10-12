@@ -35,7 +35,7 @@ template <class O> TwoSiteDMs::ExpectationT TwoSiteDMs::Contract(const O& op) co
     for (int ia=1; ia<=itsL-1;ia++)
         for (int ib=ia+1; ib<=itsL; ib++)
         {
-            eType ex(0.0);
+            dcmplx ex(0.0);
             const DMType& dm=itsDMs(ia,ib);
 //            cout << "dm=" << dm << endl;
             for (int m1=1; m1<=itsd; m1++)
@@ -71,7 +71,7 @@ TwoSiteDMs::ExpectationT TwoSiteDMs::GetVNEntropies() const
         for (int ib=ia+1; ib<=itsL; ib++)
         {
             //Vector<double> s=EigenValuesOnly<double,MatrixCT>(itsDMs(ia,ib).Flatten());
-            Vector<eType> s(itsDMs(ia,ib).Flatten().GetDiagonal());
+            Vector<dcmplx> s(itsDMs(ia,ib).Flatten().GetDiagonal());
 //            cout << "s(" << ia << "," << ib << ")=" << s << ", sum=" << Sum(s) << endl;
             ret(ia,ib)=VNEntropyFromEVs(real(s));
         }

@@ -71,7 +71,7 @@ template <class T> double SVCompressorImp<T>::Compress(MatrixT& U, DiagonalMatri
     return integratedS2;
 }
 
-template class SVCompressorImp<eType>;
+template class SVCompressorImp<dcmplx>;
 template class SVCompressorImp<double>;
 
 }
