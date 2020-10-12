@@ -10,6 +10,7 @@ namespace TensorNetworks
 Bond::Bond()
     : itsBondEntropy(0.0)
     , itsMinSV(0.0)
+    , itsIntegratedS2(-99)
     , itsRank(0)
     , itsLeft_Site(0)
     , itsRightSite(0)
@@ -47,7 +48,7 @@ void Bond::NewBondDimension(int D)
     itsRank=D;
 }
 
-void Bond::SetSingularValues(const DiagonalMatrixRT& s)
+void Bond::SetSingularValues(const DiagonalMatrixRT& s,double integratedS2)
 {
     //std::cout << "SingularValues=" << s << std::endl;
     int N=s.GetNumRows();
@@ -56,8 +57,9 @@ void Bond::SetSingularValues(const DiagonalMatrixRT& s)
 
     itsRank=N;
     itsMinSV=itsSingularValues(N);
-    itsBondEntropy=0.0;
+    itsIntegratedS2=integratedS2;
 
+    itsBondEntropy=0.0;
     for (int i=1;i<=N;i++)
     {
         double s2=itsSingularValues(i)*itsSingularValues(i);
@@ -74,18 +76,30 @@ void Bond::SetSingularValues(const DiagonalMatrixRT& s)
 //
 //  Direction is the normaliztions direction, which i opposite to the direction that UV gets tranferred.
 //
-void Bond::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixCT& UV)
+void Bond::SVDTransfer(Direction lr,double integratedS2,const DiagonalMatrixRT& s,const MatrixCT& UV)
 {
-    SetSingularValues(s);
+    SetSingularValues(s,integratedS2);
     assert(GetSite(lr));
     GetSite(lr)->SVDTransfer(lr,s,UV);
 }
 
-void Bond::CanonicalTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixCT& UV)
+void Bond::CanonicalTransfer(Direction lr,double integratedS2,const DiagonalMatrixRT& s,const MatrixCT& UV)
 {
-    SetSingularValues(s);
+    SetSingularValues(s,integratedS2);
     assert(GetSite(lr));
     GetSite(lr)->SVDTransfer(lr,UV);
 }
+
+void Bond::Report(std::ostream& os) const
+{
+    os
+                                                  << std::setw(4) << itsRank
+       << std::fixed      << std::setprecision(6) << std::setw(12) << itsBondEntropy
+       << std::scientific << std::setprecision(1) << std::setw(10) << itsMinSV
+       << std::scientific << std::setprecision(1) << std::setw(10) << itsIntegratedS2
+       ;
+
+}
+
 
 } //namespace

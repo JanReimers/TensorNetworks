@@ -39,19 +39,20 @@ void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
     }
 
     auto [U,s,Vdagger]=oml_CSVDecomp(ReshapeBeforeSVD(lr)); //Solves A=U * s * Vdagger  returns V not Vdagger
-    if (comp) comp->Compress(U,s,Vdagger);
+    double integratedS2=0.0;
+    if (comp) integratedS2=comp->Compress(U,s,Vdagger);
 //    cout << "Limits for U,s,Vdagger=" << U.GetLimits() << " " << s.GetLimits() << " " << Vdagger.GetLimits() << endl;
     switch (lr)
     {
         case DRight:
         {
-            GetBond(lr)->SVDTransfer(lr,s,U);
+            GetBond(lr)->SVDTransfer(lr,integratedS2,s,U);
             ReshapeAfter_SVD(lr,Vdagger);  //A is now Vdagger
             break;
         }
         case DLeft:
         {
-            GetBond(lr)->SVDTransfer(lr,s,Vdagger);
+            GetBond(lr)->SVDTransfer(lr,integratedS2,s,Vdagger);
             ReshapeAfter_SVD(lr,U);  //A is now U
             break;
         }
@@ -84,19 +85,20 @@ void MPSSite::Canonicalize(Direction lr,SVCompressorC* comp)
 //    VectorRT s(N); // This get passed from one site to the next.
 //    MatrixCT V(N,A.GetNumCols());
     auto [U,s,Vdagger]=oml_CSVDecomp(A); //Solves A=U * s * Vdagger  returns V not Vdagger
-    if (comp) comp->Compress(U,s,Vdagger);
+    double integratedS2=0.0;
+    if (comp) integratedS2=comp->Compress(U,s,Vdagger);
 
     switch (lr)
     {
         case DRight:
         {
-            GetBond(lr)->CanonicalTransfer(lr,s,U);
+            GetBond(lr)->CanonicalTransfer(lr,integratedS2,s,U);
             ReshapeAfter_SVD(lr,Vdagger);  //A is now Vdagger
             break;
         }
         case DLeft:
         {
-            GetBond(lr)->CanonicalTransfer(lr,s,Vdagger);
+            GetBond(lr)->CanonicalTransfer(lr,integratedS2,s,Vdagger);
             ReshapeAfter_SVD(lr,U);  //A is now U
             break;
         }

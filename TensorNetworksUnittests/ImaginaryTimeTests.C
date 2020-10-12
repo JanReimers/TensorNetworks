@@ -146,6 +146,10 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt0)
     EXPECT_NEAR(Psi2->GetOverlap(Psi3),1.0,1e-7);
     EXPECT_NEAR(Psi3->GetOverlap(Psi3),1.0,1e-6);
 
+    Psi1->Report(cout);
+    Psi2->Report(cout);
+    Psi3->Report(cout);
+
     delete Psi3;
     delete Psi2;
     delete Psi1;
@@ -298,6 +302,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 //    cout << is;
 
     Psi1->FindiTimeGroundState(itsH,is);
+    Psi1->Report(cout);
 
     double E2=Psi1->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46664265599414939,1e-5);

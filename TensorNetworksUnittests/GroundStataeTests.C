@@ -64,14 +64,12 @@ TEST_F(GroundStateTesting,TestSweepL9S1D2)
     is.Insert({maxIter,D,eps});
 
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+    itsMPS->Report(cout);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.45317425,1e-7);
     EXPECT_LT(nSweep,maxIter);
 }
-
-
-
 
 TEST_F(GroundStateTesting,TestSweepL9S1D8)
 {
@@ -86,6 +84,7 @@ TEST_F(GroundStateTesting,TestSweepL9S1D8)
     is.Insert({maxIter,D,eps});
 
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+    itsMPS->Report(cout);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.46703753,1e-7);
@@ -105,6 +104,7 @@ TEST_F(GroundStateTesting,TestSweepL9S1D4)
     is.Insert({maxIter,D,eps});
 
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+    itsMPS->Report(cout);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.46664265599414939,1e-7);
@@ -123,6 +123,7 @@ TEST_F(GroundStateTesting,TestSweepL9S5D2)
     TensorNetworks::IterationSchedule is;
     is.Insert({maxIter,D,eps});
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+    itsMPS->Report(cout);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-7.025661 ,1e-7);
@@ -142,6 +143,7 @@ TEST_F(GroundStateTesting,TestFreezeL9S1D2)
     TensorNetworks::IterationSchedule is;
     is.Insert({maxIter,D,eps});
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+    itsMPS->Report(cout);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.45317425 ,1e-7);
@@ -170,7 +172,6 @@ TEST_F(GroundStateTesting,TestSweepL6S1GrowD27)
 //    eps.itsDelatEnergy1Epsilon=1e-10;
 //    is.Insert({30,Dend,eps});
     itsMPS->FindVariationalGroundState(itsH,is);
-
     itsMPS->Report(cout);
 
     double E=itsMPS->GetExpectation(itsH);
@@ -200,7 +201,6 @@ TEST_F(GroundStateTesting,TestSweepL7S1GrowD27)
 //    eps.itsDelatEnergy1Epsilon=1e-10;
 //    is.Insert({30,Dend,eps});
     itsMPS->FindVariationalGroundState(itsH,is);
-
     itsMPS->Report(cout);
 
     double E=itsMPS->GetExpectation(itsH);

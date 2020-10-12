@@ -1,8 +1,9 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
+- Add an iTime test the is epsSv limited
 - Right now SVMPOCompressor is unused. Do we need a different policy for MPOs? If not remove SVMPOCompressor
 - Right now PrimeEigenSolver depends in FullStateImp, can be break this somewhow?
-- Fix MPS::Report columns
+- Done: Fix MPS::Report columns
     why are they empty sometimes?
 - Reorg : Operators goes under Imp folder
     Create State under imp folder

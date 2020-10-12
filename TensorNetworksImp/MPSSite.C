@@ -195,16 +195,13 @@ char MPSSite::GetNormStatus(double eps) const
 
 void MPSSite::Report(std::ostream& os) const
 {
-    os << std::setprecision(3)
-       << std::setw(4) << itsD1
-       << std::setw(4)  << itsD2
-       << std::setw(2)  << GetNormStatus(1e-12)
-       << std::fixed
-       << std::setw(5)  << itsNumUpdates << "      "
-       << std::setprecision(7)
-       << std::setw(9)  << itsEmin << "     " << std::setprecision(4)
-       << std::setw(5)  << itsGapE << "   " << std::scientific
-       << std::setw(5)  << itsIterDE << "  "
+    os << std::setw(4)          << itsD1
+       << std::setw(4)          << itsD2
+       << std::setw(5)          << GetNormStatus(1e-12)
+       << std::setw(8)          << itsNumUpdates
+       << std::fixed      << std::setprecision(8) << std::setw(13) << itsEmin
+       << std::fixed      << std::setprecision(5) << std::setw(10) << itsGapE
+       << std::scientific << std::setprecision(1) << std::setw(10) << itsIterDE
        ;
 }
 

@@ -138,7 +138,7 @@ void iTEBDStateImp::Apply(int isite,const Matrix4RT& expH)
             for (int i3=1;i3<=itsDmax;i3++)
                 MB[nb](i2,i3)=Vdagger(nbi2,i3)/lambdaB(i3);
 
-   bondA->SetSingularValues(s);
+   bondA->SetSingularValues(s,0.0); //No SVs were thrown away (yet!)
 
 }
 

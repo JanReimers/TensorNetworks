@@ -25,6 +25,8 @@ template <class T> double SVCompressorImp<T>::Compress(MatrixT& U, DiagonalMatri
     {
         D=itsDmax;
         assert(D>0);
+        for (int id=D+1;id<=N;id++)
+            integratedS2+=s(id,id)*s(id,id);
     }
     else
     {

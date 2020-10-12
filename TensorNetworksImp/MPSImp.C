@@ -176,13 +176,19 @@ void MPSImp::IncreaseBondDimensions(int D)
 //
 void MPSImp::Report(std::ostream& os) const
 {
-    os.precision(3);
     os << "Matrix product state for " << itsL << " lattice sites." << endl;
-    os << "  Site  D1  D2  Bond Entropy   #updates  Rank  Sparsisty     Emin      Egap    dA" << endl;
+    os << "  Site  D1  D2  Norm #updates  Emin        Egap     dE" << endl;
     SiteLoop(ia)
     {
         os << std::setw(3) << ia << "  ";
         itsSites[ia]->Report(os);
+        os << endl;
+    }
+    os << "  Bond  Rank  Entropy   Min(Sv)   SvError " << endl;
+    for (int ib=1; ib<itsL; ib++)
+    {
+        os << std::setw(3) << ib << "  ";
+        itsBonds[ib]->Report(os);
         os << endl;
     }
 }
