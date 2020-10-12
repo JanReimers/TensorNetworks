@@ -1,11 +1,11 @@
 #include "Tests.H"
 #include "itensor/itensor.h"
 
-class ITensorTesting : public ::testing::Test
+class ITensorTests : public ::testing::Test
 {
 public:
 
-    ITensorTesting()
+    ITensorTests()
     : eps(1.0e-13)
     {
 //        StreamableObject::SetToPretty();
@@ -16,7 +16,7 @@ public:
 
 using namespace itensor;
 
-TEST_F(ITensorTesting,TestITensor)
+TEST_F(ITensorTests,TestITensor)
 {
     double S=0.5;
     int d=2*S+1;
@@ -85,7 +85,7 @@ ITensor MakeH(Index const& s1,Index const& s2)
 }
 #include "itensor/decomp.h"
 
-TEST_F(ITensorTesting,Test3SiteHamiltonian)
+TEST_F(ITensorTests,Test3SiteHamiltonian)
 {
     double S=0.5;
     int d=2*S+1;
@@ -116,7 +116,7 @@ TEST_F(ITensorTesting,Test3SiteHamiltonian)
 //    PrintData(expH);
 
 }
-TEST_F(ITensorTesting,Test4SiteHamiltonian)
+TEST_F(ITensorTests,Test4SiteHamiltonian)
 {
     double S=0.5;
     int d=2*S+1;

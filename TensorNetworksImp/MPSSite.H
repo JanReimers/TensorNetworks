@@ -5,8 +5,8 @@
 #include "NumericalMethods/PrimeEigenSolver.H"
 #include <vector>
 
-class MPOTesting;
-class MatrixProductTesting;
+class MPOTests;
+class MPSTests;
 
 namespace TensorNetworks
 {
@@ -93,13 +93,12 @@ class MPSSite
         char GetNormStatus(double eps) const;
         void Report    (std::ostream&) const;
 
-//-----------------------------------------------------------------------------------
-//
-//  This stuff is for unti testing only.
-//
 private:
-    friend class ::MPOTesting;
+    friend class ::MPOTests;
+    friend class ::MPSTests;
+    friend class iTEBDStateImp;
     friend class Bond;
+
 
     Position WhereAreWe() const {return itsPosition;}
 
@@ -119,9 +118,6 @@ private:
         return lr==DLeft ? itsRightBond : itsLeft_Bond;
     }
 
-
-    friend class ::MatrixProductTesting;
-    friend class iTEBDStateImp;
 
     typedef std::vector<MatrixCT>     dVectorT;
     typedef dVectorT::      iterator  dIterT;

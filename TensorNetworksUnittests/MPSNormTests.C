@@ -8,10 +8,10 @@
 #include <complex>
 
 
-class MPSNormTesting : public ::testing::Test
+class MPSNormTests : public ::testing::Test
 {
 public:
-    MPSNormTesting()
+    MPSNormTests()
     : itsMPS(0)
     , eps(1.0e-10)
     {
@@ -20,7 +20,7 @@ public:
         std::cout.precision(5);
         cout << std::fixed;
     }
-    ~MPSNormTesting() {delete itsMPS;}
+    ~MPSNormTests() {delete itsMPS;}
 
     void Setup(int L, double S, int D)
     {
@@ -57,7 +57,7 @@ std::string BuildNormString(const TensorNetworks::MPSImp* mps,int L)
 
 
 
-TEST_F(MPSNormTesting,LeftNormalMatriciesProductStateL10S3D2)
+TEST_F(MPSNormTests,LeftNormalMatriciesProductStateL10S3D2)
 {
     int L=itsMPS->GetL();
     itsMPS->InitializeWith(TensorNetworks::Product);
@@ -66,7 +66,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesProductStateL10S3D2)
 }
 
 
-TEST_F(MPSNormTesting,RightNormalMatriciesProductStateL100S3D2)
+TEST_F(MPSNormTests,RightNormalMatriciesProductStateL100S3D2)
 {
     int L=itsMPS->GetL();
     itsMPS->InitializeWith(TensorNetworks::Product);
@@ -75,7 +75,7 @@ TEST_F(MPSNormTesting,RightNormalMatriciesProductStateL100S3D2)
 }
 
 
-TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D2)
+TEST_F(MPSNormTests,LeftNormalMatriciesRandomStateL10S3D2)
 {
     int L=itsMPS->GetL();
     itsMPS->InitializeWith(TensorNetworks::Random);
@@ -83,7 +83,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D2)
     EXPECT_EQ(BuildNormString(itsMPS,L),"AAAAAAAAAA");
 }
 
-TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL100S3D2)
+TEST_F(MPSNormTests,RightNormalMatriciesRandomStateL100S3D2)
 {
     int L=itsMPS->GetL();
     itsMPS->InitializeWith(TensorNetworks::Random);
@@ -91,7 +91,7 @@ TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL100S3D2)
     EXPECT_EQ(BuildNormString(itsMPS,L),"BBBBBBBBBB");
 }
 
-TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D3)
+TEST_F(MPSNormTests,LeftNormalMatriciesRandomStateL10S3D3)
 {
     int L=10;
     Setup(L,1.5,3);
@@ -100,7 +100,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D3)
     EXPECT_EQ(BuildNormString(itsMPS,L),"AAAAAAAAAA");
 }
 
-TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S1D1)
+TEST_F(MPSNormTests,LeftNormalMatriciesRandomStateL10S1D1)
 {
     int L=10;
     Setup(L,0.5,1);
@@ -108,7 +108,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S1D1)
     itsMPS->Normalize(TensorNetworks::DLeft);
     EXPECT_EQ(BuildNormString(itsMPS,L),"IIIIIIIIII");
 }
-TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S5D1)
+TEST_F(MPSNormTests,LeftNormalMatriciesRandomStateL10S5D1)
 {
     int L=10;
     Setup(L,2.5,1);
@@ -116,7 +116,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S5D1)
     itsMPS->Normalize(TensorNetworks::DLeft);
     EXPECT_EQ(BuildNormString(itsMPS,L),"IIIIIIIIII");
 }
-TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S1D1)
+TEST_F(MPSNormTests,RightNormalMatriciesRandomStateL10S1D1)
 {
     int L=10;
     Setup(L,0.5,1);
@@ -124,7 +124,7 @@ TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S1D1)
     itsMPS->Normalize(TensorNetworks::DRight);
     EXPECT_EQ(BuildNormString(itsMPS,L),"IIIIIIIIII");
 }
-TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S5D1)
+TEST_F(MPSNormTests,RightNormalMatriciesRandomStateL10S5D1)
 {
     int L=10;
     Setup(L,2.5,1);
@@ -133,7 +133,7 @@ TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S5D1)
     EXPECT_EQ(BuildNormString(itsMPS,L),"IIIIIIIIII");
 }
 
-TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D10)
+TEST_F(MPSNormTests,LeftNormalMatriciesRandomStateL10S3D10)
 {
     int L=10;
     Setup(L,0.5,10);
@@ -142,7 +142,7 @@ TEST_F(MPSNormTesting,LeftNormalMatriciesRandomStateL10S3D10)
     EXPECT_EQ(BuildNormString(itsMPS,L),"AAAAAAAAAA");
 }
 
-TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S3D10)
+TEST_F(MPSNormTests,RightNormalMatriciesRandomStateL10S3D10)
 {
     int L=10;
     Setup(L,1.5,10);
@@ -151,7 +151,7 @@ TEST_F(MPSNormTesting,RightNormalMatriciesRandomStateL10S3D10)
     EXPECT_EQ(BuildNormString(itsMPS,L),"BBBBBBBBBB");
 }
 
-TEST_F(MPSNormTesting,LeftNormalOverlapL10S1D2)
+TEST_F(MPSNormTests,LeftNormalOverlapL10S1D2)
 {
     int L=10;
     Setup(L,0.5,2);
@@ -160,7 +160,7 @@ TEST_F(MPSNormTesting,LeftNormalOverlapL10S1D2)
     EXPECT_EQ(BuildNormString(itsMPS,L),"AAAAAAAAAA");
 }
 
-TEST_F(MPSNormTesting,RightNormalOverlapL10S2D2)
+TEST_F(MPSNormTests,RightNormalOverlapL10S2D2)
 {
     int L=10;
     Setup(L,1.5,2);
@@ -171,7 +171,7 @@ TEST_F(MPSNormTesting,RightNormalOverlapL10S2D2)
 
 
 
-TEST_F(MPSNormTesting,MixedCanonicalL10S1D3)
+TEST_F(MPSNormTests,MixedCanonicalL10S1D3)
 {
     int L=10;
     Setup(L,0.5,3);
@@ -183,7 +183,7 @@ TEST_F(MPSNormTesting,MixedCanonicalL10S1D3)
     }
 }
 
-TEST_F(MPSNormTesting,SeflOverlapRandomStateL10S3D10)
+TEST_F(MPSNormTests,SeflOverlapRandomStateL10S3D10)
 {
     int L=10;
     Setup(L,1.5,10);

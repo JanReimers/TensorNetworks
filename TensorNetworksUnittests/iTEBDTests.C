@@ -5,13 +5,13 @@
 
 using std::setw;
 
-class iTEBDTesting : public ::testing::Test
+class iTEBDTests : public ::testing::Test
 {
 public:
     typedef TensorNetworks::MatrixRT MatrixRT;
     typedef TensorNetworks::Matrix4RT Matrix4RT;
 
-    iTEBDTesting()
+    iTEBDTests()
     : eps(1.0e-13)
     , itsFactory(TensorNetworks::Factory::GetFactory())
     {
@@ -34,7 +34,7 @@ public:
 
 
 
-TEST_F(iTEBDTesting,TestApplyIdentity)
+TEST_F(iTEBDTests,TestApplyIdentity)
 {
     int UnitCell=2,D=8;
     double dt=0.0;

@@ -16,12 +16,12 @@ using TensorNetworks::FirstOrder;
 using TensorNetworks::SecondOrder;
 using TensorNetworks::FourthOrder;
 
-class ImaginaryTimeTesting : public ::testing::Test
+class ImaginaryTimeTests : public ::testing::Test
 {
 public:
     typedef TensorNetworks::MatrixRT MatrixRT;
 
-    ImaginaryTimeTesting()
+    ImaginaryTimeTests()
     : eps(1.0e-13)
     , itsFactory(TensorNetworks::Factory::GetFactory())
     {
@@ -44,7 +44,7 @@ public:
 
 
 
-TEST_F(ImaginaryTimeTesting,TestApplyIdentity)
+TEST_F(ImaginaryTimeTests,TestApplyIdentity)
 {
     int D=1;
     Setup(3,0.5,D);
@@ -64,7 +64,7 @@ TEST_F(ImaginaryTimeTesting,TestApplyIdentity)
 }
 
 
-TEST_F(ImaginaryTimeTesting,TestMPPOCombine)
+TEST_F(ImaginaryTimeTests,TestMPPOCombine)
 {
     int D=2,L=9;
     double S=0.5,dt=0.05000;
@@ -113,7 +113,7 @@ TEST_F(ImaginaryTimeTesting,TestMPPOCombine)
     delete Psi2;
     delete W;
 }
-TEST_F(ImaginaryTimeTesting,TestIterationSchedule)
+TEST_F(ImaginaryTimeTests,TestIterationSchedule)
 {
     TensorNetworks::Epsilons eps(1e-12);
     TensorNetworks::IterationScheduleLine l1={10,5,0.2,TensorNetworks::FirstOrder,eps};
@@ -125,7 +125,7 @@ TEST_F(ImaginaryTimeTesting,TestIterationSchedule)
 }
 
 
-TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt0)
+TEST_F(ImaginaryTimeTests,MPOCompressSeconderOrderTrotter_dt0)
 {
     int D=8,L=9;
     double dt=0.0,epsSVD=1e-12;                                                                                                                                                                                                        ;
@@ -154,7 +154,7 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt0)
 
 #ifndef DEBUG
 
-TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05_FixedEps)
+TEST_F(ImaginaryTimeTests,MPOCompressSeconderOrderTrotter_dt05_FixedEps)
 {
     int D=8,L=9;
     double dt=0.05,epsSVD=1e-3;                                                                                                                                                                                                     ;
@@ -202,7 +202,7 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05_FixedEps)
     delete W;
 }
 
-TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05_FixedDw)
+TEST_F(ImaginaryTimeTests,MPOCompressSeconderOrderTrotter_dt05_FixedDw)
 {
     int D=8,L=9,DwMax=4;
     double dt=0.05,epsSVD=0;                                                                                                                                                                                                     ;
@@ -250,7 +250,7 @@ TEST_F(ImaginaryTimeTesting,MPOCompressSeconderOrderTrotter_dt05_FixedDw)
 }
 
 
-TEST_F(ImaginaryTimeTesting,MPOCompressFourthOrderTrotter)
+TEST_F(ImaginaryTimeTests,MPOCompressFourthOrderTrotter)
 {
     int D=8,L=9;
     double dt=0.1;
@@ -262,7 +262,7 @@ TEST_F(ImaginaryTimeTesting,MPOCompressFourthOrderTrotter)
 }
 
 
-TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
+TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotter)
 {
     int D=4,L=9;
     Setup(L,0.5,D);
@@ -311,7 +311,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeFirstOrderTrotter)
 
 #ifdef RunLongTests
 
-TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
+TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter)
 {
     int D=4,L=9;
     Setup(L,0.5,D);
@@ -347,7 +347,7 @@ TEST_F(ImaginaryTimeTesting,TestITimeSecondOrderTrotter)
     delete Psi1;
 }
 
-TEST_F(ImaginaryTimeTesting,TestITimeFourthOrderTrotter)
+TEST_F(ImaginaryTimeTests,TestITimeFourthOrderTrotter)
 {
     int D=4,L=9;
     Setup(L,0.5,D);

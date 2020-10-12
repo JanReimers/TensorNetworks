@@ -9,7 +9,7 @@
 #include "oml/vector_io.h"
 #include "oml/stopw.h"
 
-class MPOTesting : public ::testing::Test
+class MPOTests : public ::testing::Test
 {
 public:
     typedef TensorNetworks::Matrix6CT Matrix6CT;
@@ -17,7 +17,7 @@ public:
     typedef TensorNetworks::MatrixCT  MatrixCT;
     typedef TensorNetworks::Vector3CT Vector3CT;
     typedef TensorNetworks::dcmplx     dcmplx;
-    MPOTesting()
+    MPOTests()
         : eps(1.0e-13)
         , itsFactory(TensorNetworks::Factory::GetFactory())
 
@@ -54,67 +54,67 @@ public:
 
 
 
-TEST_F(MPOTesting,MakeHamiltonian)
+TEST_F(MPOTests,MakeHamiltonian)
 {
     Setup(10,0.5,2);
 }
 
 
-TEST_F(MPOTesting,HamiltonianGetLeftW00)
+TEST_F(MPOTests,HamiltonianGetLeftW00)
 {
     Setup(10,0.5,2);
     EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PLeft,0,0)),"(1:1),(1:5) \n[ -0 0 0 -0.5 1 ]\n");
 }
 
-TEST_F(MPOTesting,HamiltonianGetRightW00)
+TEST_F(MPOTests,HamiltonianGetRightW00)
 {
     Setup(10,0.5,2);
     EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PRight,0,0)),"(1:5),(1:1) \n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ -0.5 ]\n[ -0 ]\n");
 }
-TEST_F(MPOTesting,HamiltonianGetLeftW10)
+TEST_F(MPOTests,HamiltonianGetLeftW10)
 {
     Setup(10,0.5,2);
     EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PLeft,1,0)),"(1:1),(1:5) \n[ 0 0 0.5 0 0 ]\n");
 }
-TEST_F(MPOTesting,HamiltonianGetRightW10)
+TEST_F(MPOTests,HamiltonianGetRightW10)
 {
     Setup(10,0.5,2);
     EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PRight,1,0)),"(1:5),(1:1) \n[ 0 ]\n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ 0 ]\n");
 }
-TEST_F(MPOTesting,HamiltonianGetLeftW01)
+TEST_F(MPOTests,HamiltonianGetLeftW01)
 {
     Setup(10,0.5,2);
     EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PLeft,0,1)),"(1:1),(1:5) \n[ 0 0.5 0 0 0 ]\n");
 }
-TEST_F(MPOTesting,HamiltonianGetRightW01)
+TEST_F(MPOTests,HamiltonianGetRightW01)
 {
     Setup(10,0.5,2);
     EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PRight,0,1)),"(1:5),(1:1) \n[ 0 ]\n[ 0 ]\n[ 1 ]\n[ 0 ]\n[ 0 ]\n");
 }
-TEST_F(MPOTesting,HamiltonianGetLeftW11)
+TEST_F(MPOTests,HamiltonianGetLeftW11)
 {
     Setup(10,0.5,2);
     EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PLeft,1,1)),"(1:1),(1:5) \n[ 0 0 0 0.5 1 ]\n");
 }
-TEST_F(MPOTesting,HamiltonianGetRightW11)
+TEST_F(MPOTests,HamiltonianGetRightW11)
 {
     Setup(10,0.5,2);
     EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PRight,1,1)),"(1:5),(1:1) \n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ 0.5 ]\n[ 0 ]\n");
 }
 
-TEST_F(MPOTesting,CheckThatWsGotLoaded)
+TEST_F(MPOTests,CheckThatWsGotLoaded)
 {
     Setup(10,0.5,2);
     EXPECT_EQ(ToString(GetW(2,0,0)),"(1:5),(1:5) \n[ 1 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ -0.5 0 0 0 0 ]\n[ -0 0 0 -0.5 1 ]\n");
     EXPECT_EQ(ToString(GetW(2,0,1)),"(1:5),(1:5) \n[ 0 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 1 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 0 0.5 0 0 0 ]\n");
 }
 
-double MPOTesting::ENeel(double s) const
+double MPOTests::ENeel(double s) const
 {
     return -s*s*(itsH->GetL()-1);
 }
 
-TEST_F(MPOTesting,DoHamiltionExpectationL10S1_5D2)
+TEST_F(MPOTests,DoHamiltionExpectationL10S1_5D2)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
@@ -124,27 +124,27 @@ TEST_F(MPOTesting,DoHamiltionExpectationL10S1_5D2)
     }
 }
 
-TEST_F(MPOTesting,DoHamiltionExpectationProductL10S1D1)
+TEST_F(MPOTests,DoHamiltionExpectationProductL10S1D1)
 {
     Setup(10,0.5,1);
     itsMPS->InitializeWith(TensorNetworks::Neel);
     EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
 }
-TEST_F(MPOTesting,DoHamiltionExpectationNeelL10S1D1)
+TEST_F(MPOTests,DoHamiltionExpectationNeelL10S1D1)
 {
     Setup(10,0.5,1);
     itsMPS->InitializeWith(TensorNetworks::Neel);
     EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
 }
 
-TEST_F(MPOTesting,LeftNormalizeThenDoHamiltionExpectation)
+TEST_F(MPOTests,LeftNormalizeThenDoHamiltionExpectation)
 {
     Setup(10,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Neel);
     itsMPS->Normalize(TensorNetworks::DLeft);
     EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
 }
-TEST_F(MPOTesting,RightNormalizeThenDoHamiltionExpectation)
+TEST_F(MPOTests,RightNormalizeThenDoHamiltionExpectation)
 {
     Setup(10,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Neel);
@@ -154,7 +154,7 @@ TEST_F(MPOTesting,RightNormalizeThenDoHamiltionExpectation)
 
 
 
-TEST_F(MPOTesting,TestGetLRIterateL10S1D2)
+TEST_F(MPOTests,TestGetLRIterateL10S1D2)
 {
     int L=10;
     Setup(L,0.5,2);
@@ -169,7 +169,7 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D2)
     EXPECT_NEAR(std::real(ER),std::real(EL),10*eps);
 }
 
-TEST_F(MPOTesting,TestGetLRIterateL10S1D1)
+TEST_F(MPOTests,TestGetLRIterateL10S1D1)
 {
     int L=10;
     Setup(L,0.5,1);
@@ -184,7 +184,7 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D1)
     EXPECT_NEAR(std::real(ER),std::real(EL),10*eps);
 }
 
-TEST_F(MPOTesting,TestGetLRIterateL10S1D6)
+TEST_F(MPOTests,TestGetLRIterateL10S1D6)
 {
     int L=10;
     Setup(L,0.5,6);
@@ -198,7 +198,7 @@ TEST_F(MPOTesting,TestGetLRIterateL10S1D6)
     EXPECT_NEAR(std::imag(ER),0.0,10*eps);
     EXPECT_NEAR(std::real(ER),std::real(EL),10*eps);
 }
-TEST_F(MPOTesting,TestGetLRIterateL10S5D2)
+TEST_F(MPOTests,TestGetLRIterateL10S5D2)
 {
     int L=10;
     Setup(L,2.5,2);
@@ -213,7 +213,7 @@ TEST_F(MPOTesting,TestGetLRIterateL10S5D2)
     EXPECT_NEAR(std::real(ER),std::real(EL),100000*eps);
 }
 
-TEST_F(MPOTesting,TestEoldEnew)
+TEST_F(MPOTests,TestEoldEnew)
 {
     int L=10;
     Setup(L,0.5,2);
@@ -228,7 +228,7 @@ TEST_F(MPOTesting,TestEoldEnew)
     EXPECT_NEAR(std::real(EL),Enew,100*eps);
 }
 
-TEST_F(MPOTesting,TestMPOCombineForH2)
+TEST_F(MPOTests,TestMPOCombineForH2)
 {
     int L=10,D=8;
     Setup(L,0.5,D);
@@ -246,7 +246,7 @@ TEST_F(MPOTesting,TestMPOCombineForH2)
     delete H2;
 }
 
-TEST_F(MPOTesting,TestMPOCompressForH2)
+TEST_F(MPOTests,TestMPOCompressForH2)
 {
     int L=10,D=8;
     Setup(L,0.5,D);
@@ -263,7 +263,7 @@ TEST_F(MPOTesting,TestMPOCompressForH2)
     delete H2;
 }
 
-TEST_F(MPOTesting,TestHamiltonianCreateH2)
+TEST_F(MPOTests,TestHamiltonianCreateH2)
 {
     int L=10,D=8;
     Setup(L,0.5,D);
@@ -274,7 +274,7 @@ TEST_F(MPOTesting,TestHamiltonianCreateH2)
     delete H2;
 }
 
-TEST_F(MPOTesting,TestMPOCompressForE2)
+TEST_F(MPOTests,TestMPOCompressForE2)
 {
     int L=10,D=8;
     Setup(L,0.5,D);
@@ -296,7 +296,7 @@ TEST_F(MPOTesting,TestMPOCompressForE2)
 
 #ifndef DEBUG
 
-TEST_F(MPOTesting,TestTimingE2_S5D4)
+TEST_F(MPOTests,TestTimingE2_S5D4)
 {
     int L=10,D=4;
     double S=2.5;
@@ -316,7 +316,7 @@ TEST_F(MPOTesting,TestTimingE2_S5D4)
 
 #ifdef RunLongTests
 
-TEST_F(MPOTesting,TestTimingE2_S1D16)
+TEST_F(MPOTests,TestTimingE2_S1D16)
 {
     int L=10,D=16;
     double S=2.5;

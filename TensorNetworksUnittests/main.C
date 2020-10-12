@@ -5,16 +5,16 @@
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
-    testing::GTEST_FLAG(filter) = "LinearAlgebraTesting*";
-//    testing::GTEST_FLAG(filter) = "MatrixProductTesting*";
-//    testing::GTEST_FLAG(filter) = "MPSNormTesting*";
-//    testing::GTEST_FLAG(filter) = "MPOTesting*";
-//    testing::GTEST_FLAG(filter) = "VariationalGroundStateTesting*";
-//    testing::GTEST_FLAG(filter) = "ExpectationsTesting*";
-//    testing::GTEST_FLAG(filter) = "ExactDiagTesting*";
-//    testing::GTEST_FLAG(filter) = "ImaginaryTimeTesting*";
-//    testing::GTEST_FLAG(filter) = "iTEBDTesting*";
-//    testing::GTEST_FLAG(filter) = "ITensorTesting*";
+//    testing::GTEST_FLAG(filter) = "LinearAlgebraTests*";
+//    testing::GTEST_FLAG(filter) = "MPSTests*";
+//    testing::GTEST_FLAG(filter) = "MPSNormTests*";
+//    testing::GTEST_FLAG(filter) = "MPOTests*";
+//    testing::GTEST_FLAG(filter) = "VariationalGroundStateTests*";
+//    testing::GTEST_FLAG(filter) = "ExpectationsTests*";
+//    testing::GTEST_FLAG(filter) = "ExactDiagTests*";
+//    testing::GTEST_FLAG(filter) = "ImaginaryTimeTests*";
+//    testing::GTEST_FLAG(filter) = "iTEBDTests*";
+//    testing::GTEST_FLAG(filter) = "ITensorTests*";
 
     return RUN_ALL_TESTS();
 }

@@ -12,7 +12,7 @@
 using std::cout;
 using std::endl;
 
-class LinearAlgebraTesting : public ::testing::Test
+class LinearAlgebraTests : public ::testing::Test
 {
 public:
     typedef TensorNetworks::MatrixCT MatrixCT;
@@ -21,7 +21,7 @@ public:
     typedef TensorNetworks::DiagonalMatrixRT DiagonalMatrixRT;
     typedef TensorNetworks::dcmplx dcmplx;
 
-    LinearAlgebraTesting()
+    LinearAlgebraTests()
     : itsEps()
     , eps(1.0e-13)
     {
@@ -112,7 +112,7 @@ public:
 
 };
 
-TEST_F(LinearAlgebraTesting,oml_SVDRandomComplexMatrix_10x10)
+TEST_F(LinearAlgebraTests,oml_SVDRandomComplexMatrix_10x10)
 {
     SetupC(10);
     auto [U,s,Vdagger]=oml_CSVDecomp(itsAC); //Solve A=U*s*conj(V)
@@ -124,7 +124,7 @@ TEST_F(LinearAlgebraTesting,oml_SVDRandomComplexMatrix_10x10)
 }
 
 
-TEST_F(LinearAlgebraTesting,oml_SVDRandomComplexMatrix_10x5)
+TEST_F(LinearAlgebraTests,oml_SVDRandomComplexMatrix_10x5)
 {
     SetupC(10,5);
     auto [U,s,Vdagger]=oml_CSVDecomp(itsAC);
@@ -136,7 +136,7 @@ TEST_F(LinearAlgebraTesting,oml_SVDRandomComplexMatrix_10x5)
 }
 
 
-TEST_F(LinearAlgebraTesting,oml_SVDRandomComplexMatrix_5x10)
+TEST_F(LinearAlgebraTests,oml_SVDRandomComplexMatrix_5x10)
 {
     SetupC(5,10);
     auto [U,s,Vdagger]=oml_CSVDecomp(itsAC);
@@ -147,7 +147,7 @@ TEST_F(LinearAlgebraTesting,oml_SVDRandomComplexMatrix_5x10)
     EXPECT_NEAR(Max(abs(U*s*Vdagger-itsAC)),0.0,eps);
 }
 
-TEST_F(LinearAlgebraTesting,OML_EigenSolverComplexHermitian_oldUI)
+TEST_F(LinearAlgebraTests,OML_EigenSolverComplexHermitian_oldUI)
 {
     SetupH(50);
     MatrixCT Acopy(itsAC);
@@ -159,7 +159,7 @@ TEST_F(LinearAlgebraTesting,OML_EigenSolverComplexHermitian_oldUI)
     EXPECT_NEAR(Max(abs(diag)),0.0,2*eps);
 }
 
-TEST_F(LinearAlgebraTesting,OML_EigenSolverComplexHermitian)
+TEST_F(LinearAlgebraTests,OML_EigenSolverComplexHermitian)
 {
     SetupH(50);
     auto [U,w]=oml_Diagonalize(itsAC);
@@ -170,7 +170,7 @@ TEST_F(LinearAlgebraTesting,OML_EigenSolverComplexHermitian)
 
 #include "Containers/SparseMatrix.H"
 
-TEST_F(LinearAlgebraTesting,SparseMatrixClass)
+TEST_F(LinearAlgebraTests,SparseMatrixClass)
 {
     SetupSparseH(20);
     SparseMatrix<dcmplx> sm(itsAC,1e-12);
@@ -179,7 +179,7 @@ TEST_F(LinearAlgebraTesting,SparseMatrixClass)
 
 #include "NumericalMethods/PrimeEigenSolver.H"
 
-TEST_F(LinearAlgebraTesting,Prime_EigenSolverSparseComplexHermitian200x200)
+TEST_F(LinearAlgebraTests,Prime_EigenSolverSparseComplexHermitian200x200)
 {
     int Ne=10; //Number of eigenvector/values to calculate.
     SetupSparseH(200);
@@ -203,7 +203,7 @@ TEST_F(LinearAlgebraTesting,Prime_EigenSolverSparseComplexHermitian200x200)
 }
 
 #ifndef DEBUG
-TEST_F(LinearAlgebraTesting,Prime_EigenSolverDenseComplexHermitian200x200)
+TEST_F(LinearAlgebraTests,Prime_EigenSolverDenseComplexHermitian200x200)
 {
     int Ne=10;
     SetupH(200);
@@ -227,7 +227,7 @@ TEST_F(LinearAlgebraTesting,Prime_EigenSolverDenseComplexHermitian200x200)
 
 #endif // DEBUG
 
-TEST_F(LinearAlgebraTesting,oml_SVDComplex4004Matrix_1x4)
+TEST_F(LinearAlgebraTests,oml_SVDComplex4004Matrix_1x4)
 {
     SetupC(1,4);
     Load4004(itsAC);
@@ -242,7 +242,7 @@ TEST_F(LinearAlgebraTesting,oml_SVDComplex4004Matrix_1x4)
 
 #include "NumericalMethods/LapackSVD.H"
 
-TEST_F(LinearAlgebraTesting,LAPACK_SVDReal4004Matrix_1x4a)
+TEST_F(LinearAlgebraTests,LAPACK_SVDReal4004Matrix_1x4a)
 {
     SetupR(1,4);
     Load4004(itsAR);
@@ -252,7 +252,7 @@ TEST_F(LinearAlgebraTesting,LAPACK_SVDReal4004Matrix_1x4a)
     EXPECT_NEAR(Max(abs(U*s*VT-itsAR)),0.0,eps);
 }
 
-TEST_F(LinearAlgebraTesting,LAPACK_SVDRealRandomMatrix_1x4a)
+TEST_F(LinearAlgebraTests,LAPACK_SVDRealRandomMatrix_1x4a)
 {
     SetupR(1,4);
     auto [U,s,VT]=LaSVDecomp(itsAR); //Solve M=U*s*VT
@@ -261,7 +261,7 @@ TEST_F(LinearAlgebraTesting,LAPACK_SVDRealRandomMatrix_1x4a)
     EXPECT_NEAR(Max(abs(U*s*VT-itsAR)),0.0,eps);
 }
 
-TEST_F(LinearAlgebraTesting,LAPACK_SVDReal4004Matrix_4x1a)
+TEST_F(LinearAlgebraTests,LAPACK_SVDReal4004Matrix_4x1a)
 {
     SetupR(4,1);
     Load4004(itsAR);
@@ -272,7 +272,7 @@ TEST_F(LinearAlgebraTesting,LAPACK_SVDReal4004Matrix_4x1a)
 }
 
 
-TEST_F(LinearAlgebraTesting,LAPACK_SVDRealRandomMatrix_4x1a)
+TEST_F(LinearAlgebraTests,LAPACK_SVDRealRandomMatrix_4x1a)
 {
     SetupR(4,1);
     auto [U,s,VT]=LaSVDecomp(itsAR); //Solve M=U*s*VT
@@ -283,7 +283,7 @@ TEST_F(LinearAlgebraTesting,LAPACK_SVDRealRandomMatrix_4x1a)
 
 
 
-TEST_F(LinearAlgebraTesting,LAPACK_SVDRealRandomMatrix_200x3a)
+TEST_F(LinearAlgebraTests,LAPACK_SVDRealRandomMatrix_200x3a)
 {
     SetupR(300,3);
     auto [U,s,VT]=LaSVDecomp(itsAR); //Solve M=U*s*VT
@@ -292,7 +292,7 @@ TEST_F(LinearAlgebraTesting,LAPACK_SVDRealRandomMatrix_200x3a)
     EXPECT_NEAR(Max(abs(U*s*VT-itsAR)),0.0,eps);
 }
 
-TEST_F(LinearAlgebraTesting,LAPACK_SVDRealRandomMatrix_3x200a)
+TEST_F(LinearAlgebraTests,LAPACK_SVDRealRandomMatrix_3x200a)
 {
     SetupR(3,200);
     auto [U,s,VT]=LaSVDecomp(itsAR); //Solve M=U*s*VT
@@ -301,7 +301,7 @@ TEST_F(LinearAlgebraTesting,LAPACK_SVDRealRandomMatrix_3x200a)
     EXPECT_NEAR(Max(abs(U*s*VT-itsAR)),0.0,eps);
 }
 
-TEST_F(LinearAlgebraTesting,LAPACK_SVDRealRandomMatrix_100x100)
+TEST_F(LinearAlgebraTests,LAPACK_SVDRealRandomMatrix_100x100)
 {
     SetupR(100,100);
     auto [U,s,VT]=LaSVDecomp(itsAR); //Solve M=U*s*VT
@@ -310,7 +310,7 @@ TEST_F(LinearAlgebraTesting,LAPACK_SVDRealRandomMatrix_100x100)
     EXPECT_NEAR(Max(abs(U*s*VT-itsAR)),0.0,eps);
 }
 
-TEST_F(LinearAlgebraTesting,ArpackEigenSolver_ComplexNonHermition)
+TEST_F(LinearAlgebraTests,ArpackEigenSolver_ComplexNonHermition)
 {
     int Nev=4;
     SetupC(100);
@@ -327,7 +327,7 @@ TEST_F(LinearAlgebraTesting,ArpackEigenSolver_ComplexNonHermition)
 }
 
 
-TEST_F(LinearAlgebraTesting,omlDiagonalMatrix_double)
+TEST_F(LinearAlgebraTests,omlDiagonalMatrix_double)
 {
     int N=10;
     Vector<double> v(N);
@@ -344,7 +344,7 @@ TEST_F(LinearAlgebraTesting,omlDiagonalMatrix_double)
 
 }
 
-TEST_F(LinearAlgebraTesting,omlDiagonalMatrix_complex)
+TEST_F(LinearAlgebraTests,omlDiagonalMatrix_complex)
 {
     int N=10;
     Vector<dcmplx> v(N);
@@ -360,7 +360,7 @@ TEST_F(LinearAlgebraTesting,omlDiagonalMatrix_complex)
     EXPECT_NEAR(Max(abs(M*M*M+dMdMdM)),0.0,eps);
 
 }
-TEST_F(LinearAlgebraTesting,omlDiagonalMatrix_complex_double)
+TEST_F(LinearAlgebraTests,omlDiagonalMatrix_complex_double)
 {
     int N=10;
     Vector<double> v(N);

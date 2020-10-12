@@ -5,17 +5,17 @@
 #include "oml/random.h"
 #include <complex>
 
-class MatrixProductTesting : public ::testing::Test
+class MPSTests : public ::testing::Test
 {
 public:
-    MatrixProductTesting()
+    MPSTests()
     : itsMPS(0)
     , eps(1.0e-10)
     {
         Setup(10,0.5,2);
         StreamableObject::SetToPretty();
     }
-    ~MatrixProductTesting() {delete itsMPS;}
+    ~MPSTests() {delete itsMPS;}
 
 
 
@@ -43,14 +43,14 @@ public:
 
 
 
-TEST_F(MatrixProductTesting,Constructor)
+TEST_F(MPSTests,Constructor)
 {
     EXPECT_EQ(itsMPS->GetL(),10);
 //    EXPECT_EQ(itsMPS->GetD(),2);
     EXPECT_EQ(itsMPS->Getp(),2);
 }
 
-TEST_F(MatrixProductTesting,MatrixOpMul)
+TEST_F(MPSTests,MatrixOpMul)
 {
     DMatrix<double> A(10,10),B(10,9);
     FillRandom(A);
@@ -59,7 +59,7 @@ TEST_F(MatrixProductTesting,MatrixOpMul)
 }
 
 
-TEST_F(MatrixProductTesting,LeftNormalMatricies)
+TEST_F(MPSTests,LeftNormalMatricies)
 {
     itsMPS->InitializeWith(TensorNetworks::Product);
     VerifyUnit(GetNorm(TensorNetworks::DLeft,1),eps);
@@ -68,7 +68,7 @@ TEST_F(MatrixProductTesting,LeftNormalMatricies)
 }
 
 
-TEST_F(MatrixProductTesting,RightNormalMatricies)
+TEST_F(MPSTests,RightNormalMatricies)
 {
     itsMPS->InitializeWith(TensorNetworks::Product);
     // The first site will not be right normalized
@@ -79,7 +79,7 @@ TEST_F(MatrixProductTesting,RightNormalMatricies)
 }
 
 
-TEST_F(MatrixProductTesting,LeftNormalMatricies_S2)
+TEST_F(MPSTests,LeftNormalMatricies_S2)
 {
     Setup(10,1.5,2);
     itsMPS->InitializeWith(TensorNetworks::Product);
@@ -88,7 +88,7 @@ TEST_F(MatrixProductTesting,LeftNormalMatricies_S2)
     VerifyUnit(GetNorm(TensorNetworks::DLeft,9),eps);
 }
 
-TEST_F(MatrixProductTesting,RightNormalMatricies_S2)
+TEST_F(MPSTests,RightNormalMatricies_S2)
 {
     Setup(10,1.5,3);
     itsMPS->InitializeWith(TensorNetworks::Product);

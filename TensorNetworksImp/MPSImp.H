@@ -8,9 +8,9 @@
 
 
 // Required forward decs, for friend decs below
-class MPOTesting;
+class MPOTests;
 class MPSNormTesting;
-class MatrixProductTesting;
+class MPSTests;
 
 namespace TensorNetworks
 {
@@ -116,9 +116,9 @@ protected:
 //  Allows unit test classes inside.
 //
 private:
-        friend class ::MPOTesting;
+        friend class ::MPOTests;
         friend class ::MPSNormTesting;
-        friend class ::MatrixProductTesting;
+        friend class ::MPSTests;
 
         void InitSitesAndBonds();
         static int GetD1(int a, int L, int d, int DMax);

@@ -13,13 +13,13 @@
 
 using std::setw;
 
-class ExpectationsTesting : public ::testing::Test
+class ExpectationsTests : public ::testing::Test
 {
 public:
     typedef std::complex<double> complx;
     typedef TensorNetworks:: ArrayRT  ArrayRT;
 
-    ExpectationsTesting()
+    ExpectationsTests()
         : itsFactory(TensorNetworks::Factory::GetFactory())
         , itsH(0)
         , itsMPS(0)
@@ -28,7 +28,7 @@ public:
         StreamableObject::SetToPretty();
 
     }
-    ~ExpectationsTesting()
+    ~ExpectationsTests()
     {
         delete itsFactory;
         delete itsH;
@@ -56,7 +56,7 @@ public:
 };
 
 
-TEST_F(ExpectationsTesting,TestSpinCalculatorS12)
+TEST_F(ExpectationsTests,TestSpinCalculatorS12)
 {
     TensorNetworks::SpinCalculator sc(0.5);
 
@@ -70,7 +70,7 @@ TEST_F(ExpectationsTesting,TestSpinCalculatorS12)
 
 
 
-TEST_F(ExpectationsTesting,TestSweepL9S1D2)
+TEST_F(ExpectationsTests,TestSweepL9S1D2)
 {
     int L=9,D=2;
     double S=0.5;
@@ -81,7 +81,7 @@ TEST_F(ExpectationsTesting,TestSweepL9S1D2)
 }
 
 
-TEST_F(ExpectationsTesting,TestOneSiteDMs)
+TEST_F(ExpectationsTests,TestOneSiteDMs)
 {
     int L=9,D=4;
     double S=0.5;
@@ -95,7 +95,7 @@ TEST_F(ExpectationsTesting,TestOneSiteDMs)
     }
 }
 
-TEST_F(ExpectationsTesting,TestOneSiteExpectations)
+TEST_F(ExpectationsTests,TestOneSiteExpectations)
 {
     int L=9,D=4;
     double S=0.5;
@@ -150,7 +150,7 @@ TEST_F(ExpectationsTesting,TestOneSiteExpectations)
     cout << "E=" << E << endl;
 */
 }
-TEST_F(ExpectationsTesting,TestFreezeL9S1D2)
+TEST_F(ExpectationsTests,TestFreezeL9S1D2)
 {
     int L=9,D=2,maxIter=100;
     double S=0.5;
@@ -277,7 +277,7 @@ SMatrix<DMatrix<double> > SuseptibilityTensor(const TensorNetworks::MPS* mps,con
     return ret;
 }
 
-TEST_F(ExpectationsTesting,TestTwoSiteDMs)
+TEST_F(ExpectationsTests,TestTwoSiteDMs)
 {
     int L=9,D=4;
     double S=0.5;

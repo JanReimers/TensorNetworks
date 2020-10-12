@@ -1,6 +1,6 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
-- For declare instead of include in Imp/Typedefs.H
+- Forward declare instead of include in Imp/Typedefs.H
 - Try and get wave function optimization convergence working
 - Add some EXPECTS for iTensor tests.
 - Add an iTime test the is epsSv limited
@@ -10,9 +10,10 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     Create State under imp folder
 - Move multiplotable back to Plotting
     -Pulled out of CB projects for now
-- Tidy up test names
+- Done: Tidy up test names
     -SVDTesting should be LinAlgebraTesting
-    -Prefix with numbers or somehow tell gtest the run order
+    Not Possible: -Prefix with numbers or somehow tell gtest the run order
+        The seem to run an alphabetical order because of CB ordering that way, But we cannot rely on this
 - The freeze idea didn;t work because normalization is current sweeping through the frozen Site
     If we freeze site one, then left normalization needs to start at site 2
     and the right sweeps we need to stop at site two since we can;t SVD transfer to site 1.

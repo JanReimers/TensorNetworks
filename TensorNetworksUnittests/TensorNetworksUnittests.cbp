@@ -80,36 +80,32 @@
 			<Add directory="../ITensor/lib" />
 		</Linker>
 		<Unit filename="ExactDiagTests.C">
-			<Option compilerVar="CC" />
+			<Option compilerVar="CPP" />
 		</Unit>
 		<Unit filename="ExpectationsTests.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="GroundStataeTests.C">
-			<Option compilerVar="CC" />
+			<Option compilerVar="CPP" />
 		</Unit>
 		<Unit filename="ITensorUnitTests.C">
-			<Option compilerVar="CC" />
+			<Option compilerVar="CPP" />
 		</Unit>
 		<Unit filename="ImaginaryTimeTests.C">
-			<Option compilerVar="CC" />
+			<Option compilerVar="CPP" />
 		</Unit>
-		<Unit filename="MPOTests.cpp" />
+		<Unit filename="LinearAlgebraTesting.C">
+			<Option compilerVar="CPP" />
+		</Unit>
 		<Unit filename="MPSTests.C">
-			<Option compilerVar="CC" />
+			<Option compilerVar="CPP" />
 		</Unit>
 		<Unit filename="SVDNormTests.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="SVDTesting.C">
-			<Option compilerVar="CC" />
+			<Option compilerVar="CPP" />
 		</Unit>
 		<Unit filename="Tests.H" />
 		<Unit filename="iTEBDTests.C">
-			<Option compilerVar="CC" />
+			<Option compilerVar="CPP" />
 		</Unit>
 		<Unit filename="main.C">
-			<Option compilerVar="CC" />
+			<Option compilerVar="CPP" />
 		</Unit>
 		<Extensions />
 	</Project>
