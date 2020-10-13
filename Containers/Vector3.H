@@ -2,9 +2,6 @@
 #define VECTOR3_H
 
 #include "oml/vector.h"
-
-using std::cout;
-using std::endl;
 //
 //  Store 6 index tensor as a flattened 2 index matrix.
 //
