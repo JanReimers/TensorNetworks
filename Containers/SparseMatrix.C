@@ -11,7 +11,8 @@ template <class T>  SparseMatrix<T>::SparseMatrix(const DMatrix<T>& denseMatrix,
 {
     for (int i=1;i<=itsNr;i++)
         for (int j=1;j<=itsNc;j++)
-            if (abs(denseMatrix(i,j))>eps)
+        {
+            if (fabs(denseMatrix(i,j))>eps)
             {
                 if (nonZeroRows.size()==0 || nonZeroRows.back()!=i)
                 {
@@ -23,6 +24,7 @@ template <class T>  SparseMatrix<T>::SparseMatrix(const DMatrix<T>& denseMatrix,
                 r.values.push_back(denseMatrix(i,j));
                 itsTotalNumElements++;
             }
+        }
 }
 
 template <class T> SparseMatrix<T>::SparseMatrix(int Nr, int Nc)
@@ -112,6 +114,7 @@ template <class T> void SparseMatrix<T>::DoMVMultiplication(int N, T* xvec,T* yv
 }
 
 #include <complex>
+template class SparseMatrix<double>;
 template class SparseMatrix<std::complex<double> >;
 
 
