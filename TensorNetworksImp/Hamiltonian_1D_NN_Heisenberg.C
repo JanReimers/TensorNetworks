@@ -248,7 +248,7 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TrotterOrder order)
 
 FullState* Hamiltonian_1D_NN_Heisenberg::CreateFullState () const
  {
-    return new FullStateImp(itsL,itsS);
+    return new FullStateImp<double>(itsL,itsS);
  }
 
 

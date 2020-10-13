@@ -2,6 +2,8 @@
 #include "TensorNetworksImp/Bond.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
+#include "NumericalMethods/PrimeEigenSolver.H"
+
 #include "oml/minmax.h"
 #include "oml/cnumeric.h"
 //#include "oml/vector_io.h"
@@ -22,14 +24,14 @@ void MPSSite::Refine(const MatrixCT& Heff,const Epsilons& eps)
     int N=Heff.GetNumRows();
     //cout << "Heff N=" << N << endl;
     Vector<double>  eigenValues(N);
-    itsEigenSolver.Solve(Heff,2,eps); //Get lowest two eigen values/states
+    itsEigenSolver->Solve(Heff,2,eps); //Get lowest two eigen values/states
 
-    eigenValues=itsEigenSolver.GetEigenValues();
+    eigenValues=itsEigenSolver->GetEigenValues();
 
     itsIterDE=eigenValues(1)-itsEmin;
     itsEmin=eigenValues(1);
     itsGapE=eigenValues(2)-eigenValues(1);
-    Update(itsEigenSolver.GetEigenVector(1));
+    Update(itsEigenSolver->GetEigenVector(1));
 }
 
 void MPSSite::Update(const VectorCT& newAs)

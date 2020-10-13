@@ -2,13 +2,13 @@
 #define MATRIXPRODUCTSITE_H
 
 #include "TensorNetworksImp/Namespace.H"
-#include "NumericalMethods/PrimeEigenSolver.H"
 #include "Containers/Vector3.H"
+#include "oml/dmatrix.h"
 #include <vector>
 
 class MPOTests;
 class MPSTests;
-
+template <class T> class PrimeEigenSolver;
 namespace TensorNetworks
 {
 
@@ -153,7 +153,7 @@ private:
     dVectorT itsMs;   //We need a separate matrix for each of the p basis states on one site.
     Vector3CT itsHLeft_Cache,itsHRightCache; //L/R tensors for <Psi|H|Psi>
     mutable MatrixCT itsLeft_Cache ,itsRightCache;  //L/R matrices for <Psi|Psi>
-    PrimeEigenSolver<dcmplx> itsEigenSolver;
+    PrimeEigenSolver<dcmplx>* itsEigenSolver;
 
     int    itsNumUpdates;
     bool   isFrozen; //Don't refine this site.

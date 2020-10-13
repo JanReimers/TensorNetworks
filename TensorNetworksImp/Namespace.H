@@ -9,7 +9,7 @@ namespace TensorNetworks
     class iTEBDStateImp;
     class MPSSite;
     class Bond;
-    class FullStateImp;
+    template <class T> class FullStateImp;
 }
 
 #endif // NAMESPACEIMP_H_INCLUDED

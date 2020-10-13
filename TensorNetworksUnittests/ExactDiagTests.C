@@ -16,8 +16,8 @@ public:
         , itsH(0)
         , itsSched({1000,8,TensorNetworks::Epsilons(1e-10)})
     {
-        itsSched.itsEps.itsDelatEnergy1Epsilon=2e-15;
-        itsSched.itsEps.itsEigenSolverEpsilon=1e-15;
+        itsSched.itsEps.itsDelatEnergy1Epsilon=6e-15;
+        itsSched.itsEps.itsEigenSolverEpsilon=2e-15;
 
         StreamableObject::SetToPretty();
 
@@ -245,6 +245,7 @@ TEST_F(ExactDiagTests,LanczosGroundStateL2S52)
 TEST_F(ExactDiagTests,LanczosGroundStateL10S12)
 {
     Setup(10,0.5);
+    itsSched.itsEps.itsEigenSolverEpsilon=1e-12;
     itsPsi->FindGroundState(itsSched,*itsH);
 //    cout << *psi << endl;
     EXPECT_NEAR(itsPsi->GetE(),-4.258035207282882,itsSched.itsEps.itsDelatEnergy1Epsilon);

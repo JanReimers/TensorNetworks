@@ -4,6 +4,19 @@
 #include "TensorNetworksImp/Namespace.H"
 #include "Containers/SparseMatrix.H"
 
+struct primme_params;
+
+//
+//  Client code can derive from this and control the matvec multiplication operations
+//
+template <class T> class PrimeEigenSolverClient
+{
+public:
+    virtual long int GetSize  () const=0; //2^L Hilbert space size
+    virtual void     DoMatVecContraction (int N, T* xvec, T* yvec) const=0;
+
+    static const PrimeEigenSolverClient* theClient;
+};
 //
 //  Solve sparse eigen systems using the PRIMME library
 //  For efficiency client code should keep and instance of PrimeEigenSolver alive
@@ -11,31 +24,34 @@
 //
 template <class T> class PrimeEigenSolver
 {
-        typedef TensorNetworks::Matrix4RT Matrix4T;
-    public:
-        PrimeEigenSolver();
-        ~PrimeEigenSolver();
+public:
+    PrimeEigenSolver();
+    ~PrimeEigenSolver();
 
-        // Get lowest N eigen values and vectors with no initial guess
-        int Solve(const DMatrix<T>&                              , int NumEigenValues,const TensorNetworks::Epsilons& eps);
-        int Solve(const Matrix4T& Hlocal, const TensorNetworks::FullStateImp* Psi, int NumEigenValues,const TensorNetworks::Epsilons& eps);
-
-
-        Vector <T> GetEigenVector (int index) const;
-        DMatrix<T> GetEigenVectors() const {return itsEigenVectors;}
-        Vector <double> GetEigenValues () const {return itsEigenValues;}
-
-        static const SparseMatrix<T>* theSparseMatrix;
-        static const      DMatrix<T>* theDenseMatrix;
-    protected:
-        int SolveSparse(int NumEigenValues,double eps);
-        int SolveDense (int NumEigenValues,double eps);
+    // Get lowest N eigen values and vectors with no initial guess
+    int Solve(const DMatrix<T>&               , int NumEigenValues,const TensorNetworks::Epsilons& eps);
+    int Solve(const PrimeEigenSolverClient<T>*, int NumEigenValues,const TensorNetworks::Epsilons& eps);
 
 
-    private:
-        Vector<double>   itsEigenValues;
-        DMatrix<T>       itsEigenVectors;
-        int              itsNumGuesses;
+    Vector <T> GetEigenVector (int index) const;
+    DMatrix<T> GetEigenVectors() const
+    {
+        return itsEigenVectors;
+    }
+    Vector <double> GetEigenValues () const
+    {
+        return itsEigenValues;
+    }
+
+    static const SparseMatrix<T>* theSparseMatrix;
+    static const      DMatrix<T>* theDenseMatrix;
+protected:
+    int Solve(primme_params&);
+
+private:
+    Vector<double>   itsEigenValues;
+    DMatrix<T>       itsEigenVectors;
+    int              itsNumGuesses;
 };
 
 #endif // PRIMEEIGENSOLVER_H

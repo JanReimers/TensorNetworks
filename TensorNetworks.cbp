@@ -18,8 +18,6 @@
 					<Add option="-std=c++17" />
 					<Add option="-g" />
 					<Add option="-DDEBUG" />
-					<Add directory="TensorNetworksImp" />
-					<Add directory="./" />
 				</Compiler>
 				<Linker>
 					<Add directory="../Debug" />
@@ -38,8 +36,6 @@
 					<Add option="-std=c++17" />
 					<Add option="-pg" />
 					<Add option="-DNDEBUG" />
-					<Add directory="TensorNetworksImp" />
-					<Add directory="./" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />

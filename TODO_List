@@ -1,9 +1,12 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
+- Optimization: Learn about preconditioning, does that help with primme eigen solver?
+- Optimization: FullStateImp<T>::DoHContraction  needs to do vector copies.
+    We can avoid this by allowing Vector<T>(T*) constructors
+        Be careful with the # if owners so we don delete T*
 - Try and get wave function optimization convergence working
 - Add some EXPECTS for iTensor tests.
 - Add an iTime test the is epsSv limited
-- Right now PrimeEigenSolver depends in FullStateImp, can be break this somewhow?
 - Reorg : Operators goes under Imp folder
     Create State under imp folder
 - The freeze idea didn;t work because normalization is current sweeping through the frozen Site
@@ -38,6 +41,7 @@ Backburner:
 
 
 
+- Done: Right now PrimeEigenSolver depends in FullStateImp, can be break this somewhow?
 - Done: Forward declare instead of include in Imp/Typedefs.H
 - Done: Tidy up test names
     -SVDTesting should be LinAlgebraTesting

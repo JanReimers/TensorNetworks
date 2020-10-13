@@ -40,6 +40,27 @@ public:
         FillRandom(itsAR);
         Unit(itsIR);
     }
+    void SetupSym(int N)
+    {
+        MatrixRT A(N,N);
+        itsWR.SetLimits(N);
+        itsAR.SetLimits(N,N);
+        FillRandom(A);
+        itsAR=A+Transpose(A); //Make it hermitian
+        Unit(itsIR);
+    }
+    void SetupSparseSym(int N)
+    {
+        MatrixRT A(N,N);
+        FillRandom(A);
+        for (int i=0;i<1.0*N*N;i++)
+        {
+            int ir=static_cast<int>(OMLRand<float>()*N)+1;
+            int ic=static_cast<int>(OMLRand<float>()*N)+1;
+            A(ir,ic)=0.0;
+        }
+        itsAR=A+Transpose(A); //Make it hermitian
+    }
 
     void SetupC(int N)
     {
@@ -179,7 +200,53 @@ TEST_F(LinearAlgebraTests,SparseMatrixClass)
 
 #include "NumericalMethods/PrimeEigenSolver.H"
 
-TEST_F(LinearAlgebraTests,Prime_EigenSolverSparseComplexHermitian200x200)
+TEST_F(LinearAlgebraTests,Primme_EigenSolverSparseRealSymmetric200x200)
+{
+    int Ne=10; //Number of eigenvector/values to calculate.
+    SetupSparseSym(200);
+
+    PrimeEigenSolver<double> solver;
+    itsEps.itsEigenSolverEpsilon=1e-4;
+    solver.Solve(itsAR,Ne,itsEps);
+    itsEps.itsEigenSolverEpsilon=1e-6; //Previous solution at eps=1e-4 should be cached and used as a starting point.
+    solver.Solve(itsAR,Ne,itsEps);
+    itsEps.itsEigenSolverEpsilon=1e-8;
+    solver.Solve(itsAR,Ne,itsEps);
+    itsEps.itsEigenSolverEpsilon=1e-11;
+    solver.Solve(itsAR,Ne,itsEps);
+    itsEps.itsEigenSolverEpsilon=1e-14;
+    solver.Solve(itsAR,Ne,itsEps);
+
+    MatrixRT diag=Transpose(solver.GetEigenVectors())*itsAR*solver.GetEigenVectors();
+    itsWR=solver.GetEigenValues();
+    for (int i=1;i<=Ne;i++) diag(i,i)-=itsWR(i);
+    EXPECT_NEAR(Max(abs(diag)),0.0,100*eps);
+}
+
+TEST_F(LinearAlgebraTests,Primme_EigenSolverDenseRealSymmetric200x200)
+{
+    int Ne=10;
+    SetupSym(200);
+    PrimeEigenSolver<double> solver;
+    itsEps.itsEigenSolverEpsilon=1e-4;
+    solver.Solve(itsAR,Ne,itsEps);
+    itsEps.itsEigenSolverEpsilon=1e-6;
+    solver.Solve(itsAR,Ne,itsEps);
+    itsEps.itsEigenSolverEpsilon=1e-8;
+    solver.Solve(itsAR,Ne,itsEps);
+    itsEps.itsEigenSolverEpsilon=1e-11;
+    solver.Solve(itsAR,Ne,itsEps);
+    itsEps.itsEigenSolverEpsilon=1e-14;
+    solver.Solve(itsAR,Ne,itsEps);
+
+    MatrixRT diag=Transpose(solver.GetEigenVectors())*itsAR*solver.GetEigenVectors();
+    MatrixRT UU=Transpose(solver.GetEigenVectors())*solver.GetEigenVectors();
+    itsWR=solver.GetEigenValues();
+    for (int i=1;i<=Ne;i++) diag(i,i)-=itsWR(i);
+    EXPECT_NEAR(Max(abs(diag)),0.0,100*eps);
+}
+
+TEST_F(LinearAlgebraTests,Primme_EigenSolverSparseComplexHermitian200x200)
 {
     int Ne=10; //Number of eigenvector/values to calculate.
     SetupSparseH(200);
@@ -203,7 +270,7 @@ TEST_F(LinearAlgebraTests,Prime_EigenSolverSparseComplexHermitian200x200)
 }
 
 #ifndef DEBUG
-TEST_F(LinearAlgebraTests,Prime_EigenSolverDenseComplexHermitian200x200)
+TEST_F(LinearAlgebraTests,Primme_EigenSolverDenseComplexHermitian200x200)
 {
     int Ne=10;
     SetupH(200);
