@@ -27,12 +27,12 @@ double MPSImp::FindVariationalGroundState(const Hamiltonian* H,const IterationSc
 
 double MPSImp::FindVariationalGroundState(const Hamiltonian* H, const IterationScheduleLine& isl)
 {
-    assert(itsDmax<=isl.itsDmax);
+    int Dmax=GetMaxD();
     MPO* H2=H->CreateH2Operator();
     double DE2=0;
-    for (int D=itsDmax;D<=isl.itsDmax;D+=isl.itsDeltaD)
+    for (int D=Dmax;D<=isl.itsDmax;D+=isl.itsDeltaD)
     {
-        if (D>itsDmax)
+        if (D>Dmax)
         {
             IncreaseBondDimensions(D);
             Normalize(DRight);

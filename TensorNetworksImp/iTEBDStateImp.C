@@ -7,9 +7,9 @@ namespace TensorNetworks
 {
 
 iTEBDStateImp::iTEBDStateImp(int L,double S, int D,double normEps,TNSLogger* s)
-    : MPSImp(L,S,D,DLeft,normEps,s)
+    : MPSImp(L,S,DLeft,normEps,s)
 {
-    InitSitesAndBonds();
+    InitSitesAndBonds(D);
 }
 
 iTEBDStateImp::~iTEBDStateImp()
@@ -19,7 +19,7 @@ iTEBDStateImp::~iTEBDStateImp()
 }
 
 
-void iTEBDStateImp::InitSitesAndBonds()
+void iTEBDStateImp::InitSitesAndBonds(int D)
 {
     //
     //  Create bond objects
@@ -33,8 +33,8 @@ void iTEBDStateImp::InitSitesAndBonds()
     //
     itsSites.push_back(0);  //Dummy space holder. We want this array to be 1 based.
     for (int i=1; i<=itsL-1; i++)
-        itsSites.push_back(new MPSSite(PBulk,itsBonds[i-1],itsBonds[i],itsd,itsDmax,itsDmax));
-    itsSites.push_back(new MPSSite(PRight,itsBonds[itsL-1],itsBonds[0],itsd,itsDmax,itsDmax));
+        itsSites.push_back(new MPSSite(PBulk,itsBonds[i-1],itsBonds[i],itsd,D,D));
+    itsSites.push_back(new MPSSite(PRight,itsBonds[itsL-1],itsBonds[0],itsd,D,D));
     //
     //  Tell each bond about its left and right sites.
     //
@@ -104,17 +104,19 @@ void iTEBDStateImp::Apply(int isite,const Matrix4RT& expH)
     //                                   |                   |
     //                              expH(mA,nA,              mB,nB)
     //
-    Matrix4CT Theta(itsd,itsDmax,itsd,itsDmax,0);
+    assert(siteA->GetD2()==siteB->GetD2());
+    int D=siteA->GetD2();
+    Matrix4CT Theta(itsd,D,itsd,D,0);
     Fill(Theta.Flatten(),dcmplx(0.0));
     for (int na=0;na<itsd;na++)
     for (int nb=0;nb<itsd;nb++)
-        for (int i1=1;i1<=itsDmax;i1++)
-            for (int i3=1;i3<=itsDmax;i3++)
+        for (int i1=1;i1<=D;i1++)
+            for (int i3=1;i3<=D;i3++)
             {
                 dcmplx t(0.0);
                 for (int ma=0;ma<itsd;ma++)
                 for (int mb=0;mb<itsd;mb++)
-                for (int i2=1;i2<=itsDmax;i2++)
+                for (int i2=1;i2<=D;i2++)
                     t+=lambdaB(i1)*MA[ma](i1,i2)*lambdaA(i2)*MB[mb](i2,i3)*lambdaB(i3)*expH(ma,na,mb,nb);
                 Theta(na,i1-1,nb,i3-1)=t;
             }
@@ -129,13 +131,13 @@ void iTEBDStateImp::Apply(int isite,const Matrix4RT& expH)
     cout << std::scientific << std::setprecision(1) << "s=" << s.GetDiagonal() << endl;
     int nai1=1;
     for (int na=0;na<itsd;na++)
-        for (int i1=1;i1<=itsDmax;i1++,nai1++)
-            for (int i2=1;i2<=itsDmax;i2++)
+        for (int i1=1;i1<=D;i1++,nai1++)
+            for (int i2=1;i2<=D;i2++)
                 MA[na](i1,i2)=U(nai1,i2)/lambdaB(i1);
     int nbi2=1;
     for (int nb=0;nb<itsd;nb++)
-        for (int i2=1;i2<=itsDmax;i2++,nbi2++)
-            for (int i3=1;i3<=itsDmax;i3++)
+        for (int i2=1;i2<=D;i2++,nbi2++)
+            for (int i3=1;i3<=D;i3++)
                 MB[nb](i2,i3)=Vdagger(nbi2,i3)/lambdaB(i3);
 
    bondA->SetSingularValues(s,0.0); //No SVs were thrown away (yet!)

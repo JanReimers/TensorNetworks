@@ -41,7 +41,7 @@ class iTEBDStateImp : public virtual iTEBDState,
         MatrixCT& GetGamma (int isite,int n);
 
     private:
-        void InitSitesAndBonds();
+        void InitSitesAndBonds(int D);
 };
 
 }

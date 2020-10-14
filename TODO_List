@@ -4,17 +4,6 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     -All MPOs stored the full lattice, possibly with lots of identity ops then everything would be much simpler.
 - Bond.C line 70 has a hard coded limit for SVs
     Should be using itsMPSCompressEpsilon
-- The purpose of MPSImp itsDmax is becoming murky, what does it mean?
-    int particular if do MPO*|MPS> where MPO has some DwMax then newDmax=DwMax*itsDmax
-    But what are we supposed to use newDmax for
-    Its is currently used for:
-        -Init sites and bonds
-        -Setting canonical bond dimensions.
-        -D increase loops in Var GS search
-        -MPS*  MPSImp::Apply(const Operator* o) const
-        -void iTEBDStateImp::Apply(int isite,const Matrix4RT& expH)
-- Done: Get rid of SetCanonicalBondDimensions
-- Get rid of SiteMessage
 - Fix MPS*  Apply       (const Operator* o) const;
 - Optimization: Learn about preconditioning, does that help with primme eigen solver?
 - Optimization: FullStateImp<T>::DoHContraction  needs to do vector copies.
@@ -57,6 +46,17 @@ Backburner:
 
 
 
+- Done: The purpose of MPSImp itsDmax is becoming murky, what does it mean?
+    int particular if do MPO*|MPS> where MPO has some DwMax then newDmax=DwMax*itsDmax
+    But what are we supposed to use newDmax for
+    Its is currently used for:
+        -Init sites and bonds
+        -Setting canonical bond dimensions.
+        -D increase loops in Var GS search
+        -MPS*  MPSImp::Apply(const Operator* o) const
+        -void iTEBDStateImp::Apply(int isite,const Matrix4RT& expH)
+- Done: Get rid of SetCanonicalBondDimensions
+- Done: Get rid of SiteMessage
 - Done: Try and get wave function optimization convergence working
 - Done: Add an iTime test the is epsSv limited
 - Done: Right now PrimeEigenSolver depends in FullStateImp, can be break this somewhow?

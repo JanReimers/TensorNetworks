@@ -21,7 +21,6 @@ namespace TensorNetworks
 //
 MPSImp::MPSImp(int L, double S, int D,double normEps,TNSLogger* s)
     : itsL(L)
-    , itsDmax(D)
     , itsS(S)
     , itsd(2*S+1)
     , itsNSweep(0)
@@ -31,34 +30,33 @@ MPSImp::MPSImp(int L, double S, int D,double normEps,TNSLogger* s)
     assert(itsL>0);
     assert(isValidSpin(S));
     assert(itsS>=0.5);
-    assert(itsDmax>0);
+    assert(D>0);
 
     if (itsLogger==0)
         itsLogger=new TNSLogger();
 
-    InitSitesAndBonds();
+    InitSitesAndBonds(D);
 }
 
 MPSImp::MPSImp(const MPSImp& mps)
     : itsL           (mps.itsL)
-    , itsDmax        (mps.itsDmax)
     , itsS           (mps.itsS)
     , itsd           (mps.itsd)
     , itsNSweep      (mps.itsNSweep)
     , itsNormEps     (mps.itsNormEps)
     , itsLogger      (mps.itsLogger)
 {
-    assert(itsDmax>0);
-    InitSitesAndBonds();
+    int D=mps.GetMaxD();
+    assert(D>0);
+    InitSitesAndBonds(D);
     for (int ia=1; ia<=itsL; ia++)
         itsSites[ia]->CloneState(mps.itsSites[ia]); //Transfer wave function data
     for (int ia=1; ia<itsL; ia++)
         itsBonds[ia]->CloneState(mps.itsBonds[ia]); //Transfer wave function data
 }
 
-MPSImp::MPSImp(int L, double S, int D,Direction lr,double normEps,TNSLogger* s)
+MPSImp::MPSImp(int L, double S,Direction lr,double normEps,TNSLogger* s)
     : itsL(L)
-    , itsDmax(D)
     , itsS(S)
     , itsd(2*S+1)
     , itsNSweep(0)
@@ -67,11 +65,10 @@ MPSImp::MPSImp(int L, double S, int D,Direction lr,double normEps,TNSLogger* s)
 {
     assert(itsL>0);
     assert(isValidSpin(S));
-    assert(itsDmax>0);
 
     if (itsLogger==0)
         itsLogger=new TNSLogger();
-
+    //InitSitesAndBonds is called from the derived class
 }
 
 int MPSImp::GetCanonicalD1(int a, int DMax)
@@ -86,7 +83,7 @@ int MPSImp::GetCanonicalD2(int a, int DMax)
     return Min(static_cast<int>(pow(itsd,iexp)),DMax);
 }
 
-void MPSImp::InitSitesAndBonds()
+void MPSImp::InitSitesAndBonds(int D)
 {
     //
     //  Create bond objects
@@ -99,12 +96,12 @@ void MPSImp::InitSitesAndBonds()
     //
     itsSites.push_back(0);  //Dummy space holder. We want this array to be 1 based.
     itsSites.push_back(new MPSSite(PLeft,NULL,itsBonds[1],itsd,
-                       GetCanonicalD1(1,itsDmax),GetCanonicalD2(1,itsDmax)));
+                       GetCanonicalD1(1,D),GetCanonicalD2(1,D)));
     for (int i=2; i<=itsL-1; i++)
         itsSites.push_back(new MPSSite(PBulk,itsBonds[i-1],itsBonds[i],itsd,
-                           GetCanonicalD1(i,itsDmax),GetCanonicalD2(i,itsDmax)));
+                           GetCanonicalD1(i,D),GetCanonicalD2(i,D)));
     itsSites.push_back(new MPSSite(PRight,itsBonds[itsL-1],NULL,itsd,
-                       GetCanonicalD1(itsL,itsDmax),GetCanonicalD2(itsL,itsDmax)));
+                       GetCanonicalD1(itsL,D),GetCanonicalD2(itsL,D)));
     //
     //  Tell each bond about its left and right sites.
     //
@@ -120,7 +117,6 @@ MPSImp::~MPSImp()
 
 MPS* MPSImp::Clone() const
 {
-    assert(this->itsDmax>0);
     return new MPSImp(*this);
 }
 
@@ -171,7 +167,6 @@ void MPSImp::IncreaseBondDimensions(int D)
         Dideal*=itsd;
     }
 
-    itsDmax=D;
 }
 
 

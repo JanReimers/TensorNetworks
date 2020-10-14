@@ -89,7 +89,7 @@ public:
 
 protected:
     // Constructor used for iTEBD
-        MPSImp(int L, double S, int D,Direction lr,double normEps=1e-12,TNSLogger* s=0);
+        MPSImp(int L, double S, Direction lr,double normEps=1e-12,TNSLogger* s=0);
 //--------------------------------------------------------------------------------------
 //
 //  Loop Control
@@ -121,7 +121,7 @@ private:
         friend class ::MPSNormTesting;
         friend class ::MPSTests;
 
-        void InitSitesAndBonds();
+        void InitSitesAndBonds(int D);
         void IncreaseBondDimensions(int D);
         int GetCanonicalD1(int a, int DMax);
         int GetCanonicalD2(int a, int DMax);
@@ -184,7 +184,6 @@ private:
 //
     protected:
         int    itsL;   //Number of lattice sites
-        int    itsDmax; //Maximum bond dimension
         double itsS;  //2*S, avoid storing floats for S=n/2
         int    itsd;   //Number ot states for the spin on each site = 2S+1
         int    itsNSweep;

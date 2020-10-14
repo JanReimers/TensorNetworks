@@ -17,7 +17,6 @@ namespace TensorNetworks
 double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule& is)
 {
     double E1=0;
-    assert(this->itsDmax>0);
     itsLogger->LogInfoV(1,"Initiate iTime GS iterations, Dmax=%4d",GetMaxD());
     for (is.begin(); !is.end(); is++)
         E1=FindiTimeGroundState(H,*is);
@@ -40,9 +39,8 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
     MPO* W =H->CreateOperator(isl.itsdt,isl.itsTrotterOrder);
     W->Compress(mpo_compressor);
 //    W->Report(cout);
-    itsLogger->LogInfoV(1,"   Begin iterations, dt=%.3f,  Dw=%4d, GetMaxD=%4d, itsDmax=%4d, isl.Dmax=%4d, epsMPO=%.1e, epsMPS=%.1e ",isl.itsdt,W->GetMaxDw(),GetMaxD(),itsDmax,isl.itsDmax,isl.itsEps.itsMPOCompressEpsilon,isl.itsEps.itsMPSCompressEpsilon);
+    itsLogger->LogInfoV(1,"   Begin iterations, dt=%.3f,  Dw=%4d, GetMaxD=%4d, isl.Dmax=%4d, epsMPO=%.1e, epsMPS=%.1e ",isl.itsdt,W->GetMaxDw(),GetMaxD(),isl.itsDmax,isl.itsEps.itsMPOCompressEpsilon,isl.itsEps.itsMPSCompressEpsilon);
     int niter=1;
-    assert(this->itsDmax>0);
     for (; niter<isl.itsMaxGSSweepIterations; niter++)
     {
 
@@ -183,14 +181,13 @@ MatrixCT MPSImp::Calc12RightCache(const MPS* psi2,int isite, bool cache) const
 
 void  MPSImp::ApplyInPlace(const Operator* o)
 {
-    assert(itsDmax>0);
     SiteLoop(ia)
         itsSites[ia]->ApplyInPlace(o->GetSiteOperator(ia));
 }
 
 MPS*  MPSImp::Apply(const Operator* o) const
 {
-    MPSImp* psiPrime=new MPSImp(itsL,itsS,itsDmax,itsNormEps,itsLogger);
+    MPSImp* psiPrime=new MPSImp(itsL,itsS,GetMaxD(),itsNormEps,itsLogger);
     SiteLoop(ia)
         itsSites[ia]->Apply(o->GetSiteOperator(ia),psiPrime->itsSites[ia]);
 

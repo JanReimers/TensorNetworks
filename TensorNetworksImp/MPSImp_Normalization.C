@@ -33,7 +33,6 @@ void MPSImp::NormalizeAndCompress(Direction LR,SVCompressorC* comp)
 {
     ForLoop(LR)
          NormalizeAndCompressSite(LR,ia,comp);
-    if (comp && comp->Donly()) itsDmax=comp->GetDmax();
 }
 
 void MPSImp::NormalizeAndCompressSite(Direction lr,int isite,SVCompressorC* comp)
