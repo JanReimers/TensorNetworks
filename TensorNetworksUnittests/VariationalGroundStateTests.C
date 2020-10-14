@@ -50,8 +50,7 @@ TEST_F(VariationalGroundStateTesting,TestIdentityOperator)
     Setup(10,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DLeft);
-//    TensorNetworks::OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
-    TensorNetworks::Operator* IO=itsH->CreateUnitOperator();
+    TensorNetworks::MPO* IO=itsH->CreateUnitOperator();
     double S=itsMPS->GetExpectation(IO);
     EXPECT_NEAR(S,1.0,eps);
 

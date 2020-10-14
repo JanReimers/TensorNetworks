@@ -17,7 +17,8 @@ namespace TensorNetworks
 class MPOImp : public virtual MPO
 {
     public:
-        MPOImp(int L, double S);
+        enum LoadWith {Identity,LoadLater};
+        MPOImp(int L, double S,LoadWith);
         virtual ~MPOImp();
 
         virtual int   GetL() const {return itsL;}
@@ -25,15 +26,18 @@ class MPOImp : public virtual MPO
         {
             assert(isite>0);
             assert(isite<=itsL);
+            assert(areSitesLinked);
             return itsSites[isite];
         }
 
     protected:
-
+        void LinkSites();
+        void Insert(SiteOperator*);
     private:
         typedef optr_vector<SiteOperator*> SitesType;
 
         int itsL;
+        bool areSitesLinked;
         SitesType itsSites;
 
 };

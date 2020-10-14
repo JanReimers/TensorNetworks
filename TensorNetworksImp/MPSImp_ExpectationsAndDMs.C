@@ -30,7 +30,7 @@ double   MPSImp::GetOverlap(const MPS* Psi2) const
 
 
 
-double   MPSImp::GetExpectation   (const Operator* o) const
+double   MPSImp::GetExpectation   (const MPO* o) const
 {
     Vector3CT F(1,1,1,1);
     F(1,1,1)=dcmplx(1.0);
@@ -44,7 +44,7 @@ double   MPSImp::GetExpectation   (const Operator* o) const
     return std::real(F(1,1,1));
 }
 
-dcmplx   MPSImp::GetExpectationC(const Operator* o) const
+dcmplx   MPSImp::GetExpectationC(const MPO* o) const
 {
     Vector3CT F(1,1,1,1);
     F(1,1,1)=dcmplx(1.0);

@@ -3,7 +3,7 @@
 
 #include "TensorNetworks/Hamiltonian.H"
 #include "Operators/SiteOperatorImp.H"
-#include "Operators/MPO_LRB.H"
+#include "Operators/MPOImp.H"
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 
@@ -15,7 +15,7 @@ namespace TensorNetworks
 class Hamiltonian_1D_NN_Heisenberg
     : public virtual Hamiltonian
     , public virtual OperatorClient
-    , public MPO_LRB
+    , private MPOImp
 {
     public:
         Hamiltonian_1D_NN_Heisenberg(int L, double S, double Jxy,double Jz, double hz);

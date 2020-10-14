@@ -1,11 +1,6 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
-- clean up spin calculator
-- Done: Get rid of OperatorWRepresentation, or find a better name.
-- Get rid of operator base class
-    -All MPOs stored the full lattice, possibly with lots of identity ops then everything would be much simpler.
-- Done: Bond.C line 70 has a hard coded limit for SVs
-    Should be using itsMPSCompressEpsilon
+- clean up SpinCalculator
 - Optimization: Learn about preconditioning, does that help with primme eigen solver?
 - Optimization: FullStateImp<T>::DoHContraction  needs to do vector copies.
     We can avoid this by allowing Vector<T>(T*) constructors
@@ -47,6 +42,11 @@ Backburner:
 
 
 
+- Done: Get rid of OperatorWRepresentation, or find a better name.
+- Done: Get rid of operator base class and MPO_*
+    -All MPOs stored the full lattice, possibly with lots of identity ops then everything would be much simpler.
+- Done: Bond.C line 70 has a hard coded limit for SVs
+    Should be using itsMPSCompressEpsilon
 - Done: Fix MPS*  Apply       (const Operator* o) const;
     Moved to MPS base class
 - Done: The purpose of MPSImp itsDmax is becoming murky, what does it mean?

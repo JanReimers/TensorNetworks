@@ -9,7 +9,37 @@
 namespace TensorNetworks
 {
 
-void MPO::Combine(const Operator* O2)
+int MPO::GetMaxDw() const
+{
+    int L=GetL();
+    int Dw=0;
+    for (int ia=1;ia<L;ia++)
+    {
+        Dw=Max(Dw,GetSiteOperator(ia)->GetDw12().Dw2);
+    }
+    return Dw;
+}
+
+void MPO::Report(std::ostream& os) const
+{
+    int L=GetL();
+    os << "Matrix Product Operator for " << L << " sites." << std::endl;
+    for (int ia=1;ia<=L;ia++)
+    {
+        os << "   Site " << ia << ": ";
+        GetSiteOperator(ia)->Report(os);
+        os << std::endl;
+    }
+}
+
+const SiteOperator* MPO::GetSiteOperator(int isite) const
+{
+    return const_cast<MPO*>(this)->GetSiteOperator(isite);
+}
+
+
+
+void MPO::Combine(const MPO* O2)
 {
     int L=GetL();
     assert(L==O2->GetL());

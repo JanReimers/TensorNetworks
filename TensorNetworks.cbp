@@ -88,18 +88,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="NumericalMethods/PrimeEigenSolver.H" />
-		<Unit filename="Operators/IdentityOperator.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Operators/IdentityOperator.H" />
 		<Unit filename="Operators/MPOImp.C">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/MPOImp.H" />
-		<Unit filename="Operators/MPO_LRB.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Operators/MPO_LRB.H" />
 		<Unit filename="Operators/MPO_OneSite.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -112,10 +104,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/MPO_TwoSite.H" />
-		<Unit filename="Operators/OneSiteSpinOperator.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Operators/OneSiteSpinOperator.H" />
 		<Unit filename="Operators/SiteOperatorImp.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -153,11 +141,6 @@
 		</Unit>
 		<Unit filename="TensorNetworks/MPS.H" />
 		<Unit filename="TensorNetworks/Namespace.H" />
-		<Unit filename="TensorNetworks/Operator.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworks/Operator.H" />
-		<Unit filename="TensorNetworks/OperatorWRepresentation.H" />
 		<Unit filename="TensorNetworks/SVCompressor.H" />
 		<Unit filename="TensorNetworks/SiteOperator.H" />
 		<Unit filename="TensorNetworks/TNSLogger.H" />

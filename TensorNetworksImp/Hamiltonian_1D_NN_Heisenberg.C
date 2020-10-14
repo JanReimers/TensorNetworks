@@ -9,7 +9,7 @@ namespace TensorNetworks
 {
 
 Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, double Jxy,double Jz, double hz)
-    : MPO_LRB(L,S)
+    : MPOImp(L,S,MPOImp::LoadLater)
     , itsL(L)
     , itsS(S)
     , itsJxy(Jxy)
@@ -49,15 +49,13 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
     itsDw12s[PRight]=Dw12(5,1,w1_first_5x1,w2_last_5x1);
 
     //
-    //  Load W matrices for the left edge,bulk and right edge
+    //  Load up site operators with special ops at the edges
     //
-    SiteOperator* left =new SiteOperatorImp(itsd,PLeft ,this);
-    SiteOperator* bulk =new SiteOperatorImp(itsd,PBulk ,this);
-    SiteOperator* right=new SiteOperatorImp(itsd,PRight,this);
-    itsSites.push_back(left );     //Left edge
-    itsSites.push_back(bulk );     //bulk
-    itsSites.push_back(right);     //Right edge
-
+    int d=2*S+1;
+    Insert(new SiteOperatorImp(d,PLeft ,this));
+    for (int ia=2;ia<=itsL-1;ia++)
+        Insert(new SiteOperatorImp(d,PBulk ,this));
+    Insert(new SiteOperatorImp(d,PRight,this));
 }
 
 Hamiltonian_1D_NN_Heisenberg::~Hamiltonian_1D_NN_Heisenberg()
@@ -166,7 +164,6 @@ Matrix4RT Hamiltonian_1D_NN_Heisenberg::BuildLocalMatrix() const
 #include "TensorNetworksImp/iTEBDStateImp.H"
 #include "TensorNetworksImp/FullStateImp.H"
 #include "TensorNetworksImp/MPSImp.H"
-#include "Operators/MPOImp.H"
 #include "Operators/MPO_SpatialTrotter.H"
 
 namespace TensorNetworks
@@ -193,12 +190,12 @@ iTEBDState* Hamiltonian_1D_NN_Heisenberg::CreateiTEBDState(int D,double normEps,
 
 MPO* Hamiltonian_1D_NN_Heisenberg::CreateUnitOperator() const
 {
-    return new MPOImp(itsL,itsS);
+    return new MPOImp(itsL,itsS,MPOImp::Identity);
 }
 
 MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TrotterOrder order) const
 {
-    MPO* W=new MPOImp(itsL,itsS);
+    MPO* W=CreateUnitOperator();
     Matrix4RT H12=BuildLocalMatrix(); //Full H matrix for two sites 1&2
     switch (order)
     {
@@ -209,16 +206,16 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TrotterOrder order)
         }
         case FirstOrder :
         {
-            MPO_SpatialTrotter Wodd (dt,Odd ,itsL,Getd(),H12);
-            MPO_SpatialTrotter Weven(dt,Even,itsL,Getd(),H12);
+            MPO_SpatialTrotter Wodd (dt,Odd ,itsL,itsS,H12);
+            MPO_SpatialTrotter Weven(dt,Even,itsL,itsS,H12);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             break;
         }
         case SecondOrder :
         {
-            MPO_SpatialTrotter Wodd (dt/2.0,Odd ,itsL,Getd(),H12);
-            MPO_SpatialTrotter Weven(dt,Even,itsL,Getd(),H12);
+            MPO_SpatialTrotter Wodd (dt/2.0,Odd ,itsL,itsS,H12);
+            MPO_SpatialTrotter Weven(dt    ,Even,itsL,itsS,H12);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             W->Combine(&Wodd);
@@ -237,9 +234,9 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TrotterOrder order)
             ts(5)=ts(1);
             for (int it=1;it<=5;it++)
             {
-                MPOImp U(itsL,itsS);
-                MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,itsL,Getd(),H12);
-                MPO_SpatialTrotter Weven(ts(it)    ,Even,itsL,Getd(),H12);
+                MPOImp U(itsL,itsS,MPOImp::Identity);
+                MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,itsL,itsS,H12);
+                MPO_SpatialTrotter Weven(ts(it)    ,Even,itsL,itsS,H12);
                 U.Combine(&Wodd);
                 U.Combine(&Weven);
                 U.Combine(&Wodd);

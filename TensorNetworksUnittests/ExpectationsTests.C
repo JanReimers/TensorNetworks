@@ -104,10 +104,10 @@ TEST_F(ExpectationsTests,TestOneSiteExpectations)
     Vector<std::complex<double> > Sp_mpo(L),Sm_mpo(L);
     for (int ia=1;ia<=L;ia++)
     {
-        TensorNetworks::Operator* Sxo=new TensorNetworks::MPO_OneSite(L,S ,ia, TensorNetworks::Sx);
-        TensorNetworks::Operator* Szo=new TensorNetworks::MPO_OneSite(L,S ,ia, TensorNetworks::Sz);
-        TensorNetworks::Operator* Spo=new TensorNetworks::MPO_OneSite(L,S ,ia, TensorNetworks::Sp);
-        TensorNetworks::Operator* Smo=new TensorNetworks::MPO_OneSite(L,S ,ia, TensorNetworks::Sm);
+        TensorNetworks::MPO* Sxo=new TensorNetworks::MPO_OneSite(L,S ,ia, TensorNetworks::Sx);
+        TensorNetworks::MPO* Szo=new TensorNetworks::MPO_OneSite(L,S ,ia, TensorNetworks::Sz);
+        TensorNetworks::MPO* Spo=new TensorNetworks::MPO_OneSite(L,S ,ia, TensorNetworks::Sp);
+        TensorNetworks::MPO* Smo=new TensorNetworks::MPO_OneSite(L,S ,ia, TensorNetworks::Sm);
         Sx_mpo(ia)=itsMPS->GetExpectation(Sxo);
         Sz_mpo(ia)=itsMPS->GetExpectation(Szo);
         Sp_mpo(ia)=itsMPS->GetExpectationC(Smo);
@@ -230,10 +230,10 @@ SMatrix<DMatrix<double> > SuseptibilityTensor(const TensorNetworks::MPS* mps,con
     Vector<std::complex<double> > Sp_mpo(L),Sm_mpo(L);
     for (int ia=1; ia<=L; ia++)
     {
-        TensorNetworks::Operator* Sxo=new TensorNetworks::MPO_OneSite(L,S,ia, TensorNetworks::Sx);
-        TensorNetworks::Operator* Szo=new TensorNetworks::MPO_OneSite(L,S,ia, TensorNetworks::Sz);
-        TensorNetworks::Operator* Spo=new TensorNetworks::MPO_OneSite(L,S,ia, TensorNetworks::Sp);
-        TensorNetworks::Operator* Smo=new TensorNetworks::MPO_OneSite(L,S,ia, TensorNetworks::Sm);
+        TensorNetworks::MPO* Sxo=new TensorNetworks::MPO_OneSite(L,S,ia, TensorNetworks::Sx);
+        TensorNetworks::MPO* Szo=new TensorNetworks::MPO_OneSite(L,S,ia, TensorNetworks::Sz);
+        TensorNetworks::MPO* Spo=new TensorNetworks::MPO_OneSite(L,S,ia, TensorNetworks::Sp);
+        TensorNetworks::MPO* Smo=new TensorNetworks::MPO_OneSite(L,S,ia, TensorNetworks::Sm);
         Sx_mpo(ia)=mps->GetExpectation(Sxo);
         Sz_mpo(ia)=mps->GetExpectation(Szo);
         Sp_mpo(ia)=mps->GetExpectationC(Smo);
@@ -295,14 +295,14 @@ TEST_F(ExpectationsTests,TestTwoSiteDMs)
     for (int ia=1;ia<L;ia++)
         for (int ib=ia+1;ib<=L;ib++)
     {
-        TensorNetworks::Operator* SxSxo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sx,TensorNetworks::Sx);
-        TensorNetworks::Operator* SxSzo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sx,TensorNetworks::Sz);
-        TensorNetworks::Operator* SzSxo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sz,TensorNetworks::Sx);
-        TensorNetworks::Operator* SzSzo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sz,TensorNetworks::Sz);
-        TensorNetworks::Operator* SmSmo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sm,TensorNetworks::Sm);
-        TensorNetworks::Operator* SmSpo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sm,TensorNetworks::Sp);
-        TensorNetworks::Operator* SpSmo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sp,TensorNetworks::Sm);
-        TensorNetworks::Operator* SpSpo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sp,TensorNetworks::Sp);
+        TensorNetworks::MPO* SxSxo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sx,TensorNetworks::Sx);
+        TensorNetworks::MPO* SxSzo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sx,TensorNetworks::Sz);
+        TensorNetworks::MPO* SzSxo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sz,TensorNetworks::Sx);
+        TensorNetworks::MPO* SzSzo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sz,TensorNetworks::Sz);
+        TensorNetworks::MPO* SmSmo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sm,TensorNetworks::Sm);
+        TensorNetworks::MPO* SmSpo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sm,TensorNetworks::Sp);
+        TensorNetworks::MPO* SpSmo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sp,TensorNetworks::Sm);
+        TensorNetworks::MPO* SpSpo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sp,TensorNetworks::Sp);
         SxSx_mpo(ia,ib)=itsMPS->GetExpectation (SxSxo);
         SxSz_mpo(ia,ib)=itsMPS->GetExpectation (SxSzo);
         SzSx_mpo(ia,ib)=itsMPS->GetExpectation (SzSxo);

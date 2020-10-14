@@ -1,7 +1,7 @@
 #ifndef MPO_H
 #define MPO_H
 
-#include "TensorNetworks/Operator.H"
+#include "TensorNetworks/Namespace.H"
 #include <iosfwd>
 
 namespace TensorNetworks
@@ -11,13 +11,19 @@ namespace TensorNetworks
 //  Most of the this interface can be implemented using a few abstract functions
 //  from the Operator class.
 //
-class MPO : public virtual Operator
+class MPO
 {
     public:
         MPO() {};
         virtual ~MPO() {};
 
-        virtual void   Combine(const Operator* O2);
+        virtual int   GetL() const=0;
+        virtual int   GetMaxDw() const;
+        virtual void  Report(std::ostream&) const;
+        virtual const SiteOperator* GetSiteOperator(int isite) const;
+        virtual       SiteOperator* GetSiteOperator(int isite)      =0;
+
+        virtual void   Combine(const MPO* O2);
         virtual double Compress(int Dmax, double epsSV);
         virtual double Compress(const SVCompressorR*);
 };

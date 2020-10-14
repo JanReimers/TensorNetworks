@@ -181,7 +181,7 @@ MatrixCT MPSImp::Calc12RightCache(const MPS* psi2,int isite, bool cache) const
 //
 //  |this> = O*|this>
 //
-void  MPSImp::ApplyInPlace(const Operator* o)
+void  MPSImp::ApplyInPlace(const MPO* o)
 {
     SiteLoop(ia)
         itsSites[ia]->ApplyInPlace(o->GetSiteOperator(ia));

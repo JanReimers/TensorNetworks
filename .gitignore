@@ -18,3 +18,5 @@ ReleaseLong/
 *.s
 
 *.cscope_file_list
+
+Operators/gmon.out

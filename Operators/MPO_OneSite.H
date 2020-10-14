@@ -1,9 +1,7 @@
 #ifndef MPO_OneSIte_H
 #define MPO_OneSIte_H
 
-#include "TensorNetworks/Namespace.H"
-#include "TensorNetworks/Operator.H"
-#include "Containers/ptr_vector.h"
+#include "Operators/MPOImp.H"
 
 
 namespace TensorNetworks
@@ -11,28 +9,13 @@ namespace TensorNetworks
 //
 //  Represent an MPO for one site only. The rest of the sites are just identity operators.
 //
-class MPO_OneSite : public virtual Operator
+class MPO_OneSite
+    : public virtual MPO
+    , private MPOImp
 {
     public:
         MPO_OneSite(int L, double S ,int isite, SpinOperator);
         virtual ~MPO_OneSite();
-
-        virtual int   GetL() const {return itsL;}
-        SiteOperator* GetSiteOperator(int isite)
-        {
-            assert(isite>=1);
-            assert(isite<=itsL);
-            return isite==itsSiteIndex ? itsSiteOperator : itsIndentityOperator;
-        }
-
-    private:
-
-        int itsL;   //Number of lattice sites
-        int itsd;   //Number ot states for the spin on each site = 2S+1
-        int itsSiteIndex;
-
-        SiteOperator* itsSiteOperator;
-        SiteOperator* itsIndentityOperator;
 };
 
 }

@@ -12,12 +12,11 @@ namespace TensorNetworks
 
     class Hamiltonian;
     class MPO;
-    class Operator;
     class SiteOperator;
     class Dw12;
 
     template <class T> class SVCompressor;
-    typedef SVCompressor<dcmplx > SVCompressorC;
+    typedef SVCompressor<dcmplx> SVCompressorC;
     typedef SVCompressor<double> SVCompressorR;
 
     class Epsilons;

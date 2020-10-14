@@ -2,13 +2,13 @@
 #define HAMILTONIAN_H
 
 #include "TensorNetworks/Namespace.H"
-#include "TensorNetworks/Operator.H"
+#include "TensorNetworks/MPO.H"
 
 
 namespace TensorNetworks
 {
 
-class Hamiltonian : public virtual Operator
+class Hamiltonian : public virtual MPO
 {
     public:
         Hamiltonian() {}

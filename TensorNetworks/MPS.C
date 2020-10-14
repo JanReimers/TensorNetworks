@@ -20,7 +20,7 @@ void MPS::NormalizeAndCompress(Direction lr,int Dmax,double epsSV)
 //
 //  |psi`> = O*|this>
 //
-MPS*  MPS::Apply(const Operator* o) const
+MPS*  MPS::Apply(const MPO* o) const
 {
     MPS* psiPrime=Clone();
     psiPrime->ApplyInPlace(o);

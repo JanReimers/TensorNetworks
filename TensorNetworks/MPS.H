@@ -44,16 +44,16 @@ public:
 //    Overlap and expectation contractions
 //
     virtual double   GetOverlap     (const MPS* Psi2) const=0; //<this|Psi2>
-    virtual double   GetExpectation (const Operator* o) const=0; //This one checks the answer is real, the ..C version allows comples return values.
-    virtual dcmplx   GetExpectationC(const Operator* o) const=0; //For non hermitian operators, S+, S-. Sy
+    virtual double   GetExpectation (const MPO* o) const=0; //This one checks the answer is real, the ..C version allows comples return values.
+    virtual dcmplx   GetExpectationC(const MPO* o) const=0; //For non hermitian operators, S+, S-. Sy
 //--------------------------------------------------------------------------------------
 //
 //  Operate on MPS with an MPO:  |Psi> -> O|Psi>.
 //  In general this will increase the bond dimension from D to D*Dw
 //  The overloaded operator is just syntatic suger, not sure how usefull it will be
 //
-    virtual void  ApplyInPlace(const Operator* o) =0;
-    virtual MPS*  Apply       (const Operator* o) const;
+    virtual void  ApplyInPlace(const MPO* o) =0;
+    virtual MPS*  Apply       (const MPO* o) const;
 
 //--------------------------------------------------------------------------------------
 //
@@ -73,7 +73,7 @@ public:
     virtual bool        IsRLNormalized(int isite) const=0; //  AAA..AMBB..BBB form at one site.
 }; // class
 
-inline MPS* operator*(const Operator& o, const MPS& psi)
+inline MPS* operator*(const MPO& o, const MPS& psi)
 {
     return psi.Apply(&o);
 }

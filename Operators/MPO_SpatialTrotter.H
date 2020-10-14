@@ -2,7 +2,8 @@
 #define MPO_SPATIALTROTTER_H
 
 #include "TensorNetworks/Namespace.H"
-#include "TensorNetworks/Operator.H"
+#include "Operators/MPOImp.H"
+
 namespace TensorNetworks
 {
 
@@ -14,26 +15,14 @@ namespace TensorNetworks
 //  geometries (Kagome, CST, FCC, Tri) we will need a more general
 //  decomposition in N non-interacting sublattices.
 //
-class MPO_SpatialTrotter : public virtual Operator
+class MPO_SpatialTrotter
+    : public virtual MPO
+    , private MPOImp
 {
     public:
-        MPO_SpatialTrotter(double dt, Trotter type,int L, int d, const Matrix4RT& Hlocal);
+        MPO_SpatialTrotter(double dt, Trotter type,int L, double S, const Matrix4RT& Hlocal);
+        MPO_SpatialTrotter(double dt, Trotter type,int L, int d   , const Matrix4RT& Hlocal) = delete;
         virtual ~MPO_SpatialTrotter();
-
-        virtual int   GetL() const {return itsL;}
-        virtual SiteOperator* GetSiteOperator(int isite);
-
-    protected:
-
-    private:
-
-        Trotter itsOddEven;
-        int itsL;   //Number of lattice sites
-        int itsd;   //Number ot states for the spin on each site = 2S+1
-        SiteOperator* itsLeft_Site; //Left  site of pair
-        SiteOperator* itsRightSite; //Right site of pair
-        SiteOperator* itsUnit_Site; //Site with unit operator for chain ends.
-
 };
 
 }

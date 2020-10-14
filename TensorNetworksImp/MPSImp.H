@@ -62,14 +62,14 @@ public:
 //    Overlap and expectation contractions
 //
         virtual double   GetOverlap     (const MPS* Psi2) const; //<this|Psi2>
-        virtual double   GetExpectation (const Operator* o) const;
-        virtual dcmplx   GetExpectationC(const Operator* o) const;
+        virtual double   GetExpectation (const MPO* o) const;
+        virtual dcmplx   GetExpectationC(const MPO* o) const;
 //--------------------------------------------------------------------------------------
 //
 //  Operate on MPS with an MPO:  |Psi> -> O|Psi>.
 //  In general this will increase the bond dimension from D to D*Dw
 //
-        virtual void  ApplyInPlace(const Operator* o);
+        virtual void  ApplyInPlace(const MPO* o);
 //--------------------------------------------------------------------------------------
 //
 //    One site density matrix and expectation calculations
@@ -151,8 +151,8 @@ private:
 
         void     LoadHeffCaches(const Hamiltonian* h);
         Vector3CT GetHeffCache (Direction lr,int isite) const;
-        Vector3CT CalcHeffLeft (const Operator* o,int isite,bool cache=false) const;
-        Vector3CT CalcHeffRight(const Operator* o,int isite,bool cache=false) const;
+        Vector3CT CalcHeffLeft (const MPO* o,int isite,bool cache=false) const;
+        Vector3CT CalcHeffRight(const MPO* o,int isite,bool cache=false) const;
 
         Matrix4CT CalculateTwoSiteDM(int ia,int ib) const;
 //--------------------------------------------------------------------

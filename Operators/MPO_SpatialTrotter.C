@@ -3,6 +3,7 @@
 #include "Containers/Matrix4.H"
 #include "Operators/SiteOperatorImp.H"
 #include "NumericalMethods/LapackSVD.H"
+#include "TensorNetworks/CheckSpin.H"
 #include "oml/diagonalmatrix.h"
 #include "oml/numeric.h"
 
@@ -13,24 +14,21 @@ namespace TensorNetworks
 //  THe local two site Hamiltonian H12 should be stored as H12(m1,m2,n1,n2);
 //   Whem flatted to H(m,n) where m=(m1,m2) n=(n1,n2) it is hermitian and diagonalizable.
 //
-MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, int d, const Matrix4RT& H12)
-    : itsOddEven(type)
-    , itsL(L)
-    , itsd(d)
-    , itsLeft_Site(0)
-    , itsRightSite(0)
-    , itsUnit_Site(0)
+MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, double S, const Matrix4RT& H12)
+    : MPOImp(L,S,MPOImp::LoadLater)
 {
-    assert(itsOddEven==Odd || itsOddEven==Even);
-    assert(itsL>1);
-    assert(itsd>1);
+    assert(isValidSpin(S));
+    int d=2*S+1;
+    assert(L>1);
+    assert(d>1);
+    assert(type==Odd || type==Even);
     //
     //  Diagonalize H12 in order to caluclate exp(-t*H)
     //
     //cout << "H12=" << H12 << endl;
     MatrixRT U12=H12.Flatten();
     VectorRT evs=Diagonalize(U12);
-    assert(evs.size()==itsd*itsd);
+    assert(evs.size()==d*d);
     VectorRT expEvs=exp(-dt*evs);
     Matrix4RT expH(d,d,d,d,0);
     Fill(expH.Flatten(),0.0);
@@ -49,60 +47,43 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, int d, con
 //
     auto [U,sm,VT]=LaSVDecomp(expH.Flatten()); //Solves A=U * s * VT
 
-    itsLeft_Site=new SiteOperatorImp(itsd,DLeft ,U ,sm);
-    itsRightSite=new SiteOperatorImp(itsd,DRight,VT,sm);
-    itsUnit_Site=new SiteOperatorImp(itsd);
+    //
+    //  Load up site operators with special ops at the edges
+    //
+    switch (type)
+    {
+    case Even :  // LRLRLR  or LRLRLRI
+        {
+            for (int ia=1;ia<L;ia+=2)
+            {
+                Insert(new SiteOperatorImp(d,DLeft ,U ,sm));
+                Insert(new SiteOperatorImp(d,DRight,VT,sm));
+            }
+            if (L%2) Insert(new SiteOperatorImp(d)); //if L is odd add one I op at the end
+            break;
+        }
+    case Odd : // ILRLRI or ILRLRLR
+        {
+            Insert(new SiteOperatorImp(d)); //if L is odd add one I op at the start
+            for (int ia=2;ia<=L-1;ia+=2)
+            {
+                Insert(new SiteOperatorImp(d,DLeft ,U ,sm));
+                Insert(new SiteOperatorImp(d,DRight,VT,sm));
+            }
+            if (!(L%2)) Insert(new SiteOperatorImp(d)); //if L is odd add one I op at the end
+            break;
+        }
+    default :
+        {
+            assert(false);
+        }
+    }
 
 }
 
 MPO_SpatialTrotter::~MPO_SpatialTrotter()
 {
     //dtor
-}
-
-
-//
-//  THis is non-trivial because we need return unit MPOs for special cases
-//
-SiteOperator* MPO_SpatialTrotter::GetSiteOperator(int isite)
-{
-    assert(isite>0);
-    assert(isite<=itsL);
-    SiteOperator* ret=0;
-
-    if (itsOddEven==Odd)
-    {
-        if (itsL%2 && isite==itsL)
-        {
-            //odd number of sites
-            ret=itsUnit_Site;
-        }
-        else
-        {
-            // Odd site are left, even are right
-            ret=(isite%2) ? itsLeft_Site : itsRightSite;
-        }
-    }
-    else
-    {
-        if (isite==1 || (!(itsL%2) && isite==itsL))
-        {
-            //odd number of sites
-            ret=itsUnit_Site;
-        }
-        else
-        {
-            //Odd sites are right, even are left.
-            ret=(isite%2) ? itsRightSite : itsLeft_Site;
-        }
-    }
-    /*
-    cout << "Site " << isite << " is ";
-    if (ret==itsLeft_Site) cout << "LEFT" << endl;
-    if (ret==itsRightSite) cout << "RIGHT" << endl;
-    if (ret==itsUnit_Site) cout << "UNIT" << endl;
-    */
-    return ret;
 }
 
 }

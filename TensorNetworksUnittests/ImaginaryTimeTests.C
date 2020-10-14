@@ -69,7 +69,7 @@ TEST_F(ImaginaryTimeTests,TestApplyIdentity)
     itsMPS->Normalize(TensorNetworks::DLeft );
     EXPECT_NEAR(itsMPS->GetExpectation(itsH) ,E1,eps);
 
-    TensorNetworks::Operator* IO=itsH->CreateUnitOperator();
+    TensorNetworks::MPO* IO=itsH->CreateUnitOperator();
     TensorNetworks::MPS* Psi2=*IO**itsMPS;
     EXPECT_NEAR(Psi2->GetExpectation(itsH) ,E1,eps);
     delete Psi2;
@@ -85,8 +85,8 @@ TEST_F(ImaginaryTimeTests,TestMPPOCombine)
     TensorNetworks::Matrix4RT H12=itsH->BuildLocalMatrix(); //Full H matrix for two sites 1&2
 
     // Create some Trotter 2nd order operators
-    TensorNetworks::MPO_SpatialTrotter W_Odd (dt/2.0,TensorNetworks::Odd ,L,2*S+1,H12);
-    TensorNetworks::MPO_SpatialTrotter W_Even(dt    ,TensorNetworks::Even,L,2*S+1,H12);
+    TensorNetworks::MPO_SpatialTrotter W_Odd (dt/2.0,TensorNetworks::Odd ,L,S,H12);
+    TensorNetworks::MPO_SpatialTrotter W_Even(dt    ,TensorNetworks::Even,L,S,H12);
     //
     //  Now combine three trotters into one
     //

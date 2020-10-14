@@ -123,7 +123,7 @@ void MPSImp::LoadHeffCaches(const Hamiltonian* h)
 //
 //  Used to calculate Hamiltonian L&R caches for Heff calcultions.
 //
-Vector3CT MPSImp::CalcHeffLeft(const Operator* o,int isite, bool cache) const
+Vector3CT MPSImp::CalcHeffLeft(const MPO* o,int isite, bool cache) const
 {
 //    CheckSiteNumber(isite);  this function accepts out of bounds site numbers
     Vector3CT F(1,1,1,1);
@@ -135,7 +135,7 @@ Vector3CT MPSImp::CalcHeffLeft(const Operator* o,int isite, bool cache) const
 //
 //  Used to calculate Hamiltonian L&R caches for Heff calcultions.
 //
-Vector3CT MPSImp::CalcHeffRight(const Operator* o,int isite, bool cache) const
+Vector3CT MPSImp::CalcHeffRight(const MPO* o,int isite, bool cache) const
 {
 //    CheckSiteNumber(isite); this function accepts out of bounds site numbers
     Vector3CT F(1,1,1,1);
