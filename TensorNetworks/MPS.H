@@ -26,6 +26,7 @@ public:
     virtual void MixedCanonical(int isite)=0; //Mixed Canonical normalization
 
     virtual void Normalize(Direction LR);
+    virtual void NormalizeAndCompress(Direction LR,int Dmax,double eps);
     virtual void NormalizeAndCompress(Direction LR,SVCompressorC*)=0;
 //--------------------------------------------------------------------------------------
 //
@@ -37,14 +38,14 @@ public:
 //
 //  Vary this MPS to be as close as possible to Psi2 by minimizing ||this-Psi2||^2
 //
-    virtual void Optimize(const MPS* Psi2,const IterationScheduleLine&)=0; // Minimize ||this-Psi2||^2
+    virtual int Optimize(const MPS* Psi2,const IterationScheduleLine&)=0; // Minimize ||this-Psi2||^2
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions
 //
     virtual double   GetOverlap     (const MPS* Psi2) const=0; //<this|Psi2>
     virtual double   GetExpectation (const Operator* o) const=0; //This one checks the answer is real, the ..C version allows comples return values.
-    virtual dcmplx    GetExpectationC(const Operator* o) const=0; //For non hermitian operators, S+, S-. Sy
+    virtual dcmplx   GetExpectationC(const Operator* o) const=0; //For non hermitian operators, S+, S-. Sy
 //--------------------------------------------------------------------------------------
 //
 //  Operate on MPS with an MPO:  |Psi> -> O|Psi>.
@@ -65,6 +66,7 @@ public:
 //
 //    Reporting
 //
+    virtual int         GetMaxD       (         ) const=0;
     virtual char        GetNormStatus (int isite) const=0;
     virtual std::string GetNormStatus (         ) const=0;
     virtual void        Report    (std::ostream&) const=0;
