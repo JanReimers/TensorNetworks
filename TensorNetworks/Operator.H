@@ -13,10 +13,9 @@ class Operator
         Operator() {};
         virtual ~Operator() {};
         virtual int   GetL() const=0;
-        virtual const SiteOperator* GetSiteOperator(int isite) const
-        {
-            return const_cast<Operator*>(this)->GetSiteOperator(isite);
-        }
+        virtual int   GetMaxDw() const;
+        virtual void  Report(std::ostream&) const;
+        virtual const SiteOperator* GetSiteOperator(int isite) const;
         virtual       SiteOperator* GetSiteOperator(int isite)      =0;
 };
 
