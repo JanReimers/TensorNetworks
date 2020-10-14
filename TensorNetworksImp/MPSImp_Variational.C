@@ -16,7 +16,7 @@ double MPSImp::FindVariationalGroundState(const Hamiltonian* H,const IterationSc
 {
     itsLogger->ReadyToStart("Right normalize");
     Normalize(DRight);
-    itsLogger->LogInfo(1,"Load L&R caches");
+    itsLogger->LogInfo(3,"Load L&R caches");
     LoadHeffCaches(H);
 
     double DE2=0;
@@ -130,7 +130,7 @@ Vector3CT MPSImp::CalcHeffLeft(const Operator* o,int isite, bool cache) const
     F(1,1,1)=dcmplx(1.0);
     for (int ia=1; ia<isite; ia++)
     {
-        itsLogger->LogInfo(1,SiteMessage("Calculating L cache for site ",ia));
+        itsLogger->LogInfo(3,SiteMessage("Calculating Heff L cache for site ",ia));
         F=itsSites[ia]->IterateLeft_F(o->GetSiteOperator(ia),F,cache);
     }
     return F;
@@ -145,43 +145,8 @@ Vector3CT MPSImp::CalcHeffRight(const Operator* o,int isite, bool cache) const
     F(1,1,1)=dcmplx(1.0);
     for (int ia=itsL; ia>isite; ia--)
     {
-        itsLogger->LogInfo(1,SiteMessage("Calculating R cache for site ",ia));
+        itsLogger->LogInfo(3,SiteMessage("Calculating Heff R cache for site ",ia));
         F=itsSites[ia]->IterateRightF(o->GetSiteOperator(ia),F,cache);
-    }
-    return F;
-}
-//
-//  Used to calculate  L&R caches for <psi_tilde|psi> calcultions.
-//
-MatrixCT MPSImp::CalcHeffLeft(const MPS* psi2,int isite, bool cache) const
-{
-//    CheckSiteNumber(isite);  this function accepts out of bounds site numbers
-    const MPSImp* psi2Imp=dynamic_cast<const MPSImp*>(psi2);
-    assert(psi2Imp);
-
-    MatrixCT F(1,1);
-    F(1,1)=dcmplx(1.0);
-    for (int ia=1; ia<isite; ia++)
-    {
-        itsLogger->LogInfo(1,SiteMessage("Calculating L cache for site ",ia));
-        F=itsSites[ia]->IterateLeft_F(psi2Imp->itsSites[ia],F,cache);
-    }
-    return F;
-}
-//
-//  Used to calculate  L&R caches for <psi_tilde|psi> calcultions.
-//
-MatrixCT MPSImp::CalcHeffRight(const MPS* psi2,int isite, bool cache) const
-{
-//    CheckSiteNumber(isite); this function accepts out of bounds site numbers
-    const MPSImp* psi2Imp=dynamic_cast<const MPSImp*>(psi2);
-    assert(psi2Imp);
-    MatrixCT F(1,1);
-    F(1,1)=dcmplx(1.0);
-    for (int ia=itsL; ia>isite; ia--)
-    {
-        itsLogger->LogInfo(1,SiteMessage("Calculating R cache for site ",ia));
-        F=itsSites[ia]->IterateRightF(psi2Imp->itsSites[ia],F,cache);
     }
     return F;
 }

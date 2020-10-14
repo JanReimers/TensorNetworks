@@ -1,5 +1,11 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
+- Heisenbug trap in MPSSite_Contractions.C line ~354 can be removed after enough test time (discovered 13 Oct 2020)
+- Bond.C line 70 has a hard coded limit for SVs
+    Should be using itsMPSCompressEpsilon
+- The purpose of MPSImp itsDmax is becoming murky, what does it mean?
+    int particular if do MPO*|MPS> where MPO has some DwMax then newDmax=DwMax*itsDmax
+    But what are we supposed to use newDmax for
 - Optimization: Learn about preconditioning, does that help with primme eigen solver?
 - Optimization: FullStateImp<T>::DoHContraction  needs to do vector copies.
     We can avoid this by allowing Vector<T>(T*) constructors

@@ -34,6 +34,7 @@ class MPSSite
         double GetEGap       () const {return itsGapE;}
         double GetIterDE     () const {return itsIterDE;}
         bool   IsFrozen      () const {return isFrozen;}
+        int    GetD2         () const {return itsD2;}
 //---------------------------------------------------------------------------------
 //
 //  Required for ground state calculations

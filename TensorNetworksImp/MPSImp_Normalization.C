@@ -50,22 +50,19 @@ void MPSImp::CanonicalizeSite(Direction lr,int isite,SVCompressorC* comp)
 
 void MPSImp::NormalizeAndCompress(Direction LR,SVCompressorC* comp)
 {
-//    SetCanonicalBondDimensions(Invert(LR)); //Sweep backwards and set proper bond dimensions
     ForLoop(LR)
-        NormalizeAndCompressSite(LR,ia,comp);
+         NormalizeAndCompressSite(LR,ia,comp);
     if (comp && comp->Donly()) itsDmax=comp->GetDmax();
 }
 
 void MPSImp::NormalizeAndCompressSite(Direction lr,int isite,SVCompressorC* comp)
 {
     CheckSiteNumber(isite);
-//    cout << "----- Normalize and Compress site " << isite << " " << GetNormStatus() << " -----" << endl;
-    std::string lrs=lr==DLeft ? "Left" : "Right";
-    itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize site ");
-    //cout << "SVD " << lrs << " site " << isite << endl;
+
+//    if (lr==DLeft  && isite==itsL)
+//        cout << "----- Normalize and Compress site " << isite << " " << GetNormStatus() << " -----" << endl;
     itsSites[isite]->SVDNormalize(lr,comp);
 
-    itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize update Bond data ");
     int bond_index=isite+( lr==DLeft ? 0 :-1);
     if (bond_index<itsL && bond_index>=1)
         UpdateBondData(bond_index);

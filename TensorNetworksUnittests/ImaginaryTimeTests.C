@@ -5,6 +5,7 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
 #include "Operators/MPO_SpatialTrotter.H"
+#include "TensorNetworksImp/SPDLogger.H"
 
 #include "oml/matrix.h"
 #include "oml/stream.h"
@@ -24,22 +25,36 @@ public:
     ImaginaryTimeTests()
     : eps(1.0e-13)
     , itsFactory(TensorNetworks::Factory::GetFactory())
+    , itsH(0)
+    , itsMPS(0)
+    , itsLogger(new TensorNetworks::SPDLogger(1))
     {
         StreamableObject::SetToPretty();
 
+    }
+    ~ImaginaryTimeTests()
+    {
+        delete itsFactory;
+        if (itsH)
+            delete itsH;
+        if (itsMPS)
+            delete itsMPS;
+        delete itsLogger;
     }
 
     void Setup(int L, double S, int D)
     {
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsMPS=itsH->CreateMPS(D);
+        itsMPS=itsH->CreateMPS(D,1e-12,itsLogger);
+        itsMPS->InitializeWith(TensorNetworks::Random);
     }
 
 
     double eps;
-    TensorNetworks::Factory*     itsFactory=TensorNetworks::Factory::GetFactory();
+    TensorNetworks::Factory*     itsFactory;
     TensorNetworks::Hamiltonian* itsH;
     TensorNetworks::MPS*         itsMPS;
+    TensorNetworks::TNSLogger*   itsLogger;
 };
 
 
@@ -48,18 +63,16 @@ TEST_F(ImaginaryTimeTests,TestApplyIdentity)
 {
     int D=1;
     Setup(3,0.5,D);
-    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
-    Psi1->InitializeWith(TensorNetworks::Neel);
-    double E1=Psi1->GetExpectation(itsH);
-    Psi1->Normalize(TensorNetworks::DRight);
-    Psi1->Normalize(TensorNetworks::DLeft );
-    EXPECT_NEAR(Psi1->GetExpectation(itsH) ,E1,eps);
+    itsMPS->InitializeWith(TensorNetworks::Neel);
+    double E1=itsMPS->GetExpectation(itsH);
+    itsMPS->Normalize(TensorNetworks::DRight);
+    itsMPS->Normalize(TensorNetworks::DLeft );
+    EXPECT_NEAR(itsMPS->GetExpectation(itsH) ,E1,eps);
 
     TensorNetworks::OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
     TensorNetworks::Operator* IO=itsH->CreateOperator(IWO);
-    TensorNetworks::MPS* Psi2=*IO**Psi1;
+    TensorNetworks::MPS* Psi2=*IO**itsMPS;
     EXPECT_NEAR(Psi2->GetExpectation(itsH) ,E1,eps);
-    delete Psi1;
     delete Psi2;
 }
 
@@ -85,31 +98,28 @@ TEST_F(ImaginaryTimeTests,TestMPPOCombine)
     //
     //  Make a random normalized wave function
     //
-    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
-    Psi1->InitializeWith(TensorNetworks::Random);
-    Psi1->Normalize(TensorNetworks::DRight);
+    itsMPS->Normalize(TensorNetworks::DRight);
     //
     //  Psi2 = W*Psi1
     //
-    TensorNetworks::MPS* Psi2=Psi1->Apply(W);
+    TensorNetworks::MPS* Psi2=itsMPS->Apply(W);
     //
     //  Psi1 = W_Odd * W_Even * W_Odd * Psi1
     //
-    Psi1->ApplyInPlace(&W_Odd);
-    Psi1->ApplyInPlace(&W_Even);
-    Psi1->ApplyInPlace(&W_Odd);
+    itsMPS->ApplyInPlace(&W_Odd);
+    itsMPS->ApplyInPlace(&W_Even);
+    itsMPS->ApplyInPlace(&W_Odd);
     //
     //  At this point if the Combine function is working Psi1==Psi2
     //
-    double O11=Psi1->GetOverlap(Psi1);
-    double O12=Psi1->GetOverlap(Psi2);
-    double O21=Psi2->GetOverlap(Psi1);
+    double O11=itsMPS->GetOverlap(itsMPS);
+    double O12=itsMPS->GetOverlap(Psi2);
+    double O21=Psi2->GetOverlap(itsMPS);
     double O22=Psi2->GetOverlap(Psi2);
     EXPECT_NEAR(O12/O11,1.0,1e-14);
     EXPECT_NEAR(O21/O11,1.0,1e-14);
     EXPECT_NEAR(O22/O11,1.0,1e-14);
 
-    delete Psi1;
     delete Psi2;
     delete W;
 }
@@ -130,25 +140,23 @@ TEST_F(ImaginaryTimeTests,MPOCompressSeconderOrderTrotter_dt0)
     int D=8,L=9;
     double dt=0.0,epsSVD=1e-12;                                                                                                                                                                                                        ;
     Setup(L,0.5,D);
-    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
-    Psi1->InitializeWith(TensorNetworks::Random);
-    Psi1->Normalize(TensorNetworks::DLeft );
-    Psi1->Normalize(TensorNetworks::DRight);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::DLeft );
+    itsMPS->Normalize(TensorNetworks::DRight);
 
     //Since dt=0 W should be unit operator.
     TensorNetworks::MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
 
-    TensorNetworks::MPS* Psi2=Psi1->Apply(W);
-    EXPECT_NEAR(Psi1->GetOverlap(Psi2),1.0,eps);
+    TensorNetworks::MPS* Psi2=itsMPS->Apply(W);
+    EXPECT_NEAR(itsMPS->GetOverlap(Psi2),1.0,eps);
     W->Compress(0,epsSVD);
-    TensorNetworks::MPS* Psi3=Psi1->Apply(W);
-    EXPECT_NEAR(Psi1->GetOverlap(Psi3),1.0,1e-7);
+    TensorNetworks::MPS* Psi3=itsMPS->Apply(W);
+    EXPECT_NEAR(itsMPS->GetOverlap(Psi3),1.0,1e-7);
     EXPECT_NEAR(Psi2->GetOverlap(Psi3),1.0,1e-7);
     EXPECT_NEAR(Psi3->GetOverlap(Psi3),1.0,1e-6);
 
     delete Psi3;
     delete Psi2;
-    delete Psi1;
     delete W;
 }
 
@@ -266,13 +274,9 @@ TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotter)
 {
     int D=4,L=9;
     Setup(L,0.5,D);
-    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
-//    Psi1->Report(cout);
-    Psi1->InitializeWith(TensorNetworks::Random);
-    Psi1->Normalize(TensorNetworks::DRight);
-//    double E1=Psi1->GetExpectation(itsH);
-//    cout << "E1=" << std::fixed << E1 << endl;
-//    cout << "Psi1 overlap=" << Psi1->GetOverlap(Psi1) << endl;
+
+    itsMPS->Normalize(TensorNetworks::DLeft);
+    itsMPS->Normalize(TensorNetworks::DRight);
 
     TensorNetworks::Epsilons eps(1e-12);
     eps.itsMPOCompressEpsilon=1e-5;
@@ -298,14 +302,76 @@ TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotter)
     //is.Insert({500,D,6,0.002,FirstOrder,eps});
 //    cout << is;
 
-    Psi1->FindiTimeGroundState(itsH,is);
+    itsMPS->FindiTimeGroundState(itsH,is);
 
-    double E2=Psi1->GetExpectation(itsH);
+    double E2=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46664265599414939,1e-4);
+}
 
-    delete Psi1;
+TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
+{
+    int D=16,Dcompress=0,L=9; //Set DMax high
+//    double epsSV=1e-9;
+    Setup(L,0.5,D);
+    itsMPS->NormalizeAndCompress(TensorNetworks::DLeft ,D,1e-5);
+    itsMPS->NormalizeAndCompress(TensorNetworks::DRight,D,1e-5);
 
+    TensorNetworks::Epsilons eps(1e-12);
 
+    TensorNetworks::IterationSchedule is;
+
+    eps.itsDelatEnergy1Epsilon=1e-4;
+    eps.itsMPOCompressEpsilon=1e-4;
+    eps.itsMPSCompressEpsilon=1e-4; //Just Eps for compression
+    eps.itsDelatNormEpsilon=1e-4;
+    is.Insert({50 ,Dcompress,5,0.5,SecondOrder,eps});
+
+    eps.itsDelatEnergy1Epsilon=1e-4;
+    eps.itsMPOCompressEpsilon=1e-4;
+    eps.itsMPSCompressEpsilon=1e-4; //Just Eps for compression
+    eps.itsDelatNormEpsilon=1e-5;
+    is.Insert({500,Dcompress,5,0.2,SecondOrder,eps});
+
+    eps.itsDelatEnergy1Epsilon=1e-5;
+    eps.itsMPOCompressEpsilon=1e-6;
+    eps.itsMPSCompressEpsilon=1e-6; //Just Eps for compression
+    eps.itsDelatNormEpsilon=1e-7;
+    is.Insert({500,Dcompress,5,0.1,SecondOrder,eps});
+
+    eps.itsDelatEnergy1Epsilon=1e-6;
+    eps.itsMPOCompressEpsilon=1e-9;
+    eps.itsMPSCompressEpsilon=1e-7; //Just Eps for compression
+    eps.itsDelatNormEpsilon=1e-8;
+    is.Insert({500,Dcompress,5,0.1,SecondOrder,eps});
+
+//    eps.itsDelatEnergy1Epsilon=2e-7;
+//    eps.itsMPOCompressEpsilon=1e-10;
+//    eps.itsMPSCompressEpsilon=1e-8; //Just Eps for compression
+//    eps.itsDelatNormEpsilon=1e-11;
+//    is.Insert({500,D,5,0.1,SecondOrder,eps});
+
+    eps.itsDelatEnergy1Epsilon=1e-7;
+    eps.itsMPOCompressEpsilon=1e-14;
+    eps.itsMPSCompressEpsilon=1e-10; //Just Eps for compression
+    eps.itsDelatNormEpsilon=1e-12;
+    is.Insert({500,Dcompress,5,0.1,SecondOrder,eps});
+
+    eps.itsDelatEnergy1Epsilon=1e-9;
+    eps.itsMPOCompressEpsilon=1e-16;
+    eps.itsMPSCompressEpsilon=1e-10; //Just Eps for compression
+    eps.itsDelatNormEpsilon=1e-12;
+    is.Insert({500,Dcompress,5,0.1,SecondOrder,eps});
+
+    eps.itsDelatEnergy1Epsilon=1e-8;
+    eps.itsMPOCompressEpsilon=1e-16;
+    eps.itsMPSCompressEpsilon=1e-10; //Just Eps for compression
+    eps.itsDelatNormEpsilon=1e-12;
+    is.Insert({500,Dcompress,5,0.01,SecondOrder,eps});
+
+    itsMPS->FindiTimeGroundState(itsH,is);
+
+    double E2=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E2/(L-1),-0.46703997271019776,1e-7);
 }
 #endif // DEBUG
 

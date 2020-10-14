@@ -153,6 +153,9 @@
 		</Unit>
 		<Unit filename="TensorNetworks/MPS.H" />
 		<Unit filename="TensorNetworks/Namespace.H" />
+		<Unit filename="TensorNetworks/Operator.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="TensorNetworks/Operator.H" />
 		<Unit filename="TensorNetworks/OperatorWRepresentation.H" />
 		<Unit filename="TensorNetworks/SVCompressor.H" />

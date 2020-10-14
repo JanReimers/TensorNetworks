@@ -56,14 +56,14 @@ public:
 //
 //  Vary this MPS to be as close as possible to Psi2 by minimizing ||this-Psi2||^2
 //
-        virtual void Optimize(const MPS* Psi2,const IterationScheduleLine&); // Minimize ||this-Psi2||^2
+        virtual int Optimize(const MPS* Psi2,const IterationScheduleLine&); // Minimize ||this-Psi2||^2
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions
 //
         virtual double   GetOverlap     (const MPS* Psi2) const; //<this|Psi2>
         virtual double   GetExpectation (const Operator* o) const;
-        virtual dcmplx    GetExpectationC(const Operator* o) const;
+        virtual dcmplx   GetExpectationC(const Operator* o) const;
 //--------------------------------------------------------------------------------------
 //
 //  Operate on MPS with an MPO:  |Psi> -> O|Psi>.
@@ -81,6 +81,7 @@ public:
 //
 //    Reporting
 //
+        virtual int          GetMaxD      (         ) const;
         virtual char         GetNormStatus(int isite) const;
         virtual std::string  GetNormStatus(         ) const;
         virtual void            Report(std::ostream&) const;
@@ -152,8 +153,8 @@ private:
         Matrix6CT GetHeffIterate(const Hamiltonian* h,int isite) const;
 
         void     LoadHeffCaches(const Hamiltonian* h);
-        Vector3CT GetHeffCache(Direction lr,int isite) const;
-        Vector3CT CalcHeffLeft(const Operator* o,int isite,bool cache=false) const;
+        Vector3CT GetHeffCache (Direction lr,int isite) const;
+        Vector3CT CalcHeffLeft (const Operator* o,int isite,bool cache=false) const;
         Vector3CT CalcHeffRight(const Operator* o,int isite,bool cache=false) const;
 
         Matrix4CT CalculateTwoSiteDM(int ia,int ib) const;
@@ -164,8 +165,8 @@ private:
         double   Sweep (Direction lr,const MPS* Psi2);
         void LoadCaches(const MPS* Psi2);
         MatrixCT GetRLCache(Direction lr,int isite) const;
-        MatrixCT CalcHeffLeft(const MPS* Psi2,int isite,bool cache=false) const;
-        MatrixCT CalcHeffRight(const MPS* Psi2,int isite,bool cache=false) const;
+        MatrixCT Calc12Left_Cache(const MPS* Psi2,int isite,bool cache=false) const;
+        MatrixCT Calc12RightCache(const MPS* Psi2,int isite,bool cache=false) const;
 
 
 //--------------------------------------------------------------------------------------
