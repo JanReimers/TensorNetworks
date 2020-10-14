@@ -65,25 +65,9 @@ void MPSSite::Rescale(double norm)
     for (int n=0; n<itsd; n++) itsMs[n]/=norm;
 }
 
-bool MPSSite::SetCanonicalBondDimensions(int maxAllowedD1,int maxAllowedD2)
-{
-    bool reshape=false;
-    if (itsD1>maxAllowedD1 || itsD2 >maxAllowedD2)
-    {
-        assert(itsD1>=maxAllowedD1);
-        assert(itsD2>=maxAllowedD2);
-        NewBondDimensions(maxAllowedD1,maxAllowedD2,true);
-        reshape=true;
-    }
-    return reshape;
-}
-
 void MPSSite::Canonicalize(Direction lr,SVCompressorC* comp)
 {
     MatrixCT A=ReshapeBeforeSVD(lr);
-//    int N=Min(A.GetNumRows(),A.GetNumCols());
-//    VectorRT s(N); // This get passed from one site to the next.
-//    MatrixCT V(N,A.GetNumCols());
     auto [U,s,Vdagger]=oml_CSVDecomp(A); //Solves A=U * s * Vdagger  returns V not Vdagger
     double integratedS2=0.0;
     if (comp) integratedS2=comp->Compress(U,s,Vdagger);

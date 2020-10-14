@@ -5,25 +5,6 @@
 namespace TensorNetworks
 {
 
-int MPSImp::GetD1(int a, int L, int d, int DMax)
-{
-    int D=DMax;
-    if (a<=L/2)
-        D=Min(static_cast<int>(pow(d,a-1)),DMax); //LHS
-    else
-        D=Min(static_cast<int>(pow(d,L-a+1)),DMax);  //RHS
-    return D;
-}
-
-int MPSImp::GetD2(int a, int L, int d, int DMax)
-{
-    int D=DMax;
-    if (a<=L/2)
-        D=Min(static_cast<int>(pow(d,a)),DMax); //LHS
-    else
-        D=Min(static_cast<int>(pow(d,L-a)),DMax); //RHS
-    return D;
-}
 
 //-------------------------------------------------------------------------------
 //
@@ -58,9 +39,6 @@ void MPSImp::NormalizeAndCompress(Direction LR,SVCompressorC* comp)
 void MPSImp::NormalizeAndCompressSite(Direction lr,int isite,SVCompressorC* comp)
 {
     CheckSiteNumber(isite);
-
-//    if (lr==DLeft  && isite==itsL)
-//        cout << "----- Normalize and Compress site " << isite << " " << GetNormStatus() << " -----" << endl;
     itsSites[isite]->SVDNormalize(lr,comp);
 
     int bond_index=isite+( lr==DLeft ? 0 :-1);
@@ -77,34 +55,13 @@ void MPSImp::MixedCanonical(int isite)
     if (isite>1)
     {
         for (int ia=1; ia<isite; ia++)
-        {
             NormalizeSite(DLeft,ia);
-        }
-//        itsSites[isite]->ReshapeFromLeft(rank);
     }
 
     if (isite<itsL)
     {
         for (int ia=itsL; ia>isite; ia--)
-        {
             NormalizeSite(DRight,ia);
-        }
-//        itsSites[isite]->ReshapeFromRight(rank);
-    }
-}
-
-void MPSImp::SetCanonicalBondDimensions(Direction LR)
-{
-    assert(false); //Make sure we are not using this right now.
-    int D1= LR==DLeft ? 1    : itsd;
-    int D2= LR==DLeft ? itsd : 1   ;
-
-    ForLoop(LR)
-    {
-        itsSites[ia]->SetCanonicalBondDimensions(D1,D2);
-        if (D1>itsDmax && D2>itsDmax) break;
-        D1*=itsd;
-        D2*=itsd;
     }
 }
 

@@ -129,10 +129,7 @@ Vector3CT MPSImp::CalcHeffLeft(const Operator* o,int isite, bool cache) const
     Vector3CT F(1,1,1,1);
     F(1,1,1)=dcmplx(1.0);
     for (int ia=1; ia<isite; ia++)
-    {
-        itsLogger->LogInfo(3,SiteMessage("Calculating Heff L cache for site ",ia));
         F=itsSites[ia]->IterateLeft_F(o->GetSiteOperator(ia),F,cache);
-    }
     return F;
 }
 //
@@ -144,10 +141,7 @@ Vector3CT MPSImp::CalcHeffRight(const Operator* o,int isite, bool cache) const
     Vector3CT F(1,1,1,1);
     F(1,1,1)=dcmplx(1.0);
     for (int ia=itsL; ia>isite; ia--)
-    {
-        itsLogger->LogInfo(3,SiteMessage("Calculating Heff R cache for site ",ia));
         F=itsSites[ia]->IterateRightF(o->GetSiteOperator(ia),F,cache);
-    }
     return F;
 }
 

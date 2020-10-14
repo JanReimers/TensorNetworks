@@ -122,10 +122,9 @@ private:
         friend class ::MPSTests;
 
         void InitSitesAndBonds();
-        static int GetD1(int a, int L, int d, int DMax);
-        static int GetD2(int a, int L, int d, int DMax);
-        static c_str SiteMessage(const std::string& message,int isite);
         void IncreaseBondDimensions(int D);
+        int GetCanonicalD1(int a, int DMax);
+        int GetCanonicalD2(int a, int DMax);
 
 //--------------------------------------------------------------------------------------
 //
@@ -137,7 +136,6 @@ private:
         void   Sweep (Direction lr,const Hamiltonian*,const Epsilons&);
         void   NormalizeSite             (Direction lr,int isite);
         void   NormalizeAndCompressSite  (Direction lr,int isite,SVCompressorC*);
-        void   SetCanonicalBondDimensions(Direction lr);
 //-------------------------------------------------------------------------------------
 //
 //  hooks for derived classes to do live updates for UI interfaces or graphs

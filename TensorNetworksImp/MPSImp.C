@@ -73,6 +73,19 @@ MPSImp::MPSImp(int L, double S, int D,Direction lr,double normEps,TNSLogger* s)
         itsLogger=new TNSLogger();
 
 }
+
+int MPSImp::GetCanonicalD1(int a, int DMax)
+{
+    int iexp = a<=itsL/2 ? a-1 : itsL-a+1;
+    return Min(static_cast<int>(pow(itsd,iexp)),DMax);
+}
+
+int MPSImp::GetCanonicalD2(int a, int DMax)
+{
+    int iexp = a<=itsL/2 ? a : itsL-a;
+    return Min(static_cast<int>(pow(itsd,iexp)),DMax);
+}
+
 void MPSImp::InitSitesAndBonds()
 {
     //
@@ -86,12 +99,12 @@ void MPSImp::InitSitesAndBonds()
     //
     itsSites.push_back(0);  //Dummy space holder. We want this array to be 1 based.
     itsSites.push_back(new MPSSite(PLeft,NULL,itsBonds[1],itsd,
-                       GetD1(1,itsL,itsd,itsDmax),GetD2(1,itsL,itsd,itsDmax)));
+                       GetCanonicalD1(1,itsDmax),GetCanonicalD2(1,itsDmax)));
     for (int i=2; i<=itsL-1; i++)
         itsSites.push_back(new MPSSite(PBulk,itsBonds[i-1],itsBonds[i],itsd,
-                           GetD1(i,itsL,itsd,itsDmax),GetD2(i,itsL,itsd,itsDmax)));
+                           GetCanonicalD1(i,itsDmax),GetCanonicalD2(i,itsDmax)));
     itsSites.push_back(new MPSSite(PRight,itsBonds[itsL-1],NULL,itsd,
-                       GetD1(itsL,itsL,itsd,itsDmax),GetD2(itsL,itsL,itsd,itsDmax)));
+                       GetCanonicalD1(itsL,itsDmax),GetCanonicalD2(itsL,itsDmax)));
     //
     //  Tell each bond about its left and right sites.
     //
@@ -190,13 +203,6 @@ void MPSImp::Report(std::ostream& os) const
         itsBonds[ib]->Report(os);
         os << endl;
     }
-}
-
-c_str MPSImp::SiteMessage(const std::string& message,int isite)
-{
-    static std::string ret;
-    ret=message+std::to_string(isite);
-    return ret.c_str();
 }
 
 char MPSImp::GetNormStatus(int isite) const

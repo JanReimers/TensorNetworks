@@ -49,14 +49,14 @@ class MPSSite
         {
             return lr==DLeft ? itsLeft_Cache : itsRightCache;
         }
-        void     UpdateCache(const SiteOperator* so       ,const Vector3CT& HLeft,const Vector3CT& HRight); //update <Psi|H|Psi> L/R cahces
-        void     UpdateCache(const MPSSite* Psi2,const MatrixCT&  Left,const MatrixCT&  Right); //update <Psi|Psi> L/R cahces
+        void     UpdateCache(const SiteOperator* so,const Vector3CT& HLeft,const Vector3CT& HRight); //update <Psi|H|Psi> L/R cahces
+        void     UpdateCache(const MPSSite* Psi2   ,const MatrixCT&   Left,const MatrixCT&   Right); //update <Psi|Psi> L/R cahces
 
-        MatrixCT IterateLeft_F(const MPSSite* Psi2,const MatrixCT& Fam1,bool cache=false) const;
-        MatrixCT IterateRightF(const MPSSite* Psi2,const MatrixCT& Fam1,bool cache=false) const;
-        MatrixCT IterateF     (Direction lr ,const MatrixCT& M) const;
-        Vector3CT IterateLeft_F(const SiteOperator*      so  ,const Vector3CT& Fam1,bool cache=false);
-        Vector3CT IterateRightF(const SiteOperator*      so  ,const Vector3CT& Fam1,bool cache=false);
+        MatrixCT  IterateLeft_F(const MPSSite* Psi2   ,const MatrixCT&  Fam1,bool cache=false) const;
+        MatrixCT  IterateRightF(const MPSSite* Psi2   ,const MatrixCT&  Fam1,bool cache=false) const;
+        Vector3CT IterateLeft_F(const SiteOperator* so,const Vector3CT& Fam1,bool cache=false);
+        Vector3CT IterateRightF(const SiteOperator* so,const Vector3CT& Fam1,bool cache=false);
+        MatrixCT  IterateF     (Direction lr ,const MatrixCT& M) const;
 
 //---------------------------------------------------------------------------------
 //
@@ -64,8 +64,6 @@ class MPSSite
 //
         void SVDNormalize(Direction lr,SVCompressorC*);
         void Canonicalize(Direction lr,SVCompressorC*);
-        bool IsNormalized(Direction lr,double eps) const;
-        bool SetCanonicalBondDimensions(int D1,int D2);
 
 //--------------------------------------------------------------------------------------
 //
@@ -92,6 +90,7 @@ class MPSSite
 //
 //  Statusreporting
 //
+        bool IsNormalized(Direction lr,double eps) const;
         char GetNormStatus(double eps) const;
         void Report    (std::ostream&) const;
 

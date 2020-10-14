@@ -162,10 +162,7 @@ MatrixCT MPSImp::Calc12Left_Cache(const MPS* psi2,int isite, bool cache) const
     MatrixCT F(1,1);
     F(1,1)=dcmplx(1.0);
     for (int ia=1; ia<isite; ia++)
-    {
-        itsLogger->LogInfo(3,SiteMessage("Calculating <psi2|psi1> L cache for site ",ia));
         F=itsSites[ia]->IterateLeft_F(psi2Imp->itsSites[ia],F,cache);
-    }
     return F;
 }
 MatrixCT MPSImp::Calc12RightCache(const MPS* psi2,int isite, bool cache) const
@@ -176,10 +173,7 @@ MatrixCT MPSImp::Calc12RightCache(const MPS* psi2,int isite, bool cache) const
     MatrixCT F(1,1);
     F(1,1)=dcmplx(1.0);
     for (int ia=itsL; ia>isite; ia--)
-    {
-        itsLogger->LogInfo(3,SiteMessage("Calculating <psi2|psi1> R cache for site ",ia));
         F=itsSites[ia]->IterateRightF(psi2Imp->itsSites[ia],F,cache);
-    }
     return F;
 }
 

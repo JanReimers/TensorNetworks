@@ -1,18 +1,27 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
-- Heisenbug trap in MPSSite_Contractions.C line ~354 can be removed after enough test time (discovered 13 Oct 2020)
+- Get rid of operator base class
+    -All MPOs stored the full lattice, possibly with lots of identity ops then everything would be much simpler.
 - Bond.C line 70 has a hard coded limit for SVs
     Should be using itsMPSCompressEpsilon
 - The purpose of MPSImp itsDmax is becoming murky, what does it mean?
     int particular if do MPO*|MPS> where MPO has some DwMax then newDmax=DwMax*itsDmax
     But what are we supposed to use newDmax for
+    Its is currently used for:
+        -Init sites and bonds
+        -Setting canonical bond dimensions.
+        -D increase loops in Var GS search
+        -MPS*  MPSImp::Apply(const Operator* o) const
+        -void iTEBDStateImp::Apply(int isite,const Matrix4RT& expH)
+- Done: Get rid of SetCanonicalBondDimensions
+- Get rid of SiteMessage
+- Fix MPS*  Apply       (const Operator* o) const;
 - Optimization: Learn about preconditioning, does that help with primme eigen solver?
 - Optimization: FullStateImp<T>::DoHContraction  needs to do vector copies.
     We can avoid this by allowing Vector<T>(T*) constructors
         Be careful with the # if owners so we don delete T*
-- Try and get wave function optimization convergence working
+- MTrace calculation in MPSImp::Sweep(Direction lr,const MPS* Psi2) still doesn't work.
 - Add some EXPECTS for iTensor tests.
-- Add an iTime test the is epsSv limited
 - Reorg : Operators goes under Imp folder
     Create State under imp folder
 - The freeze idea didn;t work because normalization is current sweeping through the frozen Site
@@ -36,6 +45,7 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     -Try iPEPS with iTEBD GS and Corner transfer matrix for contractions.
 
 Backburner:
+- Possibly fixed: Heisenbug trap in MPSSite_Contractions.C line ~354 can be removed after enough test time (discovered 13 Oct 2020)
 - Right now SVMPOCompressor is unused. Do we need a different policy for MPOs? If not remove SVMPOCompressor
 - Move multiplotable back to Plotting
     -Pulled out of CB projects for now
@@ -47,6 +57,8 @@ Backburner:
 
 
 
+- Done: Try and get wave function optimization convergence working
+- Done: Add an iTime test the is epsSv limited
 - Done: Right now PrimeEigenSolver depends in FullStateImp, can be break this somewhow?
 - Done: Forward declare instead of include in Imp/Typedefs.H
 - Done: Tidy up test names
