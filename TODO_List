@@ -4,7 +4,6 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     -All MPOs stored the full lattice, possibly with lots of identity ops then everything would be much simpler.
 - Bond.C line 70 has a hard coded limit for SVs
     Should be using itsMPSCompressEpsilon
-- Fix MPS*  Apply       (const Operator* o) const;
 - Optimization: Learn about preconditioning, does that help with primme eigen solver?
 - Optimization: FullStateImp<T>::DoHContraction  needs to do vector copies.
     We can avoid this by allowing Vector<T>(T*) constructors
@@ -46,6 +45,8 @@ Backburner:
 
 
 
+- Done: Fix MPS*  Apply       (const Operator* o) const;
+    Moved to MPS base class
 - Done: The purpose of MPSImp itsDmax is becoming murky, what does it mean?
     int particular if do MPO*|MPS> where MPO has some DwMax then newDmax=DwMax*itsDmax
     But what are we supposed to use newDmax for

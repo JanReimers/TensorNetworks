@@ -178,20 +178,14 @@ MatrixCT MPSImp::Calc12RightCache(const MPS* psi2,int isite, bool cache) const
 
 
 
-
+//
+//  |this> = O*|this>
+//
 void  MPSImp::ApplyInPlace(const Operator* o)
 {
     SiteLoop(ia)
         itsSites[ia]->ApplyInPlace(o->GetSiteOperator(ia));
 }
 
-MPS*  MPSImp::Apply(const Operator* o) const
-{
-    MPSImp* psiPrime=new MPSImp(itsL,itsS,GetMaxD(),itsNormEps,itsLogger);
-    SiteLoop(ia)
-        itsSites[ia]->Apply(o->GetSiteOperator(ia),psiPrime->itsSites[ia]);
-
-    return psiPrime;
-}
 
 }; // namespace

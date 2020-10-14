@@ -70,7 +70,6 @@ public:
 //  In general this will increase the bond dimension from D to D*Dw
 //
         virtual void  ApplyInPlace(const Operator* o);
-        virtual MPS*  Apply       (const Operator* o) const;
 //--------------------------------------------------------------------------------------
 //
 //    One site density matrix and expectation calculations

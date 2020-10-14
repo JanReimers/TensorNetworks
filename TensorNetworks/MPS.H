@@ -52,8 +52,8 @@ public:
 //  In general this will increase the bond dimension from D to D*Dw
 //  The overloaded operator is just syntatic suger, not sure how usefull it will be
 //
-    virtual void  ApplyInPlace(const Operator* o)      =0;
-    virtual MPS*  Apply       (const Operator* o) const=0;
+    virtual void  ApplyInPlace(const Operator* o) =0;
+    virtual MPS*  Apply       (const Operator* o) const;
 
 //--------------------------------------------------------------------------------------
 //

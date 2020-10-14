@@ -17,4 +17,15 @@ void MPS::NormalizeAndCompress(Direction lr,int Dmax,double epsSV)
     delete comp;
 }
 
+//
+//  |psi`> = O*|this>
+//
+MPS*  MPS::Apply(const Operator* o) const
+{
+    MPS* psiPrime=Clone();
+    psiPrime->ApplyInPlace(o);
+    return psiPrime;
+}
+
+
 }
