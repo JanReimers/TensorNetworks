@@ -19,7 +19,7 @@ namespace TensorNetworks
 //
 //  Init/construction zone
 //
-MPSImp::MPSImp(int L, double S, int D,double normEps,TNSLogger* s)
+MPSImp::MPSImp(int L, double S, int D,double normEps,double epsSV, TNSLogger* s)
     : itsL(L)
     , itsS(S)
     , itsd(2*S+1)
@@ -35,7 +35,7 @@ MPSImp::MPSImp(int L, double S, int D,double normEps,TNSLogger* s)
     if (itsLogger==0)
         itsLogger=new TNSLogger();
 
-    InitSitesAndBonds(D);
+    InitSitesAndBonds(D,epsSV);
 }
 
 MPSImp::MPSImp(const MPSImp& mps)
@@ -48,7 +48,7 @@ MPSImp::MPSImp(const MPSImp& mps)
 {
     int D=mps.GetMaxD();
     assert(D>0);
-    InitSitesAndBonds(D);
+    InitSitesAndBonds(D,0); //Clone state should transfer ,double epsSV
     for (int ia=1; ia<=itsL; ia++)
         itsSites[ia]->CloneState(mps.itsSites[ia]); //Transfer wave function data
     for (int ia=1; ia<itsL; ia++)
@@ -83,14 +83,14 @@ int MPSImp::GetCanonicalD2(int a, int DMax)
     return Min(static_cast<int>(pow(itsd,iexp)),DMax);
 }
 
-void MPSImp::InitSitesAndBonds(int D)
+void MPSImp::InitSitesAndBonds(int D,double epsSV)
 {
     //
     //  Create bond objects
     //
     itsBonds.push_back(0);  //Dummy space holder. We want this array to be 1 based.
     for (int i=1; i<itsL; i++)
-        itsBonds.push_back(new Bond());
+        itsBonds.push_back(new Bond(epsSV));
     //
     //  Create Sites
     //

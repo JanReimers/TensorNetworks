@@ -18,8 +18,8 @@ class Hamiltonian : public virtual Operator
         virtual int GetMaxDw() const=0;
 
         //  Creates an MPS or operators with the correct lattice size and spin space.
-        virtual MPS*        CreateMPS       (int D,double normEps=1e-12, TNSLogger* =0) const=0;
-        virtual iTEBDState* CreateiTEBDState(int D,double normEps=1e-12, TNSLogger* =0) const=0;
+        virtual MPS*        CreateMPS       (int D,double normEps=1e-12,double epsSV=1e-12, TNSLogger* =0) const=0;
+        virtual iTEBDState* CreateiTEBDState(int D,double normEps=1e-12,double epsSV=1e-12, TNSLogger* =0) const=0;
 
         //  Create full lattice of operators
         virtual Operator*           CreateOperator(const OperatorWRepresentation*) const=0;

@@ -1,8 +1,9 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
+- Get rid of OperatorWRepresentation, or find a better name.
 - Get rid of operator base class
     -All MPOs stored the full lattice, possibly with lots of identity ops then everything would be much simpler.
-- Bond.C line 70 has a hard coded limit for SVs
+- Done: Bond.C line 70 has a hard coded limit for SVs
     Should be using itsMPSCompressEpsilon
 - Optimization: Learn about preconditioning, does that help with primme eigen solver?
 - Optimization: FullStateImp<T>::DoHContraction  needs to do vector copies.

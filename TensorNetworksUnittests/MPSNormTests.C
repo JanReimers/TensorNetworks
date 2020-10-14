@@ -25,13 +25,13 @@ public:
     void Setup(int L, double S, int D)
     {
         delete itsMPS;
-        itsMPS=new TensorNetworks::MPSImp(L,S,D);
+        itsMPS=new TensorNetworks::MPSImp(L,S,D,1e-12,1e-12,0);
     }
 
     typedef TensorNetworks::MatrixCT MatrixCT;
 
     TensorNetworks::MPSImp* itsMPS;
-    double                 eps;
+    double                  eps;
 };
 
 

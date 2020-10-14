@@ -7,8 +7,9 @@
 namespace TensorNetworks
 {
 
-Bond::Bond()
-    : itsBondEntropy(0.0)
+Bond::Bond(double epsSV)
+    : itsEpsSV(epsSV)
+    , itsBondEntropy(0.0)
     , itsMinSV(0.0)
     , itsIntegratedS2(-99)
     , itsD(0)
@@ -26,6 +27,7 @@ Bond::~Bond()
 void Bond::CloneState(const Bond* b2)
 {
     itsSingularValues=b2->itsSingularValues;
+    itsEpsSV         =b2->itsEpsSV;
     itsBondEntropy   =b2->itsBondEntropy;
     itsIntegratedS2  =b2->itsIntegratedS2;
     itsMinSV         =b2->itsMinSV;
@@ -67,7 +69,7 @@ void Bond::SetSingularValues(const DiagonalMatrixRT& s,double integratedS2)
     {
         double s2=itsSingularValues(i)*itsSingularValues(i);
         if (s2>0.0) itsBondEntropy-=s2*log(s2);
-        if (fabs(itsSingularValues(i))<1e-12)
+        if (fabs(itsSingularValues(i))<itsEpsSV)
         {
             //cout << "Auto rank reduction s=" << s << endl;
             itsRank--;

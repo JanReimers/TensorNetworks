@@ -6,10 +6,10 @@
 namespace TensorNetworks
 {
 
-iTEBDStateImp::iTEBDStateImp(int L,double S, int D,double normEps,TNSLogger* s)
+iTEBDStateImp::iTEBDStateImp(int L,double S, int D,double normEps,double epsSV,TNSLogger* s)
     : MPSImp(L,S,DLeft,normEps,s)
 {
-    InitSitesAndBonds(D);
+    InitSitesAndBonds(D,epsSV);
 }
 
 iTEBDStateImp::~iTEBDStateImp()
@@ -19,14 +19,14 @@ iTEBDStateImp::~iTEBDStateImp()
 }
 
 
-void iTEBDStateImp::InitSitesAndBonds(int D)
+void iTEBDStateImp::InitSitesAndBonds(int D,double epsSV)
 {
     //
     //  Create bond objects
     //
     itsBonds.push_back(0);  //Dummy space holder. We want this array to be 1 based.
     for (int i=1; i<=itsL; i++)
-        itsBonds.push_back(new Bond());
+        itsBonds.push_back(new Bond(epsSV));
     itsBonds[0]=itsBonds[itsL];  //Periodic boundary conditions
     //
     //  Create Sites

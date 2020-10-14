@@ -22,7 +22,7 @@ class MPSImp : public virtual MPS
 //  Construction and initialization zone
 //
 public:
-        MPSImp(int L, double S, int D,double normEps=1e-12,TNSLogger* s=0);
+        MPSImp(int L, double S, int D,double normEps,double epsSV,TNSLogger* s=0);
         MPSImp(const MPSImp& mps);
 
         virtual ~MPSImp();
@@ -120,7 +120,7 @@ private:
         friend class ::MPSNormTesting;
         friend class ::MPSTests;
 
-        void InitSitesAndBonds(int D);
+        void InitSitesAndBonds(int D,double epsSV);
         void IncreaseBondDimensions(int D);
         int GetCanonicalD1(int a, int DMax);
         int GetCanonicalD2(int a, int DMax);

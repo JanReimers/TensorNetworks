@@ -11,7 +11,7 @@ namespace TensorNetworks
 class Bond
 {
    public:
-        Bond();
+        Bond(double epsSV);
         virtual ~Bond();
         void CloneState(const Bond* b2);
         void SetSites(MPSSite* left, MPSSite* right);
@@ -42,6 +42,7 @@ class Bond
         }
 
         Vector<double> itsSingularValues;
+        double itsEpsSV; //SVs < itsEpsSV are deemed to be zero when determining rank and entropies.
         double itsBondEntropy;
         double itsMinSV;
         double itsIntegratedS2; // sum of reject S_i^2

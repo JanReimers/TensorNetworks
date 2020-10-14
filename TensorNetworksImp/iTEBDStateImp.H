@@ -17,7 +17,7 @@ class iTEBDStateImp : public virtual iTEBDState,
     private MPSImp
 {
     public:
-        iTEBDStateImp(int L,double S, int D,double normEps=1e-12,TNSLogger* s=0);
+        iTEBDStateImp(int L,double S, int D,double normEps,double epsSV,TNSLogger* s=0);
         virtual ~iTEBDStateImp();
         virtual void InitializeWith(State);
  //--------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ class iTEBDStateImp : public virtual iTEBDState,
         MatrixCT& GetGamma (int isite,int n);
 
     private:
-        void InitSitesAndBonds(int D);
+        void InitSitesAndBonds(int D, double epsSV);
 };
 
 }
