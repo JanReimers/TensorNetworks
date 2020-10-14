@@ -351,6 +351,14 @@ void MPSSite::SVDTransfer(Direction lr,const DiagonalMatrixRT& s, const MatrixCT
         }
         for (int in=0; in<itsd; in++)
         {
+            // Getting Heisenbug trap.  Leave in place
+            if (itsMs[in].GetNumCols()!=UV.GetNumRows())
+            {
+                // D2=2 oldD2=8 in=0 N1=2 M=(1:8),(1:2)  UV=(1:4),(1:2)
+                // D2=2 oldD2=8 in=1 N1=2 M=(1:8),(1:2)  UV=(1:4),(1:2)
+                cout << "D2=" << itsD2 << " in=" << in << " N1=" << N1 << " M=" << itsMs[in].GetLimits() << " UV=" << UV.GetLimits() << endl;
+                abort();
+            }
             assert(itsMs[in].GetNumCols()==UV.GetNumRows());
             MatrixCT temp=itsMs[in]*UV*s;
             itsMs[in].SetLimits(0,0);

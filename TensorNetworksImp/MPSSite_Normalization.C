@@ -23,7 +23,7 @@ void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
     {
         assert(itsRightBond);
         assert(itsD1==1);
-        int newD2=Max(itsRightBond->GetRank(),itsd); //Don't shrink below p
+        int newD2=Max(itsRightBond->GetD(),itsd); //Don't shrink below p
         if (newD2<itsD2) NewBondDimensions(itsD1,newD2,true); //But also don't grow D2
         Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
         return;
@@ -32,7 +32,7 @@ void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
     {
         assert(itsLeft_Bond);
         assert(itsD2==1);
-        int newD1=Max(itsLeft_Bond->GetRank(),itsd); //Don't shrink below p
+        int newD1=Max(itsLeft_Bond->GetD(),itsd); //Don't shrink below p
         if (newD1<itsD1) NewBondDimensions(newD1,itsD2,true); //But also don't grow D1
         Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
         return;
@@ -41,7 +41,7 @@ void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
     auto [U,s,Vdagger]=oml_CSVDecomp(ReshapeBeforeSVD(lr)); //Solves A=U * s * Vdagger  returns V not Vdagger
     double integratedS2=0.0;
     if (comp) integratedS2=comp->Compress(U,s,Vdagger);
-//    cout << "Limits for U,s,Vdagger=" << U.GetLimits() << " " << s.GetLimits() << " " << Vdagger.GetLimits() << endl;
+
     switch (lr)
     {
         case DRight:

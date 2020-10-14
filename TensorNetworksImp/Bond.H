@@ -22,7 +22,8 @@ class Bond
 
         double GetBondEntropy() const {return itsBondEntropy;}
         double GetMinSV      () const {return itsMinSV;}
-        int    GetRank       () const {return itsRank;}
+        int    GetD          () const {return itsD;}
+//        int    GetRank       () const {return itsRank;}
         Vector<double> GetSVs () const {return itsSingularValues;}
 
         void Report    (std::ostream&) const;
@@ -44,7 +45,8 @@ class Bond
         double itsBondEntropy;
         double itsMinSV;
         double itsIntegratedS2; // sum of reject S_i^2
-        int    itsRank;
+        int    itsD;
+        int    itsRank; //Rank <=D depending on zero SVs
         MPSSite* itsLeft_Site;
         MPSSite* itsRightSite;
 

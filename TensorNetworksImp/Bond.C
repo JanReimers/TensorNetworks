@@ -11,6 +11,7 @@ Bond::Bond()
     : itsBondEntropy(0.0)
     , itsMinSV(0.0)
     , itsIntegratedS2(-99)
+    , itsD(0)
     , itsRank(0)
     , itsLeft_Site(0)
     , itsRightSite(0)
@@ -26,7 +27,9 @@ void Bond::CloneState(const Bond* b2)
 {
     itsSingularValues=b2->itsSingularValues;
     itsBondEntropy   =b2->itsBondEntropy;
+    itsIntegratedS2  =b2->itsIntegratedS2;
     itsMinSV         =b2->itsMinSV;
+    itsD             =b2->itsD;
     itsRank          =b2->itsRank;
 }
 
@@ -41,26 +44,26 @@ void Bond::SetSites(MPSSite* left, MPSSite* right)
 void Bond::NewBondDimension(int D)
 {
     assert(D>=1);
-    assert(itsRank==itsSingularValues.size());
+    assert(itsD==itsSingularValues.size());
     itsSingularValues.SetLimits(D,true);
-    for (int i=itsRank+1;i<=D;i++)
+    for (int i=itsD+1;i<=D;i++)
         itsSingularValues(i)=0.0;
-    itsRank=D;
+    itsD=D;
 }
 
 void Bond::SetSingularValues(const DiagonalMatrixRT& s,double integratedS2)
 {
     //std::cout << "SingularValues=" << s << std::endl;
-    int N=s.GetNumRows();
-    itsSingularValues.SetLimits(N);
+    itsD=s.GetNumRows();
+    itsSingularValues.SetLimits(itsD);
     itsSingularValues=s.GetDiagonal();
 
-    itsRank=N;
-    itsMinSV=itsSingularValues(N);
+    itsRank=itsD;
+    itsMinSV=itsSingularValues(itsD);
     itsIntegratedS2=integratedS2;
 
     itsBondEntropy=0.0;
-    for (int i=1;i<=N;i++)
+    for (int i=1;i<=itsD;i++)
     {
         double s2=itsSingularValues(i)*itsSingularValues(i);
         if (s2>0.0) itsBondEntropy-=s2*log(s2);
@@ -93,7 +96,8 @@ void Bond::CanonicalTransfer(Direction lr,double integratedS2,const DiagonalMatr
 void Bond::Report(std::ostream& os) const
 {
     os
-                                                  << std::setw(4) << itsRank
+                                                  << std::setw(4)  << itsD
+                                                  << std::setw(4)  << itsRank
        << std::fixed      << std::setprecision(6) << std::setw(12) << itsBondEntropy
        << std::scientific << std::setprecision(1) << std::setw(10) << itsMinSV
        << std::scientific << std::setprecision(1) << std::setw(10) << itsIntegratedS2
