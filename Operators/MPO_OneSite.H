@@ -31,8 +31,6 @@ class MPO_OneSite : public virtual Operator
         int itsd;   //Number ot states for the spin on each site = 2S+1
         int itsSiteIndex;
 
-        OperatorWRepresentation* itsSpinWOp;
-        OperatorWRepresentation* itsIdentityWOp;
         SiteOperator* itsSiteOperator;
         SiteOperator* itsIndentityOperator;
 };

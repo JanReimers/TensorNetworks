@@ -2,7 +2,6 @@
 #include "TensorNetworksImp/Typedefs.H"
 #include "Containers/Matrix4.H"
 #include "Operators/SiteOperatorImp.H"
-#include "Operators/IdentityOperator.H"
 #include "NumericalMethods/LapackSVD.H"
 #include "oml/diagonalmatrix.h"
 #include "oml/numeric.h"
@@ -49,13 +48,11 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, int d, con
 // Now SVD to factor exp(-dt*H)
 //
     auto [U,sm,VT]=LaSVDecomp(expH.Flatten()); //Solves A=U * s * VT
-    OperatorWRepresentation* IdentityWOp=new IdentityOperator();
 
-    itsLeft_Site=new SiteOperatorImp(DLeft,U,sm,itsd);
-    itsRightSite=new SiteOperatorImp(DRight,VT,sm,itsd);
-    itsUnit_Site=new SiteOperatorImp(PBulk,IdentityWOp,itsd);
+    itsLeft_Site=new SiteOperatorImp(itsd,DLeft ,U ,sm);
+    itsRightSite=new SiteOperatorImp(itsd,DRight,VT,sm);
+    itsUnit_Site=new SiteOperatorImp(itsd);
 
-    delete IdentityWOp;
 }
 
 MPO_SpatialTrotter::~MPO_SpatialTrotter()

@@ -1,7 +1,7 @@
 #include "Operators/SiteOperatorImp.H"
-#include "TensorNetworks/OperatorWRepresentation.H"
-#include "TensorNetworks/IterationSchedule.H"
+//#include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/SVCompressor.H"
+#include "TensorNetworksImp/SpinCalculator.H"
 #include "NumericalMethods/LapackSVD.H"
 #include "Containers/Vector3.H"
 #include "oml/minmax.h"
@@ -12,9 +12,49 @@ namespace TensorNetworks
 {
 
 //
+//  Build with Dw=1 identity operators
+//
+SiteOperatorImp::SiteOperatorImp(int d)
+    : itsd(d)
+    , itsDw12(1,1,Vector<int>(1),Vector<int>(1))
+    , itsWs(d,d)
+{
+    itsDw12.w1_first(1)=1;
+    itsDw12.w2_last (1)=1;
+
+    MatrixRT I0(1,1),I1(1,1);
+    I0(1,1)=0.0;
+    I1(1,1)=1.0;
+
+    for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
+        {
+            itsWs(m+1,n+1)= (m==n) ? I1 : I0;
+            assert(itsWs(m+1,n+1).GetNumRows()==itsDw12.Dw1);
+            assert(itsWs(m+1,n+1).GetNumCols()==itsDw12.Dw2);
+        }
+}
+
+SiteOperatorImp::SiteOperatorImp(int d, double S, SpinOperator so) //Construct spin operator
+    : itsd(d)
+    , itsDw12(1,1,Vector<int>(1),Vector<int>(1))
+    , itsWs(d,d)
+{
+    itsDw12.w1_first(1)=1;
+    itsDw12.w2_last (1)=1;
+    SpinCalculator sc(S);
+    for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
+        {
+            itsWs(m+1,n+1)=sc.Get(m,n,so);
+            assert(itsWs(m+1,n+1).GetNumRows()==itsDw12.Dw1);
+            assert(itsWs(m+1,n+1).GetNumCols()==itsDw12.Dw2);
+        }
+}
+//
 //  Build from a W rep object
 //
-SiteOperatorImp::SiteOperatorImp(Position lbr, const OperatorWRepresentation* H,int d)
+SiteOperatorImp::SiteOperatorImp(int d, Position lbr, const OperatorClient* H)
     : itsd(d)
     , itsDw12(H->GetDw12(lbr))
     , itsWs(d,d)
@@ -30,7 +70,7 @@ SiteOperatorImp::SiteOperatorImp(Position lbr, const OperatorWRepresentation* H,
 //
 // Build from a trotter decomp.
 //
-SiteOperatorImp::SiteOperatorImp(Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s, int d)
+SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s)
     : itsd(d)
     , itsDw12()
     , itsWs(d,d)

@@ -1,6 +1,5 @@
 #include "Operators/MPOImp.H"
 #include "Operators/SiteOperatorImp.H"
-#include "Operators/IdentityOperator.H"
 #include "TensorNetworksImp/SVMPOCompressor.H"
 #include "oml/vector_io.h"
 
@@ -16,12 +15,11 @@ MPOImp::MPOImp(int L, double S)
 //
 //  Load up the sites with unit operators
 //
-    OperatorWRepresentation* IdentityWOp=new IdentityOperator();
     itsSites.push_back(0); //Start count sites at index 1
-    itsSites.push_back(new SiteOperatorImp(PLeft,IdentityWOp,d));
+    itsSites.push_back(new SiteOperatorImp(d));
     for (int ia=2;ia<=itsL-1;ia++)
-          itsSites.push_back(new SiteOperatorImp(PBulk,IdentityWOp,d));
-    itsSites.push_back(new SiteOperatorImp(PRight,IdentityWOp,d));
+          itsSites.push_back(new SiteOperatorImp(d));
+    itsSites.push_back(new SiteOperatorImp(d));
 //
 //  Loop again and set neighbours.  Each site needs to know its neighbours in order to
 //  carry out SVD tranfers, A[1]->U*s*VT, A=U, s*VT -> Transfered to next site.

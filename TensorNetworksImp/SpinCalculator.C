@@ -1,3 +1,4 @@
+#include "TensorNetworks/Typedefs.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 #include "TensorNetworks/CheckSpin.H"
 #include <cmath>
@@ -67,6 +68,44 @@ double SpinCalculator::GetSz (int m, int n) const
 
     return ret;
 }
+
+MatrixRT  SpinCalculator::Get(int m, int n,SpinOperator so) const
+{
+    MatrixRT W(1,1);
+
+    switch(so)
+    {
+        case Sx:
+        {
+            W(1,1)=GetSx(m,n);
+            break;
+        }
+        case Sy:
+        {
+            // THis return a pure imaginary matrix whihc we don;t support yet
+            //W(1,1)=sc.GetSy(m,n);
+            assert(false);
+            break;
+        }
+        case Sz:
+        {
+            W(1,1)=GetSz(m,n);
+            break;
+        }
+        case Sp:
+        {
+            W(1,1)=GetSp(m,n);
+            break;
+        }
+        case Sm:
+        {
+            W(1,1)=GetSm(m,n);
+            break;
+        }
+    }
+    return W;
+}
+
 
 template <class M,class F> M SpinCalculator::BuildMatrix(int lowerIndex,F fp) const
 {

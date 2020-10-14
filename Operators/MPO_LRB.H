@@ -17,7 +17,6 @@ class MPO_LRB : public virtual Operator
 {
     public:
         MPO_LRB(int L, double S);
-        MPO_LRB(const OperatorWRepresentation* O, int L, double S);
         virtual ~MPO_LRB();
 
         virtual int   GetL() const {return itsL;}
@@ -27,9 +26,6 @@ class MPO_LRB : public virtual Operator
             return itsSites[GetPosition(isite)];
         }
     protected:
-        void Init(const OperatorWRepresentation* O); //Derived classes must call this from constructor,
-
-    private:
         Position GetPosition(int isite) const;
         friend class MPOTesting;
 

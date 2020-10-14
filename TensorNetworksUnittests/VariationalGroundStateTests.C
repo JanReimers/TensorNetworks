@@ -1,7 +1,7 @@
 #include "Tests.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/IterationSchedule.H"
-#include "TensorNetworks/OperatorWRepresentation.H"
+#include "TensorNetworks/MPO.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworksImp/SPDLogger.H"
@@ -50,8 +50,8 @@ TEST_F(VariationalGroundStateTesting,TestIdentityOperator)
     Setup(10,0.5,2);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DLeft);
-    TensorNetworks::OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
-    TensorNetworks::Operator* IO=itsH->CreateOperator(IWO);
+//    TensorNetworks::OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
+    TensorNetworks::Operator* IO=itsH->CreateUnitOperator();
     double S=itsMPS->GetExpectation(IO);
     EXPECT_NEAR(S,1.0,eps);
 

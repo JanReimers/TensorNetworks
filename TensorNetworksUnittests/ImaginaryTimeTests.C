@@ -69,8 +69,7 @@ TEST_F(ImaginaryTimeTests,TestApplyIdentity)
     itsMPS->Normalize(TensorNetworks::DLeft );
     EXPECT_NEAR(itsMPS->GetExpectation(itsH) ,E1,eps);
 
-    TensorNetworks::OperatorWRepresentation* IWO=itsFactory->MakeIdentityOperator();
-    TensorNetworks::Operator* IO=itsH->CreateOperator(IWO);
+    TensorNetworks::Operator* IO=itsH->CreateUnitOperator();
     TensorNetworks::MPS* Psi2=*IO**itsMPS;
     EXPECT_NEAR(Psi2->GetExpectation(itsH) ,E1,eps);
     delete Psi2;

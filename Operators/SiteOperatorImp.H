@@ -7,14 +7,32 @@
 #include "TensorNetworksImp/Typedefs.H"
 #include "oml/dmatrix.h"
 
+class MPOTests;
 
 namespace TensorNetworks
 {
+//
+//  Derive from this in order to load up your site MPO/W matrices
+//
+class OperatorClient
+{
+protected:
+    OperatorClient() {}
+    virtual ~OperatorClient() {}
+
+    virtual MatrixRT GetW   (Position,int m, int n) const=0;
+    virtual Dw12     GetDw12(Position) const=0;
+    friend class SiteOperatorImp;
+    friend class ::MPOTests;
+};
+
 class SiteOperatorImp : public virtual SiteOperator
 {
     public:
-        SiteOperatorImp(Position  lbr, const OperatorWRepresentation* O,int d);
-        SiteOperatorImp(Direction lr , const MatrixRT& U, const DiagonalMatrixRT& expEvs, int d);
+        SiteOperatorImp(int d); //Construct with identity operator
+        SiteOperatorImp(int d, double S, SpinOperator so); //Construct with identity operator
+        SiteOperatorImp(int d, Position  lbr, const OperatorClient* O);
+        SiteOperatorImp(int d, Direction lr , const MatrixRT& U, const DiagonalMatrixRT& expEvs);
         virtual ~SiteOperatorImp();
         void SetNeighbours(SiteOperator* left, SiteOperator* right);
 

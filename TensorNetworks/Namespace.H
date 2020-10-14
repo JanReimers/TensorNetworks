@@ -14,7 +14,6 @@ namespace TensorNetworks
     class MPO;
     class Operator;
     class SiteOperator;
-    class OperatorWRepresentation;
     class Dw12;
 
     template <class T> class SVCompressor;

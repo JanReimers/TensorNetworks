@@ -1,6 +1,7 @@
 #ifndef SPINCALCULATOR_H
 #define SPINCALCULATOR_H
 
+#include "TensorNetworks/Enums.H"
 #include "Containers/Matrix4.H"
 #include "oml/dmatrix.h"
 #include <complex>
@@ -38,8 +39,10 @@ class SpinCalculator
         MatrixRT  GetSm (int lowerIndex=1) const;
         MatrixRT  GetSp (int lowerIndex=1) const;
         MatrixRT  GetSx (int lowerIndex=1) const;
-        MatrixCT GetSy (int lowerIndex=1) const;
+        MatrixCT  GetSy (int lowerIndex=1) const;
         MatrixRT  GetSz (int lowerIndex=1) const;
+
+        MatrixRT  Get   (int m, int n,SpinOperator so) const;
         //
         //  Two site Matrix versions
         //

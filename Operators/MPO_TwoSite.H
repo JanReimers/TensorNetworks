@@ -33,9 +33,6 @@ class MPO_TwoSite : public virtual Operator
         int itsSite1Index;
         int itsSite2Index;
 
-        OperatorWRepresentation* itsSpin1WOp;
-        OperatorWRepresentation* itsSpin2WOp;
-        OperatorWRepresentation* itsIdentityWOp;
         SiteOperator* itsSite1Operator;
         SiteOperator* itsSite2Operator;
         SiteOperator* itsIndentityOperator;

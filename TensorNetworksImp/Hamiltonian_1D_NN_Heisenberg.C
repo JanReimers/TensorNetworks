@@ -1,13 +1,5 @@
 #include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
-#include "TensorNetworksImp/MPSImp.H"
-#include "TensorNetworksImp/iTEBDStateImp.H"
-#include "TensorNetworksImp/FullStateImp.H"
 #include "TensorNetworks/CheckSpin.H"
-#include "Operators/MPO_LRB.H"
-#include "Operators/MPOImp.H"
-#include "Operators/MPO_SpatialTrotter.H"
-
-
 #include <iostream>
 
 using std::cout;
@@ -56,7 +48,15 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
     itsDw12s[PBulk ]=Dw12(5,5,w1_first_5x5,w2_last_5x5);
     itsDw12s[PRight]=Dw12(5,1,w1_first_5x1,w2_last_5x1);
 
-    Init(this);
+    //
+    //  Load W matrices for the left edge,bulk and right edge
+    //
+    SiteOperator* left =new SiteOperatorImp(itsd,PLeft ,this);
+    SiteOperator* bulk =new SiteOperatorImp(itsd,PBulk ,this);
+    SiteOperator* right=new SiteOperatorImp(itsd,PRight,this);
+    itsSites.push_back(left );     //Left edge
+    itsSites.push_back(bulk );     //bulk
+    itsSites.push_back(right);     //Right edge
 
 }
 
@@ -103,7 +103,7 @@ MatrixRT Hamiltonian_1D_NN_Heisenberg::GetW (Position lbr,int m, int n) const
     case PBulk :
     {
         W.SetLimits(Dw,Dw);
-        Fill(W,ElementT(0.0));
+        Fill(W,0.0);
         W(1,1)=I(m,n);
         W(2,1)=sc.GetSp(m,n);
         W(3,1)=sc.GetSm(m,n);
@@ -161,9 +161,21 @@ Matrix4RT Hamiltonian_1D_NN_Heisenberg::BuildLocalMatrix() const
 
     return H12;
 }
+} //namespace
 
+#include "TensorNetworksImp/iTEBDStateImp.H"
+#include "TensorNetworksImp/FullStateImp.H"
+#include "TensorNetworksImp/MPSImp.H"
+#include "Operators/MPOImp.H"
+#include "Operators/MPO_SpatialTrotter.H"
 
+namespace TensorNetworks
+{
 
+//------------------------------------------------------------------
+//
+//  Factory zone
+//
 //
 //  Create states.  Why are these here?  Because the Hamiltonian is the
 //  only thing that knows L,S,Dw
@@ -182,11 +194,6 @@ iTEBDState* Hamiltonian_1D_NN_Heisenberg::CreateiTEBDState(int D,double normEps,
 MPO* Hamiltonian_1D_NN_Heisenberg::CreateUnitOperator() const
 {
     return new MPOImp(itsL,itsS);
-}
-
-Operator* Hamiltonian_1D_NN_Heisenberg::CreateOperator(const OperatorWRepresentation* Wrep) const
-{
-    return new MPO_LRB(Wrep,itsL,itsS);
 }
 
 MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TrotterOrder order) const

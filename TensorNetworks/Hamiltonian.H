@@ -21,8 +21,6 @@ class Hamiltonian : public virtual Operator
         virtual MPS*        CreateMPS       (int D,double normEps=1e-12,double epsSV=1e-12, TNSLogger* =0) const=0;
         virtual iTEBDState* CreateiTEBDState(int D,double normEps=1e-12,double epsSV=1e-12, TNSLogger* =0) const=0;
 
-        //  Create full lattice of operators
-        virtual Operator*           CreateOperator(const OperatorWRepresentation*) const=0;
         //  Create full lattice of unit operators
         virtual MPO*                CreateUnitOperator() const=0;
         virtual MPO*                CreateH2Operator  () const;

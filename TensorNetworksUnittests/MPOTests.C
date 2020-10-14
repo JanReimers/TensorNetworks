@@ -1,9 +1,9 @@
 #include "Tests.H"
 #include "TensorNetworks/Hamiltonian.H"
-#include "TensorNetworks/OperatorWRepresentation.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/Factory.H"
+#include "Operators/SiteOperatorImp.H"
 #include "Containers/Matrix6.H"
 
 #include "oml/stream.h"
@@ -21,16 +21,25 @@ public:
     MPOTests()
         : eps(1.0e-13)
         , itsFactory(TensorNetworks::Factory::GetFactory())
-
+        , itsH(0)
+        , itsOperatorClient(0)
+        , itsMPS(0)
     {
         assert(itsFactory);
         StreamableObject::SetToPretty();
-
     }
+    ~MPOTests()
+    {
+        delete itsFactory;
+        if (itsH) delete itsH;
+//        delete itsOperatorClient; NO! part of itsH.
+        if (itsMPS) delete itsMPS;
+    }
+
     void Setup(int L, double S, int D)
     {
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsWRep=dynamic_cast<TensorNetworks::OperatorWRepresentation*>(itsH);
+        itsOperatorClient=dynamic_cast<TensorNetworks::OperatorClient*>(itsH);
         itsMPS=itsH->CreateMPS(D);
     }
     double ENeel(double S) const;
@@ -39,16 +48,17 @@ public:
     Vector3CT CalcHeffRight(int isite,bool cache=false) const {return GetMPSImp()->CalcHeffRight(itsH,isite,cache);}
     void LoadHeffCaches() {GetMPSImp()->LoadHeffCaches(itsH);}
 
+    MatrixRT GetW1(TensorNetworks::Position lrb , int m, int n) {return itsOperatorClient->GetW(lrb,m,n);}
     MatrixRT GetW(int isite, int m, int n) {return itsH->GetSiteOperator(isite)->GetW(m,n);}
 
           TensorNetworks::MPSImp* GetMPSImp()       {return dynamic_cast<      TensorNetworks::MPSImp*>(itsMPS);}
     const TensorNetworks::MPSImp* GetMPSImp() const {return dynamic_cast<const TensorNetworks::MPSImp*>(itsMPS);}
 
     double eps;
-    TensorNetworks::Factory*                 itsFactory=TensorNetworks::Factory::GetFactory();
-    TensorNetworks::Hamiltonian*             itsH;
-    TensorNetworks::OperatorWRepresentation* itsWRep;
-    TensorNetworks::MPS*                     itsMPS;
+    TensorNetworks::Factory*        itsFactory;
+    TensorNetworks::Hamiltonian*    itsH;
+    TensorNetworks::OperatorClient* itsOperatorClient;
+    TensorNetworks::MPS*            itsMPS;
 };
 
 
@@ -64,43 +74,43 @@ TEST_F(MPOTests,MakeHamiltonian)
 TEST_F(MPOTests,HamiltonianGetLeftW00)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PLeft,0,0)),"(1:1),(1:5) \n[ -0 0 0 -0.5 1 ]\n");
+    EXPECT_EQ(ToString(GetW1(TensorNetworks::PLeft,0,0)),"(1:1),(1:5) \n[ -0 0 0 -0.5 1 ]\n");
 }
 
 TEST_F(MPOTests,HamiltonianGetRightW00)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PRight,0,0)),"(1:5),(1:1) \n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ -0.5 ]\n[ -0 ]\n");
+    EXPECT_EQ(ToString(GetW1(TensorNetworks::PRight,0,0)),"(1:5),(1:1) \n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ -0.5 ]\n[ -0 ]\n");
 }
 TEST_F(MPOTests,HamiltonianGetLeftW10)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PLeft,1,0)),"(1:1),(1:5) \n[ 0 0 0.5 0 0 ]\n");
+    EXPECT_EQ(ToString(GetW1(TensorNetworks::PLeft,1,0)),"(1:1),(1:5) \n[ 0 0 0.5 0 0 ]\n");
 }
 TEST_F(MPOTests,HamiltonianGetRightW10)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PRight,1,0)),"(1:5),(1:1) \n[ 0 ]\n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ 0 ]\n");
+    EXPECT_EQ(ToString(GetW1(TensorNetworks::PRight,1,0)),"(1:5),(1:1) \n[ 0 ]\n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ 0 ]\n");
 }
 TEST_F(MPOTests,HamiltonianGetLeftW01)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PLeft,0,1)),"(1:1),(1:5) \n[ 0 0.5 0 0 0 ]\n");
+    EXPECT_EQ(ToString(GetW1(TensorNetworks::PLeft,0,1)),"(1:1),(1:5) \n[ 0 0.5 0 0 0 ]\n");
 }
 TEST_F(MPOTests,HamiltonianGetRightW01)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PRight,0,1)),"(1:5),(1:1) \n[ 0 ]\n[ 0 ]\n[ 1 ]\n[ 0 ]\n[ 0 ]\n");
+    EXPECT_EQ(ToString(GetW1(TensorNetworks::PRight,0,1)),"(1:5),(1:1) \n[ 0 ]\n[ 0 ]\n[ 1 ]\n[ 0 ]\n[ 0 ]\n");
 }
 TEST_F(MPOTests,HamiltonianGetLeftW11)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PLeft,1,1)),"(1:1),(1:5) \n[ 0 0 0 0.5 1 ]\n");
+    EXPECT_EQ(ToString(GetW1(TensorNetworks::PLeft,1,1)),"(1:1),(1:5) \n[ 0 0 0 0.5 1 ]\n");
 }
 TEST_F(MPOTests,HamiltonianGetRightW11)
 {
     Setup(10,0.5,2);
-    EXPECT_EQ(ToString(itsWRep->GetW(TensorNetworks::PRight,1,1)),"(1:5),(1:1) \n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ 0.5 ]\n[ 0 ]\n");
+    EXPECT_EQ(ToString(GetW1(TensorNetworks::PRight,1,1)),"(1:5),(1:1) \n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ 0.5 ]\n[ 0 ]\n");
 }
 
 TEST_F(MPOTests,CheckThatWsGotLoaded)
