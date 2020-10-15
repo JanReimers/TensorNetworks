@@ -2,6 +2,7 @@
 
 #include "TensorNetworks/Epsilons.H"
 #include "NumericalMethods/ArpackEigenSolver.H"
+#include "Containers/SparseMatrix.H"
 #include "oml/stream.h"
 #include "oml/numeric.h"
 #include "oml/cnumeric.h"
@@ -15,15 +16,18 @@ using std::endl;
 class LinearAlgebraTests : public ::testing::Test
 {
 public:
-    typedef TensorNetworks::MatrixCT MatrixCT;
-    typedef TensorNetworks::MatrixRT MatrixRT;
-    typedef TensorNetworks::VectorRT VectorRT;
-    typedef TensorNetworks::DiagonalMatrixRT DiagonalMatrixRT;
     typedef TensorNetworks::dcmplx dcmplx;
+    typedef DMatrix<dcmplx> MatrixCT;
+    typedef DMatrix<double> MatrixRT;
+    typedef Vector <double> VectorRT;
+    typedef DiagonalMatrix<double> DiagonalMatrixRT;
+    typedef SparseMatrix<dcmplx> SparseMatrixCT;
+    typedef SparseMatrix<double> SparseMatrixRT;
 
     LinearAlgebraTests()
     : itsEps()
     , eps(1.0e-13)
+    , Nsvd(30)
     {
         StreamableObject::SetToPretty();
     }
@@ -62,6 +66,33 @@ public:
         itsAR=A+Transpose(A); //Make it hermitian
     }
 
+    void SetupSparseR(int M,int N)
+    {
+        MatrixRT A(M,N);
+        FillRandom(A);
+        for (int i=0;i<0.5*log(N*M)*N*M;i++)
+        {
+            int ir=static_cast<int>(OMLRand<float>()*M)+1;
+            int ic=static_cast<int>(OMLRand<float>()*N)+1;
+            A(ir,ic)=0.0;
+        }
+        itsARs=A; //Make it hermitian
+        cout << "Density=" << itsARs.GetDensity() << "%" << endl;
+    }
+    void SetupSparseC(int M,int N)
+    {
+        MatrixCT A(M,N);
+        FillRandom(A);
+        for (int i=0;i<0.5*log(N*M)*N*M;i++)
+        {
+            int ir=static_cast<int>(OMLRand<float>()*M)+1;
+            int ic=static_cast<int>(OMLRand<float>()*N)+1;
+            A(ir,ic)=0.0;
+        }
+        itsACs=A; //Make it hermitian
+        cout << "Density=" << itsACs.GetDensity() << "%" << endl;
+    }
+
     void SetupC(int N)
     {
         SetupC(N,N);
@@ -94,6 +125,7 @@ public:
             A(ir,ic)=0.0;
         }
         itsAC=A+Transpose(conj(A)); //Make it hermitian
+
     }
     //
     // This trivial matrix cuased horrendous problems for the numerical recipes solver
@@ -124,12 +156,15 @@ public:
     }
 
 
+    SparseMatrixRT itsARs;
+    SparseMatrixCT itsACs;
     MatrixCT  itsAC,itsIC;
     MatrixRT  itsAR,itsIR;
     VectorRT  itsWR; //Eigen values
 
     TensorNetworks::Epsilons  itsEps;
     double eps;
+    int Nsvd;
 
 };
 
@@ -268,6 +303,144 @@ TEST_F(LinearAlgebraTests,Primme_EigenSolverSparseComplexHermitian200x200)
     for (int i=1;i<=Ne;i++) diag(i,i)-=itsWR(i);
     EXPECT_NEAR(Max(abs(diag)),0.0,100*eps);
 }
+
+#include "NumericalMethods/PrimeSVDSolver.H"
+
+TEST_F(LinearAlgebraTests,Primme_SVDSolverDenseReal10x10)
+{
+    SetupR(Nsvd,Nsvd);
+
+    PrimeSVDSolver<double> solver;
+    auto [U,s,VT]=solver.Solve(itsAR,Nsvd,eps);
+
+    double dA=Max(fabs(itsAR-U*s*VT));
+    EXPECT_NEAR(dA,0.0,10*eps);
+}
+
+TEST_F(LinearAlgebraTests,Primme_SVDSolverDenseReal10x5)
+{
+    SetupR(Nsvd,Nsvd/2);
+
+    PrimeSVDSolver<double> solver;
+    auto [U,s,VT]=solver.Solve(itsAR,Nsvd/2,eps);
+
+    double dA=Max(fabs(itsAR-U*s*VT));
+    EXPECT_NEAR(dA,0.0,10*eps);
+}
+TEST_F(LinearAlgebraTests,Primme_SVDSolverDenseReal5x10)
+{
+    SetupR(Nsvd/2,Nsvd);
+
+    PrimeSVDSolver<double> solver;
+    auto [U,s,VT]=solver.Solve(itsAR,Nsvd/2,eps);
+
+    double dA=Max(fabs(itsAR-U*s*VT));
+    EXPECT_NEAR(dA,0.0,10*eps);
+}
+
+TEST_F(LinearAlgebraTests,Primme_SVDSolverDenseComplex10x10)
+{
+    SetupC(Nsvd,Nsvd);
+
+    PrimeSVDSolver<dcmplx> solver;
+    auto [U,s,VT]=solver.Solve(itsAC,Nsvd,eps);
+
+    double dA=Max(abs(itsAC-U*s*VT));
+    EXPECT_NEAR(dA,0.0,10*eps);
+}
+
+TEST_F(LinearAlgebraTests,Primme_SVDSolverDenseComplex10x5)
+{
+    SetupC(Nsvd,Nsvd/2);
+
+    PrimeSVDSolver<dcmplx> solver;
+    auto [U,s,VT]=solver.Solve(itsAC,Nsvd/2,eps);
+
+    double dA=Max(abs(itsAC-U*s*VT));
+    EXPECT_NEAR(dA,0.0,10*eps);
+}
+TEST_F(LinearAlgebraTests,Primme_SVDSolverDenseComplex5x10)
+{
+    SetupC(Nsvd/2,Nsvd);
+
+    PrimeSVDSolver<dcmplx> solver;
+    auto [U,s,VT]=solver.Solve(itsAC,Nsvd/2,eps);
+
+    double dA=Max(abs(itsAC-U*s*VT));
+    EXPECT_NEAR(dA,0.0,10*eps);
+}
+
+TEST_F(LinearAlgebraTests,Primme_SVDSolverSparseReal10x10)
+{
+    SetupSparseR(Nsvd,Nsvd);
+
+    PrimeSVDSolver<double> solver;
+    auto [U,s,VT]=solver.Solve(itsARs,Nsvd,eps);
+
+    MatrixRT AR=U*s*VT;
+    double dA=Max(fabs(itsARs-AR));
+    EXPECT_NEAR(dA,0.0,10*eps);
+}
+
+TEST_F(LinearAlgebraTests,Primme_SVDSolverSparseReal10x5)
+{
+    SetupSparseR(Nsvd,Nsvd/2);
+
+    PrimeSVDSolver<double> solver;
+    auto [U,s,VT]=solver.Solve(itsARs,Nsvd/2,eps);
+
+    MatrixRT AR=U*s*VT;
+    double dA=Max(fabs(itsARs-AR));
+    EXPECT_NEAR(dA,0.0,10*eps);
+}
+
+TEST_F(LinearAlgebraTests,Primme_SVDSolverSparseReal5x10)
+{
+    SetupSparseR(Nsvd/2,Nsvd);
+
+    PrimeSVDSolver<double> solver;
+    auto [U,s,VT]=solver.Solve(itsARs,Nsvd/2,eps);
+
+    MatrixRT AR=U*s*VT;
+    double dA=Max(fabs(itsARs-AR));
+    EXPECT_NEAR(dA,0.0,10*eps);
+}
+
+TEST_F(LinearAlgebraTests,Primme_SVDSolverSparseComplex10x10)
+{
+    SetupSparseC(Nsvd,Nsvd);
+
+    PrimeSVDSolver<dcmplx> solver;
+    auto [U,s,VT]=solver.Solve(itsACs,Nsvd,eps);
+
+    MatrixCT AC=U*s*VT;
+    double dA=Max(abs(itsACs-AC));
+    EXPECT_NEAR(dA,0.0,10*eps);
+}
+TEST_F(LinearAlgebraTests,Primme_SVDSolverSparseComplex10x5)
+{
+    SetupSparseC(Nsvd,Nsvd/2);
+
+    PrimeSVDSolver<dcmplx> solver;
+    auto [U,s,VT]=solver.Solve(itsACs,Nsvd/2,eps);
+
+    MatrixCT AC=U*s*VT;
+    double dA=Max(abs(itsACs-AC));
+    EXPECT_NEAR(dA,0.0,10*eps);
+}
+TEST_F(LinearAlgebraTests,Primme_SVDSolverSparseComplex5x10)
+{
+    SetupSparseC(Nsvd/2,2*Nsvd);
+
+    PrimeSVDSolver<dcmplx> solver;
+    auto [U,s,VT]=solver.Solve(itsACs,Nsvd/2,eps);
+
+    MatrixCT AC=U*s*VT;
+    double dA=Max(abs(itsACs-AC));
+    EXPECT_NEAR(dA,0.0,5*eps);
+}
+
+
 
 #ifndef DEBUG
 TEST_F(LinearAlgebraTests,Primme_EigenSolverDenseComplexHermitian200x200)

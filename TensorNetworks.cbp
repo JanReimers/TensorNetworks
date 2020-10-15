@@ -75,6 +75,7 @@
 		<Unit filename="Containers/TwoSiteDMs.H" />
 		<Unit filename="Containers/Vector3.H" />
 		<Unit filename="Containers/Vector4.H" />
+		<Unit filename="Containers/rc_ptr.h" />
 		<Unit filename="Install" />
 		<Unit filename="NumericalMethods/ArpackEigenSolver.C">
 			<Option compilerVar="CC" />
@@ -88,6 +89,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="NumericalMethods/PrimeEigenSolver.H" />
+		<Unit filename="NumericalMethods/PrimeSVDSolver.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="NumericalMethods/PrimeSVDSolver.H" />
 		<Unit filename="Operators/MPOImp.C">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -7,8 +7,35 @@ using std::endl;
 template <class T>  SparseMatrix<T>::SparseMatrix(const DMatrix<T>& denseMatrix,double eps)
  : itsNr(denseMatrix.GetNumRows())
  , itsNc(denseMatrix.GetNumCols())
- ,itsTotalNumElements(0)
+ , itsTotalNumElements(0)
 {
+      AssignFrom(denseMatrix,eps);
+}
+
+template <class T> SparseMatrix<T>::SparseMatrix(int Nr, int Nc)
+ : itsNr(Nr)
+ , itsNc(Nc)
+ , itsTotalNumElements(0)
+{}
+template <class T> SparseMatrix<T>::SparseMatrix()
+ : itsNr(0)
+ , itsNc(0)
+ , itsTotalNumElements(0)
+{}
+
+template <class T> SparseMatrix<T>& SparseMatrix<T>::operator=(const DMatrix<T>& denseMatrix)
+{
+      AssignFrom(denseMatrix,0);
+      return *this;
+}
+
+template <class T> void SparseMatrix<T>::AssignFrom(const DMatrix<T>& denseMatrix,double eps)
+{
+    Rows.clear();
+    nonZeroRows.clear();
+    itsTotalNumElements=0;
+    itsNr=denseMatrix.GetNumRows();
+    itsNc=denseMatrix.GetNumCols();
     for (int i=1;i<=itsNr;i++)
         for (int j=1;j<=itsNc;j++)
         {
@@ -25,15 +52,9 @@ template <class T>  SparseMatrix<T>::SparseMatrix(const DMatrix<T>& denseMatrix,
                 itsTotalNumElements++;
             }
         }
-}
-
-template <class T> SparseMatrix<T>::SparseMatrix(int Nr, int Nc)
- : itsNr(Nr)
- , itsNc(Nc)
- , itsTotalNumElements(0)
-{
 
 }
+
 
 template <class T> T SparseMatrix<T>::operator()(int i, int j) const
 {
@@ -89,11 +110,18 @@ template <class T> void SparseMatrix<T>::Insert(const T& val,int i, int j)
 
 template <class T> void SparseMatrix<T>::Dump(std::ostream& os) const
 {
-    for (long unsigned int ir=0;ir<nonZeroRows.size();ir++)
-    {
-        const Row& r=Rows[ir];
-        for (long unsigned int ic=0;ic<r.nonZeroColumns.size();ic++)
-            os << "[" << nonZeroRows[ir] << "," << r.nonZeroColumns[ic] << "]=" << r.values[ic] << std::endl;
+//    for (long unsigned int ir=0;ir<nonZeroRows.size();ir++)
+//    {
+//        const Row& r=Rows[ir];
+//        for (long unsigned int ic=0;ic<r.nonZeroColumns.size();ic++)
+//            os << "[" << nonZeroRows[ir] << "," << r.nonZeroColumns[ic] << "]=" << r.values[ic] << std::endl;
+//    }
+    os << endl;
+   for (int ir=1;ir<=itsNr;ir++)
+   {
+        for (int ic=1;ic<=itsNc;ic++)
+             os << (*this)(ir,ic) << " ";
+         os << endl;
     }
 }
 
@@ -111,6 +139,44 @@ template <class T> void SparseMatrix<T>::DoMVMultiplication(int N, T* xvec,T* yv
             yvec[nonZeroRows[ir]-1]+=xvec[r.nonZeroColumns[ic]-1] * r.values[ic];
         }
     }
+}
+
+inline const double& conj(const double& d) { return d;}
+
+template <class T> void SparseMatrix<T>::DoMVMultiplication(int M, int N, T* xvec,T* yvec, int transpose) const
+{
+    assert(M==itsNr);
+    assert(N==itsNc);
+    if (transpose==0)
+    {
+        for (int i=1;i<=itsNr;i++) yvec[i-1]=0.0;
+//        for (int ir=1;ir<=itsNr;ir++)
+//            for (int ic=1;ic<=itsNc;ic++)
+//                yvec[ir-1]+=(*this)(ir,ic)*xvec[ic-1];
+        for (long unsigned int ir=0; ir<nonZeroRows.size(); ir++)
+        {
+            const Row& r=Rows[ir];
+            for (long unsigned int ic=0; ic<r.nonZeroColumns.size(); ic++)
+            {
+                yvec[nonZeroRows[ir]-1]+=xvec[r.nonZeroColumns[ic]-1] * r.values[ic];
+            }
+        }
+    }
+    else
+    {
+        for (int i=1;i<=itsNc;i++) yvec[i-1]=0.0;
+//        for (int ir=1;ir<=itsNr;ir++)
+//            for (int ic=1;ic<=itsNc;ic++)
+//                yvec[ic-1]+=(*this)(ir,ic)*xvec[ir-1];
+        for (long unsigned int ir=0; ir<nonZeroRows.size(); ir++)
+        {
+            const Row& r=Rows[ir];
+            for (long unsigned int ic=0; ic<r.nonZeroColumns.size(); ic++)
+            {
+                yvec[r.nonZeroColumns[ic]-1]+=xvec[nonZeroRows[ir]-1] * conj(r.values[ic]);
+            }
+        } //for
+    } //if else
 }
 
 #include <complex>
