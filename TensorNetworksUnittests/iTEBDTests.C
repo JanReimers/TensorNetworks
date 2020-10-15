@@ -14,13 +14,23 @@ public:
     iTEBDTests()
     : eps(1.0e-13)
     , itsFactory(TensorNetworks::Factory::GetFactory())
+    , itsH(0)
+    , itsState(0)
     {
         StreamableObject::SetToPretty();
+    }
 
+    ~iTEBDTests()
+    {
+        delete itsFactory;
+        if (itsH) delete itsH;
+        if (itsState) delete itsState;
     }
 
     void Setup(int L, double S, int D)
     {
+        if (itsH) delete itsH;
+        if (itsState) delete itsState;
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
         itsState=itsH->CreateiTEBDState(D);
     }

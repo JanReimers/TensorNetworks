@@ -15,14 +15,17 @@ public:
         Setup(10,0.5,2);
         StreamableObject::SetToPretty();
     }
-    ~MPSTests() {delete itsMPS;}
+    ~MPSTests()
+    {
+        if (itsMPS) delete itsMPS;
+    }
 
 
 
     void Setup(int L, double  S, int D)
     {
-        delete itsMPS;
-        itsMPS=new TensorNetworks::MPSImp(L,S,D,1e-12,1e-12,0);
+        if (itsMPS) delete itsMPS;
+        itsMPS=new TensorNetworks::MPSImp(L,S,D,1e-12,1e-12);
     }
 
 

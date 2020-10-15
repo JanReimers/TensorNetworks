@@ -1,6 +1,15 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
+-Profiling
+	TestITimeSecondOrderTrotter_EpsLimitedCompression
+	oml_CSVDecomp used 29.8% 2.97 sec
+
+- Try CSVD from LaPack and Primme
+- Try to use the factory more in all testing classes
+- Done: Valgrind issues:
+    Who owns Loggers?  Use rcptr?
 - clean up SpinCalculator
+- Optimization: Learn about OpenMP, try it on a hot loop.
 - Optimization: Learn about preconditioning, does that help with primme eigen solver?
 - Optimization: FullStateImp<T>::DoHContraction  needs to do vector copies.
     We can avoid this by allowing Vector<T>(T*) constructors

@@ -14,6 +14,7 @@ public:
     ExactDiagTests()
         : itsFactory(TensorNetworks::Factory::GetFactory())
         , itsH(0)
+        , itsPsi(0)
         , itsSched({1000,8,TensorNetworks::Epsilons(1e-10)})
     {
         itsSched.itsEps.itsDelatEnergy1Epsilon=6e-15;
@@ -25,8 +26,8 @@ public:
     ~ExactDiagTests()
     {
         delete itsFactory;
-        delete itsH;
-        delete itsPsi;
+        if (itsH) delete itsH;
+        if (itsPsi) delete itsPsi;
     }
 
     void SetupH(int L, double S)

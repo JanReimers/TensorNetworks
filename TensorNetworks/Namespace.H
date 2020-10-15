@@ -26,5 +26,6 @@ namespace TensorNetworks
     class TNSLogger;
 }
 
+template<class X> class rc_ptr;
 
 #endif // NAMESPACE_H_INCLUDED

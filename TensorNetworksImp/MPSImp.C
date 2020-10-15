@@ -19,21 +19,18 @@ namespace TensorNetworks
 //
 //  Init/construction zone
 //
-MPSImp::MPSImp(int L, double S, int D,double normEps,double epsSV, TNSLogger* s)
+MPSImp::MPSImp(int L, double S, int D,double normEps,double epsSV)
     : itsL(L)
     , itsS(S)
     , itsd(2*S+1)
     , itsNSweep(0)
     , itsNormEps(normEps)
-    , itsLogger(s)
+    , itsLogger(0)
 {
     assert(itsL>0);
     assert(isValidSpin(S));
     assert(itsS>=0.5);
     assert(D>0);
-
-    if (itsLogger==0)
-        itsLogger=new TNSLogger();
 
     InitSitesAndBonds(D,epsSV);
 }
@@ -44,7 +41,7 @@ MPSImp::MPSImp(const MPSImp& mps)
     , itsd           (mps.itsd)
     , itsNSweep      (mps.itsNSweep)
     , itsNormEps     (mps.itsNormEps)
-    , itsLogger      (mps.itsLogger)
+    , itsLogger      (mps.itsLogger) //rc_ptr should handle this
 {
     int D=mps.GetMaxD();
     assert(D>0);
@@ -55,19 +52,16 @@ MPSImp::MPSImp(const MPSImp& mps)
         itsBonds[ia]->CloneState(mps.itsBonds[ia]); //Transfer wave function data
 }
 
-MPSImp::MPSImp(int L, double S,Direction lr,double normEps,TNSLogger* s)
+MPSImp::MPSImp(int L, double S,Direction lr,double normEps)
     : itsL(L)
     , itsS(S)
     , itsd(2*S+1)
     , itsNSweep(0)
     , itsNormEps(normEps)
-    , itsLogger(s)
 {
     assert(itsL>0);
     assert(isValidSpin(S));
 
-    if (itsLogger==0)
-        itsLogger=new TNSLogger();
     //InitSitesAndBonds is called from the derived class
 }
 
@@ -120,6 +114,10 @@ MPS* MPSImp::Clone() const
     return new MPSImp(*this);
 }
 
+void MPSImp::Inject(rc_ptr<TNSLogger>& l)
+{
+    itsLogger=l;
+}
 
 
 

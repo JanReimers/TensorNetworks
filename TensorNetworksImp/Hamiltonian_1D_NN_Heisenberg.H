@@ -27,8 +27,8 @@ class Hamiltonian_1D_NN_Heisenberg
         virtual int Getd () const {return 2*itsS+1;}
         virtual int GetMaxDw() const {return Dw;}
 
-        virtual MPS*        CreateMPS         (int D,double normEps,double epsSV, TNSLogger* =0) const;
-        virtual iTEBDState* CreateiTEBDState  (int D,double normEps,double epsSV, TNSLogger* =0) const;
+        virtual MPS*        CreateMPS         (int D,double normEps,double epsSV) const;
+        virtual iTEBDState* CreateiTEBDState  (int D,double normEps,double epsSV) const;
         virtual MPO*        CreateUnitOperator() const;
         virtual MPO*        CreateOperator    (double dt, TrotterOrder) const;
         virtual Matrix4RT   BuildLocalMatrix  () const;

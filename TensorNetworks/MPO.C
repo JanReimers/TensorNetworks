@@ -51,10 +51,12 @@ void MPO::Combine(const MPO* O2)
 
 double MPO::Compress(int Dmax, double epsSV)
 {
-    SVCompressorR* comp=Factory::GetFactory()->MakeMPOCompressor(Dmax,epsSV);
-    double percent=Compress(comp);
+    Factory* f=Factory::GetFactory();
+    SVCompressorR* comp=f->MakeMPOCompressor(Dmax,epsSV);
+    double integratedS2=Compress(comp);
     delete comp;
-    return percent;
+    delete f;
+    return integratedS2;
 }
 
 

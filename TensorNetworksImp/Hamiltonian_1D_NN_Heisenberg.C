@@ -177,14 +177,14 @@ namespace TensorNetworks
 //  Create states.  Why are these here?  Because the Hamiltonian is the
 //  only thing that knows L,S,Dw
 //
-MPS* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,double normEps, double epsSV, TNSLogger* s) const
+MPS* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,double normEps, double epsSV) const
 {
-    return new MPSImp(itsL,itsS,D,normEps,epsSV,s);
+    return new MPSImp(itsL,itsS,D,normEps,epsSV);
 }
 
-iTEBDState* Hamiltonian_1D_NN_Heisenberg::CreateiTEBDState(int D,double normEps, double epsSV,TNSLogger*s) const
+iTEBDState* Hamiltonian_1D_NN_Heisenberg::CreateiTEBDState(int D,double normEps, double epsSV) const
 {
-    return new iTEBDStateImp(itsL,itsS,D,normEps,epsSV,s);
+    return new iTEBDStateImp(itsL,itsS,D,normEps,epsSV);
 }
 
 

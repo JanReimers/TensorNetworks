@@ -62,7 +62,7 @@ OneSiteDMs MPSImp::CalculateOneSiteDMs()
     Normalize(DRight);
     SiteLoop(ia)
     {
-        itsLogger->LogInfo(2,ia,"Calculate ro(mn)");
+        if (itsLogger) itsLogger->LogInfo(2,ia,"Calculate ro(mn)");
         ret.Insert(ia,itsSites[ia]->CalculateOneSiteDM());
         NormalizeSite(DLeft,ia);
     }

@@ -17,14 +17,14 @@ namespace TensorNetworks
 double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule& is)
 {
     double E1=0;
-    itsLogger->LogInfoV(1,"Initiate iTime GS iterations, Dmax=%4d",GetMaxD());
+    if (itsLogger) itsLogger->LogInfoV(1,"Initiate iTime GS iterations, Dmax=%4d",GetMaxD());
     for (is.begin(); !is.end(); is++)
         E1=FindiTimeGroundState(H,*is);
 
     MPO* H2=H->CreateH2Operator();
     double E2=GetExpectation(H2);
     delete H2;
-    itsLogger->LogInfoV(0,"Finished iTime GS iterations D=%4d, <E>=%.9f, <E^2>-<E>^2=%.2e",GetMaxD(),E1,E2);
+    if (itsLogger) itsLogger->LogInfoV(0,"Finished iTime GS iterations D=%4d, <E>=%.9f, <E^2>-<E>^2=%.2e",GetMaxD(),E1,E2);
     return E2-E1*E1;
 }
 
@@ -39,7 +39,7 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
     MPO* W =H->CreateOperator(isl.itsdt,isl.itsTrotterOrder);
     W->Compress(mpo_compressor);
 //    W->Report(cout);
-    itsLogger->LogInfoV(1,"   Begin iterations, dt=%.3f,  Dw=%4d, GetMaxD=%4d, isl.Dmax=%4d, epsMPO=%.1e, epsMPS=%.1e ",isl.itsdt,W->GetMaxDw(),GetMaxD(),isl.itsDmax,isl.itsEps.itsMPOCompressEpsilon,isl.itsEps.itsMPSCompressEpsilon);
+    if (itsLogger) itsLogger->LogInfoV(1,"   Begin iterations, dt=%.3f,  Dw=%4d, GetMaxD=%4d, isl.Dmax=%4d, epsMPO=%.1e, epsMPS=%.1e ",isl.itsdt,W->GetMaxDw(),GetMaxD(),isl.itsDmax,isl.itsEps.itsMPOCompressEpsilon,isl.itsEps.itsMPSCompressEpsilon);
     int niter=1;
     for (; niter<isl.itsMaxGSSweepIterations; niter++)
     {
@@ -64,10 +64,10 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
         double dE=Enew-E1;
         E1=Enew;
         if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon) break;
-        itsLogger->LogInfoV(2,"      E=%.9f, dE=%.2e, D1=%4d, D2=%4d, <2|1> niter=%4d",E1,dE,GetMaxD(),Psi2->GetMaxD(),niter);
+        if (itsLogger) itsLogger->LogInfoV(2,"      E=%.9f, dE=%.2e, D1=%4d, D2=%4d, <2|1> niter=%4d",E1,dE,GetMaxD(),Psi2->GetMaxD(),niter);
         delete Psi2;
     }
-    itsLogger->LogInfoV(1,"     End iterations, dt=%.3f, niter=%4d, D=%4d, E=%.9f.",isl.itsdt,niter,GetMaxD(),E1);
+    if (itsLogger) itsLogger->LogInfoV(1,"     End iterations, dt=%.3f, niter=%4d, D=%4d, E=%.9f.",isl.itsdt,niter,GetMaxD(),E1);
     delete mpo_compressor;
     delete mps_compressor;
     return E1;
@@ -87,7 +87,7 @@ int MPSImp::Optimize(const MPS* Psi2,const IterationScheduleLine& isl)
         double O1=Sweep(DLeft ,Psi2);  //This actually sweeps to the right, but leaves left normalized sites in its wake
         double O2=Sweep(DRight,Psi2); //return ||psi2-psi1||^2
         double dO=fabs(O2-O1);
-        itsLogger->LogInfoV(3,"         Minimize ||psi2-psi1||^2 err1=%.1e, err2=%.1e, delta=%.1e",O1,O2,dO);
+        if (itsLogger) itsLogger->LogInfoV(3,"         Minimize ||psi2-psi1||^2 err1=%.1e, err2=%.1e, delta=%.1e",O1,O2,dO);
         if (dO<=isl.itsEps.itsDelatNormEpsilon) break;
     }
     return in+1;

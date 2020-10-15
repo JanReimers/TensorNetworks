@@ -6,8 +6,8 @@
 namespace TensorNetworks
 {
 
-iTEBDStateImp::iTEBDStateImp(int L,double S, int D,double normEps,double epsSV,TNSLogger* s)
-    : MPSImp(L,S,DLeft,normEps,s)
+iTEBDStateImp::iTEBDStateImp(int L,double S, int D,double normEps,double epsSV)
+    : MPSImp(L,S,DLeft,normEps)
 {
     InitSitesAndBonds(D,epsSV);
 }

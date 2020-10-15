@@ -3,8 +3,10 @@
 
 #include "TensorNetworks/MPS.H"
 #include "TensorNetworks/Epsilons.H"
+#include "TensorNetworks/TNSLogger.H"
 #include "TensorNetworksImp/MPSSite.H"
 #include "Containers/ptr_vector.h"
+#include "Containers/rc_ptr.h"
 
 
 // Required forward decs, for friend decs below
@@ -22,7 +24,7 @@ class MPSImp : public virtual MPS
 //  Construction and initialization zone
 //
 public:
-        MPSImp(int L, double S, int D,double normEps,double epsSV,TNSLogger* s=0);
+        MPSImp(int L, double S, int D,double normEps,double epsSV);
         MPSImp(const MPSImp& mps);
 
         virtual ~MPSImp();
@@ -30,6 +32,7 @@ public:
         virtual void InitializeWith(State);
         virtual void Freeze(int isite,double s);
         virtual MPS* Clone() const;
+        virtual void Inject(rc_ptr<TNSLogger>&);
 //--------------------------------------------------------------------------------------
 //
 //  Access to information
@@ -88,7 +91,7 @@ public:
 
 protected:
     // Constructor used for iTEBD
-        MPSImp(int L, double S, Direction lr,double normEps=1e-12,TNSLogger* s=0);
+        MPSImp(int L, double S, Direction lr,double normEps);
 //--------------------------------------------------------------------------------------
 //
 //  Loop Control
@@ -186,11 +189,12 @@ private:
         double itsS;  //2*S, avoid storing floats for S=n/2
         int    itsd;   //Number ot states for the spin on each site = 2S+1
         int    itsNSweep;
+        double itsNormEps;
 
-        double     itsNormEps;
-        TNSLogger* itsLogger;
         BondsType  itsBonds;
         SitesType  itsSites;
+
+        rc_ptr<TNSLogger> itsLogger;
 }; // class
 
 } //namespace

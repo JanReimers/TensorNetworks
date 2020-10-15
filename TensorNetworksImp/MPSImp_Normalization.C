@@ -14,10 +14,7 @@ namespace TensorNetworks
 void MPSImp::NormalizeSite(Direction lr,int isite)
 {
     CheckSiteNumber(isite);
-    std::string lrs=lr==DLeft ? "Left" : "Right";
-    itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize site ");
     itsSites[isite]->SVDNormalize(lr,NULL);
-    itsLogger->LogInfo(2,isite,"SVD "+lrs+" Normalize update Bond data ");
     int bond_index=isite+( lr==DLeft ? 0 :-1);
     if (bond_index<itsL && bond_index>=1)
         UpdateBondData(bond_index);

@@ -14,9 +14,7 @@ namespace TensorNetworks
 
 double MPSImp::FindVariationalGroundState(const Hamiltonian* H,const IterationSchedule& is)
 {
-    itsLogger->ReadyToStart("Right normalize");
     Normalize(DRight);
-    itsLogger->LogInfo(3,"Load L&R caches");
     LoadHeffCaches(H);
 
     double DE2=0;
@@ -41,9 +39,9 @@ double MPSImp::FindVariationalGroundState(const Hamiltonian* H, const IterationS
         int in=0;
         for (; in<isl.itsMaxGSSweepIterations; in++)
         {
-            itsLogger->LogInfo(1,"Sweep Right");
+            if (itsLogger) itsLogger->LogInfo(1,"Sweep Right");
             Sweep(DLeft,H,isl.itsEps);  //This actually sweeps to the right, but leaves left normalized sites in its wake
-            itsLogger->LogInfo(1,"Sweep Left");
+            if (itsLogger) itsLogger->LogInfo(1,"Sweep Left");
             Sweep(DRight,H,isl.itsEps);
             double dE=GetMaxDeltaE();
             //cout << "dE=" << dE << endl;
@@ -54,7 +52,7 @@ double MPSImp::FindVariationalGroundState(const Hamiltonian* H, const IterationS
         double E1=GetExpectation(H);
         double E2=GetExpectation(H2);
         DE2=E2-E1*E1;
-        itsLogger->LogInfoV(0,"Variational GS D=%4d, %4d iterations, <E>=%.9f, <E^2>-<E>^2=%.2e",D,in,E1,DE2);
+        if (itsLogger) itsLogger->LogInfoV(0,"Variational GS D=%4d, %4d iterations, <E>=%.9f, <E^2>-<E>^2=%.2e",D,in,E1,DE2);
         IterationEnergy(E1);
     }
     delete H2;
@@ -83,9 +81,9 @@ void MPSImp::Refine(Direction lr,const Hamiltonian *h,const Epsilons& eps,int is
     assert(IsRLNormalized(isite));
     if (!itsSites[isite]->IsFrozen())
     {
-        itsLogger->LogInfo(2,isite,"Calculating Heff"); //Logger will update the graphs
+        if (itsLogger) itsLogger->LogInfo(2,isite,"Calculating Heff"); //Logger will update the graphs
         Matrix6CT Heff6=GetHeffIterate(h,isite); //New iterative version
-        itsLogger->LogInfo(2,isite,"Running eigen solver"); //Logger will update the graphs
+        if (itsLogger) itsLogger->LogInfo(2,isite,"Running eigen solver"); //Logger will update the graphs
         itsSites[isite]->Refine(Heff6.Flatten(),eps);
     }
     UpdateEnergyData(isite);

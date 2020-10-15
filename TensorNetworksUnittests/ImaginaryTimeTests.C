@@ -30,31 +30,30 @@ public:
     , itsLogger(new TensorNetworks::SPDLogger(1))
     {
         StreamableObject::SetToPretty();
-
     }
     ~ImaginaryTimeTests()
     {
         delete itsFactory;
-        if (itsH)
-            delete itsH;
-        if (itsMPS)
-            delete itsMPS;
-        delete itsLogger;
+        if (itsH)   delete itsH;
+        if (itsMPS) delete itsMPS;
     }
 
     void Setup(int L, double S, int D)
     {
+        if (itsH)   delete itsH;
+        if (itsMPS) delete itsMPS;
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsMPS=itsH->CreateMPS(D,1e-12,1e-12,itsLogger);
+        itsMPS=itsH->CreateMPS(D);
+        itsMPS->Inject(itsLogger);
         itsMPS->InitializeWith(TensorNetworks::Random);
     }
 
 
     double eps;
-    TensorNetworks::Factory*     itsFactory;
-    TensorNetworks::Hamiltonian* itsH;
-    TensorNetworks::MPS*         itsMPS;
-    TensorNetworks::TNSLogger*   itsLogger;
+    TensorNetworks::Factory*          itsFactory;
+    TensorNetworks::Hamiltonian*      itsH;
+    TensorNetworks::MPS*              itsMPS;
+    rc_ptr<TensorNetworks::TNSLogger> itsLogger;
 };
 
 
@@ -73,6 +72,7 @@ TEST_F(ImaginaryTimeTests,TestApplyIdentity)
     TensorNetworks::MPS* Psi2=*IO**itsMPS;
     EXPECT_NEAR(Psi2->GetExpectation(itsH) ,E1,eps);
     delete Psi2;
+    delete IO;
 }
 
 

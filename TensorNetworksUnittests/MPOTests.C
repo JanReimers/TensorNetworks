@@ -38,6 +38,8 @@ public:
 
     void Setup(int L, double S, int D)
     {
+        if (itsH) delete itsH;
+        if (itsMPS) delete itsMPS;
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
         itsOperatorClient=dynamic_cast<TensorNetworks::OperatorClient*>(itsH);
         itsMPS=itsH->CreateMPS(D);

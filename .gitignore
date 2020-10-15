@@ -20,3 +20,5 @@ ReleaseLong/
 *.cscope_file_list
 
 Operators/gmon.out
+
+TensorNetworksUnittests/ValgrindOut.xml

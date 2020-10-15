@@ -20,12 +20,15 @@ public:
         std::cout.precision(5);
         cout << std::fixed;
     }
-    ~MPSNormTests() {delete itsMPS;}
+    ~MPSNormTests()
+    {
+        if (itsMPS) delete itsMPS;
+    }
 
     void Setup(int L, double S, int D)
     {
-        delete itsMPS;
-        itsMPS=new TensorNetworks::MPSImp(L,S,D,1e-12,1e-12,0);
+        if (itsMPS) delete itsMPS;
+        itsMPS=new TensorNetworks::MPSImp(L,S,D,1e-12,1e-12);
     }
 
     typedef TensorNetworks::MatrixCT MatrixCT;

@@ -17,7 +17,7 @@ class iTEBDStateImp : public virtual iTEBDState,
     private MPSImp
 {
     public:
-        iTEBDStateImp(int L,double S, int D,double normEps,double epsSV,TNSLogger* s=0);
+        iTEBDStateImp(int L,double S, int D,double normEps,double epsSV);
         virtual ~iTEBDStateImp();
         virtual void InitializeWith(State);
  //--------------------------------------------------------------------------------------
