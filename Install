@@ -20,10 +20,8 @@ Non GUI
         cmake ./
         make
 
-    ARPack=ng
 
-    sudo apt install gfortran
-    sudo apt-get install libblas-dev liblapack-dev libarpack2-dev
+    sudo apt-get install libblas-dev liblapack-dev libarpack2-dev libomp-dev gfortran
 
     sudo ldconfig
     iTensor C++ v3.0
