@@ -1,10 +1,21 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
+-oml upgrades
+    Git rid of Matrix
+    Rename DMatrix to Matrix
+    Fix up unit tests for double (forget int float for now)
+    Round out LAPack and Arpack wrappers and move everything to oml_CSVDecomp
+    Is it possible to simplify expression templates with C++17?
+    Beef up Diagonal and Sparse matrices.
+    add fabs for complex matrices
+    use int_64 throughout
+    F(A-B) for work where F(const DMatrix<T>&)
 -Profiling
 	TestITimeSecondOrderTrotter_EpsLimitedCompression
 	oml_CSVDecomp used 29.8% 2.97 sec
 
 - Try CSVD from LaPack and Primme
+
 - Try to use the factory more in all testing classes
 - Done: Valgrind issues:
     Who owns Loggers?  Use rcptr?

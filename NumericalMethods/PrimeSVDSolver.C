@@ -1,12 +1,11 @@
 #include "PrimeSVDSolver.H"
 #include "Containers/SparseMatrix.H"
 #include "oml/dmatrix.h"
-#include <primme.h>
 #include "oml/vector_io.h"
+#include <primme.h>
 
 using std::cout;
 using std::endl;
-//using TensorNetworks::dcmplx;
 
 
 template <class T> void  DenseMatvec(void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *blockSize, int* transpose, primme_svds_params *primme, int *ierr);

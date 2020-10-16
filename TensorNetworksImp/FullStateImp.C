@@ -190,7 +190,7 @@ template <class T> double FullStateImp<T>::FindGroundState(const IterationSchedu
     double E=0;
     int Neig=1;
     PrimeEigenSolver<T> solver;
-    solver.Solve(this,Neig,sched.itsEps);
+    solver.Solve1(this,Neig,sched.itsEps);
     itsE=solver.GetEigenValues()(1);
     VectorRT amp=solver.GetEigenVector(1);
     for (int i=1; i<=itsN; i++)

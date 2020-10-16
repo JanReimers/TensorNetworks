@@ -1,12 +1,11 @@
-#include "TensorNetworks/Epsilons.H"
 #include "PrimeEigenSolver.H"
-#include <primme.h>
+#include "Containers/SparseMatrix.H"
+#include "oml/dmatrix.h"
 #include "oml/vector_io.h"
+#include <primme.h>
 
 using std::cout;
 using std::endl;
-using TensorNetworks::dcmplx;
-
 
 template <class T> void  DenseMatvec(void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *blockSize, primme_params *primme, int *ierr);
 template <class T> void SparseMatvec(void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *blockSize, primme_params *primme, int *ierr);
@@ -30,9 +29,43 @@ typedef    void (*MatvecT) (void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, 
 // Function dec for building primme paramater struct
 primme_params MakeParameters(MatvecT MatVec,int N,int NumEigenValues,int NumGuesses,double eps);
 
+template <class T> typename PrimeEigenSolver<T>::UdType
+PrimeEigenSolver<T>::Solve(const MatrixT& m, int NumEigenValues,double eps)
+{
+    int N=m.GetNumRows();
+    assert(N==m.GetNumCols());
+    assert(NumEigenValues<=N);
+    assert(IsHermitian(m,eps));
+    theDenseMatrix=&m;
+    primme_params primme=MakeParameters(DenseMatvec<T>,N,NumEigenValues,itsNumGuesses,eps);
+    return Solve(primme);
+}
+
+template <class T> typename PrimeEigenSolver<T>::UdType
+PrimeEigenSolver<T>::Solve(const SparseMatrixT& m, int NumEigenValues,double eps)
+{
+    int N=m.GetNumRows();
+    assert(N==m.GetNumCols());
+    assert(NumEigenValues<=N);
+//    assert(IsHermitian(m,eps));
+    theSparseMatrix=&m;
+    primme_params primme=MakeParameters(SparseMatvec<T>,N,NumEigenValues,itsNumGuesses,eps);
+    return Solve(primme);
+}
+
+template <class T> typename PrimeEigenSolver<T>::UdType
+PrimeEigenSolver<T>::Solve(const PrimeEigenSolverClient<T>* client, int NumEigenValues,double eps)
+{
+    assert(client);
+    int N=client->GetSize();
+    assert(NumEigenValues<=N);
+    PrimeEigenSolverClient<T>::theClient=client;  //Used by the M*v call back
+    primme_params primme=MakeParameters(ClientMatvec<T>,N,NumEigenValues,itsNumGuesses,eps);
+    return Solve(primme);
+}
 
 
-template <class T> int PrimeEigenSolver<T>::Solve(const DMatrix<T>& m, int NumEigenValues,const TensorNetworks::Epsilons& eps)
+template <class T> int PrimeEigenSolver<T>::Solve1(const DMatrix<T>& m, int NumEigenValues,const TensorNetworks::Epsilons& eps)
 {
     assert(&m);
     assert(m.GetNumRows()==m.GetNumCols());
@@ -50,10 +83,11 @@ template <class T> int PrimeEigenSolver<T>::Solve(const DMatrix<T>& m, int NumEi
         theDenseMatrix=&m;
         primme=MakeParameters(DenseMatvec<T>,N,NumEigenValues,itsNumGuesses,eps.itsEigenSolverEpsilon);
     }
-    return Solve(primme);
+    Solve(primme);
+    return 1;
 }
 
-template <class T> int PrimeEigenSolver<T>::Solve
+template <class T> int PrimeEigenSolver<T>::Solve1
 (const PrimeEigenSolverClient<T>* client, int NumEigenValues,const TensorNetworks::Epsilons& eps)
 {
     assert(client);
@@ -61,12 +95,15 @@ template <class T> int PrimeEigenSolver<T>::Solve
 
     int N=client->GetSize();
     primme_params primme=MakeParameters(ClientMatvec<T>,N,NumEigenValues,itsNumGuesses,eps.itsEigenSolverEpsilon);
-    return Solve(primme);
+    Solve(primme);
+    return 1;
 }
 
 //
 //  Enable template solve function to call the correct primme routine
 //
+typedef std::complex<double> dcmplx;
+
 template <class T> int primmeT(double *evals, T *evecs, double *resNorms, primme_params *primme);
 template <> int primmeT<double> (double *evals, double *evecs, double *resNorms, primme_params *primme)
 {
@@ -80,7 +117,8 @@ template <> int primmeT<dcmplx> (double *evals, dcmplx *evecs, double *resNorms,
 //
 //  Lowest level solve routine used by all higher level solve functions
 //
-template <class T> int PrimeEigenSolver<T>::Solve(primme_params& p)
+template <class T> typename PrimeEigenSolver<T>::UdType
+PrimeEigenSolver<T>::Solve(primme_params& p)
 {
     itsEigenValues.SetLimits(p.numEvals);
     itsEigenVectors.SetLimits(p.n,p.numEvals);
@@ -90,11 +128,11 @@ template <class T> int PrimeEigenSolver<T>::Solve(primme_params& p)
     (void)ret; //avoid compiler warning in release modems)) << " " << std::endl;
     if (Max(abs(rnorms))>1000*p.eps)
         cout << "Warning high rnorms in PrimeEigenSolver::SolveSparse rnorma=" << std::scientific << rnorms << endl;
-    int niter=p.stats.numOuterIterations;
+    //int niter=p.stats.numOuterIterations;
     //std::cout << "Primme niter=" << niter << std::endl;
     itsNumGuesses=p.numEvals; //Set up using guesses for next time around
     primme_free(&p);
-    return niter;
+    return std::make_tuple(itsEigenVectors,itsEigenValues);
 }
 
 //

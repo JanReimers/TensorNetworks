@@ -1,10 +1,14 @@
 #ifndef PRIMEEIGENSOLVER_H
 #define PRIMEEIGENSOLVER_H
 
-#include "TensorNetworksImp/Namespace.H"
-#include "Containers/SparseMatrix.H"
+#include "TensorNetworks/Epsilons.H"
+#include "oml/vector.h"
+#include "oml/dmatrix.h"
+#include <tuple>
 
 struct primme_params;
+template <class T> class SparseMatrix;
+template <class T> class DMatrix;
 
 //
 //  Client code can derive from this and control the matvec multiplication operations
@@ -24,13 +28,21 @@ public:
 //
 template <class T> class PrimeEigenSolver
 {
+    typedef    Vector<double>              VectorT;
+    typedef        DMatrix<T>              MatrixT;
+    typedef   SparseMatrix<T>        SparseMatrixT;
+    typedef std::tuple<MatrixT,VectorT> UdType;
 public:
     PrimeEigenSolver();
     ~PrimeEigenSolver();
 
     // Get lowest N eigen values and vectors with no initial guess
-    int Solve(const DMatrix<T>&               , int NumEigenValues,const TensorNetworks::Epsilons& eps);
-    int Solve(const PrimeEigenSolverClient<T>*, int NumEigenValues,const TensorNetworks::Epsilons& eps);
+    UdType Solve(const MatrixT&                  , int NumEigenValues,double eps);
+    UdType Solve(const SparseMatrixT&            , int NumEigenValues,double eps);
+    UdType Solve(const PrimeEigenSolverClient<T>*, int NumEigenValues,double eps);
+
+    int Solve1(const DMatrix<T>&               , int NumEigenValues,const TensorNetworks::Epsilons& eps);
+    int Solve1(const PrimeEigenSolverClient<T>*, int NumEigenValues,const TensorNetworks::Epsilons& eps);
 
 
     Vector <T> GetEigenVector (int index) const;
@@ -46,7 +58,7 @@ public:
     static const SparseMatrix<T>* theSparseMatrix;
     static const      DMatrix<T>* theDenseMatrix;
 protected:
-    int Solve(primme_params&);
+    UdType Solve(primme_params&);
 
 private:
     Vector<double>   itsEigenValues;
