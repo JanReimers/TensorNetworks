@@ -81,6 +81,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="NumericalMethods/ArpackEigenSolver.H" />
+		<Unit filename="NumericalMethods/LapackEigenSolver.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="NumericalMethods/LapackEigenSolver.H" />
 		<Unit filename="NumericalMethods/LapackSVD.C">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -10,12 +10,21 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     add fabs for complex matrices
     use int_64 throughout
     F(A-B) for work where F(const DMatrix<T>&)
+    Loose all the Get prefixes
+    Initialize value as third argument
 -Profiling
 	TestITimeSecondOrderTrotter_EpsLimitedCompression
 	oml_CSVDecomp used 29.8% 2.97 sec
 
 - Try CSVD from LaPack and Primme
 
+- LinAlg solvers
+    Make abstract interfaces for SVD and eigen
+    Do left and right Evs for non sym
+    Done Add Lapack non sym routines
+    Options for largest or smallest evs
+    Why is primme
+     so slow
 - Try to use the factory more in all testing classes
 - Done: Valgrind issues:
     Who owns Loggers?  Use rcptr?
@@ -269,3 +278,21 @@ Done Use eps values.
 
 
 
+Expression template notes:
+    C++-11 and C++-17 introduce a lot of language features that should expression
+    template programming much easier.
+    References:
+        https://gieseanw.wordpress.com/2019/10/20/we-dont-need-no-stinking-expression-templates/
+        https://stackoverflow.com/questions/11809052/expression-templates-and-c11
+        https://baptiste-wicht.com/posts/2018/02/c%2B%2B17-migration-of-expression-templates-library-etl.html
+        https://stackoverflow.com/questions/56261171/c-expression-templates-lifetime
+    Recommended language feature to use:
+        std:tuple
+        auto return types
+        auto parameter types
+        argument dependent lookup => operator overloading without having a base class
+            Putting expression classes into a namespace aids ADL
+        lambda expression
+        represent expressions as aggregate types
+        noexcept to help optimizer
+        ranged-for loop

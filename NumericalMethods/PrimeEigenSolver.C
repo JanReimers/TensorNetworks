@@ -47,7 +47,7 @@ PrimeEigenSolver<T>::Solve(const SparseMatrixT& m, int NumEigenValues,double eps
     int N=m.GetNumRows();
     assert(N==m.GetNumCols());
     assert(NumEigenValues<=N);
-//    assert(IsHermitian(m,eps));
+    assert(IsHermitian(m,eps));
     theSparseMatrix=&m;
     primme_params primme=MakeParameters(SparseMatvec<T>,N,NumEigenValues,itsNumGuesses,eps);
     return Solve(primme);

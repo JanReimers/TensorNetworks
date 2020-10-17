@@ -71,8 +71,6 @@ template <> int primmeT<dcmplx> (double *svals, dcmplx *svecs, double *resNorms,
     return zprimme_svds(svals,svecs,resNorms,primme); //complex<double>
 }
 
-inline const double& conj(const double& d) { return d;}
-
 //
 //  Lowest level solve routine used by all higher level solve functions
 //

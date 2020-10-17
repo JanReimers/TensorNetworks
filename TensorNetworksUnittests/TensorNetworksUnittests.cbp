@@ -91,6 +91,7 @@
 		<Unit filename="LinearAlgebraTests.C">
 			<Option compilerVar="CPP" />
 		</Unit>
+		<Unit filename="LinearAlgebraTests.H" />
 		<Unit filename="MPOTests.C">
 			<Option compilerVar="CPP" />
 		</Unit>

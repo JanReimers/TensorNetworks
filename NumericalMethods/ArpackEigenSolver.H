@@ -1,22 +1,27 @@
 #ifndef ARPACKEIGENSOLVER_H
 #define ARPACKEIGENSOLVER_H
 
-#include "TensorNetworks/Namespace.H"
+#include <tuple>
+#include <complex>
 
-class ArpackEigenSolver
+template <class T> class DMatrix;
+template <class T> class SparseMatrix;
+template <class T> class Vector;
+
+template <class T> class ArpackEigenSolver
 {
-    typedef TensorNetworks::MatrixCT MatrixCT;
-    typedef TensorNetworks::VectorCT VectorCT;
+    typedef std::complex<double> dcmplx;
+    typedef std::tuple<DMatrix<dcmplx>,Vector<dcmplx> > UdType;
 public:
-    ArpackEigenSolver();
-    virtual ~ArpackEigenSolver();
+    ArpackEigenSolver() {};
+    ~ArpackEigenSolver() {};
 
     //Return value is: (EigenValues,EigenVectors)
-    std::tuple<VectorCT,MatrixCT> Solve(const MatrixCT&, int NumEigenValues,const TensorNetworks::Epsilons& eps);
-
-
+    UdType SolveNonSym(const DMatrix     <T>&, int NumEigenValues,double eps);
+    UdType SolveNonSym(const SparseMatrix<T>&, int NumEigenValues,double eps);
 private:
-
+    // Generic version
+    template <template <typename> class Mat> UdType SolveG(const Mat<T>&, int NumEigenValues,double eps);
 };
 
 #endif // ARPACKEIGENSOLVER_H
