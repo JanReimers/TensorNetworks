@@ -2,6 +2,7 @@
 <CodeBlocks_workspace_file>
 	<Workspace title="Workspace">
 		<Project filename="oml/oml.cbp" />
+		<Project filename="oml/omlUnitTests.cbp" />
 		<Project filename="ITensor.cbp" />
 		<Project filename="TensorNetworks.cbp" />
 		<Project filename="TensorNetworksUnittests/TensorNetworksUnittests.cbp">
