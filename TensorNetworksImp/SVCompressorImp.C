@@ -43,7 +43,7 @@ template <class T> double SVCompressorImp<T>::Compress(MatrixT& U, DiagonalMatri
         {
             if (D>itsDmax)
             {
-                std::cerr << "Warning: SVCompressorImp::Compress loss of epslion control D=" << D << " > Dmax=" << itsDmax << std::endl;
+//                std::cerr << "Warning: SVCompressorImp::Compress loss of epslion control D=" << D << " > Dmax=" << itsDmax << std::endl;
                 D=itsDmax;
             }
         }

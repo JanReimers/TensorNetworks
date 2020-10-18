@@ -22,3 +22,5 @@ ReleaseLong/
 Operators/gmon.out
 
 TensorNetworksUnittests/ValgrindOut.xml
+
+TensorNetworksUnittests/gprof.out

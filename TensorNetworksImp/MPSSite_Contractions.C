@@ -164,10 +164,14 @@ MatrixCT MPSSite::IterateLeft_F(const MPSSite* Psi2, const MatrixCT& Fam1,bool c
     Fill(F,dcmplx(0.0));
     for (int m=0; m<itsd; m++)
         for (int i2=1; i2<=itsD2; i2++)
-            for (int j2=1; j2<=Psi2->itsD2; j2++)
+            for (int j1=1; j1<=Psi2->itsD1; j1++)
+            {
+                dcmplx FM(0);
                 for (int i1=1; i1<=itsD1; i1++)
-                    for (int j1=1; j1<=Psi2->itsD1; j1++)
-                        F(i2,j2)+=Fam1(i1,j1)*conj(itsMs[m](i1,i2))*Psi2->itsMs[m](j1,j2); //Not Optimized
+                    FM+=Fam1(i1,j1)*conj(itsMs[m](i1,i2));
+                for (int j2=1; j2<=Psi2->itsD2; j2++)
+                    F(i2,j2)+=FM*Psi2->itsMs[m](j1,j2);
+            }
     if (cache) itsLeft_Cache=F;
 //    cout << "Lcache=" << itsLeft_Cache.GetLimits() << endl;
     return F;
@@ -184,11 +188,14 @@ MatrixCT MPSSite::IterateRightF(const MPSSite* Psi2, const MatrixCT& Fap1,bool c
 
     for (int m=0; m<itsd; m++)
         for (int i1=1; i1<=itsD1; i1++)
-            for (int j1=1; j1<=Psi2->itsD1; j1++)
+            for (int j2=1; j2<=Psi2->itsD2; j2++)
+            {
+                dcmplx FM(0);
                 for (int i2=1; i2<=itsD2; i2++)
-                    for (int j2=1; j2<=Psi2->itsD2; j2++)
-                        F(i1,j1)+=Fap1(i2,j2)*conj(itsMs[m](i1,i2))*Psi2->itsMs[m](j1,j2); //Not Optimized
-
+                    FM+=Fap1(i2,j2)*conj(itsMs[m](i1,i2));
+                for (int j1=1; j1<=Psi2->itsD1; j1++)
+                    F(i1,j1)+=FM*Psi2->itsMs[m](j1,j2); //Not Optimized
+            }
     if (cache) itsRightCache=F;
 //    cout << "Rcache=" << itsRightCache.GetLimits() << endl;
 
@@ -360,9 +367,9 @@ void MPSSite::SVDTransfer(Direction lr,const DiagonalMatrixRT& s, const MatrixCT
                 abort();
             }
             assert(itsMs[in].GetNumCols()==UV.GetNumRows());
-            MatrixCT temp=itsMs[in]*UV*s;
+            MatrixCT MU=itsMs[in]*UV;
             itsMs[in].SetLimits(0,0);
-            itsMs[in]=temp; //Shallow copy
+            itsMs[in]=MU*s;
             assert(itsMs[in].GetNumCols()==itsD2); //Verify shape is correct;
         }
         break;
@@ -381,9 +388,9 @@ void MPSSite::SVDTransfer(Direction lr,const DiagonalMatrixRT& s, const MatrixCT
         for (int in=0; in<itsd; in++)
         {
             assert(UV.GetNumCols()==itsMs[in].GetNumRows());
-            MatrixCT temp=s*UV*itsMs[in];
+            MatrixCT VM=UV*itsMs[in];
             itsMs[in].SetLimits(0,0);
-            itsMs[in]=temp; //Shallow copy
+            itsMs[in]=s*VM;
             //        cout << "A[" << in << "]=" << itsAs[in] << endl;
             assert(itsMs[in].GetNumRows()==itsD1); //Verify shape is correct;
         }
@@ -549,22 +556,22 @@ MatrixCT MPSSite::ContractLRM(const MatrixCT& M, const MatrixCT& L, const Matrix
     assert(R.GetNumRows()==itsD2);
     assert(L.GetNumRows()==itsD1);
 
-    MatrixCT RM=Contract_RM(R,M);
-    assert(RM.GetNumCols()==L.GetNumCols());
-    assert(RM.GetNumRows()==itsD2);
-
     MatrixCT M_tilde(itsD1,itsD2);
     Fill(M_tilde,dcmplx(0.0));
 
 //    cout << "ContractLRM RM=" << RM.GetLimits() << endl;
-    for (int i1=1; i1<=itsD1; i1++)
         for (int i2=1; i2<=itsD2; i2++)
             for (int j1=1; j1<=L.GetNumCols(); j1++)
-                M_tilde(i1,i2)+=L(i1,j1)*RM(i2,j1);
-
+            {
+                dcmplx RM(0);
+                for (int j2=1; j2<=R.GetNumCols(); j2++)
+                    RM+=R(i2,j2)*M(j1,j2);
+                for (int i1=1; i1<=itsD1; i1++)
+                    M_tilde(i1,i2)+=L(i1,j1)*RM;
+            }
     return M_tilde;
 }
-
+/*
 MatrixCT MPSSite::Contract_RM(const MatrixCT& R, const MatrixCT& M) const
 {
     assert(R.GetNumCols()==M.GetNumCols());
@@ -577,7 +584,7 @@ MatrixCT MPSSite::Contract_RM(const MatrixCT& R, const MatrixCT& M) const
                 RM(i2,j1)+=R(i2,j2)*M(j1,j2);
     return RM;
 }
-
+*/
 void  MPSSite::ApplyInPlace(const SiteOperator* so)
 {
     dVectorT newAs;

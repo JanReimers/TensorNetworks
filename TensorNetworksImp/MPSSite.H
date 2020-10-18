@@ -143,7 +143,7 @@ private:
     MatrixCT ContractCA(int n2, const MatrixCT& C) const;
     void     Contract(dVectorT& newAs,const SiteOperator* so);
     MatrixCT ContractLRM(const MatrixCT& M, const MatrixCT& L, const MatrixCT& R) const;
-    MatrixCT Contract_RM(const MatrixCT& R, const MatrixCT& M) const;
+   // MatrixCT Contract_RM(const MatrixCT& R, const MatrixCT& M) const;
 
 
     Bond* itsLeft_Bond;

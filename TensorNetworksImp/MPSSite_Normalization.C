@@ -5,6 +5,7 @@
 #include "TensorNetworks/Dw12.H"
 #include "oml/minmax.h"
 #include "oml/cnumeric.h"
+#include "NumericalMethods/LapackSVD.H"
 //#include "oml/vector_io.h"
 #include "oml/random.h"
 #include <iostream>
@@ -37,8 +38,17 @@ void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
         Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
         return;
     }
-
-    auto [U,s,Vdagger]=oml_CSVDecomp(ReshapeBeforeSVD(lr)); //Solves A=U * s * Vdagger  returns V not Vdagger
+    MatrixCT A=ReshapeBeforeSVD(lr);
+    LapackSVDSolver<dcmplx> solver;
+    int D=Min(A.GetNumRows(),A.GetNumCols());
+    if (comp)
+    {
+        int Dmax=comp->GetDmax();
+//        cout << "D Dmax=" << D << " " << Dmax << endl;
+        if (Dmax>0 && Dmax<D) D=Dmax;
+    }
+    auto [U,s,Vdagger]=solver.Solve(A,D,1e-10); //Solves A=U * s * Vdagger  returns V not Vdagger
+//    auto [U,s,Vdagger]=oml_CSVDecomp(ReshapeBeforeSVD(lr)); //Solves A=U * s * Vdagger  returns V not Vdagger
     double integratedS2=0.0;
     if (comp) integratedS2=comp->Compress(U,s,Vdagger);
 

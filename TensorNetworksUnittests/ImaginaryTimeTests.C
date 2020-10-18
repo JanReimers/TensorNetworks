@@ -27,7 +27,7 @@ public:
     , itsFactory(TensorNetworks::Factory::GetFactory())
     , itsH(0)
     , itsMPS(0)
-    , itsLogger(new TensorNetworks::SPDLogger(1))
+    , itsLogger(new TensorNetworks::SPDLogger(2))
     {
         StreamableObject::SetToPretty();
     }
@@ -306,10 +306,10 @@ TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotter)
     double E2=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46664265599414939,1e-4);
 }
-
+#endif
 TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
 {
-    int D=16,Dcompress=0,L=9; //Set DMax high
+    int D=16,Dcompress=16,L=16; //Set DMax high
 //    double epsSV=1e-9;
     Setup(L,0.5,D);
     itsMPS->NormalizeAndCompress(TensorNetworks::DLeft ,D,1e-5);
@@ -340,7 +340,7 @@ TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
     eps.itsDelatEnergy1Epsilon=1e-6;
     eps.itsMPOCompressEpsilon=1e-9;
     eps.itsMPSCompressEpsilon=1e-7; //Just Eps for compression
-    eps.itsDelatNormEpsilon=1e-8;
+    eps.itsDelatNormEpsilon=1e-10;
     is.Insert({500,Dcompress,5,0.1,SecondOrder,eps});
 
 //    eps.itsDelatEnergy1Epsilon=2e-7;
@@ -349,30 +349,30 @@ TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
 //    eps.itsDelatNormEpsilon=1e-11;
 //    is.Insert({500,D,5,0.1,SecondOrder,eps});
 
-    eps.itsDelatEnergy1Epsilon=1e-7;
-    eps.itsMPOCompressEpsilon=1e-14;
-    eps.itsMPSCompressEpsilon=1e-10; //Just Eps for compression
-    eps.itsDelatNormEpsilon=1e-12;
-    is.Insert({500,Dcompress,5,0.1,SecondOrder,eps});
+//    eps.itsDelatEnergy1Epsilon=1e-7;
+//    eps.itsMPOCompressEpsilon=1e-14;
+//    eps.itsMPSCompressEpsilon=1e-10; //Just Eps for compression
+//    eps.itsDelatNormEpsilon=1e-12;
+//    is.Insert({500,Dcompress,5,0.1,SecondOrder,eps});
 
-    eps.itsDelatEnergy1Epsilon=1e-9;
-    eps.itsMPOCompressEpsilon=1e-16;
-    eps.itsMPSCompressEpsilon=1e-10; //Just Eps for compression
-    eps.itsDelatNormEpsilon=1e-12;
-    is.Insert({500,Dcompress,5,0.1,SecondOrder,eps});
-
-    eps.itsDelatEnergy1Epsilon=1e-8;
-    eps.itsMPOCompressEpsilon=1e-16;
-    eps.itsMPSCompressEpsilon=1e-10; //Just Eps for compression
-    eps.itsDelatNormEpsilon=1e-12;
-    is.Insert({500,Dcompress,5,0.01,SecondOrder,eps});
+//    eps.itsDelatEnergy1Epsilon=1e-8;
+//    eps.itsMPOCompressEpsilon=1e-16;
+//    eps.itsMPSCompressEpsilon=1e-9; //Just Eps for compression
+//    eps.itsDelatNormEpsilon=1e-12;
+//    is.Insert({500,Dcompress,5,0.1,SecondOrder,eps});
+//
+//    eps.itsDelatEnergy1Epsilon=1e-8;
+//    eps.itsMPOCompressEpsilon=1e-16;
+//    eps.itsMPSCompressEpsilon=1e-9; //Just Eps for compression
+//    eps.itsDelatNormEpsilon=1e-12;
+//    is.Insert({500,Dcompress,5,0.01,SecondOrder,eps});
 
     itsMPS->FindiTimeGroundState(itsH,is);
 
     double E2=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46703997271019776,1e-7);
 }
-#endif // DEBUG
+//#endif // DEBUG
 
 #ifdef RunLongTests
 
