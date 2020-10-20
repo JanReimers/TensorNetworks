@@ -10,7 +10,6 @@
 #include "oml/stream.h"
 #include "oml/numeric.h"
 #include "oml/cnumeric.h"
-#include "oml/vector_io.h"
 #include "oml/diagonalmatrix.h"
 
 class LinearAlgebraTests : public ::testing::Test
@@ -188,9 +187,9 @@ TEST_F(LinearAlgebraTests,oml_SVDRandomComplexMatrix_10x10)
     auto [U,s,Vdagger]=oml_CSVDecomp(itsAC); //Solve A=U*s*conj(V)
 
     MatrixCT V=Transpose(conj(Vdagger));
-    EXPECT_NEAR(Max(abs(Transpose(conj(U))*U-itsIC)),0.0,eps);
-    EXPECT_NEAR(Max(abs(V*Vdagger-itsIC)),0.0,eps);
-    EXPECT_NEAR(Max(abs(U*s*Vdagger-itsAC)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(Transpose(conj(U))*U-itsIC)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(V*Vdagger-itsIC)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(U*s*Vdagger-itsAC)),0.0,eps);
 }
 
 
@@ -200,9 +199,9 @@ TEST_F(LinearAlgebraTests,oml_SVDRandomComplexMatrix_10x5)
     auto [U,s,Vdagger]=oml_CSVDecomp(itsAC);
 
     MatrixCT V=Transpose(conj(Vdagger));
-//    EXPECT_NEAR(Max(abs(Transpose(conj(U))*U-itsIC)),0.0,eps); //Not true for 10x5
-    EXPECT_NEAR(Max(abs(V*Vdagger-itsIC)),0.0,eps);
-    EXPECT_NEAR(Max(abs(U*s*Vdagger-itsAC)),0.0,eps);
+//    EXPECT_NEAR(Max(fabs(Transpose(conj(U))*U-itsIC)),0.0,eps); //Not true for 10x5
+    EXPECT_NEAR(Max(fabs(V*Vdagger-itsIC)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(U*s*Vdagger-itsAC)),0.0,eps);
 }
 
 
@@ -212,9 +211,9 @@ TEST_F(LinearAlgebraTests,oml_SVDRandomComplexMatrix_5x10)
     auto [U,s,Vdagger]=oml_CSVDecomp(itsAC);
 
     MatrixCT V=Transpose(conj(Vdagger));
-    EXPECT_NEAR(Max(abs(Transpose(conj(U))*U-itsIC)),0.0,eps);
-    //EXPECT_NEAR(Max(abs(V*Vdagger-itsIC)),0.0,eps); Not true for 5x10
-    EXPECT_NEAR(Max(abs(U*s*Vdagger-itsAC)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(Transpose(conj(U))*U-itsIC)),0.0,eps);
+    //EXPECT_NEAR(Max(fabs(V*Vdagger-itsIC)),0.0,eps); Not true for 5x10
+    EXPECT_NEAR(Max(fabs(U*s*Vdagger-itsAC)),0.0,eps);
 }
 
 TEST_F(LinearAlgebraTests,OML_EigenSolverComplexHermitian_oldUI)
@@ -226,7 +225,7 @@ TEST_F(LinearAlgebraTests,OML_EigenSolverComplexHermitian_oldUI)
     EXPECT_EQ(ierr,0);
     MatrixCT diag=Transpose(conj(itsAC))*Acopy*itsAC;
     for (int i=1;i<=itsWR.size();i++) diag(i,i)-=itsWR(i);
-    EXPECT_NEAR(Max(abs(diag)),0.0,Neigen*eps);
+    EXPECT_NEAR(Max(fabs(diag)),0.0,Neigen*eps);
 }
 
 TEST_F(LinearAlgebraTests,OML_EigenSolverComplexHermitian)
@@ -235,7 +234,7 @@ TEST_F(LinearAlgebraTests,OML_EigenSolverComplexHermitian)
     auto [U,w]=oml_Diagonalize(itsAC);
     MatrixCT diag=Transpose(conj(U))*itsAC*U;
     for (int i=1;i<=w.size();i++) diag(i,i)-=w(i);
-    EXPECT_NEAR(Max(abs(diag)),0.0,Neigen*eps);
+    EXPECT_NEAR(Max(fabs(diag)),0.0,Neigen*eps);
 }
 
 TEST_F(LinearAlgebraTests,omlDiagonalMatrix_double)
@@ -247,11 +246,11 @@ TEST_F(LinearAlgebraTests,omlDiagonalMatrix_double)
     MatrixRT M(N,N);
     FillRandom(M);
     MatrixRT Md=M*d;
-    EXPECT_NEAR(Max(abs(M+Md)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(M+Md)),0.0,eps);
     MatrixRT dM=d*M;
-    EXPECT_NEAR(Max(abs(M+dM)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(M+dM)),0.0,eps);
     MatrixRT dMdMdM=d*M*d*M*d*M;
-    EXPECT_NEAR(Max(abs(M*M*M+dMdMdM)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(M*M*M+dMdMdM)),0.0,eps);
 
 }
 
@@ -264,11 +263,11 @@ TEST_F(LinearAlgebraTests,omlDiagonalMatrix_complex)
     MatrixCT M(N,N);
     FillRandom(M);
     MatrixCT Md=M*d;
-    EXPECT_NEAR(Max(abs(M+Md)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(M+Md)),0.0,eps);
     MatrixCT dM=d*M;
-    EXPECT_NEAR(Max(abs(M+dM)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(M+dM)),0.0,eps);
     MatrixCT dMdMdM=d*M*d*M*d*M;
-    EXPECT_NEAR(Max(abs(M*M*M+dMdMdM)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(M*M*M+dMdMdM)),0.0,eps);
 
 }
 TEST_F(LinearAlgebraTests,omlDiagonalMatrix_complex_double)
@@ -280,11 +279,11 @@ TEST_F(LinearAlgebraTests,omlDiagonalMatrix_complex_double)
     MatrixCT M(N,N);
     FillRandom(M);
     MatrixCT Md=M*d;
-    EXPECT_NEAR(Max(abs(M+Md)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(M+Md)),0.0,eps);
     MatrixCT dM=d*M;
-    EXPECT_NEAR(Max(abs(M+dM)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(M+dM)),0.0,eps);
     MatrixCT dMdMdM=d*M*d*M*d*M;
-    EXPECT_NEAR(Max(abs(M*M*M+dMdMdM)),0.0,eps);
+    EXPECT_NEAR(Max(fabs(M*M*M+dMdMdM)),0.0,eps);
 
 }
 

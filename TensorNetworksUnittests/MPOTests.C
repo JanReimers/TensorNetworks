@@ -7,7 +7,6 @@
 #include "Containers/Matrix6.H"
 
 #include "oml/stream.h"
-#include "oml/vector_io.h"
 #include "oml/stopw.h"
 
 class MPOTests : public ::testing::Test

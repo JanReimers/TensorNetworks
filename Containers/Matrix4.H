@@ -45,7 +45,7 @@ template <class T> class Matrix4
         bool IsHermitian(double eps) const
         {
             //return itsData.IsHermitian(eps);
-            return Max(abs(itsData-conj(Transpose(itsData))))<eps;
+            return Max(fabs(itsData-conj(Transpose(itsData))))<eps;
         }
 
         friend std::ostream& operator<<(std::ostream& os,const Matrix4& m) {return os << m.itsData;}

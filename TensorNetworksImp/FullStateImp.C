@@ -7,7 +7,6 @@
 #include "Containers/SparseMatrix.H"
 #include "Containers/Matrix4.H"
 #include "oml/random.h"
-#include "oml/vector_io.h"
 
 namespace TensorNetworks
 {
@@ -82,7 +81,7 @@ template <class T> double FullStateImp<T>::OperateOverLattice()
     // Scale out the eigen value
     newAmplitudes/=itsE;
     // Find the change in psi
-    double deltaPsi=Max(abs(newAmplitudes-itsAmplitudes));
+    double deltaPsi=Max(fabs(newAmplitudes-itsAmplitudes));
     // Assign and normalize the updated amplitudes.
     itsAmplitudes=newAmplitudes;
     Normalize(itsAmplitudes);

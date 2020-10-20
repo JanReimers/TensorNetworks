@@ -8,6 +8,7 @@ OneSiteDMs::OneSiteDMs(int L, int d)
     , itsd(d)
     , itsDMs(L)
 {
+    itsDMs.push_back(DMType());
     //ctor
 }
 
@@ -21,7 +22,7 @@ void OneSiteDMs::Insert(int ia, const DMType& dm)
     assert(dm.GetNumRows()==itsd);
     assert(dm.GetNumCols()==itsd);
     assert(IsHermitian(dm,1e-14));
-    itsDMs(ia)=dm;
+    itsDMs[ia]=dm;
 }
 
 template <class O> OneSiteDMs::ExpectationT OneSiteDMs::Contract(const O& op) const
@@ -35,7 +36,7 @@ template <class O> OneSiteDMs::ExpectationT OneSiteDMs::Contract(const O& op) co
     for (int ia=1; ia<=itsL; ia++)
     {
         dcmplx ex(0.0);
-        const DMType& dm=itsDMs(ia);
+        const DMType& dm=itsDMs[ia];
 //            cout << "dm=" << dm << endl;
         for (int m1=1; m1<=itsd; m1++)
             for (int n1=1; n1<=itsd; n1++)
@@ -55,7 +56,7 @@ OneSiteDMs::ExpectationT OneSiteDMs::GetTraces() const
     ExpectationT ret(itsL);
     Fill(ret,0.0);
     for (int ia=1; ia<=itsL; ia++)
-        ret(ia)=std::real(Sum(itsDMs(ia).GetDiagonal()));
+        ret(ia)=std::real(Sum(itsDMs[ia].GetDiagonal()));
     return ret;
 }
 
@@ -66,12 +67,11 @@ OneSiteDMs::ExpectationT OneSiteDMs::GetVNEntropies() const
     for (int ia=1; ia<=itsL; ia++)
     {
         //Vector<double> s=EigenValuesOnly<double,MatrixCT>(itsDMs(ia,ib).Flatten());
-        Vector<dcmplx> s(itsDMs(ia).GetDiagonal());
+        Vector<dcmplx> s(itsDMs[ia].GetDiagonal());
 //            cout << "s(" << ia << "," << ib << ")=" << s << ", sum=" << Sum(s) << endl;
         ret(ia)=VNEntropyFromEVs(real(s));
     }
     return ret;
 }
 
-#define TYPE OneSiteDMs::DMType
-#include "oml/src/smatrix.cc"
+

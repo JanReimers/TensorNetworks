@@ -1,7 +1,6 @@
 #include "PrimeEigenSolver.H"
 #include "Containers/SparseMatrix.H"
 #include "oml/dmatrix.h"
-#include "oml/vector_io.h"
 #include <primme.h>
 
 using std::cout;
@@ -126,7 +125,7 @@ PrimeEigenSolver<T>::Solve(primme_params& p)
     int ret = primmeT<T>(&itsEigenValues(1), &itsEigenVectors(1,1), &rnorms(1), &p);
     assert(ret==0);
     (void)ret; //avoid compiler warning in release modems)) << " " << std::endl;
-    if (Max(abs(rnorms))>1000*p.eps)
+    if (Max(fabs(rnorms))>1000*p.eps)
         cout << "Warning high rnorms in PrimeEigenSolver::SolveSparse rnorma=" << std::scientific << rnorms << endl;
     //int niter=p.stats.numOuterIterations;
     //std::cout << "Primme niter=" << niter << std::endl;

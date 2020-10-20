@@ -89,7 +89,7 @@
 			<Option compilerVar="CPP" />
 		</Unit>
 		<Unit filename="LinearAlgebraTests.C">
-			<Option compilerVar="CPP" />
+			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="LinearAlgebraTests.H" />
 		<Unit filename="MPOTests.C">

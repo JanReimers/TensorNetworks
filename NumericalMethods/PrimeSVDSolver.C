@@ -1,7 +1,6 @@
 #include "PrimeSVDSolver.H"
 #include "Containers/SparseMatrix.H"
 #include "oml/dmatrix.h"
-#include "oml/vector_io.h"
 #include <primme.h>
 
 using std::cout;
@@ -83,7 +82,7 @@ PrimeSVDSolver<T>::Solve(primme_svds_params& p)
     int ret = primmeT<T>(&itsSingularValues(1,1), &itsSingularVectors(1), &rnorms(1), &p);
     assert(ret==0);
     (void)ret; //avoid compiler warning in release modems)) << " " << std::endl;
-    if (Max(abs(rnorms))>1000*p.eps)
+    if (Max(fabs(rnorms))>1000*p.eps)
         cout << "Warning high rnorms in PrimeSVDSolver::Solve rnorma=" << std::scientific << rnorms << endl;
 //    int niter=p.stats.numOuterIterations;
     //std::cout << "Primme niter=" << niter << std::endl;

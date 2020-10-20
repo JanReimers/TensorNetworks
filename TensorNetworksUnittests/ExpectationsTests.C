@@ -365,9 +365,9 @@ TEST_F(ExpectationsTests,TestTwoSiteDMs)
         for (int ib=ia+1;ib<=L;ib++)
         {
  //           cout << "Sites (" << ia << "," << ib << "): <S_a*S_b>-<S_a>*<S_b>=" << Sus(ia,ib) <<endl;
-            double err=Max(abs(Sus1(ia,ib)-Sus2(ia,ib)));
-            double err1=Max(abs(Sus1(ia,ib)-Transpose(Sus1(ia,ib))));
-            double err2=Max(abs(Sus2(ia,ib)-Transpose(Sus2(ia,ib))));
+            double err =Max(fabs(Sus1(ia,ib)-Sus2(ia,ib)));
+            double err1=Max(fabs(Sus1(ia,ib)-Transpose(Sus1(ia,ib))));
+            double err2=Max(fabs(Sus2(ia,ib)-Transpose(Sus2(ia,ib))));
             EXPECT_NEAR(err,0.0,1e-14);
             EXPECT_NEAR(err1,0.0,2e-8);
             EXPECT_NEAR(err2,0.0,2e-8);

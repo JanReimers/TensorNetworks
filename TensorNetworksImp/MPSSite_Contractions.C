@@ -5,7 +5,6 @@
 #include "Containers/Matrix6.H"
 #include "oml/minmax.h"
 #include "oml/cnumeric.h"
-#include "oml/vector_io.h"
 #include "oml/random.h"
 #include "oml/diagonalmatrix.h"
 #include <iostream>

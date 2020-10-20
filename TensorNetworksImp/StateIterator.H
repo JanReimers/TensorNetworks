@@ -1,7 +1,8 @@
 #ifndef STATEITERATOR_H
 #define STATEITERATOR_H
 
-#include "oml/vector_io.h"
+#include "oml/vector.h"
+#include <iostream>
 
 namespace TensorNetworks
 {

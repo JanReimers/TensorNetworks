@@ -4,7 +4,7 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     Git rid of Matrix
     Rename DMatrix to Matrix
     Fix up unit tests for double (forget int float for now)
-    Round out LAPack and Arpack wrappers and move everything to oml_CSVDecomp
+    Round out LAPack and Arpack wrappers and move everything to oml
     Is it possible to simplify expression templates with C++17?
     Beef up Diagonal and Sparse matrices.
     Done: add fabs for complex matrices
@@ -12,6 +12,11 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     F(A-B) for work where F(const DMatrix<T>&)
     Loose all the Get prefixes
     Initialize value as third argument, Loose to FIll routines
+        This has consequences
+            1) Vector<dcmplx>(10,0.5) -> uses the Vector(int low,int high) constructor
+            2) Vector<Matrix<whatever>> breaks to compile on the Fill calls.
+                We can solve by keeping everything inline & dont use FillType=None
+    Does explicit on the contructors help with anything?
     use class enums
     Use constructor delegation
 -Done Profiling

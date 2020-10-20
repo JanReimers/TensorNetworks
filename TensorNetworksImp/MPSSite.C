@@ -214,7 +214,7 @@ bool MPSSite::IsUnit(const MatrixCT& m,double eps)
     int N=m.GetNumRows();
     MatrixCT I(N,N);
     Unit(I);
-    return Max(abs(m-I))<eps;
+    return Max(fabs(m-I))<eps;
 }
 
 } //namespace

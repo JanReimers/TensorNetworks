@@ -306,7 +306,6 @@ TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotter)
     double E2=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46664265599414939,1e-4);
 }
-#endif
 TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
 {
     int D=16,Dcompress=16,L=16; //Set DMax high
@@ -372,7 +371,7 @@ TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
     double E2=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46703997271019776,1e-7);
 }
-//#endif // DEBUG
+#endif // DEBUG
 
 #ifdef RunLongTests
 

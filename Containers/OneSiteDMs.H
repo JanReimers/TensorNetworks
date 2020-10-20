@@ -4,6 +4,7 @@
 #include "oml/dmatrix.h"
 #include "oml/vector.h"
 #include <complex>
+#include <vector>
 //---------------------------------------------------------------------------------------
 //
 //  Store and manipulate 2-site density matricies
@@ -28,7 +29,7 @@ public:
     ExpectationT GetVNEntropies() const;
 
 private:
-    typedef Vector<DMType> DMsType;
+    typedef std::vector<DMType> DMsType;
     typedef DMatrix<dcmplx> MatrixCT;
 
     int     itsL;

@@ -2,7 +2,6 @@
 #include "Operators/SiteOperatorImp.H"
 #include "TensorNetworksImp/SVMPOCompressor.H"
 #include "TensorNetworks/CheckSpin.H"
-#include "oml/vector_io.h"
 
 namespace TensorNetworks
 {

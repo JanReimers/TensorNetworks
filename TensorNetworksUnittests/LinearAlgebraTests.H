@@ -18,7 +18,7 @@ template <> DMatrix<double> MyAbs(const DMatrix<double> &m)
 
 template <> DMatrix<double> MyAbs(const DMatrix<dcmplx> &m)
 {
-    return abs(m);
+    return fabs(m);
 };
 
 const DMatrix<double>& conj(const DMatrix<double>& m) {return m;}
@@ -94,13 +94,13 @@ public:
         if (N<=M)
         {
             DMatrix<T> V=Transpose(conj(VT));
-            EXPECT_NEAR(Max(abs(V*VT-I)),0.0,100*eps);
+            EXPECT_NEAR(Max(fabs(V*VT-I)),0.0,100*eps);
         }
         if (N>=M)
         {
             DMatrix<T> UT=Transpose(conj(U));
             //cout << "U*UT=" << UT*U << endl;
-            EXPECT_NEAR(Max(abs(UT*U-I)),0.0,sqrt(N*M)*eps);
+            EXPECT_NEAR(Max(fabs(UT*U-I)),0.0,sqrt(N*M)*eps);
         }
 
         DMatrix<T> A1=U*s*VT;
@@ -139,12 +139,12 @@ public:
         auto [U,d]=solver.Solve(A,Ne,eps);
 //        cout << "U,d=" << U << d << endl;
         DMatrix<T> UT=Transpose(conj(U));
-        EXPECT_NEAR(Max(abs(UT*U-I)),0.0,10*eps);
+        EXPECT_NEAR(Max(fabs(UT*U-I)),0.0,10*eps);
 //        cout << "UT*U=" << UT*U << endl;
         DMatrix<T> diag=UT*A*U;
 //        cout << "diag=" << diag << endl;
         for (int i=1;i<=Ne;i++) diag(i,i)-=d(i);
-        EXPECT_NEAR(Max(abs(diag)),0.0,100*eps);
+        EXPECT_NEAR(Max(fabs(diag)),0.0,100*eps);
     }
 
 };
@@ -175,7 +175,7 @@ public:
         {
             Vector<dcmplx> Ui=U.GetColumn(i);
             Vector<dcmplx> residuals=A*Ui-d(i)*Ui;
-            double res=Max(abs(residuals));
+            double res=Max(fabs(residuals));
             EXPECT_NEAR(res,0.0,15*eps);
         }
 
