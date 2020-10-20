@@ -4,3 +4,6 @@
 [submodule "ITensor"]
 	path = ITensor
 	url = https://github.com/ITensor/ITensor
+[submodule "googletest"]
+	path = googletest
+	url = https://github.com/google/googletest
