@@ -3,7 +3,7 @@
 #include "Containers/SparseMatrix.H"
 
 #include "arpack/arpackdef.h"
-#include "oml/dmatrix.h"
+#include "oml/matrix.h"
 #include <tuple>
 #include <iostream>
 

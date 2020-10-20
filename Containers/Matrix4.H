@@ -1,7 +1,7 @@
 #ifndef MATRIX4_H
 #define MATRIX4_H
 
-#include "oml/dmatrix.h"
+#include "oml/matrix.h"
 
 using std::cout;
 using std::endl;

@@ -1,7 +1,7 @@
 #ifndef ONESITEDMS_H
 #define ONESITEDMS_H
 
-#include "oml/dmatrix.h"
+#include "oml/matrix.h"
 #include "oml/vector.h"
 #include <complex>
 #include <vector>

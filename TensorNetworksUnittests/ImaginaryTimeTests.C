@@ -8,8 +8,8 @@
 #include "TensorNetworksImp/SPDLogger.H"
 
 #include "oml/matrix.h"
-#include "oml/stream.h"
-#include "oml/stopw.h"
+//#include "oml/stream.h"
+//#include "oml/stopw.h"
 
 using std::setw;
 using TensorNetworks::TrotterOrder;

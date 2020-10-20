@@ -1,5 +1,5 @@
 #include "SVMPOCompressor.H"
-#include "oml/dmatrix.h"
+#include "oml/matrix.h"
 #include "oml/diagonalmatrix.h"
 
 namespace TensorNetworks

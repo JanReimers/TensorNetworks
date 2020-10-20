@@ -7,7 +7,7 @@
 #include "NumericalMethods/LapackEigenSolver.H"
 #include "NumericalMethods/ArpackEigenSolver.H"
 #include "Containers/SparseMatrix.H"
-#include "oml/stream.h"
+//#include "oml/stream.h"
 #include "oml/numeric.h"
 #include "oml/cnumeric.h"
 #include "oml/diagonalmatrix.h"
@@ -218,7 +218,7 @@ TEST_F(LinearAlgebraTests,oml_SVDRandomComplexMatrix_5x10)
 
 TEST_F(LinearAlgebraTests,OML_EigenSolverComplexHermitian_oldUI)
 {
-    SetupH(Neigen);
+    SetupH(50);
     MatrixCT Acopy(itsAC);
     int ierr=0;
     ch(itsAC, itsWR ,true,ierr);
@@ -230,7 +230,7 @@ TEST_F(LinearAlgebraTests,OML_EigenSolverComplexHermitian_oldUI)
 
 TEST_F(LinearAlgebraTests,OML_EigenSolverComplexHermitian)
 {
-    SetupH(Neigen);
+    SetupH(50);
     auto [U,w]=oml_Diagonalize(itsAC);
     MatrixCT diag=Transpose(conj(U))*itsAC*U;
     for (int i=1;i<=w.size();i++) diag(i,i)-=w(i);

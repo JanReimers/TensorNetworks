@@ -6,8 +6,8 @@
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworksImp/SPDLogger.H"
 
-#include "oml/stream.h"
-#include "oml/stopw.h"
+//#include "oml/stream.h"
+//#include "oml/stopw.h"
 
 using std::setw;
 

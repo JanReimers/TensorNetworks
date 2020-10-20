@@ -3,7 +3,7 @@
 
 #include "TensorNetworks/Epsilons.H"
 #include "oml/vector.h"
-#include "oml/dmatrix.h"
+#include "oml/matrix.h"
 #include <tuple>
 
 struct primme_params;

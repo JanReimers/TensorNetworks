@@ -60,8 +60,9 @@
 			<Add option="-Wall" />
 			<Add option="-std=c++17" />
 			<Add option="-m64" />
-			<Add directory="../" />
+			<Add directory="../oml/include" />
 			<Add directory="../ITensor" />
+			<Add directory="../" />
 		</Compiler>
 		<Linker>
 			<Add option="-m64" />

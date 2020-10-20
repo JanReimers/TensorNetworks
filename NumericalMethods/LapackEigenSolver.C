@@ -1,5 +1,5 @@
 #include "LapackEigenSolver.H"
-#include "oml/dmatrix.h"
+#include "oml/matrix.h"
 #include "oml/vector.h"
 //#include "oml/matrix_io.h"
 #include <complex>

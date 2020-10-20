@@ -1,6 +1,6 @@
 #include "PrimeSVDSolver.H"
 #include "Containers/SparseMatrix.H"
-#include "oml/dmatrix.h"
+#include "oml/matrix.h"
 #include <primme.h>
 
 using std::cout;

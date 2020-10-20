@@ -3,7 +3,7 @@
 
 #include "TensorNetworks/Enums.H"
 #include "Containers/Matrix4.H"
-#include "oml/dmatrix.h"
+#include "oml/matrix.h"
 #include <complex>
 #include <cassert>
 

@@ -1,7 +1,7 @@
 #ifndef SPARSEMATRIX_H
 #define SPARSEMATRIX_H
 
-#include "oml/dmatrix.h"
+#include "oml/matrix.h"
 #include <vector>
 #include <map>
 #include <iostream>

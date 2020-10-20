@@ -1,6 +1,6 @@
 #include "SVCompressorImp.H"
 #include "oml/diagonalmatrix.h"
-#include "oml/dmatrix.h"
+#include "oml/matrix.h"
 #include <iostream>
 
 namespace TensorNetworks

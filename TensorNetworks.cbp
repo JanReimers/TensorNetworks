@@ -46,6 +46,7 @@
 		<Compiler>
 			<Add option="-std=c++17" />
 			<Add option="-fPIC" />
+			<Add directory="oml/include" />
 			<Add directory="./" />
 		</Compiler>
 		<Linker>

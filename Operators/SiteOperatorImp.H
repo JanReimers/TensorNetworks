@@ -5,7 +5,7 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworksImp/Typedefs.H"
-#include "oml/dmatrix.h"
+#include "oml/matrix.h"
 
 class MPOTests;
 

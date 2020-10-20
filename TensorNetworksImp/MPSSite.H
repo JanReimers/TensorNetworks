@@ -3,7 +3,7 @@
 
 #include "TensorNetworksImp/Namespace.H"
 #include "Containers/Vector3.H"
-#include "oml/dmatrix.h"
+#include "oml/matrix.h"
 #include <vector>
 
 class MPOTests;
