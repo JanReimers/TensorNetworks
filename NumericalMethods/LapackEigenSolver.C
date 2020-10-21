@@ -60,7 +60,7 @@ LapackEigenSolver<T>::Solve(const MatrixT& A, int NumEigenValues,double eps)
     Vector<double> W(N);
     Vector<T> work(1);
     Vector<int> iwork(5*N),ifail(N);
-    DMatrix<T> U(N,NumEigenValues),Alower(A);
+    Matrix<T> U(N,NumEigenValues),Alower(A);
     char jobz='V',range='I',uplo='L';
     //
     //  Initial call to see how much work space is needed
@@ -93,7 +93,7 @@ LapackEigenSolver<double>::SolveNonSym(const MatrixT& A, int NumEigenValues,doub
     Vector<double> WR(N),WI(N);
     Vector<double> work(1);
     Vector<int> iwork(5*N),ifail(N);
-    DMatrix<double> VL(N,N),VR(N,N),Acopy(A);
+    Matrix<double> VL(N,N),VR(N,N),Acopy(A);
     char jobvl='N',jobvr='V';
     //
     //  Initial call to see how much work space is needed
@@ -110,7 +110,7 @@ LapackEigenSolver<double>::SolveNonSym(const MatrixT& A, int NumEigenValues,doub
     //  Unpack the eigen pairs
     //
     Vector<dcmplx> W(N);
-    DMatrix<dcmplx> V(N,N);
+    Matrix<dcmplx> V(N,N);
     for (int j=1;j<=N;j++)
     {
         if (fabs(WI(j))<eps)
@@ -147,7 +147,7 @@ LapackEigenSolver<dcmplx>::SolveNonSym(const MatrixT& A, int NumEigenValues,doub
     int info=0,lwork=-1;
     Vector<dcmplx> W(N),work(1);
     Vector<double> rwork(2*N);
-    DMatrix<dcmplx> VL(N,N),VR(N,N),Acopy(A);
+    Matrix<dcmplx> VL(N,N),VR(N,N),Acopy(A);
     char jobvl='N',jobvr='V';
     //
     //  Initial call to see how much work space is needed

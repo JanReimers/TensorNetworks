@@ -79,4 +79,4 @@ TwoSiteDMs::ExpectationT TwoSiteDMs::GetVNEntropies() const
 }
 
 #define TYPE TwoSiteDMs::DMType
-#include "oml/src/smatrix.cc"
+#include "oml/src/smatrix.cpp"

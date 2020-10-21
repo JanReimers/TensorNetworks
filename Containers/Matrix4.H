@@ -10,7 +10,7 @@ using std::endl;
 //
 template <class T> class Matrix4
 {
-    typedef DMatrix<T> MatrixRT;
+    typedef Matrix<T> MatrixRT;
     public:
         Matrix4(int Dw1,int D1, int Dw2, int D2, int wLow=1)
          : itsDw1(Dw1), itsD1(D1), itsDw2(Dw2), itsD2(D2), itswLow(1-wLow)

@@ -9,13 +9,13 @@
 template <class T> class SparseMatrix
 {
     public:
-        SparseMatrix(const DMatrix<T>& denseMatrix,double eps=0.0);
+        SparseMatrix(const Matrix<T>& denseMatrix,double eps=0.0);
         SparseMatrix(const MatLimits&);
         SparseMatrix(int Nr, int Nc);
         SparseMatrix();
         ~SparseMatrix() {};
 
-        SparseMatrix& operator=(const DMatrix<T>&);
+        SparseMatrix& operator=(const Matrix<T>&);
 
         void Insert(const T&,int i, int j);
         T operator()(int i, int j) const;
@@ -35,7 +35,7 @@ template <class T> class SparseMatrix
 
     protected:
         void Dump(std::ostream& os) const;
-        void AssignFrom(const DMatrix<T>& denseMatrix,double eps);
+        void AssignFrom(const Matrix<T>& denseMatrix,double eps);
 
     private:
         int itsNr,itsNc;
@@ -95,10 +95,10 @@ public:
 };
 
 
-template <class T> DMatrix<T> operator-(const SparseMatrix<T>& a, const DMatrix<T>& b)
+template <class T> Matrix<T> operator-(const SparseMatrix<T>& a, const Matrix<T>& b)
 {
     assert(a.GetLimits()==b.GetLimits());
-    DMatrix<T> ret(a.GetLimits());
+    Matrix<T> ret(a.GetLimits());
     Fill(ret,T(0));
     for (int i=1;i<=a.GetNumRows();i++)
         for (int j=1;j<=b.GetNumCols();j++)
@@ -106,12 +106,12 @@ template <class T> DMatrix<T> operator-(const SparseMatrix<T>& a, const DMatrix<
     return ret;
 }
 
-template <class TA, class TB> auto operator*(const SparseMatrix<TA>& a, const DMatrix<TB>& b)
+template <class TA, class TB> auto operator*(const SparseMatrix<TA>& a, const Matrix<TB>& b)
 {
     assert(a.GetNumCols()==b.GetNumRows());
     typedef typename BinaryRetType<TA,TB,OpMul<TA,TB> >::RetType TR;
 
-    DMatrix<TR> ret(a.GetNumRows(),b.GetNumCols());
+    Matrix<TR> ret(a.GetNumRows(),b.GetNumCols());
     Fill(ret,TR(0));
     for (typename SparseMatrix<TA>::const_iterator ia(a);!ia.end();ia++)
         for (int j=1;j<=b.GetNumCols();j++)
@@ -119,11 +119,11 @@ template <class TA, class TB> auto operator*(const SparseMatrix<TA>& a, const DM
     return ret;
 }
 
-template <class TA, class TB> auto operator*(const DMatrix<TA>& a, const SparseMatrix<TB>& b)
+template <class TA, class TB> auto operator*(const Matrix<TA>& a, const SparseMatrix<TB>& b)
 {
     assert(a.GetNumCols()==b.GetNumRows());
     typedef typename BinaryRetType<TA,TB,OpMul<TA,TB> >::RetType TR;
-    DMatrix<TR> ret(a.GetNumRows(),b.GetNumCols());
+    Matrix<TR> ret(a.GetNumRows(),b.GetNumCols());
     Fill(ret,TR(0));
     for (typename SparseMatrix<TB>::const_iterator ib(b);!ib.end();ib++)
         for (int i=1;i<=a.GetNumRows();i++)

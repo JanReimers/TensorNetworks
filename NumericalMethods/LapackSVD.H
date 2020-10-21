@@ -3,17 +3,17 @@
 
 #include <tuple>
 
-template <class T> class DMatrix;
+template <class T> class Matrix;
 template <class T> class DiagonalMatrix;
 //
 //  SVD decomposition for real*8  matrix.
 //
 //template <class TM> void LaSVDecomp(TM& A, Vector<double>& s, TM& V);
-std::tuple<DMatrix<double>,DiagonalMatrix<double>,DMatrix<double> > LaSVDecomp(const DMatrix<double>& A);
+std::tuple<Matrix<double>,DiagonalMatrix<double>,Matrix<double> > LaSVDecomp(const Matrix<double>& A);
 
 template <class T> class LapackSVDSolver
 {
-    typedef        DMatrix<T>              MatrixT;
+    typedef        Matrix<T>              MatrixT;
     typedef DiagonalMatrix<double> DiagonalMatrixT;
     typedef std::tuple<MatrixT,DiagonalMatrixT,MatrixT> UsVType;
 public:

@@ -44,7 +44,7 @@ extern "C"
     void zneupd_c(bool rvec, char const* howmny, a_int const* select, dcmplx* d , dcmplx*  z, a_int ldz, dcmplx sigma, dcmplx* workev, char const* bmat, a_int n, char const* which, a_int nev, double tol, dcmplx* resid, a_int ncv, dcmplx* v, a_int ldv, a_int* iparam, a_int* ipntr, dcmplx* workd, dcmplx* workl, a_int lworkl, double* rwork, a_int* info);
 }
 
-template <class T> void matvec(int N, const DMatrix<T>& A, const T * x, T * y)
+template <class T> void matvec(int N, const Matrix<T>& A, const T * x, T * y)
 {
     assert(A.GetNumRows()==N);
     assert(A.GetNumCols()==N);
@@ -70,7 +70,7 @@ template <class T> void matvec(int N, const SparseMatrix<T>& A, const T * x, T *
 }
 
 template <class T> typename ArpackEigenSolver<T>::UdType
-ArpackEigenSolver<T>::SolveNonSym(const DMatrix<T>& A, int Nev,double eps)
+ArpackEigenSolver<T>::SolveNonSym(const Matrix<T>& A, int Nev,double eps)
 {
     return SolveG(A,Nev,eps);
 }
@@ -99,7 +99,7 @@ ArpackEigenSolver<double>::SolveG(const Mat<double>& A, int Nev,double eps)
     Vector<double>  residuals(N);
     Vector<double>  Workd(3*N);
     Vector<double>  Workl(Lworkl);
-    DMatrix<double>  V(N,Ncv);
+    Matrix<double>  V(N,Ncv);
     Vector<double> rwork(Ncv);
     Vector<int> iParam(11);
     iParam(1)=1; //ISHIFT
@@ -129,7 +129,7 @@ ArpackEigenSolver<double>::SolveG(const Mat<double>& A, int Nev,double eps)
     //
     Vector<int> select(Ncv);
     Vector<double> DR(Nev+1),DI(Nev+1),Workev(3*Ncv);
-//    DMatrix<double> U(N,Nev+1);
+//    Matrix<double> U(N,Nev+1);
     double sigmar(0),sigmai(0);
     char how_many('A');
     dneupd_c(true, &how_many, &select(1), &DR(1),&DI(1), &V(1,1),N,
@@ -138,7 +138,7 @@ ArpackEigenSolver<double>::SolveG(const Mat<double>& A, int Nev,double eps)
           Lworkl, &INFO );
 
     Vector<dcmplx> D(Nev);
-    DMatrix<dcmplx> UC(N,Nev);
+    Matrix<dcmplx> UC(N,Nev);
     int ne=1;
     while (ne<Nev)
     {
@@ -180,7 +180,7 @@ ArpackEigenSolver<dcmplx>::SolveG(const Mat<dcmplx>& A, int Nev,double eps)
     int MaxIter=1000;
 
     Vector<dcmplx>  residuals(N),Workd(3*N),Workl(Lworkl);
-    DMatrix<dcmplx>  V(N,Ncv);
+    Matrix<dcmplx>  V(N,Ncv);
     Vector<double> rwork(Ncv);
     Vector<int> iParam(11);
     iParam(1)=1; //ISHIFT
@@ -210,7 +210,7 @@ ArpackEigenSolver<dcmplx>::SolveG(const Mat<dcmplx>& A, int Nev,double eps)
     //
     Vector<int> select(Ncv);
     Vector<dcmplx> D(Nev+1),Workev(2*Ncv);
-    DMatrix<dcmplx> U(N,Nev);
+    Matrix<dcmplx> U(N,Nev);
     dcmplx sigma(0);
     zneupd_c(true, "All", &select(1), &D(1), &U(1,1),N,
         sigma, &Workev(1), &arI,N,"LM", Nev, eps,

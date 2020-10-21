@@ -390,5 +390,5 @@ void SiteOperatorImp::Report(std::ostream& os) const
 //
 //  Make template instance
 //
-#define TYPE DMatrix<double>
-#include "oml/src/dmatrix.cc"
+#define TYPE Matrix<double>
+#include "oml/src/matrix.cpp"

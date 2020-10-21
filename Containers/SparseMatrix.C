@@ -4,7 +4,7 @@
 using std::cout;
 using std::endl;
 
-template <class T>  SparseMatrix<T>::SparseMatrix(const DMatrix<T>& denseMatrix,double eps)
+template <class T>  SparseMatrix<T>::SparseMatrix(const Matrix<T>& denseMatrix,double eps)
  : itsNr(denseMatrix.GetNumRows())
  , itsNc(denseMatrix.GetNumCols())
  , itsTotalNumElements(0)
@@ -30,13 +30,13 @@ template <class T> SparseMatrix<T>::SparseMatrix()
  , itsTotalNumElements(0)
 {}
 
-template <class T> SparseMatrix<T>& SparseMatrix<T>::operator=(const DMatrix<T>& denseMatrix)
+template <class T> SparseMatrix<T>& SparseMatrix<T>::operator=(const Matrix<T>& denseMatrix)
 {
       AssignFrom(denseMatrix,0);
       return *this;
 }
 
-template <class T> void SparseMatrix<T>::AssignFrom(const DMatrix<T>& denseMatrix,double eps)
+template <class T> void SparseMatrix<T>::AssignFrom(const Matrix<T>& denseMatrix,double eps)
 {
     itsTotalNumElements=0;
     itsNr=denseMatrix.GetNumRows();

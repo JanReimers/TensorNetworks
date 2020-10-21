@@ -13,9 +13,9 @@ class OneSiteDMs
 {
 public:
     typedef std::complex<double> dcmplx;
-    typedef DMatrix<dcmplx>       DMType;
-    typedef DMatrix<double>      OperatorT;
-    typedef DMatrix<dcmplx>       OperatorCT;
+    typedef Matrix<dcmplx>       DMType;
+    typedef Matrix<double>      OperatorT;
+    typedef Matrix<dcmplx>       OperatorCT;
     typedef Vector<double>       ExpectationT;
 
     OneSiteDMs(int L,int d);
@@ -30,7 +30,7 @@ public:
 
 private:
     typedef std::vector<DMType> DMsType;
-    typedef DMatrix<dcmplx> MatrixCT;
+    typedef Matrix<dcmplx> MatrixCT;
 
     int     itsL;
     int     itsd;

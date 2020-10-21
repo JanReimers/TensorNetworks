@@ -55,7 +55,7 @@ TEST_F(MPSTests,Constructor)
 
 TEST_F(MPSTests,MatrixOpMul)
 {
-    DMatrix<double> A(10,10),B(10,9);
+    Matrix<double> A(10,10),B(10,9);
     FillRandom(A);
     FillRandom(B);
     A*=B;

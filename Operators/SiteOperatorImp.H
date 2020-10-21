@@ -61,7 +61,7 @@ class SiteOperatorImp : public virtual SiteOperator
         void     Reshape(int D1, int D2, bool saveData=false);
         void     Reshape(Direction lr,const MatrixRT& UV);
 
-        typedef DMatrix<MatrixRT> TensorT;
+        typedef Matrix<MatrixRT> TensorT;
 
         int itsd; //2*S+1
         Dw12 itsDw12;

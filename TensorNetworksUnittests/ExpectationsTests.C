@@ -181,12 +181,12 @@ TEST_F(ExpectationsTests,TestFreezeL9S1D2)
 
 
 
-SMatrix<DMatrix<double> > SuseptibilityTensor(const OneSiteDMs& dm1,const TwoSiteDMs& dm2)
+SMatrix<Matrix<double> > SuseptibilityTensor(const OneSiteDMs& dm1,const TwoSiteDMs& dm2)
 {
     int L=dm1.GetL();
     assert(dm2.GetL()==L);
     assert(dm2.GetS()==dm1.GetS());
-    SMatrix<DMatrix<double> > ret(L,L);
+    SMatrix<Matrix<double> > ret(L,L);
     TensorNetworks::SpinCalculator sc(dm1.GetS());
 
     OneSiteDMs::ExpectationT Sx=dm1.Contract(sc.GetSx());
@@ -204,7 +204,7 @@ SMatrix<DMatrix<double> > SuseptibilityTensor(const OneSiteDMs& dm1,const TwoSit
     for (int ia=1;ia<=L-1;ia++)
         for (int ib=ia+1;ib<=L;ib++)
         {
-            DMatrix<double> Sus(3,3);
+            Matrix<double> Sus(3,3);
             Sus(1,1)=SxSx(ia,ib)-Sx(ia)*Sx(ib);
             Sus(1,2)=SxSy(ia,ib)-Sx(ia)*Sy(ib);
             Sus(1,3)=SxSz(ia,ib)-Sx(ia)*Sz(ib);
@@ -219,7 +219,7 @@ SMatrix<DMatrix<double> > SuseptibilityTensor(const OneSiteDMs& dm1,const TwoSit
     return ret;
 }
 
-SMatrix<DMatrix<double> > SuseptibilityTensor(const TensorNetworks::MPS* mps,const TwoSiteDMs& dm2)
+SMatrix<Matrix<double> > SuseptibilityTensor(const TensorNetworks::MPS* mps,const TwoSiteDMs& dm2)
 {
     int L=dm2.GetL();
     double S=dm2.GetS();
@@ -245,7 +245,7 @@ SMatrix<DMatrix<double> > SuseptibilityTensor(const TensorNetworks::MPS* mps,con
     }
     OneSiteDMs::ExpectationT Sy_mpo=-0.5*imag(Sp_mpo-Sm_mpo);
 
-    SMatrix<DMatrix<double> > ret(L,L);
+    SMatrix<Matrix<double> > ret(L,L);
     TensorNetworks::SpinCalculator sc(dm2.GetS());
 
 
@@ -261,7 +261,7 @@ SMatrix<DMatrix<double> > SuseptibilityTensor(const TensorNetworks::MPS* mps,con
     for (int ia=1; ia<L; ia++)
         for (int ib=ia+1; ib<=L; ib++)
         {
-            DMatrix<double> Sus(3,3);
+            Matrix<double> Sus(3,3);
             Sus(1,1)=SxSx(ia,ib)-Sx_mpo(ia)*Sx_mpo(ib);
             Sus(1,2)=SxSy(ia,ib)-Sx_mpo(ia)*Sy_mpo(ib);
             Sus(1,3)=SxSz(ia,ib)-Sx_mpo(ia)*Sz_mpo(ib);
@@ -358,8 +358,8 @@ TEST_F(ExpectationsTests,TestTwoSiteDMs)
 //    OneSiteDMs::ExpectationT Sx=ro1.Contract(sc.GetSx());
 //    OneSiteDMs::ExpectationT Sy=ro1.Contract(sc.GetSy());
 //    OneSiteDMs::ExpectationT Sz=ro1.Contract(sc.GetSz());
-    SMatrix<DMatrix<double> > Sus1=SuseptibilityTensor(ro1,ros);
-    SMatrix<DMatrix<double> > Sus2=SuseptibilityTensor(itsMPS,ros);
+    SMatrix<Matrix<double> > Sus1=SuseptibilityTensor(ro1,ros);
+    SMatrix<Matrix<double> > Sus2=SuseptibilityTensor(itsMPS,ros);
 
     for (int ia=1;ia<L;ia++)
         for (int ib=ia+1;ib<=L;ib++)
@@ -372,7 +372,7 @@ TEST_F(ExpectationsTests,TestTwoSiteDMs)
             EXPECT_NEAR(err1,0.0,2e-8);
             EXPECT_NEAR(err2,0.0,2e-8);
 //            cout << "Err 12,nonsym1,nonsym2=" << err << " " << err1 << " " << err2 << endl;
-//            DMatrix<double> SusSym=0.5*(Sus2(ia,ib)+ Transpose(Sus2(ia,ib)));
+//            Matrix<double> SusSym=0.5*(Sus2(ia,ib)+ Transpose(Sus2(ia,ib)));
 //            cout << "Sites (" << ia << "," << ib << "): Eigen Values=" << Diagonalize(SusSym) <<endl;
         }
     //
@@ -387,6 +387,6 @@ TEST_F(ExpectationsTests,TestTwoSiteDMs)
 }
 
 
-#define TYPE DMatrix<double>
-#include "oml/src/smatrix.cc"
+#define TYPE Matrix<double>
+#include "oml/src/smatrix.cpp"
 

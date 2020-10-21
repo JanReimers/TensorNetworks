@@ -29,7 +29,7 @@ public:
 
 private:
     typedef SMatrix<DMType> DMsType;
-    typedef DMatrix<dcmplx> MatrixCT;
+    typedef Matrix<dcmplx> MatrixCT;
 
     int itsL;
     int itsd;

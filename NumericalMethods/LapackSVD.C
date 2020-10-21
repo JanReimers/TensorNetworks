@@ -48,7 +48,7 @@ template <class TM> void LaSVDecomp(TM& A, Vector<double>& s, TM& VT)
     return;
 }
 
-std::tuple<DMatrix<double>,DiagonalMatrix<double>,DMatrix<double>> LaSVDecomp(const DMatrix<double>& A)
+std::tuple<Matrix<double>,DiagonalMatrix<double>,Matrix<double>> LaSVDecomp(const Matrix<double>& A)
 {
     int M=A.GetNumRows(),N=A.GetNumCols(),mn=Min(M,N);
 
@@ -57,7 +57,7 @@ std::tuple<DMatrix<double>,DiagonalMatrix<double>,DMatrix<double>> LaSVDecomp(co
     //
     int info=0,lwork=-1;
     Vector<double> s(mn),work(1);
-    DMatrix<double> U(A),VT(N,N);
+    Matrix<double> U(A),VT(N,N);
     char jobu='O',jobv='A';
     //
     //  Initial call to see how much work space is needed
@@ -109,7 +109,7 @@ LapackSVDSolver<T>::Solve(const MatrixT& A, int NumSingularValues,double eps)
     int info=0,lwork=-1;
     Vector<double> s(mn);
     Vector<T> work(1);
-    DMatrix<T> U(A),VT(N,N);
+    Matrix<T> U(A),VT(N,N);
     char jobu='O',jobv='A';
     //
     //  Initial call to see how much work space is needed
@@ -134,4 +134,4 @@ LapackSVDSolver<T>::Solve(const MatrixT& A, int NumSingularValues,double eps)
 
 template class LapackSVDSolver<double>;
 template class LapackSVDSolver<dcmplx>;
-template void LaSVDecomp<DMatrix<double> >(DMatrix<double>& A, Vector<double>& s, DMatrix<double>& VT);
+template void LaSVDecomp<Matrix<double> >(Matrix<double>& A, Vector<double>& s, Matrix<double>& VT);

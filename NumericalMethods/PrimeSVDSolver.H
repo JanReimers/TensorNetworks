@@ -7,7 +7,7 @@
 
 struct primme_svds_params;
 template <class T> class SparseMatrix;
-template <class T> class DMatrix;
+template <class T> class Matrix;
 //
 //  Client code can derive from this and control the matvec multiplication operations
 //
@@ -28,7 +28,7 @@ public:
 template <class T> class PrimeSVDSolver
 {
     typedef         Vector<T>              VectorT;
-    typedef        DMatrix<T>              MatrixT;
+    typedef        Matrix<T>              MatrixT;
     typedef   SparseMatrix<T>        SparseMatrixT;
     typedef DiagonalMatrix<double> DiagonalMatrixT;
     typedef std::tuple<MatrixT,DiagonalMatrixT,MatrixT> UsVType;

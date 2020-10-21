@@ -17,8 +17,8 @@ namespace TensorNetworks
 class SpinCalculator
 {
         typedef std::complex<double> complx;
-        typedef DMatrix<complx> MatrixCT;
-        typedef DMatrix<double> MatrixRT;
+        typedef Matrix<complx> MatrixCT;
+        typedef Matrix<double> MatrixRT;
         typedef Matrix4<complx> Matrix4CT;
         typedef Matrix4<double> Matrix4T;
         typedef double(SpinCalculator::*dfp)(int,int) const;

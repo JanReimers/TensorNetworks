@@ -206,7 +206,7 @@ void ClientMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_bl
 //  static variable. Kludge for getting the matrix into the MatVec routines.
 //
 template<class T> const SparseMatrix<T>* PrimeSVDSolver<T>::theSparseMatrix = 0;
-template<class T> const      DMatrix<T>* PrimeSVDSolver<T>::theDenseMatrix = 0;
+template<class T> const      Matrix<T>* PrimeSVDSolver<T>::theDenseMatrix = 0;
 
 template <class T> const PrimeSVDSolverClient<T>* PrimeSVDSolverClient<T>::theClient;
 

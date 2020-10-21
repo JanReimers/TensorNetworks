@@ -64,7 +64,7 @@ PrimeEigenSolver<T>::Solve(const PrimeEigenSolverClient<T>* client, int NumEigen
 }
 
 
-template <class T> int PrimeEigenSolver<T>::Solve1(const DMatrix<T>& m, int NumEigenValues,const TensorNetworks::Epsilons& eps)
+template <class T> int PrimeEigenSolver<T>::Solve1(const Matrix<T>& m, int NumEigenValues,const TensorNetworks::Epsilons& eps)
 {
     assert(&m);
     assert(m.GetNumRows()==m.GetNumCols());
@@ -220,7 +220,7 @@ void ClientMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_bl
 //  static variable. Kludge for getting the matrix into the MatVec routines.
 //
 template<class T> const SparseMatrix<T>* PrimeEigenSolver<T>::theSparseMatrix = 0;
-template<class T> const      DMatrix<T>* PrimeEigenSolver<T>::theDenseMatrix = 0;
+template<class T> const      Matrix<T>* PrimeEigenSolver<T>::theDenseMatrix = 0;
 
 template <class T> const PrimeEigenSolverClient<T>* PrimeEigenSolverClient<T>::theClient;
 

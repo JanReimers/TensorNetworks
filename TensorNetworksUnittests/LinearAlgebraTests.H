@@ -10,23 +10,23 @@ using std::endl;
 
 typedef std::complex<double> dcmplx;
 
-template <typename T> DMatrix<double> MyAbs(const DMatrix<T> &);
-template <> DMatrix<double> MyAbs(const DMatrix<double> &m)
+template <typename T> Matrix<double> MyAbs(const Matrix<T> &);
+template <> Matrix<double> MyAbs(const Matrix<double> &m)
 {
     return fabs(m);
 };
 
-template <> DMatrix<double> MyAbs(const DMatrix<dcmplx> &m)
+template <> Matrix<double> MyAbs(const Matrix<dcmplx> &m)
 {
     return fabs(m);
 };
 
-const DMatrix<double>& conj(const DMatrix<double>& m) {return m;}
+const Matrix<double>& conj(const Matrix<double>& m) {return m;}
 
 //
 //  Randomly put zeros into a dense matrix until a request density is achieved
 //
-template <class T> void MakeSparse(DMatrix<T>& m,double TargetDensity)
+template <class T> void MakeSparse(Matrix<T>& m,double TargetDensity)
 {
     int Ntotal=m.size(),N=m.size();
     int Nr=m.GetNumRows(),Nc=m.GetNumCols();
@@ -57,9 +57,9 @@ public:
     }
 
     virtual void RunTests()=0;
-    virtual DMatrix<T> MakeMatrix()
+    virtual Matrix<T> MakeMatrix()
     {
-        DMatrix<T> ret(M,N);
+        Matrix<T> ret(M,N);
         FillRandom(ret);
         MakeSparse(ret,Density);
         return ret;
@@ -69,7 +69,7 @@ public:
     double Density;
     Solver<T> solver;
     Mat<T> A;
-    DMatrix<T> I;
+    Matrix<T> I;
     double eps;
 };
 
@@ -93,18 +93,18 @@ public:
         auto [U,s,VT]=solver.Solve(A,Min(M,N),eps);
         if (N<=M)
         {
-            DMatrix<T> V=Transpose(conj(VT));
+            Matrix<T> V=Transpose(conj(VT));
             EXPECT_NEAR(Max(fabs(V*VT-I)),0.0,100*eps);
         }
         if (N>=M)
         {
-            DMatrix<T> UT=Transpose(conj(U));
+            Matrix<T> UT=Transpose(conj(U));
             //cout << "U*UT=" << UT*U << endl;
             EXPECT_NEAR(Max(fabs(UT*U-I)),0.0,sqrt(N*M)*eps);
         }
 
-        DMatrix<T> A1=U*s*VT;
-        DMatrix<T> dA=A-A1;
+        Matrix<T> A1=U*s*VT;
+        Matrix<T> dA=A-A1;
         EXPECT_NEAR(Max(MyAbs(dA)),0.0,sqrt(N*M)*eps);
 
     }
@@ -125,10 +125,10 @@ public:
 
     SymEigenTester(int N,double density=1.0) : Base(N,N,density) {}
 
-    virtual DMatrix<T> MakeMatrix()
+    virtual Matrix<T> MakeMatrix()
     {
-        DMatrix<T> ret=Base::MakeMatrix();
-        ret=DMatrix<T>(ret+Transpose(conj(ret)));
+        Matrix<T> ret=Base::MakeMatrix();
+        ret=Matrix<T>(ret+Transpose(conj(ret)));
         return ret;
     }
     virtual void RunTests()
@@ -138,10 +138,10 @@ public:
 //        cout << "A=" << A << endl;
         auto [U,d]=solver.Solve(A,Ne,eps);
 //        cout << "U,d=" << U << d << endl;
-        DMatrix<T> UT=Transpose(conj(U));
+        Matrix<T> UT=Transpose(conj(U));
         EXPECT_NEAR(Max(fabs(UT*U-I)),0.0,10*eps);
 //        cout << "UT*U=" << UT*U << endl;
-        DMatrix<T> diag=UT*A*U;
+        Matrix<T> diag=UT*A*U;
 //        cout << "diag=" << diag << endl;
         for (int i=1;i<=Ne;i++) diag(i,i)-=d(i);
         EXPECT_NEAR(Max(fabs(diag)),0.0,100*eps);

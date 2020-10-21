@@ -9,7 +9,7 @@ namespace TensorNetworks
 template <class T> class SVCompressor
 {
     public:
-        typedef DMatrix<T> MatrixT;
+        typedef Matrix<T> MatrixT;
 
         SVCompressor() {};
         virtual ~SVCompressor() {};

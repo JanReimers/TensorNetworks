@@ -3,7 +3,7 @@
 
 #include <complex>
 
-template <class T> class DMatrix;
+template <class T> class Matrix;
 template <class T> class DiagonalMatrix;
 template <class T> class Vector;
 template <class T> class Matrix4;
@@ -15,8 +15,8 @@ template <class T> class Matrix4;
 namespace TensorNetworks
 {
     typedef std::complex<double> dcmplx;
-    typedef DMatrix  <dcmplx>  MatrixCT;
-    typedef DMatrix  <double>  MatrixRT;
+    typedef Matrix  <dcmplx>  MatrixCT;
+    typedef Matrix  <double>  MatrixRT;
     typedef Vector   <double>  VectorRT;
     typedef Vector   <dcmplx>  VectorCT;
     typedef Matrix4  <double>  Matrix4RT;

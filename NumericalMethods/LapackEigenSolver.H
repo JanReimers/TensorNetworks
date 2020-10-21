@@ -3,7 +3,7 @@
 
 #include <tuple>
 
-template <class T> class DMatrix;
+template <class T> class Matrix;
 template <class T> class Vector;
 namespace std {
 template <class T> class complex;
@@ -14,8 +14,8 @@ template <class T> class LapackEigenSolver
     typedef std::complex<double> dcmplx;
     typedef Vector <double> VectorR;
     typedef Vector <dcmplx> VectorC;
-    typedef DMatrix<T>      MatrixT;
-    typedef DMatrix<dcmplx> MatrixC;
+    typedef Matrix<T>      MatrixT;
+    typedef Matrix<dcmplx> MatrixC;
     typedef std::tuple<MatrixT,VectorR> UdType;
     typedef std::tuple<MatrixC,VectorC> UdTypeN;
 public:

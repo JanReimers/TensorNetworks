@@ -8,7 +8,7 @@
 
 struct primme_params;
 template <class T> class SparseMatrix;
-template <class T> class DMatrix;
+template <class T> class Matrix;
 
 //
 //  Client code can derive from this and control the matvec multiplication operations
@@ -29,7 +29,7 @@ public:
 template <class T> class PrimeEigenSolver
 {
     typedef    Vector<double>              VectorT;
-    typedef        DMatrix<T>              MatrixT;
+    typedef        Matrix<T>              MatrixT;
     typedef   SparseMatrix<T>        SparseMatrixT;
     typedef std::tuple<MatrixT,VectorT> UdType;
 public:
@@ -41,12 +41,12 @@ public:
     UdType Solve(const SparseMatrixT&            , int NumEigenValues,double eps);
     UdType Solve(const PrimeEigenSolverClient<T>*, int NumEigenValues,double eps);
 
-    int Solve1(const DMatrix<T>&               , int NumEigenValues,const TensorNetworks::Epsilons& eps);
+    int Solve1(const Matrix<T>&               , int NumEigenValues,const TensorNetworks::Epsilons& eps);
     int Solve1(const PrimeEigenSolverClient<T>*, int NumEigenValues,const TensorNetworks::Epsilons& eps);
 
 
     Vector <T> GetEigenVector (int index) const;
-    DMatrix<T> GetEigenVectors() const
+    Matrix<T> GetEigenVectors() const
     {
         return itsEigenVectors;
     }
@@ -56,13 +56,13 @@ public:
     }
 
     static const SparseMatrix<T>* theSparseMatrix;
-    static const      DMatrix<T>* theDenseMatrix;
+    static const      Matrix<T>* theDenseMatrix;
 protected:
     UdType Solve(primme_params&);
 
 private:
     Vector<double>   itsEigenValues;
-    DMatrix<T>       itsEigenVectors;
+    Matrix<T>       itsEigenVectors;
     int              itsNumGuesses;
 };
 
