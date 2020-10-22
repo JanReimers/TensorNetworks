@@ -256,7 +256,7 @@ TEST_F(ImaginaryTimeTests,MPOCompressSeconderOrderTrotter_dt05_FixedDw)
     delete W;
 }
 
-
+#endif
 TEST_F(ImaginaryTimeTests,MPOCompressFourthOrderTrotter)
 {
     int D=8,L=9;
@@ -267,7 +267,7 @@ TEST_F(ImaginaryTimeTests,MPOCompressFourthOrderTrotter)
     EXPECT_EQ(W->GetMaxDw(),16);
 
 }
-
+#ifndef DEBUG
 
 TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotter)
 {

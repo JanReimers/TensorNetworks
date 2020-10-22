@@ -241,7 +241,7 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TrotterOrder order)
                 U.Combine(&Weven);
                 U.Combine(&Wodd);
                 W->Combine(&U);
-                W->Compress(0,1e-9);
+                W->Compress(0,1e-12);
             }
             break;
         }

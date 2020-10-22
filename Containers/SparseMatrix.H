@@ -109,7 +109,7 @@ template <class T> Matrix<T> operator-(const SparseMatrix<T>& a, const Matrix<T>
 template <class TA, class TB> auto operator*(const SparseMatrix<TA>& a, const Matrix<TB>& b)
 {
     assert(a.GetNumCols()==b.GetNumRows());
-    typedef typename BinaryRetType<TA,TB,OpMul<TA,TB> >::RetType TR;
+    typedef typename ReturnType<TA,TB>::RetType TR;
 
     Matrix<TR> ret(a.GetNumRows(),b.GetNumCols());
     Fill(ret,TR(0));
@@ -122,7 +122,7 @@ template <class TA, class TB> auto operator*(const SparseMatrix<TA>& a, const Ma
 template <class TA, class TB> auto operator*(const Matrix<TA>& a, const SparseMatrix<TB>& b)
 {
     assert(a.GetNumCols()==b.GetNumRows());
-    typedef typename BinaryRetType<TA,TB,OpMul<TA,TB> >::RetType TR;
+    typedef typename ReturnType<TA,TB>::RetType TR;
     Matrix<TR> ret(a.GetNumRows(),b.GetNumCols());
     Fill(ret,TR(0));
     for (typename SparseMatrix<TB>::const_iterator ib(b);!ib.end();ib++)
@@ -137,7 +137,7 @@ template <class TA, class TB> auto operator*(const Matrix<TA>& a, const SparseMa
 template <class TA, class TB> auto operator*(const SparseMatrix<TA>& a, const Vector<TB>& b)
 {
     assert(a.GetNumCols()==b.size());
-    typedef typename BinaryRetType<TA,TB,OpMul<TA,TB> >::RetType TR;
+    typedef typename ReturnType<TA,TB>::RetType TR;
 
     Vector<TR> ret(a.GetNumRows());
     Fill(ret,TR(0));

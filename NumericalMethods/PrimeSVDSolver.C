@@ -79,7 +79,7 @@ PrimeSVDSolver<T>::Solve(primme_svds_params& p)
     itsSingularValues.SetLimits(p.numSvals,p.numSvals);
     itsSingularVectors.SetLimits((p.m+p.n)*p.numSvals);
     Vector<double> rnorms(p.numSvals);
-    int ret = primmeT<T>(&itsSingularValues(1,1), &itsSingularVectors(1), &rnorms(1), &p);
+    int ret = primmeT<T>(&itsSingularValues(1), &itsSingularVectors(1), &rnorms(1), &p);
     assert(ret==0);
     (void)ret; //avoid compiler warning in release modems)) << " " << std::endl;
     if (Max(fabs(rnorms))>1000*p.eps)
