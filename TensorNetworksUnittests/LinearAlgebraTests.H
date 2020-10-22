@@ -94,18 +94,18 @@ public:
         if (N<=M)
         {
             Matrix<T> V=Transpose(conj(VT));
-            EXPECT_NEAR(Max(fabs(V*VT-I)),0.0,100*eps);
+            EXPECT_NEAR(Max(fabs(V*VT-I)),0.0,2*sqrt(N*M)*eps);
         }
         if (N>=M)
         {
             Matrix<T> UT=Transpose(conj(U));
             //cout << "U*UT=" << UT*U << endl;
-            EXPECT_NEAR(Max(fabs(UT*U-I)),0.0,sqrt(N*M)*eps);
+            EXPECT_NEAR(Max(fabs(UT*U-I)),0.0,2*sqrt(N*M)*eps);
         }
 
         Matrix<T> A1=U*s*VT;
         Matrix<T> dA=A-A1;
-        EXPECT_NEAR(Max(MyAbs(dA)),0.0,sqrt(N*M)*eps);
+        EXPECT_NEAR(Max(MyAbs(dA)),0.0,2*sqrt(N*M)*eps);
 
     }
 

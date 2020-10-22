@@ -27,7 +27,7 @@ public:
     , itsFactory(TensorNetworks::Factory::GetFactory())
     , itsH(0)
     , itsMPS(0)
-    , itsLogger(new TensorNetworks::SPDLogger(2))
+    , itsLogger(new TensorNetworks::SPDLogger(1))
     {
         StreamableObject::SetToPretty();
     }
@@ -369,7 +369,7 @@ TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
     itsMPS->FindiTimeGroundState(itsH,is);
 
     double E2=itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(E2/(L-1),-0.46703997271019776,1e-7);
+    EXPECT_NEAR(E2/(L-1),-0.4607585,1e-6);
 }
 #endif // DEBUG
 
