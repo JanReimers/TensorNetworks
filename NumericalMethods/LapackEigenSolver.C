@@ -76,7 +76,7 @@ LapackEigenSolver<T>::Solve(const MatrixT& A, int NumEigenValues,double eps)
     //
     //  Now fix up the matrix limits
     W.SetLimits(NumEigenValues,true);
-    return std::make_tuple(U,W);
+    return std::make_tuple(std::move(U),std::move(W));
 }
 
 template <> typename LapackEigenSolver<double>::UdTypeN
@@ -131,7 +131,7 @@ LapackEigenSolver<double>::SolveNonSym(const MatrixT& A, int NumEigenValues,doub
             j++;
         }
     }
-    return std::make_tuple(V,W);
+    return std::make_tuple(std::move(V),std::move(W));
 }
 
 template <> typename LapackEigenSolver<dcmplx>::UdTypeN
@@ -160,7 +160,7 @@ LapackEigenSolver<dcmplx>::SolveNonSym(const MatrixT& A, int NumEigenValues,doub
     //
     zgeev_(&jobvl,&jobvr,&N,&Acopy(1,1),&N,&W(1),&VL(1,1),&N,&VR(1,1),&N, &work(1),&lwork,&rwork(1),&info);
     assert(info==0);
-    return std::make_tuple(VR,W);
+    return std::make_tuple(std::move(VR),std::move(W));
 }
 
 //

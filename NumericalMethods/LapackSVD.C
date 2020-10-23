@@ -48,6 +48,7 @@ template <class TM> void LaSVDecomp(TM& A, Vector<double>& s, TM& VT)
     return;
 }
 
+/*
 std::tuple<Matrix<double>,DiagonalMatrix<double>,Matrix<double>> LaSVDecomp(const Matrix<double>& A)
 {
     int M=A.GetNumRows(),N=A.GetNumCols(),mn=Min(M,N);
@@ -76,9 +77,9 @@ std::tuple<Matrix<double>,DiagonalMatrix<double>,Matrix<double>> LaSVDecomp(cons
     U .SetLimits(M,mn,true); //Throw away last N-mn columns
     VT.SetLimits(mn,N,true); // Throw away last N-mn rows
     DiagonalMatrix<double> ds(s);
-    return std::make_tuple(U,ds,VT);
+    return std::make_tuple(std::move(U),std::move(ds),std::move(VT));
 }
-
+*/
 template <class T> void gesvd(char* JOBU,char* JOBV,int* M,int* N,T* A,int* LDA, double* S,T* U,
 int* LDU,T* VT,int* LDVT,T* WORK,int* LWORK,int* INFO);
 
@@ -114,7 +115,6 @@ LapackSVDSolver<T>::Solve(const MatrixT& A, int NumSingularValues,double eps)
     //
     //  Initial call to see how much work space is needed
     //
-//    dgesvd_(&jobu,&jobv,&M,&N,&U(1,1),&M,&s(1),0,&M,&VT(1,1),&N,&work(1),&lwork,&info);
     gesvd<T>(&jobu,&jobv,&M,&N,&U(1,1),&M,&s(1),0,&M,&VT(1,1),&N,&work(1),&lwork,&info);
     lwork=real(work(1));
     work.SetLimits(lwork);
@@ -129,7 +129,7 @@ LapackSVDSolver<T>::Solve(const MatrixT& A, int NumSingularValues,double eps)
     U .SetLimits(M,mn,true); //Throw away last N-mn columns
     VT.SetLimits(mn,N,true); // Throw away last N-mn rows
     DiagonalMatrix<double> ds(s);
-    return std::make_tuple(U,ds,VT);
+    return std::make_tuple(std::move(U),std::move(ds),std::move(VT));
 }
 
 template class LapackSVDSolver<double>;

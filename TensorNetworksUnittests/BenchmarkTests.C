@@ -69,5 +69,6 @@ TEST_F(BenchmarkTests,TestSweepL9S1D8)
     itsMPS->Report(cout);
 
     double E=itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(E/(L-1),-0.4670402,1e-7);
+//    EXPECT_NEAR(E/(L-1),-0.4670402,1e-7); //For D=16
+    EXPECT_NEAR(E/(L-1),-0.4670375,1e-7); //For D=8
 }

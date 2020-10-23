@@ -161,7 +161,7 @@ ArpackEigenSolver<double>::SolveG(const Mat<double>& A, int Nev,double eps)
             ne+=2;
         }
     }
-    return make_tuple(UC,D);
+    return make_tuple(std::move(UC),std::move(D));
 }
 
 template <> template <template <typename> class Mat> typename ArpackEigenSolver<dcmplx>::UdType
@@ -217,7 +217,7 @@ ArpackEigenSolver<dcmplx>::SolveG(const Mat<dcmplx>& A, int Nev,double eps)
           &residuals(1), Ncv, &V(1,1),N, &iParam(1), iPntr, &Workd(1), &Workl(1),
           Lworkl, &rwork(1), &INFO );
 
-    return make_tuple(U,D);
+    return make_tuple(std::move(U),std::move(D));
 }
 
 template class ArpackEigenSolver<double>;

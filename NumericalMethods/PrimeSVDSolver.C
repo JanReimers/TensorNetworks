@@ -101,7 +101,7 @@ PrimeSVDSolver<T>::Solve(primme_svds_params& p)
         for (int i=1;i<=p.n;i++,linearIndex++)
             VT(j,i)=conj(itsSingularVectors(linearIndex));
 
-    return std::make_tuple(U,itsSingularValues,VT);
+    return std::make_tuple(std::move(U),std::move(itsSingularValues),std::move(VT));
 }
 
 //

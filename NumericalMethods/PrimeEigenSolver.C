@@ -131,7 +131,7 @@ PrimeEigenSolver<T>::Solve(primme_params& p)
     //std::cout << "Primme niter=" << niter << std::endl;
     itsNumGuesses=p.numEvals; //Set up using guesses for next time around
     primme_free(&p);
-    return std::make_tuple(itsEigenVectors,itsEigenValues);
+    return std::make_tuple(std::move(itsEigenVectors),std::move(itsEigenValues));
 }
 
 //

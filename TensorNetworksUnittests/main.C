@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 //    testing::GTEST_FLAG(filter) = "ImaginaryTimeTests.MPOCompressFourthOrderTrotter";
 //    testing::GTEST_FLAG(filter) = "iTEBDTests*";
 //    testing::GTEST_FLAG(filter) = "ITensorTests*";
-    testing::GTEST_FLAG(filter) = "BenchmarkTests.*";
+//    testing::GTEST_FLAG(filter) = "BenchmarkTests.*";
 
     return RUN_ALL_TESTS();
 }
