@@ -23,6 +23,7 @@
 			</Target>
 			<Target title="Release">
 				<Option output="../Release/TensorNetworksUnittests" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Release" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -77,6 +78,9 @@
 			<Add library="pthread" />
 			<Add directory="../ITensor/lib" />
 		</Linker>
+		<Unit filename="BenchmarkTests.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="ExactDiagTests.C">
 			<Option compilerVar="CPP" />
 		</Unit>

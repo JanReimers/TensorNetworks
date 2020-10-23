@@ -9,7 +9,7 @@ template <class T> class DiagonalMatrix;
 //  SVD decomposition for real*8  matrix.
 //
 //template <class TM> void LaSVDecomp(TM& A, Vector<double>& s, TM& V);
-std::tuple<Matrix<double>,DiagonalMatrix<double>,Matrix<double> > LaSVDecomp(const Matrix<double>& A);
+//std::tuple<Matrix<double>,DiagonalMatrix<double>,Matrix<double> > LaSVDecomp(const Matrix<double>& A);
 
 template <class T> class LapackSVDSolver
 {

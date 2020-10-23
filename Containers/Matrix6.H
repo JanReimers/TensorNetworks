@@ -40,6 +40,18 @@ template <class T> class Matrix6
 
         void Fill(const T& fill) {::Fill(itsData,fill);}
 
+        class Subscriptor
+        {
+        public:
+            Subscriptor(Matrix6& m) : itsS(m.itsData), itsM(m) {}
+            T& operator()(int m, int i1, int i2, int n, int j1, int j2)
+            {
+                return itsS(itsM.index1(m,i1,i2),itsM.index2(n,j1,j2));
+            }
+            private:
+            typename MatrixRT::Subscriptor itsS;
+            const Matrix6& itsM;
+            };
         T& operator()(int m, int i1, int i2, int n, int j1, int j2)
         {
             //cout << "m,i1,12,index=" << m << " " << i1 << " " << i2 << " " << index1(m,i1,i2) <<endl;
@@ -80,7 +92,7 @@ template <class T> class Matrix6
         MatrixRT& Flatten() {return itsData;}
 
         friend std::ostream& operator<<(std::ostream& os,const Matrix6& m) {return os << m.itsData;}
-
+        friend class Subscriptor;
         void Dump(std::ostream& os) const
         {
         for (int w1=1-itsmnLow; w1<=M1-itsmnLow; w1++)

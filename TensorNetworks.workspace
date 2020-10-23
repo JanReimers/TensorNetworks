@@ -10,7 +10,6 @@
 		<Project filename="TensorNetworks.cbp" />
 		<Project filename="TensorNetworksUnittests/TensorNetworksUnittests.cbp">
 			<Depends filename="oml/oml.cbp" />
-			<Depends filename="ITensor.cbp" />
 			<Depends filename="TensorNetworks.cbp" />
 		</Project>
 		<Project filename="PyTensorNetworks/PyTensorNetworks.cbp">

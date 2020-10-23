@@ -9,6 +9,7 @@
 class MPOTests;
 class MPSTests;
 template <class T> class PrimeEigenSolver;
+template <class T> class LapackEigenSolver;
 namespace TensorNetworks
 {
 
@@ -153,7 +154,7 @@ private:
     dVectorT itsMs;   //We need a separate matrix for each of the p basis states on one site.
     Vector3CT itsHLeft_Cache,itsHRightCache; //L/R tensors for <Psi|H|Psi>
     mutable MatrixCT itsLeft_Cache ,itsRightCache;  //L/R matrices for <Psi|Psi>
-    PrimeEigenSolver<dcmplx>* itsEigenSolver;
+    LapackEigenSolver<dcmplx>* itsEigenSolver;
 
     int    itsNumUpdates;
     bool   isFrozen; //Don't refine this site.

@@ -3,7 +3,8 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworks/CheckSpin.H"
-#include "NumericalMethods/PrimeEigenSolver.H"
+//#include "NumericalMethods/PrimeEigenSolver.H"
+#include "NumericalMethods/LapackEigenSolver.H"
 //#include "oml/minmax.h"
 #include "oml/cnumeric.h"
 //#include "oml/vector_io.h"
@@ -27,7 +28,7 @@ MPSSite::MPSSite(Position lbr, Bond* leftBond, Bond* rightBond,int d, int D1, in
     , itsHRightCache(1,1,1,1)
     , itsLeft_Cache (1,1)
     , itsRightCache (1,1)
-    , itsEigenSolver(new PrimeEigenSolver<dcmplx>())
+    , itsEigenSolver(new LapackEigenSolver<dcmplx>())
     , itsNumUpdates(0)
     , isFrozen(false)
     , itsEmin(0.0)

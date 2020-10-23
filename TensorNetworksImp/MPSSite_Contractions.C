@@ -115,6 +115,7 @@ GetHeff(const SiteOperator* mops,const Vector3CT& L,const Vector3CT& R) const
 {
     assert(mops);
     Matrix6<dcmplx> Heff(itsd,itsD1,itsD2,itsd,itsD1,itsD2);
+    Matrix6<dcmplx>::Subscriptor SHeff(Heff);
     const Dw12& Dws=mops->GetDw12();
 
     for (int m=0; m<itsd; m++)
@@ -123,21 +124,24 @@ GetHeff(const SiteOperator* mops,const Vector3CT& L,const Vector3CT& R) const
             const MatrixRT& W=mops->GetW(m,n);
             assert(W.GetNumRows()==Dws.Dw1);
             Vector3CT WR(Dws.Dw1,itsD2,itsD2,1);
-            for (int w1=1; w1<=Dws.Dw1; w1++)
-                for (int i2=1; i2<=itsD2; i2++)
-                    for (int j2=1; j2<=itsD2; j2++)
-                        WR(w1,i2,j2)=ContractWR(w1,i2,j2,W,Dws.w2_last(w1),R);
-
-            for (int i1=1; i1<=itsD1; i1++)
-                for (int j1=1; j1<=itsD1; j1++)
-                    for (int i2=1; i2<=itsD2; i2++)
-                        for (int j2=1; j2<=itsD2; j2++)
+            #pragma omp parallel for collapse(2)
+             for (int i2=1; i2<=itsD2; i2++)
+                for (int j2=1; j2<=itsD2; j2++)
+                {
+                    VectorCT WR(Dws.Dw1,FillType::Zero);
+                    VectorCT::Subscriptor sWR(WR);
+                    for (int w1=1; w1<=Dws.Dw1; w1++)
+                        WR(w1)=ContractWR(w1,i2,j2,W,Dws.w2_last(w1),R);
+                    for (int i1=1; i1<=itsD1; i1++)
+                        for (int j1=1; j1<=itsD1; j1++)
                         {
                             dcmplx LWR(0.0);
-                            for (int w1=1; w1<=W.GetNumRows(); w1++)
-                                LWR+=L(w1,i1,j1)*WR(w1,i2,j2);
-                            Heff(m,i1,i2,n,j1,j2)=LWR;
+                            for (int w1=1; w1<=Dws.Dw1; w1++)
+                                LWR+=L(w1,i1,j1)*sWR(w1);
+                            SHeff(m,i1,i2,n,j1,j2)=LWR;
                         }
+                }
+
         }
 
     return Heff;
@@ -245,10 +249,12 @@ Vector3CT MPSSite::IterateLeft_F(const SiteOperator* so, const Vector3CT& Fam1,b
 {
     int Dw2=so->GetDw12().Dw2;
     Vector3CT F(Dw2,itsD2,itsD2,1);
+    Vector3CT::Subscriptor sF(F);
     for (int w2=1; w2<=Dw2; w2++)
-        for (int i2=1; i2<=itsD2; i2++)
+        //#pragma omp parallel for collapse(2)
+         for (int i2=1; i2<=itsD2; i2++)
             for (int j2=1; j2<=itsD2; j2++)
-                F(w2,i2,j2)=ContractAWFA(w2,i2,j2,so,Fam1);
+                sF(w2,i2,j2)=ContractAWFA(w2,i2,j2,so,Fam1);
     if (cache) itsHLeft_Cache=F;
     return F;
 }
@@ -271,12 +277,12 @@ dcmplx MPSSite::ContractWFA(int m, int w2, int i1, int j2, const SiteOperator* s
     {
         const MatrixRT& Wmn=so->GetW(m,n);
         assert(Wmn.GetNumRows()==Dws1.Dw1);
-        for (int w1=1; w1<Dws1.w1_first(w2); w1++)
-            assert(Wmn(w1,w2)==0);
+//        for (int w1=1; w1<Dws1.w1_first(w2); w1++)
+//            assert(Wmn(w1,w2)==0);
         for (int w1=Dws1.w1_first(w2); w1<=Dws1.Dw1; w1++)
             if (Wmn(w1,w2)!=0.0)
             {
-                assert(fabs(Wmn(w1,w2))>0.0);
+//                assert(fabs(Wmn(w1,w2))>0.0);
                 wfa+=Wmn(w1,w2)*ContractFA(n,w1,i1,j2,Fam1);
             }
     }
@@ -297,10 +303,12 @@ Vector3CT MPSSite::IterateRightF(const SiteOperator* so, const Vector3CT& Fap1, 
 {
     int Dw1=so->GetDw12().Dw1;;
     Vector3CT F(Dw1,itsD1,itsD1,1);
+    Vector3CT::Subscriptor sF(F);
     for (int w1=1; w1<=Dw1; w1++)
+        //#pragma omp parallel for collapse(2)
         for (int i1=1; i1<=itsD1; i1++)
             for (int j1=1; j1<=itsD1; j1++)
-                F(w1,i1,j1)=ContractBWFB(w1,i1,j1,so,Fap1);
+                sF(w1,i1,j1)=ContractBWFB(w1,i1,j1,so,Fap1);
     if (cache) itsHRightCache=F;
     return F;
 }

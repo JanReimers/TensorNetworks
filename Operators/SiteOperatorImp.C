@@ -185,7 +185,8 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
     assert(comp);
     MatrixRT  A=Reshape(lr);
 
-    auto [U,sm,VT]=LaSVDecomp(A); //Solves A=U * s * VT
+    LapackSVDSolver<double> solver;
+    auto [U,sm,VT]=solver.Solve(A,Min(A.GetNumRows(),A.GetNumCols()),1e-12); //Solves A=U * s * VT
 //    VectorRT s=sm.GetDiagonal();
 //    cout << "error1=" << std::scientific << Max(abs(MatrixRT(U*sm*VT-A))) << endl;
 //    assert(Max(abs(MatrixRT(U*sm*VT-A)))<1e-10);
