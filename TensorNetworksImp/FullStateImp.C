@@ -189,7 +189,7 @@ template <class T> double FullStateImp<T>::FindGroundState(const IterationSchedu
     double E=0;
     int Neig=1;
     PrimeEigenSolver<T> solver;
-    solver.Solve1(this,Neig,sched.itsEps);
+    solver.Solve(this,sched.itsEps.itsEigenSolverEpsilon,Neig);
     itsE=solver.GetEigenValues()(1);
     VectorRT amp=solver.GetEigenVector(1);
     for (int i=1; i<=itsN; i++)
@@ -202,7 +202,7 @@ template <class T> double FullStateImp<T>::FindGroundState(const IterationSchedu
 //  Called from the Lanczos M*v routine. Do yvec=H*xvec; where H=sum{Hlocal(ia,ia+1}
 //  This is a const member function so we don't use the member amplitudes.
 //
-template <class T> void FullStateImp<T>::DoMatVecContraction (int N, T* xvec, T* yvec) const
+template <class T> void FullStateImp<T>::DoMatVecContraction (int N, const T* xvec, T* yvec) const
 {
     assert(itsHlocal.Flatten().GetNumRows()==itsd*itsd);
     assert(itsHlocal.Flatten().GetNumCols()==itsd*itsd);

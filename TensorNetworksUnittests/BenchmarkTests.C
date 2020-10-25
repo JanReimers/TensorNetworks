@@ -47,7 +47,7 @@ public:
     rc_ptr<TensorNetworks::TNSLogger> itsLogger;
 };
 
-
+#ifndef DEBUG
 TEST_F(BenchmarkTests,TestSweepL9S1D8)
 {
     int L=9,D=8,maxIter=100,Nreplicates=1;
@@ -72,3 +72,4 @@ TEST_F(BenchmarkTests,TestSweepL9S1D8)
 //    EXPECT_NEAR(E/(L-1),-0.4670402,1e-7); //For D=16
     EXPECT_NEAR(E/(L-1),-0.4670375,1e-7); //For D=8
 }
+#endif

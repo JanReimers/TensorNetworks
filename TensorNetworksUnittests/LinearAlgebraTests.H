@@ -1,6 +1,10 @@
 #ifndef LINEARALGEBRATESTS_H_INCLUDED
 #define LINEARALGEBRATESTS_H_INCLUDED
 
+#include "NumericalMethods/SVDSolver.H"
+#include "NumericalMethods/SparseSVDSolver.H"
+#include "NumericalMethods/EigenSolver.H"
+#include "NumericalMethods/SparseEigenSolver.H"
 #include "oml/random.h"
 #include <iostream>
 #include <complex>
@@ -46,18 +50,271 @@ template <class T> void MakeSparse(Matrix<T>& m,double TargetDensity)
 
 }
 
-template <typename T, template <typename> class Mat,template <typename> class Solver> class Tester
+template <typename T> class EigenBase
 {
 public:
-    Tester(int m,int n,double density)
-    : M(m), N(n), Density(density),
-    A(M,N), I(Min(M,N),Min(M,N)),eps(1e-13)
+    EigenBase(int n,double density=1.0)
+        : N(n), Nev(n),Density(density),eps(1e-13)
+        , I(N,N)
+        {
+            Unit(I);
+        }
+    EigenBase(int n,int nev,double density=1.0)
+        : N(n), Nev(nev),Density(density),eps(1e-13)
+        , I(N,N)
+        {
+            Unit(I);
+        }
+    virtual Matrix<T> MakeMatrix()
     {
-        Unit(I);
+        Matrix<T> ret(N,N);
+        FillRandom(ret);
+        MakeSparse(ret,Density);
+        return ret;
     }
 
-    virtual void RunTests()=0;
+    virtual void ValidateSymmetric(const Matrix<T>& U)
+    {
+        Matrix<T> UT=Transpose(conj(U));
+        //cout << "U*UT=" << UT*U << endl;
+        EXPECT_NEAR(Max(fabs(UT*U-I)),0.0,2*N*eps);
+    }
+
+
+protected:
+    int N;
+    int Nev;
+    double Density;
+    double eps;
+    Matrix<T> I;
+};
+
+template <typename T>
+class EigenTester : public EigenBase<T>
+{
+    using Base=EigenBase<T>;
+    using Base::N;
+    using Base::Nev;
+    using Base::eps;
+    using Base::I;
+public:
+    EigenTester(EigenSolver<T>* s, int n,double density=1.0)
+        : Base(n,density)
+        , itsSolver(s)
+        , A(n,n)
+     {}
+    EigenTester(EigenSolver<T>* s, int n,int Nev,double density=1.0)
+        : Base(n,Nev,density)
+        , itsSolver(s)
+        , A(n,n)
+     {}
+    ~EigenTester() {delete itsSolver;}
+
+    virtual void RunTests()
+    {
+        A=MakeMatrix();
+        {
+            auto [U,d]=itsSolver->Solve(A,eps,Nev);
+            ValidateSymmetric(U,d);
+            itsSolver->Reset();
+        }
+        if (Nev/2>=1)
+        {
+            auto [U,d]=itsSolver->Solve(A,eps,Nev/2); //Get only half the eigen values
+            ValidateSymmetric(U,d);
+            itsSolver->Reset();
+        }
+        if (Nev==N)
+        {
+            auto [U,d]=itsSolver->SolveAll(A,eps);
+            ValidateSymmetric(U,d);
+            itsSolver->Reset();
+        }
+        A=Base::MakeMatrix(); //Make a non sym matrix
+        {
+            auto [U,d]=itsSolver->SolveNonSym(A,eps,Nev);
+            ValidateNonSymmetric(U,d);
+            itsSolver->Reset();
+        }
+        if (Nev/2>=1)
+        {
+            auto [U,d]=itsSolver->SolveNonSym(A,eps,Nev/2);
+            ValidateNonSymmetric(U,d);
+            itsSolver->Reset();
+        }
+        if (Nev==N)
+        {
+            auto [U,d]=itsSolver->SolveAllNonSym(A,eps);
+            ValidateNonSymmetric(U,d);
+            itsSolver->Reset();
+        }
+    }
     virtual Matrix<T> MakeMatrix()
+    {
+        Matrix<T> ret=Base::MakeMatrix();
+        ret=Matrix<T>(ret+Transpose(conj(ret)));
+        return ret;
+    }
+    virtual void ValidateSymmetric(const Matrix<T>& U, const Vector<double>& d)
+    {
+        Matrix<T> UT=Transpose(conj(U));
+//        cout << "U*UT=" << UT*U << endl;
+        EXPECT_NEAR(Max(fabs(UT*U-I)),0.0,2*N*eps);
+        Matrix<T> diag=UT*A*U;
+//        cout << "diag=" << diag << endl;
+        int Ne=d.size();
+        for (int i=1;i<=Ne;i++) diag(i,i)-=d(i);
+        EXPECT_NEAR(Max(fabs(diag)),0.0,N*eps);
+    }
+    virtual void ValidateNonSymmetric(const Matrix<dcmplx>& U, const Vector<dcmplx>& d)
+    {
+        int Ne=d.size();
+        if (Ne>0)
+        {
+            for (int i=1;i<=Ne;i++)
+            {
+                Vector<dcmplx> Ui=U.GetColumn(i);
+                Vector<dcmplx> residuals=A*Ui-d(i)*Ui;
+                double res=Max(fabs(residuals));
+                EXPECT_NEAR(res,0.0,15*eps);
+            }
+        }
+    }
+
+    EigenSolver<T>* itsSolver;
+    Matrix     <T>  A;
+ };
+
+template <typename T>
+class SparseEigenTester
+    : public EigenBase<T>
+    , public virtual SparseEigenSolverClient<T>
+{
+    using Base=EigenBase<T>;
+    using Base::N;
+    using Base::Nev;
+    using Base::eps;
+    using Base::I;
+public:
+    SparseEigenTester(SparseEigenSolver<T>* s, int n,double density=1.0)
+        : Base(n,density)
+        , itsSolver(s)
+        , A(n,n)
+     {}
+    SparseEigenTester(SparseEigenSolver<T>* s, int n,int Nev,double density=1.0)
+        : Base(n,Nev,density)
+        , itsSolver(s)
+        , A(n,n)
+     {}
+    ~SparseEigenTester() {delete itsSolver;}
+
+    virtual void RunTests()
+    {
+        A=MakeMatrix();
+        {
+            auto [U,d]=itsSolver->Solve(A,eps,Nev);
+            ValidateSymmetric(U,d);
+            itsSolver->Reset();
+        }
+        {
+            auto [U,d]=itsSolver->Solve(this,eps,Nev);
+            ValidateSymmetric(U,d);
+            itsSolver->Reset();
+        }
+        if (Nev/2>=1)
+        {
+            auto [U,d]=itsSolver->Solve(A,eps,Nev/2); //Get only half the eigen values
+            ValidateSymmetric(U,d);
+            itsSolver->Reset();
+        }
+        if (Nev/2>=1)
+        {
+            auto [U,d]=itsSolver->Solve(this,eps,Nev/2); //Get only half the eigen values
+            ValidateSymmetric(U,d);
+            itsSolver->Reset();
+        }
+        A=Base::MakeMatrix(); //Make a non sym matrix
+        {
+            auto [U,d]=itsSolver->SolveNonSym(A,eps,Nev);
+            ValidateNonSymmetric(U,d);
+            itsSolver->Reset();
+        }
+        {
+            auto [U,d]=itsSolver->SolveNonSym(this,eps,Nev);
+            ValidateNonSymmetric(U,d);
+            itsSolver->Reset();
+        }
+        if (Nev/2>=1)
+        {
+            auto [U,d]=itsSolver->SolveNonSym(A,eps,Nev/2);
+            ValidateNonSymmetric(U,d);
+            itsSolver->Reset();
+        }
+        if (Nev/2>=1)
+        {
+            auto [U,d]=itsSolver->SolveNonSym(this,eps,Nev/2);
+            ValidateNonSymmetric(U,d);
+            itsSolver->Reset();
+        }
+    }
+    virtual Matrix<T> MakeMatrix()
+    {
+        Matrix<T> ret=Base::MakeMatrix();
+        ret=Matrix<T>(ret+Transpose(conj(ret)));
+        return ret;
+    }
+    virtual void ValidateSymmetric(const Matrix<T>& U, const Vector<double>& d)
+    {
+        Matrix<T> UT=Transpose(conj(U));
+        //cout << "U*UT=" << UT*U << endl;
+        EXPECT_NEAR(Max(fabs(UT*U-I)),0.0,2*N*eps);
+        Matrix<T> diag=UT*A*U;
+//        cout << "diag=" << diag << endl;
+        int Ne=d.size();
+        for (int i=1;i<=Ne;i++) diag(i,i)-=d(i);
+        EXPECT_NEAR(Max(fabs(diag)),0.0,2*N*eps);
+    }
+    virtual void ValidateNonSymmetric(const Matrix<dcmplx>& U, const Vector<dcmplx>& d)
+    {
+        int Ne=d.size();
+        if (Ne>0)
+        {
+            for (int i=1;i<=Ne;i++)
+            {
+                Vector<dcmplx> Ui=U.GetColumn(i);
+                Vector<dcmplx> residuals=A*Ui-d(i)*Ui;
+                double res=Max(fabs(residuals));
+                EXPECT_NEAR(res,0.0,15*eps);
+            }
+        }
+    }
+
+    virtual long int GetSize  () const {return N;}; //2^L Hilbert space size
+    virtual void     DoMatVecContraction (int N, const T* xvec, T* yvec) const
+    {
+        A.DoMVMultiplication(N,xvec,yvec);
+    };
+
+
+    SparseEigenSolver<T>* itsSolver;
+    SparseMatrix     <T>  A;
+ };
+
+//
+//   SVD Tester classes
+//
+template <typename T> class SVDBase
+{
+public:
+    using DMatRT=DiagonalMatrix<double>;
+
+    SVDBase(int m, int n,double density=1.0)
+        : M(m), N(n), Density(density),eps(1e-13)
+        , I(Min(M,N),Min(M,N))
+        {
+            Unit(I);
+        }
+    Matrix<T> MakeMatrix()
     {
         Matrix<T> ret(M,N);
         FillRandom(ret);
@@ -65,32 +322,8 @@ public:
         return ret;
     }
 
-    int M,N;
-    double Density;
-    Solver<T> solver;
-    Mat<T> A;
-    Matrix<T> I;
-    double eps;
-};
-
-
-template <typename T, template <typename> class Mat,template <typename> class Solver>
-class SVDTester : public Tester<T,Mat,Solver>
-{
-public:
-    typedef Tester<T,Mat,Solver> Base;
-    using Base::solver;
-    using Base::A;
-    using Base::I;
-    using Base::M;
-    using Base::N;
-    using Base::eps;
-    SVDTester(int M, int N,double density=1.0) : Base(M,N,density) {}
-
-    virtual void RunTests()
+    virtual void Validate(const Matrix<T>& U, const DMatRT& s,const Matrix<T>& VT)
     {
-        A=Base::MakeMatrix();
-        auto [U,s,VT]=solver.Solve(A,Min(M,N),eps);
         if (N<=M)
         {
             Matrix<T> V=Transpose(conj(VT));
@@ -102,86 +335,109 @@ public:
             //cout << "U*UT=" << UT*U << endl;
             EXPECT_NEAR(Max(fabs(UT*U-I)),0.0,2*sqrt(N*M)*eps);
         }
-
-        Matrix<T> A1=U*s*VT;
-        Matrix<T> dA=A-A1;
-        EXPECT_NEAR(Max(MyAbs(dA)),0.0,2*sqrt(N*M)*eps);
-
     }
 
+
+protected:
+    int M,N;
+    double Density;
+    double eps;
+    Matrix<T> I;
 };
 
-template <typename T, template <typename> class Mat,template <typename> class Solver>
-class SymEigenTester : public Tester<T,Mat,Solver>
+template <typename T>
+class SVDTester : public SVDBase<T>
 {
-public:
-    typedef Tester<T,Mat,Solver> Base;
-    using Base::solver;
-    using Base::A;
-    using Base::I;
+    using Base=SVDBase<T>;
+    using DMatRT=typename Base::DMatRT;
     using Base::M;
     using Base::N;
     using Base::eps;
-
-    SymEigenTester(int N,double density=1.0) : Base(N,N,density) {}
-
-    virtual Matrix<T> MakeMatrix()
-    {
-        Matrix<T> ret=Base::MakeMatrix();
-        ret=Matrix<T>(ret+Transpose(conj(ret)));
-        return ret;
-    }
-    virtual void RunTests()
-    {
-        A=MakeMatrix();
-        int Ne=N/2;
-//        cout << "A=" << A << endl;
-        auto [U,d]=solver.Solve(A,Ne,eps);
-//        cout << "U,d=" << U << d << endl;
-        Matrix<T> UT=Transpose(conj(U));
-        EXPECT_NEAR(Max(fabs(UT*U-I)),0.0,10*eps);
-//        cout << "UT*U=" << UT*U << endl;
-        Matrix<T> diag=UT*A*U;
-//        cout << "diag=" << diag << endl;
-        for (int i=1;i<=Ne;i++) diag(i,i)-=d(i);
-        EXPECT_NEAR(Max(fabs(diag)),0.0,100*eps);
-    }
-
-};
-
-template <typename T, template <typename> class Mat,template <typename> class Solver>
-class NonSymEigenTester : public Tester<T,Mat,Solver>
-{
-public:
-    typedef Tester<T,Mat,Solver> Base;
-    using Base::solver;
-    using Base::A;
     using Base::I;
-    using Base::M;
-    using Base::N;
-    using Base::eps;
-
-    NonSymEigenTester(int N,double density=1.0) : Base(N,N,density) {}
+public:
+    SVDTester(SVDSolver<T>* s, int m, int n,double density=1.0)
+        : Base(m,n,density)
+        , itsSolver(s)
+        , A(m,n)
+     {}
+    ~SVDTester() {delete itsSolver;}
 
     virtual void RunTests()
     {
         A=Base::MakeMatrix();
-        //Fill(A,1.0);
-        int Ne=N/2;
-        auto [U,d]=solver.SolveNonSym(A,Ne,eps);
-//        cout << "U,d=" << U << d << endl;
-        //Eigen vectors are not orthogonal so no ortho check here
-        for (int i=1;i<=Ne;i++)
         {
-            Vector<dcmplx> Ui=U.GetColumn(i);
-            Vector<dcmplx> residuals=A*Ui-d(i)*Ui;
-            double res=Max(fabs(residuals));
-            EXPECT_NEAR(res,0.0,15*eps);
+            auto [U,s,VT]=itsSolver->Solve(A,eps,Min(M,N));
+            Validate(U,s,VT);
         }
-
+        {
+            auto [U,s,VT]=itsSolver->SolveAll(A,eps);
+            Validate(U,s,VT);
+        }
+    }
+    virtual void Validate(const Matrix<T>& U, const DMatRT& s,const Matrix<T>& VT)
+    {
+        Base::Validate(U,s,VT); //Check U,V orthonormality
+        Matrix<T> A1=U*s*VT;
+        Matrix<T> dA=A-A1;
+        EXPECT_NEAR(Max(MyAbs(dA)),0.0,2*sqrt(N*M)*eps);
     }
 
-};
+    SVDSolver<T>* itsSolver;
+    Matrix   <T>  A;
+ };
 
+template <typename T>
+class SparseSVDTester
+    : public SVDBase<T>
+    , public virtual SparseSVDSolverClient<T>
+{
+    using Base=SVDBase<T>;
+    using DMatRT=typename Base::DMatRT;
+    using Base::M;
+    using Base::N;
+    using Base::eps;
+    using Base::I;
+
+public:
+    SparseSVDTester(SparseSVDSolver<T>* s, int m, int n,double density=1.0)
+        : Base(m,n,density)
+        , itsSolver(s)
+        , A(m,n)
+     {}
+    ~SparseSVDTester() {delete itsSolver;}
+
+    virtual void RunTests()
+    {
+        A=Base::MakeMatrix();
+        {
+            auto [U,s,VT]=itsSolver->Solve(A,eps,Min(M,N));
+            Validate(U,s,VT);
+        }
+        {  //Client version
+            auto [U,s,VT]=itsSolver->Solve(this,eps,Min(M,N));
+            Validate(U,s,VT);
+        }
+    }
+    virtual void Validate(const Matrix<T>& U, const DMatRT& s,const Matrix<T>& VT)
+    {
+        Base::Validate(U,s,VT); //Check U,V orthonormality
+        Matrix<T> A1=U*s*VT;
+        Matrix<T> dA=A-A1;
+        EXPECT_NEAR(Max(MyAbs(dA)),0.0,2*sqrt(N*M)*eps);
+    }
+//
+// SparseSVDSolverClient interface
+//
+    virtual int  GetNumRows() const {return M;}
+    virtual int  GetNumCols() const {return N;}
+    virtual void DoMatVecContraction (int N, const T* xvec, T* yvec,int transpose) const
+    {
+        A.DoMVMultiplication(M,N,xvec,yvec,transpose);
+    }
+
+private:
+    SparseSVDSolver<T>* itsSolver;
+    SparseMatrix   <T>  A;
+ };
 
 #endif // LINEARALGEBRATESTS_H_INCLUDED

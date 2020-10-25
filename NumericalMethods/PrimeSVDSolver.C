@@ -29,7 +29,7 @@ primme_svds_params MakeParameters(MatvecT MatVec,int M,int N,int NumSingularValu
 
 
 template <class T> typename PrimeSVDSolver<T>::UsVType
-PrimeSVDSolver<T>::Solve(const MatrixT& m, int NumSingularValues,double eps)
+PrimeSVDSolver<T>::Solve(const MatrixT& m,double eps, int NumSingularValues)
 {
     assert(NumSingularValues<=Min(m.GetNumRows(),m.GetNumCols()));
     theDenseMatrix=&m;
@@ -38,7 +38,14 @@ PrimeSVDSolver<T>::Solve(const MatrixT& m, int NumSingularValues,double eps)
 }
 
 template <class T> typename PrimeSVDSolver<T>::UsVType
-PrimeSVDSolver<T>::Solve(const SparseMatrixT& m, int NumSingularValues,double eps)
+PrimeSVDSolver<T>::SolveAll(const MatrixT& A,double eps)
+{
+    int N=Min(A.GetNumRows(),A.GetNumCols());
+    return Solve(A,eps,N);
+}
+
+template <class T> typename PrimeSVDSolver<T>::UsVType
+PrimeSVDSolver<T>::Solve(const SparseMatrixT& m,double eps, int NumSingularValues)
 {
     assert(NumSingularValues<=Min(m.GetNumRows(),m.GetNumCols()));
     theSparseMatrix=&m;
@@ -47,11 +54,12 @@ PrimeSVDSolver<T>::Solve(const SparseMatrixT& m, int NumSingularValues,double ep
 }
 
 template <class T> typename PrimeSVDSolver<T>::UsVType
-PrimeSVDSolver<T>::Solve(const PrimeSVDSolverClient<T>* client, int NumSingularValues,double eps)
+PrimeSVDSolver<T>::Solve(const ClientT* client,double eps, int NumSingularValues)
 {
     assert(client);
     assert(NumSingularValues<=Min(client->GetNumRows(),client->GetNumCols()));
-    PrimeSVDSolverClient<T>::theClient=client;  //Used by the M*v call back
+    ClientT::theClient=client;  //Used by the M*v call back
+
     primme_svds_params primme=MakeParameters(ClientMatvec<T>,client->GetNumRows(),client->GetNumCols(),NumSingularValues,itsNumGuesses,eps);
     return Solve(primme);
 }
@@ -132,8 +140,8 @@ primme_svds_params MakeParameters(MatvecT MatVec,int M,int N,int NumSingularValu
 
 template <class T> void SparseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_blockSize,int* transpose,  primme_svds_params *primme, int *ierr)
 {
-    typedef PrimeSVDSolver<T> primmeT;
-    assert(primmeT::theSparseMatrix);
+    typedef SparseSVDSolver<T> SSS;
+    assert(SSS::theSparseMatrix);
     long int& ldx(*_ldx);
     long int& ldy(*_ldy);
     int& blockSize(*_blockSize);
@@ -142,15 +150,15 @@ template <class T> void SparseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_
     {
         T* xvec = static_cast<T*>(x) + ldx*ib;
         T* yvec = static_cast<T*>(y) + ldy*ib;
-        primmeT::theSparseMatrix->DoMVMultiplication(primme->m,primme->n,xvec,yvec,*transpose);
+        SSS::theSparseMatrix->DoMVMultiplication(primme->m,primme->n,xvec,yvec,*transpose);
     }
     *ierr = 0;
 }
 
 template <class T> void DenseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_blockSize,int* transpose,  primme_svds_params *primme, int *ierr)
 {
-    typedef PrimeSVDSolver<T> primmeT;
-    assert(primmeT::theDenseMatrix);
+    typedef SparseSVDSolver<T> SSS;
+    assert(SSS::theDenseMatrix);
     long int& ldx(*_ldx);
     long int& ldy(*_ldy);
     int& blockSize(*_blockSize);
@@ -165,7 +173,7 @@ template <class T> void DenseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_I
             {
                 yvec[i-1]=0.0;
                 for (int j=1;j<=N;j++)
-                    yvec[i-1]+=(*primmeT::theDenseMatrix)(i,j)*xvec[j-1];
+                    yvec[i-1]+=(*SSS::theDenseMatrix)(i,j)*xvec[j-1];
             }
         }
     else
@@ -177,7 +185,7 @@ template <class T> void DenseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_I
             {
                 yvec[i-1]=0.0;
                 for (int j=1;j<=M;j++)
-                    yvec[i-1]+=conj((*primmeT::theDenseMatrix)(j,i))*xvec[j-1];
+                    yvec[i-1]+=conj((*SSS::theDenseMatrix)(j,i))*xvec[j-1];
             }
         }
     *ierr = 0;
@@ -187,28 +195,21 @@ template <class T> void DenseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_I
 template <class T>
 void ClientMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_blockSize, int* transpose, primme_svds_params *primme, int *ierr)
 {
-    assert(PrimeSVDSolverClient<T>::theClient); //|Psi>
+    assert(SparseSVDSolverClient<T>::theClient); //|Psi>
     long int& ldx(*_ldx);
     long int& ldy(*_ldy);
     int& blockSize(*_blockSize);
 
     for (int ib=0; ib<blockSize; ib++)
     {
-        T* xvec = static_cast<T*>(x) + ldx*ib;
-        T* yvec = static_cast<T*>(y) + ldy*ib;
-        PrimeSVDSolverClient<T>::theClient->DoMatVecContraction(primme->n,xvec,yvec,*transpose);
+        const T* xvec = static_cast<const T*>(x) + ldx*ib;
+              T* yvec = static_cast<      T*>(y) + ldy*ib;
+        SparseSVDSolverClient<T>::theClient->DoMatVecContraction(primme->n,xvec,yvec,*transpose);
     }
     *ierr = 0;
 
 }
 
-//
-//  static variable. Kludge for getting the matrix into the MatVec routines.
-//
-template<class T> const SparseMatrix<T>* PrimeSVDSolver<T>::theSparseMatrix = 0;
-template<class T> const      Matrix<T>* PrimeSVDSolver<T>::theDenseMatrix = 0;
-
-template <class T> const PrimeSVDSolverClient<T>* PrimeSVDSolverClient<T>::theClient;
 
 //
 //  Make template instances

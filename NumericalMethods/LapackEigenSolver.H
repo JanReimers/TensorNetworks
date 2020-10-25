@@ -1,28 +1,20 @@
 #ifndef LAPACKEIGENSOLVER_H
 #define LAPACKEIGENSOLVER_H
 
-#include <tuple>
+#include "EigenSolver.H"
 
-template <class T> class Matrix;
-template <class T> class Vector;
-namespace std {
-template <class T> class complex;
-}
-
-template <class T> class LapackEigenSolver
+template <class T> class LapackEigenSolver : public virtual EigenSolver<T>
 {
-    typedef std::complex<double> dcmplx;
-    typedef Vector <double> VectorR;
-    typedef Vector <dcmplx> VectorC;
-    typedef Matrix<T>      MatrixT;
-    typedef Matrix<dcmplx> MatrixC;
-    typedef std::tuple<MatrixT,VectorR> UdType;
-    typedef std::tuple<MatrixC,VectorC> UdTypeN;
+    using UdType =typename EigenSolver<T>::UdType;
+    using UdTypeN=typename EigenSolver<T>::UdTypeN;
+    using MatrixT=typename EigenSolver<T>::MatrixT;
 public:
-    LapackEigenSolver() {};
     ~LapackEigenSolver() {};
+    virtual void Reset() {};  //Noop Clear out guesses from previous iterations
 
-    UdType  Solve      (const MatrixT&, int NumEigenValues,double eps);
-    UdTypeN SolveNonSym(const MatrixT&, int NumEigenValues,double eps);
+    virtual UdType  Solve         (const MatrixT&,double eps, int NumEigenValues);
+    virtual UdType  SolveAll      (const MatrixT&,double eps                    );
+    virtual UdTypeN SolveNonSym   (const MatrixT&,double eps, int NumEigenValues);
+    virtual UdTypeN SolveAllNonSym(const MatrixT&,double eps                    );
 };
 #endif // LAPACKEIGENSOLVER_H

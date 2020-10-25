@@ -3,7 +3,7 @@
 
 #include "TensorNetworks/FullState.H"
 #include "TensorNetworksImp/Typedefs.H"
-#include "NumericalMethods/PrimeEigenSolver.H"
+#include "NumericalMethods/SparseEigenSolver.H"
 #include "oml/vector.h"
 
 namespace TensorNetworks
@@ -15,7 +15,7 @@ namespace TensorNetworks
 //
 template <class T> class FullStateImp
     : public virtual FullState
-    , public virtual PrimeEigenSolverClient<T>
+    , public virtual SparseEigenSolverClient<T>
 {
 
     public:
@@ -32,7 +32,7 @@ template <class T> class FullStateImp
 //
 // Implement PrimeEigenSolverClient interface
 //
-        virtual void  DoMatVecContraction (int N, T* xvec, T* yvec) const;
+        virtual void  DoMatVecContraction (int N, const T* xvec, T* yvec) const;
         void          Normalize    (Vector<T>& amplitudes);
         double        OperateOverLattice     (); // do Psi=H*Psi and fix up Psi
 

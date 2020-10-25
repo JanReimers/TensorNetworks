@@ -1,7 +1,6 @@
 #include "LapackEigenSolver.H"
 #include "oml/matrix.h"
 #include "oml/vector.h"
-//#include "oml/matrix_io.h"
 #include <complex>
 #include <iostream>
 //
@@ -41,17 +40,31 @@ template <> void ev<dcmplx>(char* JOBVL,char* JOBVR,int* N,dcmplx* A,int* LDA,dc
     zgeev_ (JOBVL,JOBVR,N,A,LDA,W    ,VL,LDVL,VR,LDVR,WORK,LWORK,&rwork(1),INFO);
 }
 
+template <class T> typename LapackEigenSolver<T>::UdType
+LapackEigenSolver<T>::SolveAll(const MatrixT& A,double eps)
+{
+    int N=A.GetNumRows();
+    return std::move(Solve(A,eps,N));
+}
 
+inline const Matrix<double>& conj(const Matrix<double>& m) {return m;}
 inline const double& real(const double& d) {return d;}
 using std::real;
 
 template <class T> typename LapackEigenSolver<T>::UdType
-LapackEigenSolver<T>::Solve(const MatrixT& A, int NumEigenValues,double eps)
+LapackEigenSolver<T>::Solve(const MatrixT& A,double eps, int NumEigenValues)
 {
     int N=A.GetNumRows();
     assert(N==A.GetNumCols());
     assert(NumEigenValues<=N);
-    assert(IsHermitian(A,eps));
+    double epsH=eps == 0.0 ? 1e-13 : eps;
+    if (!IsHermitian(A,epsH))
+    {
+        std::cerr << "Non-hermitian matrix, eps=" << eps << std::endl;
+        double delta=Max(fabs(A-Transpose(conj(A))));
+        std::cerr << "Max(fabs(A-Adagger))=" << delta << std::endl;
+    }
+    assert(IsHermitian(A,epsH));
     //
     //  Dicey deciding how much work space lapack needs. more is faster
     //
@@ -79,8 +92,15 @@ LapackEigenSolver<T>::Solve(const MatrixT& A, int NumEigenValues,double eps)
     return std::make_tuple(std::move(U),std::move(W));
 }
 
+template <class T> typename LapackEigenSolver<T>::UdTypeN
+LapackEigenSolver<T>::SolveAllNonSym(const MatrixT& A,double eps)
+{
+    int N=A.GetNumRows();
+    return std::move(SolveNonSym(A,eps,N));
+}
+
 template <> typename LapackEigenSolver<double>::UdTypeN
-LapackEigenSolver<double>::SolveNonSym(const MatrixT& A, int NumEigenValues,double eps)
+LapackEigenSolver<double>::SolveNonSym(const MatrixT& A,double eps, int NumEigenValues)
 {
     int N=A.GetNumRows();
     assert(N==A.GetNumCols());
@@ -135,7 +155,7 @@ LapackEigenSolver<double>::SolveNonSym(const MatrixT& A, int NumEigenValues,doub
 }
 
 template <> typename LapackEigenSolver<dcmplx>::UdTypeN
-LapackEigenSolver<dcmplx>::SolveNonSym(const MatrixT& A, int NumEigenValues,double eps)
+LapackEigenSolver<dcmplx>::SolveNonSym(const MatrixT& A,double eps, int NumEigenValues)
 {
     int N=A.GetNumRows();
     assert(N==A.GetNumCols());

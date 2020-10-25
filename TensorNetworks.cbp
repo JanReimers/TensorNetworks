@@ -18,6 +18,7 @@
 					<Add option="-std=c++17" />
 					<Add option="-g" />
 					<Add option="-DDEBUG" />
+					<Add directory="NumericalMethods" />
 				</Compiler>
 				<Linker>
 					<Add directory="../Debug" />
@@ -36,6 +37,7 @@
 					<Add option="-std=c++17" />
 					<Add option="-pg" />
 					<Add option="-DNDEBUG" />
+					<Add directory="NumericalMethods" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />
@@ -82,6 +84,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="NumericalMethods/ArpackEigenSolver.H" />
+		<Unit filename="NumericalMethods/EigenSolver.H" />
 		<Unit filename="NumericalMethods/LapackEigenSolver.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -98,6 +101,12 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="NumericalMethods/PrimeSVDSolver.H" />
+		<Unit filename="NumericalMethods/SVDSolver.H" />
+		<Unit filename="NumericalMethods/Solvers.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="NumericalMethods/SparseEigenSolver.H" />
+		<Unit filename="NumericalMethods/SparseSVDSolver.H" />
 		<Unit filename="Operators/MPOImp.C">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -77,105 +77,100 @@ TEST_F(LinearAlgebraTests,SparseMatrix)
 //    cout << m << endl;
 }
 
-
 TEST_F(LinearAlgebraTests,Primme_SVDSolverDenseReal)
 {
-    SVDTester<double,Matrix,PrimeSVDSolver>(Nsvd  ,Nsvd  ).RunTests();
-    SVDTester<double,Matrix,PrimeSVDSolver>(Nsvd/2,Nsvd  ).RunTests();
-    SVDTester<double,Matrix,PrimeSVDSolver>(Nsvd  ,Nsvd/2).RunTests();
+    SVDTester<double>(new PrimeSVDSolver<double>(),Nsvd  ,Nsvd  ).RunTests();
+    SVDTester<double>(new PrimeSVDSolver<double>(),Nsvd/2,Nsvd  ).RunTests();
+    SVDTester<double>(new PrimeSVDSolver<double>(),Nsvd  ,Nsvd/2).RunTests();
 }
 
 TEST_F(LinearAlgebraTests,Primme_SVDSolverDenseComplex)
 {
-    SVDTester<dcmplx,Matrix,PrimeSVDSolver>(Nsvd  ,Nsvd  ).RunTests();
-    SVDTester<dcmplx,Matrix,PrimeSVDSolver>(Nsvd/2,Nsvd  ).RunTests();
-    SVDTester<dcmplx,Matrix,PrimeSVDSolver>(Nsvd  ,Nsvd/2).RunTests();
+    SVDTester<dcmplx>(new PrimeSVDSolver<dcmplx>(),Nsvd  ,Nsvd  ).RunTests();
+    SVDTester<dcmplx>(new PrimeSVDSolver<dcmplx>(),Nsvd/2,Nsvd  ).RunTests();
+    SVDTester<dcmplx>(new PrimeSVDSolver<dcmplx>(),Nsvd  ,Nsvd/2).RunTests();
 }
 
 TEST_F(LinearAlgebraTests,Primme_SVDSolverSparseReal)
 {
-    SVDTester<double,SparseMatrix,PrimeSVDSolver>(Nsvd  ,Nsvd  ,svdDensity).RunTests();
-    SVDTester<double,SparseMatrix,PrimeSVDSolver>(Nsvd/2,Nsvd  ,svdDensity).RunTests();
-    SVDTester<double,SparseMatrix,PrimeSVDSolver>(Nsvd  ,Nsvd/2,svdDensity).RunTests();
+    SparseSVDTester<double>(new PrimeSVDSolver<double>(),Nsvd  ,Nsvd  ,svdDensity).RunTests();
+    SparseSVDTester<double>(new PrimeSVDSolver<double>(),Nsvd/2,Nsvd  ,svdDensity).RunTests();
+    SparseSVDTester<double>(new PrimeSVDSolver<double>(),Nsvd  ,Nsvd/2,svdDensity).RunTests();
 }
+
 TEST_F(LinearAlgebraTests,Primme_SVDSolverSparseComplex)
 {
-    SVDTester<dcmplx,SparseMatrix,PrimeSVDSolver>(Nsvd  ,Nsvd  ,svdDensity).RunTests();
-    SVDTester<dcmplx,SparseMatrix,PrimeSVDSolver>(Nsvd/2,Nsvd  ,svdDensity).RunTests();
-    SVDTester<dcmplx,SparseMatrix,PrimeSVDSolver>(Nsvd  ,Nsvd/2,svdDensity).RunTests();
-}
-
-TEST_F(LinearAlgebraTests,Primme_EigenSolverDenseReal)
-{
-    SymEigenTester<double,Matrix,PrimeEigenSolver>(Neigen).RunTests();
-}
-TEST_F(LinearAlgebraTests,Primme_EigenSolverDenseComplex)
-{
-    SymEigenTester<dcmplx,Matrix,PrimeEigenSolver>(Neigen).RunTests();
-}
-
-TEST_F(LinearAlgebraTests,Primme_EigenSolverSparseReal)
-{
-    SymEigenTester<double,SparseMatrix,PrimeEigenSolver>(Neigen,eigenDensity).RunTests();
-}
-
-TEST_F(LinearAlgebraTests,Primme_EigenSolverSparseComplex)
-{
-    SymEigenTester<dcmplx,SparseMatrix,PrimeEigenSolver>(Neigen,eigenDensity).RunTests();
+    SparseSVDTester<dcmplx>(new PrimeSVDSolver<dcmplx>(),Nsvd  ,Nsvd  ,svdDensity).RunTests();
+    SparseSVDTester<dcmplx>(new PrimeSVDSolver<dcmplx>(),Nsvd/2,Nsvd  ,svdDensity).RunTests();
+    SparseSVDTester<dcmplx>(new PrimeSVDSolver<dcmplx>(),Nsvd  ,Nsvd/2,svdDensity).RunTests();
 }
 
 TEST_F(LinearAlgebraTests,Lapack_SVDSolverDenseReal)
 {
-    SVDTester<double,Matrix,LapackSVDSolver>(Nsvd  ,Nsvd  ).RunTests();
-    SVDTester<double,Matrix,LapackSVDSolver>(Nsvd/2,Nsvd  ).RunTests();
-    SVDTester<double,Matrix,LapackSVDSolver>(Nsvd  ,Nsvd/2).RunTests();
+    SVDTester<double>(new LapackSVDSolver<double>(),Nsvd  ,Nsvd  ).RunTests();
+    SVDTester<double>(new LapackSVDSolver<double>(),Nsvd/2,Nsvd  ).RunTests();
+    SVDTester<double>(new LapackSVDSolver<double>(),Nsvd  ,Nsvd/2).RunTests();
 }
 TEST_F(LinearAlgebraTests,Lapack_SVDSolverDenseComplex)
 {
-    SVDTester<dcmplx,Matrix,LapackSVDSolver>(Nsvd  ,Nsvd  ).RunTests();
-    SVDTester<dcmplx,Matrix,LapackSVDSolver>(Nsvd/2,Nsvd  ).RunTests();
-    SVDTester<dcmplx,Matrix,LapackSVDSolver>(Nsvd  ,Nsvd/2).RunTests();
+    SVDTester<dcmplx>(new LapackSVDSolver<dcmplx>(),Nsvd  ,Nsvd  ).RunTests();
+    SVDTester<dcmplx>(new LapackSVDSolver<dcmplx>(),Nsvd/2,Nsvd  ).RunTests();
+    SVDTester<dcmplx>(new LapackSVDSolver<dcmplx>(),Nsvd  ,Nsvd/2).RunTests();
 }
 
+
+
+
+TEST_F(LinearAlgebraTests,Primme_EigenSolverDenseReal)
+{
+    EigenTester<double>(new PrimeEigenSolver<double>(),Neigen).RunTests();
+}
+
+TEST_F(LinearAlgebraTests,Primme_EigenSolverDenseComplex)
+{
+    EigenTester<dcmplx>(new PrimeEigenSolver<dcmplx>(),Neigen).RunTests();
+}
+
+TEST_F(LinearAlgebraTests,Primme_EigenSolverSparseReal)
+{
+    SparseEigenTester<double>(new PrimeEigenSolver<double>(),Neigen,eigenDensity).RunTests();
+}
+
+TEST_F(LinearAlgebraTests,Primme_EigenSolverSparseComplex)
+{
+    SparseEigenTester<dcmplx>(new PrimeEigenSolver<dcmplx>(),Neigen,eigenDensity).RunTests();
+}
 
 
 TEST_F(LinearAlgebraTests,Lapack_EigenSolverDenseReal)
 {
-    SymEigenTester<double,Matrix,LapackEigenSolver>(Neigen).RunTests();
+    EigenTester<double>(new LapackEigenSolver<double>(),Neigen).RunTests();
 }
 TEST_F(LinearAlgebraTests,Lapack_EigenSolverDenseComplex)
 {
-    SymEigenTester<dcmplx,Matrix,LapackEigenSolver>(Neigen).RunTests();
-}
-
-TEST_F(LinearAlgebraTests,Lapack_EigenSolverDenseNonSymReal)
-{
-    NonSymEigenTester<double,Matrix,LapackEigenSolver>(Neigen).RunTests();
-}
-TEST_F(LinearAlgebraTests,Lapack_EigenSolverDenseNonSymComplex)
-{
-    NonSymEigenTester<dcmplx,Matrix,LapackEigenSolver>(Neigen).RunTests();
+    EigenTester<dcmplx>(new LapackEigenSolver<dcmplx>(),Neigen).RunTests();
 }
 
 
 TEST_F(LinearAlgebraTests,Arpack_EigenSolverDenseReal)
 {
-    NonSymEigenTester<double,Matrix,ArpackEigenSolver>(Neigen).RunTests();
+    EigenTester<double>(new ArpackEigenSolver<double>(),Neigen,Neigen-2).RunTests();
 }
 
 TEST_F(LinearAlgebraTests,Arpack_EigenSolverDenseComplex)
 {
-    NonSymEigenTester<dcmplx,Matrix,ArpackEigenSolver>(Neigen).RunTests();
+    EigenTester<dcmplx>(new ArpackEigenSolver<dcmplx>(),Neigen,Neigen-2).RunTests();
 }
+
 
 TEST_F(LinearAlgebraTests,Arpack_EigenSolverSparseReal)
 {
-    NonSymEigenTester<double,SparseMatrix,ArpackEigenSolver>(Neigen,eigenDensity).RunTests();
+    SparseEigenTester<double>(new ArpackEigenSolver<double>(),Neigen,Neigen-2).RunTests();
 }
 
 TEST_F(LinearAlgebraTests,Arpack_EigenSolverSparseComplex)
 {
-    NonSymEigenTester<dcmplx,SparseMatrix,ArpackEigenSolver>(Neigen,eigenDensity).RunTests();
+    SparseEigenTester<dcmplx>(new ArpackEigenSolver<dcmplx>(),Neigen,Neigen-2).RunTests();
 }
 
 
@@ -286,5 +281,6 @@ TEST_F(LinearAlgebraTests,omlDiagonalMatrix_complex_double)
     EXPECT_NEAR(Max(fabs(M*M*M+dMdMdM)),0.0,eps);
 
 }
+
 
 

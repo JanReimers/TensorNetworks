@@ -1,48 +1,64 @@
 #ifndef PRIMEEIGENSOLVER_H
 #define PRIMEEIGENSOLVER_H
 
-#include "TensorNetworks/Epsilons.H"
+#include "EigenSolver.H"
+#include "SparseEigenSolver.H"
 #include "oml/vector.h"
-#include "oml/matrix.h"
-#include <tuple>
 
 struct primme_params;
-template <class T> class SparseMatrix;
-template <class T> class Matrix;
+
 
 //
 //  Client code can derive from this and control the matvec multiplication operations
 //
-template <class T> class PrimeEigenSolverClient
-{
-public:
-    virtual long int GetSize  () const=0; //2^L Hilbert space size
-    virtual void     DoMatVecContraction (int N, T* xvec, T* yvec) const=0;
-
-    static const PrimeEigenSolverClient* theClient;
-};
+//template <class T> class PrimeEigenSolverClient
+//{
+//public:
+//    virtual long int GetSize  () const=0; //2^L Hilbert space size
+//    virtual void     DoMatVecContraction (int N, T* xvec, T* yvec) const=0;
+//
+//    static const PrimeEigenSolverClient* theClient;
+//};
 //
 //  Solve sparse eigen systems using the PRIMME library
 //  For efficiency client code should keep and instance of PrimeEigenSolver alive
 //  between iterations so that eigen vector initial guess get used.
 //
 template <class T> class PrimeEigenSolver
+  : public virtual SparseEigenSolver<T>
+  , public virtual       EigenSolver<T>
 {
-    typedef    Vector<double>              VectorT;
-    typedef        Matrix<T>              MatrixT;
-    typedef   SparseMatrix<T>        SparseMatrixT;
-    typedef std::tuple<MatrixT,VectorT> UdType;
+    using UdType =typename SparseEigenSolver<T>::UdType;
+    using UdTypeN=typename EigenSolver<T>::UdTypeN;
+    using MatrixT=typename EigenSolver<T>::MatrixT;
+    using SparseMatrixT=typename SparseEigenSolver<T>::SparseMatrixT;
+
+    using VectorC=typename SparseEigenSolver<T>::VectorC;
+    using MatrixC=typename SparseEigenSolver<T>::MatrixC;
+
+    using SparseEigenSolver<T>::theDenseMatrix;
+    using SparseEigenSolver<T>::theSparseMatrix;
 public:
+    using ClientT=typename SparseEigenSolver<T>::ClientT;
+
     PrimeEigenSolver();
     ~PrimeEigenSolver();
+    virtual void Reset() {itsNumGuesses=0;};  //Clear out guesses from previous iterations
+    //Dense interface
+    virtual UdType  Solve         (const MatrixT&,double eps, int NumEigenValues);
+    virtual UdType  SolveAll      (const MatrixT&,double eps                    );
+    virtual UdTypeN SolveNonSym   (const MatrixT&,double eps, int NumEigenValues);
+    virtual UdTypeN SolveAllNonSym(const MatrixT&,double eps                    );
+    // Sparse interface
+    virtual UdType  Solve      (const SparseMatrixT&,double eps, int NumEigenValues);
+    virtual UdType  Solve      (const ClientT*      ,double eps, int NumEigenValues);
+    virtual UdTypeN SolveNonSym(const SparseMatrixT&,double eps, int NumEigenValues);
+    virtual UdTypeN SolveNonSym(const ClientT*      ,double eps, int NumEigenValues);
 
-    // Get lowest N eigen values and vectors with no initial guess
-    UdType Solve(const MatrixT&                  , int NumEigenValues,double eps);
-    UdType Solve(const SparseMatrixT&            , int NumEigenValues,double eps);
-    UdType Solve(const PrimeEigenSolverClient<T>*, int NumEigenValues,double eps);
-
-    int Solve1(const Matrix<T>&               , int NumEigenValues,const TensorNetworks::Epsilons& eps);
-    int Solve1(const PrimeEigenSolverClient<T>*, int NumEigenValues,const TensorNetworks::Epsilons& eps);
+    //Old UI
+//    UdType Solve (const MatrixT&                  , int NumEigenValues,double eps);
+//    int    Solve1(const Matrix<T>&,int NumEigenValues,const TensorNetworks::Epsilons& eps);
+//    int    Solve1(const ClientT*  ,int NumEigenValues,const TensorNetworks::Epsilons& eps);
 
 
     Vector <T> GetEigenVector (int index) const;
@@ -55,14 +71,12 @@ public:
         return itsEigenValues;
     }
 
-    static const SparseMatrix<T>* theSparseMatrix;
-    static const      Matrix<T>* theDenseMatrix;
 protected:
     UdType Solve(primme_params&);
 
 private:
     Vector<double>   itsEigenValues;
-    Matrix<T>       itsEigenVectors;
+    Matrix<T>        itsEigenVectors;
     int              itsNumGuesses;
 };
 

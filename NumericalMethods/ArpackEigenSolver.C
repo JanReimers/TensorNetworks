@@ -44,54 +44,81 @@ extern "C"
     void zneupd_c(bool rvec, char const* howmny, a_int const* select, dcmplx* d , dcmplx*  z, a_int ldz, dcmplx sigma, dcmplx* workev, char const* bmat, a_int n, char const* which, a_int nev, double tol, dcmplx* resid, a_int ncv, dcmplx* v, a_int ldv, a_int* iparam, a_int* ipntr, dcmplx* workd, dcmplx* workl, a_int lworkl, double* rwork, a_int* info);
 }
 
-template <class T> void matvec(int N, const Matrix<T>& A, const T * x, T * y)
+//----------------------------------------------------------------------------------------
+//
+//  Private solver routines routines
+//
+template <> typename ArpackEigenSolver<dcmplx>::UdTypeN
+ArpackEigenSolver<dcmplx>::SolveG(MatvecT matvec,int N, int Nev,double eps)
 {
-    assert(A.GetNumRows()==N);
-    assert(A.GetNumCols()==N);
-    for (int i=1;i<=N;i++)
-    {
-        y[i-1]=T (0.0);
-        for (int j=1;j<=N;j++)
-            y[i-1]+=A(i,j)*x[j-1];
-    }
-}
-
-template <class T> void matvec(int N, const SparseMatrix<T>& A, const T * x, T * y)
-{
-    assert(A.GetNumRows()==N);
-    assert(A.GetNumCols()==N);
-    A.DoMVMultiplication(N,x,y);
-//    for (int i=1;i<=N;i++)
-//    {
-//        y[i-1]=T (0.0);
-//        for (int j=1;j<=N;j++)
-//            y[i-1]+=A(i,j)*x[j-1];
-//    }
-}
-
-template <class T> typename ArpackEigenSolver<T>::UdType
-ArpackEigenSolver<T>::SolveNonSym(const Matrix<T>& A, int Nev,double eps)
-{
-    return SolveG(A,Nev,eps);
-}
-
-template <class T> typename ArpackEigenSolver<T>::UdType
-ArpackEigenSolver<T>::SolveNonSym(const SparseMatrix<T>& A, int Nev,double eps)
-{
-    return SolveG(A,Nev,eps);
-}
-
-template <> template <template <typename> class Mat> typename ArpackEigenSolver<double>::UdType
-ArpackEigenSolver<double>::SolveG(const Mat<double>& A, int Nev,double eps)
-{
-    int N=A.GetNumRows();
-    assert(N==A.GetNumCols());
     assert(Nev>0);
-    assert(Nev<N);
+    assert(Nev<=N-2);
 
     int IDO=0,INFO=0;
-    int Ncv=2*Nev; //*** THis has a huge effect on convergence, bigger is better.
+    int Ncv=5*Nev; //  *** THis has a huge effect on convergence, bigger is better.
     if (Ncv>N) Ncv=N;
+    int Lworkl=3*Ncv*Ncv + 5*Ncv;
+
+    int MaxIter=1000;
+
+    Vector<dcmplx>  residuals(N),Workd(3*N),Workl(Lworkl);
+    Matrix<dcmplx>  V(N,Ncv);
+    Vector<double> rwork(Ncv);
+    Vector<int> iParam(11);
+    iParam(1)=1; //ISHIFT
+    iParam(3)=MaxIter;
+    iParam(4)=1; //NB only 1 works
+    iParam(7)=1; //Mode
+    int iPntr[14];
+    char arI='I';
+
+    // Arnaldi iteration loop
+    do
+    {
+        znaupd_c(&IDO,&arI,N,"LM",Nev,eps,&residuals(1),Ncv,&V(1,1)
+        ,N,&iParam(1),iPntr,&Workd(1),&Workl(1),Lworkl,&rwork(1),&INFO);
+//        cout << "IDO=" << IDO << endl;
+        if (IDO==-1 || IDO==1)
+            matvec(N,&Workd(iPntr[0]),&Workd(iPntr[1]));
+        else
+            break;
+
+    } while(true);
+    //cout << "Info=" << INFO << endl;
+    //cout << "nIter=" << iParam(3) << endl;
+    assert(INFO==0);
+    //
+    //  Post processing to the eigen vectors.
+    //
+    Vector<int> select(Ncv);
+    Vector<dcmplx> D(Nev+1),Workev(2*Ncv);
+    Matrix<dcmplx> U(N,Nev);
+    dcmplx sigma(0);
+    zneupd_c(true, "All", &select(1), &D(1), &U(1,1),N,
+        sigma, &Workev(1), &arI,N,"LM", Nev, eps,
+          &residuals(1), Ncv, &V(1,1),N, &iParam(1), iPntr, &Workd(1), &Workl(1),
+          Lworkl, &rwork(1), &INFO );
+
+    theDenseMatrix=nullptr; //Make sure these don't accidentally get reused
+    theSparseMatrix=nullptr;
+    ClientT::theClient=nullptr;
+//    cout << "D(Nev+1)=" << D(Nev+1) << endl;
+    D.SetLimits(Nev,true);
+    return make_tuple(std::move(U),std::move(D));
+}
+
+
+
+template <> typename ArpackEigenSolver<double>::UdTypeN
+ArpackEigenSolver<double>::SolveG(MatvecT matvec,int N, int Nev,double eps)
+{
+    assert(Nev>0);
+    assert(Nev<=N-2);
+
+    int IDO=0,INFO=0;
+    int Ncv=2*Nev+1; //*** THis has a huge effect on convergence, bigger is better.
+    if (Ncv>=N) Ncv=N;
+    //cout << "Nev Ncv N = " << Nev << " " << Ncv << " " << N << endl;
     int Lworkl=3*Ncv*Ncv + 6*Ncv;
 
     int MaxIter=1000;
@@ -116,7 +143,7 @@ ArpackEigenSolver<double>::SolveG(const Mat<double>& A, int Nev,double eps)
         ,N,&iParam(1),iPntr,&Workd(1),&Workl(1),Lworkl,&INFO);
 //        cout << "IDO=" << IDO << endl;
         if (IDO==-1 || IDO==1)
-            matvec<double>(N,A,&Workd(iPntr[0]),&Workd(iPntr[1]));
+            matvec(N,&Workd(iPntr[0]),&Workd(iPntr[1]));
         else
             break;
 
@@ -129,7 +156,7 @@ ArpackEigenSolver<double>::SolveG(const Mat<double>& A, int Nev,double eps)
     //
     Vector<int> select(Ncv);
     Vector<double> DR(Nev+1),DI(Nev+1),Workev(3*Ncv);
-//    Matrix<double> U(N,Nev+1);
+    Fill(DI,0.0);
     double sigmar(0),sigmai(0);
     char how_many('A');
     dneupd_c(true, &how_many, &select(1), &DR(1),&DI(1), &V(1,1),N,
@@ -137,88 +164,198 @@ ArpackEigenSolver<double>::SolveG(const Mat<double>& A, int Nev,double eps)
           &residuals(1), Ncv, &V(1,1),N, &iParam(1), iPntr, &Workd(1), &Workl(1),
           Lworkl, &INFO );
 
+    if (fabs(DI(Nev+1))>eps)
+    {
+        std::cerr << "warning Incrementing Nev to avoid conjugate eigen value pair cut off" << std::endl;
+        Nev++; //avoid cutting off a conj pair.
+    }
     Vector<dcmplx> D(Nev);
     Matrix<dcmplx> UC(N,Nev);
-    int ne=1;
-    while (ne<Nev)
+    for (int j=1;j<=Nev;j++)
     {
-        if (fabs(DI(ne))<eps)
+        if (fabs(DI(j))>eps && j==Nev)
+            std::cerr << "warning conjugate eigen value pair is cut off, increase Nev by one" << std::endl;
+        if (fabs(DI(j))<eps || j==Nev)
         {
-            D(ne)=dcmplx(DR(ne),0.0);
+            D(j)=dcmplx(DR(j),0.0);
             for (int i=1;i<=N;i++)
-                UC(i,ne  )=dcmplx(V(i,ne),0.0);
-            ne+=1;
+                UC(i,j  )=dcmplx(V(i,j),0.0);
         }
         else
         {
-            D(ne)=dcmplx(DR(ne),DI(ne));
-            D(ne+1)=dcmplx(DR(ne+1),DI(ne+1));
+            D(j  )=dcmplx(DR(j  ),DI(j  ));
+            D(j+1)=dcmplx(DR(j+1),DI(j+1));
             for (int i=1;i<=N;i++)
             {
-                UC(i,ne  )=dcmplx(V(i,ne), V(i,ne+1));
-                UC(i,ne+1)=dcmplx(V(i,ne),-V(i,ne+1));
+                UC(i,j  )=dcmplx(V(i,j), V(i,j+1));
+                UC(i,j+1)=dcmplx(V(i,j),-V(i,j+1));
             }
-            ne+=2;
+            j++;
         }
     }
+    theDenseMatrix=nullptr; //Make sure these don't accidentally get reused
+    theSparseMatrix=nullptr;
+    ClientT::theClient=nullptr;
     return make_tuple(std::move(UC),std::move(D));
 }
 
-template <> template <template <typename> class Mat> typename ArpackEigenSolver<dcmplx>::UdType
-ArpackEigenSolver<dcmplx>::SolveG(const Mat<dcmplx>& A, int Nev,double eps)
+
+
+
+template <class T> void matvecDense(int N, const T * x, T * y)
 {
-    int N=A.GetNumRows();
-    assert(N==A.GetNumCols());
-    assert(Nev>0);
-    assert(Nev<N);
-
-    int IDO=0,INFO=0;
-    int Ncv=5*Nev; //*** THis has a huge effect on convergence, bigger is better.
-    if (Ncv>N) Ncv=N;
-    int Lworkl=3*Ncv*Ncv + 5*Ncv;
-
-    int MaxIter=1000;
-
-    Vector<dcmplx>  residuals(N),Workd(3*N),Workl(Lworkl);
-    Matrix<dcmplx>  V(N,Ncv);
-    Vector<double> rwork(Ncv);
-    Vector<int> iParam(11);
-    iParam(1)=1; //ISHIFT
-    iParam(3)=MaxIter;
-    iParam(4)=1; //NB only 1 works
-    iParam(7)=1; //Mode
-    int iPntr[14];
-    char arI='I';
-
-    // Arnaldi iteration loop
-    do
+    typedef ArpackEigenSolver<T> ArpackT;
+    assert(ArpackT::theDenseMatrix);
+    assert(ArpackT::theDenseMatrix->GetNumRows()==N);
+    assert(ArpackT::theDenseMatrix->GetNumCols()==N);
+    for (int i=1;i<=N;i++)
     {
-        znaupd_c(&IDO,&arI,N,"LM",Nev,eps,&residuals(1),Ncv,&V(1,1)
-        ,N,&iParam(1),iPntr,&Workd(1),&Workl(1),Lworkl,&rwork(1),&INFO);
-//        cout << "IDO=" << IDO << endl;
-        if (IDO==-1 || IDO==1)
-            matvec<dcmplx>(N,A,&Workd(iPntr[0]),&Workd(iPntr[1]));
-        else
-            break;
-
-    } while(true);
-    //cout << "Info=" << INFO << endl;
-    //cout << "nIter=" << iParam(3) << endl;
-    assert(INFO==0);
-    //
-    //  Post processing to the eigen vectors.
-    //
-    Vector<int> select(Ncv);
-    Vector<dcmplx> D(Nev+1),Workev(2*Ncv);
-    Matrix<dcmplx> U(N,Nev);
-    dcmplx sigma(0);
-    zneupd_c(true, "All", &select(1), &D(1), &U(1,1),N,
-        sigma, &Workev(1), &arI,N,"LM", Nev, eps,
-          &residuals(1), Ncv, &V(1,1),N, &iParam(1), iPntr, &Workd(1), &Workl(1),
-          Lworkl, &rwork(1), &INFO );
-
-    return make_tuple(std::move(U),std::move(D));
+        y[i-1]=T (0.0);
+        for (int j=1;j<=N;j++)
+            y[i-1]+=(*ArpackT::theDenseMatrix)(i,j)*x[j-1];
+    }
 }
+
+template <class T> void matvecSparse(int N, const T * x, T * y)
+{
+    typedef ArpackEigenSolver<T> ArpackT;
+    assert(ArpackT::theSparseMatrix);
+    assert(ArpackT::theSparseMatrix->GetNumRows()==N);
+    assert(ArpackT::theSparseMatrix->GetNumCols()==N);
+    ArpackT::theSparseMatrix->DoMVMultiplication(N,x,y);
+}
+
+template <class T> void matvecClient(int N, const T * x, T * y)
+{
+    typedef typename ArpackEigenSolver<T>::ClientT ClientT;
+    assert(ClientT::theClient);
+    assert(ClientT::theClient->GetSize()==N);
+    ClientT::theClient->DoMatVecContraction(N,x,y);
+}
+
+//----------------------------------------------------------------------------------------
+//
+//  Public interface routines
+//
+template <class T> typename ArpackEigenSolver<T>::UdType
+ArpackEigenSolver<T>::Solve(const MatrixT& A,double eps, int Nev)
+{
+    std::cerr << "ArpackEigenSolver::Solve is not implemented yet, Using non-sym solver." << std::endl;
+    assert(A.GetNumRows()==A.GetNumCols());
+    assert(Nev<A.GetNumRows());
+    theDenseMatrix=&A;
+    auto [Uc,dc]=SolveG(matvecDense,A.GetNumRows(),Nev,eps);
+    Vector<double> d=real(dc);
+    return std::make_tuple(std::move(Uc),std::move(d));
+}
+
+template <> typename ArpackEigenSolver<double>::UdType
+ArpackEigenSolver<double>::Solve(const MatrixT& A,double eps, int Nev)
+{
+    std::cerr << "ArpackEigenSolver::Solve is not implemented yet, Using non-sym solver." << std::endl;
+    assert(A.GetNumRows()==A.GetNumCols());
+    assert(Nev<A.GetNumRows());
+    theDenseMatrix=&A;
+    auto [Uc,dc]=SolveG(matvecDense,A.GetNumRows(),Nev,eps);
+    Matrix<double> U=real(Uc);
+    Vector<double> d=real(dc);
+    return std::make_tuple(std::move(U),std::move(d));
+}
+
+template <class T> typename ArpackEigenSolver<T>::UdType  ArpackEigenSolver<T>::SolveAll      (const MatrixT& A,double eps)
+{
+    std::cerr << "ArpackEigenSolver does not support all Evs, doing N/2" << std::endl;
+    int N=A.GetNumRows();
+    return Solve(A,eps,N/2);
+}
+
+
+
+template <class T> typename ArpackEigenSolver<T>::UdType
+ArpackEigenSolver<T>::Solve(const SparseMatrixT& A,double eps, int Nev)
+{
+    std::cerr << "ArpackEigenSolver::Solve is not implemented yet, Using non-sym solver." << std::endl;
+    assert(A.GetNumRows()==A.GetNumCols());
+    assert(Nev<A.GetNumRows());
+    theSparseMatrix=&A;
+    auto [Uc,dc]=SolveG(matvecSparse,A.GetNumRows(),Nev,eps);
+    Vector<double> d=real(dc);
+    return std::make_tuple(std::move(Uc),std::move(d));
+}
+
+template <> typename ArpackEigenSolver<double>::UdType
+ArpackEigenSolver<double>::Solve(const SparseMatrixT& A,double eps, int Nev)
+{
+    std::cerr << "ArpackEigenSolver::Solve is not implemented yet, Using non-sym solver." << std::endl;
+    assert(A.GetNumRows()==A.GetNumCols());
+    assert(Nev<A.GetNumRows());
+    theSparseMatrix=&A;
+    auto [Uc,dc]=SolveG(matvecSparse,A.GetNumRows(),Nev,eps);
+    Matrix<double> U=real(Uc);
+    Vector<double> d=real(dc);
+    return std::make_tuple(std::move(U),std::move(d));
+}
+
+
+template <class T> typename ArpackEigenSolver<T>::UdTypeN
+ArpackEigenSolver<T>::SolveNonSym(const MatrixT& A,double eps, int Nev)
+{
+    assert(A.GetNumRows()==A.GetNumCols());
+    assert(Nev<A.GetNumRows());
+    theDenseMatrix=&A;
+    return SolveG(matvecDense,A.GetNumRows(),Nev,eps);
+}
+template <class T> typename ArpackEigenSolver<T>::UdTypeN ArpackEigenSolver<T>::SolveAllNonSym(const MatrixT& A,double eps)
+{
+    std::cerr << "ArpackEigenSolver does not support all Evs, doing N/2" << std::endl;
+    int N=A.GetNumRows();
+    return SolveNonSym(A,eps,N/2);
+}
+
+template <class T> typename ArpackEigenSolver<T>::UdTypeN
+ArpackEigenSolver<T>::SolveNonSym(const SparseMatrixT& A,double eps, int Nev)
+{
+    assert(A.GetNumRows()==A.GetNumCols());
+    assert(Nev<A.GetNumRows());
+    theSparseMatrix=&A;
+    return SolveG(matvecSparse,A.GetNumRows(),Nev,eps);
+}
+
+template <class T> typename ArpackEigenSolver<T>::UdType
+ArpackEigenSolver<T>::Solve(const ClientT* client,double eps, int Nev)
+{
+    std::cerr << "ArpackEigenSolver::Solve is not implemented yet, Using non-sym solver." << std::endl;
+    ClientT::theClient=client;
+    auto [Uc,dc]=SolveG(matvecClient,client->GetSize(),Nev,eps);
+    Vector<double> d=real(dc);
+    return std::make_tuple(std::move(Uc),std::move(d));
+}
+
+template <> typename ArpackEigenSolver<double>::UdType
+ArpackEigenSolver<double>::Solve(const ClientT* client,double eps, int Nev)
+{
+    std::cerr << "ArpackEigenSolver::Solve is not implemented yet, Using non-sym solver." << std::endl;
+    ClientT::theClient=client;
+    auto [Uc,dc]=SolveG(matvecClient,client->GetSize(),Nev,eps);
+    Matrix<double> U=real(Uc);
+    Vector<double> d=real(dc);
+    return std::make_tuple(std::move(U),std::move(d));
+}
+
+
+template <class T> typename ArpackEigenSolver<T>::UdTypeN
+ArpackEigenSolver<T>::SolveNonSym(const ClientT* client,double eps, int Nev)
+{
+    ClientT::theClient=client;
+    return SolveG(matvecClient,client->GetSize(),Nev,eps);
+}
+
+
+//
+//  static variable. Kludge for getting the matrix into the MatVec routines.
+//
+template <class T> const SparseMatrix<T>* ArpackEigenSolver<T>::theSparseMatrix = 0;
+template <class T> const       Matrix<T>* ArpackEigenSolver<T>::theDenseMatrix = 0;
 
 template class ArpackEigenSolver<double>;
 template class ArpackEigenSolver<dcmplx>;

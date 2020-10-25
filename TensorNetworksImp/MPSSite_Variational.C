@@ -3,12 +3,9 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworks/Epsilons.H"
-//#include "NumericalMethods/PrimeEigenSolver.H"
-#include "NumericalMethods/LapackEigenSolver.H"
+#include "NumericalMethods/EigenSolver.H"
 
-//#include "oml/minmax.h"
 #include "oml/cnumeric.h"
-//#include "oml/vector_io.h"
 #include "oml/random.h"
 #include <iostream>
 #include <iomanip>
@@ -26,7 +23,7 @@ void MPSSite::Refine(const MatrixCT& Heff,const Epsilons& eps)
     int N=Heff.GetNumRows();
     //cout << "Heff N=" << N << endl;
     Vector<double>  eigenValues(N);
-    auto [U,d]=itsEigenSolver->Solve(Heff,2,eps.itsEigenSolverEpsilon); //Get lowest two eigen values/states
+    auto [U,d]=itsEigenSolver->Solve(Heff,eps.itsEigenSolverEpsilon,2); //Get lowest two eigen values/states
 
     eigenValues=d;
 

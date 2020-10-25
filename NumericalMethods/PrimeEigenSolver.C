@@ -29,7 +29,7 @@ typedef    void (*MatvecT) (void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, 
 primme_params MakeParameters(MatvecT MatVec,int N,int NumEigenValues,int NumGuesses,double eps);
 
 template <class T> typename PrimeEigenSolver<T>::UdType
-PrimeEigenSolver<T>::Solve(const MatrixT& m, int NumEigenValues,double eps)
+PrimeEigenSolver<T>::Solve(const MatrixT& m,double eps, int NumEigenValues)
 {
     int N=m.GetNumRows();
     assert(N==m.GetNumCols());
@@ -41,7 +41,14 @@ PrimeEigenSolver<T>::Solve(const MatrixT& m, int NumEigenValues,double eps)
 }
 
 template <class T> typename PrimeEigenSolver<T>::UdType
-PrimeEigenSolver<T>::Solve(const SparseMatrixT& m, int NumEigenValues,double eps)
+PrimeEigenSolver<T>::SolveAll(const MatrixT& A,double eps)
+{
+    int mn=Min(A.GetNumRows(),A.GetNumCols());
+    return Solve(A,eps,mn);
+}
+
+template <class T> typename PrimeEigenSolver<T>::UdType
+PrimeEigenSolver<T>::Solve(const SparseMatrixT& m,double eps, int NumEigenValues)
 {
     int N=m.GetNumRows();
     assert(N==m.GetNumCols());
@@ -53,18 +60,46 @@ PrimeEigenSolver<T>::Solve(const SparseMatrixT& m, int NumEigenValues,double eps
 }
 
 template <class T> typename PrimeEigenSolver<T>::UdType
-PrimeEigenSolver<T>::Solve(const PrimeEigenSolverClient<T>* client, int NumEigenValues,double eps)
+PrimeEigenSolver<T>::Solve(const ClientT* client,double eps, int NumEigenValues)
 {
     assert(client);
     int N=client->GetSize();
     assert(NumEigenValues<=N);
-    PrimeEigenSolverClient<T>::theClient=client;  //Used by the M*v call back
+    ClientT::theClient=client;  //Used by the M*v call back
     primme_params primme=MakeParameters(ClientMatvec<T>,N,NumEigenValues,itsNumGuesses,eps);
     return Solve(primme);
 }
 
 
-template <class T> int PrimeEigenSolver<T>::Solve1(const Matrix<T>& m, int NumEigenValues,const TensorNetworks::Epsilons& eps)
+
+template <class T> typename PrimeEigenSolver<T>::UdTypeN
+PrimeEigenSolver<T>::SolveNonSym   (const MatrixT&,double eps, int NumEigenValues)
+{
+    std::cerr << "PrimeEigenSolver::SolveNonSym is not implemented yet." << std::endl;
+    return std::make_tuple(MatrixC(0,0),VectorC(0));
+}
+template <class T> typename PrimeEigenSolver<T>::UdTypeN
+PrimeEigenSolver<T>::SolveAllNonSym(const MatrixT& A,double eps)
+{
+    int N=A.GetNumRows();
+    return SolveNonSym(A,eps,N);
+}
+
+template <class T> typename PrimeEigenSolver<T>::UdTypeN
+PrimeEigenSolver<T>::SolveNonSym(const SparseMatrixT&,double eps, int NumEigenValues)
+{
+    std::cerr << "PrimeEigenSolver::SolveNonSym is not implemented yet." << std::endl;
+    return std::make_tuple(MatrixC(0,0),VectorC(0));
+}
+template <class T> typename PrimeEigenSolver<T>::UdTypeN
+PrimeEigenSolver<T>::SolveNonSym(const ClientT*      ,double eps, int NumEigenValues)
+{
+    std::cerr << "PrimeEigenSolver::SolveNonSym is not implemented yet." << std::endl;
+    return std::make_tuple(MatrixC(0,0),VectorC(0));
+}
+
+
+/*template <class T> int PrimeEigenSolver<T>::Solve1(const Matrix<T>& m, int NumEigenValues,const TensorNetworks::Epsilons& eps)
 {
     assert(&m);
     assert(m.GetNumRows()==m.GetNumCols());
@@ -97,7 +132,7 @@ template <class T> int PrimeEigenSolver<T>::Solve1
     Solve(primme);
     return 1;
 }
-
+*/
 //
 //  Enable template solve function to call the correct primme routine
 //
@@ -131,7 +166,7 @@ PrimeEigenSolver<T>::Solve(primme_params& p)
     //std::cout << "Primme niter=" << niter << std::endl;
     itsNumGuesses=p.numEvals; //Set up using guesses for next time around
     primme_free(&p);
-    return std::make_tuple(std::move(itsEigenVectors),std::move(itsEigenValues));
+    return std::make_tuple(itsEigenVectors,itsEigenValues);
 }
 
 //
@@ -159,8 +194,8 @@ primme_params MakeParameters(MatvecT MatVec,int N,int NumEigenValues,int NumGues
 
 template <class T> void SparseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_blockSize, primme_params *primme, int *ierr)
 {
-    typedef PrimeEigenSolver<T> primmeT;
-    assert(primmeT::theSparseMatrix);
+    typedef SparseEigenSolver<T> SES;
+    assert(SES::theSparseMatrix);
     long int& ldx(*_ldx);
     long int& ldy(*_ldy);
     int& blockSize(*_blockSize);
@@ -169,15 +204,15 @@ template <class T> void SparseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_
     {
         T* xvec = static_cast<T*>(x) + ldx*ib;
         T* yvec = static_cast<T*>(y) + ldy*ib;
-        primmeT::theSparseMatrix->DoMVMultiplication(primme->n,xvec,yvec);
+        SES::theSparseMatrix->DoMVMultiplication(primme->n,xvec,yvec);
     }
     *ierr = 0;
 }
 
 template <class T> void DenseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_blockSize, primme_params *primme, int *ierr)
 {
-    typedef PrimeEigenSolver<T> primmeT;
-    assert(primmeT::theDenseMatrix);
+    typedef SparseEigenSolver<T> SES;
+    assert(SES::theDenseMatrix);
     long int& ldx(*_ldx);
     long int& ldy(*_ldy);
     int& blockSize(*_blockSize);
@@ -191,7 +226,7 @@ template <class T> void DenseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_I
         {
             yvec[ir-1]=0.0;
             for (int ic=1;ic<=N;ic++)
-                yvec[ir-1]+=(*primmeT::theDenseMatrix)(ir,ic)*xvec[ic-1];
+                yvec[ir-1]+=(*SES::theDenseMatrix)(ir,ic)*xvec[ic-1];
         }
     }
     *ierr = 0;
@@ -201,7 +236,8 @@ template <class T> void DenseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_I
 template <class T>
 void ClientMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_blockSize, primme_params *primme, int *ierr)
 {
-    assert(PrimeEigenSolverClient<T>::theClient); //|Psi>
+    typedef typename PrimeEigenSolver<T>::ClientT ClientT;
+    assert(ClientT::theClient); //|Psi>
     long int& ldx(*_ldx);
     long int& ldy(*_ldy);
     int& blockSize(*_blockSize);
@@ -210,19 +246,12 @@ void ClientMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_bl
     {
         T* xvec = static_cast<T*>(x) + ldx*ib;
         T* yvec = static_cast<T*>(y) + ldy*ib;
-        PrimeEigenSolverClient<T>::theClient->DoMatVecContraction(primme->n,xvec,yvec);
+        ClientT::theClient->DoMatVecContraction(primme->n,xvec,yvec);
     }
     *ierr = 0;
 
 }
 
-//
-//  static variable. Kludge for getting the matrix into the MatVec routines.
-//
-template<class T> const SparseMatrix<T>* PrimeEigenSolver<T>::theSparseMatrix = 0;
-template<class T> const      Matrix<T>* PrimeEigenSolver<T>::theDenseMatrix = 0;
-
-template <class T> const PrimeEigenSolverClient<T>* PrimeEigenSolverClient<T>::theClient;
 
 //
 //  Make template instances
