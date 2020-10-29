@@ -6,7 +6,7 @@
 TwoSiteDMs::TwoSiteDMs(int L, int d)
     : itsL(L)
     , itsd(d)
-    , itsDMs(1,L,1,L)
+    , itsDMs(L)
 {
     //ctor
 }
