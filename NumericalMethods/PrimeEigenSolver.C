@@ -73,66 +73,32 @@ PrimeEigenSolver<T>::Solve(const ClientT* client,double eps, int NumEigenValues)
 
 
 template <class T> typename PrimeEigenSolver<T>::UdTypeN
-PrimeEigenSolver<T>::SolveNonSym   (const MatrixT&,double eps, int NumEigenValues)
+PrimeEigenSolver<T>::SolveRightNonSym   (const MatrixT&,double eps, int NumEigenValues)
 {
     std::cerr << "PrimeEigenSolver::SolveNonSym is not implemented yet." << std::endl;
-    return std::make_tuple(MatrixC(0,0),VectorC(0));
+    return std::make_tuple(MatrixC(),VectorC());
 }
+
 template <class T> typename PrimeEigenSolver<T>::UdTypeN
-PrimeEigenSolver<T>::SolveAllNonSym(const MatrixT& A,double eps)
+PrimeEigenSolver<T>::SolveAllRightNonSym(const MatrixT& A,double eps)
 {
     int N=A.GetNumRows();
-    return SolveNonSym(A,eps,N);
+    return SolveRightNonSym(A,eps,N);
 }
 
 template <class T> typename PrimeEigenSolver<T>::UdTypeN
-PrimeEigenSolver<T>::SolveNonSym(const SparseMatrixT&,double eps, int NumEigenValues)
+PrimeEigenSolver<T>::SolveRightNonSym(const SparseMatrixT&,double eps, int NumEigenValues)
 {
     std::cerr << "PrimeEigenSolver::SolveNonSym is not implemented yet." << std::endl;
-    return std::make_tuple(MatrixC(0,0),VectorC(0));
+    return std::make_tuple(MatrixC(),VectorC());
 }
 template <class T> typename PrimeEigenSolver<T>::UdTypeN
-PrimeEigenSolver<T>::SolveNonSym(const ClientT*      ,double eps, int NumEigenValues)
+PrimeEigenSolver<T>::SolveRightNonSym(const ClientT*      ,double eps, int NumEigenValues)
 {
     std::cerr << "PrimeEigenSolver::SolveNonSym is not implemented yet." << std::endl;
-    return std::make_tuple(MatrixC(0,0),VectorC(0));
+    return std::make_tuple(MatrixC(),VectorC());
 }
 
-
-/*template <class T> int PrimeEigenSolver<T>::Solve1(const Matrix<T>& m, int NumEigenValues,const TensorNetworks::Epsilons& eps)
-{
-    assert(&m);
-    assert(m.GetNumRows()==m.GetNumCols());
-    SparseMatrix<T> sparsem(m,eps.itsSparseMatrixEpsilon);
-    int N=m.GetNumRows();
-    //cout << "Density=" << sparsem.GetDensity() << "%" << endl;
-    primme_params primme;
-    if (sparsem.GetDensity()<80)
-    {
-        theSparseMatrix=&sparsem;
-        primme=MakeParameters(SparseMatvec<T>,N,NumEigenValues,itsNumGuesses,eps.itsEigenSolverEpsilon);
-    }
-    else
-    {
-        theDenseMatrix=&m;
-        primme=MakeParameters(DenseMatvec<T>,N,NumEigenValues,itsNumGuesses,eps.itsEigenSolverEpsilon);
-    }
-    Solve(primme);
-    return 1;
-}
-
-template <class T> int PrimeEigenSolver<T>::Solve1
-(const PrimeEigenSolverClient<T>* client, int NumEigenValues,const TensorNetworks::Epsilons& eps)
-{
-    assert(client);
-    PrimeEigenSolverClient<T>::theClient=client;  //Used by the M*v call back
-
-    int N=client->GetSize();
-    primme_params primme=MakeParameters(ClientMatvec<T>,N,NumEigenValues,itsNumGuesses,eps.itsEigenSolverEpsilon);
-    Solve(primme);
-    return 1;
-}
-*/
 //
 //  Enable template solve function to call the correct primme routine
 //

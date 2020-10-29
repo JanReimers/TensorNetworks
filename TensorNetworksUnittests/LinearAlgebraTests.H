@@ -6,6 +6,7 @@
 #include "NumericalMethods/EigenSolver.H"
 #include "NumericalMethods/SparseEigenSolver.H"
 #include "oml/random.h"
+#include "oml/fakedouble.h"
 #include <iostream>
 #include <complex>
 
@@ -24,8 +25,6 @@ template <> Matrix<double> MyAbs(const Matrix<dcmplx> &m)
 {
     return fabs(m);
 };
-
-const Matrix<double>& conj(const Matrix<double>& m) {return m;}
 
 //
 //  Randomly put zeros into a dense matrix until a request density is achieved
@@ -132,20 +131,31 @@ public:
         }
         A=Base::MakeMatrix(); //Make a non sym matrix
         {
-            auto [U,d]=itsSolver->SolveNonSym(A,eps,Nev);
-            ValidateNonSymmetric(U,d);
+            auto [U,d]=itsSolver->SolveRightNonSym(A,eps,Nev);
+            ValidateRight(U,d);
+            itsSolver->Reset();
+        }
+        {
+            auto [U,d]=itsSolver->SolveLeft_NonSym(A,eps,Nev);
+            ValidateLeft(U,d);
             itsSolver->Reset();
         }
         if (Nev/2>=1)
         {
-            auto [U,d]=itsSolver->SolveNonSym(A,eps,Nev/2);
-            ValidateNonSymmetric(U,d);
+            auto [U,d]=itsSolver->SolveRightNonSym(A,eps,Nev/2);
+            ValidateRight(U,d);
+            itsSolver->Reset();
+        }
+        if (Nev/2>=1)
+        {
+            auto [U,d]=itsSolver->SolveLeft_NonSym(A,eps,Nev/2);
+            ValidateLeft(U,d);
             itsSolver->Reset();
         }
         if (Nev==N)
         {
-            auto [U,d]=itsSolver->SolveAllNonSym(A,eps);
-            ValidateNonSymmetric(U,d);
+            auto [U,d]=itsSolver->SolveAllRightNonSym(A,eps);
+            ValidateRight(U,d);
             itsSolver->Reset();
         }
     }
@@ -166,7 +176,7 @@ public:
         for (int i=1;i<=Ne;i++) diag(i,i)-=d(i);
         EXPECT_NEAR(Max(fabs(diag)),0.0,N*eps);
     }
-    virtual void ValidateNonSymmetric(const Matrix<dcmplx>& U, const Vector<dcmplx>& d)
+    virtual void ValidateRight(const Matrix<dcmplx>& U, const Vector<dcmplx>& d)
     {
         int Ne=d.size();
         if (Ne>0)
@@ -175,6 +185,20 @@ public:
             {
                 Vector<dcmplx> Ui=U.GetColumn(i);
                 Vector<dcmplx> residuals=A*Ui-d(i)*Ui;
+                double res=Max(fabs(residuals));
+                EXPECT_NEAR(res,0.0,15*eps);
+            }
+        }
+    }
+    virtual void ValidateLeft(const Matrix<dcmplx>& U, const Vector<dcmplx>& d)
+    {
+        int Ne=d.size();
+        if (Ne>0)
+        {
+            for (int i=1;i<=Ne;i++)
+            {
+                Vector<dcmplx> Ui=U.GetColumn(i);
+                Vector<dcmplx> residuals=Ui*A-d(i)*Ui;
                 double res=Max(fabs(residuals));
                 EXPECT_NEAR(res,0.0,15*eps);
             }
@@ -235,25 +259,36 @@ public:
         }
         A=Base::MakeMatrix(); //Make a non sym matrix
         {
-            auto [U,d]=itsSolver->SolveNonSym(A,eps,Nev);
-            ValidateNonSymmetric(U,d);
+            auto [U,d]=itsSolver->SolveRightNonSym(A,eps,Nev);
+            ValidateRight(U,d);
             itsSolver->Reset();
         }
         {
-            auto [U,d]=itsSolver->SolveNonSym(this,eps,Nev);
-            ValidateNonSymmetric(U,d);
+            auto [U,d]=itsSolver->SolveLeft_NonSym(A,eps,Nev);
+            ValidateLeft(U,d);
+            itsSolver->Reset();
+        }
+        {
+            auto [U,d]=itsSolver->SolveRightNonSym(this,eps,Nev);
+            ValidateRight(U,d);
             itsSolver->Reset();
         }
         if (Nev/2>=1)
         {
-            auto [U,d]=itsSolver->SolveNonSym(A,eps,Nev/2);
-            ValidateNonSymmetric(U,d);
+            auto [U,d]=itsSolver->SolveRightNonSym(A,eps,Nev/2);
+            ValidateRight(U,d);
             itsSolver->Reset();
         }
         if (Nev/2>=1)
         {
-            auto [U,d]=itsSolver->SolveNonSym(this,eps,Nev/2);
-            ValidateNonSymmetric(U,d);
+            auto [U,d]=itsSolver->SolveLeft_NonSym(A,eps,Nev/2);
+            ValidateLeft(U,d);
+            itsSolver->Reset();
+        }
+        if (Nev/2>=1)
+        {
+            auto [U,d]=itsSolver->SolveRightNonSym(this,eps,Nev/2);
+            ValidateRight(U,d);
             itsSolver->Reset();
         }
     }
@@ -274,7 +309,7 @@ public:
         for (int i=1;i<=Ne;i++) diag(i,i)-=d(i);
         EXPECT_NEAR(Max(fabs(diag)),0.0,2*N*eps);
     }
-    virtual void ValidateNonSymmetric(const Matrix<dcmplx>& U, const Vector<dcmplx>& d)
+    virtual void ValidateRight(const Matrix<dcmplx>& U, const Vector<dcmplx>& d)
     {
         int Ne=d.size();
         if (Ne>0)
@@ -283,6 +318,20 @@ public:
             {
                 Vector<dcmplx> Ui=U.GetColumn(i);
                 Vector<dcmplx> residuals=A*Ui-d(i)*Ui;
+                double res=Max(fabs(residuals));
+                EXPECT_NEAR(res,0.0,15*eps);
+            }
+        }
+    }
+    virtual void ValidateLeft(const Matrix<dcmplx>& U, const Vector<dcmplx>& d)
+    {
+        int Ne=d.size();
+        if (Ne>0)
+        {
+            for (int i=1;i<=Ne;i++)
+            {
+                Vector<dcmplx> Ui=U.GetColumn(i);
+                Vector<dcmplx> residuals=Ui*A-d(i)*Ui;
                 double res=Max(fabs(residuals));
                 EXPECT_NEAR(res,0.0,15*eps);
             }

@@ -30,7 +30,7 @@ public:
     , Neigen(30)
 #else
     , Nsvd  (100)
-    , Neigen(200)
+    , Neigen(100)
 #endif
     , svdDensity(0.2)
     , eigenDensity(0.1)

@@ -7,10 +7,10 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 - Done Try CSVD from LaPack and Primme
     -Lapack takes SVD out of the top 25 fr CPU
     -Some contractions MPSSite::IterateLeft_F, IterateLeft_R, ContractLRM
-        needoptimization
+        need optimization
     SVDtransfer takes 28% of the cpu time
 - LinAlg solvers
-    Make abstract interfaces for SVD and eigen
+    Done Make abstract interfaces for SVD and eigen
     Do left and right Evs for non sym
     Done Done Add Lapack non sym routines
     Options for largest or smallest evs

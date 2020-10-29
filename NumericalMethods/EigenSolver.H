@@ -27,10 +27,11 @@ public:
     virtual ~EigenSolver() {};
     virtual void Reset()=0;  //Clear out guesses from previous iterations
 
-    virtual UdType  Solve         (const MatrixT&,double eps, int NumEigenValues)=0;
-    virtual UdType  SolveAll      (const MatrixT&,double eps                    )=0;
-    virtual UdTypeN SolveNonSym   (const MatrixT&,double eps, int NumEigenValues)=0;
-    virtual UdTypeN SolveAllNonSym(const MatrixT&,double eps                    )=0;
+    virtual UdType  Solve              (const MatrixT&,double eps, int NumEigenValues)=0;
+    virtual UdType  SolveAll           (const MatrixT&,double eps                    )=0;
+    virtual UdTypeN SolveRightNonSym   (const MatrixT&,double eps, int NumEigenValues)=0;
+    virtual UdTypeN SolveLeft_NonSym   (const MatrixT&,double eps, int NumEigenValues)  ;
+    virtual UdTypeN SolveAllRightNonSym(const MatrixT&,double eps                    )=0;
 
 };
 

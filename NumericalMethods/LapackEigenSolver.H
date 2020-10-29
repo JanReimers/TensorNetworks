@@ -12,9 +12,9 @@ public:
     ~LapackEigenSolver() {};
     virtual void Reset() {};  //Noop Clear out guesses from previous iterations
 
-    virtual UdType  Solve         (const MatrixT&,double eps, int NumEigenValues);
-    virtual UdType  SolveAll      (const MatrixT&,double eps                    );
-    virtual UdTypeN SolveNonSym   (const MatrixT&,double eps, int NumEigenValues);
-    virtual UdTypeN SolveAllNonSym(const MatrixT&,double eps                    );
+    virtual UdType  Solve              (const MatrixT&,double eps, int NumEigenValues);
+    virtual UdType  SolveAll           (const MatrixT&,double eps                    );
+    virtual UdTypeN SolveRightNonSym   (const MatrixT&,double eps, int NumEigenValues);
+    virtual UdTypeN SolveAllRightNonSym(const MatrixT&,double eps                    );
 };
 #endif // LAPACKEIGENSOLVER_H

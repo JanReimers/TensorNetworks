@@ -1,6 +1,7 @@
 #include "LapackEigenSolver.H"
 #include "oml/matrix.h"
 #include "oml/vector.h"
+#include "oml/fakedouble.h"
 #include <complex>
 #include <iostream>
 //
@@ -47,9 +48,7 @@ LapackEigenSolver<T>::SolveAll(const MatrixT& A,double eps)
     return std::move(Solve(A,eps,N));
 }
 
-inline const Matrix<double>& conj(const Matrix<double>& m) {return m;}
-inline const double& real(const double& d) {return d;}
-using std::real;
+
 
 template <class T> typename LapackEigenSolver<T>::UdType
 LapackEigenSolver<T>::Solve(const MatrixT& A,double eps, int NumEigenValues)
@@ -93,14 +92,14 @@ LapackEigenSolver<T>::Solve(const MatrixT& A,double eps, int NumEigenValues)
 }
 
 template <class T> typename LapackEigenSolver<T>::UdTypeN
-LapackEigenSolver<T>::SolveAllNonSym(const MatrixT& A,double eps)
+LapackEigenSolver<T>::SolveAllRightNonSym(const MatrixT& A,double eps)
 {
     int N=A.GetNumRows();
-    return std::move(SolveNonSym(A,eps,N));
+    return std::move(SolveRightNonSym(A,eps,N));
 }
 
 template <> typename LapackEigenSolver<double>::UdTypeN
-LapackEigenSolver<double>::SolveNonSym(const MatrixT& A,double eps, int NumEigenValues)
+LapackEigenSolver<double>::SolveRightNonSym(const MatrixT& A,double eps, int NumEigenValues)
 {
     int N=A.GetNumRows();
     assert(N==A.GetNumCols());
@@ -155,7 +154,7 @@ LapackEigenSolver<double>::SolveNonSym(const MatrixT& A,double eps, int NumEigen
 }
 
 template <> typename LapackEigenSolver<dcmplx>::UdTypeN
-LapackEigenSolver<dcmplx>::SolveNonSym(const MatrixT& A,double eps, int NumEigenValues)
+LapackEigenSolver<dcmplx>::SolveRightNonSym(const MatrixT& A,double eps, int NumEigenValues)
 {
     int N=A.GetNumRows();
     assert(N==A.GetNumCols());

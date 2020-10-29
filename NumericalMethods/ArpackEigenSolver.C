@@ -298,22 +298,24 @@ ArpackEigenSolver<double>::Solve(const SparseMatrixT& A,double eps, int Nev)
 
 
 template <class T> typename ArpackEigenSolver<T>::UdTypeN
-ArpackEigenSolver<T>::SolveNonSym(const MatrixT& A,double eps, int Nev)
+ArpackEigenSolver<T>::SolveRightNonSym(const MatrixT& A,double eps, int Nev)
 {
     assert(A.GetNumRows()==A.GetNumCols());
     assert(Nev<A.GetNumRows());
     theDenseMatrix=&A;
     return SolveG(matvecDense,A.GetNumRows(),Nev,eps);
 }
-template <class T> typename ArpackEigenSolver<T>::UdTypeN ArpackEigenSolver<T>::SolveAllNonSym(const MatrixT& A,double eps)
+
+
+template <class T> typename ArpackEigenSolver<T>::UdTypeN ArpackEigenSolver<T>::SolveAllRightNonSym(const MatrixT& A,double eps)
 {
     std::cerr << "ArpackEigenSolver does not support all Evs, doing N/2" << std::endl;
     int N=A.GetNumRows();
-    return SolveNonSym(A,eps,N/2);
+    return SolveRightNonSym(A,eps,N/2);
 }
 
 template <class T> typename ArpackEigenSolver<T>::UdTypeN
-ArpackEigenSolver<T>::SolveNonSym(const SparseMatrixT& A,double eps, int Nev)
+ArpackEigenSolver<T>::SolveRightNonSym(const SparseMatrixT& A,double eps, int Nev)
 {
     assert(A.GetNumRows()==A.GetNumCols());
     assert(Nev<A.GetNumRows());
@@ -344,7 +346,7 @@ ArpackEigenSolver<double>::Solve(const ClientT* client,double eps, int Nev)
 
 
 template <class T> typename ArpackEigenSolver<T>::UdTypeN
-ArpackEigenSolver<T>::SolveNonSym(const ClientT* client,double eps, int Nev)
+ArpackEigenSolver<T>::SolveRightNonSym(const ClientT* client,double eps, int Nev)
 {
     ClientT::theClient=client;
     return SolveG(matvecClient,client->GetSize(),Nev,eps);

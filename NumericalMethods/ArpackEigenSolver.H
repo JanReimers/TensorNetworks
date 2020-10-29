@@ -23,15 +23,15 @@ public:
     virtual void Reset() {};  //Clear out guesses from previous iterations
 
         //Dense interface
-    virtual UdType  Solve         (const MatrixT&,double eps, int NumEigenValues);
-    virtual UdType  SolveAll      (const MatrixT&,double eps                    );
-    virtual UdTypeN SolveNonSym   (const MatrixT&,double eps, int NumEigenValues);
-    virtual UdTypeN SolveAllNonSym(const MatrixT&,double eps                    );
+    virtual UdType  Solve              (const MatrixT&,double eps, int NumEigenValues);
+    virtual UdType  SolveAll           (const MatrixT&,double eps                    );
+    virtual UdTypeN SolveRightNonSym   (const MatrixT&,double eps, int NumEigenValues);
+    virtual UdTypeN SolveAllRightNonSym(const MatrixT&,double eps                    );
     // Sparse interface
     virtual UdType  Solve      (const SparseMatrixT&,double eps, int NumEigenValues);
     virtual UdType  Solve      (const ClientT*      ,double eps, int NumEigenValues);
-    virtual UdTypeN SolveNonSym(const SparseMatrixT&,double eps, int NumEigenValues);
-    virtual UdTypeN SolveNonSym(const ClientT*      ,double eps, int NumEigenValues);
+    virtual UdTypeN SolveRightNonSym(const SparseMatrixT&,double eps, int NumEigenValues);
+    virtual UdTypeN SolveRightNonSym(const ClientT*      ,double eps, int NumEigenValues);
 
     //Return value is: (EigenValues,EigenVectors)
 //    UdType SolveNonSym(const Matrix     <T>&, int NumEigenValues,double eps);

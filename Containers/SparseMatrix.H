@@ -2,6 +2,8 @@
 #define SPARSEMATRIX_H
 
 #include "oml/matrix.h"
+#include "oml/vector.h"
+#include "oml/fakedouble.h"
 #include <vector>
 #include <map>
 #include <iostream>
@@ -144,13 +146,21 @@ template <class TA, class TB> auto operator*(const SparseMatrix<TA>& a, const Ve
     for (typename SparseMatrix<TA>::const_iterator i(a);!i.end();i++)
          ret(i.RowIndex())+=i.Value()*b(i.ColIndex());
 
-//    for (int i=1;i<=a.GetNumRows();i++)
-//        for (int j=1;j<=b.size();j++)
-//            ret(i)+=a(i,j)*b(j);
+    return ret;
+}
+template <class TA, class TB> auto operator*(const Vector<TA>& a, const SparseMatrix<TB>& b)
+{
+    assert(b.GetNumRows()==a.size());
+    typedef typename ReturnType<TA,TB>::RetType TR;
+
+    Vector<TR> ret(b.GetNumCols());
+    Fill(ret,TR(0));
+    for (typename SparseMatrix<TB>::const_iterator i(b);!i.end();i++)
+         ret(i.ColIndex())+=a(i.RowIndex())*i.Value();
+
     return ret;
 }
 
-inline const double& conj(const double& d) { return d;}
 
 template <class T> bool IsHermitian(const SparseMatrix<T>& m, double eps=0.0)
 {
@@ -160,4 +170,13 @@ template <class T> bool IsHermitian(const SparseMatrix<T>& m, double eps=0.0)
             ret=ret && (fabs(m(i,j)-conj(m(j,i)))<eps);
     return ret;
 }
+
+template <class T> SparseMatrix<T> operator~(const SparseMatrix<T>& m)
+{
+    SparseMatrix<T> ret(MatLimits(m.GetLimits().Col,m.GetLimits().Row));
+    for (typename SparseMatrix<T>::const_iterator i(m);!i.end();i++)
+         ret.Insert(conj(i.Value()),i.ColIndex(),i.RowIndex());
+    return ret;
+}
+
 #endif // SPARSEMATRIX_H
