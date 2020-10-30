@@ -6,8 +6,8 @@
 using std::cout;
 using std::endl;
 
-template <class T> void  DenseMatvec(void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *blockSize, primme_params *primme, int *ierr);
-template <class T> void SparseMatvec(void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *blockSize, primme_params *primme, int *ierr);
+template <class T, class TM> void  DenseMatvec(void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *blockSize, primme_params *primme, int *ierr);
+template <class T, class TM> void SparseMatvec(void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *blockSize, primme_params *primme, int *ierr);
 template <class T> void ClientMatvec(void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *blockSize, primme_params *primme, int *ierr);
 
 
@@ -27,6 +27,7 @@ template <class T> Vector<T>  PrimeEigenSolver<T>::GetEigenVector(int index) con
 typedef    void (*MatvecT) (void *x, PRIMME_INT *ldx, void *y, PRIMME_INT *ldy, int *blockSize,struct primme_params *primme, int *ierr);
 // Function dec for building primme paramater struct
 primme_params MakeParameters(MatvecT MatVec,int N,int NumEigenValues,int NumGuesses,double eps);
+primme_params MakeParametersNonSym(MatvecT MatVec,int N,int NumEigenValues,int NumGuesses,double eps);
 
 template <class T> typename PrimeEigenSolver<T>::UdType
 PrimeEigenSolver<T>::Solve(const MatrixT& m,double eps, int NumEigenValues)
@@ -36,7 +37,7 @@ PrimeEigenSolver<T>::Solve(const MatrixT& m,double eps, int NumEigenValues)
     assert(NumEigenValues<=N);
     assert(IsHermitian(m,eps));
     theDenseMatrix=&m;
-    primme_params primme=MakeParameters(DenseMatvec<T>,N,NumEigenValues,itsNumGuesses,eps);
+    primme_params primme=MakeParameters(DenseMatvec<T,T>,N,NumEigenValues,itsNumGuesses,eps);
     return Solve(primme);
 }
 
@@ -55,7 +56,7 @@ PrimeEigenSolver<T>::Solve(const SparseMatrixT& m,double eps, int NumEigenValues
     assert(NumEigenValues<=N);
     assert(IsHermitian(m,eps));
     theSparseMatrix=&m;
-    primme_params primme=MakeParameters(SparseMatvec<T>,N,NumEigenValues,itsNumGuesses,eps);
+    primme_params primme=MakeParameters(SparseMatvec<T,T>,N,NumEigenValues,itsNumGuesses,eps);
     return Solve(primme);
 }
 
@@ -73,10 +74,15 @@ PrimeEigenSolver<T>::Solve(const ClientT* client,double eps, int NumEigenValues)
 
 
 template <class T> typename PrimeEigenSolver<T>::UdTypeN
-PrimeEigenSolver<T>::SolveRightNonSym   (const MatrixT&,double eps, int NumEigenValues)
+PrimeEigenSolver<T>::SolveRightNonSym   (const MatrixT& m,double eps, int NumEigenValues)
 {
-    std::cerr << "PrimeEigenSolver::SolveNonSym is not implemented yet." << std::endl;
-    return std::make_tuple(MatrixC(),VectorC());
+    int N=m.GetNumRows();
+    assert(N==m.GetNumCols());
+    assert(NumEigenValues<=N);
+    //assert(IsNormal(m,eps));
+    theDenseMatrix=&m;
+    primme_params primme=MakeParametersNonSym(DenseMatvec<dcmplx,T>,N,NumEigenValues,itsNumGuesses,eps);
+    return SolveNormal(primme);
 }
 
 template <class T> typename PrimeEigenSolver<T>::UdTypeN
@@ -87,15 +93,21 @@ PrimeEigenSolver<T>::SolveAllRightNonSym(const MatrixT& A,double eps)
 }
 
 template <class T> typename PrimeEigenSolver<T>::UdTypeN
-PrimeEigenSolver<T>::SolveRightNonSym(const SparseMatrixT&,double eps, int NumEigenValues)
+PrimeEigenSolver<T>::SolveRightNonSym(const SparseMatrixT& m,double eps, int NumEigenValues)
 {
-    std::cerr << "PrimeEigenSolver::SolveNonSym is not implemented yet." << std::endl;
-    return std::make_tuple(MatrixC(),VectorC());
+    int N=m.GetNumRows();
+    assert(N==m.GetNumCols());
+    assert(NumEigenValues<=N);
+//    assert(IsHermitian(m,eps));
+    theSparseMatrix=&m;
+    primme_params primme=MakeParametersNonSym(SparseMatvec<dcmplx,T>,N,NumEigenValues,itsNumGuesses,eps);
+    return SolveNormal(primme);
 }
+
 template <class T> typename PrimeEigenSolver<T>::UdTypeN
 PrimeEigenSolver<T>::SolveRightNonSym(const ClientT*      ,double eps, int NumEigenValues)
 {
-    std::cerr << "PrimeEigenSolver::SolveNonSym is not implemented yet." << std::endl;
+    std::cerr << "PrimeEigenSolver::SolveNonSym for Client is not implemented yet." << std::endl;
     return std::make_tuple(MatrixC(),VectorC());
 }
 
@@ -114,8 +126,10 @@ template <> int primmeT<dcmplx> (double *evals, dcmplx *evecs, double *resNorms,
     return zprimme(evals,evecs,resNorms,primme); //complex<double>
 }
 
+int zprimme_normal (dcmplx *evals, dcmplx *evecs, double *resNorms, primme_params *primme);
+
 //
-//  Lowest level solve routine used by all higher level solve functions
+//  Lowest level solve routines used by all higher level solve functions
 //
 template <class T> typename PrimeEigenSolver<T>::UdType
 PrimeEigenSolver<T>::Solve(primme_params& p)
@@ -135,9 +149,30 @@ PrimeEigenSolver<T>::Solve(primme_params& p)
     return std::make_tuple(itsEigenVectors,itsEigenValues);
 }
 
+template <class T> typename PrimeEigenSolver<T>::UdTypeN
+PrimeEigenSolver<T>::SolveNormal(primme_params& p)
+{
+    itsNonSymEigenValues.SetLimits(p.numEvals);
+    itsNonSymEigenVectors.SetLimits(p.n,p.numEvals);
+    Vector<double> rnorms(p.numEvals);
+    int ret = zprimme_normal(&itsNonSymEigenValues(1), &itsNonSymEigenVectors(1,1), &rnorms(1), &p);
+    if (ret!=0)
+        std::cerr << "Error in primme solver, ret=" << ret << std::endl;
+    assert(ret==0);
+    (void)ret; //avoid compiler warning in release modems)) << " " << std::endl;
+    if (Max(fabs(rnorms))>1000*p.eps)
+        cout << "Warning high rnorms in PrimeEigenSolver::SolveSparse rnorma=" << std::scientific << rnorms << endl;
+    //int niter=p.stats.numOuterIterations;
+    //std::cout << "Primme niter=" << niter << std::endl;
+    itsNumGuesses=p.numEvals; //Set up using guesses for next time around
+    primme_free(&p);
+    return std::make_tuple(itsNonSymEigenVectors,itsNonSymEigenValues);
+}
+
 //
 //  Build up parameters structure
 //
+
 primme_params MakeParameters(MatvecT MatVec,int N,int NumEigenValues,int NumGuesses,double eps)
 {
     primme_params primme;
@@ -152,15 +187,38 @@ primme_params MakeParameters(MatvecT MatVec,int N,int NumEigenValues,int NumGues
     primme_set_method(PRIMME_DYNAMIC, &primme);
     return primme;
 }
+double targetShifts[1];
+primme_params MakeParametersNonSym(MatvecT MatVec,int N,int NumEigenValues,int NumGuesses,double eps)
+{
+    primme_params primme;
+    primme_initialize(&primme);
+    primme.matrixMatvec = MatVec;
+    primme.n = N; /* set problem dimension */
+    primme.numEvals = NumEigenValues;   /* Number of wanted eigenpairs */
+    primme.eps = eps;      /* ||r|| <= eps * ||matrix|| */
+    targetShifts[0] = 0.0;
+    primme.targetShifts = targetShifts;
+    primme.numTargetShifts = 1;
+    primme.target = primme_closest_abs;//primme_smallest; /* Wanted the smallest eigenvalues */
+
+    primme.initSize=NumGuesses;
+    primme.printLevel=1;
+    primme_set_method(PRIMME_DEFAULT_MIN_MATVECS, &primme);
+    primme.correctionParams.projectors.RightX = 0;
+//    primme.maxOuterIterations=100;
+
+    primme_set_method(PRIMME_DYNAMIC, &primme);
+    return primme;
+}
 
 //  matrix-vector product, Y = A * X
 //   - X, input dense matrix of size primme.n x blockSize;
 //   - Y, output dense matrix of size primme.n x blockSize;
 //   - A, square matrix of dimension primme.n with this form:
 
-template <class T> void SparseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_blockSize, primme_params *primme, int *ierr)
+template <class T, class TM> void SparseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_blockSize, primme_params *primme, int *ierr)
 {
-    typedef SparseEigenSolver<T> SES;
+    typedef SparseEigenSolver<TM> SES;
     assert(SES::theSparseMatrix);
     long int& ldx(*_ldx);
     long int& ldy(*_ldy);
@@ -175,15 +233,14 @@ template <class T> void SparseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_
     *ierr = 0;
 }
 
-template <class T> void DenseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_blockSize, primme_params *primme, int *ierr)
+template <class T,class TM> void DenseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_blockSize, primme_params *primme, int *ierr)
 {
-    typedef SparseEigenSolver<T> SES;
+    typedef SparseEigenSolver<TM> SES;
     assert(SES::theDenseMatrix);
     long int& ldx(*_ldx);
     long int& ldy(*_ldy);
     int& blockSize(*_blockSize);
     int N=primme->n;
-
     for (int ib=0; ib<blockSize; ib++)
     {
         T* xvec = static_cast<T*>(x) + ldx*ib;
@@ -198,6 +255,8 @@ template <class T> void DenseMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_I
     *ierr = 0;
 
 }
+
+
 
 template <class T>
 void ClientMatvec(void *x, PRIMME_INT *_ldx, void *y, PRIMME_INT *_ldy, int *_blockSize, primme_params *primme, int *ierr)

@@ -123,22 +123,22 @@ TEST_F(LinearAlgebraTests,Lapack_SVDSolverDenseComplex)
 
 TEST_F(LinearAlgebraTests,Primme_EigenSolverDenseReal)
 {
-    EigenTester<double>(new PrimeEigenSolver<double>(),Neigen).RunTests();
+    EigenTester<double>(new PrimeEigenSolver<double>(),Neigen,1).RunTests(true);
 }
 
 TEST_F(LinearAlgebraTests,Primme_EigenSolverDenseComplex)
 {
-    EigenTester<dcmplx>(new PrimeEigenSolver<dcmplx>(),Neigen).RunTests();
+    EigenTester<dcmplx>(new PrimeEigenSolver<dcmplx>(),Neigen).RunTests(true);
 }
 
 TEST_F(LinearAlgebraTests,Primme_EigenSolverSparseReal)
 {
-    SparseEigenTester<double>(new PrimeEigenSolver<double>(),Neigen,eigenDensity).RunTests();
+    SparseEigenTester<double>(new PrimeEigenSolver<double>(),Neigen,eigenDensity).RunTests(true);
 }
 
 TEST_F(LinearAlgebraTests,Primme_EigenSolverSparseComplex)
 {
-    SparseEigenTester<dcmplx>(new PrimeEigenSolver<dcmplx>(),Neigen,eigenDensity).RunTests();
+    SparseEigenTester<dcmplx>(new PrimeEigenSolver<dcmplx>(),Neigen,eigenDensity).RunTests(true);
 }
 
 

@@ -6,6 +6,7 @@
 #include "NumericalMethods/EigenSolver.H"
 #include "NumericalMethods/SparseEigenSolver.H"
 #include "oml/random.h"
+#include "oml/diagonalmatrix.h"
 #include "oml/fakedouble.h"
 #include <iostream>
 #include <complex>
@@ -109,7 +110,7 @@ public:
      {}
     ~EigenTester() {delete itsSolver;}
 
-    virtual void RunTests()
+    virtual void RunTests(bool useNormal=false)
     {
         A=MakeMatrix();
         {
@@ -129,7 +130,10 @@ public:
             ValidateSymmetric(U,d);
             itsSolver->Reset();
         }
-        A=Base::MakeMatrix(); //Make a non sym matrix
+        if (useNormal)
+            A=MakeNormalMatrix(); //Make a non sym normal matrix
+        else
+            A=Base::MakeMatrix(); //Make an unrestricted non sym matrix
         {
             auto [U,d]=itsSolver->SolveRightNonSym(A,eps,Nev);
             ValidateRight(U,d);
@@ -164,6 +168,13 @@ public:
         Matrix<T> ret=Base::MakeMatrix();
         ret=Matrix<T>(ret+Transpose(conj(ret)));
         return ret;
+    }
+    virtual Matrix<T> MakeNormalMatrix()
+    {
+        Matrix<T> A=MakeMatrix();
+        auto [U,d]=itsSolver->SolveAll(A,eps);
+        itsSolver->Reset();
+        return U;
     }
     virtual void ValidateSymmetric(const Matrix<T>& U, const Vector<double>& d)
     {
@@ -209,6 +220,19 @@ public:
     Matrix     <T>  A;
  };
 
+//template <>  Matrix<dcmplx> EigenTester<dcmplx>::MakeNormalMatrix()
+//    {
+//        Matrix<dcmplx> ret=Base::MakeMatrix();
+//        for (index_t i:ret.rows())
+//        {
+//            ret(i,i)=real(ret(i,i));
+//            for (index_t j:ret.cols(i+1))
+//                ret(i,j)=dcmplx(real(ret(i,j)),-imag(ret(j,i)));
+//        }
+//        return ret;
+//    }
+
+
 template <typename T>
 class SparseEigenTester
     : public EigenBase<T>
@@ -232,7 +256,7 @@ public:
      {}
     ~SparseEigenTester() {delete itsSolver;}
 
-    virtual void RunTests()
+    virtual void RunTests(bool useNormal=false)
     {
         A=MakeMatrix();
         {
@@ -257,7 +281,10 @@ public:
             ValidateSymmetric(U,d);
             itsSolver->Reset();
         }
-        A=Base::MakeMatrix(); //Make a non sym matrix
+        if (useNormal)
+            A=MakeNormalMatrix(); //Make a non sym normal matrix
+        else
+            A=Base::MakeMatrix(); //Make an unrestricted non sym matrix
         {
             auto [U,d]=itsSolver->SolveRightNonSym(A,eps,Nev);
             ValidateRight(U,d);
@@ -297,6 +324,13 @@ public:
         Matrix<T> ret=Base::MakeMatrix();
         ret=Matrix<T>(ret+Transpose(conj(ret)));
         return ret;
+    }
+    virtual Matrix<T> MakeNormalMatrix()
+    {
+        Matrix<T> A=MakeMatrix();
+        auto [U,d]=itsSolver->Solve(A,eps,A.GetNumRows());
+        itsSolver->Reset();
+        return U;
     }
     virtual void ValidateSymmetric(const Matrix<T>& U, const Vector<double>& d)
     {

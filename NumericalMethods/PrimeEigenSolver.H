@@ -7,18 +7,6 @@
 
 struct primme_params;
 
-
-//
-//  Client code can derive from this and control the matvec multiplication operations
-//
-//template <class T> class PrimeEigenSolverClient
-//{
-//public:
-//    virtual long int GetSize  () const=0; //2^L Hilbert space size
-//    virtual void     DoMatVecContraction (int N, T* xvec, T* yvec) const=0;
-//
-//    static const PrimeEigenSolverClient* theClient;
-//};
 //
 //  Solve sparse eigen systems using the PRIMME library
 //  For efficiency client code should keep and instance of PrimeEigenSolver alive
@@ -28,6 +16,7 @@ template <class T> class PrimeEigenSolver
   : public virtual SparseEigenSolver<T>
   , public virtual       EigenSolver<T>
 {
+    using dcmplx =typename EigenSolver<T>::dcmplx;
     using UdType =typename SparseEigenSolver<T>::UdType;
     using UdTypeN=typename EigenSolver<T>::UdTypeN;
     using MatrixT=typename EigenSolver<T>::MatrixT;
@@ -55,12 +44,6 @@ public:
     virtual UdTypeN SolveRightNonSym(const SparseMatrixT&,double eps, int NumEigenValues);
     virtual UdTypeN SolveRightNonSym(const ClientT*      ,double eps, int NumEigenValues);
 
-    //Old UI
-//    UdType Solve (const MatrixT&                  , int NumEigenValues,double eps);
-//    int    Solve1(const Matrix<T>&,int NumEigenValues,const TensorNetworks::Epsilons& eps);
-//    int    Solve1(const ClientT*  ,int NumEigenValues,const TensorNetworks::Epsilons& eps);
-
-
     Vector <T> GetEigenVector (int index) const;
     Matrix<T> GetEigenVectors() const
     {
@@ -72,11 +55,15 @@ public:
     }
 
 protected:
-    UdType Solve(primme_params&);
+    UdType  Solve(primme_params&);
+    UdTypeN SolveNormal(primme_params&);
 
 private:
     Vector<double>   itsEigenValues;
     Matrix<T>        itsEigenVectors;
+    Vector<dcmplx>   itsNonSymEigenValues;
+    Matrix<dcmplx>   itsNonSymEigenVectors;
+
     int              itsNumGuesses;
 };
 

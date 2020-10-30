@@ -10,6 +10,7 @@
 
 template <class T> class SparseMatrix
 {
+        typedef std::complex<double> dcmplx;
     public:
         SparseMatrix(const Matrix<T>& denseMatrix,double eps=0.0);
         SparseMatrix(const MatLimits&);
@@ -28,7 +29,8 @@ template <class T> class SparseMatrix
             return os;
         }
 
-        void DoMVMultiplication(int N, const T* xvec,T* yvec) const;
+        void DoMVMultiplication(int N, const double* xvec,double* yvec) const;
+        void DoMVMultiplication(int N, const dcmplx* xvec,dcmplx* yvec) const;
         void DoMVMultiplication(int M, int N, const T* xvec,T* yvec,int transpose=0) const;
         MatLimits GetLimits() const {return MatLimits(itsNr,itsNc);}
         int GetNumRows() const {return itsNr;}

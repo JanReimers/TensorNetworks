@@ -90,7 +90,19 @@ template <class T> void SparseMatrix<T>::Dump(std::ostream& os) const
     }
 }
 
-template <class T> void SparseMatrix<T>::DoMVMultiplication(int N, const T* xvec,T* yvec) const
+template <> void SparseMatrix<double>::DoMVMultiplication(int N, const double* xvec,double* yvec) const
+{
+    assert(N==itsNr);
+    assert(N==itsNc);
+    for (int i=1;i<=itsNr;i++) yvec[i-1]=0.0;
+    for (const_iterator i(*this);!i.end();i++)
+    {
+//        cout << "i,j,y[i],A(i,j),x[j]=" << i.RowIndex() << " " << i.ColIndex() << " " << yvec[i.RowIndex()-1] << " " << i.Value() << " " << xvec[i.ColIndex()-1] << endl;
+         yvec[i.RowIndex()-1]+=xvec[i.ColIndex()-1] * i.Value();
+    }
+}
+
+template <class T> void SparseMatrix<T>::DoMVMultiplication(int N, const dcmplx* xvec,dcmplx* yvec) const
 {
     assert(N==itsNr);
     assert(N==itsNc);
