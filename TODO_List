@@ -11,13 +11,17 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     SVDtransfer takes 28% of the cpu time
 - LinAlg solvers
     Done Make abstract interfaces for SVD and eigen
-    Do left and right Evs for non sym
-    Done Done Add Lapack non sym routines
+    Done Do left and right Evs for non sym
+    Done Add Lapack non sym routines
     Options for largest or smallest evs
     Why is primme so slow
+    Why is primme not converging well for non-sym matrices
+    Make more general Normal matrices for prime, U*e*U_dagger where e is diagonal complex
+        This might solve primmes not converging issues.
 - Try to use the factory more in all testing classes
 - Done: Valgrind issues:
     Who owns Loggers?  Use rcptr?
+    Make a global variable that always has something as a logger.
 - clean up SpinCalculator
 - Optimization: Learn about OpenMP, try it on a hot loop.
 - Optimization: Learn about preconditioning, does that help with primme eigen solver?

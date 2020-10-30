@@ -143,7 +143,7 @@ PrimeEigenSolver<T>::Solve(primme_params& p)
     assert(ret==0);
     (void)ret; //avoid compiler warning in release modems)) << " " << std::endl;
     if (Max(fabs(rnorms))>1000*p.eps)
-        cout << "Warning high rnorms in PrimeEigenSolver::SolveSparse rnorma=" << std::scientific << rnorms << endl;
+        cout << "Warning high rnorms in PrimeEigenSolver::SolveSparse Max(rnorms)=" << std::scientific << Max(rnorms) << endl;
     //int niter=p.stats.numOuterIterations;
     //std::cout << "Primme niter=" << niter << std::endl;
     itsNumGuesses=p.numEvals; //Set up using guesses for next time around
@@ -163,7 +163,7 @@ PrimeEigenSolver<T>::SolveNormal(primme_params& p)
     assert(ret==0);
     (void)ret; //avoid compiler warning in release modems)) << " " << std::endl;
     if (Max(fabs(rnorms))>1000*p.eps)
-        cout << "Warning high rnorms in PrimeEigenSolver::SolveSparse rnorma=" << std::scientific << rnorms << endl;
+        cout << "Warning high rnorms in PrimeEigenSolver::SolveSparse Max(rnorms)=" << std::scientific << Max(rnorms) << endl;
     //int niter=p.stats.numOuterIterations;
     //std::cout << "Primme niter=" << niter << std::endl;
     itsNumGuesses=p.numEvals; //Set up using guesses for next time around
@@ -207,7 +207,7 @@ primme_params MakeParametersNonSym(MatvecT MatVec,int N,int NumEigenValues,int N
     primme.printLevel=1;
     primme_set_method(PRIMME_DEFAULT_MIN_MATVECS, &primme);
     primme.correctionParams.projectors.RightX = 0;
-    primme.maxOuterIterations=1000;
+    primme.maxOuterIterations=10000;
 
     primme_set_method(PRIMME_DYNAMIC, &primme);
     return primme;

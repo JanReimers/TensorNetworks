@@ -5,6 +5,7 @@
 #include "NumericalMethods/SparseSVDSolver.H"
 #include "NumericalMethods/EigenSolver.H"
 #include "NumericalMethods/SparseEigenSolver.H"
+#include "NumericalMethods/LapackEigenSolver.H"
 #include "oml/random.h"
 #include "oml/diagonalmatrix.h"
 #include "oml/fakedouble.h"
@@ -56,22 +57,29 @@ public:
     EigenBase(int n,double density=1.0)
         : N(n), Nev(n),Density(density),eps(1e-13)
         , I(N,N)
-        {
-            Unit(I);
-        }
+    {
+        Unit(I);
+    }
     EigenBase(int n,int nev,double density=1.0)
         : N(n), Nev(nev),Density(density),eps(1e-13)
         , I(N,N)
-        {
-            Unit(I);
-        }
-    virtual Matrix<T> MakeMatrix()
+    {
+        Unit(I);
+    }
+    Matrix<T> MakeNonSymMatrix()
     {
         Matrix<T> ret(N,N);
         FillRandom(ret);
         MakeSparse(ret,Density);
         return ret;
     }
+    Matrix<T> MakeSymMatrix()
+    {
+        Matrix<T> ret=MakeNonSymMatrix();
+        ret=Matrix<T>(ret+Transpose(conj(ret)));
+        return ret;
+    }
+    Matrix<T> MakeNormalMatrix();
 
     virtual void ValidateSymmetric(const Matrix<T>& U)
     {
@@ -89,6 +97,43 @@ protected:
     Matrix<T> I;
 };
 
+template <>  Matrix<double> EigenBase<double>::MakeNormalMatrix()
+{
+//    return MakeSymMatrix();
+    Matrix<double> A=MakeSymMatrix();
+    auto [U,d]=LapackEigenSolver<double>().SolveAll(A,eps);
+    return U;
+//    DiagonalMatrix<dcmplx> e(d.size());
+//    e(1)=d(1);
+//    for (index_t i=2;i<=d.size();i++)
+//    {
+//        double im=1.01*OMLRandPos<double>();
+//        e(i)  =dcmplx(d(i), im);
+//        e(i+1)=dcmplx(d(i+1),-im);
+//        i++;
+//    }
+//    Matrix<dcmplx> Ac=U*e*~U;
+//    cout << "A=" << Ac << endl;
+//    cout << "A*~A=" << Ac*~Ac << endl;
+//    cout << "A*~A-~A*A=" << Ac*~Ac-~Ac*Ac << endl;
+//    assert(IsNormal(Ac,1e-13));
+//    return Ac;
+}
+template <>  Matrix<dcmplx> EigenBase<dcmplx>::MakeNormalMatrix()
+{
+    Matrix<dcmplx> A=MakeSymMatrix();
+    auto [U,d]=LapackEigenSolver<dcmplx>().SolveAll(A,eps);
+    DiagonalMatrix<dcmplx> e(d.size());
+    for (index_t i=1;i<=d.size();i++)
+    {
+        double im=1.00*OMLRand<double>();
+        e(i)  =dcmplx(d(i), im);
+    }
+    Matrix<dcmplx> Ac=U*e*~U;
+    assert(IsNormal(Ac,Ac.GetNumRows()*1e-13));
+    return Ac;
+}
+
 template <typename T>
 class EigenTester : public EigenBase<T>
 {
@@ -102,17 +147,20 @@ public:
         : Base(n,density)
         , itsSolver(s)
         , A(n,n)
-     {}
+    {}
     EigenTester(EigenSolver<T>* s, int n,int Nev,double density=1.0)
         : Base(n,Nev,density)
         , itsSolver(s)
         , A(n,n)
-     {}
-    ~EigenTester() {delete itsSolver;}
+    {}
+    ~EigenTester()
+    {
+        delete itsSolver;
+    }
 
     virtual void RunTests(bool useNormal=false)
     {
-        A=MakeMatrix();
+        A=Base::MakeSymMatrix();
         {
             auto [U,d]=itsSolver->Solve(A,eps,Nev);
             ValidateSymmetric(U,d);
@@ -131,9 +179,9 @@ public:
             itsSolver->Reset();
         }
         if (useNormal)
-            A=MakeNormalMatrix(); //Make a non sym normal matrix
+            A=Base::MakeNormalMatrix(); //Make a non sym normal matrix
         else
-            A=Base::MakeMatrix(); //Make an unrestricted non sym matrix
+            A=Base::MakeNonSymMatrix(); //Make an unrestricted non sym matrix
         {
             auto [U,d]=itsSolver->SolveRightNonSym(A,eps,Nev);
             ValidateRight(U,d);
@@ -163,19 +211,6 @@ public:
             itsSolver->Reset();
         }
     }
-    virtual Matrix<T> MakeMatrix()
-    {
-        Matrix<T> ret=Base::MakeMatrix();
-        ret=Matrix<T>(ret+Transpose(conj(ret)));
-        return ret;
-    }
-    virtual Matrix<T> MakeNormalMatrix()
-    {
-        Matrix<T> A=MakeMatrix();
-        auto [U,d]=itsSolver->SolveAll(A,eps);
-        itsSolver->Reset();
-        return U;
-    }
     virtual void ValidateSymmetric(const Matrix<T>& U, const Vector<double>& d)
     {
         Matrix<T> UT=Transpose(conj(U));
@@ -184,7 +219,7 @@ public:
         Matrix<T> diag=UT*A*U;
 //        cout << "diag=" << diag << endl;
         int Ne=d.size();
-        for (int i=1;i<=Ne;i++) diag(i,i)-=d(i);
+        for (int i=1; i<=Ne; i++) diag(i,i)-=d(i);
         EXPECT_NEAR(Max(fabs(diag)),0.0,N*eps);
     }
     virtual void ValidateRight(const Matrix<dcmplx>& U, const Vector<dcmplx>& d)
@@ -192,12 +227,12 @@ public:
         int Ne=d.size();
         if (Ne>0)
         {
-            for (int i=1;i<=Ne;i++)
+            for (int i=1; i<=Ne; i++)
             {
                 Vector<dcmplx> Ui=U.GetColumn(i);
                 Vector<dcmplx> residuals=A*Ui-d(i)*Ui;
                 double res=Max(fabs(residuals));
-                EXPECT_NEAR(res,0.0,15*eps);
+                EXPECT_NEAR(res,0.0,U.GetNumRows()*eps);
             }
         }
     }
@@ -206,31 +241,19 @@ public:
         int Ne=d.size();
         if (Ne>0)
         {
-            for (int i=1;i<=Ne;i++)
+            for (int i=1; i<=Ne; i++)
             {
                 Vector<dcmplx> Ui=U.GetColumn(i);
                 Vector<dcmplx> residuals=Ui*A-d(i)*Ui;
                 double res=Max(fabs(residuals));
-                EXPECT_NEAR(res,0.0,15*eps);
+                EXPECT_NEAR(res,0.0,U.GetNumRows()*eps);
             }
         }
     }
 
     EigenSolver<T>* itsSolver;
     Matrix     <T>  A;
- };
-
-//template <>  Matrix<dcmplx> EigenTester<dcmplx>::MakeNormalMatrix()
-//    {
-//        Matrix<dcmplx> ret=Base::MakeMatrix();
-//        for (index_t i:ret.rows())
-//        {
-//            ret(i,i)=real(ret(i,i));
-//            for (index_t j:ret.cols(i+1))
-//                ret(i,j)=dcmplx(real(ret(i,j)),-imag(ret(j,i)));
-//        }
-//        return ret;
-//    }
+};
 
 
 template <typename T>
@@ -248,17 +271,20 @@ public:
         : Base(n,density)
         , itsSolver(s)
         , A(n,n)
-     {}
+    {}
     SparseEigenTester(SparseEigenSolver<T>* s, int n,int Nev,double density=1.0)
         : Base(n,Nev,density)
         , itsSolver(s)
         , A(n,n)
-     {}
-    ~SparseEigenTester() {delete itsSolver;}
+    {}
+    ~SparseEigenTester()
+    {
+        delete itsSolver;
+    }
 
     virtual void RunTests(bool useNormal=false)
     {
-        A=MakeMatrix();
+        A=Base::MakeSymMatrix();
         {
             auto [U,d]=itsSolver->Solve(A,eps,Nev);
             ValidateSymmetric(U,d);
@@ -282,9 +308,9 @@ public:
             itsSolver->Reset();
         }
         if (useNormal)
-            A=MakeNormalMatrix(); //Make a non sym normal matrix
+            A=Base::MakeNormalMatrix(); //Make a non sym normal matrix
         else
-            A=Base::MakeMatrix(); //Make an unrestricted non sym matrix
+            A=Base::MakeNonSymMatrix(); //Make an unrestricted non sym matrix
         {
             auto [U,d]=itsSolver->SolveRightNonSym(A,eps,Nev);
             ValidateRight(U,d);
@@ -319,19 +345,6 @@ public:
             itsSolver->Reset();
         }
     }
-    virtual Matrix<T> MakeMatrix()
-    {
-        Matrix<T> ret=Base::MakeMatrix();
-        ret=Matrix<T>(ret+Transpose(conj(ret)));
-        return ret;
-    }
-    virtual Matrix<T> MakeNormalMatrix()
-    {
-        Matrix<T> A=MakeMatrix();
-        auto [U,d]=itsSolver->Solve(A,eps,A.GetNumRows());
-        itsSolver->Reset();
-        return U;
-    }
     virtual void ValidateSymmetric(const Matrix<T>& U, const Vector<double>& d)
     {
         Matrix<T> UT=Transpose(conj(U));
@@ -340,7 +353,7 @@ public:
         Matrix<T> diag=UT*A*U;
 //        cout << "diag=" << diag << endl;
         int Ne=d.size();
-        for (int i=1;i<=Ne;i++) diag(i,i)-=d(i);
+        for (int i=1; i<=Ne; i++) diag(i,i)-=d(i);
         EXPECT_NEAR(Max(fabs(diag)),0.0,2*N*eps);
     }
     virtual void ValidateRight(const Matrix<dcmplx>& U, const Vector<dcmplx>& d)
@@ -348,7 +361,7 @@ public:
         int Ne=d.size();
         if (Ne>0)
         {
-            for (int i=1;i<=Ne;i++)
+            for (int i=1; i<=Ne; i++)
             {
                 Vector<dcmplx> Ui=U.GetColumn(i);
                 Vector<dcmplx> residuals=A*Ui-d(i)*Ui;
@@ -362,7 +375,7 @@ public:
         int Ne=d.size();
         if (Ne>0)
         {
-            for (int i=1;i<=Ne;i++)
+            for (int i=1; i<=Ne; i++)
             {
                 Vector<dcmplx> Ui=U.GetColumn(i);
                 Vector<dcmplx> residuals=Ui*A-d(i)*Ui;
@@ -372,7 +385,10 @@ public:
         }
     }
 
-    virtual long int GetSize  () const {return N;}; //2^L Hilbert space size
+    virtual long int GetSize  () const
+    {
+        return N;
+    }; //2^L Hilbert space size
     virtual void     DoMatVecContraction (int N, const T* xvec, T* yvec) const
     {
         A.DoMVMultiplication(N,xvec,yvec);
@@ -381,7 +397,7 @@ public:
 
     SparseEigenSolver<T>* itsSolver;
     SparseMatrix     <T>  A;
- };
+};
 
 //
 //   SVD Tester classes
@@ -394,9 +410,9 @@ public:
     SVDBase(int m, int n,double density=1.0)
         : M(m), N(n), Density(density),eps(1e-13)
         , I(Min(M,N),Min(M,N))
-        {
-            Unit(I);
-        }
+    {
+        Unit(I);
+    }
     Matrix<T> MakeMatrix()
     {
         Matrix<T> ret(M,N);
@@ -442,8 +458,11 @@ public:
         : Base(m,n,density)
         , itsSolver(s)
         , A(m,n)
-     {}
-    ~SVDTester() {delete itsSolver;}
+    {}
+    ~SVDTester()
+    {
+        delete itsSolver;
+    }
 
     virtual void RunTests()
     {
@@ -467,7 +486,7 @@ public:
 
     SVDSolver<T>* itsSolver;
     Matrix   <T>  A;
- };
+};
 
 template <typename T>
 class SparseSVDTester
@@ -486,8 +505,11 @@ public:
         : Base(m,n,density)
         , itsSolver(s)
         , A(m,n)
-     {}
-    ~SparseSVDTester() {delete itsSolver;}
+    {}
+    ~SparseSVDTester()
+    {
+        delete itsSolver;
+    }
 
     virtual void RunTests()
     {
@@ -496,7 +518,8 @@ public:
             auto [U,s,VT]=itsSolver->Solve(A,eps,Min(M,N));
             Validate(U,s,VT);
         }
-        {  //Client version
+        {
+            //Client version
             auto [U,s,VT]=itsSolver->Solve(this,eps,Min(M,N));
             Validate(U,s,VT);
         }
@@ -511,8 +534,14 @@ public:
 //
 // SparseSVDSolverClient interface
 //
-    virtual int  GetNumRows() const {return M;}
-    virtual int  GetNumCols() const {return N;}
+    virtual int  GetNumRows() const
+    {
+        return M;
+    }
+    virtual int  GetNumCols() const
+    {
+        return N;
+    }
     virtual void DoMatVecContraction (int N, const T* xvec, T* yvec,int transpose) const
     {
         A.DoMVMultiplication(M,N,xvec,yvec,transpose);
@@ -521,6 +550,6 @@ public:
 private:
     SparseSVDSolver<T>* itsSolver;
     SparseMatrix   <T>  A;
- };
+};
 
 #endif // LINEARALGEBRATESTS_H_INCLUDED

@@ -69,7 +69,7 @@ public:
 
 };
 
-
+/*
 TEST_F(LinearAlgebraTests,SparseMatrix)
 {
     Matrix<double> d(5,6);
@@ -120,11 +120,11 @@ TEST_F(LinearAlgebraTests,Lapack_SVDSolverDenseComplex)
 }
 
 
-
+*/
 
 TEST_F(LinearAlgebraTests,Primme_EigenSolverDenseReal)
 {
-    EigenTester<double>(new PrimeEigenSolver<double>(),Neigen,1).RunTests(true);
+    EigenTester<double>(new PrimeEigenSolver<double>(),Neigen).RunTests(true);
 }
 
 TEST_F(LinearAlgebraTests,Primme_EigenSolverDenseComplex)
