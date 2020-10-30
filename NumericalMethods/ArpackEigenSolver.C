@@ -199,6 +199,63 @@ ArpackEigenSolver<double>::SolveG(MatvecT matvec,int N, int Nev,double eps)
     return make_tuple(std::move(UC),std::move(D));
 }
 
+template <> typename ArpackEigenSolver<double>::UdType
+ArpackEigenSolver<double>::SolveSym(MatvecT matvec,int N, int Nev,double eps)
+{
+    assert(Nev>0);
+    assert(Nev<=N-2);
+
+    int IDO=0,INFO=0;
+    int Ncv=2*Nev+1; //*** THis has a huge effect on convergence, bigger is better.
+    if (Ncv>=N) Ncv=N;
+    //cout << "Nev Ncv N = " << Nev << " " << Ncv << " " << N << endl;
+    int Lworkl=Ncv*Ncv + 8*Ncv;
+
+    int MaxIter=1000;
+
+    Vector<double>  residuals(N);
+    Vector<double>  Workd(3*N);
+    Vector<double>  Workl(Lworkl);
+    Matrix<double>  V(N,Ncv);
+    Vector<double> rwork(Ncv);
+    Vector<int> iParam(11);
+    iParam(1)=1; //ISHIFT
+    iParam(3)=MaxIter;
+    iParam(4)=1; //NB only 1 works
+    iParam(7)=1; //Mode
+    int iPntr[14];
+    char arI='I';
+
+    // Arnaldi iteration loop
+    do
+    {
+      dsaupd_c(&IDO,&arI,N,"LM",Nev,eps,&residuals(1),Ncv,&V(1,1),N,&iParam(1),iPntr,&Workd(1),&Workl(1),Lworkl,&INFO);
+//        cout << "IDO=" << IDO << endl;
+        if (IDO==-1 || IDO==1)
+            matvec(N,&Workd(iPntr[0]),&Workd(iPntr[1]));
+        else
+            break;
+
+    } while(true);
+//    cout << "Info=" << INFO << endl;
+//    cout << "nIter=" << iParam(3) << endl;
+    assert(INFO==0);
+    //
+    //  Post processing to the eigen vectors.
+    //
+    Vector<int> select(Ncv);
+    Vector<double> D(Nev+1),Workev(3*Ncv);
+    double sigma(0);
+    char how_many('A');
+    dseupd_c(true, &how_many, &select(1), &D(1), &V(1,1),N, sigma, &arI,N,"LM", Nev, eps, &residuals(1), Ncv, &V(1,1),N, &iParam(1), iPntr, &Workd(1), &Workl(1),          Lworkl, &INFO );
+
+    D.SetLimits(Nev,true);
+    V.SetLimits(N,Nev,true);
+    theDenseMatrix=nullptr; //Make sure these don't accidentally get reused
+    theSparseMatrix=nullptr;
+    ClientT::theClient=nullptr;
+    return std::make_tuple(std::move(V),std::move(D));
+}
 
 
 
@@ -240,7 +297,7 @@ template <class T> void matvecClient(int N, const T * x, T * y)
 template <class T> typename ArpackEigenSolver<T>::UdType
 ArpackEigenSolver<T>::Solve(const MatrixT& A,double eps, int Nev)
 {
-    std::cerr << "ArpackEigenSolver::Solve is not implemented yet, Using non-sym solver." << std::endl;
+    // For complex Hermitian we are supposed to use the non-sym solver
     assert(A.GetNumRows()==A.GetNumCols());
     assert(Nev<A.GetNumRows());
     theDenseMatrix=&A;
@@ -252,21 +309,17 @@ ArpackEigenSolver<T>::Solve(const MatrixT& A,double eps, int Nev)
 template <> typename ArpackEigenSolver<double>::UdType
 ArpackEigenSolver<double>::Solve(const MatrixT& A,double eps, int Nev)
 {
-    std::cerr << "ArpackEigenSolver::Solve is not implemented yet, Using non-sym solver." << std::endl;
     assert(A.GetNumRows()==A.GetNumCols());
     assert(Nev<A.GetNumRows());
+    assert(IsSymmetric(A,eps));
     theDenseMatrix=&A;
-    auto [Uc,dc]=SolveG(matvecDense,A.GetNumRows(),Nev,eps);
-    Matrix<double> U=real(Uc);
-    Vector<double> d=real(dc);
-    return std::make_tuple(std::move(U),std::move(d));
+    return SolveSym(matvecDense,A.GetNumRows(),Nev,eps);
 }
 
 template <class T> typename ArpackEigenSolver<T>::UdType  ArpackEigenSolver<T>::SolveAll      (const MatrixT& A,double eps)
 {
-    std::cerr << "ArpackEigenSolver does not support all Evs, doing N/2" << std::endl;
     int N=A.GetNumRows();
-    return Solve(A,eps,N/2);
+    return Solve(A,eps,N-2);
 }
 
 
@@ -274,7 +327,7 @@ template <class T> typename ArpackEigenSolver<T>::UdType  ArpackEigenSolver<T>::
 template <class T> typename ArpackEigenSolver<T>::UdType
 ArpackEigenSolver<T>::Solve(const SparseMatrixT& A,double eps, int Nev)
 {
-    std::cerr << "ArpackEigenSolver::Solve is not implemented yet, Using non-sym solver." << std::endl;
+    // For complex Hermitian we are supposed to use the non-sym solver
     assert(A.GetNumRows()==A.GetNumCols());
     assert(Nev<A.GetNumRows());
     theSparseMatrix=&A;
@@ -286,14 +339,10 @@ ArpackEigenSolver<T>::Solve(const SparseMatrixT& A,double eps, int Nev)
 template <> typename ArpackEigenSolver<double>::UdType
 ArpackEigenSolver<double>::Solve(const SparseMatrixT& A,double eps, int Nev)
 {
-    std::cerr << "ArpackEigenSolver::Solve is not implemented yet, Using non-sym solver." << std::endl;
     assert(A.GetNumRows()==A.GetNumCols());
     assert(Nev<A.GetNumRows());
     theSparseMatrix=&A;
-    auto [Uc,dc]=SolveG(matvecSparse,A.GetNumRows(),Nev,eps);
-    Matrix<double> U=real(Uc);
-    Vector<double> d=real(dc);
-    return std::make_tuple(std::move(U),std::move(d));
+    return SolveSym(matvecSparse,A.GetNumRows(),Nev,eps);
 }
 
 
@@ -309,9 +358,9 @@ ArpackEigenSolver<T>::SolveRightNonSym(const MatrixT& A,double eps, int Nev)
 
 template <class T> typename ArpackEigenSolver<T>::UdTypeN ArpackEigenSolver<T>::SolveAllRightNonSym(const MatrixT& A,double eps)
 {
-    std::cerr << "ArpackEigenSolver does not support all Evs, doing N/2" << std::endl;
+    std::cerr << "ArpackEigenSolver does not support all Evs, doing N-2" << std::endl;
     int N=A.GetNumRows();
-    return SolveRightNonSym(A,eps,N/2);
+    return SolveRightNonSym(A,eps,N-2);
 }
 
 template <class T> typename ArpackEigenSolver<T>::UdTypeN
@@ -326,7 +375,7 @@ ArpackEigenSolver<T>::SolveRightNonSym(const SparseMatrixT& A,double eps, int Ne
 template <class T> typename ArpackEigenSolver<T>::UdType
 ArpackEigenSolver<T>::Solve(const ClientT* client,double eps, int Nev)
 {
-    std::cerr << "ArpackEigenSolver::Solve is not implemented yet, Using non-sym solver." << std::endl;
+    // For complex Hermitian we are supposed to use the non-sym solver
     ClientT::theClient=client;
     auto [Uc,dc]=SolveG(matvecClient,client->GetSize(),Nev,eps);
     Vector<double> d=real(dc);
@@ -336,12 +385,8 @@ ArpackEigenSolver<T>::Solve(const ClientT* client,double eps, int Nev)
 template <> typename ArpackEigenSolver<double>::UdType
 ArpackEigenSolver<double>::Solve(const ClientT* client,double eps, int Nev)
 {
-    std::cerr << "ArpackEigenSolver::Solve is not implemented yet, Using non-sym solver." << std::endl;
     ClientT::theClient=client;
-    auto [Uc,dc]=SolveG(matvecClient,client->GetSize(),Nev,eps);
-    Matrix<double> U=real(Uc);
-    Vector<double> d=real(dc);
-    return std::make_tuple(std::move(U),std::move(d));
+    return SolveSym(matvecClient,client->GetSize(),Nev,eps);
 }
 
 

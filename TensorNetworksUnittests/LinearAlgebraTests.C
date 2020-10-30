@@ -69,6 +69,7 @@ public:
 
 };
 
+
 TEST_F(LinearAlgebraTests,SparseMatrix)
 {
     Matrix<double> d(5,6);

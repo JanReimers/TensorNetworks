@@ -138,6 +138,8 @@ PrimeEigenSolver<T>::Solve(primme_params& p)
     itsEigenVectors.SetLimits(p.n,p.numEvals);
     Vector<double> rnorms(p.numEvals);
     int ret = primmeT<T>(&itsEigenValues(1), &itsEigenVectors(1,1), &rnorms(1), &p);
+    if (ret!=0)
+        std::cerr << "Error in primme solver, ret=" << ret << std::endl;
     assert(ret==0);
     (void)ret; //avoid compiler warning in release modems)) << " " << std::endl;
     if (Max(fabs(rnorms))>1000*p.eps)
@@ -196,7 +198,7 @@ primme_params MakeParametersNonSym(MatvecT MatVec,int N,int NumEigenValues,int N
     primme.n = N; /* set problem dimension */
     primme.numEvals = NumEigenValues;   /* Number of wanted eigenpairs */
     primme.eps = eps;      /* ||r|| <= eps * ||matrix|| */
-    targetShifts[0] = 0.0;
+    targetShifts[0] = -10.0;
     primme.targetShifts = targetShifts;
     primme.numTargetShifts = 1;
     primme.target = primme_closest_abs;//primme_smallest; /* Wanted the smallest eigenvalues */
@@ -205,7 +207,7 @@ primme_params MakeParametersNonSym(MatvecT MatVec,int N,int NumEigenValues,int N
     primme.printLevel=1;
     primme_set_method(PRIMME_DEFAULT_MIN_MATVECS, &primme);
     primme.correctionParams.projectors.RightX = 0;
-//    primme.maxOuterIterations=100;
+    primme.maxOuterIterations=1000;
 
     primme_set_method(PRIMME_DYNAMIC, &primme);
     return primme;

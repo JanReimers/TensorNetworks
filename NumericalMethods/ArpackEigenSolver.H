@@ -41,7 +41,8 @@ public:
     typedef    void (*MatvecT) (int N, const T * x, T * y);
 private:
     // Generic version
-    UdTypeN SolveG(MatvecT,int N, int NumEigenValues,double eps);
+    UdType  SolveSym(MatvecT,int N, int NumEigenValues,double eps);
+    UdTypeN SolveG  (MatvecT,int N, int NumEigenValues,double eps);
 };
 
 #endif // ARPACKEIGENSOLVER_H
