@@ -3,10 +3,10 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/Dw12.H"
-//#include "oml/minmax.h"
-#include "oml/cnumeric.h"
 #include "NumericalMethods/LapackSVD.H"
-//#include "oml/vector_io.h"
+#include "NumericalMethods/ArpackEigenSolver.H"
+#include "Containers/Matrix4.H"
+#include "oml/cnumeric.h"
 #include "oml/random.h"
 #include <iostream>
 #include <iomanip>
@@ -47,8 +47,8 @@ void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
 //        cout << "D Dmax=" << D << " " << Dmax << endl;
         if (Dmax>0 && Dmax<D) D=Dmax;
     }
-    auto [U,s,Vdagger]=solver.Solve(A,D,1e-10); //Solves A=U * s * Vdagger  returns V not Vdagger
-//    auto [U,s,Vdagger]=oml_CSVDecomp(ReshapeBeforeSVD(lr)); //Solves A=U * s * Vdagger  returns V not Vdagger
+    auto [U,s,Vdagger]=solver.Solve(A,D,1e-10); //Solves A=U * s * Vdagger
+//    auto [U,s,Vdagger]=oml_CSVDecomp(ReshapeBeforeSVD(lr)); //Solves A=U * s * Vdagger
     double integratedS2=0.0;
     if (comp) integratedS2=comp->Compress(U,s,Vdagger);
 
@@ -74,6 +74,17 @@ void MPSSite::Rescale(double norm)
 {
     for (int n=0; n<itsd; n++) itsMs[n]/=norm;
 }
+double   MPSSite::FrobeniusNorm() const
+{
+    double fnorm=0;
+    for (int n=0; n<itsd; n++)
+    {
+        double f=::FrobeniusNorm(itsMs[n]);
+        fnorm+=f*f;
+    }
+    return sqrt(fnorm);
+}
+
 
 void MPSSite::Canonicalize(Direction lr,SVCompressorC* comp)
 {
@@ -97,6 +108,28 @@ void MPSSite::Canonicalize(Direction lr,SVCompressorC* comp)
             break;
         }
     }
+}
+
+void MPSSite::iNormalize(Direction lr)
+{
+    MatrixCT E=GetTransferMatrix(lr).Flatten();
+    EigenSolver<dcmplx>* solver=new ArpackEigenSolver<dcmplx>;
+    dcmplx eigenValue(0);
+    if (lr==DLeft)
+    {
+        auto [U,d]=solver->SolveLeft_NonSym(E,1e-13,1);
+        cout << std::fixed << std::setprecision(4) << "Left  Arpack d=" << d << endl;
+        eigenValue=d(1);
+    }
+    if (lr==DRight)
+    {
+        auto [U,d]=solver->SolveRightNonSym(E,1e-13,1);
+        cout << std::fixed << std::setprecision(4) << "Right Arpack d=" << d << endl;
+        eigenValue=d(1);
+    }
+    delete solver;
+    assert(fabs(imag(eigenValue))<1e-10);
+    Rescale(sqrt(real(eigenValue)));
 }
 
 } //namespace

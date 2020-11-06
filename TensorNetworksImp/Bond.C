@@ -47,23 +47,42 @@ void Bond::NewBondDimension(int D)
 {
     assert(D>=1);
     assert(itsD==itsSingularValues.size());
-    itsSingularValues.SetLimits(D,true);
-    for (int i=itsD+1;i<=D;i++)
-        itsSingularValues(i)=0.0;
-    itsD=D;
+    if (D>itsD)
+    { //Grow
+        itsSingularValues.SetLimits(D,true);
+        for (int i=itsD+1;i<=D;i++)
+            itsSingularValues(i)=0.0;
+        itsD=D;
+    }
+    else
+    { //Shrink/compress
+        itsIntegratedS2=0.0;
+        for (int i=D+1;i<=itsD;i++)
+            itsIntegratedS2+=itsSingularValues(i)*itsSingularValues(i);
+        itsSingularValues.SetLimits(D,true);
+        itsMinSV=itsSingularValues(D);
+        itsD=D;
+        UpdateBondEntropy();
+    }
 }
 
 void Bond::SetSingularValues(const DiagonalMatrixRT& s,double integratedS2)
 {
     //std::cout << "SingularValues=" << s << std::endl;
     itsD=s.GetNumRows();
-    itsSingularValues.SetLimits(itsD);
-    itsSingularValues=s.GetDiagonal();
+//    itsSingularValues.SetLimits(itsD);
+    itsSingularValues=s;
 
     itsRank=itsD;
     itsMinSV=itsSingularValues(itsD);
     itsIntegratedS2=integratedS2;
+    UpdateBondEntropy();
 
+
+}
+
+void Bond::UpdateBondEntropy()
+{
     itsBondEntropy=0.0;
     for (int i=1;i<=itsD;i++)
     {
@@ -75,7 +94,8 @@ void Bond::SetSingularValues(const DiagonalMatrixRT& s,double integratedS2)
             itsRank--;
         }
     }
-
+    if (itsBondEntropy<0.0)
+        std::cerr << "Warning negative bond entropy s=" << itsSingularValues << std::endl;
 }
 
 //

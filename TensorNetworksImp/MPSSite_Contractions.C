@@ -3,7 +3,7 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
 #include "Containers/Matrix6.H"
-//#include "oml/minmax.h"
+#include "Containers/Matrix4.H"
 #include "oml/cnumeric.h"
 #include "oml/random.h"
 #include "oml/diagonalmatrix.h"
@@ -592,6 +592,40 @@ MatrixCT MPSSite::Contract_RM(const MatrixCT& R, const MatrixCT& M) const
     return RM;
 }
 */
+
+Matrix4CT  MPSSite::GetTransferMatrix(Direction lr) const
+{
+    assert(itsD1==itsD2);
+    const DiagonalMatrixRT& lambda=GetBond(Invert(lr))->GetSVs();
+    int D=itsD1;
+    Matrix4CT E(D,D,D,D);
+    for (int m=0;m<itsd;m++)
+    {
+//        cout << "lambda,M=" << lambda.size() << " " << itsMs[m].GetLimits() << endl;
+        MatrixCT theta;
+        if (lr==DLeft)
+        {
+            assert(lambda.size()==itsMs[m].GetNumRows());
+            theta=lambda*itsMs[m];
+        }
+        else
+        {
+            assert(lambda.size()==itsMs[m].GetNumCols());
+            theta=itsMs[m]*lambda;
+        }
+        assert(theta.GetNumRows()==D);
+        assert(theta.GetNumCols()==D);
+//        cout << "theta,D1,D2=" << theta.GetLimits() << " " << itsD1 << " " << itsD2 << endl;
+        for (index_t i1:theta.rows())
+        for (index_t i2:theta.cols())
+            for (index_t j1:theta.rows())
+            for (index_t j2:theta.cols())
+                E(i1,j1,i2,j2)+=conj(theta(i1,i2))*theta(j1,j2);
+    }
+    return E;
+}
+
+
 void  MPSSite::ApplyInPlace(const SiteOperator* so)
 {
     dVectorT newAs;

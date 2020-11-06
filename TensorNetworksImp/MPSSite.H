@@ -34,6 +34,7 @@ class MPSSite
         double GetEGap       () const {return itsGapE;}
         double GetIterDE     () const {return itsIterDE;}
         bool   IsFrozen      () const {return isFrozen;}
+        int    GetD1         () const {return itsD1;}
         int    GetD2         () const {return itsD2;}
 //---------------------------------------------------------------------------------
 //
@@ -94,6 +95,8 @@ class MPSSite
         char GetNormStatus(double eps) const;
         void Report    (std::ostream&) const;
 
+        typedef std::vector<MatrixCT>     dVectorT;
+
 private:
     friend class ::MPOTests;
     friend class ::MPSTests;
@@ -103,12 +106,14 @@ private:
 
     Position WhereAreWe() const {return itsPosition;}
 
-    MatrixCT GetNorm(Direction lr) const;
-    MatrixCT ReshapeBeforeSVD(Direction lr);
-    void     ReshapeAfter_SVD(Direction lr,const MatrixCT& UV);
-    void     Rescale(double norm);
-    void     Update      (const VectorCT& newAs);
-
+    MatrixCT  GetNorm(Direction lr) const;
+    MatrixCT  ReshapeBeforeSVD(Direction lr);
+    void      ReshapeAfter_SVD(Direction lr,const MatrixCT& UV);
+    void      Rescale(double norm);
+    double    FrobeniusNorm() const;
+    Matrix4CT GetTransferMatrix(Direction lr) const;
+    void      Update      (const VectorCT& newAs);
+    void      iNormalize(Direction lr); //Use transfer matrix eigenvalue to rescale.
     static bool     IsUnit(const MatrixCT& m,double eps);
 
     //
@@ -118,9 +123,16 @@ private:
     {
         return lr==DLeft ? itsRightBond : itsLeft_Bond;
     }
+    const Bond* GetBond(Direction lr) const
+    {
+        return lr==DLeft ? itsRightBond : itsLeft_Bond;
+    }
 
+     Direction Invert(Direction lr) const
+    {
+        return lr==DLeft ?  DRight : DLeft;
+    }
 
-    typedef std::vector<MatrixCT>     dVectorT;
     typedef dVectorT::      iterator  dIterT;
     typedef dVectorT::const_iterator cdIterT;
 

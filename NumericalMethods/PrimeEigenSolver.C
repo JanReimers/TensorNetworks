@@ -198,7 +198,7 @@ primme_params MakeParametersNonSym(MatvecT MatVec,int N,int NumEigenValues,int N
     primme.n = N; /* set problem dimension */
     primme.numEvals = NumEigenValues;   /* Number of wanted eigenpairs */
     primme.eps = eps;      /* ||r|| <= eps * ||matrix|| */
-    targetShifts[0] = -10.0;
+    targetShifts[0] = 1000.0;
     primme.targetShifts = targetShifts;
     primme.numTargetShifts = 1;
     primme.target = primme_closest_abs;//primme_smallest; /* Wanted the smallest eigenvalues */

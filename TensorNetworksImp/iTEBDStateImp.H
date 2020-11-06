@@ -2,6 +2,7 @@
 #define ITEBDSTATEIMP_H
 
 #include "TensorNetworks/iTEBDState.H"
+#include "TensorNetworks/Typedefs.H"
 #include "TensorNetworksImp/MPSImp.H"
 
 namespace TensorNetworks
@@ -30,15 +31,41 @@ class iTEBDStateImp : public virtual iTEBDState,
 //
 //  Normalization members with and without SVD compression
 //
-        virtual void NormalizeAndCompress(Direction LR,SVCompressorC*);
+        virtual void Canonicalize(Direction);  //Vidals L-G-L-G-L canonical form
+        virtual void Normalize(Direction LR);
+        virtual void Orthogonalize(int isite);
 
-        virtual void Apply(int isite,const Matrix4RT& expH);
+        virtual double GetExpectation (int isite, const MPO* o) const;
+        virtual double GetExpectation (int isite, const Matrix4RT& Hlocal) const;
+        virtual void Apply(int isite,const Matrix4RT& expH,SVCompressorC*);
         virtual void Report(std::ostream&) const;
 
     protected:
-        int GetModSite(int isite);
-        VectorRT&  GetLambda(int isite);
-        MatrixCT& GetGamma (int isite,int n);
+        using dVectorT=MPSSite::dVectorT;
+        typedef std::tuple<dVectorT,DiagonalMatrixRT> GLType;
+
+        int GetModSite(int isite) const;
+        const DiagonalMatrixRT& GetLambda(int isite) const;
+        const         MatrixCT& GetGamma (int isite,int n) const ;
+        Matrix4CT GetTransferMatrix() const;
+        GLType Orthogonalize(const dVectorT& gamma, const DiagonalMatrixRT& lambda);
+        bool TestOrthogonal(int site) ;
+        Matrix4CT GetTransferMatrix(const dVectorT& M);
+
+        struct Sites
+        {
+            Sites(int leftSite,iTEBDStateImp*);
+            MPSSite* siteA;
+            MPSSite* siteB;
+            Bond*    bondA;
+            Bond*    bondB;
+            dVectorT& MA;
+            dVectorT& MB;
+            const DiagonalMatrixRT& lambdaA;
+            const DiagonalMatrixRT& lambdaB;
+        };
+
+
 
     private:
         void InitSitesAndBonds(int D, double epsSV);

@@ -24,11 +24,15 @@ class iTEBDState
 //
 //  Normalization members with and without SVD compression
 //
-        virtual void Normalize(Direction LR);
-        virtual void NormalizeAndCompress(Direction LR,SVCompressorC*)=0;
+        virtual void Canonicalize(Direction)=0;  //Vidals L-G-L-G-L canonical form
+        virtual void Normalize(Direction LR)=0; //Use largest eigen value of transfer matrix
+        virtual void Orthogonalize(int isite)=0;
+//        virtual void NormalizeAndCompress(Direction LR,SVCompressorC*)=0;
 
+        virtual double GetExpectation (int isite, const MPO* o) const=0;
+        virtual double GetExpectation (int isite, const Matrix4RT& Hlocal) const=0;
         virtual void Report    (std::ostream&) const=0;
-        virtual void Apply(int isite,const Matrix4RT& expH)=0;
+        virtual void Apply(int isite,const Matrix4RT& expH,SVCompressorC*)=0;
 };
 
 }

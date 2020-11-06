@@ -2,7 +2,8 @@
 #define BOND_H
 
 #include "TensorNetworksImp/Namespace.H"
-#include "oml/vector.h"
+#include "TensorNetworks/Typedefs.H"
+#include "oml/diagonalmatrix.h"
 
 
 namespace TensorNetworks
@@ -10,6 +11,7 @@ namespace TensorNetworks
 
 class Bond
 {
+
    public:
         Bond(double epsSV);
         virtual ~Bond();
@@ -23,8 +25,8 @@ class Bond
         double GetBondEntropy() const {return itsBondEntropy;}
         double GetMinSV      () const {return itsMinSV;}
         int    GetD          () const {return itsD;}
-//        int    GetRank       () const {return itsRank;}
-        Vector<double> GetSVs () const {return itsSingularValues;}
+        int    GetRank       () const {return itsRank;}
+        const DiagonalMatrixRT& GetSVs () const {return itsSingularValues;}
 
         void Report    (std::ostream&) const;
 
@@ -33,6 +35,7 @@ class Bond
     private:
         friend class iTEBDStateImp;
         void SetSingularValues(const DiagonalMatrixRT& s, double integratedS2);
+        void UpdateBondEntropy();
         //
         //  lr is the normalization direction.  For normalization we need to access the right bond.
         //
@@ -41,7 +44,7 @@ class Bond
             return lr==DLeft ? itsRightSite : itsLeft_Site;
         }
 
-        Vector<double> itsSingularValues;
+        DiagonalMatrixRT itsSingularValues;
         double itsEpsSV; //SVs < itsEpsSV are deemed to be zero when determining rank and entropies.
         double itsBondEntropy;
         double itsMinSV;
