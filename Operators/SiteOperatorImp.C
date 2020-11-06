@@ -141,7 +141,7 @@ void SiteOperatorImp::SetNeighbours(SiteOperator* left, SiteOperator* right)
 }
 
 
-void SiteOperatorImp::Combine(const SiteOperator* O2)
+void SiteOperatorImp::Combine(const SiteOperator* O2,double factor)
 {
     //const SiteOperatorImp* O2=dynamic_cast<const SiteOperatorImp*>(_O2);
     //assert(O2);
@@ -174,7 +174,7 @@ void SiteOperatorImp::Combine(const SiteOperator* O2)
                                 Wmo(w1,w2)+=W1(w11,w21)*W2(w12,w22);
                     }
             }
-            newWs(m+1,o+1)=Wmo;
+            newWs(m+1,o+1)=factor*Wmo;
         }
     itsWs=newWs;
     itsDw12=Dw;

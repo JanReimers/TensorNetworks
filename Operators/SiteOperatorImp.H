@@ -44,7 +44,7 @@ class SiteOperatorImp : public virtual SiteOperator
         //
         //  Contract MPOs together
         //
-        virtual void Combine(const SiteOperator* O2);
+        virtual void Combine(const SiteOperator* O2,double factor);
         //
         //  SVD compress and normalize to reduce Dw
         //
