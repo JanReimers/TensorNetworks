@@ -522,7 +522,7 @@ b is
 
 \end_inset
 
-where I have explicitly shown that the product runs backward through the
+where I have explicitly shown that the product runs backwards through the
  lattice since 
 \begin_inset Formula $\left(\boldsymbol{A}\boldsymbol{B}\right)^{\dagger}=\boldsymbol{B}^{\dagger}\boldsymbol{A}^{\dagger}$
 \end_inset
@@ -864,7 +864,7 @@ Repeated SVD and normalization
 
 \begin_layout Standard
 We can now start on the left and zip through the lattice and convert the
- whole MPS into canonical form.
+ whole MPS into a left canonical form.
  Starting with site 
 \begin_inset Formula $1$
 \end_inset
@@ -894,8 +894,8 @@ At this point we need to decide what to do with
 \end_inset
 
 .
- We keep the singular values separate, and they actually live on the bond
- between sites 
+ We can keep the singular values separate, and they would naturally live
+ on the bond between sites 
 \begin_inset Formula $1$
 \end_inset
 
@@ -912,7 +912,7 @@ At this point we need to decide what to do with
 \begin_inset Formula $\boldsymbol{V}^{1}$
 \end_inset
 
- matrices gets absorbed into 
+ matrices can be absorbed into 
 \begin_inset Formula $\boldsymbol{M}^{n_{2}}$
 \end_inset
 
@@ -1060,7 +1060,7 @@ literal "false"
 \end_inset
 
  involves storing the singular values on each bond.
- Consider and SVD decomposition of the first matrix at site 
+ Consider an SVD decomposition of the first matrix at site 
 \begin_inset Formula $1$
 \end_inset
 
@@ -1100,6 +1100,8 @@ noprefix "false"
 \end_inset
 
 and repeat this process across the lattice.
+ The difference here is that we do not absrobe the singular values into
+ the next site, instead we keep them separate, living on the bond.
  We end up with
 \begin_inset Formula 
 \begin{equation}
@@ -1108,7 +1110,28 @@ and repeat this process across the lattice.
 
 \end_inset
 
-with this representation we can bifurcate the lattice at any bond and quickly
+as shown in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Vidal's-canonial-form"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ The numerical labels for the lambdas can be a little confusing, for example
+ 
+\begin_inset Formula $\lambda^{[1]}$
+\end_inset
+
+ should really be labeld 
+\begin_inset Formula $\lambda^{[12]}$
+\end_inset
+
+ since it is equally associated with site one and site 2.
+ With this representation we can bifurcate the lattice at any bond and quickly
  create a block wave function or a mixed canonical form
 \begin_inset Formula 
 \[
@@ -1204,7 +1227,7 @@ For a wave function with OBC bond dimension
 \begin_inset Formula $a$
 \end_inset
 
-from the left then the bond dimensions will be 
+ from the left then the bond dimensions will be 
 \begin_inset Formula $\min\left\{ d^{a-1},D\right\} \times\min\left\{ d^{a},D\right\} $
 \end_inset
 
@@ -1214,16 +1237,16 @@ from the left then the bond dimensions will be
 
 .
  The literature does make a passing mention of this in a few instances.
- They don;t have a name for it, so I will just call it 
+ They don't have a name for it, so I will just call it 
 \emph on
 canonical bond dimensions
 \emph default
 .
  These limits are unavoidable, the Hilbert space at the edges of the lattice
  is only so big.
- If you run a left normalization sweep across the lattice these conditions
- will automatically be enforced by the number of non-zero singular values
- at each bond.
+ If you run a left and then right normalization sweeps across the lattice
+ these conditions will automatically be enforced by the number of non-zero
+ singular values at each bond.
  However for a left normalization sweep no such automatic sizing happens
  on the right hand side of the lattice.
  SImilarly if you only do a right normalization sweep, then left side ends
@@ -1275,7 +1298,7 @@ Single and two site density matrices make the calculation of expectation
  values trivial since
 \begin_inset Formula 
 \[
-\left\langle \psi\right|\hat{O}_{a}\left|\psi\right\rangle =Tr\left(O_{a}\rho_{a}\right)=\sum_{mn=0}^{d}O_{a}^{mn}\rho_{a}^{mn}
+\left\langle \psi\right|\hat{O}_{a}\left|\psi\right\rangle =Tr\left(O_{a}\rho_{a}\right)=\sum_{mn=0}^{d-1}O_{a}^{mn}\rho_{a}^{mn}
 \]
 
 \end_inset
@@ -1283,7 +1306,7 @@ Single and two site density matrices make the calculation of expectation
 and
 \begin_inset Formula 
 \[
-\left\langle \psi\right|\hat{O}_{a}\hat{O}_{b}\left|\psi\right\rangle =Tr\left(O_{a}O_{b}\rho_{ab}\right)=\sum_{m_{a}n_{a}=0}^{d}\sum_{m_{b}n_{b}=0}^{d}O_{a}^{m_{a}n_{a}}O_{b}^{m_{b}n_{b}}\rho_{ab}^{\left(m_{a}m_{b}\right)\left(n_{a}n_{b}\right)}
+\left\langle \psi\right|\hat{O}_{a}\hat{O}_{b}\left|\psi\right\rangle =Tr\left(O_{a}O_{b}\rho_{ab}\right)=\sum_{m_{a}n_{a}=0}^{d-1}\sum_{m_{b}n_{b}=0}^{d-1}O_{a}^{m_{a}n_{a}}O_{b}^{m_{b}n_{b}}\rho_{ab}^{\left(m_{a}m_{b}\right)\left(n_{a}n_{b}\right)}
 \]
 
 \end_inset
@@ -1298,22 +1321,23 @@ where
 
  two site density matrix.
  In addition these density matrices are of interest in the their own right.
- For example the two site density matrix 
+ For example the two site density matrix has 
 \begin_inset Formula $d^{2}$
 \end_inset
 
- has positive definite eigenvalues all summing to 
+ positive definite eigenvalues all summing to 
 \begin_inset Formula $1$
 \end_inset
 
 .
  The largest 
-\begin_inset Formula $d$
+\begin_inset Formula $2d$
 \end_inset
 
- of these will associated with disentangled states on each site.
+ of these will be predominantly associated with disentangled states on each
+ site.
  The remaining 
-\begin_inset Formula $d^{2}-d$
+\begin_inset Formula $d^{2}-2d$
 \end_inset
 
  eigenvalues are a measure of the entanglement entropy between the two sites.
@@ -1430,13 +1454,9 @@ noprefix "false"
 .
 \end_layout
 
-\begin_layout Subsubsection
-Neighbouring two site density matrix
-\end_layout
-
 \begin_layout Standard
-However the calculation becomes trivial if the system is in a mixed canonical
- state as per eq.
+The calculation becomes trivial if the system is in a mixed canonical state
+ as per eq.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -1467,6 +1487,14 @@ a.
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Subsubsection
+Neighbouring two site density matrix
+\end_layout
+
+\begin_layout Standard
 The two site density matrix for neighbouring site is almost as simple
 \begin_inset Formula 
 \[
@@ -1604,7 +1632,7 @@ We need to decide on an efficient way of zipping through the lattice from
  transfer matrices is probably not the way to go.
  The first step is to pick a direction.
  Let's try left to right.
- The obvious first step is to contract over 
+ The obvious next step is to contract over 
 \begin_inset Formula $i_{a-1}=j_{a-1}$
 \end_inset
 
@@ -3417,7 +3445,15 @@ noprefix "false"
 b) is
 \begin_inset Formula 
 \[
-E_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}^{1}=\sum_{n_{1}}\left(\varGamma_{i_{1}i_{2}}^{1n_{1}}\lambda_{i_{2}}^{1}\right)^{\dagger}\varGamma_{j_{1}j_{2}}^{1n_{1}}\lambda_{j_{2}}^{1}=\lambda_{i_{2}}^{1}\lambda_{j_{2}}^{1}\sum_{n_{1}}\varGamma_{i_{2}i_{1}}^{1*n_{1}}\varGamma_{j_{1}j_{2}}^{1n_{1}}
+E_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}^{1}=\sum_{n_{1}}\left(M_{i_{2}i_{1}}^{n_{1}}\right)^{\dagger}M_{j_{i}j_{2}}^{n_{1}}=\sum_{n_{1}}\left(\varGamma_{i_{2}i_{1}}^{1n_{1}}\lambda_{i_{2}}^{1}\right)^{\dagger}\varGamma_{j_{1}j_{2}}^{1n_{1}}\lambda_{j_{2}}^{1}=\lambda_{i_{2}}^{1}\lambda_{j_{2}}^{1}\sum_{n_{1}}\varGamma_{i_{1}i_{2}}^{1*n_{1}}\varGamma_{j_{1}j_{2}}^{1n_{1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{n_{1}}M_{i_{1}i_{2}}^{*n_{1}}M_{j_{i}j_{2}}^{n_{1}}
 \]
 
 \end_inset
@@ -3437,20 +3473,24 @@ where the indices are grouped to shape this as a
 
 Strictly speaking this expression is not a scalar but just wait.
  To proceed we can do an eigen decomposition of the repeating product 
-\begin_inset Formula $\boldsymbol{E}^{1}\boldsymbol{E}^{2}=\boldsymbol{U}\boldsymbol{e}\boldsymbol{U}^{\dagger}$
+\begin_inset Formula $\boldsymbol{E}^{1}\boldsymbol{E}^{2}=\boldsymbol{U}_{R}^{-1}\boldsymbol{e}\boldsymbol{U}_{R}$
 \end_inset
 
 
 \begin_inset Formula 
 \[
-\left\langle \psi|\psi\right\rangle =\lim_{N\rightarrow\infty}\boldsymbol{e}^{N}
+\left\langle \psi|\psi\right\rangle =\boldsymbol{U}_{R}^{-1}\lim_{N\rightarrow\infty}\boldsymbol{e}^{N}\boldsymbol{U}_{R}
 \]
 
 \end_inset
 
 which is matrix of eigen values to the high power.
- Of course all the eigemodes are irrelevant except for dominant one so in
- the end we get 
+ Of course all the eigemodes are irrelevant except for dominant one so the
+ 
+\begin_inset Formula $U$
+\end_inset
+
+s cancel and in the end we get 
 \begin_inset Formula 
 \[
 \left\langle \psi|\psi\right\rangle =\lim_{N\rightarrow\infty}e_{max}^{N}
@@ -3475,6 +3515,62 @@ which should ensure that the new
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Standard
+Explicitly we have 
+\begin_inset Formula 
+\[
+\boldsymbol{e}=\boldsymbol{E}^{1}\boldsymbol{E}^{2}=\sum_{i_{2}j_{2}}E_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}^{1}E_{\left(i_{2}j_{2}\right)\left(i_{3}j_{3}\right)}^{2}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{i_{2}j_{2}}\sum_{n_{1}}M_{i_{1}i_{2}}^{*n_{1}}M_{j_{i}j_{2}}^{n_{1}}\sum_{n_{2}}M_{i_{2}i_{3}}^{*n_{2}}M_{j_{2}j_{3}}^{n_{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{n_{1}}\sum_{n_{2}}\left(\sum_{i_{2}}M_{i_{1}i_{2}}^{*n_{1}}M_{i_{2}i_{3}}^{*n_{2}}\right)\left(\sum_{j_{2}}M_{j_{i}j_{2}}^{n_{1}}M_{j_{2}j_{3}}^{n_{2}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{n_{1}}\sum_{n_{2}}N_{i_{1}i_{3}}^{*n_{1}n_{2}}N_{j_{1}j_{3}}^{n_{1}n_{2}}
+\]
+
+\end_inset
+
+=
+\end_layout
+
+\begin_layout Standard
+Iteratively calculating the tranfer matrix from left right, we start with
+\begin_inset Formula 
+\[
+C_{i_{1}j_{1}}^{0}=1
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+C^{1}=\sum_{n_{1}}M_{i_{1}i_{2}}^{*n_{1}}C_{i_{1}j_{1}}^{0}M_{j_{1}j_{2}}^{n_{1}}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
@@ -3786,8 +3882,425 @@ Repeat steps 2-7 with the structure
 
 \end_layout
 
+\begin_layout Subsubsection
+Maintaining Orthogonality
+\end_layout
+
+\begin_layout Standard
+If we keep the full SVD in step 4 above then we would aloways keep orthonormalit
+y
+\begin_inset Formula 
+\[
+U^{\dagger}U=VV^{\dagger}=1
+\]
+
+\end_inset
+
+in terms of lambda-gamma we have
+\begin_inset Formula 
+\[
+U^{\dagger}U=\sum_{n_{a}}\left(\lambda^{B}\Gamma^{n_{a}}\right)^{\dagger}\lambda^{B}\Gamma^{n_{a}}=\sum_{n_{a}}\Gamma_{ik}^{*n_{a}}\lambda_{k}^{B}\lambda_{k}^{B}\Gamma_{k,j}^{n_{a}}=\sum_{n_{a}}\Gamma_{ik}^{*n_{a}}\rho_{kk}^{B}\Gamma_{k,j}^{n_{a}}=\delta_{ij}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+VV^{\dagger}=\sum_{n_{b}}\Gamma^{n_{b}}\lambda^{B}\left(\Gamma^{n_{b}}\lambda^{B}\right)^{\dagger}=\sum_{n_{b}}\Gamma_{ik}^{n_{b}}\lambda_{k}^{B}\lambda_{k}^{B}\Gamma_{k,j}^{*n_{b}}=\sum_{n_{b}}\Gamma_{ik}^{n_{b}}\rho_{kk}^{B}\Gamma_{k,j}^{*n_{b}}=\delta_{ij}.
+\]
+
+\end_inset
+
+Similarly with the structure in 8 we get
+\begin_inset Formula 
+\[
+U^{\dagger}U=\sum_{n_{b}}\left(\lambda^{A}\Gamma^{n_{b}}\right)^{\dagger}\lambda^{A}\Gamma^{n_{b}}=\sum_{n_{b}}\Gamma_{ik}^{*n_{b}}\rho_{kk}^{A}\Gamma_{kj}^{n_{b}}=\delta_{ij}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+VV^{\dagger}=\sum_{n_{a}}\Gamma^{n_{a}}\lambda^{A}\left(\Gamma^{n_{a}}\lambda^{A}\right)^{\dagger}=\sum_{n_{a}}\Gamma_{ik}^{n_{a}}\rho_{kk}^{A}\Gamma_{kj}^{*n_{a}}=\delta_{ij}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In step 5 we truncate the singluar values, after withc the orthonormality
+ no longer holds true.
+ 
+\end_layout
+
+\begin_layout Standard
+The canonical form is by definition when Schmidt deomposition about any
+ 
+\begin_inset Formula $A$
+\end_inset
+
+ bond site is
+\begin_inset Formula 
+\[
+\left|\psi\right\rangle =\sum_{i=1}^{D}\lambda_{i}^{A}\left|\Phi_{i}^{L}\right\rangle \left|\Phi_{i}^{R}\right\rangle 
+\]
+
+\end_inset
+
+with 
+\begin_inset Formula 
+\[
+\left|\Phi_{i}^{L}\right\rangle =\cdots\lambda^{A}\Gamma^{n_{b-2}}\lambda^{B}\Gamma^{n_{a-1}}\lambda^{A}\Gamma_{kj}^{n_{b-1}}\lambda_{j}^{B}\Gamma_{ji}^{n_{a0}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|\Phi_{i}^{R}\right\rangle =\Gamma_{ij}^{n_{b0}}\lambda_{j}^{B}\Gamma_{jk}^{n_{a1}}\lambda^{A}\Gamma^{n_{b1}}\lambda^{B}\Gamma^{n_{a2}}\cdots
+\]
+
+\end_inset
+
+and the right abd left wave functions are orthongonal
+\begin_inset Formula 
+\[
+\left\langle \Phi_{i}^{L}|\Phi_{j}^{L}\right\rangle =\delta_{ij}=\sum_{n_{a}n_{b}}\left(\lambda^{A}\Gamma_{kj}^{n_{b}}\lambda_{j}^{B}\Gamma_{ji}^{n_{a}}\right)^{\dagger}\lambda^{A}\Gamma_{kj}^{n_{b}}\lambda_{j}^{B}\Gamma_{ji}^{n_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+L_{ikk'i'}=\sum_{n_{a}n_{b}}\Gamma_{ij}^{*n_{a}}\lambda_{j}^{B}\Gamma_{jk}^{*n_{b}}\lambda_{k}^{A}\lambda_{k'}^{A}\Gamma_{k'j'}^{n_{b}}\lambda_{j'}^{B}\Gamma_{j'i'}^{n_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left\langle \Phi_{i}^{R}|\Phi_{j}^{R}\right\rangle =\delta_{ij}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Canonical1.png
+	lyxscale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Proceedure for getting an iTEBD state into canonical form, which also restores
+ orthogonality.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can transform to a canonical form by defining
+\begin_inset Formula 
+\begin{equation}
+\Gamma_{j_{1}j_{2}}^{n_{a}}\lambda_{j_{2}}^{A}\Gamma_{j_{2}j_{3}}^{n_{b}}\lambda_{i_{3}}^{B}=\varGamma_{j_{1}j_{3}}\lambda_{j_{3}}\label{eq:GammAB}
+\end{equation}
+
+\end_inset
+
+with
+\begin_inset Formula 
+\[
+\varGamma_{j_{1}j_{3}}^{n_{A}n_{B}}=\sum_{j_{2}}\varGamma_{j_{1}j_{2}}^{n_{a}}\lambda_{j_{2}}^{A}\varGamma_{j_{2}j_{3}}^{n_{b}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+R_{\left(i_{1}j_{1}\right)\left(i_{3}j_{3}\right)}=\sum_{n_{a}n_{b}}\left(\varGamma_{i_{1}i_{3}}\lambda_{i_{3}}\right)\left(\varGamma_{j_{1}j_{3}}^{*}\lambda_{j_{3}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+L_{\left(i_{1}j_{1}\right)\left(i_{3}j_{3}\right)}=\sum_{n_{a}n_{b}}\left(\lambda_{i_{1}}\varGamma_{i_{1}i_{3}}\right)\left(\lambda_{j_{1}}\varGamma_{j_{1}j_{3}}^{*}\right)
+\]
+
+\end_inset
+
+Find eigen vectors as
+\begin_inset Formula 
+\[
+\sum_{i_{1}j_{1}}V_{i_{1}j_{1}}^{L}L_{\left(i_{1}j_{1}\right)\left(i_{3}j_{3}\right)}=\eta_{L}V_{i_{3}j_{3}}^{L}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{i_{3}j_{3}}R_{\left(i_{1}j_{1}\right)\left(i_{3}j_{3}\right)}V_{i_{3}j_{3}}^{R}=\eta_{R}V_{i_{1}j_{1}}^{R}
+\]
+
+\end_inset
+
+the idea is to now factor the eigen matrices as
+\begin_inset Formula 
+\[
+V_{ij}^{L}=UdU^{\dagger}=U\sqrt{d}\sqrt{d}U^{\dagger}=Y^{\dagger}Y
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+V_{ij}^{R}=XX^{\dagger}
+\]
+
+\end_inset
+
+now sandwich identities into
+\begin_inset Formula 
+\[
+\lambda\varGamma\lambda\rightarrow Y^{T^{-1}}Y^{T}\lambda XX^{-1}\varGamma Y^{T^{-1}}Y^{T}\lambda XX^{-1}
+\]
+
+\end_inset
+
+and group as follows
+\begin_inset Formula 
+\[
+\lambda\varGamma\lambda\rightarrow Y^{T^{-1}}\left(Y^{T}\lambda X\right)\left(X^{-1}\varGamma Y^{T^{-1}}\right)\left(Y^{T}\lambda X\right)X^{-1}
+\]
+
+\end_inset
+
+and now SVD 
+\begin_inset Formula 
+\[
+Y^{T}\lambda X=U\lambda^{\prime}V^{\dagger}
+\]
+
+\end_inset
+
+giving
+\begin_inset Formula 
+\[
+\lambda\varGamma\lambda\rightarrow Y^{T^{-1}}\left(U\lambda^{\prime}V^{\dagger}\right)\left(X^{-1}\varGamma Y^{T^{-1}}\right)\left(U\lambda^{\prime}V^{\dagger}\right)X^{-1}
+\]
+
+\end_inset
+
+from whihc we can define the new 
+\begin_inset Formula $\varGamma$
+\end_inset
+
+ as
+\begin_inset Formula 
+\[
+\Gamma^{\prime}=V^{\dagger}X^{-1}\varGamma Y^{T^{-1}}U
+\]
+
+\end_inset
+
+In order to get back 
+\begin_inset Formula $\Gamma^{n_{a}}\lambda^{A}\Gamma^{n_{b}}$
+\end_inset
+
+structure from 
+\begin_inset Formula $\Gamma^{\prime}$
+\end_inset
+
+ we do another SVD.
+ 
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Canonical2.png
+	lyxscale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Canonical-2-site-unitcell"
+
+\end_inset
+
+Canonical form for 
+\begin_inset Formula $n=2$
+\end_inset
+
+ unit cell.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Canonical-2-site-unitcell"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ step 
+\emph on
+iv 
+\emph default
+we can deduce that we need sandwich 
+\begin_inset Formula $\Gamma^{\prime}$
+\end_inset
+
+ with 
+\begin_inset Formula $\lambda^{\prime B}$
+\end_inset
+
+ and the svd it
+\begin_inset Formula 
+\[
+\lambda_{i}^{\prime B}\Gamma_{ij}^{\prime n_{a}n_{b}}\lambda_{j}^{\prime B}\overrightarrow{svd}\sum_{k}P_{ik}^{n_{a}}\lambda_{kk}^{\prime A}Q_{kj}^{n_{b}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\varGamma^{\prime An_{A}}=\lambda^{\prime B^{-1}}P^{n_{a}},\;\varGamma^{\prime Bn_{A}}\lambda^{\prime B^{-1}}
+\]
+
+\end_inset
+
+After this we end up with 2 versions of each 
+\begin_inset Formula $\Gamma^{\prime}$
+\end_inset
+
+ and 4 versions of 
+\begin_inset Formula $\lambda^{\prime A}$
+\end_inset
+
+.
+ I think we need to reshape 
+\begin_inset Formula $\Gamma^{\prime}$
+\end_inset
+
+ 
+\begin_inset Formula 
+\[
+\Gamma_{ij}^{\prime n_{a}n_{b}}\rightarrow\Gamma_{\left(in_{a}\right)\left(jn_{b}\right)}^{\prime}
+\]
+
+\end_inset
+
+now
+\begin_inset Formula 
+\[
+\lambda_{i}^{\prime B}\Gamma_{\left(in_{a}\right)\left(jn_{b}\right)}^{\prime}\lambda_{j}^{\prime B}\;\overrightarrow{svd}\;\sum_{k=1}^{dD}P_{\left(n_{a}i\right)k}\lambda_{kk}^{\prime A}Q_{k\left(n_{b}j\right)}\sim\sum_{k=1}^{D}P_{\left(n_{a}i\right)k}\lambda_{kk}^{\prime A}Q_{k\left(n_{b}j\right)}
+\]
+
+\end_inset
+
+whihc gives us the correct number of 
+\begin_inset Formula $P$
+\end_inset
+
+s and 
+\begin_inset Formula $Q$
+\end_inset
+
+s and a 
+\begin_inset Formula $\lambda_{kk}^{\prime A}$
+\end_inset
+
+ of length 
+\begin_inset Formula $dD$
+\end_inset
+
+ which we can compress down to length 
+\begin_inset Formula $D$
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Subsection
-Infinite Density Matrix Renormalization Group (iDMRG)
+Infinite Density Matrix Renormalization Group 
+\end_layout
+
+\begin_layout Subsection
+(iDMRG)
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Infinite-Density-Matrix"
