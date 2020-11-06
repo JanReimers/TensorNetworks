@@ -24,6 +24,7 @@ class MPO
         virtual       SiteOperator* GetSiteOperator(int isite)      =0;
 
         virtual void   Combine(const MPO* O2);
+        virtual void   Combine(const MPO* O2,double factor);
         virtual double Compress(int Dmax, double epsSV);
         virtual double Compress(const SVCompressorR*);
 };
