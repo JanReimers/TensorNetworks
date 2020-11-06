@@ -75,7 +75,7 @@ ArpackEigenSolver<dcmplx>::SolveG(MatvecT matvec,int N, int Nev,double eps)
     // Arnaldi iteration loop
     do
     {
-        znaupd_c(&IDO,&arI,N,"LM",Nev,eps,&residuals(1),Ncv,&V(1,1)
+        znaupd_c(&IDO,&arI,N,"LR",Nev,eps,&residuals(1),Ncv,&V(1,1)
         ,N,&iParam(1),iPntr,&Workd(1),&Workl(1),Lworkl,&rwork(1),&INFO);
 //        cout << "IDO=" << IDO << endl;
         if (IDO==-1 || IDO==1)
@@ -95,7 +95,7 @@ ArpackEigenSolver<dcmplx>::SolveG(MatvecT matvec,int N, int Nev,double eps)
     Matrix<dcmplx> U(N,Nev);
     dcmplx sigma(0);
     zneupd_c(true, "All", &select(1), &D(1), &U(1,1),N,
-        sigma, &Workev(1), &arI,N,"LM", Nev, eps,
+        sigma, &Workev(1), &arI,N,"LR", Nev, eps,
           &residuals(1), Ncv, &V(1,1),N, &iParam(1), iPntr, &Workd(1), &Workl(1),
           Lworkl, &rwork(1), &INFO );
 
@@ -139,7 +139,7 @@ ArpackEigenSolver<double>::SolveG(MatvecT matvec,int N, int Nev,double eps)
     // Arnaldi iteration loop
     do
     {
-        dnaupd_c(&IDO,&arI,N,"LM",Nev,eps,&residuals(1),Ncv,&V(1,1)
+        dnaupd_c(&IDO,&arI,N,"LR",Nev,eps,&residuals(1),Ncv,&V(1,1)
         ,N,&iParam(1),iPntr,&Workd(1),&Workl(1),Lworkl,&INFO);
 //        cout << "IDO=" << IDO << endl;
         if (IDO==-1 || IDO==1)
@@ -160,7 +160,7 @@ ArpackEigenSolver<double>::SolveG(MatvecT matvec,int N, int Nev,double eps)
     double sigmar(0),sigmai(0);
     char how_many('A');
     dneupd_c(true, &how_many, &select(1), &DR(1),&DI(1), &V(1,1),N,
-        sigmar,sigmai, &Workev(1), &arI,N,"LM", Nev, eps,
+        sigmar,sigmai, &Workev(1), &arI,N,"LR", Nev, eps,
           &residuals(1), Ncv, &V(1,1),N, &iParam(1), iPntr, &Workd(1), &Workl(1),
           Lworkl, &INFO );
 
@@ -229,7 +229,7 @@ ArpackEigenSolver<double>::SolveSym(MatvecT matvec,int N, int Nev,double eps)
     // Arnaldi iteration loop
     do
     {
-      dsaupd_c(&IDO,&arI,N,"LM",Nev,eps,&residuals(1),Ncv,&V(1,1),N,&iParam(1),iPntr,&Workd(1),&Workl(1),Lworkl,&INFO);
+      dsaupd_c(&IDO,&arI,N,"LR",Nev,eps,&residuals(1),Ncv,&V(1,1),N,&iParam(1),iPntr,&Workd(1),&Workl(1),Lworkl,&INFO);
 //        cout << "IDO=" << IDO << endl;
         if (IDO==-1 || IDO==1)
             matvec(N,&Workd(iPntr[0]),&Workd(iPntr[1]));
@@ -247,7 +247,7 @@ ArpackEigenSolver<double>::SolveSym(MatvecT matvec,int N, int Nev,double eps)
     Vector<double> D(Nev+1),Workev(3*Ncv);
     double sigma(0);
     char how_many('A');
-    dseupd_c(true, &how_many, &select(1), &D(1), &V(1,1),N, sigma, &arI,N,"LM", Nev, eps, &residuals(1), Ncv, &V(1,1),N, &iParam(1), iPntr, &Workd(1), &Workl(1),          Lworkl, &INFO );
+    dseupd_c(true, &how_many, &select(1), &D(1), &V(1,1),N, sigma, &arI,N,"LR", Nev, eps, &residuals(1), Ncv, &V(1,1),N, &iParam(1), iPntr, &Workd(1), &Workl(1),          Lworkl, &INFO );
 
     D.SetLimits(Nev,true);
     V.SetLimits(N,Nev,true);
