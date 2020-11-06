@@ -132,6 +132,11 @@ LapackSVDSolver<T>::Solve(const MatrixT& A,double eps, int NumSingularValues)
     //
     //  Now fix up the matrix limits
     //
+    if (NumSingularValues<mn)
+    {
+        s.SetLimits(NumSingularValues,true);
+        mn=NumSingularValues;
+    }
     U .SetLimits(M,mn,true); //Throw away last N-mn columns
     VT.SetLimits(mn,N,true); // Throw away last N-mn rows
     DiagonalMatrix<double> ds(s);
