@@ -64,7 +64,8 @@ class MPSSite
 // Normalization
 //
         void SVDNormalize(Direction lr,SVCompressorC*);
-        void Canonicalize(Direction lr,SVCompressorC*);
+        void Canonicalize1(Direction lr,SVCompressorC*);
+        void Canonicalize2(Direction lr,SVCompressorC*);
 
 //--------------------------------------------------------------------------------------
 //
@@ -114,7 +115,7 @@ private:
     Matrix4CT GetTransferMatrix(Direction lr) const;
     void      Update      (const VectorCT& newAs);
     void      iNormalize(Direction lr); //Use transfer matrix eigenvalue to rescale.
-    static bool     IsUnit(const MatrixCT& m,double eps);
+//    static bool     IsUnit(const MatrixCT& m,double eps);
 
     //
     //  lr is the normalization direction.  For normalization we need to access the right bond.
@@ -136,6 +137,10 @@ private:
     typedef dVectorT::      iterator  dIterT;
     typedef dVectorT::const_iterator cdIterT;
 
+//
+//  NormalizationStatus
+//
+    enum class NormStatus {M,A,B,GammaLeft,GammaRight}; //UnNormalized, Left Normalized, Right Normalized, Vidal Gamma-lambda-Gamma
 //-----------------------------------------------------------------------------------
 //
 //  Internal contraction function
@@ -167,12 +172,13 @@ private:
     mutable MatrixCT itsLeft_Cache ,itsRightCache;  //L/R matrices for <Psi|Psi>
     EigenSolver<dcmplx>* itsEigenSolver;
 
-    int    itsNumUpdates;
-    bool   isFrozen; //Don't refine this site.
-    double itsEmin;
-    double itsGapE;  //Gap to the next excited state.
-    double itsIterDE;
-    Position itsPosition; //Left Bulk or Right
+    NormStatus itsNormStatus; //Indicates what the last norm command did. THis may or may not agree with the current data
+    int        itsNumUpdates;
+    bool       isFrozen; //Don't refine this site.
+    double     itsEmin;
+    double     itsGapE;  //Gap to the next excited state.
+    double     itsIterDE;
+    Position   itsPosition; //Left Bulk or Right
 };
 
 }

@@ -39,6 +39,7 @@ void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
         return;
     }
     MatrixCT A=ReshapeBeforeSVD(lr);
+    cout << "A=" << A << endl;
     LapackSVDSolver<dcmplx> solver;
     int D=Min(A.GetNumRows(),A.GetNumCols());
     if (comp)
@@ -47,25 +48,26 @@ void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
 //        cout << "D Dmax=" << D << " " << Dmax << endl;
         if (Dmax>0 && Dmax<D) D=Dmax;
     }
-    auto [U,s,Vdagger]=solver.Solve(A,D,1e-10); //Solves A=U * s * Vdagger
-//    auto [U,s,Vdagger]=oml_CSVDecomp(ReshapeBeforeSVD(lr)); //Solves A=U * s * Vdagger
+    auto [U,s,Vdagger]=solver.Solve(A,1e-10,D); //Solves A=U * s * Vdagger
     double integratedS2=0.0;
     if (comp) integratedS2=comp->Compress(U,s,Vdagger);
 
     switch (lr)
     {
-        case DRight:
-        {
-            GetBond(lr)->SVDTransfer(lr,integratedS2,s,U);
-            ReshapeAfter_SVD(lr,Vdagger);  //A is now Vdagger
-            break;
-        }
-        case DLeft:
-        {
-            GetBond(lr)->SVDTransfer(lr,integratedS2,s,Vdagger);
-            ReshapeAfter_SVD(lr,U);  //A is now U
-            break;
-        }
+    case DRight:
+    {
+        GetBond(lr)->SVDTransfer(lr,integratedS2,s,U);
+        ReshapeAfter_SVD(lr,Vdagger);  //A is now Vdagger
+        itsNormStatus=NormStatus::B;
+        break;
+    }
+    case DLeft:
+    {
+        GetBond(lr)->SVDTransfer(lr,integratedS2,s,Vdagger);
+        ReshapeAfter_SVD(lr,U);  //A is now U
+        itsNormStatus=NormStatus::A;
+        break;
+    }
     }
     assert(GetNormStatus(1e-12)!='M');
 }
@@ -86,7 +88,7 @@ double   MPSSite::FrobeniusNorm() const
 }
 
 
-void MPSSite::Canonicalize(Direction lr,SVCompressorC* comp)
+void MPSSite::Canonicalize1(Direction lr,SVCompressorC* comp)
 {
     MatrixCT A=ReshapeBeforeSVD(lr);
     auto [U,s,Vdagger]=oml_CSVDecomp(A); //Solves A=U * s * Vdagger  returns V not Vdagger
@@ -95,16 +97,53 @@ void MPSSite::Canonicalize(Direction lr,SVCompressorC* comp)
 
     switch (lr)
     {
+    case DRight:
+    {
+        GetBond(lr)->CanonicalTransfer(lr,integratedS2,s,U);
+        ReshapeAfter_SVD(lr,Vdagger);  //A is now Vdagger
+        itsNormStatus=NormStatus::B;
+        break;
+    }
+    case DLeft:
+    {
+        GetBond(lr)->CanonicalTransfer(lr,integratedS2,s,Vdagger);
+        ReshapeAfter_SVD(lr,U);  //A is now U
+        itsNormStatus=NormStatus::A;
+        break;
+    }
+    }
+}
+
+void MPSSite::Canonicalize2(Direction lr,SVCompressorC* comp)
+{
+    Bond* bond=GetBond(Invert(lr));
+    assert(bond);
+    DiagonalMatrixRT lambda=bond->GetSVs();
+    assert(lambda.size()==itsD1);
+    assert(Min(lambda)>1e-10);
+    DiagonalMatrixRT linv=1.0/lambda;
+
+    switch (lr)
+    {
         case DRight:
         {
-            GetBond(lr)->CanonicalTransfer(lr,integratedS2,s,U);
-            ReshapeAfter_SVD(lr,Vdagger);  //A is now Vdagger
+            for (int n=0; n<itsd; n++)
+                itsMs[n]=MatrixCT(itsMs[n]*linv);
+//            for (auto m:itsMs) m=MatrixCT(m*linv);
+            itsNormStatus=NormStatus::GammaRight;
             break;
         }
         case DLeft:
         {
-            GetBond(lr)->CanonicalTransfer(lr,integratedS2,s,Vdagger);
-            ReshapeAfter_SVD(lr,U);  //A is now U
+            for (int n=0; n<itsd; n++)
+                itsMs[n]=MatrixCT(linv*itsMs[n]);
+//            for (auto m:itsMs)
+//            {
+//                cout << m << endl;
+//                m=MatrixCT(linv*m);
+//                cout << m << endl;
+//            }
+            itsNormStatus=NormStatus::GammaLeft;
             break;
         }
     }

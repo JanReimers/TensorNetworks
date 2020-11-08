@@ -21,6 +21,7 @@ class iTEBDStateImp : public virtual iTEBDState,
         iTEBDStateImp(int L,double S, int D,double normEps,double epsSV);
         virtual ~iTEBDStateImp();
         virtual void InitializeWith(State);
+        virtual void ReCenter(int isite);
  //--------------------------------------------------------------------------------------
 //
 //  Access to information
@@ -33,42 +34,51 @@ class iTEBDStateImp : public virtual iTEBDState,
 //
         virtual void Canonicalize(Direction);  //Vidals L-G-L-G-L canonical form
         virtual void Normalize(Direction LR);
-        virtual void Orthogonalize(int isite);
+        virtual void Orthogonalize();
 
-        virtual double GetExpectation (int isite, const MPO* o) const;
-        virtual double GetExpectation (int isite, const Matrix4RT& Hlocal) const;
-        virtual void Apply(int isite,const Matrix4RT& expH,SVCompressorC*);
+        virtual double GetExpectation (const MPO* o) const;
+        virtual double GetExpectation (const Matrix4RT& Hlocal) const;
+        virtual void Apply(const Matrix4RT& expH,SVCompressorC*);
         virtual void Report(std::ostream&) const;
+        virtual std::string GetNormStatus () const {return MPSImp::GetNormStatus();};
 
     protected:
         using dVectorT=MPSSite::dVectorT;
         typedef std::tuple<dVectorT,DiagonalMatrixRT> GLType;
 
         int GetModSite(int isite) const;
-        const DiagonalMatrixRT& GetLambda(int isite) const;
-        const         MatrixCT& GetGamma (int isite,int n) const ;
+//        const DiagonalMatrixRT& GetLambda(int isite) const;
+//        const         MatrixCT& GetGamma (int isite,int n) const ;
         Matrix4CT GetTransferMatrix() const;
         GLType Orthogonalize(const dVectorT& gamma, const DiagonalMatrixRT& lambda);
-        bool TestOrthogonal(int site) ;
+        bool TestOrthogonal() ;
         Matrix4CT GetTransferMatrix(const dVectorT& M);
 
         struct Sites
         {
+            Sites();
             Sites(int leftSite,iTEBDStateImp*);
             MPSSite* siteA;
             MPSSite* siteB;
             Bond*    bondA;
             Bond*    bondB;
-            dVectorT& MA;
-            dVectorT& MB;
-            const DiagonalMatrixRT& lambdaA;
-            const DiagonalMatrixRT& lambdaB;
+            dVectorT* GammaA;  //Owned by MPSImp
+            dVectorT* GammaB;  //Owned by MPSImp
+            const DiagonalMatrixRT* lambdaA; //Owned by bonds
+            const DiagonalMatrixRT* lambdaB; //Owned by bonds
         };
 
-
+        const dVectorT& GammaA() const {return *s1.GammaA;}
+        const dVectorT& GammaB() const {return *s1.GammaB;}
+              dVectorT& GammaA()       {return *s1.GammaA;}
+              dVectorT& GammaB()       {return *s1.GammaB;}
+        const DiagonalMatrixRT& lambdaA() const {return *s1.lambdaA;}
+        const DiagonalMatrixRT& lambdaB() const {return *s1.lambdaB;}
 
     private:
         void InitSitesAndBonds(int D, double epsSV);
+
+        Sites s1; //ReCenter member function will build this structure.
 };
 
 }

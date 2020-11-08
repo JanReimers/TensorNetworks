@@ -29,6 +29,7 @@ MPSSite::MPSSite(Position lbr, Bond* leftBond, Bond* rightBond,int d, int D1, in
     , itsLeft_Cache (1,1)
     , itsRightCache (1,1)
     , itsEigenSolver(new LapackEigenSolver<dcmplx>())
+    , itsNormStatus(NormStatus::M)
     , itsNumUpdates(0)
     , isFrozen(false)
     , itsEmin(0.0)
@@ -74,6 +75,7 @@ void MPSSite::CloneState(const MPSSite* psi2)
     itsLeft_Cache =psi2->itsLeft_Cache;
     itsRightCache =psi2->itsRightCache;
     isFrozen      =psi2->isFrozen;
+    itsNormStatus =psi2->itsNormStatus;
 
 }
 
@@ -209,13 +211,13 @@ bool MPSSite::IsNormalized(Direction lr,double eps) const
     return IsUnit(GetNorm(lr),eps);
 }
 
-bool MPSSite::IsUnit(const MatrixCT& m,double eps)
-{
-    assert(m.GetNumRows()==m.GetNumCols());
-    int N=m.GetNumRows();
-    MatrixCT I(N,N);
-    Unit(I);
-    return Max(fabs(m-I))<eps;
-}
+//bool MPSSite::IsUnit(const MatrixCT& m,double eps)
+//{
+//    assert(m.GetNumRows()==m.GetNumCols());
+//    int N=m.GetNumRows();
+//    MatrixCT I(N,N);
+//    Unit(I);
+//    return Max(fabs(m-I))<eps;
+//}
 
 } //namespace

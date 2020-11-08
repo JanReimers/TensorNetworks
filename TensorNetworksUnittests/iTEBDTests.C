@@ -59,47 +59,68 @@ public:
     TensorNetworks::iTEBDState*  itsState;
 };
 
-
-
-TEST_F(iTEBDTests,TestApplyIdentity)
+TEST_F(iTEBDTests,TestLeftNormalize)
 {
-    int UnitCell=2,D=8;
-    double S=0.5,dt=0.5,epsSVD=0.0;
+    int UnitCell=2,D=2;
+    double S=0.5,epsSVD=0.0;
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
-    itsState->Normalize(TensorNetworks::DLeft);
-    itsState->Normalize(TensorNetworks::DLeft);
-    itsState->Report(cout);
-    TensorNetworks::SVCompressorC* mps_compressor =itsFactory->MakeMPSCompressor(D,epsSVD);
-//    MPO* SS=MakeEnergyMPO(UnitCell,S);
-//    SS->Report(cout);
-//    double E=itsState->GetExpectation(SS);
-//    cout << "E=" << E << endl;
-
-    Matrix4RT Hlocal=itsH->BuildLocalMatrix();
-    double E1=itsState->GetExpectation(1,Hlocal);
-    double E2=itsState->GetExpectation(2,Hlocal);
-    cout << "E1,E2=" << E1 << " " << E2 << endl;
-    for (int it=1;it<=8;it++)
-    {
-        Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal);
-        //cout << std::setprecision(6) << "expH=" << expH << endl;
-        for (int i=1;i<10;i++)
-        {
-            itsState->Apply(2,expH,mps_compressor);
-//            itsState->Normalize(TensorNetworks::DLeft);
-            itsState->Apply(1,expH,mps_compressor);
-            itsState->Normalize(TensorNetworks::DLeft);
-//            itsState->Orthogonalize(1);
-//            itsState->Orthogonalize(2);
-            itsState->Report(cout);
-            cout << std::fixed << std::setprecision(5) << "E1=" << itsState->GetExpectation(1,Hlocal) << endl;
-            cout << std::fixed << std::setprecision(5) << "E2=" << itsState->GetExpectation(2,Hlocal) << endl;
-//            cout << std::fixed << std::setprecision(5) << "E3=" << itsState->GetExpectation(1,itsH) << endl;
-//            cout << std::fixed << std::setprecision(5) << "E4=" << itsState->GetExpectation(2,itsH) << endl;
-        }
-        dt/=2.0;
-    }
-
+    EXPECT_EQ(itsState->GetNormStatus(),"AA");
 }
+
+TEST_F(iTEBDTests,TestRightNormalize)
+{
+    int UnitCell=2,D=2;
+    double S=0.5,epsSVD=0.0;
+    Setup(UnitCell,S,D,epsSVD);
+    itsState->InitializeWith(TensorNetworks::Random);
+    itsState->Canonicalize(TensorNetworks::DRight);
+    EXPECT_EQ(itsState->GetNormStatus(),"BB");
+}
+
+
+//TEST_F(iTEBDTests,TestApplyIdentity)
+//{
+//    int UnitCell=2,D=8;
+//    double S=0.5,dt=0.2,epsSVD=0.0;
+//    Setup(UnitCell,S,D,epsSVD);
+//    itsState->InitializeWith(TensorNetworks::Random);
+//    itsState->Canonicalize(TensorNetworks::DLeft);
+//    itsState->Normalize(TensorNetworks::DLeft);
+//    itsState->Normalize(TensorNetworks::DLeft);
+//    itsState->Report(cout);
+//    TensorNetworks::SVCompressorC* mps_compressor =itsFactory->MakeMPSCompressor(D,epsSVD);
+////    MPO* SS=MakeEnergyMPO(UnitCell,S);
+////    SS->Report(cout);
+////    double E=itsState->GetExpectation(SS);
+////    cout << "E=" << E << endl;
+//
+//    Matrix4RT Hlocal=itsH->BuildLocalMatrix();
+//    double E1=itsState->GetExpectation(Hlocal);
+//    double E2=itsState->GetExpectation(Hlocal);
+//    cout << "E1,E2=" << E1 << " " << E2 << endl;
+//    for (int it=1;it<=8;it++)
+//    {
+//        Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal);
+//        //cout << std::setprecision(6) << "expH=" << expH << endl;
+//        for (int i=1;i<10;i++)
+//        {
+//            itsState->ReCenter(1);
+//            itsState->Apply(expH,mps_compressor);
+////            itsState->Normalize(TensorNetworks::DLeft);
+//            cout << std::fixed << std::setprecision(5) << "E1=" << itsState->GetExpectation(Hlocal) << endl;
+//            itsState->ReCenter(2);
+//            itsState->Apply(expH,mps_compressor);
+//            itsState->Normalize(TensorNetworks::DLeft);
+////            itsState->Orthogonalize(1);
+////            itsState->Orthogonalize(2);
+//            itsState->Report(cout);
+//            cout << std::fixed << std::setprecision(5) << "E2=" << itsState->GetExpectation(Hlocal) << endl;
+////            cout << std::fixed << std::setprecision(5) << "E3=" << itsState->GetExpectation(1,itsH) << endl;
+////            cout << std::fixed << std::setprecision(5) << "E4=" << itsState->GetExpectation(2,itsH) << endl;
+//        }
+//        dt/=2.0;
+//    }
+//
+//}

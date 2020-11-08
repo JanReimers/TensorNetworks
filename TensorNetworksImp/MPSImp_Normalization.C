@@ -20,10 +20,15 @@ void MPSImp::NormalizeSite(Direction lr,int isite)
         UpdateBondData(bond_index);
 }
 
-void MPSImp::CanonicalizeSite(Direction lr,int isite,SVCompressorC* comp)
+void MPSImp::CanonicalizeSite1(Direction lr,int isite,SVCompressorC* comp)
 {
     CheckSiteNumber(isite);
-    itsSites[isite]->Canonicalize(lr,comp);
+    itsSites[isite]->Canonicalize1(lr,comp);
+}
+void MPSImp::CanonicalizeSite2(Direction lr,int isite,SVCompressorC* comp)
+{
+    CheckSiteNumber(isite);
+    itsSites[isite]->Canonicalize2(lr,comp);
 }
 
 void MPSImp::NormalizeAndCompress(Direction LR,SVCompressorC* comp)

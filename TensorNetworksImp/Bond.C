@@ -112,7 +112,7 @@ void Bond::CanonicalTransfer(Direction lr,double integratedS2,const DiagonalMatr
 {
     SetSingularValues(s,integratedS2);
     assert(GetSite(lr));
-    GetSite(lr)->SVDTransfer(lr,UV);
+//    GetSite(lr)->SVDTransfer(lr,UV);
 }
 
 void Bond::Report(std::ostream& os) const

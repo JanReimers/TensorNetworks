@@ -46,7 +46,8 @@ public:
 //  Normalization members with and without SVD compression
 //
         virtual void MixedCanonical(int isite); //Mixed Canonical normalization
-        virtual void CanonicalizeSite(Direction LR, int isite,SVCompressorC*); //...lambda-Gamma-lambda-Gamma-lambda...
+        virtual void CanonicalizeSite1(Direction LR, int isite,SVCompressorC*); //...lambda-A-lambda-A-lambda...
+        virtual void CanonicalizeSite2(Direction LR, int isite,SVCompressorC*); //...lambda-Gamma-lambda-Gamma-lambda...
 
         virtual void NormalizeAndCompress(Direction LR,SVCompressorC*);
 //--------------------------------------------------------------------------------------
@@ -92,6 +93,7 @@ public:
 protected:
     // Constructor used for iTEBD
         MPSImp(int L, double S, Direction lr,double normEps);
+        void   NormalizeAndCompressSite  (Direction lr,int isite,SVCompressorC*);
 //--------------------------------------------------------------------------------------
 //
 //  Loop Control
@@ -137,7 +139,6 @@ private:
         void   Refine(Direction lr,const Hamiltonian*,const Epsilons&,int isite); //Minimize energy WRT the Ms in one site.
         void   Sweep (Direction lr,const Hamiltonian*,const Epsilons&);
         void   NormalizeSite             (Direction lr,int isite);
-        void   NormalizeAndCompressSite  (Direction lr,int isite,SVCompressorC*);
 //-------------------------------------------------------------------------------------
 //
 //  hooks for derived classes to do live updates for UI interfaces or graphs

@@ -18,6 +18,7 @@ iTEBDStateImp::iTEBDStateImp(int L,double S, int D,double normEps,double epsSV)
     : MPSImp(L,S,DLeft,normEps)
 {
     InitSitesAndBonds(D,epsSV);
+    ReCenter(1);
 }
 
 iTEBDStateImp::~iTEBDStateImp()
@@ -55,6 +56,38 @@ void iTEBDStateImp::InitializeWith(State s)
     MPSImp::InitializeWith(s);
 }
 
+void iTEBDStateImp::ReCenter(int isite)
+{
+    s1=Sites(isite,this);
+}
+
+
+iTEBDStateImp::Sites::Sites(int leftSite, iTEBDStateImp* iTEBD)
+    : siteA(iTEBD->itsSites[iTEBD->GetModSite(leftSite  )])
+    , siteB(iTEBD->itsSites[iTEBD->GetModSite(leftSite+1)])
+    , bondA(siteA->itsRightBond)
+    , bondB(siteB->itsRightBond)
+    , GammaA(&siteA->itsMs)
+    , GammaB(&siteB->itsMs)
+    , lambdaA(&bondA->GetSVs())
+    , lambdaB(&bondB->GetSVs())
+{
+
+}
+
+iTEBDStateImp::Sites::Sites()
+    : siteA(nullptr)
+    , siteB(nullptr)
+    , bondA(nullptr)
+    , bondB(nullptr)
+//    , GammaA()
+//    , GammaB()
+//    , lambdaA()
+//    , lambdaB()
+{
+
+}
+
 
 
 void iTEBDStateImp::Normalize(Direction lr)
@@ -89,7 +122,10 @@ void iTEBDStateImp::Normalize(Direction lr)
 void iTEBDStateImp::Canonicalize(Direction lr)
 {
     ForLoop(lr)
-    MPSImp::CanonicalizeSite(lr,ia,0);
+      MPSImp::CanonicalizeSite1(lr,ia,0); //Stores A1-lambda1-A2-lambda2
+    ForLoop(lr)
+      MPSImp::CanonicalizeSite2(lr,ia,0); //Convert to Gamma1-lambda1-Gamma2-lambda2
+
 }
 
 //void iTEBDStateImp::NormalizeAndCompress(Direction LR,int Dmax,double epsMin);
@@ -101,36 +137,24 @@ int iTEBDStateImp::GetModSite(int isite) const
     return modSite;
 }
 
-const DiagonalMatrixRT&  iTEBDStateImp::GetLambda(int isite) const
-{
-    const MPSSite* site=itsSites[GetModSite(isite  )];
-    assert(site);
-    const Bond*    bond=site->itsRightBond;
-    assert(bond);
-    return bond->itsSingularValues;
-}
+//const DiagonalMatrixRT&  iTEBDStateImp::GetLambda(int isite) const
+//{
+//    const MPSSite* site=itsSites[GetModSite(isite  )];
+//    assert(site);
+//    const Bond*    bond=site->itsRightBond;
+//    assert(bond);
+//    return bond->itsSingularValues;
+//}
+//
+//const MatrixCT& iTEBDStateImp::GetGamma (int isite,int n) const
+//{
+//    assert(n>=0);
+//    assert(n<itsd);
+//    const MPSSite* site=itsSites[GetModSite(isite  )];
+//    assert(site);
+//    return site->itsMs[n];
+//}
 
-const MatrixCT& iTEBDStateImp::GetGamma (int isite,int n) const
-{
-    assert(n>=0);
-    assert(n<itsd);
-    const MPSSite* site=itsSites[GetModSite(isite  )];
-    assert(site);
-    return site->itsMs[n];
-}
-
-iTEBDStateImp::Sites::Sites(int leftSite, iTEBDStateImp* iTEBD)
-    : siteA(iTEBD->itsSites[iTEBD->GetModSite(leftSite  )])
-    , siteB(iTEBD->itsSites[iTEBD->GetModSite(leftSite+1)])
-    , bondA(siteA->itsRightBond)
-    , bondB(siteB->itsRightBond)
-    , MA(siteA->itsMs)
-    , MB(siteB->itsMs)
-    , lambdaA(bondA->GetSVs())
-    , lambdaB(bondB->GetSVs())
-{
-
-}
 
 MatrixCT ReshapeForSVD(int d,const MPSSite::dVectorT& M)
 {
@@ -151,17 +175,16 @@ MatrixCT ReshapeForSVD(int d,const MPSSite::dVectorT& M)
     return ret.Flatten();
 }
 
-void iTEBDStateImp::Orthogonalize(int isite)
+void iTEBDStateImp::Orthogonalize()
 {
-    Sites s(isite,this);
     dVectorT gamma(itsd*itsd);
     int nab=0;
     for (int nb=0; nb<itsd; nb++)
         for (int na=0; na<itsd; na++,nab++)
-            gamma[na+itsd*nb]=s.MA[na]*s.lambdaA*s.MB[nb];
-    auto [gammap,lambdap]=Orthogonalize(gamma,s.lambdaB);
+            gamma[na+itsd*nb]=GammaA()[na]*lambdaA()*GammaB()[nb];
+    auto [gammap,lambdap]=Orthogonalize(gamma,lambdaB());
 
-    s.bondB->SetSingularValues(lambdap,0.0);
+    s1.bondB->SetSingularValues(lambdap,0.0);
     DiagonalMatrixRT lbinv=1.0/lambdap; //inverse of LambdaB
 //    cout << "lambdap* 1/lambdap=" << lambdap*lbinv << endl;
     //
@@ -173,11 +196,11 @@ void iTEBDStateImp::Orthogonalize(int isite)
 
     MatrixCT bgb4=ReshapeForSVD(itsd,bgb);
 
-    int D=s.lambdaA.size();
+    int D=lambdaA().size();
     SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
     auto [P,lambdaA_prime,Q]=svd_solver->Solve(bgb4,1e-13,D); //only keep D svs.
     assert(Max(fabs(P*lambdaA_prime*Q-bgb4))<1e-13);
-    s.bondA->SetSingularValues(lambdaA_prime,0.0);
+    s1.bondA->SetSingularValues(lambdaA_prime,0.0);
     cout << std::fixed << "lambdaB_prime" << lambdap.GetDiagonal() << endl;
     cout << std::fixed << "lambdaA_prime" << lambdaA_prime.GetDiagonal() << endl;
 //    cout << "P=" << P << endl;
@@ -192,12 +215,12 @@ void iTEBDStateImp::Orthogonalize(int isite)
         for (int j=1; j<=D; j++)
         {
 //            cout << n << " " << i << " " << j << " " << n*D+i << " " << n*D+j << endl;
-            s.MA[n](i,j)=lbinv(i)*P(n*D+i,       j);
-            s.MB[n](i,j)=         Q(       i,n*D+j)*lbinv(j);
+            GammaA()[n](i,j)=lbinv(i)*P(n*D+i,       j);
+            GammaB()[n](i,j)=         Q(       i,n*D+j)*lbinv(j);
         }
-//        s.MA[n]=lbinv*s.MA[n];
-//        s.MB[n]=s.MB[n]*lbinv;
-//        cout << "n,GA,GB=" << n << " " << s.MA[n] << " " << s.MB[n]<< endl;
+//        GammaA()[n]=lbinv*GammaA()[n];
+//        GammaB()[n]=GammaB()[n]*lbinv;
+//        cout << "n,GA,GB=" << n << " " << GammaA()[n] << " " << GammaB()[n]<< endl;
     }
 
     delete svd_solver;
@@ -206,13 +229,13 @@ void iTEBDStateImp::Orthogonalize(int isite)
 //    nab=0;
 //    for (int nb=0; nb<itsd; nb++)
 //        for (int na=0; na<itsd; na++,nab++)
-//            gammap1[na+itsd*nb]=s.MA[na]*lambdaA_prime*s.MB[nb];
+//            gammap1[na+itsd*nb]=GammaA()[na]*lambdaA_prime*GammaB()[nb];
 //
 //    for (int n=0;n<itsd*itsd;n++)
 //        cout << "gammap1-gammap=" << Max(fabs(gammap1[n] - gammap[n])) << endl;
 
 
-    assert(TestOrthogonal(1));
+    assert(TestOrthogonal());
 }
 
 MPSSite::dVectorT operator*(const MPSSite::dVectorT& gamma, const DiagonalMatrixRT& lambda)
@@ -263,17 +286,16 @@ MatrixCT operator*(const MatrixCT& Vl,const Matrix4CT& E)
     return Evl;
 }
 
-bool iTEBDStateImp::TestOrthogonal(int isite)
+bool iTEBDStateImp::TestOrthogonal()
 {
-    Sites s(isite,this);
     dVectorT gamma(itsd*itsd);
-    int D=s.lambdaA.size();
+    int D=lambdaA().size();
     int nab=0;
     for (int na=0; na<itsd; na++)
         for (int nb=0; nb<itsd; nb++,nab++)
-            gamma[nab]=s.MA[na]*s.lambdaA*s.MB[nb];
-    Matrix4CT Er=GetTransferMatrix(gamma*s.lambdaB);
-    Matrix4CT El=GetTransferMatrix(s.lambdaB*gamma);
+            gamma[nab]=GammaA()[na]*lambdaA()*GammaB()[nb];
+    Matrix4CT Er=GetTransferMatrix(gamma*lambdaB());
+    Matrix4CT El=GetTransferMatrix(lambdaB()*gamma);
     MatrixCT I(D,D); //Right ei
     Unit(I);
     MatrixCT ErI=Er*I;
@@ -452,41 +474,27 @@ Matrix4CT iTEBDStateImp::GetTransferMatrix() const
     return E;
 }
 
-void iTEBDStateImp::Apply(int isite,const Matrix4RT& expH,SVCompressorC* comp)
+void iTEBDStateImp::Apply(const Matrix4RT& expH,SVCompressorC* comp)
 {
     assert(comp);
-    MPSSite* siteA=itsSites[GetModSite(isite  )];
-    Bond*    bondA=siteA->itsRightBond;
-    MPSSite* siteB=itsSites[GetModSite(isite+1)];
-    Bond*    bondB=siteB->itsRightBond;
-    assert(siteA);
-    assert(siteB);
-    assert(bondA);
-    assert(bondB);
-    assert(siteA!=siteB);
-    assert(bondA!=bondB);
-    MPSSite::dVectorT& MA(siteA->itsMs);
-    MPSSite::dVectorT& MB(siteB->itsMs);
-    const DiagonalMatrixRT& lambdaA=bondA->GetSVs();
-    const DiagonalMatrixRT& lambdaB=bondB->GetSVs();
     //
-    //  New we need to contract   Theta(nA,i1,nB,i3) =
+    //  We need to contract   Theta(nA,i1,nB,i3) =
     //                         sB(i1)*MA(mA,i1,i2)*sA(i2)*MB(mB,i2,i3)*sB(i3)
     //                                   |                   |
     //                              expH(mA,nA,              mB,nB)
     //
     //  Make sure everything is square
-    assert(siteA->GetD2()==siteB->GetD1());
-    assert(siteA->GetD1()==siteB->GetD2());
-    assert(siteA->GetD1()==siteA->GetD2());
-    int D=siteA->GetD1();
+    assert(s1.siteA->GetD2()==s1.siteB->GetD1());
+    assert(s1.siteA->GetD1()==s1.siteB->GetD2());
+    assert(s1.siteA->GetD1()==s1.siteA->GetD2());
+    int D=s1.siteA->GetD1();
     Matrix4CT Theta(itsd,D,itsd,D);
     Theta.Fill(0.0);
 
     for (int ma=0; ma<itsd; ma++)
         for (int mb=0; mb<itsd; mb++)
         {
-            MatrixCT theta13=lambdaB*MA[ma]*lambdaA*MB[mb]*lambdaB;
+            MatrixCT theta13=lambdaB()*GammaA()[ma]*lambdaA()*GammaB()[mb]*lambdaB();
             for (int na=0; na<itsd; na++)
                 for (int nb=0; nb<itsd; nb++)
                     for (int i1=1; i1<=D; i1++)
@@ -519,16 +527,16 @@ void iTEBDStateImp::Apply(int isite,const Matrix4RT& expH,SVCompressorC* comp)
     cout << "sums1,sums2,s2/s1=" << sums1 << " " << sums2 << " " << sums2/sums1 << endl;
 //    cout << "After compression U=" << U.GetLimits() << endl;
     s/=sqrt(sums2);
-    bondA->SetSingularValues(s,integratedS2); //No SVs were thrown away (yet!)
+    s1.bondA->SetSingularValues(s,integratedS2); //No SVs were thrown away (yet!)
 
     int nai1=1;
     for (int i1=1; i1<=D; i1++)
         for (int na=0; na<itsd; na++,nai1++)
             for (int i2=1; i2<=D; i2++)
             {
-                assert(lambdaB(i1,i1)>1e-10);
+                assert(lambdaB()(i1,i1)>1e-10);
 //                cout << na << " " << i1 << " " << i2 << " " << nai1 << " " << lambdaB(i1,i1) << endl;
-                MA[na](i1,i2)=U(nai1,i2)/lambdaB(i1,i1);
+                GammaA()[na](i1,i2)=U(nai1,i2)/lambdaB()(i1,i1);
             }
 //    cout << "-----------------------------------------------------------------------------" << endl;
     int nbi2=1;
@@ -536,9 +544,9 @@ void iTEBDStateImp::Apply(int isite,const Matrix4RT& expH,SVCompressorC* comp)
         for (int nb=0; nb<itsd; nb++,nbi2++)
             for (int i2=1; i2<=D; i2++)
             {
-                assert(lambdaB(i3,i3)>1e-10);
+                assert(lambdaB()(i3,i3)>1e-10);
 //                cout << nb << " " << i2 << " " << i3 << " " << nbi2 << " " << lambdaB(i3,i3) << endl;
-                MB[nb](i2,i3)=Vdagger(i2,nbi2)/lambdaB(i3,i3);
+                GammaB()[nb](i2,i3)=Vdagger(i2,nbi2)/lambdaB()(i3,i3);
             }
 
 //    cout << "-----------------------------------------------------------------------------" << endl;
@@ -549,27 +557,25 @@ void iTEBDStateImp::Apply(int isite,const Matrix4RT& expH,SVCompressorC* comp)
 
 }
 
-double iTEBDStateImp::GetExpectation (int isite, const Matrix4RT& Hlocal) const
+double iTEBDStateImp::GetExpectation (const Matrix4RT& Hlocal) const
 {
-    Sites s(isite,const_cast<iTEBDStateImp*>(this));
-
-    int D=s.siteA->GetD1();
-    assert(D==s.siteA->GetD2());
-    assert(D==s.siteB->GetD1());
-    assert(D==s.siteB->GetD2());
+    int D=s1.siteA->GetD1();
+    assert(D==s1.siteA->GetD2());
+    assert(D==s1.siteB->GetD1());
+    assert(D==s1.siteB->GetD2());
 
     Matrix4CT Eo(D,D,D,D);
     Eo.Fill(0);
     for (int na=0; na<itsd; na++)
         for (int nb=0; nb<itsd; nb++)
         {
-            MatrixCT theta13_n=s.MA[na]*s.lambdaA*s.MB[nb]*s.lambdaB;
+            MatrixCT theta13_n=GammaA()[na]*lambdaA()*GammaB()[nb]*lambdaB();
             assert(theta13_n.GetNumRows()==D);
             assert(theta13_n.GetNumCols()==D);
             for (int ma=0; ma<itsd; ma++)
                 for (int mb=0; mb<itsd; mb++)
                 {
-                    MatrixCT theta13_m=conj(s.MA[ma])*s.lambdaA*conj(s.MB[mb])*s.lambdaB;
+                    MatrixCT theta13_m=conj(GammaA()[ma])*lambdaA()*conj(GammaB()[mb])*lambdaB();
                     assert(theta13_m.GetNumRows()==D);
                     assert(theta13_m.GetNumCols()==D);
                     for (int i1=1; i1<=D; i1++)
@@ -625,15 +631,13 @@ double iTEBDStateImp::GetExpectation (int isite, const Matrix4RT& Hlocal) const
 
 }
 
-double iTEBDStateImp::GetExpectation (int isite,const MPO* o) const
+double iTEBDStateImp::GetExpectation (const MPO* o) const
 {
     assert(o->GetL()==2);
-    Sites s(isite,const_cast<iTEBDStateImp*>(this));
-
-    int D=s.siteA->GetD1();
-    assert(D==s.siteA->GetD2());
-    assert(D==s.siteB->GetD1());
-    assert(D==s.siteB->GetD2());
+    int D=s1.siteA->GetD1();
+    assert(D==s1.siteA->GetD2());
+    assert(D==s1.siteB->GetD1());
+    assert(D==s1.siteB->GetD2());
 
     const SiteOperator* soA=o->GetSiteOperator(1);
     const SiteOperator* soB=o->GetSiteOperator(2);
@@ -649,7 +653,7 @@ double iTEBDStateImp::GetExpectation (int isite,const MPO* o) const
     for (int na=0; na<itsd; na++)
         for (int nb=0; nb<itsd; nb++)
         {
-            MatrixCT theta13_n=s.MA[na]*s.lambdaA*s.MB[nb]*s.lambdaB;
+            MatrixCT theta13_n=GammaA()[na]*lambdaA()*GammaB()[nb]*lambdaB();
             assert(theta13_n.GetNumRows()==D);
             assert(theta13_n.GetNumCols()==D);
             for (int ma=0; ma<itsd; ma++)
@@ -665,7 +669,7 @@ double iTEBDStateImp::GetExpectation (int isite,const MPO* o) const
                     for (int w2=1; w2<=DwA2; w2++)
                         Omn+=WAmn(1,w2)*WBmn(w2,1);
 
-                    MatrixCT theta13_m=conj(s.MA[ma])*s.lambdaA*conj(s.MB[mb])*s.lambdaB;
+                    MatrixCT theta13_m=conj(GammaA()[ma])*lambdaA()*conj(GammaB()[mb])*lambdaB();
                     assert(theta13_m.GetNumRows()==D);
                     assert(theta13_m.GetNumCols()==D);
                     for (int i1=1; i1<=D; i1++)
