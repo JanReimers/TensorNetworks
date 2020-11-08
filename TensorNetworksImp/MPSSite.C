@@ -171,14 +171,20 @@ void MPSSite::NewBondDimensions(int D1, int D2, bool saveData)
     itsD2=D2;
 }
 
+bool MPSSite::IsNormalized(Direction lr,double eps) const
+{
+    return IsUnit(GetNorm(lr),eps);
+}
 
+bool MPSSite::IsCanonical(Direction lr,double eps) const
+{
+    return IsUnit(GetCanonicalNorm(lr),eps);
+}
 
 char MPSSite::GetNormStatus(double eps) const
 {
-//    StreamableObject::SetToPretty();
-//    for (int id=0;id<itsd; id++)
-//        cout << "A[" << id << "]=" << itsAs[id] << endl;
     char ret;
+
     if (IsNormalized(DLeft,eps))
     {
         if (IsNormalized(DRight,eps))
@@ -189,7 +195,18 @@ char MPSSite::GetNormStatus(double eps) const
     else if (IsNormalized(DRight,eps))
         ret='B';
     else
-        ret='M';
+    {
+        bool cl=IsCanonical(DLeft ,eps);
+        bool cr=IsCanonical(DRight,eps);
+        if (cl && cr)
+            ret='G';
+        else if (cl && !cr)
+            ret='l';
+        else if (cr && !cl)
+            ret='r';
+        else
+            ret='M';
+    }
 
     return ret;
 }
@@ -206,10 +223,6 @@ void MPSSite::Report(std::ostream& os) const
        ;
 }
 
-bool MPSSite::IsNormalized(Direction lr,double eps) const
-{
-    return IsUnit(GetNorm(lr),eps);
-}
 
 //bool MPSSite::IsUnit(const MatrixCT& m,double eps)
 //{

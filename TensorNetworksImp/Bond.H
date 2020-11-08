@@ -13,7 +13,7 @@ class Bond
 {
 
    public:
-        Bond(double epsSV);
+        Bond(int D, double epsSV);
         virtual ~Bond();
         void CloneState(const Bond* b2);
         void SetSites(MPSSite* left, MPSSite* right);

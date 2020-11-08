@@ -7,8 +7,9 @@
 namespace TensorNetworks
 {
 
-Bond::Bond(double epsSV)
-    : itsEpsSV(epsSV)
+Bond::Bond(int D, double epsSV)
+    : itsSingularValues(D)
+    , itsEpsSV(epsSV)
     , itsBondEntropy(0.0)
     , itsMinSV(0.0)
     , itsIntegratedS2(-99)
@@ -17,6 +18,8 @@ Bond::Bond(double epsSV)
     , itsLeft_Site(0)
     , itsRightSite(0)
 {
+    assert(D>0);
+    Fill(itsSingularValues,1.0/D);  //Start with maximum entanglement.
 }
 
 Bond::~Bond()

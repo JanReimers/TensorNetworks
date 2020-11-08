@@ -84,12 +84,41 @@ MatrixCT MPSSite::GetNorm(Direction lr) const
     MatrixCT ret;
     switch(lr)
     {
-    case DLeft:
-    {
-        ret.SetLimits(itsD2,itsD2);
-        Fill(ret,std::complex<double>(0.0));
-        if (itsNormStatus==NormStatus::GammaLeft)
+        case DLeft:
         {
+            ret.SetLimits(itsD2,itsD2);
+            Fill(ret,std::complex<double>(0.0));
+            //
+            //  Sum_ip A^t(id) * A(id)
+            //
+            for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
+                ret+=conj(Transpose((*id)))*(*id);
+            break;
+        }
+        case DRight:
+        {
+            ret.SetLimits(itsD1,itsD1);
+            Fill(ret,std::complex<double>(0.0));
+            //
+            //  Sum_ip B(id)*B^t(id)
+            //
+            for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
+                ret+=(*id)*conj(Transpose((*id)));
+            break;
+        }
+    }
+    return ret;
+}
+
+MatrixCT MPSSite::GetCanonicalNorm(Direction lr) const
+{
+    MatrixCT ret;
+    switch(lr)
+    {
+        case DLeft:
+        {
+            ret.SetLimits(itsD2,itsD2);
+            Fill(ret,std::complex<double>(0.0));
             const DiagonalMatrixRT& lambda=itsLeft_Bond->GetSVs();
             //
             //  Sum_ip A^t(id) * gamma^2 * A(id)
@@ -97,40 +126,20 @@ MatrixCT MPSSite::GetNorm(Direction lr) const
             for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
                 ret+=conj(Transpose((*id)))*lambda*lambda*(*id);
 
+            break;
         }
-        else
+        case DRight:
         {
-            //
-            //  Sum_ip A^t(id) * A(id)
-            //
-            for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
-                ret+=conj(Transpose((*id)))*(*id);
-        }
-        break;
-    }
-    case DRight:
-    {
-        ret.SetLimits(itsD1,itsD1);
-        Fill(ret,std::complex<double>(0.0));
-        if (itsNormStatus==NormStatus::GammaRight)
-        {
+            ret.SetLimits(itsD1,itsD1);
+            Fill(ret,std::complex<double>(0.0));
             const DiagonalMatrixRT& lambda=itsRightBond->GetSVs();
             //
             //  Sum_ip B(id) * gamma^2 * B^t(id)
             //
             for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
                 ret+=(*id)*lambda*lambda*conj(Transpose((*id)));
+            break;
         }
-        else
-        {
-            //
-            //  Sum_ip B(id)*B^t(id)
-            //
-            for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
-                ret+=(*id)*conj(Transpose((*id)));
-        }
-        break;
-    }
     }
     return ret;
 }

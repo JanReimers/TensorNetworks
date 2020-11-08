@@ -35,6 +35,7 @@ class iTEBDStateImp : public virtual iTEBDState,
         virtual void Canonicalize(Direction);  //Vidals L-G-L-G-L canonical form
         virtual void Normalize(Direction LR);
         virtual void Orthogonalize();
+        virtual bool TestOrthogonal(double eps) const;
 
         virtual double GetExpectation (const MPO* o) const;
         virtual double GetExpectation (const Matrix4RT& Hlocal) const;
@@ -51,13 +52,13 @@ class iTEBDStateImp : public virtual iTEBDState,
 //        const         MatrixCT& GetGamma (int isite,int n) const ;
         Matrix4CT GetTransferMatrix() const;
         GLType Orthogonalize(const dVectorT& gamma, const DiagonalMatrixRT& lambda);
-        bool TestOrthogonal() ;
-        Matrix4CT GetTransferMatrix(const dVectorT& M);
+        Matrix4CT GetTransferMatrix(const dVectorT& M) const;
 
         struct Sites
         {
             Sites();
             Sites(int leftSite,iTEBDStateImp*);
+            int leftSiteNumber;
             MPSSite* siteA;
             MPSSite* siteB;
             Bond*    bondA;

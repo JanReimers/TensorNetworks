@@ -35,7 +35,7 @@ void iTEBDStateImp::InitSitesAndBonds(int D,double epsSV)
     //
     itsBonds.push_back(0);  //Dummy space holder. We want this array to be 1 based.
     for (int i=1; i<=itsL; i++)
-        itsBonds.push_back(new Bond(epsSV));
+        itsBonds.push_back(new Bond(D,epsSV));
     itsBonds[0]=itsBonds[itsL];  //Periodic boundary conditions
     //
     //  Create Sites
@@ -59,11 +59,20 @@ void iTEBDStateImp::InitializeWith(State s)
 void iTEBDStateImp::ReCenter(int isite)
 {
     s1=Sites(isite,this);
+    assert(s1.siteA!=s1.siteB);
+    assert(s1.bondA!=s1.bondB);
+    assert(s1.siteA->itsLeft_Bond==s1.bondB);
+    assert(s1.siteB->itsLeft_Bond==s1.bondA);
+    assert(lambdaA().size()>0);
+    assert(lambdaB().size()>0);
+    assert(Max(lambdaA())>0.0);
+    assert(Max(lambdaB())>0.0);
 }
 
 
 iTEBDStateImp::Sites::Sites(int leftSite, iTEBDStateImp* iTEBD)
-    : siteA(iTEBD->itsSites[iTEBD->GetModSite(leftSite  )])
+    : leftSiteNumber(leftSite)
+    , siteA(iTEBD->itsSites[iTEBD->GetModSite(leftSite  )])
     , siteB(iTEBD->itsSites[iTEBD->GetModSite(leftSite+1)])
     , bondA(siteA->itsRightBond)
     , bondB(siteB->itsRightBond)
@@ -76,7 +85,8 @@ iTEBDStateImp::Sites::Sites(int leftSite, iTEBDStateImp* iTEBD)
 }
 
 iTEBDStateImp::Sites::Sites()
-    : siteA(nullptr)
+    : leftSiteNumber(1)
+    , siteA(nullptr)
     , siteB(nullptr)
     , bondA(nullptr)
     , bondB(nullptr)
@@ -111,9 +121,9 @@ void iTEBDStateImp::Normalize(Direction lr)
 //    assert(fabs(imag(right_eigenValue))<1e-10);
     double lnorm=sqrt(real(left_eigenValue));
 //    double rnorm=sqrt(real(right_eigenValue));
-    double fa=itsSites[1]->FrobeniusNorm();
-    double fb=itsSites[2]->FrobeniusNorm();
-    cout << "lnorm, fa,fb=" << lnorm << " " << fa << " " << fb << endl;
+//    double fa=itsSites[1]->FrobeniusNorm();
+//    double fb=itsSites[2]->FrobeniusNorm();
+//    cout << "lnorm, fa,fb=" << lnorm << " " << fa << " " << fb << endl;
     itsSites[1]->Rescale(sqrt(lnorm));
     itsSites[2]->Rescale(sqrt(lnorm));
 
@@ -201,8 +211,8 @@ void iTEBDStateImp::Orthogonalize()
     auto [P,lambdaA_prime,Q]=svd_solver->Solve(bgb4,1e-13,D); //only keep D svs.
     assert(Max(fabs(P*lambdaA_prime*Q-bgb4))<1e-13);
     s1.bondA->SetSingularValues(lambdaA_prime,0.0);
-    cout << std::fixed << "lambdaB_prime" << lambdap.GetDiagonal() << endl;
-    cout << std::fixed << "lambdaA_prime" << lambdaA_prime.GetDiagonal() << endl;
+//    cout << std::scientific << "lambdaB_prime" << lambdap.GetDiagonal() << endl;
+//    cout << std::scientific << "lambdaA_prime" << lambdaA_prime.GetDiagonal() << endl;
 //    cout << "P=" << P << endl;
 //    cout << "Q=" << Q << endl;
     assert(P.GetNumCols()==D);
@@ -234,8 +244,9 @@ void iTEBDStateImp::Orthogonalize()
 //    for (int n=0;n<itsd*itsd;n++)
 //        cout << "gammap1-gammap=" << Max(fabs(gammap1[n] - gammap[n])) << endl;
 
-
-    assert(TestOrthogonal());
+    s1.siteA->itsNormStatus=MPSSite::NormStatus::GammaLeft;
+    s1.siteB->itsNormStatus=MPSSite::NormStatus::GammaLeft;
+    assert(TestOrthogonal(1e-9));
 }
 
 MPSSite::dVectorT operator*(const MPSSite::dVectorT& gamma, const DiagonalMatrixRT& lambda)
@@ -286,7 +297,7 @@ MatrixCT operator*(const MatrixCT& Vl,const Matrix4CT& E)
     return Evl;
 }
 
-bool iTEBDStateImp::TestOrthogonal()
+bool iTEBDStateImp::TestOrthogonal(double eps) const
 {
     dVectorT gamma(itsd*itsd);
     int D=lambdaA().size();
@@ -300,12 +311,19 @@ bool iTEBDStateImp::TestOrthogonal()
     Unit(I);
     MatrixCT ErI=Er*I;
     MatrixCT IEl=I*El;
-    cout << std::scientific;
-    cout << "Er*I-I=" << Max(fabs(ErI-I)) << endl;
-    cout << "i*El-I=" << Max(fabs(IEl-I)) << endl;
-//    cout << "IsUnit(ErI,1e-13)" << IsUnit(ErI,1e-12) << endl;
-//    cout << "IsUnit(IEl,1e-13)" << IsUnit(IEl,1e-12) << endl;
-    return IsUnit(ErI,1e-9) && IsUnit(IEl,1e-9);
+    double r_error= Max(fabs(ErI-I));
+    double l_error= Max(fabs(IEl-I));
+    if (r_error>eps)
+    {
+        cout << std::scientific;
+        cout << "Error not orthogonal Max(fabs(ErI-I))=" << r_error << " > eps=" << eps << endl;
+    }
+    if (l_error>eps)
+    {
+        cout << std::scientific;
+        cout << "Error not orthogonal Max(fabs(IEl-I))=" << l_error << " > eps=" << eps << endl;
+    }
+    return r_error && l_error;
 }
 
 iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(const dVectorT& gamma, const DiagonalMatrixRT& lambda)
@@ -413,7 +431,7 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(const dVectorT& gamma, const 
     return std::make_tuple(gamma_prime,lambda_prime);
 }
 
-Matrix4CT iTEBDStateImp::GetTransferMatrix(const dVectorT& M)
+Matrix4CT iTEBDStateImp::GetTransferMatrix(const dVectorT& M) const
 {
     int d=M.size();
     assert(d>0);
@@ -439,29 +457,18 @@ Matrix4CT iTEBDStateImp::GetTransferMatrix(const dVectorT& M)
 //
 Matrix4CT iTEBDStateImp::GetTransferMatrix() const
 {
-    MPSSite* siteA=itsSites[GetModSite(1)];
-    MPSSite* siteB=itsSites[GetModSite(2)];
-    Bond*    bondA=siteA->itsRightBond;
-    Bond*    bondB=siteB->itsRightBond;
-    assert(siteA);
-    assert(siteB);
-    MPSSite::dVectorT& MA(siteA->itsMs);
-    MPSSite::dVectorT& MB(siteB->itsMs);
-    const DiagonalMatrixRT& lambdaA=bondA->GetSVs();
-    const DiagonalMatrixRT& lambdaB=bondB->GetSVs();
-
-    int D=siteA->GetD1();
-    assert(D==siteA->GetD2());
-    assert(D==siteB->GetD1());
-    assert(D==siteB->GetD2());
+    int D=s1.siteA->GetD1();
+    assert(D==s1.siteA->GetD2());
+    assert(D==s1.siteB->GetD1());
+    assert(D==s1.siteB->GetD2());
 
     Matrix4CT E(D,D,D,D);
     E.Fill(0);
     for (int na=0; na<itsd; na++)
         for (int nb=0; nb<itsd; nb++)
         {
-            MatrixCT theta13=MA[na]*lambdaA*MB[nb]*lambdaB;
-            MatrixCT theta13c=conj(MA[na])*lambdaA*conj(MB[nb])*lambdaB;
+            MatrixCT theta13=GammaA()[na]*lambdaA()*GammaB()[nb]*lambdaB();
+            MatrixCT theta13c=conj(GammaA()[na])*lambdaA()*conj(GammaB()[nb])*lambdaB();
             assert(conj(theta13c)==theta13);
             assert(theta13.GetNumRows()==D);
             assert(theta13.GetNumCols()==D);

@@ -84,7 +84,7 @@ void MPSImp::InitSitesAndBonds(int D,double epsSV)
     //
     itsBonds.push_back(0);  //Dummy space holder. We want this array to be 1 based.
     for (int i=1; i<itsL; i++)
-        itsBonds.push_back(new Bond(epsSV));
+        itsBonds.push_back(new Bond(D,epsSV));
     //
     //  Create Sites
     //

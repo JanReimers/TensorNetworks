@@ -93,6 +93,7 @@ class MPSSite
 //  Statusreporting
 //
         bool IsNormalized(Direction lr,double eps) const;
+        bool IsCanonical (Direction lr,double eps) const;
         char GetNormStatus(double eps) const;
         void Report    (std::ostream&) const;
 
@@ -107,7 +108,8 @@ private:
 
     Position WhereAreWe() const {return itsPosition;}
 
-    MatrixCT  GetNorm(Direction lr) const;
+    MatrixCT  GetNorm         (Direction lr) const;
+    MatrixCT  GetCanonicalNorm(Direction lr) const;
     MatrixCT  ReshapeBeforeSVD(Direction lr);
     void      ReshapeAfter_SVD(Direction lr,const MatrixCT& UV);
     void      Rescale(double norm);
