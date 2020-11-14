@@ -102,27 +102,33 @@ iTEBDStateImp::Sites::Sites()
 
 void iTEBDStateImp::Normalize(Direction lr)
 {
-    Matrix4CT E=GetTransferMatrix();
-    EigenSolver<dcmplx>* solver=new ArpackEigenSolver<dcmplx>;
+    double sA2=lambdaA().GetDiagonal()*lambdaA().GetDiagonal();
+    double sB2=lambdaB().GetDiagonal()*lambdaB().GetDiagonal();
+    s1.bondA->SetSingularValues(lambdaA()/sqrt(sA2),0.0);
+    s1.bondB->SetSingularValues(lambdaB()/sqrt(sB2),0.0);
+//    cout << std::fixed << std::setprecision(5);
+//    cout << "lambdaA=" << lambdaA() << endl;
+//    cout << "lambdaB=" << lambdaB() << endl;
+//    cout << "sA2,sB2=" << sA2 << " " << sB2 << endl;
+
+    int D=lambdaA().size();
+    Matrix4CT E=GetTransferMatrix(DLeft);
+    EigenSolver<dcmplx>* solver=0;
+    if (D==1)
+        solver=new LapackEigenSolver<dcmplx>;
+     else
+        solver=new ArpackEigenSolver<dcmplx>;
     dcmplx left_eigenValue(0);
     {
         auto [U,d]=solver->SolveLeft_NonSym(E.Flatten(),1e-13,1);
-//        cout << std::fixed << std::setprecision(4) << "Left  Arpack d=" << d << endl;
         left_eigenValue=d(1);
     }
-//    dcmplx right_eigenValue(0);
-//    {
-//        auto [U,d]=solver->SolveRightNonSym(E.Flatten(),1e-13,1);
-//        cout << std::fixed << std::setprecision(4) << "Right Arpack d=" << d << endl;
-//        right_eigenValue=d(1);
-//    }
-//    delete solver;
+    delete solver;
     assert(fabs(imag(left_eigenValue))<1e-10);
-//    assert(fabs(imag(right_eigenValue))<1e-10);
     double lnorm=sqrt(real(left_eigenValue));
 //    double rnorm=sqrt(real(right_eigenValue));
-//    double fa=itsSites[1]->FrobeniusNorm();
-//    double fb=itsSites[2]->FrobeniusNorm();
+    double fa=itsSites[1]->FrobeniusNorm();
+    double fb=itsSites[2]->FrobeniusNorm();
 //    cout << "lnorm, fa,fb=" << lnorm << " " << fa << " " << fb << endl;
     itsSites[1]->Rescale(sqrt(lnorm));
     itsSites[2]->Rescale(sqrt(lnorm));
@@ -146,24 +152,6 @@ int iTEBDStateImp::GetModSite(int isite) const
     assert(modSite<=itsL);
     return modSite;
 }
-
-//const DiagonalMatrixRT&  iTEBDStateImp::GetLambda(int isite) const
-//{
-//    const MPSSite* site=itsSites[GetModSite(isite  )];
-//    assert(site);
-//    const Bond*    bond=site->itsRightBond;
-//    assert(bond);
-//    return bond->itsSingularValues;
-//}
-//
-//const MatrixCT& iTEBDStateImp::GetGamma (int isite,int n) const
-//{
-//    assert(n>=0);
-//    assert(n<itsd);
-//    const MPSSite* site=itsSites[GetModSite(isite  )];
-//    assert(site);
-//    return site->itsMs[n];
-//}
 
 
 MatrixCT ReshapeForSVD(int d,const MPSSite::dVectorT& M)
@@ -193,6 +181,9 @@ void iTEBDStateImp::Orthogonalize()
         for (int na=0; na<itsd; na++,nab++)
             gamma[na+itsd*nb]=GammaA()[na]*lambdaA()*GammaB()[nb];
     auto [gammap,lambdap]=Orthogonalize(gamma,lambdaB());
+    double s2=lambdap.GetDiagonal()*lambdap.GetDiagonal();
+//    cout << "lambdap s2=" << lambdap << " " << sqrt(s2) << endl;
+    lambdap*=1.0/sqrt(s2);
 
     s1.bondB->SetSingularValues(lambdap,0.0);
     DiagonalMatrixRT lbinv=1.0/lambdap; //inverse of LambdaB
@@ -210,6 +201,9 @@ void iTEBDStateImp::Orthogonalize()
     SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
     auto [P,lambdaA_prime,Q]=svd_solver->Solve(bgb4,1e-13,D); //only keep D svs.
     assert(Max(fabs(P*lambdaA_prime*Q-bgb4))<1e-13);
+    double s2Ap=lambdaA_prime.GetDiagonal()*lambdaA_prime.GetDiagonal();
+//    cout << "lambdaA_prime s2Ap=" << lambdaA_prime << " " << sqrt(s2Ap) << endl;
+    lambdaA_prime*=1.0/sqrt(s2Ap);
     s1.bondA->SetSingularValues(lambdaA_prime,0.0);
 //    cout << std::scientific << "lambdaB_prime" << lambdap.GetDiagonal() << endl;
 //    cout << std::scientific << "lambdaA_prime" << lambdaA_prime.GetDiagonal() << endl;
@@ -235,18 +229,80 @@ void iTEBDStateImp::Orthogonalize()
 
     delete svd_solver;
 
-//    dVectorT gammap1(itsd*itsd);
-//    nab=0;
-//    for (int nb=0; nb<itsd; nb++)
-//        for (int na=0; na<itsd; na++,nab++)
-//            gammap1[na+itsd*nb]=GammaA()[na]*lambdaA_prime*GammaB()[nb];
-//
-//    for (int n=0;n<itsd*itsd;n++)
-//        cout << "gammap1-gammap=" << Max(fabs(gammap1[n] - gammap[n])) << endl;
-
     s1.siteA->itsNormStatus=MPSSite::NormStatus::GammaLeft;
     s1.siteB->itsNormStatus=MPSSite::NormStatus::GammaLeft;
     assert(TestOrthogonal(1e-9));
+}
+
+void iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT& lambdap,SVCompressorC* comp)
+{
+    assert(comp);
+    assert(gammap.size()==itsd*itsd);
+    int D=lambdaA().size();
+    assert(gammap[0].GetLimits()==MatLimits(D,D));
+
+    double s2=lambdap.GetDiagonal()*lambdap.GetDiagonal();
+//    cout << "lambdap s2=" << lambdap << " " << sqrt(s2) << endl;
+    lambdap*=1.0/sqrt(s2);
+
+    //
+    //  Now unpack gamma' into gammaA'*lambdaA'*gammaB'
+    //
+    dVectorT bgb(itsd*itsd);
+    for (int n=0; n<itsd*itsd; n++)
+        bgb[n]=lambdap*gammap[n]*lambdap; // Sandwich LambdaB*gammap*LambdaB
+
+    MatrixCT bgb4=ReshapeForSVD(itsd,bgb);
+    SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
+    auto [P,lambdaA_prime,Q]=svd_solver->SolveAll(bgb4,1e-13); //only keep D svs.
+    assert(Max(fabs(P*lambdaA_prime*Q-bgb4))<1e-13);
+    delete svd_solver;
+//    //
+//    //  Compress from d*D back to D
+//    //
+    double integratedS2=comp->Compress(P,lambdaA_prime,Q);
+//    cout << "Compression error=" << sqrt(integratedS2) << endl;
+//
+//  Normalize lambdaA_prime
+//
+    double s2Ap=lambdaA_prime.GetDiagonal()*lambdaA_prime.GetDiagonal();
+//    cout << "lambdaA_prime s2Ap=" << lambdaA_prime << " " << sqrt(s2Ap) << endl;
+    lambdaA_prime*=1.0/sqrt(s2Ap);
+//
+//  Set Svs
+//
+    s1.bondA->SetSingularValues(lambdaA_prime,integratedS2);
+    s1.bondB->SetSingularValues(lambdap,0.0); //No compression needed on this one.
+//
+    assert(Min(lambdap)>1e-10);
+    DiagonalMatrixRT lbinv=1.0/lambdap; //inverse of LambdaB
+
+//    cout << std::scientific << "lambdaB_prime" << lambdap.GetDiagonal() << endl;
+//    cout << std::scientific << "lambdaA_prime" << lambdaA_prime.GetDiagonal() << endl;
+//    cout << "P=" << P << endl;
+//    cout << "Q=" << Q << endl;
+    assert(P.GetNumCols()==D);
+    assert(P.GetNumRows()==D*itsd);
+    assert(Q.GetNumCols()==D*itsd);
+    assert(Q.GetNumRows()==D);
+    for (int n=0; n<itsd; n++)
+    {
+        for (int i=1; i<=D; i++)
+        for (int j=1; j<=D; j++)
+        {
+//            cout << n << " " << i << " " << j << " " << n*D+i << " " << n*D+j << endl;
+            GammaA()[n](i,j)=lbinv(i)*P(n*D+i,       j);
+            GammaB()[n](i,j)=         Q(       i,n*D+j)*lbinv(j);
+        }
+//        GammaA()[n]=lbinv*GammaA()[n];
+//        GammaB()[n]=GammaB()[n]*lbinv;
+//        cout << "n,GA,GB=" << n << " " << GammaA()[n] << " " << GammaB()[n]<< endl;
+    }
+
+
+    s1.siteA->itsNormStatus=MPSSite::NormStatus::GammaLeft;
+    s1.siteB->itsNormStatus=MPSSite::NormStatus::GammaLeft;
+    TestOrthogonal(Max(D*sqrt(integratedS2),D*1e-12));
 }
 
 MPSSite::dVectorT operator*(const MPSSite::dVectorT& gamma, const DiagonalMatrixRT& lambda)
@@ -297,6 +353,20 @@ MatrixCT operator*(const MatrixCT& Vl,const Matrix4CT& E)
     return Evl;
 }
 
+dcmplx Contract(const MatrixCT& Vl,const Matrix4CT& E,const MatrixCT& Vr)
+{
+    int D=Vl.GetNumRows();
+    dcmplx ret(0);
+    for (int i2=1; i2<=D; i2++)
+    for (int j2=1; j2<=D; j2++)
+    {
+        for (int i1=1; i1<=D; i1++)
+        for (int j1=1; j1<=D; j1++)
+            ret+=Vl(i1,j1)*E(i1,j1,i2,j2)*Vr(i2,j2);
+    }
+    return ret;
+}
+
 bool iTEBDStateImp::TestOrthogonal(double eps) const
 {
     dVectorT gamma(itsd*itsd);
@@ -311,6 +381,8 @@ bool iTEBDStateImp::TestOrthogonal(double eps) const
     Unit(I);
     MatrixCT ErI=Er*I;
     MatrixCT IEl=I*El;
+//    cout << "Er*I=" << ErI << endl;
+//    cout << "I*El=" << IEl << endl;
     double r_error= Max(fabs(ErI-I));
     double l_error= Max(fabs(IEl-I));
     if (r_error>eps)
@@ -323,7 +395,7 @@ bool iTEBDStateImp::TestOrthogonal(double eps) const
         cout << std::scientific;
         cout << "Error not orthogonal Max(fabs(IEl-I))=" << l_error << " > eps=" << eps << endl;
     }
-    return r_error && l_error;
+    return (r_error<=eps) && (l_error<=eps);
 }
 
 iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(const dVectorT& gamma, const DiagonalMatrixRT& lambda)
@@ -333,52 +405,70 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(const dVectorT& gamma, const 
     int D=gamma[0].GetNumRows();
     assert(D==gamma[0].GetNumCols());
 
+//    double s2=lambda.GetDiagonal()*lambda.GetDiagonal();
+//    cout << "input lambda s2=" << s2 << endl;
+
     //
     //  Calculate right and left transfer matrices and the R/L eigen vectors
     //  Transform the eigen vectors into Hermitian eigen matrices
     //
-    EigenSolver<dcmplx>* solver=new ArpackEigenSolver<dcmplx>;
+    EigenSolver<dcmplx>* solver=0;
+    if (D==1)
+        solver=new LapackEigenSolver<dcmplx>;
+     else
+        solver=new ArpackEigenSolver<dcmplx>;
 
     dVectorT gl=gamma*lambda;
     for (int n=0;n<d;n++)
         assert(gl[n]==gamma[n]*lambda);
     Matrix4CT Er=GetTransferMatrix(gamma*lambda);
-//    cout << std::fixed << "Er=" << Er << endl;
 
     MatrixCT Vr(D,D); //Right eigen matrix
+    double er;
     {
         auto [U,e]=solver->SolveRightNonSym(Er.Flatten(),1e-13,1);
 //        cout << "Right e 1-e=" << e << " " << 1.0-e(1) << endl;
-        assert(fabs(1.0-e(1))<1e-10);
+//        assert(fabs(1.0-e(1))<1e-10);
+        assert(imag(e(1))<1e-10);
+        er=real(e(1));
         int ij=1;
         for (int j=1; j<=D; j++)
             for (int i=1; i<=D; i++,ij++)
                 Vr(i,j)=U.GetColumn(1)(ij);
         dcmplx phase=Vr(1,1)/fabs(Vr(1,1));
+        assert(fabs(phase)-1.0<1e-14);
         Vr*=conj(phase); //Take out arbitrary phase angle
     }
+//    if (fabs(er-1.0)>1e-10)
+//        cout << "Right eigenvalue=" << er << endl;
 //    cout << "Vr=" << Vr << endl;
-    MatrixCT rerr=Er*Vr-Vr;
-//    cout << "rerr=" << rerr << endl;
-    assert(Max(fabs(rerr))<1e-10);
+    double rerr=Max(fabs(Er*Vr-er*Vr));
+    if (rerr>1e-13) cout  << std::scientific << "rerr=" << rerr << endl;
+    assert(rerr<1e-10);
 
     Matrix4CT El=GetTransferMatrix(lambda*gamma);
     MatrixCT Vl(D,D); //Right eigen matrix
+    double el;
     {
         auto [U,e]=solver->SolveLeft_NonSym(El.Flatten(),1e-13,1);
 //        cout << "Left e 1-e=" << e << " " << 1.0-e(1) << endl;
-        assert(fabs(1.0-e(1))<1e-10);
+//        assert(fabs(1.0-e(1))<1e-10);
+        assert(imag(e(1))<1e-10);
+        el=real(e(1));
         int ij=1;
         for (int j=1; j<=D; j++)
             for (int i=1; i<=D; i++,ij++)
                 Vl(i,j)=U.GetColumn(1)(ij);
         dcmplx phase=Vl(1,1)/fabs(Vl(1,1));
+        assert(fabs(phase)-1.0<1e-14);
         Vl*=conj(phase); //Take out arbitrary phase angle
     }
+//    if (fabs(el-1.0)>1e-10)
+//        cout << "Left  eigenvalue=" << el << endl;
 //    cout << "Vl=" << Vl << endl;
-    MatrixCT lerr=Vl*El-Vl;
-    assert(Max(fabs(lerr))<1e-10);
-//    cout << "lerr=" << lerr << endl;
+    double lerr=Max(fabs(Vl*El-el*Vl));
+    if (lerr>1e-13) cout  << std::scientific << "lerr=" << lerr << endl;
+    assert(lerr<1e-10);
     delete solver;
 //
 //  Decompose eigen matrices
@@ -386,34 +476,47 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(const dVectorT& gamma, const 
     solver=new LapackEigenSolver<dcmplx>; //Switch to a dense solver
     assert(IsHermitian(Vr,1e-10));
     assert(IsHermitian(Vl,1e-10));
+    Vr=0.5*(Vr+~Vr);
+    Vl=0.5*(Vl+~Vl);
+    assert(IsHermitian(Vr,1e-13));
+    assert(IsHermitian(Vl,1e-13));
     MatrixCT X,Xinv;
     {
         auto [U,e]=solver->SolveAll(Vr,1e-13);
         X=U*DiagonalMatrix<double>(sqrt(e));
+        assert(Min(e)>0.0);
         Xinv=DiagonalMatrix<double>(1.0/sqrt(e))*Transpose(conj(U));
     }
+//    cout << "X,Xinv" << X << Xinv << endl;
     assert(IsUnit(X*Xinv,1e-13));
     MatrixCT YT,YTinv;
     {
         auto [U,e]=solver->SolveAll(Vl,1e-13);
         YT=Transpose(U*DiagonalMatrix<double>(sqrt(e)));
+        assert(Min(e)>0.0);
         YTinv=Transpose(DiagonalMatrix<double>(1.0/sqrt(e))*Transpose(conj(U)));
     }
-    assert(IsUnit(YT*YTinv,1e-13));
+//    cout << "YT*YTinv" << YT*YTinv << endl;
+    assert(IsUnit(YT*YTinv,1e-12));
     delete solver;
     //
     //  Transform lambda
     //
-    MatrixCT YlX=YT*lambda*X;
+    MatrixCT YlX=YT*lambda*X; //THis will scale lambda by 1/D since YT and X are both O(1/sqrt(D))
     SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
     auto [U,lambda_prime,VT]=svd_solver->SolveAll(YlX,1e-13);
     delete svd_solver;
+
+//    cout << U << lambda_prime << VT << endl;
     //
     //  Transform Gamma
     //
     dVectorT gamma_prime(d);
     for (int n=0;n<d;n++)
+    {
         gamma_prime[n]=VT*Xinv*gamma[n]*YTinv*U;
+//        cout << gamma_prime[n] << endl;
+    }
     //
     //  Verify orthogonaly
     //
@@ -421,12 +524,14 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(const dVectorT& gamma, const 
     El=GetTransferMatrix(lambda_prime*gamma_prime);
     MatrixCT I(D,D); //Right ei
     Unit(I);
-    MatrixCT ErI=Er*I;
-    MatrixCT IEl=I*El;
+    MatrixCT ErI=Er*I-er*I;
+    MatrixCT IEl=I*El-el*I;
+    assert(Max(fabs(ErI))<1e-9);
+    assert(Max(fabs(IEl))<1e-9);
 //    cout << std::scientific << "Er*I=" << ErI-I << endl;
 //    cout << "i*El=" << IEl-I << endl;
-    assert(IsUnit(ErI,1e-9));
-    assert(IsUnit(IEl,1e-9));
+//    assert(IsUnit(ErI,D*1e-9));
+//    assert(IsUnit(IEl,D*1e-9));
 
     return std::make_tuple(gamma_prime,lambda_prime);
 }
@@ -455,117 +560,232 @@ Matrix4CT iTEBDStateImp::GetTransferMatrix(const dVectorT& M) const
 //
 //  Assume two site for now
 //
-Matrix4CT iTEBDStateImp::GetTransferMatrix() const
+Matrix4CT iTEBDStateImp::GetTransferMatrix(Direction lr) const
 {
     int D=s1.siteA->GetD1();
     assert(D==s1.siteA->GetD2());
     assert(D==s1.siteB->GetD1());
     assert(D==s1.siteB->GetD2());
 
-    Matrix4CT E(D,D,D,D);
-    E.Fill(0);
-    for (int na=0; na<itsd; na++)
-        for (int nb=0; nb<itsd; nb++)
-        {
-            MatrixCT theta13=GammaA()[na]*lambdaA()*GammaB()[nb]*lambdaB();
-            MatrixCT theta13c=conj(GammaA()[na])*lambdaA()*conj(GammaB()[nb])*lambdaB();
-            assert(conj(theta13c)==theta13);
-            assert(theta13.GetNumRows()==D);
-            assert(theta13.GetNumCols()==D);
-            for (int i1=1; i1<=D; i1++)
-                for (int j1=1; j1<=D; j1++)
-                    for (int i3=1; i3<=D; i3++)
-                        for (int j3=1; j3<=D; j3++)
-                            E(i1,j1,i3,j3)+=theta13c(i1,i3)*theta13(j1,j3);
-        }
+    dVectorT gamma(itsd*itsd);
+    int nab=0;
+    for (int nb=0; nb<itsd; nb++)
+        for (int na=0; na<itsd; na++,nab++)
+            gamma[nab]=GammaA()[na]*lambdaA()*GammaB()[nb];
+    Matrix4CT E;
+    switch (lr)
+    {
+    case DRight :
+        E=GetTransferMatrix(gamma*lambdaB());
+        break;
+    case DLeft :
+        E=GetTransferMatrix(lambdaB()*gamma);
+        break;
+    }
+
+
+//    Matrix4CT E(D,D,D,D);
+//    E.Fill(0);
+//    for (int na=0; na<itsd; na++)
+//        for (int nb=0; nb<itsd; nb++)
+//        {
+//            MatrixCT theta13=GammaA()[na]*lambdaA()*GammaB()[nb]*lambdaB();
+//            MatrixCT theta13c=conj(GammaA()[na])*lambdaA()*conj(GammaB()[nb])*lambdaB();
+//            assert(conj(theta13c)==theta13);
+//            assert(theta13.GetNumRows()==D);
+//            assert(theta13.GetNumCols()==D);
+//            for (int i1=1; i1<=D; i1++)
+//                for (int j1=1; j1<=D; j1++)
+//                    for (int i3=1; i3<=D; i3++)
+//                        for (int j3=1; j3<=D; j3++)
+//                            E(i1,j1,i3,j3)+=theta13c(i1,i3)*theta13(j1,j3);
+//        }
     return E;
 }
 
+
+Matrix4CT iTEBDStateImp::GetTransferMatrix(const Matrix4CT& theta) const
+{
+    int D=s1.siteA->GetD1();
+    Matrix4CT E(D,D,D,D);
+
+    for (int i1=1; i1<=D; i1++)
+        for (int j1=1; j1<=D; j1++)
+            for (int i3=1; i3<=D; i3++)
+                for (int j3=1; j3<=D; j3++)
+                {
+                    dcmplx e(0);
+                    for (int na=1; na<=itsd; na++)
+                    for (int nb=1; nb<=itsd; nb++)
+                        e+=conj(theta(na,j1,nb,j3))*(theta(na,i1,nb,i3));
+                    E(i1,j1,i3,j3)=e;
+                }
+    return E;
+}
+
+iTEBDStateImp::MdType iTEBDStateImp::GetEigenMatrix(TensorNetworks::Direction lr, const Matrix4CT& theta)
+{
+    int D=s1.siteA->GetD1();
+    EigenSolver<dcmplx>* solver=0;
+    if (D==1)
+        solver=new LapackEigenSolver<dcmplx>;
+     else
+        solver=new ArpackEigenSolver<dcmplx>;
+
+    VectorCT eigenVector;
+    double   eigenValue;
+    switch (lr)
+    {
+        case DLeft :
+         {
+            auto [U,e]=solver->SolveLeft_NonSym(theta.Flatten(),1e-13,1);
+            assert(imag(e(1))<1e-13);
+            eigenValue=real(e(1));
+            eigenVector=U.GetColumn(1);
+            break;
+        }
+       case DRight:
+        {
+            auto [U,e]=solver->SolveRightNonSym(theta.Flatten(),1e-13,1);
+            assert(imag(e(1))<1e-13);
+            eigenValue=real(e(1));
+            eigenVector=U.GetColumn(1);
+            break;
+        }
+    }
+    cout << "eigen value=" << eigenValue << endl;
+    //
+    //  Unpack eigenVector into a matrix
+    //
+    assert(eigenVector.size()==D*D);
+    MatrixCT V(D,D); // eigen matrix
+    int ij=1;
+    for (int j=1; j<=D; j++)
+        for (int i=1; i<=D; i++,ij++)
+            V(i,j)=eigenVector(ij);
+
+    dcmplx phase=V(1,1)/fabs(V(1,1));
+    assert(fabs(phase)-1.0<1e-14);
+    V*=conj(phase); //Take out arbitrary phase angle
+
+    double err;
+    switch (lr)
+    {
+        case DLeft  : err=Max(fabs(V*theta-eigenValue*V));break; //Assumes eigen value was 1
+        case DRight : err=Max(fabs(theta*V-eigenValue*V));break;
+    }
+    if (err>1e-13) cout  << std::scientific << "Eigen vector error=" << err << endl;
+    assert(err<1e-10);
+    return std::make_tuple(V,eigenValue);
+}
+
+//
+//  Decompose eigen matrices
+//
+iTEBDStateImp::MMType iTEBDStateImp::Factor(const MatrixCT m)
+{
+    EigenSolver<dcmplx>* solver=new LapackEigenSolver<dcmplx>; //Switch to a dense solver
+    assert(IsHermitian(m,1e-10));  //Make sure are close to Hermitian
+    MatrixCT mh=0.5*(m+~m); //Make it perfectly hermitian.  THis should cancel out some numerical round off noise.
+    assert(IsHermitian(mh,1e-13));
+    MatrixCT X,Xinv;
+    auto [U,e]=solver->SolveAll(mh,1e-13);
+    delete solver;
+    X=U*DiagonalMatrix<double>(sqrt(e));
+    assert(Min(e)>1e-10);
+    Xinv=DiagonalMatrix<double>(1.0/sqrt(e))*Transpose(conj(U));
+    assert(IsUnit(X*Xinv,1e-13));
+    return std::make_tuple(X,Xinv);
+}
+
+//-----------------------------------------------------------------------------
+//
+//  THis follows PHYSICAL REVIEW B 78, 155117 2008 figure 14
+//
 void iTEBDStateImp::Apply(const Matrix4RT& expH,SVCompressorC* comp)
 {
     assert(comp);
-    //
-    //  We need to contract   Theta(nA,i1,nB,i3) =
-    //                         sB(i1)*MA(mA,i1,i2)*sA(i2)*MB(mB,i2,i3)*sB(i3)
-    //                                   |                   |
-    //                              expH(mA,nA,              mB,nB)
+//    assert(TestOrthogonal(1e-9));
     //
     //  Make sure everything is square
     assert(s1.siteA->GetD2()==s1.siteB->GetD1());
     assert(s1.siteA->GetD1()==s1.siteB->GetD2());
     assert(s1.siteA->GetD1()==s1.siteA->GetD2());
     int D=s1.siteA->GetD1();
-    Matrix4CT Theta(itsd,D,itsd,D);
-    Theta.Fill(0.0);
 
-    for (int ma=0; ma<itsd; ma++)
-        for (int mb=0; mb<itsd; mb++)
+    typedef std::vector<dVectorT> dMatrixT;
+    Matrix4CT Theta1(itsd,D,itsd,D); //Figure 14 i
+    Matrix4CT Theta2(itsd,D,itsd,D); //Figure 14 iii
+    Theta1.Fill(0.0);
+    Theta2.Fill(0.0);
+    dMatrixT Theta; //Figure 14 v
+    for (int na=0; na<itsd; na++)
+    {
+        Theta.push_back(dVectorT(itsd));
+        for (int nb=0; nb<itsd; nb++)
         {
-            MatrixCT theta13=lambdaB()*GammaA()[ma]*lambdaA()*GammaB()[mb]*lambdaB();
-            for (int na=0; na<itsd; na++)
-                for (int nb=0; nb<itsd; nb++)
-                    for (int i1=1; i1<=D; i1++)
-                        for (int i3=1; i3<=D; i3++)
-                            Theta(na+1,i1,nb+1,i3)+=theta13(i1,i3)*expH(ma,na,mb,nb);
-//                for (int i1=1;i1<=D;i1++)
-//                for (int i3=1;i3<=D;i3++)
-//                    Theta(ma+1,i1,mb+1,i3)+=theta13(i1,i3)  ;
+            Theta[na][nb]=MatrixCT(D,D);
+            Fill(Theta[na][nb],dcmplx(0.0));
+        }
+    }
+    dVectorT  Thetap(itsd*itsd);
+    for (int n=0;n<itsd*itsd;n++)
+    {
+        Thetap[n].SetLimits(D,D);
+        Fill(Thetap[n],dcmplx(0.0));
+    }
+
+    for (int mb=0; mb<itsd; mb++)
+    {
+        for (int ma=0; ma<itsd; ma++)
+        {
+            MatrixCT theta13_1=          GammaA()[ma]*lambdaA()*GammaB()[mb]*lambdaB();  //Figure 14 i
+            MatrixCT theta13_2=lambdaB()*GammaA()[ma]*lambdaA()*GammaB()[mb];            //Figure 14 iii
+            MatrixCT theta13  =GammaA()[ma]*lambdaA()*GammaB()[mb];  //Figure 14 v
+            int nab=0;
+            for (int nb=0; nb<itsd; nb++)
+            for (int na=0; na<itsd; na++,nab++)
+                for (int i1=1; i1<=D; i1++)
+                for (int i3=1; i3<=D; i3++)
+                {
+                    Theta1(na+1,i1,nb+1,i3)+=theta13_1(i1,i3)*expH(ma,na,mb,nb); //Figure 14 i
+                    Theta2(na+1,i1,nb+1,i3)+=theta13_2(i1,i3)*expH(ma,na,mb,nb); //Figure 14 iii
+                    Theta [na][nb](i1,i3)  +=theta13  (i1,i3)*expH(ma,na,mb,nb); //Figure 14 v
+                    Thetap[nab](i1,i3)+= theta13  (i1,i3)*expH(ma,na,mb,nb);
+                }
 
         }
+    }
 
+    auto [gammap,lambdap]=Orthogonalize(Thetap,lambdaB());
+    UnpackOrthonormal(gammap,lambdap,comp);
 
-    //
-    //  Now SVD Theta
-    //
-    MatrixCT ThetaF=Theta.Flatten();
-    assert(ThetaF.GetNumRows()==ThetaF.GetNumCols());
-//    cout << std::fixed << std::setprecision(3) << "Theta=" << Theta << endl;
-//    cout << "Theta=" << ThetaF.GetLimits() << endl;
-//    cout << "Before Compress Dw1 Dw2 A=" << itsDw12.Dw1 << " " << itsDw12.Dw2 << " "<< A << endl;
-    auto [U,s,Vdagger]=oml_CSVDecomp(ThetaF);
-//    cout << std::fixed << std::setprecision(3) << "Before comp s=" << s.GetDiagonal() << endl;
-    double sums1=Sum(s*s);
-    assert(Max(fabs(U*s*Vdagger-ThetaF))<1e-10);
-//    cout << "before compression U=" << U.GetLimits() << endl;
-//    cout << "Vdagger=" << Vdagger << endl;
-    double integratedS2=comp->Compress(U,s,Vdagger);
-    double sums2=Sum(s*s);
-//    cout << std::fixed << std::setprecision(3) << "After comp s=" << s.GetDiagonal() << endl;
-    cout << "sums1,sums2,s2/s1=" << sums1 << " " << sums2 << " " << sums2/sums1 << endl;
-//    cout << "After compression U=" << U.GetLimits() << endl;
-    s/=sqrt(sums2);
-    s1.bondA->SetSingularValues(s,integratedS2); //No SVs were thrown away (yet!)
+    /*
+    auto [Vr ,er]=GetEigenMatrix(DRight,Er);  //Figure 14 ii
+    auto [VlT,el]=GetEigenMatrix(DLeft ,El);  //Figure 14 iv
+//    cout << "Vr=" << Vr << endl;
+//    cout << "Vl=" << VlT << endl;
+//    cout << "Er*Vr-Vr=" << Er*Vr-Vr << endl;
+//    cout << "VlT*El-VlT=" << VlT*El-VlT<< endl;
+    assert(Max(fabs(Er *Vr-er*Vr ))<eps);
+    assert(Max(fabs(VlT*El-el*VlT))<eps);
 
-    int nai1=1;
-    for (int i1=1; i1<=D; i1++)
-        for (int na=0; na<itsd; na++,nai1++)
-            for (int i2=1; i2<=D; i2++)
-            {
-                assert(lambdaB()(i1,i1)>1e-10);
-//                cout << na << " " << i1 << " " << i2 << " " << nai1 << " " << lambdaB(i1,i1) << endl;
-                GammaA()[na](i1,i2)=U(nai1,i2)/lambdaB()(i1,i1);
-            }
-//    cout << "-----------------------------------------------------------------------------" << endl;
-    int nbi2=1;
-    for (int i3=1; i3<=D; i3++)
-        for (int nb=0; nb<itsd; nb++,nbi2++)
-            for (int i2=1; i2<=D; i2++)
-            {
-                assert(lambdaB()(i3,i3)>1e-10);
-//                cout << nb << " " << i2 << " " << i3 << " " << nbi2 << " " << lambdaB(i3,i3) << endl;
-                GammaB()[nb](i2,i3)=Vdagger(i2,nbi2)/lambdaB()(i3,i3);
-            }
-
-//    cout << "-----------------------------------------------------------------------------" << endl;
-//    if (isite==1)
-//        siteA->iNormalize(DLeft);
-//    if (isite==2)
-//        siteA->iNormalize(DRight);
-
+    auto [X , Xinv]=Factor(Vr ); //Figure 14 ii
+    auto [Ydagger,Ydaggerinv]=Factor(VlT); //Figure 14 iv
+    MatrixCT YT=Transpose(Y);
+    MatrixCT YTinv=Transpose(Yinv);
+    cout << "X*~X-Vr=" << X*~X-Vr << endl;
+    cout << "YT*~YT-VlT=" << Y*~Y-VlT << endl;
+    assert(Max(fabs(X*~X-Vr))<3*eps);
+    assert(Max(fabs(Y*~Y-VlT))<3*eps);
+    assert(IsUnit(X*Xinv,eps));
+    assert(IsUnit(YT*YTinv,eps));
+*/
 }
 
-double iTEBDStateImp::GetExpectation (const Matrix4RT& Hlocal) const
+double iTEBDStateImp::GetExpectationmmnn (const Matrix4RT& Hlocal) const
 {
+//    assert(TestOrthogonal(1e-11));
     int D=s1.siteA->GetD1();
     assert(D==s1.siteA->GetD2());
     assert(D==s1.siteB->GetD1());
@@ -573,18 +793,23 @@ double iTEBDStateImp::GetExpectation (const Matrix4RT& Hlocal) const
 
     Matrix4CT Eo(D,D,D,D);
     Eo.Fill(0);
+//    cout << "ma mb na nb" << endl;
     for (int na=0; na<itsd; na++)
         for (int nb=0; nb<itsd; nb++)
         {
-            MatrixCT theta13_n=GammaA()[na]*lambdaA()*GammaB()[nb]*lambdaB();
+            MatrixCT theta13_n=lambdaB()*GammaA()[na]*lambdaA()*GammaB()[nb]*lambdaB();
             assert(theta13_n.GetNumRows()==D);
             assert(theta13_n.GetNumCols()==D);
             for (int ma=0; ma<itsd; ma++)
                 for (int mb=0; mb<itsd; mb++)
                 {
-                    MatrixCT theta13_m=conj(GammaA()[ma])*lambdaA()*conj(GammaB()[mb])*lambdaB();
+                    MatrixCT theta13_m=conj(lambdaB()*GammaA()[ma])*lambdaA()*conj(GammaB()[mb])*lambdaB();
                     assert(theta13_m.GetNumRows()==D);
                     assert(theta13_m.GetNumCols()==D);
+//                    if (fabs(Hlocal(ma,mb,na,nb))>1e-13)
+//                    {
+//                        cout << ma << " " << mb << " " << na << " " << nb << " " << Hlocal(ma,mb,na,nb) << endl;
+//                    }
                     for (int i1=1; i1<=D; i1++)
                         for (int j1=1; j1<=D; j1++)
                             for (int i3=1; i3<=D; i3++)
@@ -592,47 +817,72 @@ double iTEBDStateImp::GetExpectation (const Matrix4RT& Hlocal) const
                                     Eo(i1,j1,i3,j3)+=theta13_m(i1,i3)*Hlocal(ma,mb,na,nb)*theta13_n(j1,j3);
                 }
         }
-//    cout << std::fixed << std::setprecision(4) << "Eo=" << Eo << endl;
-    Matrix4CT E=GetTransferMatrix();
-//    cout << std::fixed << std::setprecision(4) << "E=" << E << endl;
-
-
-    EigenSolver<dcmplx>* solver=new ArpackEigenSolver<dcmplx>;
-    VectorCT Left_EigenVector;
-    dcmplx eigenValue(0);
-    {
-        auto [U,d]=solver->SolveLeft_NonSym(E.Flatten(),1e-13,1);
-//        cout << std::fixed << std::setprecision(4) << "Left  Arpack n=" << d << endl;
-        eigenValue=d(1);
-        Left_EigenVector=U.GetColumn(1);
-//        cout << "Left_EigenVector=" << Left_EigenVector << endl;
-    }
-//    VectorCT LEo=Left_EigenVector*Eo.Flatten();
-//    cout << "LEo=" << LEo << endl;
-
-//    VectorCT RightEigenVector;
+//    cout << "expH Eo=" << Eo << endl;
+    Matrix4CT E=GetTransferMatrix(DLeft);
+    MatrixCT I(D,D); //Right ei
+    Unit(I);
+//    I*=1.0/(sqrt(D));
+//    double l_error= Max(fabs(I*E-I));
+//    if (l_error>1e-13)
 //    {
-//        auto [U,d]=solver->SolveLeft_NonSym(Eo.Flatten(),1e-13,1);
-//        cout << std::fixed << std::setprecision(4) << "left Arpack o=" << d << endl;
-//        eigenValue=d(1);
-////        RightEigenVector=U.GetColumn(1);
-////        cout << "RightEigenVector=" << RightEigenVector << endl;
+//        cout << std::scientific;
+//        cout << "GetExpectationmmnn: Error not orthogonal Max(fabs(IEl-I))=" << l_error << " > eps=" << 1e-13 << endl;
 //    }
+//    cout << "I*Eo*I=" << Contract(I,Eo,I) << endl;
+    dcmplx expectation=Contract(I,Eo,I) ;
+//    cout << "expectation,eigenvalue==" << expectation << endl;
+    assert(fabs(imag(expectation))<1e-10);
+    return real(expectation);
 
-    delete solver;
-//    VectorCT EoR=Eo.Flatten()*RightEigenVector;
-//    cout << "EoR=" << EoR << endl;
-//    cout << "L*EoR=" << Left_EigenVector*EoR << endl;
-//    cout << "LEo*R=" << LEo*RightEigenVector << endl;
-//    cout << "conj(L)*EoR=" << conj(Left_EigenVector)*EoR << endl;
-//    cout << "LEo*conj(R)=" << LEo*conj(RightEigenVector) << endl;
-//    cout << "R*EoR=" << RightEigenVector*EoR << endl;
-//    cout << "LEo*L=" << LEo*Left_EigenVector << endl;
-//    cout << "conj(R)*EoR=" << conj(RightEigenVector)*EoR << endl;
-//    cout << "LEo*conj(L)=" << LEo*conj(Left_EigenVector) << endl;
+}
+double iTEBDStateImp::GetExpectationmnmn (const Matrix4RT& expH) const
+{
+//    assert(TestOrthogonal(1e-11));
+    int D=s1.siteA->GetD1();
+    assert(D==s1.siteA->GetD2());
+    assert(D==s1.siteB->GetD1());
+    assert(D==s1.siteB->GetD2());
 
-    dcmplx expectation=Left_EigenVector*Eo.Flatten()*conj(Left_EigenVector);
-//   cout << "expectation,eigenvalue==" << expectation << " " << eigenValue << endl;
+    Matrix4CT Eo(D,D,D,D);
+    Eo.Fill(0);
+//    cout << "ma mb na nb" << endl;
+    for (int na=0; na<itsd; na++)
+        for (int nb=0; nb<itsd; nb++)
+        {
+            MatrixCT theta13_n=lambdaB()*GammaA()[na]*lambdaA()*GammaB()[nb]*lambdaB();
+            assert(theta13_n.GetNumRows()==D);
+            assert(theta13_n.GetNumCols()==D);
+            for (int ma=0; ma<itsd; ma++)
+                for (int mb=0; mb<itsd; mb++)
+                {
+                    MatrixCT theta13_m=conj(lambdaB()*GammaA()[ma])*lambdaA()*conj(GammaB()[mb])*lambdaB();
+                    assert(theta13_m.GetNumRows()==D);
+                    assert(theta13_m.GetNumCols()==D);
+//                    if (fabs(expH(ma,na,mb,nb))>1e-13)
+//                    {
+//                        cout << ma << " " << mb << " " << na << " " << nb << " " << expH(ma,na,mb,nb) << endl;
+//                    }
+                    for (int i1=1; i1<=D; i1++)
+                        for (int j1=1; j1<=D; j1++)
+                            for (int i3=1; i3<=D; i3++)
+                                for (int j3=1; j3<=D; j3++)
+                                    Eo(i1,j1,i3,j3)+=theta13_m(i1,i3)*expH(ma,na,mb,nb)*theta13_n(j1,j3);
+                }
+        }
+//    cout << "expH Eo=" << Eo << endl;
+    Matrix4CT E=GetTransferMatrix(DLeft);
+    MatrixCT I(D,D); //Right ei
+    Unit(I);
+//    I*=1.0/(sqrt(D));
+    double l_error= Max(fabs(I*E-I));
+    if (l_error>1e-13)
+    {
+        cout << std::scientific;
+        cout << "GetExpectationmnmn: Error not orthogonal Max(fabs(IEl-I))=" << l_error << " > eps=" << 1e-13 << endl;
+    }
+//    cout << "I*Eo*I=" << Contract(I,Eo,I) << endl;
+    dcmplx expectation=Contract(I,Eo,I) ;
+//    cout << "expectation,eigenvalue==" << expectation << endl;
     assert(fabs(imag(expectation))<1e-10);
     return real(expectation);
 
@@ -657,10 +907,11 @@ double iTEBDStateImp::GetExpectation (const MPO* o) const
     assert(DwA2==DwB1);
     Matrix4CT Eo(D,D,D,D);
     Eo.Fill(0);
+//    cout << "ma mb na nb" << endl;
     for (int na=0; na<itsd; na++)
         for (int nb=0; nb<itsd; nb++)
         {
-            MatrixCT theta13_n=GammaA()[na]*lambdaA()*GammaB()[nb]*lambdaB();
+            MatrixCT theta13_n=lambdaB()*GammaA()[na]*lambdaA()*GammaB()[nb]*lambdaB();
             assert(theta13_n.GetNumRows()==D);
             assert(theta13_n.GetNumCols()==D);
             for (int ma=0; ma<itsd; ma++)
@@ -676,9 +927,13 @@ double iTEBDStateImp::GetExpectation (const MPO* o) const
                     for (int w2=1; w2<=DwA2; w2++)
                         Omn+=WAmn(1,w2)*WBmn(w2,1);
 
-                    MatrixCT theta13_m=conj(GammaA()[ma])*lambdaA()*conj(GammaB()[mb])*lambdaB();
+                    MatrixCT theta13_m=conj(lambdaB()*GammaA()[ma])*lambdaA()*conj(GammaB()[mb])*lambdaB();
                     assert(theta13_m.GetNumRows()==D);
                     assert(theta13_m.GetNumCols()==D);
+//                    if (fabs(Omn)>1e-13)
+//                    {
+//                        cout << ma << " " << mb << " " << na << " " << nb << " " << Omn << endl;
+//                    }
                     for (int i1=1; i1<=D; i1++)
                         for (int j1=1; j1<=D; j1++)
                             for (int i3=1; i3<=D; i3++)
@@ -686,42 +941,21 @@ double iTEBDStateImp::GetExpectation (const MPO* o) const
                                     Eo(i1,j1,i3,j3)+=theta13_m(i1,i3)*Omn*theta13_n(j1,j3);
                 }
         }
-    Matrix4CT E=GetTransferMatrix();
 
-    EigenSolver<dcmplx>* solver=new ArpackEigenSolver<dcmplx>;
-    VectorCT Left_EigenVector;
-    dcmplx eigenValue(0);
-    {
-        auto [U,d]=solver->SolveLeft_NonSym(E.Flatten(),1e-13,1);
-        eigenValue=d(1);
-        Left_EigenVector=U.GetColumn(1);
-    }
-    VectorCT LEo=Left_EigenVector*Eo.Flatten();
+//    cout << "MPO Eo=" << Eo << endl;
+    Matrix4CT E=GetTransferMatrix(DLeft);
+    MatrixCT I(D,D); //Right ei
+    Unit(I);
+//    I*=1.0/sqrt(D);
 
-    VectorCT RightEigenVector;
-    {
-        auto [U,d]=solver->SolveRightNonSym(Eo.Flatten(),1e-13,1);
-//        cout << std::fixed << std::setprecision(4) << "Right Arpack n=" << d << endl;
-        eigenValue=d(1);
-        RightEigenVector=U.GetColumn(1);
-//        cout << "RightEigenVector=" << RightEigenVector << endl;
-    }
-
-    delete solver;
-    VectorCT EoR=Eo.Flatten()*RightEigenVector;
-//    cout << "EoR=" << EoR << endl;
-//    cout << "L*EoR=" << Left_EigenVector*EoR << endl;
-//    cout << "LEo*R=" << LEo*RightEigenVector << endl;
-//    cout << "conj(L)*EoR=" << conj(Left_EigenVector)*EoR << endl;
-//    cout << "LEo*conj(R)=" << LEo*conj(RightEigenVector) << endl;
-//    cout << "R*EoR=" << RightEigenVector*EoR << endl;
-//    cout << "LEo*L=" << LEo*Left_EigenVector << endl;
-//    cout << "conj(R)*EoR=" << conj(RightEigenVector)*EoR << endl;
-//    cout << "LEo*conj(L)=" << LEo*conj(Left_EigenVector) << endl;
-
-    dcmplx expectation=Left_EigenVector*Eo.Flatten()*conj(Left_EigenVector);
-//    cout << "expectation=" << expectation << " fabs(expectation)=" << fabs(expectation) << endl;
-    //assert(fabs(imag(eigenValue))<1e-10);
+//    double l_error= Max(fabs(I*E-I));
+//    if (l_error>1e-13)
+//    {
+//        cout << std::scientific;
+//        cout << "GetExpectation(MPO): Error not orthogonal Max(fabs(IEl-I))=" << l_error << " > eps=" << 1e-13 << endl;
+//    }
+    dcmplx expectation=Contract(I,Eo,I) ;
+    assert(fabs(imag(expectation))<1e-10);
     return real(expectation);
 }
 

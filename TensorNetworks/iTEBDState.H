@@ -32,7 +32,8 @@ class iTEBDState
 //        virtual void NormalizeAndCompress(Direction LR,SVCompressorC*)=0;
 
         virtual double GetExpectation (const MPO* o) const=0;
-        virtual double GetExpectation (const Matrix4RT& Hlocal) const=0;
+        virtual double GetExpectationmmnn (const Matrix4RT& Hlocal) const=0;
+        virtual double GetExpectationmnmn (const Matrix4RT& expH  ) const=0;
         virtual void Report    (std::ostream&) const=0;
         virtual std::string GetNormStatus (         ) const=0;
         virtual void Apply(const Matrix4RT& expH,SVCompressorC*)=0;

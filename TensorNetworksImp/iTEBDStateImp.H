@@ -38,7 +38,8 @@ class iTEBDStateImp : public virtual iTEBDState,
         virtual bool TestOrthogonal(double eps) const;
 
         virtual double GetExpectation (const MPO* o) const;
-        virtual double GetExpectation (const Matrix4RT& Hlocal) const;
+        virtual double GetExpectationmmnn (const Matrix4RT& Hlocal) const;
+        virtual double GetExpectationmnmn (const Matrix4RT& expH) const;
         virtual void Apply(const Matrix4RT& expH,SVCompressorC*);
         virtual void Report(std::ostream&) const;
         virtual std::string GetNormStatus () const {return MPSImp::GetNormStatus();};
@@ -46,13 +47,20 @@ class iTEBDStateImp : public virtual iTEBDState,
     protected:
         using dVectorT=MPSSite::dVectorT;
         typedef std::tuple<dVectorT,DiagonalMatrixRT> GLType;
+        typedef std::tuple<MatrixCT,MatrixCT> MMType;
+        typedef std::tuple<MatrixCT,double  > MdType;
 
         int GetModSite(int isite) const;
 //        const DiagonalMatrixRT& GetLambda(int isite) const;
 //        const         MatrixCT& GetGamma (int isite,int n) const ;
-        Matrix4CT GetTransferMatrix() const;
-        GLType Orthogonalize(const dVectorT& gamma, const DiagonalMatrixRT& lambda);
+        Matrix4CT GetTransferMatrix(Direction lr) const;
         Matrix4CT GetTransferMatrix(const dVectorT& M) const;
+        Matrix4CT GetTransferMatrix(const Matrix4CT& theta) const;
+
+        void UnpackOrthonormal(const dVectorT& gammap,DiagonalMatrixRT& lambdap,SVCompressorC*);
+        GLType Orthogonalize(const dVectorT& gamma, const DiagonalMatrixRT& lambda);
+        MdType GetEigenMatrix(TensorNetworks::Direction lr, const Matrix4CT& theta);
+        MMType Factor(const MatrixCT m);
 
         struct Sites
         {
