@@ -84,6 +84,8 @@ LapackEigenSolver<T>::Solve(const MatrixT& A,double eps, int NumEigenValues)
     //  Now do the actual SVD work
     //
     evx<T>(&jobz,&range,&uplo,&N,&Alower(1,1),&N,&VL,&VU,&IL,&IU,&eps,&NumEigenValues,&W(1),&U(1,1),&N, &work(1),&lwork,&iwork(1),&ifail(1),&info);
+    if (info!=0)
+        std::cerr << "Warning: LapackEigenSolver info=" << info << std::endl;
     assert(info==0);
     //
     //  Now fix up the matrix limits
@@ -103,7 +105,7 @@ LapackEigenSolver<double>::SolveRightNonSym(const MatrixT& A,double eps, int Num
 {
     int N=A.GetNumRows();
     assert(N==A.GetNumCols());
-    if (NumEigenValues<=N)
+    if (NumEigenValues<N)
         std::cerr << "Warning: Lapack does not support subset of eigen values for non-symmtric matrcies" << std::endl;
     //
     //  Dicey deciding how much work space lapack needs. more is faster
@@ -121,9 +123,11 @@ LapackEigenSolver<double>::SolveRightNonSym(const MatrixT& A,double eps, int Num
     lwork=real(work(1));
     work.SetLimits(lwork);
     //
-    //  Now do the actual SVD work
+    //  Now do the actual Eigen decomposition work
     //
     dgeev_(&jobvl,&jobvr,&N,&Acopy(1,1),&N,&WR(1),&WI(1),&VL(1,1),&N,&VR(1,1),&N, &work(1),&lwork,&info);
+    if (info!=0)
+        std::cerr << "Warning: LapackEigenSolver info=" << info << std::endl;
     assert(info==0);
     //
     //  Unpack the eigen pairs
@@ -158,7 +162,7 @@ LapackEigenSolver<dcmplx>::SolveRightNonSym(const MatrixT& A,double eps, int Num
 {
     int N=A.GetNumRows();
     assert(N==A.GetNumCols());
-    if (NumEigenValues<=N)
+    if (NumEigenValues<N)
         std::cerr << "Warning: Lapack does not support subset of eigen values for non-symmtric matrcies" << std::endl;
     //
     //  Dicey deciding how much work space lapack needs. more is faster
