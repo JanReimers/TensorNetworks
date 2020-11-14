@@ -26,3 +26,9 @@ TensorNetworksUnittests/ValgrindOut.xml
 TensorNetworksUnittests/gprof.out
 
 *.lyx~
+
+*.bak
+
+*.lyx#
+
+*.sav

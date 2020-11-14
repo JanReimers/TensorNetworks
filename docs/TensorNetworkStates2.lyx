@@ -3347,7 +3347,7 @@ So far what we have above is called iMPS.
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Infinite Lattice Contractions
 \end_layout
 
@@ -3356,7 +3356,7 @@ In this section I will use a two site unit cell iMPS.
  The extension to other unit cell size should be trivial.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Overlap
 \end_layout
 
@@ -3445,15 +3445,7 @@ noprefix "false"
 b) is
 \begin_inset Formula 
 \[
-E_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}^{1}=\sum_{n_{1}}\left(M_{i_{2}i_{1}}^{n_{1}}\right)^{\dagger}M_{j_{i}j_{2}}^{n_{1}}=\sum_{n_{1}}\left(\varGamma_{i_{2}i_{1}}^{1n_{1}}\lambda_{i_{2}}^{1}\right)^{\dagger}\varGamma_{j_{1}j_{2}}^{1n_{1}}\lambda_{j_{2}}^{1}=\lambda_{i_{2}}^{1}\lambda_{j_{2}}^{1}\sum_{n_{1}}\varGamma_{i_{1}i_{2}}^{1*n_{1}}\varGamma_{j_{1}j_{2}}^{1n_{1}}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-=\sum_{n_{1}}M_{i_{1}i_{2}}^{*n_{1}}M_{j_{i}j_{2}}^{n_{1}}
+E_{r\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}=\sum_{n}M_{i_{i}i_{2}}^{n}\left(M_{j_{2}j_{1}}^{n}\right)^{\dagger}=\sum_{n_{1}}\varGamma_{i_{1}i_{2}}^{n}\lambda_{i_{2}}\left(\lambda_{j_{2}}\varGamma_{j_{2}j_{1}}^{n}\right)^{\dagger}=\sum_{n_{1}}\varGamma_{i_{1}i_{2}}^{n}\lambda_{i_{2}}\left(\varGamma_{j_{1}j_{2}}^{n}\lambda_{j_{2}}\right)^{*}
 \]
 
 \end_inset
@@ -3517,172 +3509,7 @@ which should ensure that the new
 .
 \end_layout
 
-\begin_layout Standard
-Explicitly we have 
-\begin_inset Formula 
-\[
-\boldsymbol{e}=\boldsymbol{E}^{1}\boldsymbol{E}^{2}=\sum_{i_{2}j_{2}}E_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}^{1}E_{\left(i_{2}j_{2}\right)\left(i_{3}j_{3}\right)}^{2}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-=\sum_{i_{2}j_{2}}\sum_{n_{1}}M_{i_{1}i_{2}}^{*n_{1}}M_{j_{i}j_{2}}^{n_{1}}\sum_{n_{2}}M_{i_{2}i_{3}}^{*n_{2}}M_{j_{2}j_{3}}^{n_{2}}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-=\sum_{n_{1}}\sum_{n_{2}}\left(\sum_{i_{2}}M_{i_{1}i_{2}}^{*n_{1}}M_{i_{2}i_{3}}^{*n_{2}}\right)\left(\sum_{j_{2}}M_{j_{i}j_{2}}^{n_{1}}M_{j_{2}j_{3}}^{n_{2}}\right)
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\sum_{n_{1}}\sum_{n_{2}}N_{i_{1}i_{3}}^{*n_{1}n_{2}}N_{j_{1}j_{3}}^{n_{1}n_{2}}
-\]
-
-\end_inset
-
-=
-\end_layout
-
-\begin_layout Standard
-Iteratively calculating the tranfer matrix from left right, we start with
-\begin_inset Formula 
-\[
-C_{i_{1}j_{1}}^{0}=1
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-C^{1}=\sum_{n_{1}}M_{i_{1}i_{2}}^{*n_{1}}C_{i_{1}j_{1}}^{0}M_{j_{1}j_{2}}^{n_{1}}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection
-Energy
-\end_layout
-
-\begin_layout Standard
-The diagram for the overlap of a two site unit cell iMPS is shown in figure
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:iMPS Energy"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-a
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename iMPSE.png
-	scale 50
-
-\end_inset
-
-
-\begin_inset Graphics
-	filename iMPSETransfer.png
-	scale 50
-
-\end_inset
-
-
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:iMPS Energy"
-
-\end_inset
-
-a) Energy Diagram, b) Energy transfer matrix
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The transfer matrix for site 
-\begin_inset Formula $1$
-\end_inset
-
- (figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:iMPS Energy"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-b) is
-\begin_inset Formula 
-\[
-E_{\left(i_{1}j_{1}w_{1}\right)\left(i_{2}j_{2}w_{2}\right)}^{1}=\sum_{m_{1}n_{1}}\left(\varGamma_{i_{1}i_{2}}^{1m_{1}}\lambda_{i_{2}}^{1}\right)^{\dagger}W_{w_{1}w_{2}}^{m_{1}n_{1}}\varGamma_{j_{1}j_{2}}^{1n_{1}}\lambda_{j_{2}}^{1}=\lambda_{i_{2}}^{1}\lambda_{j_{2}}^{1}\sum_{n_{1}}\varGamma_{i_{2}i_{1}}^{1*n_{1}}W_{w_{1}w_{2}}^{m_{1}n_{1}}\varGamma_{j_{1}j_{2}}^{1n_{1}}
-\]
-
-\end_inset
-
-where the indices are grouped to shape this as a 
-\begin_inset Formula $D_{w}D^{2}\times D_{w}D^{2}$
-\end_inset
-
- matrix, as opposed to a rank six tensor.
- Now the Energy per unit cell can be expressed as a matrix product
-\begin_inset Formula 
-\[
-\frac{1}{N}\left\langle \psi\right|\mathcal{\hat{H}}\left|\psi\right\rangle =\frac{1}{N}\ldots\boldsymbol{E}^{1}\boldsymbol{E}^{2}\boldsymbol{E}^{1}\boldsymbol{E}^{2}\ldots=\lim_{N\rightarrow\infty}\frac{1}{N}\boldsymbol{e}^{N}=\lim_{N\rightarrow\infty}\frac{1}{N}e_{max}^{N}
-\]
-
-\end_inset
-
-How do we get an infinite product to generate anythong other then 
-\begin_inset Formula $0,1,\infty$
-\end_inset
-
-?
-\end_layout
-
-\begin_layout Subsection
+\begin_layout Section
 Infinite Time Evolved Block Decimation (iTBED)
 \begin_inset CommandInset label
 LatexCommand label
@@ -3882,7 +3709,7 @@ Repeat steps 2-7 with the structure
 
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Maintaining Orthogonality
 \end_layout
 
@@ -3928,22 +3755,14 @@ VV^{\dagger}=\sum_{n_{a}}\Gamma^{n_{a}}\lambda^{A}\left(\Gamma^{n_{a}}\lambda^{A
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-In step 5 we truncate the singluar values, after withc the orthonormality
+In step 5 we truncate the singluar values, after witch the orthonormality
  no longer holds true.
- 
-\end_layout
-
-\begin_layout Standard
-The canonical form is by definition when Schmidt deomposition about any
- 
+ The canonical form is by definition when Schmidt deomposition about any
+ bond 
 \begin_inset Formula $A$
 \end_inset
 
- bond site is
+ is
 \begin_inset Formula 
 \[
 \left|\psi\right\rangle =\sum_{i=1}^{D}\lambda_{i}^{A}\left|\Phi_{i}^{L}\right\rangle \left|\Phi_{i}^{R}\right\rangle 
@@ -3967,7 +3786,7 @@ with
 
 \end_inset
 
-and the right abd left wave functions are orthongonal
+and the right and left wave functions are orthonormal
 \begin_inset Formula 
 \[
 \left\langle \Phi_{i}^{L}|\Phi_{j}^{L}\right\rangle =\delta_{ij}=\sum_{n_{a}n_{b}}\left(\lambda^{A}\Gamma_{kj}^{n_{b}}\lambda_{j}^{B}\Gamma_{ji}^{n_{a}}\right)^{\dagger}\lambda^{A}\Gamma_{kj}^{n_{b}}\lambda_{j}^{B}\Gamma_{ji}^{n_{a}}
@@ -4008,6 +3827,7 @@ status open
 \begin_inset Graphics
 	filename Canonical1.png
 	lyxscale 50
+	scale 30
 
 \end_inset
 
@@ -4015,6 +3835,12 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Canonical One SIte"
+
+\end_inset
+
 Proceedure for getting an iTEBD state into canonical form, which also restores
  orthogonality.
  
@@ -4034,19 +3860,47 @@ Proceedure for getting an iTEBD state into canonical form, which also restores
 
 \end_layout
 
+\begin_layout Subsubsection
+One site unit cell, direct
+\end_layout
+
 \begin_layout Standard
-We can transform to a canonical form by defining
-\begin_inset Formula 
-\begin{equation}
-\Gamma_{j_{1}j_{2}}^{n_{a}}\lambda_{j_{2}}^{A}\Gamma_{j_{2}j_{3}}^{n_{b}}\lambda_{i_{3}}^{B}=\varGamma_{j_{1}j_{3}}\lambda_{j_{3}}\label{eq:GammAB}
-\end{equation}
+The algorithm orthongalizing a system with a one site unit is reusable for
+ larger unit cells
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Orus2008"
+literal "false"
 
 \end_inset
 
-with
+.
+ The steps are (figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Canonical One SIte"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Enumerate
+Calculate the right and left transfer matricies
 \begin_inset Formula 
 \[
-\varGamma_{j_{1}j_{3}}^{n_{A}n_{B}}=\sum_{j_{2}}\varGamma_{j_{1}j_{2}}^{n_{a}}\lambda_{j_{2}}^{A}\varGamma_{j_{2}j_{3}}^{n_{b}}
+R_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}=\sum_{n}\left(\varGamma_{i_{1}i_{2}}^{n}\lambda_{i_{2}}\right)\left(\varGamma_{j_{1}j_{2}}^{*n}\lambda_{j_{2}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+L_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}=\sum_{n}\left(\lambda_{i_{1}}\varGamma_{i_{1}i_{2}}^{n}\right)\left(\lambda_{j_{1}}\varGamma_{j_{1}j_{2}}^{*n}\right)
 \]
 
 \end_inset
@@ -4054,26 +3908,11 @@ with
 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Enumerate
+calculate the eigen matrices then solve
 \begin_inset Formula 
 \[
-R_{\left(i_{1}j_{1}\right)\left(i_{3}j_{3}\right)}=\sum_{n_{a}n_{b}}\left(\varGamma_{i_{1}i_{3}}\lambda_{i_{3}}\right)\left(\varGamma_{j_{1}j_{3}}^{*}\lambda_{j_{3}}\right)
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-L_{\left(i_{1}j_{1}\right)\left(i_{3}j_{3}\right)}=\sum_{n_{a}n_{b}}\left(\lambda_{i_{1}}\varGamma_{i_{1}i_{3}}\right)\left(\lambda_{j_{1}}\varGamma_{j_{1}j_{3}}^{*}\right)
-\]
-
-\end_inset
-
-Find eigen vectors as
-\begin_inset Formula 
-\[
-\sum_{i_{1}j_{1}}V_{i_{1}j_{1}}^{L}L_{\left(i_{1}j_{1}\right)\left(i_{3}j_{3}\right)}=\eta_{L}V_{i_{3}j_{3}}^{L}
+\sum_{i_{1}j_{1}}V_{i_{1}j_{1}}^{LT}L_{\left(i_{1}j_{1}\right)\left(i_{3}j_{3}\right)}=\eta_{L}V_{i_{3}j_{3}}^{LT}
 \]
 
 \end_inset
@@ -4086,10 +3925,22 @@ Find eigen vectors as
 
 \end_inset
 
-the idea is to now factor the eigen matrices as
+
+\end_layout
+
+\begin_layout Enumerate
+Factor 
+\begin_inset Formula $V^{R}$
+\end_inset
+
+ and 
+\begin_inset Formula $V^{L}$
+\end_inset
+
+
 \begin_inset Formula 
 \[
-V_{ij}^{L}=UdU^{\dagger}=U\sqrt{d}\sqrt{d}U^{\dagger}=Y^{\dagger}Y
+V^{R}=UdU^{\dagger}=U\sqrt{d}\sqrt{d}U^{\dagger}=XX^{\dagger}
 \]
 
 \end_inset
@@ -4097,15 +3948,19 @@ V_{ij}^{L}=UdU^{\dagger}=U\sqrt{d}\sqrt{d}U^{\dagger}=Y^{\dagger}Y
 
 \begin_inset Formula 
 \[
-V_{ij}^{R}=XX^{\dagger}
+V^{LT}=UdU^{\dagger}=U\sqrt{d}\sqrt{d}U^{\dagger}=Y^{\dagger T}Y^{T}
 \]
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Enumerate
 now sandwich identities into
 \begin_inset Formula 
 \[
-\lambda\varGamma\lambda\rightarrow Y^{T^{-1}}Y^{T}\lambda XX^{-1}\varGamma Y^{T^{-1}}Y^{T}\lambda XX^{-1}
+\lambda\varGamma^{n}\lambda\rightarrow Y^{T-1}Y^{T}\lambda XX^{-1}\varGamma^{n}Y^{T-1}Y^{T}\lambda XX^{-1}
 \]
 
 \end_inset
@@ -4113,12 +3968,16 @@ now sandwich identities into
 and group as follows
 \begin_inset Formula 
 \[
-\lambda\varGamma\lambda\rightarrow Y^{T^{-1}}\left(Y^{T}\lambda X\right)\left(X^{-1}\varGamma Y^{T^{-1}}\right)\left(Y^{T}\lambda X\right)X^{-1}
+=Y^{T-1}\left(Y^{T}\lambda X\right)\left(X^{-1}\varGamma^{n}Y^{T-1}\right)\left(Y^{T}\lambda X\right)X^{-1}
 \]
 
 \end_inset
 
-and now SVD 
+
+\end_layout
+
+\begin_layout Enumerate
+now SVD 
 \begin_inset Formula 
 \[
 Y^{T}\lambda X=U\lambda^{\prime}V^{\dagger}
@@ -4134,7 +3993,11 @@ giving
 
 \end_inset
 
-from whihc we can define the new 
+
+\end_layout
+
+\begin_layout Enumerate
+We can define the new 
 \begin_inset Formula $\varGamma$
 \end_inset
 
@@ -4146,29 +4009,280 @@ from whihc we can define the new
 
 \end_inset
 
-In order to get back 
-\begin_inset Formula $\Gamma^{n_{a}}\lambda^{A}\Gamma^{n_{b}}$
+After this procedure the new transfer matrices
+\begin_inset Formula 
+\[
+R_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}^{\prime}=\sum_{n}\left(\varGamma_{i_{1}i_{2}}^{\prime n}\lambda_{i_{2}}^{\prime}\right)\left(\varGamma_{j_{1}j_{2}}^{*\prime n}\lambda_{j_{2}}^{\prime}\right)
+\]
+
 \end_inset
 
-structure from 
-\begin_inset Formula $\Gamma^{\prime}$
+
+\begin_inset Formula 
+\[
+L_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}^{\prime}=\sum_{n}\left(\lambda_{i_{1}}^{\prime}\varGamma_{i_{1}i_{2}}^{\prime n}\right)\left(\lambda_{j_{1}}^{\prime}\varGamma_{j_{1}j_{2}}^{*\prime n}\right)
+\]
+
 \end_inset
 
- we do another SVD.
+which should have unit matrix as eigen matrices
+\begin_inset Formula 
+\[
+\sum_{i_{1}j_{1}}\delta_{i_{1}j_{1}}L_{\left(i_{1}j_{1}\right)\left(i_{3}j_{3}\right)}^{\prime}=\eta_{L}\delta_{i_{3}j_{3}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{i_{3}j_{3}}R_{\left(i_{1}j_{1}\right)\left(i_{3}j_{3}\right)}^{\prime}\delta_{i_{3}j_{3}}=\eta_{R}\delta_{i_{1}j_{1}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+One site unit cell, iterative
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:One-site-unit-cell"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In order to avoid large scale eigen vector calculations one can also use
+ an iteractive method to get and orthogonal state
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Phien2015"
+literal "false"
+
+\end_inset
+
+.
+ Again for one site per unit cell we do
+\end_layout
+
+\begin_layout Enumerate
+Evaluate
+\begin_inset Formula 
+\[
+V_{ij}^{L}=\sum_{nk}\left(\lambda_{k}\varGamma_{ki}^{n}\right)\left(\lambda_{k}\varGamma_{kj}^{n}\right)^{\dagger}=\sum_{kn}\varGamma_{jk}^{*n}\lambda_{k}^{2}\varGamma_{ki}^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+V_{ij}^{R}=\sum_{nk}\left(\varGamma_{ik}^{n}\lambda_{k}\right)\left(\varGamma_{jk}^{n}\lambda_{k}\right)^{\dagger}=\sum_{nk}\varGamma_{ik}^{n}\lambda_{k}^{2}\varGamma_{kj}^{*n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+As above we factor 
+\begin_inset Formula $V^{R}$
+\end_inset
+
+ and 
+\begin_inset Formula $V^{L}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+V^{R}=UdU^{\dagger}=U\sqrt{d}\sqrt{d}U^{\dagger}=XX^{\dagger}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+V^{L}=UdU^{\dagger}=U\sqrt{d}\sqrt{d}U^{\dagger}=Y^{\dagger}Y
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Insert the resulotions into
+\begin_inset Formula 
+\[
+\lambda\varGamma^{n}\lambda\rightarrow Y^{T-1}Y^{T}\lambda XX^{-1}\varGamma^{n}Y^{T-1}Y^{T}\lambda XX^{-1}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+SVD to get 
+\begin_inset Formula $\lambda^{\prime}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+Y^{T}\lambda X=U\lambda^{\prime}V^{\dagger}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Evaluate
+\begin_inset Formula 
+\[
+\Gamma^{\prime}=V^{\dagger}X^{-1}\varGamma Y^{T^{-1}}U
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Go back to step 1 until converged.
+\end_layout
+
+\begin_layout Subsubsection
+Orthogonalization of two site unit cell
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Orthogonalization-of-two-site"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Canonical-2-site-unitcell"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for diagrams.
+\end_layout
+
+\begin_layout Enumerate
+We start with the structure 
+\begin_inset Formula $\varGamma^{n_{a}}\lambda^{A}\varGamma^{n_{b}}\lambda^{B}$
+\end_inset
+
+ and define
+\begin_inset Formula 
+\[
+\Gamma^{n}=\varGamma^{n_{a}}\lambda^{A}\varGamma^{n_{b}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $n$
+\end_inset
+
+ spans the 
+\begin_inset Formula $d^{2}$
+\end_inset
+
+ Hilbert space of 
+\begin_inset Formula $\left(n_{a}n_{b}\right).$
+\end_inset
+
  
+\end_layout
+
+\begin_layout Enumerate
+Now do steps 
+\begin_inset Formula $1\rightarrow6$
+\end_inset
+
+ above with 
+\begin_inset Formula $\lambda=\lambda^{B}$
+\end_inset
+
+.
+ The output is 
+\begin_inset Formula $\Gamma^{\prime n}$
+\end_inset
+
+and 
+\begin_inset Formula $\lambda^{\prime}=\lambda^{\prime B}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Reshape 
+\begin_inset Formula $\Gamma_{ij}^{n\prime}\rightarrow\Gamma_{\left(in_{a}\right)\left(jn_{b}\right)}^{\prime}$
+\end_inset
+
+which has rank 
+\begin_inset Formula $dD$
+\end_inset
+
+ and SVD
+\begin_inset Formula 
+\[
+\lambda_{i}^{\prime B}\Gamma_{\left(in_{a}\right)\left(jn_{b}\right)}^{\prime}\lambda_{j}^{\prime B}\;\overrightarrow{svd}\;\sum_{k=1}^{dD}P_{\left(n_{a}i\right)k}\lambda_{kk}^{\prime A}Q_{k\left(n_{b}j\right)}\sim\sum_{k=1}^{D}P_{\left(n_{a}i\right)k}\lambda_{kk}^{\prime A}Q_{k\left(n_{b}j\right)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Calculate
+\begin_inset Formula 
+\[
+\Gamma_{ik}^{\prime n_{a}}=\lambda_{i}^{\prime B^{-1}}P_{ik}^{n_{a}},
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Gamma_{kj}^{\prime n_{b}}=Q_{kj}^{n_{b}}\lambda_{j}^{\prime B^{-1}}
+\]
+
+\end_inset
+
+
 \begin_inset Float figure
 wide false
 sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \begin_inset Graphics
 	filename Canonical2.png
 	lyxscale 50
+	scale 30
 
 \end_inset
 
@@ -4194,9 +4308,91 @@ Canonical form for
 
 \end_layout
 
-\begin_layout Plain Layout
+\end_inset
+
 
 \end_layout
+
+\begin_layout Subsubsection
+Orthogonalization of two site unit cell with gate
+\end_layout
+
+\begin_layout Standard
+The published diagrams for this are shown in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:2SiteOrthogII"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, but there is some uncertainty about accuracy of these diagrams.
+ We also need to orthogonalize after applying a two site operator/gate like
+ 
+\begin_inset Formula $g_{\left(m_{a}m_{b}\right)\left(n_{a}n_{b}\right)}=\exp\left(-\tau H_{\left(m_{a}m_{b}\right)\left(n_{a}n_{b}\right)}\right)$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Defining
+\begin_inset Formula 
+\[
+\Theta_{i_{1}i_{3}}^{n}=\Theta_{i_{1}i_{3}}^{n_{a}n_{b}}=\sum_{m_{a}m_{b}}g_{\left(m_{a}m_{b}\right)\left(n_{a}n_{b}\right)}\sum_{i_{2}}\varGamma_{i_{1}i_{2}}^{m_{a}}\lambda_{i_{2}}^{A}\varGamma_{i_{2}i_{3}}^{m_{b}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Now do steps 
+\begin_inset Formula $1\rightarrow6$
+\end_inset
+
+ in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:One-site-unit-cell"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ above with 
+\begin_inset Formula $\Gamma^{n}=\Theta^{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $\lambda=\lambda^{B}$
+\end_inset
+
+.
+ The output is 
+\begin_inset Formula $\Gamma^{\prime n}$
+\end_inset
+
+and 
+\begin_inset Formula $\lambda^{\prime}=\lambda^{\prime B}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Now do steps 3 and 4 from section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Orthogonalization-of-two-site"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -4204,95 +4400,75 @@ Canonical form for
 \end_layout
 
 \begin_layout Standard
-In fig.
- 
+This is at odds with figure 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:Canonical-2-site-unitcell"
+reference "fig:2SiteOrthogII"
 plural "false"
 caps "false"
 noprefix "false"
 
 \end_inset
 
- step 
-\emph on
-iv 
-\emph default
-we can deduce that we need sandwich 
-\begin_inset Formula $\Gamma^{\prime}$
+ where they define 
+\begin_inset Formula $Y^{T}X=U\lambda^{B\prime}V^{\dagger}\neq Y^{T}\lambda^{B}X$
 \end_inset
 
- with 
-\begin_inset Formula $\lambda^{\prime B}$
-\end_inset
-
- and the svd it
+ and they define 
 \begin_inset Formula 
 \[
-\lambda_{i}^{\prime B}\Gamma_{ij}^{\prime n_{a}n_{b}}\lambda_{j}^{\prime B}\overrightarrow{svd}\sum_{k}P_{ik}^{n_{a}}\lambda_{kk}^{\prime A}Q_{kj}^{n_{b}}
+\Theta^{n}=\lambda^{B}\sum_{m_{a}m_{b}}g_{\left(m_{a}m_{b}\right)\left(n_{a}n_{b}\right)}\sum_{i_{2}}\varGamma_{i_{1}i_{2}}^{m_{a}}\lambda_{i_{2}}^{A}\varGamma_{i_{2}i_{3}}^{m_{b}}\lambda^{B}
 \]
 
 \end_inset
 
 
-\begin_inset Formula 
-\[
-\varGamma^{\prime An_{A}}=\lambda^{\prime B^{-1}}P^{n_{a}},\;\varGamma^{\prime Bn_{A}}\lambda^{\prime B^{-1}}
-\]
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Orthogonal1.png
+	lyxscale 50
+	scale 20
 
 \end_inset
 
-After this we end up with 2 versions of each 
-\begin_inset Formula $\Gamma^{\prime}$
-\end_inset
 
- and 4 versions of 
-\begin_inset Formula $\lambda^{\prime A}$
-\end_inset
+\begin_inset Caption Standard
 
-.
- I think we need to reshape 
-\begin_inset Formula $\Gamma^{\prime}$
-\end_inset
-
- 
-\begin_inset Formula 
-\[
-\Gamma_{ij}^{\prime n_{a}n_{b}}\rightarrow\Gamma_{\left(in_{a}\right)\left(jn_{b}\right)}^{\prime}
-\]
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:2SiteOrthogII"
 
 \end_inset
 
-now
-\begin_inset Formula 
-\[
-\lambda_{i}^{\prime B}\Gamma_{\left(in_{a}\right)\left(jn_{b}\right)}^{\prime}\lambda_{j}^{\prime B}\;\overrightarrow{svd}\;\sum_{k=1}^{dD}P_{\left(n_{a}i\right)k}\lambda_{kk}^{\prime A}Q_{k\left(n_{b}j\right)}\sim\sum_{k=1}^{D}P_{\left(n_{a}i\right)k}\lambda_{kk}^{\prime A}Q_{k\left(n_{b}j\right)}
-\]
+Details of the orthogonalized iTEBD procedure for a system with two sites
+ in the unit cell.
+\end_layout
 
 \end_inset
 
-whihc gives us the correct number of 
-\begin_inset Formula $P$
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
 \end_inset
 
-s and 
-\begin_inset Formula $Q$
-\end_inset
 
-s and a 
-\begin_inset Formula $\lambda_{kk}^{\prime A}$
-\end_inset
-
- of length 
-\begin_inset Formula $dD$
-\end_inset
-
- which we can compress down to length 
-\begin_inset Formula $D$
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Subsection
@@ -4685,7 +4861,7 @@ Better convergence
 
 \begin_deeper
 \begin_layout Itemize
-For fixed 
+Done: For fixed 
 \begin_inset Formula $L$
 \end_inset
 
@@ -4701,7 +4877,7 @@ For fixed
 \end_layout
 
 \begin_layout Itemize
-Follow a schedule with ever tightening convergence criteria.
+Done: Follow a schedule with ever tightening convergence criteria.
 \end_layout
 
 \begin_layout Itemize
@@ -4738,7 +4914,7 @@ Time (imag and/or real) evolution for finite OBC lattice
 
 \begin_deeper
 \begin_layout Itemize
-Construct so called Trotter gate MPO 
+Done: Construct so called Trotter gate MPO 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:MPO-representation"
@@ -4752,11 +4928,11 @@ noprefix "false"
 \end_layout
 
 \begin_layout Itemize
-Apply to MPS
+Done: Apply to MPS
 \end_layout
 
 \begin_layout Itemize
-SVD compress 
+Done: SVD compress 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:SVD-compression"
@@ -4770,7 +4946,7 @@ noprefix "false"
 \end_layout
 
 \begin_layout Itemize
-Optimal compress 
+Done: Optimal compress 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Optimal-compression"
@@ -4864,6 +5040,7 @@ literal "false"
 \end_layout
 
 \begin_layout Itemize
+Done: 
 \begin_inset CommandInset href
 LatexCommand href
 name "ITensor"
@@ -4913,6 +5090,7 @@ literal "false"
 \end_inset
 
  tensors.
+ Rank is hard coded.
 \end_layout
 
 \begin_layout Itemize
@@ -5283,6 +5461,9 @@ ia, ib
 \begin_inset Text
 
 \begin_layout Plain Layout
+\begin_inset Formula $a,b$
+\end_inset
+
 
 \end_layout
 
@@ -5347,6 +5528,9 @@ n,m,na,ma,nb,mb
 \begin_inset Text
 
 \begin_layout Plain Layout
+\begin_inset Formula $\sigma_{a}\sigma_{b}$
+\end_inset
+
 
 \end_layout
 
@@ -5358,6 +5542,10 @@ n,m,na,ma,nb,mb
 \begin_inset Text
 
 \begin_layout Plain Layout
+Bond Indices for 
+\begin_inset Formula $\left|\psi\right\rangle $
+\end_inset
+
 
 \end_layout
 
@@ -5367,6 +5555,9 @@ n,m,na,ma,nb,mb
 \begin_inset Text
 
 \begin_layout Plain Layout
+\begin_inset Formula $i,i_{1},i_{2},i_{3}$
+\end_inset
+
 
 \end_layout
 
@@ -5376,6 +5567,17 @@ n,m,na,ma,nb,mb
 \begin_inset Text
 
 \begin_layout Plain Layout
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+i,i1,i2,i3
+\end_layout
+
+\end_inset
+
 
 \end_layout
 
@@ -5396,6 +5598,10 @@ n,m,na,ma,nb,mb
 \begin_inset Text
 
 \begin_layout Plain Layout
+Bond Indices for 
+\begin_inset Formula $\left\langle \psi\right|$
+\end_inset
+
 
 \end_layout
 
@@ -5405,6 +5611,9 @@ n,m,na,ma,nb,mb
 \begin_inset Text
 
 \begin_layout Plain Layout
+\begin_inset Formula $j,j_{1},j_{2}j_{3}$
+\end_inset
+
 
 \end_layout
 
@@ -5414,6 +5623,17 @@ n,m,na,ma,nb,mb
 \begin_inset Text
 
 \begin_layout Plain Layout
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+j,j1,j2,j3
+\end_layout
+
+\end_inset
+
 
 \end_layout
 
