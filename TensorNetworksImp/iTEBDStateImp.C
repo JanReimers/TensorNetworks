@@ -231,7 +231,7 @@ void iTEBDStateImp::Orthogonalize()
 
     s1.siteA->itsNormStatus=MPSSite::NormStatus::GammaLeft;
     s1.siteB->itsNormStatus=MPSSite::NormStatus::GammaLeft;
-    assert(TestOrthogonal(1e-9));
+    assert(TestOrthogonal(D*D*1e-6));
 }
 
 void iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT& lambdap,SVCompressorC* comp)
@@ -302,7 +302,7 @@ void iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT& 
 
     s1.siteA->itsNormStatus=MPSSite::NormStatus::GammaLeft;
     s1.siteB->itsNormStatus=MPSSite::NormStatus::GammaLeft;
-    TestOrthogonal(Max(D*sqrt(integratedS2),D*1e-12));
+    TestOrthogonal(Max(D*sqrt(integratedS2),D*D*1e-12));
 }
 
 MPSSite::dVectorT operator*(const MPSSite::dVectorT& gamma, const DiagonalMatrixRT& lambda)
@@ -526,8 +526,10 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(const dVectorT& gamma, const 
     Unit(I);
     MatrixCT ErI=Er*I-er*I;
     MatrixCT IEl=I*El-el*I;
-    assert(Max(fabs(ErI))<1e-9);
-    assert(Max(fabs(IEl))<1e-9);
+//    cout << "Max(fabs(Er*I-er*I))=" << Max(fabs(Er*I-er*I))  << endl;
+//    cout << "Max(fabs(I*El-el*I))=" << Max(fabs(I*El-el*I))  << endl;
+    assert(Max(fabs(ErI))<D*D*1e-6);
+    assert(Max(fabs(IEl))<D*D*1e-6);
 //    cout << std::scientific << "Er*I=" << ErI-I << endl;
 //    cout << "i*El=" << IEl-I << endl;
 //    assert(IsUnit(ErI,D*1e-9));
