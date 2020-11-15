@@ -46,7 +46,7 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, double S, 
 // Now SVD to factor exp(-dt*H)
 //
     LapackSVDSolver<double> solver;
-    auto [U,sm,VT]=solver.Solve(expH.Flatten(),N,1e-12); //Solves A=U * s * VT
+    auto [U,sm,VT]=solver.Solve(expH.Flatten(),1e-12,N); //Solves A=U * s * VT
 
     //
     //  Load up site operators with special ops at the edges
