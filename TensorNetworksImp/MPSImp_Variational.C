@@ -39,9 +39,9 @@ double MPSImp::FindVariationalGroundState(const Hamiltonian* H, const IterationS
         int in=0;
         for (; in<isl.itsMaxGSSweepIterations; in++)
         {
-            if (itsLogger) itsLogger->LogInfo(1,"Sweep Right");
+            if (itsLogger) itsLogger->LogInfo(2,"Sweep Right");
             Sweep(DLeft,H,isl.itsEps);  //This actually sweeps to the right, but leaves left normalized sites in its wake
-            if (itsLogger) itsLogger->LogInfo(1,"Sweep Left");
+            if (itsLogger) itsLogger->LogInfo(2,"Sweep Left");
             Sweep(DRight,H,isl.itsEps);
             double dE=GetMaxDeltaE();
             //cout << "dE=" << dE << endl;
