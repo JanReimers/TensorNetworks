@@ -3,6 +3,7 @@
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworksImp/SpinCalculator.H"
+#include "TensorNetworksImp/SPDLogger.H"
 #include "Operators/MPO_OneSite.H"
 #include "Operators/MPO_TwoSite.H"
 
@@ -23,6 +24,7 @@ public:
         , itsH(0)
         , itsMPS(0)
         , itsEps()
+        , itsLogger(new TensorNetworks::SPDLogger(1))
     {
         StreamableObject::SetToPretty();
 
@@ -39,7 +41,8 @@ public:
         delete itsH;
         delete itsMPS;
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsMPS=itsH->CreateMPS(D);
+        itsMPS=itsH->CreateMPS(1);
+        itsMPS->Inject(itsLogger);
         itsMPS->InitializeWith(TensorNetworks::Random);
 
         TensorNetworks::IterationSchedule is;
@@ -52,6 +55,7 @@ public:
     TensorNetworks::Hamiltonian* itsH;
     TensorNetworks::MPS*         itsMPS;
     TensorNetworks::Epsilons     itsEps;
+    rc_ptr<TensorNetworks::TNSLogger> itsLogger;
 };
 
 
