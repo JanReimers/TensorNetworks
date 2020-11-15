@@ -13,7 +13,7 @@ public:
     typedef TensorNetworks::Matrix4RT Matrix4RT;
 
     iTEBDTests()
-    : epsNorm(1e-11)
+    : epsNorm(4e-11)
     , epsOrth(1e-11)
     , itsFactory(TensorNetworks::Factory::GetFactory())
     , itsH(0)
@@ -34,7 +34,7 @@ public:
         if (itsH) delete itsH;
         if (itsState) delete itsState;
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsState=itsH->CreateiTEBDState(D,epsNorm,epsSVD);
+        itsState=itsH->CreateiTEBDState(D,D*epsNorm,epsSVD);
     }
 
     using MPO=TensorNetworks::MPO;
@@ -103,6 +103,31 @@ TEST_F(iTEBDTests,TestReCenterRightNormalize)
     EXPECT_EQ(itsState->GetNormStatus(),"rr");
 }
 
+TEST_F(iTEBDTests,TestNormalizeRangeSD)
+{
+    int UnitCell=2,Dmax=16;
+#ifdef DEBUG
+    Dmax=8;
+#endif // DEBUG
+    double epsSVD=0.0;
+    for (int D=1;D<Dmax;D++)
+        for (double S=0.5;S<=2.5;S+=0.5)
+        {
+            Setup(UnitCell,S,D,epsSVD);
+//            cout << "S,D=" << S << " " << D << endl;
+            itsState->InitializeWith(TensorNetworks::Random);
+            itsState->Canonicalize(TensorNetworks::DLeft);
+            EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "ll");
+            itsState->Canonicalize(TensorNetworks::DRight);
+            EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "rr");
+            itsState->ReCenter(2);
+            itsState->Canonicalize(TensorNetworks::DLeft);
+            EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "ll");
+            itsState->Canonicalize(TensorNetworks::DRight);
+            EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "rr");
+        }
+}
+
 TEST_F(iTEBDTests,TestOrthogonalLeft)
 {
     int UnitCell=2,D=2;
@@ -114,7 +139,7 @@ TEST_F(iTEBDTests,TestOrthogonalLeft)
     EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
-TEST_F(iTEBDTests,TestOrthogoanlRight)
+TEST_F(iTEBDTests,TestOrthogonalRight)
 {
     int UnitCell=2,D=2;
     double S=0.5,epsSVD=0.0;
@@ -126,7 +151,7 @@ TEST_F(iTEBDTests,TestOrthogoanlRight)
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
 
-TEST_F(iTEBDTests,TestOrthogoanlLeftReCenter1)
+TEST_F(iTEBDTests,TestOrthogonalLeftReCenter1)
 {
     int UnitCell=2,D=2;
     double S=0.5,epsSVD=0.0;
@@ -138,19 +163,19 @@ TEST_F(iTEBDTests,TestOrthogoanlLeftReCenter1)
     EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
-TEST_F(iTEBDTests,TestOrthogoanlRightReCenter1)
+TEST_F(iTEBDTests,TestOrthogonalRightReCenter1)
 {
     int UnitCell=2,D=2;
     double S=0.5,epsSVD=0.0;
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
-    itsState->Normalize(TensorNetworks::DLeft);
+    itsState->Normalize(TensorNetworks::DRight);
     itsState->ReCenter(2);
     itsState->Orthogonalize();
     EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
-TEST_F(iTEBDTests,TestOrthogoanlLeftReCenter2)
+TEST_F(iTEBDTests,TestOrthogonalLeftReCenter2)
 {
     int UnitCell=2,D=2;
     double S=0.5,epsSVD=0.0;
@@ -162,19 +187,50 @@ TEST_F(iTEBDTests,TestOrthogoanlLeftReCenter2)
     EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
-TEST_F(iTEBDTests,TestOrthogoanlRightReCenter2)
+TEST_F(iTEBDTests,TestOrthogonalRightReCenter2)
 {
     int UnitCell=2,D=2;
     double S=0.5,epsSVD=0.0;
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
-    itsState->Normalize(TensorNetworks::DLeft);
+    itsState->Normalize(TensorNetworks::DRight);
     itsState->Orthogonalize();
     itsState->ReCenter(2);
     EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
 
+TEST_F(iTEBDTests,TestOrthogonalRangeSD)
+{
+    int UnitCell=2,Dmax=16;
+#ifdef DEBUG
+    Dmax=4;
+#endif // DEBUG
+    double epsSVD=0.0;
+    for (int D=1;D<=Dmax;D*=2)
+        for (double S=0.5;S<=2.5;S+=0.5)
+        {
+            Setup(UnitCell,S,D,epsSVD);
+//            cout << "S,D=" << S << " " << D << endl;
+            itsState->InitializeWith(TensorNetworks::Random);
+            itsState->Canonicalize(TensorNetworks::DLeft);
+            itsState->Normalize(TensorNetworks::DLeft);
+
+            itsState->Orthogonalize();
+            EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
+            EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
+
+            itsState->ReCenter(2);
+
+            itsState->Orthogonalize();
+            EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
+            EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
+
+             itsState->ReCenter(1);
+            EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
+            EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
+        }
+}
 
 TEST_F(iTEBDTests,TestExpectationIdentity)
 {
@@ -251,6 +307,37 @@ TEST_F(iTEBDTests,TestReCenterExpectationIdentity2)
     delete IdentityOp;
 }
 
+TEST_F(iTEBDTests,TestExpectationIdentityRangeSD)
+{
+        int UnitCell=2,Dmax=16;
+#ifdef DEBUG
+    Dmax=4;
+#endif // DEBUG
+    double epsSVD=0.0,dt=0.0;
+    for (int D=1;D<=Dmax;D*=2)
+        for (double S=0.5;S<=2.5;S+=0.5)
+        {
+            double eps=2e-14;
+            Setup(UnitCell,S,D,epsSVD);
+//            cout << "S,D=" << S << " " << D << endl;
+            itsState->InitializeWith(TensorNetworks::Random);
+            itsState->Canonicalize(TensorNetworks::DLeft);
+            itsState->Normalize(TensorNetworks::DLeft);
+            Matrix4RT Hlocal=itsH->BuildLocalMatrix();
+            Matrix4RT IdentityOp=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
+            MPO* IdentityMPO=itsH->CreateUnitOperator();
+            EXPECT_NEAR(itsState->GetExpectationmnmn(IdentityOp ),1.0,eps);
+            EXPECT_NEAR(itsState->GetExpectation    (IdentityMPO),1.0,eps);
+            itsState->Orthogonalize();
+            EXPECT_NEAR(itsState->GetExpectationmnmn(IdentityOp ),1.0,eps);
+            EXPECT_NEAR(itsState->GetExpectation    (IdentityMPO),1.0,eps);
+            itsState->ReCenter(2);
+            EXPECT_NEAR(itsState->GetExpectationmnmn(IdentityOp ),1.0,eps);
+            EXPECT_NEAR(itsState->GetExpectation    (IdentityMPO),1.0,eps);
+        }
+
+}
+
 TEST_F(iTEBDTests,TestApplyIdentity)
 {
     int UnitCell=2,D=2;
@@ -266,22 +353,30 @@ TEST_F(iTEBDTests,TestApplyIdentity)
 }
 
 
-TEST_F(iTEBDTests,TestApplyIdentity2)
+TEST_F(iTEBDTests,TestApplyIdentityRangeSD)
 {
-    int UnitCell=2,D=2;
-    double S=0.5,epsSVD=0.0,dt=0.0;
-    Setup(UnitCell,S,D,epsSVD);
-    itsState->InitializeWith(TensorNetworks::Random);
-    itsState->Canonicalize(TensorNetworks::DLeft);
-    itsState->Normalize(TensorNetworks::DLeft);
-    itsState->Orthogonalize();
-    TensorNetworks::SVCompressorC* mps_compressor =itsFactory->MakeMPSCompressor(D,epsSVD);
-    Matrix4RT Hlocal=itsH->BuildLocalMatrix();
-    Matrix4RT IdentityOp=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
-    itsState->Apply(IdentityOp,mps_compressor);
-    itsState->ReCenter(2);
-    itsState->Apply(IdentityOp,mps_compressor);
-    EXPECT_EQ(itsState->GetNormStatus(),"GG");
+   int UnitCell=2,Dmax=16;
+#ifdef DEBUG
+    Dmax=4;
+#endif // DEBUG
+    double epsSVD=0.0,dt=0.0;
+    for (int D=1;D<=Dmax;D*=2)
+        for (double S=0.5;S<=2.5;S+=0.5)
+        {
+            Setup(UnitCell,S,D,epsSVD);
+ //           cout << "S,D=" << S << " " << D << endl;
+            itsState->InitializeWith(TensorNetworks::Random);
+            itsState->Canonicalize(TensorNetworks::DLeft);
+            itsState->Normalize(TensorNetworks::DLeft);
+            itsState->Orthogonalize();
+            TensorNetworks::SVCompressorC* mps_compressor =itsFactory->MakeMPSCompressor(D,epsSVD);
+            Matrix4RT Hlocal=itsH->BuildLocalMatrix();
+            Matrix4RT IdentityOp=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
+            itsState->Apply(IdentityOp,mps_compressor);
+            itsState->ReCenter(2);
+            itsState->Apply(IdentityOp,mps_compressor);
+            EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
+        }
 }
 
 TEST_F(iTEBDTests,TestApplyExpH)
@@ -309,10 +404,10 @@ TEST_F(iTEBDTests,TestApplyExpH2)
     itsState->Orthogonalize();
     TensorNetworks::SVCompressorC* mps_compressor =itsFactory->MakeMPSCompressor(D,epsSVD);
     Matrix4RT Hlocal=itsH->BuildLocalMatrix();
-    Matrix4RT IdentityOp=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
-    itsState->Apply(IdentityOp,mps_compressor);
+    Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
+    itsState->Apply(expH,mps_compressor);
     itsState->ReCenter(2);
-    itsState->Apply(IdentityOp,mps_compressor);
+    itsState->Apply(expH,mps_compressor);
     EXPECT_EQ(itsState->GetNormStatus(),"rl");
 }
 TEST_F(iTEBDTests,TestApplyExpH3)
@@ -325,15 +420,41 @@ TEST_F(iTEBDTests,TestApplyExpH3)
     itsState->Orthogonalize();
     TensorNetworks::SVCompressorC* mps_compressor =itsFactory->MakeMPSCompressor(D,epsSVD);
     Matrix4RT Hlocal=itsH->BuildLocalMatrix();
-    Matrix4RT IdentityOp=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
-    itsState->Apply(IdentityOp,mps_compressor);
+    Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
+    itsState->Apply(expH,mps_compressor);
     itsState->ReCenter(2);
-    itsState->Apply(IdentityOp,mps_compressor);
+    itsState->Apply(expH,mps_compressor);
     itsState->Normalize(TensorNetworks::DLeft);
     itsState->Orthogonalize();
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
 
+TEST_F(iTEBDTests,TestApplyExpHRangeSD)
+{
+       int UnitCell=2,Dmax=8;
+#ifdef DEBUG
+    Dmax=4;
+#endif // DEBUG
+    double epsSVD=0.0,dt=0.0;
+    for (int D=1;D<=Dmax;D*=2)
+        for (double S=0.5;S<=2.5;S+=0.5)
+        {
+            Setup(UnitCell,S,D,epsSVD);
+//            cout << "S,D=" << S << " " << D << endl;
+            itsState->InitializeWith(TensorNetworks::Random);
+            itsState->Normalize(TensorNetworks::DLeft);
+            itsState->Orthogonalize();
+            TensorNetworks::SVCompressorC* mps_compressor =itsFactory->MakeMPSCompressor(D,epsSVD);
+            Matrix4RT Hlocal=itsH->BuildLocalMatrix();
+            Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
+            itsState->Apply(expH,mps_compressor);
+            itsState->ReCenter(2);
+            itsState->Apply(expH,mps_compressor);
+            itsState->Normalize(TensorNetworks::DLeft);
+            itsState->Orthogonalize();
+            EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
+        }
+}
 TEST_F(iTEBDTests,TestNeelEnergyS12)
 {
     int UnitCell=2,D=1;
@@ -380,8 +501,11 @@ TEST_F(iTEBDTests,TestRandomEnergyS12)
 
 TEST_F(iTEBDTests,TestiTimeIterate)
 {
-    int UnitCell=2,D=16;
+    int UnitCell=2,D=8;
     double S=0.5,dt=0.2,epsSVD=0.0;
+#ifdef DEBUG
+    D=4;
+#endif // DEBUG
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
