@@ -39,16 +39,14 @@ void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
         return;
     }
     MatrixCT A=ReshapeBeforeSVD(lr);
-    cout << "A=" << A << endl;
     LapackSVDSolver<dcmplx> solver;
     int D=Min(A.GetNumRows(),A.GetNumCols());
     if (comp)
     {
         int Dmax=comp->GetDmax();
-//        cout << "D Dmax=" << D << " " << Dmax << endl;
         if (Dmax>0 && Dmax<D) D=Dmax;
     }
-    auto [U,s,Vdagger]=solver.Solve(A,1e-10,D); //Solves A=U * s * Vdagger
+    auto [U,s,Vdagger]=solver.Solve(A,1e-13,D); //Solves A=U * s * Vdagger
     double integratedS2=0.0;
     if (comp) integratedS2=comp->Compress(U,s,Vdagger);
 
@@ -94,6 +92,8 @@ void MPSSite::Canonicalize1(Direction lr,SVCompressorC* comp)
     auto [U,s,Vdagger]=oml_CSVDecomp(A); //Solves A=U * s * Vdagger  returns V not Vdagger
     double integratedS2=0.0;
     if (comp) integratedS2=comp->Compress(U,s,Vdagger);
+    double s2=s.GetDiagonal()*s.GetDiagonal();
+    s/=sqrt(s2);
 
     switch (lr)
     {

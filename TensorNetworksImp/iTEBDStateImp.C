@@ -102,15 +102,6 @@ iTEBDStateImp::Sites::Sites()
 
 void iTEBDStateImp::Normalize(Direction lr)
 {
-    double sA2=lambdaA().GetDiagonal()*lambdaA().GetDiagonal();
-    double sB2=lambdaB().GetDiagonal()*lambdaB().GetDiagonal();
-    s1.bondA->SetSingularValues(lambdaA()/sqrt(sA2),0.0);
-    s1.bondB->SetSingularValues(lambdaB()/sqrt(sB2),0.0);
-//    cout << std::fixed << std::setprecision(5);
-//    cout << "lambdaA=" << lambdaA() << endl;
-//    cout << "lambdaB=" << lambdaB() << endl;
-//    cout << "sA2,sB2=" << sA2 << " " << sB2 << endl;
-
     int D=lambdaA().size();
     Matrix4CT E=GetTransferMatrix(DLeft);
     EigenSolver<dcmplx>* solver=0;
@@ -127,11 +118,11 @@ void iTEBDStateImp::Normalize(Direction lr)
     assert(fabs(imag(left_eigenValue))<1e-10);
     double lnorm=sqrt(real(left_eigenValue));
 //    double rnorm=sqrt(real(right_eigenValue));
-    double fa=itsSites[1]->FrobeniusNorm();
-    double fb=itsSites[2]->FrobeniusNorm();
+//    double fa=itsSites[1]->FrobeniusNorm();
+//    double fb=itsSites[2]->FrobeniusNorm();
 //    cout << "lnorm, fa,fb=" << lnorm << " " << fa << " " << fb << endl;
-    itsSites[1]->Rescale(sqrt(lnorm));
-    itsSites[2]->Rescale(sqrt(lnorm));
+    s1.siteA->Rescale(sqrt(lnorm));
+    s1.siteB->Rescale(sqrt(lnorm));
 
 }
 
@@ -173,65 +164,24 @@ MatrixCT ReshapeForSVD(int d,const MPSSite::dVectorT& M)
     return ret.Flatten();
 }
 
-void iTEBDStateImp::Orthogonalize()
+void iTEBDStateImp::Orthogonalize(SVCompressorC* comp)
 {
+    //
+    //  Build Gamma[n] = GammaA[na]*lambdaA*GammaB[nb]
+    //
     dVectorT gamma(itsd*itsd);
     int nab=0;
     for (int nb=0; nb<itsd; nb++)
         for (int na=0; na<itsd; na++,nab++)
             gamma[na+itsd*nb]=GammaA()[na]*lambdaA()*GammaB()[nb];
+    //
+    //  Run the one site orthogonalization algorithm.
+    //
     auto [gammap,lambdap]=Orthogonalize(gamma,lambdaB());
-    double s2=lambdap.GetDiagonal()*lambdap.GetDiagonal();
-//    cout << "lambdap s2=" << lambdap << " " << sqrt(s2) << endl;
-    lambdap*=1.0/sqrt(s2);
-
-    s1.bondB->SetSingularValues(lambdap,0.0);
-    DiagonalMatrixRT lbinv=1.0/lambdap; //inverse of LambdaB
-//    cout << "lambdap* 1/lambdap=" << lambdap*lbinv << endl;
     //
-    //  Now unpack gamma' into gammaA'*lambdaA'*gammaB'
+    //  Unpack gammap into GammaA*lambdaA*GammaB, and lambdap into lambdaB.
     //
-    dVectorT bgb(itsd*itsd);
-    for (int n=0; n<itsd*itsd; n++)
-        bgb[n]=lambdap*gammap[n]*lambdap; // Sandwich LambdaB*gammap*LambdaB
-
-    MatrixCT bgb4=ReshapeForSVD(itsd,bgb);
-
-    int D=lambdaA().size();
-    SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
-    auto [P,lambdaA_prime,Q]=svd_solver->Solve(bgb4,1e-13,D); //only keep D svs.
-    assert(Max(fabs(P*lambdaA_prime*Q-bgb4))<1e-13);
-    double s2Ap=lambdaA_prime.GetDiagonal()*lambdaA_prime.GetDiagonal();
-//    cout << "lambdaA_prime s2Ap=" << lambdaA_prime << " " << sqrt(s2Ap) << endl;
-    lambdaA_prime*=1.0/sqrt(s2Ap);
-    s1.bondA->SetSingularValues(lambdaA_prime,0.0);
-//    cout << std::scientific << "lambdaB_prime" << lambdap.GetDiagonal() << endl;
-//    cout << std::scientific << "lambdaA_prime" << lambdaA_prime.GetDiagonal() << endl;
-//    cout << "P=" << P << endl;
-//    cout << "Q=" << Q << endl;
-    assert(P.GetNumCols()==D);
-    assert(P.GetNumRows()==D*itsd);
-    assert(Q.GetNumCols()==D*itsd);
-    assert(Q.GetNumRows()==D);
-    for (int n=0; n<itsd; n++)
-    {
-        for (int i=1; i<=D; i++)
-        for (int j=1; j<=D; j++)
-        {
-//            cout << n << " " << i << " " << j << " " << n*D+i << " " << n*D+j << endl;
-            GammaA()[n](i,j)=lbinv(i)*P(n*D+i,       j);
-            GammaB()[n](i,j)=         Q(       i,n*D+j)*lbinv(j);
-        }
-//        GammaA()[n]=lbinv*GammaA()[n];
-//        GammaB()[n]=GammaB()[n]*lbinv;
-//        cout << "n,GA,GB=" << n << " " << GammaA()[n] << " " << GammaB()[n]<< endl;
-    }
-
-    delete svd_solver;
-
-    s1.siteA->itsNormStatus=MPSSite::NormStatus::GammaLeft;
-    s1.siteB->itsNormStatus=MPSSite::NormStatus::GammaLeft;
-    assert(TestOrthogonal(D*D*1e-6));
+    UnpackOrthonormal(gammap,lambdap,comp); //No compressions required.
 }
 
 void iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT& lambdap,SVCompressorC* comp)
@@ -240,68 +190,50 @@ void iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT& 
     assert(gammap.size()==itsd*itsd);
     int D=lambdaA().size();
     assert(gammap[0].GetLimits()==MatLimits(D,D));
-
-    double s2=lambdap.GetDiagonal()*lambdap.GetDiagonal();
-//    cout << "lambdap s2=" << lambdap << " " << sqrt(s2) << endl;
-    lambdap*=1.0/sqrt(s2);
-
     //
-    //  Now unpack gamma' into gammaA'*lambdaA'*gammaB'
+    //  Set lambdaB=lambdap (=lambda prime)
+    //
+    s1.bondB->SetSingularValues(lambdap,0.0); //Don't use lambdap any more in case it is not normalized
+    //
+    //  Create lambdaB*gammap*lambdaB and re-shape for SVD
     //
     dVectorT bgb(itsd*itsd);
     for (int n=0; n<itsd*itsd; n++)
-        bgb[n]=lambdap*gammap[n]*lambdap; // Sandwich LambdaB*gammap*LambdaB
+        bgb[n]=lambdaB()*gammap[n]*lambdaB(); // Sandwich LambdaB*gammap*LambdaB
 
     MatrixCT bgb4=ReshapeForSVD(itsd,bgb);
+    //
+    //  Now unpack  lambdaB*gammap[n]*lambdaB into P[na]*lambdaA'*Q[nb]'
+    //
     SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
     auto [P,lambdaA_prime,Q]=svd_solver->SolveAll(bgb4,1e-13); //only keep D svs.
     assert(Max(fabs(P*lambdaA_prime*Q-bgb4))<1e-13);
     delete svd_solver;
-//    //
-//    //  Compress from d*D back to D
-//    //
-    double integratedS2=comp->Compress(P,lambdaA_prime,Q);
-//    cout << "Compression error=" << sqrt(integratedS2) << endl;
 //
-//  Normalize lambdaA_prime
+//  Compress from d*D back to D
 //
-    double s2Ap=lambdaA_prime.GetDiagonal()*lambdaA_prime.GetDiagonal();
-//    cout << "lambdaA_prime s2Ap=" << lambdaA_prime << " " << sqrt(s2Ap) << endl;
-    lambdaA_prime*=1.0/sqrt(s2Ap);
-//
-//  Set Svs
-//
-    s1.bondA->SetSingularValues(lambdaA_prime,integratedS2);
-    s1.bondB->SetSingularValues(lambdap,0.0); //No compression needed on this one.
-//
-    assert(Min(lambdap)>1e-10);
-    DiagonalMatrixRT lbinv=1.0/lambdap; //inverse of LambdaB
-
-//    cout << std::scientific << "lambdaB_prime" << lambdap.GetDiagonal() << endl;
-//    cout << std::scientific << "lambdaA_prime" << lambdaA_prime.GetDiagonal() << endl;
-//    cout << "P=" << P << endl;
-//    cout << "Q=" << Q << endl;
+    double integratedS2 =comp->Compress(P,lambdaA_prime,Q);
     assert(P.GetNumCols()==D);
     assert(P.GetNumRows()==D*itsd);
     assert(Q.GetNumCols()==D*itsd);
     assert(Q.GetNumRows()==D);
+//
+//  Set and normalize lambdaA.
+//
+    s1.bondA->SetSingularValues(lambdaA_prime,integratedS2);
+//
+//  Unpack P into GammaA and Q into GammaB
+//
+    assert(Min(lambdaB())>1e-10);
+    DiagonalMatrixRT lbinv=1.0/lambdaB(); //inverse of LambdaB
     for (int n=0; n<itsd; n++)
-    {
         for (int i=1; i<=D; i++)
         for (int j=1; j<=D; j++)
         {
-//            cout << n << " " << i << " " << j << " " << n*D+i << " " << n*D+j << endl;
             GammaA()[n](i,j)=lbinv(i)*P(n*D+i,       j);
             GammaB()[n](i,j)=         Q(       i,n*D+j)*lbinv(j);
         }
-//        GammaA()[n]=lbinv*GammaA()[n];
-//        GammaB()[n]=GammaB()[n]*lbinv;
-//        cout << "n,GA,GB=" << n << " " << GammaA()[n] << " " << GammaB()[n]<< endl;
-    }
 
-
-    s1.siteA->itsNormStatus=MPSSite::NormStatus::GammaLeft;
-    s1.siteB->itsNormStatus=MPSSite::NormStatus::GammaLeft;
     TestOrthogonal(Max(D*sqrt(integratedS2),D*D*1e-12));
 }
 
@@ -715,21 +647,6 @@ void iTEBDStateImp::Apply(const Matrix4RT& expH,SVCompressorC* comp)
     assert(s1.siteA->GetD1()==s1.siteA->GetD2());
     int D=s1.siteA->GetD1();
 
-    typedef std::vector<dVectorT> dMatrixT;
-    Matrix4CT Theta1(itsd,D,itsd,D); //Figure 14 i
-    Matrix4CT Theta2(itsd,D,itsd,D); //Figure 14 iii
-    Theta1.Fill(0.0);
-    Theta2.Fill(0.0);
-    dMatrixT Theta; //Figure 14 v
-    for (int na=0; na<itsd; na++)
-    {
-        Theta.push_back(dVectorT(itsd));
-        for (int nb=0; nb<itsd; nb++)
-        {
-            Theta[na][nb]=MatrixCT(D,D);
-            Fill(Theta[na][nb],dcmplx(0.0));
-        }
-    }
     dVectorT  Thetap(itsd*itsd);
     for (int n=0;n<itsd*itsd;n++)
     {
@@ -738,51 +655,17 @@ void iTEBDStateImp::Apply(const Matrix4RT& expH,SVCompressorC* comp)
     }
 
     for (int mb=0; mb<itsd; mb++)
+    for (int ma=0; ma<itsd; ma++)
     {
-        for (int ma=0; ma<itsd; ma++)
-        {
-            MatrixCT theta13_1=          GammaA()[ma]*lambdaA()*GammaB()[mb]*lambdaB();  //Figure 14 i
-            MatrixCT theta13_2=lambdaB()*GammaA()[ma]*lambdaA()*GammaB()[mb];            //Figure 14 iii
-            MatrixCT theta13  =GammaA()[ma]*lambdaA()*GammaB()[mb];  //Figure 14 v
-            int nab=0;
-            for (int nb=0; nb<itsd; nb++)
-            for (int na=0; na<itsd; na++,nab++)
-                for (int i1=1; i1<=D; i1++)
-                for (int i3=1; i3<=D; i3++)
-                {
-                    Theta1(na+1,i1,nb+1,i3)+=theta13_1(i1,i3)*expH(ma,na,mb,nb); //Figure 14 i
-                    Theta2(na+1,i1,nb+1,i3)+=theta13_2(i1,i3)*expH(ma,na,mb,nb); //Figure 14 iii
-                    Theta [na][nb](i1,i3)  +=theta13  (i1,i3)*expH(ma,na,mb,nb); //Figure 14 v
-                    Thetap[nab](i1,i3)+= theta13  (i1,i3)*expH(ma,na,mb,nb);
-                }
-
-        }
+        MatrixCT theta13  =GammaA()[ma]*lambdaA()*GammaB()[mb];  //Figure 14 v
+        int nab=0;
+        for (int nb=0; nb<itsd; nb++)
+        for (int na=0; na<itsd; na++,nab++)
+            Thetap[nab]+= theta13*expH(ma,na,mb,nb);
     }
 
     auto [gammap,lambdap]=Orthogonalize(Thetap,lambdaB());
     UnpackOrthonormal(gammap,lambdap,comp);
-
-    /*
-    auto [Vr ,er]=GetEigenMatrix(DRight,Er);  //Figure 14 ii
-    auto [VlT,el]=GetEigenMatrix(DLeft ,El);  //Figure 14 iv
-//    cout << "Vr=" << Vr << endl;
-//    cout << "Vl=" << VlT << endl;
-//    cout << "Er*Vr-Vr=" << Er*Vr-Vr << endl;
-//    cout << "VlT*El-VlT=" << VlT*El-VlT<< endl;
-    assert(Max(fabs(Er *Vr-er*Vr ))<eps);
-    assert(Max(fabs(VlT*El-el*VlT))<eps);
-
-    auto [X , Xinv]=Factor(Vr ); //Figure 14 ii
-    auto [Ydagger,Ydaggerinv]=Factor(VlT); //Figure 14 iv
-    MatrixCT YT=Transpose(Y);
-    MatrixCT YTinv=Transpose(Yinv);
-    cout << "X*~X-Vr=" << X*~X-Vr << endl;
-    cout << "YT*~YT-VlT=" << Y*~Y-VlT << endl;
-    assert(Max(fabs(X*~X-Vr))<3*eps);
-    assert(Max(fabs(Y*~Y-VlT))<3*eps);
-    assert(IsUnit(X*Xinv,eps));
-    assert(IsUnit(YT*YTinv,eps));
-*/
 }
 
 double iTEBDStateImp::GetExpectationmmnn (const Matrix4RT& Hlocal) const

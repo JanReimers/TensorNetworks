@@ -34,7 +34,7 @@ class iTEBDStateImp : public virtual iTEBDState,
 //
         virtual void Canonicalize(Direction);  //Vidals L-G-L-G-L canonical form
         virtual void Normalize(Direction LR);
-        virtual void Orthogonalize();
+        virtual void Orthogonalize(SVCompressorC*);
         virtual bool TestOrthogonal(double eps) const;
 
         virtual double GetExpectation (const MPO* o) const;

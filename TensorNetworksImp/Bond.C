@@ -74,7 +74,8 @@ void Bond::SetSingularValues(const DiagonalMatrixRT& s,double integratedS2)
     //std::cout << "SingularValues=" << s << std::endl;
     itsD=s.GetNumRows();
 //    itsSingularValues.SetLimits(itsD);
-    itsSingularValues=s;
+    double s2=s.GetDiagonal()*s.GetDiagonal();
+    itsSingularValues=s/sqrt(s2);
 
     itsRank=itsD;
     itsMinSV=itsSingularValues(itsD);
@@ -97,7 +98,7 @@ void Bond::UpdateBondEntropy()
             itsRank--;
         }
     }
-    if (itsBondEntropy<0.0)
+    if (itsBondEntropy<0.0 && itsD>1)
         std::cerr << "Warning negative bond entropy s=" << itsSingularValues << std::endl;
 }
 
@@ -108,6 +109,7 @@ void Bond::SVDTransfer(Direction lr,double integratedS2,const DiagonalMatrixRT& 
 {
     SetSingularValues(s,integratedS2);
     assert(GetSite(lr));
+    // We have to forward the un-normalized Svs, otherwise R/L normalization breaks.
     GetSite(lr)->SVDTransfer(lr,s,UV);
 }
 

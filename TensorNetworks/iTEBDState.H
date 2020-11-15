@@ -27,7 +27,7 @@ class iTEBDState
 //
         virtual void Canonicalize(Direction)=0;  //Vidals L-G-L-G-L canonical form
         virtual void Normalize(Direction LR)=0; //Use largest eigen value of transfer matrix
-        virtual void Orthogonalize()=0;
+        virtual void Orthogonalize(SVCompressorC*)=0;
         virtual bool TestOrthogonal(double eps) const=0;
 //        virtual void NormalizeAndCompress(Direction LR,SVCompressorC*)=0;
 
