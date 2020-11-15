@@ -20,6 +20,40 @@ typedef std::complex<double> dcmplx;
 //  See here for docs: https://www.caam.rice.edu/software/ARPACK/UG/node138.html
 //                     https://www.caam.rice.edu/software/ARPACK/UG/node44.html
 //                      https://scm.cs.kuleuven.be/scm/svn/numerics_software/ARPACK/SRC/dneupd.f//
+//
+//  INFO!= error codes:
+//c  INFO    Integer.  (INPUT/OUTPUT)
+//c          If INFO .EQ. 0, a randomly initial residual vector is used.
+//c          If INFO .NE. 0, RESID contains the initial residual vector,
+//c                          possibly from a previous run.
+//c          Error flag on output.
+//c          =  0: Normal exit.
+//c          =  1: Maximum number of iterations taken.
+//c                All possible eigenvalues of OP has been found. IPARAM(5)
+//c                returns the number of wanted converged Ritz values.
+//c          =  2: No longer an informational error. Deprecated starting
+//c                with release 2 of ARPACK.
+//c          =  3: No shifts could be applied during a cycle of the
+//c                Implicitly restarted Arnoldi iteration. One possibility
+//c                is to increase the size of NCV relative to NEV.
+//c                See remark 4 below.
+//c          = -1: N must be positive.
+//c          = -2: NEV must be positive.
+//c          = -3: NCV-NEV >= 2 and less than or equal to N.
+//c          = -4: The maximum number of Arnoldi update iteration
+//c                must be greater than zero.
+//c          = -5: WHICH must be one of 'LM', 'SM', 'LR', 'SR', 'LI', 'SI'
+//c          = -6: BMAT must be one of 'I' or 'G'.
+//c          = -7: Length of private work array is not sufficient.
+//c          = -8: Error return from LAPACK eigenvalue calculation;
+//c          = -9: Starting vector is zero.
+//c          = -10: IPARAM(7) must be 1,2,3,4.
+//c          = -11: IPARAM(7) = 1 and BMAT = 'G' are incompatable.
+//c          = -12: IPARAM(1) must be equal to 0 or 1.
+//c          = -9999: Could not build an Arnoldi factorization.
+//c                   IPARAM(5) returns the size of the current Arnoldi
+//c                   factorization.
+//c
 extern "C"
 {
     // Non symmetric complex single
@@ -71,11 +105,12 @@ ArpackEigenSolver<dcmplx>::SolveG(MatvecT matvec,int N, int Nev,double eps)
     iParam(7)=1; //Mode
     int iPntr[14];
     char arI='I';
+    char which[] = "LR";
 
     // Arnaldi iteration loop
     do
     {
-        znaupd_c(&IDO,&arI,N,"LR",Nev,eps,&residuals(1),Ncv,&V(1,1)
+        znaupd_c(&IDO,&arI,N,which,Nev,eps,&residuals(1),Ncv,&V(1,1)
         ,N,&iParam(1),iPntr,&Workd(1),&Workl(1),Lworkl,&rwork(1),&INFO);
 //        cout << "IDO=" << IDO << endl;
         if (IDO==-1 || IDO==1)
@@ -84,6 +119,10 @@ ArpackEigenSolver<dcmplx>::SolveG(MatvecT matvec,int N, int Nev,double eps)
             break;
 
     } while(true);
+    if (INFO!=0)
+    {
+        cout << "Info=" << INFO << endl;
+    }
     //cout << "Info=" << INFO << endl;
     //cout << "nIter=" << iParam(3) << endl;
     assert(INFO==0);
@@ -95,7 +134,7 @@ ArpackEigenSolver<dcmplx>::SolveG(MatvecT matvec,int N, int Nev,double eps)
     Matrix<dcmplx> U(N,Nev);
     dcmplx sigma(0);
     zneupd_c(true, "All", &select(1), &D(1), &U(1,1),N,
-        sigma, &Workev(1), &arI,N,"LR", Nev, eps,
+        sigma, &Workev(1), &arI,N,which, Nev, eps,
           &residuals(1), Ncv, &V(1,1),N, &iParam(1), iPntr, &Workd(1), &Workl(1),
           Lworkl, &rwork(1), &INFO );
 
@@ -135,11 +174,12 @@ ArpackEigenSolver<double>::SolveG(MatvecT matvec,int N, int Nev,double eps)
     iParam(7)=1; //Mode
     int iPntr[14];
     char arI='I';
+    char which[] = "LR";
 
     // Arnaldi iteration loop
     do
     {
-        dnaupd_c(&IDO,&arI,N,"LR",Nev,eps,&residuals(1),Ncv,&V(1,1)
+        dnaupd_c(&IDO,&arI,N,which,Nev,eps,&residuals(1),Ncv,&V(1,1)
         ,N,&iParam(1),iPntr,&Workd(1),&Workl(1),Lworkl,&INFO);
 //        cout << "IDO=" << IDO << endl;
         if (IDO==-1 || IDO==1)
@@ -148,7 +188,10 @@ ArpackEigenSolver<double>::SolveG(MatvecT matvec,int N, int Nev,double eps)
             break;
 
     } while(true);
-//    cout << "Info=" << INFO << endl;
+    if (INFO!=0)
+    {
+        cout << "Info=" << INFO << endl;
+    }
 //    cout << "nIter=" << iParam(3) << endl;
     assert(INFO==0);
     //
@@ -160,7 +203,7 @@ ArpackEigenSolver<double>::SolveG(MatvecT matvec,int N, int Nev,double eps)
     double sigmar(0),sigmai(0);
     char how_many('A');
     dneupd_c(true, &how_many, &select(1), &DR(1),&DI(1), &V(1,1),N,
-        sigmar,sigmai, &Workev(1), &arI,N,"LR", Nev, eps,
+        sigmar,sigmai, &Workev(1), &arI,N,which, Nev, eps,
           &residuals(1), Ncv, &V(1,1),N, &iParam(1), iPntr, &Workd(1), &Workl(1),
           Lworkl, &INFO );
 
@@ -229,7 +272,7 @@ ArpackEigenSolver<double>::SolveSym(MatvecT matvec,int N, int Nev,double eps)
     // Arnaldi iteration loop
     do
     {
-      dsaupd_c(&IDO,&arI,N,"LR",Nev,eps,&residuals(1),Ncv,&V(1,1),N,&iParam(1),iPntr,&Workd(1),&Workl(1),Lworkl,&INFO);
+      dsaupd_c(&IDO,&arI,N,"LA",Nev,eps,&residuals(1),Ncv,&V(1,1),N,&iParam(1),iPntr,&Workd(1),&Workl(1),Lworkl,&INFO);
 //        cout << "IDO=" << IDO << endl;
         if (IDO==-1 || IDO==1)
             matvec(N,&Workd(iPntr[0]),&Workd(iPntr[1]));
@@ -237,8 +280,11 @@ ArpackEigenSolver<double>::SolveSym(MatvecT matvec,int N, int Nev,double eps)
             break;
 
     } while(true);
-//    cout << "Info=" << INFO << endl;
-//    cout << "nIter=" << iParam(3) << endl;
+    if (INFO!=0)
+    {
+        cout << "Info=" << INFO << endl;
+        cout << "nIter=" << iParam(3) << endl;
+    }
     assert(INFO==0);
     //
     //  Post processing to the eigen vectors.
@@ -247,7 +293,7 @@ ArpackEigenSolver<double>::SolveSym(MatvecT matvec,int N, int Nev,double eps)
     Vector<double> D(Nev+1),Workev(3*Ncv);
     double sigma(0);
     char how_many('A');
-    dseupd_c(true, &how_many, &select(1), &D(1), &V(1,1),N, sigma, &arI,N,"LR", Nev, eps, &residuals(1), Ncv, &V(1,1),N, &iParam(1), iPntr, &Workd(1), &Workl(1),          Lworkl, &INFO );
+    dseupd_c(true, &how_many, &select(1), &D(1), &V(1,1),N, sigma, &arI,N,"LA", Nev, eps, &residuals(1), Ncv, &V(1,1),N, &iParam(1), iPntr, &Workd(1), &Workl(1),          Lworkl, &INFO );
 
     D.SetLimits(Nev,true);
     V.SetLimits(N,Nev,true);
