@@ -41,11 +41,20 @@ template <> void ev<dcmplx>(char* JOBVL,char* JOBVR,int* N,dcmplx* A,int* LDA,dc
     zgeev_ (JOBVL,JOBVR,N,A,LDA,W    ,VL,LDVL,VR,LDVR,WORK,LWORK,&rwork(1),INFO);
 }
 
+
 template <class T> typename LapackEigenSolver<T>::UdType
 LapackEigenSolver<T>::SolveAll(const MatrixT& A,double eps)
 {
     int N=A.GetNumRows();
-    return std::move(Solve(A,eps,N));
+    if (IsDiagonal(A,N*eps))
+    {
+        Matrix<T> U(N,N);
+        Unit(U);
+        Vector<T> e=A.GetDiagonal();
+        return std::make_tuple(U,real(e));
+    }
+    else
+        return std::move(Solve(A,eps,N));
 }
 
 
@@ -85,8 +94,12 @@ LapackEigenSolver<T>::Solve(const MatrixT& A,double eps, int NumEigenValues)
     //
     evx<T>(&jobz,&range,&uplo,&N,&Alower(1,1),&N,&VL,&VU,&IL,&IU,&eps,&NumEigenValues,&W(1),&U(1,1),&N, &work(1),&lwork,&iwork(1),&ifail(1),&info);
     if (info!=0)
+    {
         std::cerr << "Warning: LapackEigenSolver info=" << info << std::endl;
-    assert(info==0);
+//        std::cout << std::fixed << "A=" << A << std::endl;
+//        std::cout << "W=" << W << std::endl;
+    }
+//    assert(info==0);
     //
     //  Now fix up the matrix limits
     W.SetLimits(NumEigenValues,true);
