@@ -101,12 +101,13 @@ LapackSVDSolver<T>::SolveAll(const MatrixT& A,double eps)
     return Solve(A,eps,mn);
 }
 
-inline const double& real(const double& d) {return d;}
-using std::real;
+//using std::real;
 
 template <class T> typename LapackSVDSolver<T>::UsVType
 LapackSVDSolver<T>::Solve(const MatrixT& A,double eps, int NumSingularValues)
 {
+    assert(eps<1.0);
+    assert(NumSingularValues>0);
     assert(NumSingularValues<=Min(A.GetNumRows(),A.GetNumCols()));
     int M=A.GetNumRows(),N=A.GetNumCols(),mn=Min(M,N);
 
