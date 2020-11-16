@@ -4,7 +4,7 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     -Do normalization inside Orthogonal
     -Try and get rid off ambiguous op overload warnings.
     -Stop checking orthogonality everywhere, just report it
-    -Optimize GetExpectation functions, assume normality
+    Done: -Optimize GetExpectation functions, assumes orthonormality
     Done: -Where to put Sv normalization
         Inside Bond.C
         after each SVD call?
@@ -14,6 +14,7 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     -Bond.C don't overwrite SVerror
     -Store sqrt(s*s) for SV error.
     -Use the name CompressionError consistently.
+    -Use Factor and EigenMatrix functions
 -Investigate sweep directions for normalization
 -Improve level two logging for variation ground states
 -Done: Profiling

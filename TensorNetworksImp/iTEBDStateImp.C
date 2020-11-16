@@ -272,12 +272,12 @@ bool iTEBDStateImp::TestOrthogonal(double eps) const
 //    cout << "I*El=" << IEl << endl;
     double r_error= Max(fabs(ErI-I));
     double l_error= Max(fabs(IEl-I));
-    if (r_error>eps)
+    if (r_error>D*eps)
     {
         cout << std::scientific;
         cout << "Error not orthogonal Max(fabs(ErI-I))=" << r_error << " > eps=" << eps << endl;
     }
-    if (l_error>eps)
+    if (l_error>D*eps)
     {
         cout << std::scientific;
         cout << "Error not orthogonal Max(fabs(IEl-I))=" << l_error << " > eps=" << eps << endl;
@@ -451,10 +451,9 @@ Matrix4CT iTEBDStateImp::GetTransferMatrix(const dVectorT& M) const
 //
 Matrix4CT iTEBDStateImp::GetTransferMatrix(Direction lr) const
 {
-    int D=s1.siteA->GetD1();
-    assert(D==s1.siteA->GetD2());
-    assert(D==s1.siteB->GetD1());
-    assert(D==s1.siteB->GetD2());
+    assert(s1.siteA->GetD1()==s1.siteA->GetD2());
+    assert(s1.siteA->GetD1()==s1.siteB->GetD1());
+    assert(s1.siteA->GetD1()==s1.siteB->GetD2());
 
     dVectorT gamma(itsd*itsd);
     int nab=0;
@@ -631,9 +630,7 @@ double iTEBDStateImp::GetExpectationmmnn (const Matrix4RT& Hlocal) const
     assert(D==s1.siteB->GetD1());
     assert(D==s1.siteB->GetD2());
 
-    Matrix4CT Eo(D,D,D,D);
-    Eo.Fill(0);
-//    cout << "ma mb na nb" << endl;
+    dcmplx expectation1(0.0);
     for (int na=0; na<itsd; na++)
         for (int nb=0; nb<itsd; nb++)
         {
@@ -646,33 +643,13 @@ double iTEBDStateImp::GetExpectationmmnn (const Matrix4RT& Hlocal) const
                     MatrixCT theta13_m=conj(lambdaB()*GammaA()[ma])*lambdaA()*conj(GammaB()[mb])*lambdaB();
                     assert(theta13_m.GetNumRows()==D);
                     assert(theta13_m.GetNumCols()==D);
-//                    if (fabs(Hlocal(ma,mb,na,nb))>1e-13)
-//                    {
-//                        cout << ma << " " << mb << " " << na << " " << nb << " " << Hlocal(ma,mb,na,nb) << endl;
-//                    }
                     for (int i1=1; i1<=D; i1++)
-                        for (int j1=1; j1<=D; j1++)
-                            for (int i3=1; i3<=D; i3++)
-                                for (int j3=1; j3<=D; j3++)
-                                    Eo(i1,j1,i3,j3)+=theta13_m(i1,i3)*Hlocal(ma,mb,na,nb)*theta13_n(j1,j3);
+                        for (int i3=1; i3<=D; i3++)
+                            expectation1+=theta13_m(i1,i3)*Hlocal(ma,mb,na,nb)*theta13_n(i1,i3);
                 }
         }
-//    cout << "expH Eo=" << Eo << endl;
-    Matrix4CT E=GetTransferMatrix(DLeft);
-    MatrixCT I(D,D); //Right ei
-    Unit(I);
-//    I*=1.0/(sqrt(D));
-//    double l_error= Max(fabs(I*E-I));
-//    if (l_error>1e-13)
-//    {
-//        cout << std::scientific;
-//        cout << "GetExpectationmmnn: Error not orthogonal Max(fabs(IEl-I))=" << l_error << " > eps=" << 1e-13 << endl;
-//    }
-//    cout << "I*Eo*I=" << Contract(I,Eo,I) << endl;
-    dcmplx expectation=Contract(I,Eo,I) ;
-//    cout << "expectation,eigenvalue==" << expectation << endl;
-    assert(fabs(imag(expectation))<1e-10);
-    return real(expectation);
+    assert(fabs(imag(expectation1))<1e-10);
+    return real(expectation1);
 
 }
 double iTEBDStateImp::GetExpectationmnmn (const Matrix4RT& expH) const
@@ -683,9 +660,7 @@ double iTEBDStateImp::GetExpectationmnmn (const Matrix4RT& expH) const
     assert(D==s1.siteB->GetD1());
     assert(D==s1.siteB->GetD2());
 
-    Matrix4CT Eo(D,D,D,D);
-    Eo.Fill(0);
-//    cout << "ma mb na nb" << endl;
+    dcmplx expectation1(0.0);
     for (int na=0; na<itsd; na++)
         for (int nb=0; nb<itsd; nb++)
         {
@@ -698,33 +673,13 @@ double iTEBDStateImp::GetExpectationmnmn (const Matrix4RT& expH) const
                     MatrixCT theta13_m=conj(lambdaB()*GammaA()[ma])*lambdaA()*conj(GammaB()[mb])*lambdaB();
                     assert(theta13_m.GetNumRows()==D);
                     assert(theta13_m.GetNumCols()==D);
-//                    if (fabs(expH(ma,na,mb,nb))>1e-13)
-//                    {
-//                        cout << ma << " " << mb << " " << na << " " << nb << " " << expH(ma,na,mb,nb) << endl;
-//                    }
                     for (int i1=1; i1<=D; i1++)
-                        for (int j1=1; j1<=D; j1++)
-                            for (int i3=1; i3<=D; i3++)
-                                for (int j3=1; j3<=D; j3++)
-                                    Eo(i1,j1,i3,j3)+=theta13_m(i1,i3)*expH(ma,na,mb,nb)*theta13_n(j1,j3);
+                        for (int i3=1; i3<=D; i3++)
+                            expectation1+=theta13_m(i1,i3)*expH(ma,na,mb,nb)*theta13_n(i1,i3);
                 }
         }
-//    cout << "expH Eo=" << Eo << endl;
-    Matrix4CT E=GetTransferMatrix(DLeft);
-    MatrixCT I(D,D); //Right ei
-    Unit(I);
-//    I*=1.0/(sqrt(D));
-    double l_error= Max(fabs(I*E-I));
-    if (l_error>1e-13)
-    {
-        cout << std::scientific;
-        cout << "GetExpectationmnmn: Error not orthogonal Max(fabs(IEl-I))=" << l_error << " > eps=" << 1e-13 << endl;
-    }
-//    cout << "I*Eo*I=" << Contract(I,Eo,I) << endl;
-    dcmplx expectation=Contract(I,Eo,I) ;
-//    cout << "expectation,eigenvalue==" << expectation << endl;
-    assert(fabs(imag(expectation))<1e-10);
-    return real(expectation);
+    assert(fabs(imag(expectation1))<1e-10);
+    return real(expectation1);
 
 }
 
@@ -738,16 +693,16 @@ double iTEBDStateImp::GetExpectation (const MPO* o) const
 
     const SiteOperator* soA=o->GetSiteOperator(1);
     const SiteOperator* soB=o->GetSiteOperator(2);
-    int DwA1=soA->GetDw12().Dw1;
     int DwA2=soA->GetDw12().Dw2;
+#ifdef DEBUG
+    int DwA1=soA->GetDw12().Dw1;
     int DwB1=soB->GetDw12().Dw1;
     int DwB2=soB->GetDw12().Dw2;
+#endif
     assert(DwA1==1);
     assert(DwB2==1);
     assert(DwA2==DwB1);
-    Matrix4CT Eo(D,D,D,D);
-    Eo.Fill(0);
-//    cout << "ma mb na nb" << endl;
+    dcmplx expectation1(0.0);
     for (int na=0; na<itsd; na++)
         for (int nb=0; nb<itsd; nb++)
         {
@@ -770,33 +725,14 @@ double iTEBDStateImp::GetExpectation (const MPO* o) const
                     MatrixCT theta13_m=conj(lambdaB()*GammaA()[ma])*lambdaA()*conj(GammaB()[mb])*lambdaB();
                     assert(theta13_m.GetNumRows()==D);
                     assert(theta13_m.GetNumCols()==D);
-//                    if (fabs(Omn)>1e-13)
-//                    {
-//                        cout << ma << " " << mb << " " << na << " " << nb << " " << Omn << endl;
-//                    }
                     for (int i1=1; i1<=D; i1++)
-                        for (int j1=1; j1<=D; j1++)
-                            for (int i3=1; i3<=D; i3++)
-                                for (int j3=1; j3<=D; j3++)
-                                    Eo(i1,j1,i3,j3)+=theta13_m(i1,i3)*Omn*theta13_n(j1,j3);
+                        for (int i3=1; i3<=D; i3++)
+                            expectation1+=theta13_m(i1,i3)*Omn*theta13_n(i1,i3);
                 }
         }
 
-//    cout << "MPO Eo=" << Eo << endl;
-    Matrix4CT E=GetTransferMatrix(DLeft);
-    MatrixCT I(D,D); //Right ei
-    Unit(I);
-//    I*=1.0/sqrt(D);
-
-//    double l_error= Max(fabs(I*E-I));
-//    if (l_error>1e-13)
-//    {
-//        cout << std::scientific;
-//        cout << "GetExpectation(MPO): Error not orthogonal Max(fabs(IEl-I))=" << l_error << " > eps=" << 1e-13 << endl;
-//    }
-    dcmplx expectation=Contract(I,Eo,I) ;
-    assert(fabs(imag(expectation))<1e-10);
-    return real(expectation);
+    assert(fabs(imag(expectation1))<1e-10);
+    return real(expectation1);
 }
 
 //double iTEBDStateImp::GetExpectation (const MPO* o) const

@@ -15,7 +15,7 @@ public:
 
     iTEBDTests()
     : epsNorm(4e-11)
-    , epsOrth(1e-11)
+    , epsOrth(4e-11)
     , itsFactory(TensorNetworks::Factory::GetFactory())
     , itsH(0)
     , itsState(0)
@@ -38,7 +38,7 @@ public:
         if (itsState) delete itsState;
         if (itsCompressor) delete itsCompressor;
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsState=itsH->CreateiTEBDState(D,D*epsNorm,epsSVD);
+        itsState=itsH->CreateiTEBDState(D,D*D*epsNorm,epsSVD);
         itsCompressor=itsFactory->MakeMPSCompressor(D,epsSVD);
     }
 
@@ -111,7 +111,7 @@ TEST_F(iTEBDTests,TestReCenterRightNormalize)
 
 TEST_F(iTEBDTests,TestNormalizeRangeSD)
 {
-    int UnitCell=2,Dmax=16;
+    int UnitCell=2,Dmax=32;
 #ifdef DEBUG
     Dmax=8;
 #endif // DEBUG
@@ -432,7 +432,7 @@ TEST_F(iTEBDTests,TestApplyExpH3)
 
 TEST_F(iTEBDTests,TestApplyExpHRangeSD)
 {
-       int UnitCell=2,Dmax=8;
+       int UnitCell=2,Dmax=16;
 #ifdef DEBUG
     Dmax=4;
 #endif // DEBUG
