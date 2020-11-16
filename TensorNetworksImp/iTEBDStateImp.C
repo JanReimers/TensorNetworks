@@ -281,116 +281,132 @@ ONErrors iTEBDStateImp::GetOrthonormalityErrors() const
     return {right_norm_error,left__norm_error,right_orth_error,left__orth_error};
 }
 
-iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(const dVectorT& gamma, const DiagonalMatrixRT& lambda)
+
+iTEBDStateImp::MdType iTEBDStateImp::GetEigenMatrix(TensorNetworks::Direction lr, const Matrix4CT& theta)
 {
-    int d=gamma.size();
-    assert(d>0);
-    int D=gamma[0].GetNumRows();
-    assert(D==gamma[0].GetNumCols());
-
-//    double s2=lambda.GetDiagonal()*lambda.GetDiagonal();
-//    cout << "input lambda s2=" << s2 << endl;
-
-    //
-    //  Calculate right and left transfer matrices and the R/L eigen vectors
-    //  Transform the eigen vectors into Hermitian eigen matrices
-    //
+    int D=s1.siteA->GetD1();
     EigenSolver<dcmplx>* solver=0;
     if (D==1)
         solver=new LapackEigenSolver<dcmplx>;
      else
         solver=new ArpackEigenSolver<dcmplx>;
 
-    dVectorT gl=gamma*lambda;
-    for (int n=0;n<d;n++)
-        assert(gl[n]==gamma[n]*lambda);
-    Matrix4CT Er=GetTransferMatrix(gamma*lambda);
-
-    MatrixCT Vr(D,D); //Right eigen matrix
-    double er;
+    VectorCT eigenVector;
+    double   eigenValue;
+    switch (lr)
     {
-        auto [U,e]=solver->SolveRightNonSym(Er.Flatten(),1e-13,1);
-//        cout << "Right e 1-e=" << e << " " << 1.0-e(1) << endl;
-//        assert(fabs(1.0-e(1))<1e-10);
-        assert(imag(e(1))<1e-10);
-        er=real(e(1));
-        int ij=1;
-        for (int j=1; j<=D; j++)
-            for (int i=1; i<=D; i++,ij++)
-                Vr(i,j)=U.GetColumn(1)(ij);
-        dcmplx phase=Vr(1,1)/fabs(Vr(1,1));
-        assert(fabs(phase)-1.0<1e-14);
-        Vr*=conj(phase); //Take out arbitrary phase angle
+        case DLeft :
+         {
+            auto [U,e]=solver->SolveLeft_NonSym(theta.Flatten(),1e-13,1);
+            assert(imag(e(1))<1e-13);
+            eigenValue=real(e(1));
+            eigenVector=U.GetColumn(1);
+            break;
+        }
+       case DRight:
+        {
+            auto [U,e]=solver->SolveRightNonSym(theta.Flatten(),1e-13,1);
+            assert(imag(e(1))<1e-13);
+            eigenValue=real(e(1));
+            eigenVector=U.GetColumn(1);
+            break;
+        }
     }
-//    if (fabs(er-1.0)>1e-10)
-//        cout << "Right eigenvalue=" << er << endl;
-//    cout << "Vr=" << Vr << endl;
+//    cout << "eigen value=" << eigenValue << endl;
+    //
+    //  Unpack eigenVector into a matrix
+    //
+    assert(eigenVector.size()==D*D);
+    MatrixCT V(D,D); // eigen matrix
+    int ij=1;
+    for (int j=1; j<=D; j++)
+        for (int i=1; i<=D; i++,ij++)
+            V(i,j)=eigenVector(ij);
+
+    dcmplx phase=V(1,1)/fabs(V(1,1));
+    assert(fabs(phase)-1.0<1e-14);
+    V*=conj(phase); //Take out arbitrary phase angle
+
+    double err;
+    switch (lr)
+    {
+        case DLeft  : err=Max(fabs(V*theta-eigenValue*V));break; //Assumes eigen value was 1
+        case DRight : err=Max(fabs(theta*V-eigenValue*V));break;
+    }
+    if (err>1e-13) cout  << std::scientific << "Eigen vector error=" << err << endl;
+    assert(err<1e-10);
+    return std::make_tuple(V,eigenValue);
+}
+
+//
+//  Decompose eigen matrices
+//
+iTEBDStateImp::MMType iTEBDStateImp::Factor(const MatrixCT m)
+{
+    EigenSolver<dcmplx>* solver=new LapackEigenSolver<dcmplx>; //Switch to a dense solver
+    assert(IsHermitian(m,1e-10));  //Make sure are close to Hermitian
+    MatrixCT mh=0.5*(m+~m); //Make it perfectly hermitian.  THis should cancel out some numerical round off noise.
+    assert(IsHermitian(mh,1e-13));
+    MatrixCT X,Xinv;
+    auto [U,e]=solver->SolveAll(mh,1e-13);
+    delete solver;
+    X=U*DiagonalMatrix<double>(sqrt(e));
+    assert(Min(e)>1e-10);
+    Xinv=DiagonalMatrix<double>(1.0/sqrt(e))*Transpose(conj(U));
+    assert(IsUnit(X*Xinv,1e-13));
+    return std::make_tuple(X,Xinv);
+}
+
+
+iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(const dVectorT& gamma, const DiagonalMatrixRT& lambda)
+{
+    int d=gamma.size();
+    assert(d>0);
+    int D=gamma[0].GetNumRows();
+    assert(D==gamma[0].GetNumCols());
+    //
+    //  Calculate right and left transfer matrices and the R/L eigen vectors
+    //  Transform the eigen vectors into Hermitian eigen matrices
+    //
+    Matrix4CT Er=GetTransferMatrix(gamma*lambda);
+    Matrix4CT El=GetTransferMatrix(lambda*gamma);
+
+    auto [Vr,er]=GetEigenMatrix(DRight,Er);
+    auto [Vl,el]=GetEigenMatrix(DLeft ,El);
+
     double rerr=Max(fabs(Er*Vr-er*Vr));
     if (rerr>1e-13) cout  << std::scientific << "rerr=" << rerr << endl;
     assert(rerr<1e-10);
 
-    Matrix4CT El=GetTransferMatrix(lambda*gamma);
-    MatrixCT Vl(D,D); //Right eigen matrix
-    double el;
-    {
-        auto [U,e]=solver->SolveLeft_NonSym(El.Flatten(),1e-13,1);
-//        cout << "Left e 1-e=" << e << " " << 1.0-e(1) << endl;
-//        assert(fabs(1.0-e(1))<1e-10);
-        assert(imag(e(1))<1e-10);
-        el=real(e(1));
-        int ij=1;
-        for (int j=1; j<=D; j++)
-            for (int i=1; i<=D; i++,ij++)
-                Vl(i,j)=U.GetColumn(1)(ij);
-        dcmplx phase=Vl(1,1)/fabs(Vl(1,1));
-        assert(fabs(phase)-1.0<1e-14);
-        Vl*=conj(phase); //Take out arbitrary phase angle
-    }
-//    if (fabs(el-1.0)>1e-10)
-//        cout << "Left  eigenvalue=" << el << endl;
-//    cout << "Vl=" << Vl << endl;
     double lerr=Max(fabs(Vl*El-el*Vl));
     if (lerr>1e-13) cout  << std::scientific << "lerr=" << lerr << endl;
     assert(lerr<1e-10);
-    delete solver;
 //
-//  Decompose eigen matrices
+//  Make sure Vr and Vl are as Hermitian as they can get.
 //
-    solver=new LapackEigenSolver<dcmplx>; //Switch to a dense solver
     assert(IsHermitian(Vr,1e-10));
     assert(IsHermitian(Vl,1e-10));
-    Vr=0.5*(Vr+~Vr);
+    Vr=0.5*(Vr+~Vr); //Try and clean up non-Hermitian round-off noise.
     Vl=0.5*(Vl+~Vl);
     assert(IsHermitian(Vr,1e-13));
     assert(IsHermitian(Vl,1e-13));
-    MatrixCT X,Xinv;
-    {
-        auto [U,e]=solver->SolveAll(Vr,1e-13);
-        X=U*DiagonalMatrix<double>(sqrt(e));
-        assert(Min(e)>0.0);
-        Xinv=DiagonalMatrix<double>(1.0/sqrt(e))*Transpose(conj(U));
-    }
-//    cout << "X,Xinv" << X << Xinv << endl;
+
+//
+//  Decompose eigen matrices
+//
+    auto [X,Xinv]=Factor(Vr);
+    auto [Y,Yinv]=Factor(Vl);
+    MatrixCT YT   =Transpose(Y);
+    MatrixCT YTinv=Transpose(Yinv);
     assert(IsUnit(X*Xinv,1e-13));
-    MatrixCT YT,YTinv;
-    {
-        auto [U,e]=solver->SolveAll(Vl,1e-13);
-        YT=Transpose(U*DiagonalMatrix<double>(sqrt(e)));
-        assert(Min(e)>0.0);
-        YTinv=Transpose(DiagonalMatrix<double>(1.0/sqrt(e))*Transpose(conj(U)));
-    }
-//    cout << "YT*YTinv" << YT*YTinv << endl;
     assert(IsUnit(YT*YTinv,1e-12));
-    delete solver;
     //
-    //  Transform lambda
+    //  Transform lambda and SVD
     //
     MatrixCT YlX=YT*lambda*X; //THis will scale lambda by 1/D since YT and X are both O(1/sqrt(D))
     SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
     auto [U,lambda_prime,VT]=svd_solver->SolveAll(YlX,1e-13);
     delete svd_solver;
-
-//    cout << U << lambda_prime << VT << endl;
     //
     //  Transform Gamma
     //
@@ -398,25 +414,24 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(const dVectorT& gamma, const 
     for (int n=0;n<d;n++)
     {
         gamma_prime[n]=VT*Xinv*gamma[n]*YTinv*U;
-//        cout << gamma_prime[n] << endl;
     }
     //
     //  Verify orthogonaly
     //
-    Er=GetTransferMatrix(gamma_prime*lambda_prime);
-    El=GetTransferMatrix(lambda_prime*gamma_prime);
+    MatrixCT Nr=GetNormMatrix(DRight,gamma_prime*lambda_prime); //=Er*I
+    MatrixCT Nl=GetNormMatrix(DLeft ,lambda_prime*gamma_prime); //=I*El
     MatrixCT I(D,D); //Right ei
     Unit(I);
-    MatrixCT ErI=Er*I-er*I;
-    MatrixCT IEl=I*El-el*I;
-//    cout << "Max(fabs(Er*I-er*I))=" << Max(fabs(Er*I-er*I))  << endl;
-//    cout << "Max(fabs(I*El-el*I))=" << Max(fabs(I*El-el*I))  << endl;
-    assert(Max(fabs(ErI))<D*D*1e-6);
-    assert(Max(fabs(IEl))<D*D*1e-6);
-//    cout << std::scientific << "Er*I=" << ErI-I << endl;
-//    cout << "i*El=" << IEl-I << endl;
-//    assert(IsUnit(ErI,D*1e-9));
-//    assert(IsUnit(IEl,D*1e-9));
+    double  left_error=Max(fabs(Nr-er*I));
+    double right_error=Max(fabs(Nl-el*I));
+    if (left_error>1e-12)
+    {
+        cout << std::scientific << "Warning: Left orthogonality error=" << left_error  << endl;
+    }
+    if (right_error>1e-12)
+    {
+        cout << std::scientific << "Warning: Right orthogonality error=" << right_error  << endl;
+    }
 
     return std::make_tuple(gamma_prime,lambda_prime);
 }
@@ -544,82 +559,6 @@ Matrix4CT iTEBDStateImp::GetTransferMatrix(const Matrix4CT& theta) const
                 }
     return E;
 }
-
-iTEBDStateImp::MdType iTEBDStateImp::GetEigenMatrix(TensorNetworks::Direction lr, const Matrix4CT& theta)
-{
-    int D=s1.siteA->GetD1();
-    EigenSolver<dcmplx>* solver=0;
-    if (D==1)
-        solver=new LapackEigenSolver<dcmplx>;
-     else
-        solver=new ArpackEigenSolver<dcmplx>;
-
-    VectorCT eigenVector;
-    double   eigenValue;
-    switch (lr)
-    {
-        case DLeft :
-         {
-            auto [U,e]=solver->SolveLeft_NonSym(theta.Flatten(),1e-13,1);
-            assert(imag(e(1))<1e-13);
-            eigenValue=real(e(1));
-            eigenVector=U.GetColumn(1);
-            break;
-        }
-       case DRight:
-        {
-            auto [U,e]=solver->SolveRightNonSym(theta.Flatten(),1e-13,1);
-            assert(imag(e(1))<1e-13);
-            eigenValue=real(e(1));
-            eigenVector=U.GetColumn(1);
-            break;
-        }
-    }
-    cout << "eigen value=" << eigenValue << endl;
-    //
-    //  Unpack eigenVector into a matrix
-    //
-    assert(eigenVector.size()==D*D);
-    MatrixCT V(D,D); // eigen matrix
-    int ij=1;
-    for (int j=1; j<=D; j++)
-        for (int i=1; i<=D; i++,ij++)
-            V(i,j)=eigenVector(ij);
-
-    dcmplx phase=V(1,1)/fabs(V(1,1));
-    assert(fabs(phase)-1.0<1e-14);
-    V*=conj(phase); //Take out arbitrary phase angle
-
-    double err;
-    switch (lr)
-    {
-        case DLeft  : err=Max(fabs(V*theta-eigenValue*V));break; //Assumes eigen value was 1
-        case DRight : err=Max(fabs(theta*V-eigenValue*V));break;
-    }
-    if (err>1e-13) cout  << std::scientific << "Eigen vector error=" << err << endl;
-    assert(err<1e-10);
-    return std::make_tuple(V,eigenValue);
-}
-
-//
-//  Decompose eigen matrices
-//
-iTEBDStateImp::MMType iTEBDStateImp::Factor(const MatrixCT m)
-{
-    EigenSolver<dcmplx>* solver=new LapackEigenSolver<dcmplx>; //Switch to a dense solver
-    assert(IsHermitian(m,1e-10));  //Make sure are close to Hermitian
-    MatrixCT mh=0.5*(m+~m); //Make it perfectly hermitian.  THis should cancel out some numerical round off noise.
-    assert(IsHermitian(mh,1e-13));
-    MatrixCT X,Xinv;
-    auto [U,e]=solver->SolveAll(mh,1e-13);
-    delete solver;
-    X=U*DiagonalMatrix<double>(sqrt(e));
-    assert(Min(e)>1e-10);
-    Xinv=DiagonalMatrix<double>(1.0/sqrt(e))*Transpose(conj(U));
-    assert(IsUnit(X*Xinv,1e-13));
-    return std::make_tuple(X,Xinv);
-}
-
 //-----------------------------------------------------------------------------
 //
 //  THis follows PHYSICAL REVIEW B 78, 155117 2008 figure 14

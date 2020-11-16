@@ -15,7 +15,7 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     Done: -Bond.C don't overwrite SVerror
     Done: -Store sqrt(s*s) for SV error.
     Done: -Use the name CompressionError consistently.
-    -Use Factor and EigenMatrix functions
+    Done: -Use Factor and EigenMatrix functions
 -Investigate sweep directions for normalization
 -Improve level two logging for variation ground states
 -Done: Profiling
