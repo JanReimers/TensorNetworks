@@ -52,20 +52,33 @@ public:
     }
 
     using MPO=TensorNetworks::MPO;
-    MPO* MakeEnergyMPO(int L, double S)
+
+    double CalculateE(int L, double S)
     {
         MPO* SpSmo=new TensorNetworks::MPO_TwoSite(L,S ,1,2, TensorNetworks::Sp,TensorNetworks::Sm);
         MPO* SmSpo=new TensorNetworks::MPO_TwoSite(L,S ,1,2, TensorNetworks::Sm,TensorNetworks::Sp);
         MPO* SzSzo=new TensorNetworks::MPO_TwoSite(L,S ,1,2, TensorNetworks::Sz,TensorNetworks::Sz);
-        MPO* SS=itsH->CreateUnitOperator();
-        SS->Combine(SpSmo,0.5);
-        SS->Combine(SmSpo,0.5);
-        SS->Combine(SzSzo);
-        delete SzSzo;
-        delete SmSpo;
+        double E=0.5*(itsState->GetExpectation(SpSmo)+itsState->GetExpectation(SmSpo))+itsState->GetExpectation(SzSzo);
         delete SpSmo;
-        return SS;
+        delete SmSpo;
+        delete SzSzo;
+        return E;
     }
+//    MPO* MakeEnergyMPO(int L, double S)
+//    {
+//        MPO* SpSmo=new TensorNetworks::MPO_TwoSite(L,S ,1,2, TensorNetworks::Sp,TensorNetworks::Sm);
+//        MPO* SmSpo=new TensorNetworks::MPO_TwoSite(L,S ,1,2, TensorNetworks::Sm,TensorNetworks::Sp);
+//        MPO* SzSzo=new TensorNetworks::MPO_TwoSite(L,S ,1,2, TensorNetworks::Sz,TensorNetworks::Sz);
+//        MPO* SS=itsH->CreateUnitOperator();
+//        SS->Combine(SpSmo,0.5);
+//        SS->Combine(SmSpo,0.5);
+//        SS->Combine(SzSzo);
+//        SS->Report(cout);
+//        delete SzSzo;
+//        delete SmSpo;
+//        delete SpSmo;
+//        return SS;
+//    }
 
 
     double epsNorm,epsOrth;
@@ -445,6 +458,7 @@ TEST_F(iTEBDTests,TestNeelEnergyS12)
     Matrix4RT Hlocal=itsH->BuildLocalMatrix();
     EXPECT_NEAR(itsState->GetExpectationmmnn(Hlocal),-0.25,1e-14);
     EXPECT_NEAR(itsState->GetExpectation(itsH  ),-0.25,1e-14);
+    EXPECT_NEAR(CalculateE(UnitCell,S),-0.25,1e-14);
 }
 
 TEST_F(iTEBDTests,TestNeelEnergyS1)
@@ -457,20 +471,30 @@ TEST_F(iTEBDTests,TestNeelEnergyS1)
     Matrix4RT Hlocal=itsH->BuildLocalMatrix();
     EXPECT_NEAR(itsState->GetExpectationmmnn(Hlocal),-1.,1e-14);
     EXPECT_NEAR(itsState->GetExpectation(itsH  ),-1.,1e-14);
+    EXPECT_NEAR(CalculateE(UnitCell,S),-1.,1e-14);
 }
 
 
-TEST_F(iTEBDTests,TestRandomEnergyS12)
+TEST_F(iTEBDTests,TestRandomEnergyRangeSD)
 {
-    int UnitCell=2,D=8;
-    double S=0.5,epsSVD=0.0;
-    Setup(UnitCell,S,D,epsSVD);
-    itsState->InitializeWith(TensorNetworks::Random);
-    itsState->Canonicalize(TensorNetworks::DLeft);
-    itsState->Orthogonalize(itsCompressor);
-    EXPECT_EQ(itsState->GetNormStatus(),"GG");
-    Matrix4RT Hlocal=itsH->BuildLocalMatrix();
-    EXPECT_NEAR(itsState->GetExpectationmmnn(Hlocal),itsState->GetExpectation(itsH  ),1e-14);
+    int UnitCell=2,Dmax=16;
+#ifdef DEBUG
+    Dmax=4;
+#endif // DEBUG
+    double epsSVD=0.0;
+    for (int D=1;D<=Dmax;D*=2)
+        for (double S=0.5;S<=2.5;S+=0.5)
+        {
+            Setup(UnitCell,S,D,epsSVD);
+//            cout << "S,D=" << S << " " << D << endl;
+            itsState->InitializeWith(TensorNetworks::Random);
+            itsState->Canonicalize(TensorNetworks::DLeft);
+            itsState->Orthogonalize(itsCompressor);
+            EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
+            Matrix4RT Hlocal=itsH->BuildLocalMatrix();
+            EXPECT_NEAR(itsState->GetExpectationmmnn(Hlocal),itsState->GetExpectation(itsH  ),1e-14);
+//            EXPECT_NEAR(CalculateE(UnitCell,S),itsState->GetExpectation(itsH  ),1e-14);
+        }
 }
 
 

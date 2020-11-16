@@ -298,7 +298,9 @@ iTEBDStateImp::MdType iTEBDStateImp::GetEigenMatrix(TensorNetworks::Direction lr
         case DLeft :
          {
             auto [U,e]=solver->SolveLeft_NonSym(theta.Flatten(),1e-13,1);
-            assert(imag(e(1))<1e-13);
+            if (fabs(imag(e(1)))>1e-13)
+                std::cerr << std::scientific << "Warning: Dominant eigenvalue has large imaginary component e=" << e(1) << std::endl;
+//            assert(imag(e(1))<1e-13);
             eigenValue=real(e(1));
             eigenVector=U.GetColumn(1);
             break;
@@ -306,7 +308,9 @@ iTEBDStateImp::MdType iTEBDStateImp::GetEigenMatrix(TensorNetworks::Direction lr
        case DRight:
         {
             auto [U,e]=solver->SolveRightNonSym(theta.Flatten(),1e-13,1);
-            assert(imag(e(1))<1e-13);
+            if (fabs(imag(e(1)))>1e-13)
+                std::cerr << std::scientific << "Warning: Dominant eigenvalue has large imaginary component e=" << e(1) << std::endl;
+//            assert(imag(e(1))<1e-13);
             eigenValue=real(e(1));
             eigenVector=U.GetColumn(1);
             break;
@@ -718,6 +722,8 @@ double iTEBDStateImp::GetExpectation (const MPO* o) const
                 }
         }
 
+    if (fabs(imag(expectation1))>=1e-10)
+        std::cerr << "Warning high imaginary part in expectation " << expectation1 << std::endl;
     assert(fabs(imag(expectation1))<1e-10);
     return real(expectation1);
 }
