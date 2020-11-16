@@ -358,7 +358,7 @@ iTEBDStateImp::MMType iTEBDStateImp::Factor(const MatrixCT m)
 }
 
 
-iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(const dVectorT& gamma, const DiagonalMatrixRT& lambda)
+iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const DiagonalMatrixRT& lambda)
 {
     int d=gamma.size();
     assert(d>0);
@@ -373,12 +373,26 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(const dVectorT& gamma, const 
 
     auto [Vr,er]=GetEigenMatrix(DRight,Er);
     auto [Vl,el]=GetEigenMatrix(DLeft ,El);
-
-    double rerr=Max(fabs(Er*Vr-er*Vr));
+//
+//  Normalize
+//
+    if (fabs(er-el)>=2e-13)
+        cout << fabs(er-el) << endl;
+    assert(fabs(er-el)<2e-13);
+    Er.Flatten()/=er;
+    El.Flatten()/=el;
+    s1.siteA->Rescale(sqrt(sqrt(er)));
+    s1.siteB->Rescale(sqrt(sqrt(er)));
+    for (int n=0;n<d;n++)
+        gamma[n]/=sqrt(er);
+//
+// Check eigen matrix accuracy.
+//
+    double rerr=Max(fabs(Er*Vr-Vr));
     if (rerr>1e-13) cout  << std::scientific << "rerr=" << rerr << endl;
     assert(rerr<1e-10);
 
-    double lerr=Max(fabs(Vl*El-el*Vl));
+    double lerr=Max(fabs(Vl*El-Vl));
     if (lerr>1e-13) cout  << std::scientific << "lerr=" << lerr << endl;
     assert(lerr<1e-10);
 //
@@ -422,8 +436,8 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(const dVectorT& gamma, const 
     MatrixCT Nl=GetNormMatrix(DLeft ,lambda_prime*gamma_prime); //=I*El
     MatrixCT I(D,D); //Right ei
     Unit(I);
-    double  left_error=Max(fabs(Nr-er*I));
-    double right_error=Max(fabs(Nl-el*I));
+    double  left_error=Max(fabs(Nr-I));
+    double right_error=Max(fabs(Nl-I));
     if (left_error>1e-12)
     {
         cout << std::scientific << "Warning: Left orthogonality error=" << left_error  << endl;

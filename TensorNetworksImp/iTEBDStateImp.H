@@ -61,7 +61,7 @@ class iTEBDStateImp : public virtual iTEBDState,
         MatrixCT  GetNormMatrix(Direction lr,const dVectorT& M) const; //Er*I or I*El
 
         ONErrors UnpackOrthonormal(const dVectorT& gammap,DiagonalMatrixRT& lambdap,SVCompressorC*);
-        GLType Orthogonalize(const dVectorT& gamma, const DiagonalMatrixRT& lambda);
+        GLType Orthogonalize(dVectorT& gamma, const DiagonalMatrixRT& lambda);
         MdType GetEigenMatrix(TensorNetworks::Direction lr, const Matrix4CT& theta);
         MMType Factor(const MatrixCT m);
 
