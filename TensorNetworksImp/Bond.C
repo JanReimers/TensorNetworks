@@ -12,7 +12,7 @@ Bond::Bond(int D, double epsSV)
     , itsEpsSV(epsSV)
     , itsBondEntropy(0.0)
     , itsMinSV(0.0)
-    , itsIntegratedS2(-99)
+    , itsCompessionError(-99)
     , itsD(0)
     , itsRank(0)
     , itsLeft_Site(0)
@@ -29,13 +29,13 @@ Bond::~Bond()
 
 void Bond::CloneState(const Bond* b2)
 {
-    itsSingularValues=b2->itsSingularValues;
-    itsEpsSV         =b2->itsEpsSV;
-    itsBondEntropy   =b2->itsBondEntropy;
-    itsIntegratedS2  =b2->itsIntegratedS2;
-    itsMinSV         =b2->itsMinSV;
-    itsD             =b2->itsD;
-    itsRank          =b2->itsRank;
+    itsSingularValues =b2->itsSingularValues;
+    itsEpsSV          =b2->itsEpsSV;
+    itsBondEntropy    =b2->itsBondEntropy;
+    itsCompessionError=b2->itsCompessionError;
+    itsMinSV          =b2->itsMinSV;
+    itsD              =b2->itsD;
+    itsRank           =b2->itsRank;
 }
 
 void Bond::SetSites(MPSSite* left, MPSSite* right)
@@ -59,9 +59,9 @@ void Bond::NewBondDimension(int D)
     }
     else
     { //Shrink/compress
-        itsIntegratedS2=0.0;
+        itsCompessionError=0.0;
         for (int i=D+1;i<=itsD;i++)
-            itsIntegratedS2+=itsSingularValues(i)*itsSingularValues(i);
+            itsCompessionError+=itsSingularValues(i)*itsSingularValues(i);
         itsSingularValues.SetLimits(D,true);
         itsMinSV=itsSingularValues(D);
         itsD=D;
@@ -69,7 +69,7 @@ void Bond::NewBondDimension(int D)
     }
 }
 
-void Bond::SetSingularValues(const DiagonalMatrixRT& s,double integratedS2)
+void Bond::SetSingularValues(const DiagonalMatrixRT& s,double compressionError)
 {
     //std::cout << "SingularValues=" << s << std::endl;
     itsD=s.GetNumRows();
@@ -79,7 +79,7 @@ void Bond::SetSingularValues(const DiagonalMatrixRT& s,double integratedS2)
 
     itsRank=itsD;
     itsMinSV=itsSingularValues(itsD);
-    itsIntegratedS2=integratedS2;
+    if (compressionError>0.0) itsCompessionError=compressionError;
     UpdateBondEntropy();
 
 
@@ -105,17 +105,17 @@ void Bond::UpdateBondEntropy()
 //
 //  Direction is the normaliztions direction, which i opposite to the direction that UV gets tranferred.
 //
-void Bond::SVDTransfer(Direction lr,double integratedS2,const DiagonalMatrixRT& s,const MatrixCT& UV)
+void Bond::SVDTransfer(Direction lr,double compressionError,const DiagonalMatrixRT& s,const MatrixCT& UV)
 {
-    SetSingularValues(s,integratedS2);
+    SetSingularValues(s,compressionError);
     assert(GetSite(lr));
     // We have to forward the un-normalized Svs, otherwise R/L normalization breaks.
     GetSite(lr)->SVDTransfer(lr,s,UV);
 }
 
-void Bond::CanonicalTransfer(Direction lr,double integratedS2,const DiagonalMatrixRT& s,const MatrixCT& UV)
+void Bond::CanonicalTransfer(Direction lr,double compressionError,const DiagonalMatrixRT& s,const MatrixCT& UV)
 {
-    SetSingularValues(s,integratedS2);
+    SetSingularValues(s,compressionError);
     assert(GetSite(lr));
     GetSite(lr)->SVDTransfer(lr,UV);
 }
@@ -127,7 +127,7 @@ void Bond::Report(std::ostream& os) const
                                                   << std::setw(4)  << itsRank
        << std::fixed      << std::setprecision(6) << std::setw(12) << itsBondEntropy
        << std::scientific << std::setprecision(1) << std::setw(10) << itsMinSV
-       << std::scientific << std::setprecision(1) << std::setw(10) << itsIntegratedS2
+       << std::scientific << std::setprecision(1) << std::setw(10) << itsCompessionError
        ;
 
 }

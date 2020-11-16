@@ -212,7 +212,7 @@ void iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT& 
 //
 //  Compress from d*D back to D
 //
-    double integratedS2 =comp->Compress(P,lambdaA_prime,Q);
+    double compessionError =comp->Compress(P,lambdaA_prime,Q);
     assert(P.GetNumCols()==D);
     assert(P.GetNumRows()==D*itsd);
     assert(Q.GetNumCols()==D*itsd);
@@ -220,7 +220,7 @@ void iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT& 
 //
 //  Set and normalize lambdaA.
 //
-    s1.bondA->SetSingularValues(lambdaA_prime,integratedS2);
+    s1.bondA->SetSingularValues(lambdaA_prime,compessionError);
 //
 //  Unpack P into GammaA and Q into GammaB
 //
@@ -234,7 +234,7 @@ void iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT& 
             GammaB()[n](i,j)=         Q(       i,n*D+j)*lbinv(j);
         }
 
-    TestOrthogonal(Max(D*sqrt(integratedS2),D*D*1e-12));
+    TestOrthogonal(Max(D*sqrt(compessionError),D*D*1e-12));
 }
 
 MPSSite::dVectorT operator*(const MPSSite::dVectorT& gamma, const DiagonalMatrixRT& lambda)

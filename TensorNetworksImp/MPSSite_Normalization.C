@@ -47,21 +47,21 @@ void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
         if (Dmax>0 && Dmax<D) D=Dmax;
     }
     auto [U,s,Vdagger]=solver.Solve(A,1e-13,D); //Solves A=U * s * Vdagger
-    double integratedS2=0.0;
-    if (comp) integratedS2=comp->Compress(U,s,Vdagger);
+    double compessionError=0.0;
+    if (comp) compessionError=comp->Compress(U,s,Vdagger);
 
     switch (lr)
     {
     case DRight:
     {
-        GetBond(lr)->SVDTransfer(lr,integratedS2,s,U);
+        GetBond(lr)->SVDTransfer(lr,compessionError,s,U);
         ReshapeAfter_SVD(lr,Vdagger);  //A is now Vdagger
         itsNormStatus=NormStatus::B;
         break;
     }
     case DLeft:
     {
-        GetBond(lr)->SVDTransfer(lr,integratedS2,s,Vdagger);
+        GetBond(lr)->SVDTransfer(lr,compessionError,s,Vdagger);
         ReshapeAfter_SVD(lr,U);  //A is now U
         itsNormStatus=NormStatus::A;
         break;
@@ -90,8 +90,8 @@ void MPSSite::Canonicalize1(Direction lr,SVCompressorC* comp)
 {
     MatrixCT A=ReshapeBeforeSVD(lr);
     auto [U,s,Vdagger]=oml_CSVDecomp(A); //Solves A=U * s * Vdagger  returns V not Vdagger
-    double integratedS2=0.0;
-    if (comp) integratedS2=comp->Compress(U,s,Vdagger);
+    double compressionError=0.0;
+    if (comp) compressionError=comp->Compress(U,s,Vdagger);
     double s2=s.GetDiagonal()*s.GetDiagonal();
     s/=sqrt(s2);
 
@@ -99,14 +99,14 @@ void MPSSite::Canonicalize1(Direction lr,SVCompressorC* comp)
     {
     case DRight:
     {
-        GetBond(lr)->CanonicalTransfer(lr,integratedS2,s,U);
+        GetBond(lr)->CanonicalTransfer(lr,compressionError,s,U);
         ReshapeAfter_SVD(lr,Vdagger);  //A is now Vdagger
         itsNormStatus=NormStatus::B;
         break;
     }
     case DLeft:
     {
-        GetBond(lr)->CanonicalTransfer(lr,integratedS2,s,Vdagger);
+        GetBond(lr)->CanonicalTransfer(lr,compressionError,s,Vdagger);
         ReshapeAfter_SVD(lr,U);  //A is now U
         itsNormStatus=NormStatus::A;
         break;

@@ -19,8 +19,8 @@ class Bond
         void SetSites(MPSSite* left, MPSSite* right);
         void NewBondDimension(int D);
 
-        void SVDTransfer      (Direction lr,double integratedS2,const DiagonalMatrixRT& s,const MatrixCT& UV);
-        void CanonicalTransfer(Direction lr,double integratedS2,const DiagonalMatrixRT& s,const MatrixCT& UV);
+        void SVDTransfer      (Direction lr,double compessionError,const DiagonalMatrixRT& s,const MatrixCT& UV);
+        void CanonicalTransfer(Direction lr,double compessionError,const DiagonalMatrixRT& s,const MatrixCT& UV);
 
         double GetBondEntropy() const {return itsBondEntropy;}
         double GetMinSV      () const {return itsMinSV;}
@@ -34,7 +34,7 @@ class Bond
 
     private:
         friend class iTEBDStateImp;
-        void SetSingularValues(const DiagonalMatrixRT& s, double integratedS2);
+        void SetSingularValues(const DiagonalMatrixRT& s, double compessionError);
         void UpdateBondEntropy();
         //
         //  lr is the normalization direction.  For normalization we need to access the right bond.
@@ -48,7 +48,7 @@ class Bond
         double itsEpsSV; //SVs < itsEpsSV are deemed to be zero when determining rank and entropies.
         double itsBondEntropy;
         double itsMinSV;
-        double itsIntegratedS2; // sum of reject S_i^2
+        double itsCompessionError; // sum of reject S_i^2
         int    itsD;
         int    itsRank; //Rank <=D depending on zero SVs
         MPSSite* itsLeft_Site;
