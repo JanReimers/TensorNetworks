@@ -60,4 +60,51 @@ template <class T> class Matrix4
         MatrixRT itsData;
 };
 
+
+template <class T> Matrix<T> operator*(const Matrix4<T>& E, const Matrix<T>& Vr)
+{
+    int D=Vr.GetNumRows();
+    Matrix<T> Evr(D,D);
+    for (int i1=1; i1<=D; i1++)
+    for (int j1=1; j1<=D; j1++)
+    {
+        T evr(0);
+        for (int i2=1; i2<=D; i2++)
+        for (int j2=1; j2<=D; j2++)
+            evr+=E(i1,j1,i2,j2)*Vr(i2,j2);
+        Evr(i1,j1)=evr;
+    }
+    return Evr;
+}
+template <class T> Matrix<T> operator*(const Matrix<T>& Vl,const Matrix4<T>& E)
+{
+    int D=Vl.GetNumRows();
+    Matrix<T> Evl(D,D);
+    for (int i2=1; i2<=D; i2++)
+    for (int j2=1; j2<=D; j2++)
+    {
+        T evl(0);
+        for (int i1=1; i1<=D; i1++)
+        for (int j1=1; j1<=D; j1++)
+            evl+=Vl(i1,j1)*E(i1,j1,i2,j2);
+        Evl(i2,j2)=evl;
+    }
+    return Evl;
+}
+
+template <class T> T Contract(const Matrix<T>& Vl,const Matrix4<T>& E,const Matrix<T>& Vr)
+{
+    int D=Vl.GetNumRows();
+    T ret(0);
+    for (int i2=1; i2<=D; i2++)
+    for (int j2=1; j2<=D; j2++)
+    {
+        for (int i1=1; i1<=D; i1++)
+        for (int j1=1; j1<=D; j1++)
+            ret+=Vl(i1,j1)*E(i1,j1,i2,j2)*Vr(i2,j2);
+    }
+    return ret;
+}
+
+
 #endif // MATRIX4_H

@@ -254,51 +254,6 @@ MPSSite::dVectorT operator*(const DiagonalMatrixRT& lambda, const MPSSite::dVect
     return lg;
 }
 
-MatrixCT operator*(const Matrix4CT& E, const MatrixCT& Vr)
-{
-    int D=Vr.GetNumRows();
-    MatrixCT Evr(D,D);
-    for (int i1=1; i1<=D; i1++)
-    for (int j1=1; j1<=D; j1++)
-    {
-        dcmplx evr(0);
-        for (int i2=1; i2<=D; i2++)
-        for (int j2=1; j2<=D; j2++)
-            evr+=E(i1,j1,i2,j2)*Vr(i2,j2);
-        Evr(i1,j1)=evr;
-    }
-    return Evr;
-}
-MatrixCT operator*(const MatrixCT& Vl,const Matrix4CT& E)
-{
-    int D=Vl.GetNumRows();
-    MatrixCT Evl(D,D);
-    for (int i2=1; i2<=D; i2++)
-    for (int j2=1; j2<=D; j2++)
-    {
-        dcmplx evl(0);
-        for (int i1=1; i1<=D; i1++)
-        for (int j1=1; j1<=D; j1++)
-            evl+=Vl(i1,j1)*E(i1,j1,i2,j2);
-        Evl(i2,j2)=evl;
-    }
-    return Evl;
-}
-
-dcmplx Contract(const MatrixCT& Vl,const Matrix4CT& E,const MatrixCT& Vr)
-{
-    int D=Vl.GetNumRows();
-    dcmplx ret(0);
-    for (int i2=1; i2<=D; i2++)
-    for (int j2=1; j2<=D; j2++)
-    {
-        for (int i1=1; i1<=D; i1++)
-        for (int j1=1; j1<=D; j1++)
-            ret+=Vl(i1,j1)*E(i1,j1,i2,j2)*Vr(i2,j2);
-    }
-    return ret;
-}
-
 bool iTEBDStateImp::TestOrthogonal(double eps) const
 {
     dVectorT gamma(itsd*itsd);

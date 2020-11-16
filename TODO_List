@@ -9,22 +9,26 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
         Inside Bond.C
         after each SVD call?
     -Make a FindGroundState function in iTEBDState.H
-    Done -Use the unpack function
+    Done: -Use the unpack function
+    Done: -Move overloaded op* functions the appropriate headers.
+    -Bond.C don't overwrite SVerror
+    -Store sqrt(s*s) for SV error.
+    -Use the name CompressionError consistently.
 -Investigate sweep directions for normalization
 -Improve level two logging for variation ground states
--Done Profiling
+-Done: Profiling
 	TestITimeSecondOrderTrotter_EpsLimitedCompression
 	oml_CSVDecomp used 29.8% 2.97 sec
 
-- Done Try CSVD from LaPack and Primme
+- Done: Try CSVD from LaPack and Primme
     -Lapack takes SVD out of the top 25 fr CPU
     -Some contractions MPSSite::IterateLeft_F, IterateLeft_R, ContractLRM
         need optimization
     SVDtransfer takes 28% of the cpu time
 - LinAlg solvers
-    Done Make abstract interfaces for SVD and eigen
-    Done Do left and right Evs for non sym
-    Done Add Lapack non sym routines
+    Done: Make abstract interfaces for SVD and eigen
+    Done: Do left and right Evs for non sym
+    Done: Add Lapack non sym routines
     Options for largest or smallest evs
     Why is primme so slow
     Why is primme not converging well for non-sym matrices
