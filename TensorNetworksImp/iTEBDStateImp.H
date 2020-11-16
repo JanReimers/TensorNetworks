@@ -8,6 +8,7 @@
 namespace TensorNetworks
 {
 
+
 //--------------------------------------------------------------------------------
 //
 //  Implement Vidals  ....Lambda-Gamma-Lambda-Gamma-Lambda... canonical form.
@@ -26,16 +27,16 @@ class iTEBDStateImp : public virtual iTEBDState,
 //
 //  Access to information
 //
-        int     GetL        () const {return MPSImp::GetL();}
-        int     Getp        () const {return MPSImp::Getp();}
+        virtual int GetL() const {return MPSImp::GetL();}
+        virtual int Getp() const {return MPSImp::Getp();}
+        virtual int GetD() const {return MPSImp::GetMaxD();}
 //--------------------------------------------------------------------------------------
 //
 //  Normalization members with and without SVD compression
 //
         virtual void Canonicalize(Direction);  //Vidals L-G-L-G-L canonical form
         virtual void Normalize(Direction LR);
-        virtual void Orthogonalize(SVCompressorC*);
-        virtual bool TestOrthogonal(double eps) const;
+        virtual ONErrors Orthogonalize(SVCompressorC*);
 
         virtual double GetExpectation (const MPO* o) const;
         virtual double GetExpectationmmnn (const Matrix4RT& Hlocal) const;
@@ -53,11 +54,13 @@ class iTEBDStateImp : public virtual iTEBDState,
         int GetModSite(int isite) const;
 //        const DiagonalMatrixRT& GetLambda(int isite) const;
 //        const         MatrixCT& GetGamma (int isite,int n) const ;
+        virtual ONErrors GetOrthonormalityErrors() const;
         Matrix4CT GetTransferMatrix(Direction lr) const;
         Matrix4CT GetTransferMatrix(const dVectorT& M) const;
         Matrix4CT GetTransferMatrix(const Matrix4CT& theta) const;
+        MatrixCT  GetNormMatrix(Direction lr,const dVectorT& M) const; //Er*I or I*El
 
-        void UnpackOrthonormal(const dVectorT& gammap,DiagonalMatrixRT& lambdap,SVCompressorC*);
+        ONErrors UnpackOrthonormal(const dVectorT& gammap,DiagonalMatrixRT& lambdap,SVCompressorC*);
         GLType Orthogonalize(const dVectorT& gamma, const DiagonalMatrixRT& lambda);
         MdType GetEigenMatrix(TensorNetworks::Direction lr, const Matrix4CT& theta);
         MMType Factor(const MatrixCT m);

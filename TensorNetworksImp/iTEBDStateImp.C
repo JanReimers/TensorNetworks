@@ -164,7 +164,7 @@ MatrixCT ReshapeForSVD(int d,const MPSSite::dVectorT& M)
     return ret.Flatten();
 }
 
-void iTEBDStateImp::Orthogonalize(SVCompressorC* comp)
+ONErrors iTEBDStateImp::Orthogonalize(SVCompressorC* comp)
 {
     //
     //  Build Gamma[n] = GammaA[na]*lambdaA*GammaB[nb]
@@ -181,10 +181,10 @@ void iTEBDStateImp::Orthogonalize(SVCompressorC* comp)
     //
     //  Unpack gammap into GammaA*lambdaA*GammaB, and lambdap into lambdaB.
     //
-    UnpackOrthonormal(gammap,lambdap,comp); //No compressions required.
+    return UnpackOrthonormal(gammap,lambdap,comp); //No compressions required.
 }
 
-void iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT& lambdap,SVCompressorC* comp)
+ONErrors iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT& lambdap,SVCompressorC* comp)
 {
     assert(comp);
     assert(gammap.size()==itsd*itsd);
@@ -234,7 +234,7 @@ void iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT& 
             GammaB()[n](i,j)=         Q(       i,n*D+j)*lbinv(j);
         }
 
-    TestOrthogonal(Max(D*sqrt(compessionError),D*D*1e-12));
+    return GetOrthonormalityErrors();
 }
 
 MPSSite::dVectorT operator*(const MPSSite::dVectorT& gamma, const DiagonalMatrixRT& lambda)
@@ -254,35 +254,31 @@ MPSSite::dVectorT operator*(const DiagonalMatrixRT& lambda, const MPSSite::dVect
     return lg;
 }
 
-bool iTEBDStateImp::TestOrthogonal(double eps) const
+ONErrors iTEBDStateImp::GetOrthonormalityErrors() const
 {
     dVectorT gamma(itsd*itsd);
     int D=lambdaA().size();
+    MatrixCT I(D,D); //Right ei
+    Unit(I);
+
     int nab=0;
     for (int na=0; na<itsd; na++)
         for (int nb=0; nb<itsd; nb++,nab++)
             gamma[nab]=GammaA()[na]*lambdaA()*GammaB()[nb];
-    Matrix4CT Er=GetTransferMatrix(gamma*lambdaB());
-    Matrix4CT El=GetTransferMatrix(lambdaB()*gamma);
-    MatrixCT I(D,D); //Right ei
-    Unit(I);
-    MatrixCT ErI=Er*I;
-    MatrixCT IEl=I*El;
-//    cout << "Er*I=" << ErI << endl;
-//    cout << "I*El=" << IEl << endl;
-    double r_error= Max(fabs(ErI-I));
-    double l_error= Max(fabs(IEl-I));
-    if (r_error>D*eps)
-    {
-        cout << std::scientific;
-        cout << "Error not orthogonal Max(fabs(ErI-I))=" << r_error << " > eps=" << eps << endl;
-    }
-    if (l_error>D*eps)
-    {
-        cout << std::scientific;
-        cout << "Error not orthogonal Max(fabs(IEl-I))=" << l_error << " > eps=" << eps << endl;
-    }
-    return (r_error<=eps) && (l_error<=eps);
+
+    MatrixCT Nr=GetNormMatrix(DRight,gamma*lambdaB());
+    MatrixCT Nl=GetNormMatrix(DLeft ,lambdaB()*gamma);
+    dcmplx right_norm=Sum(Nr.GetDiagonal())/static_cast<double>(D);
+    dcmplx left__norm=Sum(Nl.GetDiagonal())/static_cast<double>(D);
+    Nr/=right_norm; //Get diagonals as close 1.0 as we can
+    Nl/=left__norm;
+
+    double right_norm_error=fabs(right_norm-1.0);
+    double left__norm_error=fabs(left__norm-1.0);
+    double right_orth_error= FrobeniusNorm(Nr-I);
+    double left__orth_error= FrobeniusNorm(Nl-I);
+
+    return {right_norm_error,left__norm_error,right_orth_error,left__orth_error};
 }
 
 iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(const dVectorT& gamma, const DiagonalMatrixRT& lambda)
@@ -446,6 +442,44 @@ Matrix4CT iTEBDStateImp::GetTransferMatrix(const dVectorT& M) const
     return E;
 }
 
+MatrixCT  iTEBDStateImp::GetNormMatrix(Direction lr,const dVectorT& M) const //Er*I or I*El
+{
+    int d=M.size();
+    assert(d>0);
+    int D=M[0].GetNumRows();
+    assert(D==M[0].GetNumCols());
+    MatrixCT N(D,D);
+    switch (lr)
+    {
+        case DLeft:
+        {
+            for (int i3=1; i3<=D; i3++)
+            for (int j3=1; j3<=D; j3++)
+            {
+                dcmplx e(0);
+                for (int i1=1; i1<=D; i1++)
+                    for (int n=0; n<d; n++)
+                        e+=M[n](i1,i3)*conj(M[n](i1,j3));
+                N(i3,j3)=e;
+            }
+            break;
+        }
+        case DRight:
+        {
+            for (int i1=1; i1<=D; i1++)
+            for (int j1=1; j1<=D; j1++)
+            {
+                dcmplx e(0);
+                for (int i3=1; i3<=D; i3++)
+                    for (int n=0; n<d; n++)
+                        e+=M[n](i1,i3)*conj(M[n](j1,i3));
+                N(i1,j1)=e;
+            }
+            break;
+        }
+    }
+    return N;
+}
 //
 //  Assume two site for now
 //

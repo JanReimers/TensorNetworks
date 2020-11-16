@@ -4,7 +4,7 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     -Implement iterative orthogonality method.
     -Do normalization inside Orthogonal
     -Try and get rid off ambiguous op overload warnings.
-    -Stop checking orthogonality everywhere, just report it
+    Done -Stop checking orthogonality everywhere, just report it
     Done: -Optimize GetExpectation functions, assumes orthonormality
     Done: -Where to put Sv normalization
         Inside Bond.C

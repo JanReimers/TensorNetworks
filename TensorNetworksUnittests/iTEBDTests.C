@@ -15,7 +15,7 @@ public:
 
     iTEBDTests()
     : epsNorm(4e-11)
-    , epsOrth(4e-11)
+    , epsOrth(1e-11)
     , itsFactory(TensorNetworks::Factory::GetFactory())
     , itsH(0)
     , itsState(0)
@@ -40,6 +40,15 @@ public:
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
         itsState=itsH->CreateiTEBDState(D,D*D*epsNorm,epsSVD);
         itsCompressor=itsFactory->MakeMPSCompressor(D,epsSVD);
+    }
+
+    void Check(const TensorNetworks::ONErrors& err) const
+    {
+//        int D=itsState->GetD();
+        EXPECT_LT(err.RightNormError,epsOrth);
+        EXPECT_LT(err.RightOrthError,epsOrth);
+        EXPECT_LT(err.Left_NormError,epsOrth);
+        EXPECT_LT(err.Left_OrthError,epsOrth);
     }
 
     using MPO=TensorNetworks::MPO;
@@ -141,8 +150,7 @@ TEST_F(iTEBDTests,TestOrthogonalLeft)
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Normalize(TensorNetworks::DLeft);
-    itsState->Orthogonalize(itsCompressor);
-    EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
+    Check(itsState->Orthogonalize(itsCompressor));
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
 TEST_F(iTEBDTests,TestOrthogonalRight)
@@ -152,8 +160,7 @@ TEST_F(iTEBDTests,TestOrthogonalRight)
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Normalize(TensorNetworks::DRight);
-    itsState->Orthogonalize(itsCompressor);
-    EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
+    Check(itsState->Orthogonalize(itsCompressor));
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
 
@@ -165,8 +172,7 @@ TEST_F(iTEBDTests,TestOrthogonalLeftReCenter1)
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Normalize(TensorNetworks::DLeft);
     itsState->ReCenter(2);
-    itsState->Orthogonalize(itsCompressor);
-    EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
+    Check(itsState->Orthogonalize(itsCompressor));
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
 TEST_F(iTEBDTests,TestOrthogonalRightReCenter1)
@@ -177,8 +183,7 @@ TEST_F(iTEBDTests,TestOrthogonalRightReCenter1)
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Normalize(TensorNetworks::DRight);
     itsState->ReCenter(2);
-    itsState->Orthogonalize(itsCompressor);
-    EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
+    Check(itsState->Orthogonalize(itsCompressor));
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
 TEST_F(iTEBDTests,TestOrthogonalLeftReCenter2)
@@ -188,9 +193,8 @@ TEST_F(iTEBDTests,TestOrthogonalLeftReCenter2)
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Normalize(TensorNetworks::DLeft);
-    itsState->Orthogonalize(itsCompressor);
+    Check(itsState->Orthogonalize(itsCompressor));
     itsState->ReCenter(2);
-    EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
 TEST_F(iTEBDTests,TestOrthogonalRightReCenter2)
@@ -200,9 +204,8 @@ TEST_F(iTEBDTests,TestOrthogonalRightReCenter2)
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Normalize(TensorNetworks::DRight);
-    itsState->Orthogonalize(itsCompressor);
+    Check(itsState->Orthogonalize(itsCompressor));
     itsState->ReCenter(2);
-    EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
 
@@ -222,18 +225,15 @@ TEST_F(iTEBDTests,TestOrthogonalRangeSD)
             itsState->Canonicalize(TensorNetworks::DLeft);
             itsState->Normalize(TensorNetworks::DLeft);
 
-            itsState->Orthogonalize(itsCompressor);
-            EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
+            Check(itsState->Orthogonalize(itsCompressor));
             EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
 
             itsState->ReCenter(2);
 
-            itsState->Orthogonalize(itsCompressor);
-            EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
+            Check(itsState->Orthogonalize(itsCompressor));
             EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
 
              itsState->ReCenter(1);
-            EXPECT_TRUE(itsState->TestOrthogonal(epsOrth));
             EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
         }
 }
