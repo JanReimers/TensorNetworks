@@ -32,3 +32,5 @@ TensorNetworksUnittests/gprof.out
 *.lyx#
 
 *.sav
+
+googletest
