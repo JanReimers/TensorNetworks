@@ -56,6 +56,16 @@ void iTEBDStateImp::InitializeWith(State s)
     MPSImp::InitializeWith(s);
 }
 
+void iTEBDStateImp::IncreaseBondDimensions(int D)
+{
+    for (int ia=1; ia<=itsL; ia++)
+    {
+        itsSites[ia]->NewBondDimensions(D,D,true);
+        itsBonds[ia]->NewBondDimension(D);
+    }
+}
+
+
 void iTEBDStateImp::ReCenter(int isite)
 {
     s1=Sites(isite,this);
@@ -177,7 +187,8 @@ ONErrors iTEBDStateImp::Orthogonalize(SVCompressorC* comp)
     //
     //  Run the one site orthogonalization algorithm.
     //
-    auto [gammap,lambdap]=Orthogonalize(gamma,lambdaB());
+    DiagonalMatrixRT lb=lambdaB();
+    auto [gammap,lambdap]=Orthogonalize(gamma,lb);
     //
     //  Unpack gammap into GammaA*lambdaA*GammaB, and lambdap into lambdaB.
     //
@@ -361,7 +372,92 @@ iTEBDStateImp::MMType iTEBDStateImp::Factor(const MatrixCT m)
     return std::make_tuple(X,Xinv);
 }
 
+//
+// Iterative version Ho N. Phien, Ian P. McCulloch, and Guifré Vidal, "Fast convergence of imaginary
+// time evolution tensor network algorithms by recycling the environment", Physical Review B 91, 11 (2015).
+//
+iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda)
+{
+    int d=gamma.size();
+    assert(d>0);
+    int D=gamma[0].GetNumRows();
+    assert(D==gamma[0].GetNumCols());
+    double eps=1e-12;
+    MatrixCT Vr,Vl,I(D,D); //Right ei
+    Unit(I);
 
+    int niter=0;
+    do
+    {
+        Vr=GetNormMatrix(DRight,gamma*lambda); //=Er*I
+        Vl=GetNormMatrix(DLeft ,lambda*gamma); //=I*El
+        double deltar=Max(fabs(Vr-I));
+        double deltal=Max(fabs(Vl-I));
+        if (deltar<eps && deltal < eps) break;
+
+    //
+    //  Make sure Vr and Vl are as Hermitian as they can get.
+    //
+        assert(IsHermitian(Vr,1e-10));
+        assert(IsHermitian(Vl,1e-10));
+        Vr=0.5*(Vr+~Vr); //Try and clean up non-Hermitian round-off noise.
+        Vl=0.5*(Vl+~Vl);
+        assert(IsHermitian(Vr,1e-13));
+        assert(IsHermitian(Vl,1e-13));
+    //
+    //  Decompose eigen matrices
+    //
+        auto [X,Xinv]=Factor(Vr);
+        auto [Y,Yinv]=Factor(Vl);
+        MatrixCT YT   =Transpose(Y);
+        MatrixCT YTinv=Transpose(Yinv);
+        assert(IsUnit(X*Xinv,1e-13));
+        assert(IsUnit(YT*YTinv,1e-12));
+        //
+        //  Transform lambda and SVD
+        //
+        MatrixCT YlX=YT*lambda*X; //THis will scale lambda by 1/D since YT and X are both O(1/sqrt(D))
+        SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
+        auto [U,lambda_prime,VT]=svd_solver->SolveAll(YlX,1e-13);
+        delete svd_solver;
+
+        double s2=lambda_prime.GetDiagonal()*lambda_prime.GetDiagonal();
+        lambda_prime/=sqrt(s2);
+        //
+        //  Transform Gamma
+        //
+        for (int n=0;n<d;n++)
+        {
+            MatrixCT gamma_prime=VT*Xinv*gamma[n]*YTinv*U;
+            gamma[n]=gamma_prime;
+        }
+        lambda=lambda_prime;
+        niter++;
+    } while (niter<1000);
+    cout << "niter=" << niter << endl;;
+
+    //
+    //  Verify orthogonaly
+    //
+    MatrixCT Nr=GetNormMatrix(DRight,gamma*lambda); //=Er*I
+    MatrixCT Nl=GetNormMatrix(DLeft ,lambda*gamma); //=I*El
+    double  left_error=Max(fabs(Nr-I));
+    double right_error=Max(fabs(Nl-I));
+    if (left_error>1e-12)
+    {
+        cout << std::scientific << "Warning: Left orthogonality error=" << left_error  << endl;
+    }
+    if (right_error>1e-12)
+    {
+        cout << std::scientific << "Warning: Right orthogonality error=" << right_error  << endl;
+    }
+
+    return std::make_tuple(gamma,lambda);
+}
+
+//
+// Eigen vector version as per PHYSICAL REVIEW B 78, 155117 2008
+//
 iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const DiagonalMatrixRT& lambda)
 {
     int d=gamma.size();

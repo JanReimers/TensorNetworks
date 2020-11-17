@@ -23,7 +23,8 @@ class iTEBDStateImp : public virtual iTEBDState,
         virtual ~iTEBDStateImp();
         virtual void InitializeWith(State);
         virtual void ReCenter(int isite);
- //--------------------------------------------------------------------------------------
+        virtual void IncreaseBondDimensions(int D);
+//--------------------------------------------------------------------------------------
 //
 //  Access to information
 //
@@ -61,7 +62,8 @@ class iTEBDStateImp : public virtual iTEBDState,
         MatrixCT  GetNormMatrix(Direction lr,const dVectorT& M) const; //Er*I or I*El
 
         ONErrors UnpackOrthonormal(const dVectorT& gammap,DiagonalMatrixRT& lambdap,SVCompressorC*);
-        GLType Orthogonalize(dVectorT& gamma, const DiagonalMatrixRT& lambda);
+        GLType Orthogonalize (dVectorT& gamma, const DiagonalMatrixRT& lambda);
+        GLType OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda);
         MdType GetEigenMatrix(TensorNetworks::Direction lr, const Matrix4CT& theta);
         MMType Factor(const MatrixCT m);
 

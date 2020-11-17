@@ -93,6 +93,7 @@ public:
 protected:
     // Constructor used for iTEBD
         MPSImp(int L, double S, Direction lr,double normEps);
+        void IncreaseBondDimensions(int D);
         void   NormalizeAndCompressSite  (Direction lr,int isite,SVCompressorC*);
 //--------------------------------------------------------------------------------------
 //
@@ -126,7 +127,6 @@ private:
         friend class ::MPSTests;
 
         void InitSitesAndBonds(int D,double epsSV);
-        void IncreaseBondDimensions(int D);
         int GetCanonicalD1(int a, int DMax);
         int GetCanonicalD2(int a, int DMax);
 

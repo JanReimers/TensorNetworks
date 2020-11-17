@@ -13,7 +13,7 @@ Bond::Bond(int D, double epsSV)
     , itsBondEntropy(0.0)
     , itsMinSV(0.0)
     , itsCompessionError(-99)
-    , itsD(0)
+    , itsD(D)
     , itsRank(0)
     , itsLeft_Site(0)
     , itsRightSite(0)
@@ -54,8 +54,9 @@ void Bond::NewBondDimension(int D)
     { //Grow
         itsSingularValues.SetLimits(D,true);
         for (int i=itsD+1;i<=D;i++)
-            itsSingularValues(i)=0.0;
+            itsSingularValues(i)=1.0/D;
         itsD=D;
+        itsRank=D;
     }
     else
     { //Shrink/compress

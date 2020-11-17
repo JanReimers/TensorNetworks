@@ -23,7 +23,8 @@ class iTEBDState
 
         virtual void InitializeWith(State)=0;
         virtual void ReCenter(int isite)=0;
- //--------------------------------------------------------------------------------------
+        virtual void IncreaseBondDimensions(int D)=0;
+//--------------------------------------------------------------------------------------
 //
 //  Access to information
 //
