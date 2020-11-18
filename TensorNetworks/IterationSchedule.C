@@ -33,6 +33,18 @@ IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,int DD, const 
     assert(DD>0);
 }
 
+IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,double dt,const Epsilons& eps)
+    : itsMaxGSSweepIterations(maxiter)
+    , itsMaxOptimizeIterations(0)
+    , itsDmax(Dmax)
+    , itsDeltaD(1)
+    , itsdt(dt)
+    , itsEps(eps)
+{
+    assert(itsMaxGSSweepIterations>0);
+    assert(itsdt>0);
+}
+
 IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,double dt,TrotterOrder o,const Epsilons& eps)
     : itsMaxGSSweepIterations(maxiter)
     , itsMaxOptimizeIterations(0)

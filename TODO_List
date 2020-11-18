@@ -10,7 +10,7 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     Done: -Where to put Sv normalization
         Inside Bond.C
         after each SVD call?
-    -Make a FindGroundState function in iTEBDState.H
+    Done: -Make a FindGroundState function in iTEBDState.H
     Done: -Use the unpack function
     Done: -Move overloaded op* functions the appropriate headers.
     Done: -Bond.C don't overwrite SVerror
@@ -19,6 +19,8 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     Done: -Use Factor and EigenMatrix functions
 -Make and iTimeGroundState abstract base class to handle iterations.
     Need global logger first, since this is heavily logger dependent.
+    I think this is a failed idea.  The iterations are fundamentally different right now.
+        Just look at MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationScheduleLine&);
 
 -We need to be able to add (rather than combine) MPOs to do:
     S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2

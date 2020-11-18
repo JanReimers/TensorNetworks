@@ -3,6 +3,7 @@
 #include "TensorNetworks/iTEBDState.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/SVCompressor.H"
+#include "TensorNetworks/IterationSchedule.H"
 #include "Operators/MPO_TwoSite.H"
 
 using std::setw;
@@ -495,6 +496,70 @@ TEST_F(iTEBDTests,TestRandomEnergyRangeSD)
             EXPECT_NEAR(itsState->GetExpectationmmnn(Hlocal),itsState->GetExpectation(itsH  ),1e-14);
 //            EXPECT_NEAR(CalculateE(UnitCell,S),itsState->GetExpectation(itsH  ),1e-14);
         }
+}
+
+TEST_F(iTEBDTests,FindiTimeGSD4S12)
+{
+    int UnitCell=2,D=8;
+    double S=0.5,epsSVD=0.0;
+#ifdef DEBUG
+    D=4;
+#endif // DEBUG
+    Setup(UnitCell,S,D,epsSVD);
+    itsState->InitializeWith(TensorNetworks::Random);
+
+    TensorNetworks::Epsilons eps(1e-12);
+    eps.itsMPSCompressEpsilon=0;
+
+    TensorNetworks::IterationSchedule is;
+    eps.itsDelatEnergy1Epsilon=1e-3;
+    is.Insert({20,D,0.5,eps});
+    eps.itsDelatEnergy1Epsilon=1e-5;
+    is.Insert({50,D,0.2,eps});
+    eps.itsDelatEnergy1Epsilon=1e-5;
+    is.Insert({50,D,0.1,eps});
+    eps.itsDelatEnergy1Epsilon=1e-6;
+    is.Insert({50,D,0.05,eps});
+    eps.itsDelatEnergy1Epsilon=1e-7;
+    is.Insert({50,D,0.02,eps});
+    eps.itsDelatEnergy1Epsilon=1e-8;
+    is.Insert({50,D,0.01,eps});
+
+    itsState->FindiTimeGroundState(itsH,is);
+    itsState->Report(cout);
+    EXPECT_GT(itsState->GetExpectation(itsH),-0.4431471805599453094172);
+}
+
+TEST_F(iTEBDTests,FindiTimeGSD32S12)
+{
+    int UnitCell=2,Dstart=2,Dmax=32;
+    double S=0.5,epsSVD=0.0;
+#ifdef DEBUG
+    Dmax=16;
+#endif // DEBUG
+    Setup(UnitCell,S,Dstart,epsSVD);
+    itsState->InitializeWith(TensorNetworks::Random);
+
+    TensorNetworks::Epsilons eps(1e-12);
+    eps.itsMPSCompressEpsilon=0;
+
+    TensorNetworks::IterationSchedule is;
+    eps.itsDelatEnergy1Epsilon=1e-3;
+    is.Insert({20,Dstart,0.5,eps});
+    eps.itsDelatEnergy1Epsilon=1e-5;
+    is.Insert({50,4,0.2,eps});
+    eps.itsDelatEnergy1Epsilon=1e-5;
+    is.Insert({50,Dmax,0.1,eps});
+    eps.itsDelatEnergy1Epsilon=1e-6;
+    is.Insert({50,Dmax,0.05,eps});
+    eps.itsDelatEnergy1Epsilon=1e-7;
+    is.Insert({50,Dmax,0.02,eps});
+    eps.itsDelatEnergy1Epsilon=1e-8;
+    is.Insert({50,Dmax,0.01,eps});
+
+    itsState->FindiTimeGroundState(itsH,is);
+    itsState->Report(cout);
+    EXPECT_GT(itsState->GetExpectation(itsH),-0.4431471805599453094172);
 }
 
 

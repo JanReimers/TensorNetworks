@@ -1,9 +1,14 @@
 #include "TensorNetworksImp/iTEBDStateImp.H"
-#include "TensorNetworksImp/Bond.H"
+#include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
+#include "TensorNetworks/IterationSchedule.H"
+#include "TensorNetworks/Factory.H"
+
+#include "TensorNetworksImp/Bond.H"
+
 #include "NumericalMethods/ArpackEigenSolver.H"
 #include "NumericalMethods/PrimeEigenSolver.H"
 #include "NumericalMethods/LapackEigenSolver.H"
@@ -66,7 +71,7 @@ void iTEBDStateImp::IncreaseBondDimensions(int D)
 }
 
 
-void iTEBDStateImp::ReCenter(int isite)
+void iTEBDStateImp::ReCenter(int isite) const
 {
     s1=Sites(isite,this);
     assert(s1.siteA!=s1.siteB);
@@ -80,7 +85,7 @@ void iTEBDStateImp::ReCenter(int isite)
 }
 
 
-iTEBDStateImp::Sites::Sites(int leftSite, iTEBDStateImp* iTEBD)
+iTEBDStateImp::Sites::Sites(int leftSite, const iTEBDStateImp* iTEBD)
     : leftSiteNumber(leftSite)
     , siteA(iTEBD->itsSites[iTEBD->GetModSite(leftSite  )])
     , siteB(iTEBD->itsSites[iTEBD->GetModSite(leftSite+1)])
@@ -152,6 +157,70 @@ int iTEBDStateImp::GetModSite(int isite) const
     assert(modSite>=1);
     assert(modSite<=itsL);
     return modSite;
+}
+
+
+double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule& is)
+{
+    assert(Logger); //Make sure we have global logger.
+    Canonicalize(TensorNetworks::DLeft);
+    Logger->LogInfoV(1,"Initiate iTime GS iterations, Dmax=%4d, Norm status=%s",GetMaxD(),GetNormStatus().c_str());
+
+    double E1=0;
+    for (is.begin(); !is.end(); is++)
+        E1=FindiTimeGroundState(H,*is);
+
+    MPO* H2=H->CreateH2Operator();
+    double E2=GetExpectation(H2);
+    E2= E2-E1*E1;
+    delete H2;
+    Logger->LogInfoV(0,"Finished iTime GS iterations D=%4d, <E>=%.9f, <E^2>-<E>^2=%.2e",GetMaxD(),E1,E2);
+    return E2;
+}
+
+double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const IterationScheduleLine& isl)
+{
+    assert(isl.itsDmax>0 || isl.itsEps.itsMPSCompressEpsilon>0);
+
+
+    Matrix4RT Hlocal=H->BuildLocalMatrix();
+    Matrix4RT expH=Hamiltonian::ExponentH(isl.itsdt,Hlocal);
+    int Dmax=GetMaxD();
+    Logger->LogInfoV(1,"   Begin iterations, dt=%.3f,  GetMaxD=%4d, isl.Dmax=%4d",isl.itsdt,Dmax,isl.itsDmax);
+    SVCompressorC* mps_compressor =Factory::GetFactory()->MakeMPSCompressor(Dmax,0.0);
+    Orthogonalize(mps_compressor);
+    ReCenter(1);
+    double E1=GetExpectation(H)/(itsL-1);
+
+    for (int D=Dmax;D<=isl.itsDmax;D+=isl.itsDeltaD)
+    {
+        if (D>Dmax)
+        {
+            IncreaseBondDimensions(D);
+            delete mps_compressor;
+            mps_compressor =Factory::GetFactory()->MakeMPSCompressor(D,0.0);
+        }
+        int niter=1;
+        for (; niter<isl.itsMaxGSSweepIterations; niter++)
+        {
+            Apply(expH,mps_compressor);
+            ReCenter(2);
+            Apply(expH,mps_compressor);
+            ReCenter(1);
+            double Enew=GetExpectation(H)/(itsL-1);
+            double dE=Enew-E1;
+            E1=Enew;
+            Logger->LogInfoV(2,"      E=%.9f, dE=%.2e, niter=%4d",E1,dE,niter);
+            if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon || dE>0.0) break;
+        }
+        Orthogonalize(mps_compressor);
+        E1=GetExpectation(H)/(itsL-1);
+        Logger->LogInfoV(2,"      E=%.9f, niter=%4d",E1,niter);
+        Logger->LogInfoV(1,"   End  iterations, dt=%.3f,   E=%.9f, D=%4d, isl.Dmax=%4d",isl.itsdt,E1,D,isl.itsDmax);
+    }
+    Logger->LogInfoV(1,"   End D iterations, dt=%.3f, D=%4d, E=%.9f.",isl.itsdt,GetMaxD(),E1);
+    delete mps_compressor;
+    return E1;
 }
 
 
@@ -235,7 +304,8 @@ ONErrors iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrix
 //
 //  Unpack P into GammaA and Q into GammaB
 //
-    assert(Min(lambdaB())>1e-10);
+    if (Min(lambdaB())<1e-10)
+        std::cerr << "Warning  small lambda min(lambda)=" << Min(lambdaB()) << std::endl;
     DiagonalMatrixRT lbinv=1.0/lambdaB(); //inverse of LambdaB
     for (int n=0; n<itsd; n++)
         for (int i=1; i<=D; i++)
@@ -345,7 +415,7 @@ iTEBDStateImp::MdType iTEBDStateImp::GetEigenMatrix(TensorNetworks::Direction lr
     double err;
     switch (lr)
     {
-        case DLeft  : err=Max(fabs(V*theta-eigenValue*V));break; //Assumes eigen value was 1
+        case DLeft  : err=Max(fabs(V*theta-eigenValue*V));break;
         case DRight : err=Max(fabs(theta*V-eigenValue*V));break;
     }
     if (err>1e-13) cout  << std::scientific << "Eigen vector error=" << err << endl;
@@ -366,7 +436,13 @@ iTEBDStateImp::MMType iTEBDStateImp::Factor(const MatrixCT m)
     auto [U,e]=solver->SolveAll(mh,1e-13);
     delete solver;
     X=U*DiagonalMatrix<double>(sqrt(e));
-    assert(Min(e)>1e-10);
+    if (Min(e)<1e-10)
+    {
+        std::cerr << "iTEBDStateImp::Factor Warning  small eigen min(e)=" << Min(e) << std::endl;
+        std::cerr << "  mh.diag=" << mh.GetDiagonal() << std::endl;
+        std::cerr << "   e=" << e << std::endl;
+    }
+
     Xinv=DiagonalMatrix<double>(1.0/sqrt(e))*Transpose(conj(U));
     assert(IsUnit(X*Xinv,1e-13));
     return std::make_tuple(X,Xinv);
@@ -472,7 +548,10 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
     Matrix4CT El=GetTransferMatrix(lambda*gamma);
 
     auto [Vr,er]=GetEigenMatrix(DRight,Er);
+    if (Min(fabs(Vr.GetDiagonal()))<1e-10) return std::make_tuple(gamma,lambda); //Bail if V is singular. THis can happen when increasing D.
+
     auto [Vl,el]=GetEigenMatrix(DLeft ,El);
+    if (Min(fabs(Vl.GetDiagonal()))<1e-10) return std::make_tuple(gamma,lambda); //Bail if V is singular. THis can happen when increasing D.
 //
 //  Normalize
 //
@@ -513,7 +592,7 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
     MatrixCT YT   =Transpose(Y);
     MatrixCT YTinv=Transpose(Yinv);
     assert(IsUnit(X*Xinv,1e-13));
-    assert(IsUnit(YT*YTinv,1e-12));
+    //assert(IsUnit(YT*YTinv,1e-12));
     //
     //  Transform lambda and SVD
     //
@@ -772,7 +851,17 @@ double iTEBDStateImp::GetExpectationmnmn (const Matrix4RT& expH) const
 
 double iTEBDStateImp::GetExpectation (const MPO* o) const
 {
+    int oldCenter=s1.leftSiteNumber;
+    double e1=GetExpectation(o,1);
+    double e2=GetExpectation(o,2);
+    ReCenter(oldCenter);
+    return 0.5*(e1+e2);
+}
+
+double iTEBDStateImp::GetExpectation (const MPO* o,int center) const
+{
     assert(o->GetL()==2);
+    ReCenter(center);
     int D=s1.siteA->GetD1();
     assert(D==s1.siteA->GetD2());
     assert(D==s1.siteB->GetD1());
