@@ -1,17 +1,20 @@
 #include "SPDLogger.H"
 
+
 namespace TensorNetworks
 {
+TNSLogger* Logger=nullptr;
 
 SPDLogger::SPDLogger(int level)
     : itsLevel(level)
 {
     //Defulat logger is stdout
+    if (!Logger) Logger=this;
 }
 
 SPDLogger::~SPDLogger()
 {
-    //dtor
+    if (Logger==this) Logger=nullptr;
 }
 
 void SPDLogger::ReadyToStart(c_str message)

@@ -2,8 +2,8 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
 -iTEBD
     Done: -Test S*S operator for energy.
-    -Implement iterative orthogonality method.
-    Done -Do normalization inside Orthogonal
+    Done: -Implement iterative orthogonality method.
+    Done: -Do normalization inside Orthogonal
     Fixed: Dunno why?!-Try and get rid off ambiguous op overload warnings.
     Done -Stop checking orthogonality everywhere, just report it
     Done: -Optimize GetExpectation functions, assumes orthonormality
@@ -17,11 +17,14 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     Done: -Store sqrt(s*s) for SV error.
     Done: -Use the name CompressionError consistently.
     Done: -Use Factor and EigenMatrix functions
+-Make and iTimeGroundState abstract base class to handle iterations.
+    Need global logger first, since this is heavily logger dependent.
+
 -We need to be able to add (rather than combine) MPOs to do:
     S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
 -Investigate sweep directions for normalization
 -Improve level two logging for variational ground states
--Make a global logger
+Done: -Make a global logger
 -Prime eigen solver -44 error.
 -Done: Profiling
 	TestITimeSecondOrderTrotter_EpsLimitedCompression

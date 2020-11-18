@@ -7,11 +7,8 @@
 namespace TensorNetworks
 {
 //
-//  LOgger for a long running process (LRP).  The public interface is for use by
-//  the LRP, it simply calls ReadyToStart at the begining and then
-//  repeatedly calls DoneOneStep(level) where level defines a hierarcy of steps.
-//  These calls may be blocking ... that's the point.  The GUI user can step through
-//  a calculation pla/pause it.  The logger can also update the GUI at each step if required.
+// Abstract interface for a logger.  Hopefully file, console and GUIs can both derive
+// from this.
 //
 class TNSLogger
 {
@@ -34,7 +31,10 @@ class TNSLogger
             snprintf( buf.get(), size, fmt, args ... );
             LogInfo(level,buf.get());
         }
+
 };
+
+extern TNSLogger* Logger;
 
 }
 #endif // TNSLOGGER_H

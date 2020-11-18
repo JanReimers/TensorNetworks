@@ -82,9 +82,9 @@ public:
 
 
     double epsNorm,epsOrth;
-    TensorNetworks::Factory*     itsFactory=TensorNetworks::Factory::GetFactory();
-    TensorNetworks::Hamiltonian* itsH;
-    TensorNetworks::iTEBDState*  itsState;
+    TensorNetworks::Factory*       itsFactory=TensorNetworks::Factory::GetFactory();
+    TensorNetworks::Hamiltonian*   itsH;
+    TensorNetworks::iTEBDState*    itsState;
     TensorNetworks::SVCompressorC* itsCompressor;
 };
 

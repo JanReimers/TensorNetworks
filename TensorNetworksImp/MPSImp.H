@@ -32,7 +32,6 @@ public:
         virtual void InitializeWith(State);
         virtual void Freeze(int isite,double s);
         virtual MPS* Clone() const;
-        virtual void Inject(rc_ptr<TNSLogger>&);
 //--------------------------------------------------------------------------------------
 //
 //  Access to information
@@ -195,7 +194,6 @@ private:
         BondsType  itsBonds;
         SitesType  itsSites;
 
-        rc_ptr<TNSLogger> itsLogger;
 }; // class
 
 } //namespace

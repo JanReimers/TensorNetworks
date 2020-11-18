@@ -58,11 +58,12 @@ dcmplx   MPSImp::GetExpectationC(const MPO* o) const
 
 OneSiteDMs MPSImp::CalculateOneSiteDMs()
 {
+    assert(Logger); //Make sure we have global logger.
     OneSiteDMs ret(itsL,itsd);
     Normalize(DRight);
     SiteLoop(ia)
     {
-        if (itsLogger) itsLogger->LogInfo(2,ia,"Calculate ro(mn)");
+        Logger->LogInfo(2,ia,"Calculate ro(mn)");
         ret.Insert(ia,itsSites[ia]->CalculateOneSiteDM());
         NormalizeSite(DLeft,ia);
     }

@@ -5,7 +5,6 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
 #include "Operators/MPO_SpatialTrotter.H"
-#include "TensorNetworksImp/SPDLogger.H"
 
 #include "oml/matrix.h"
 //#include "oml/stream.h"
@@ -27,7 +26,6 @@ public:
     , itsFactory(TensorNetworks::Factory::GetFactory())
     , itsH(0)
     , itsMPS(0)
-    , itsLogger(new TensorNetworks::SPDLogger(1))
     {
         StreamableObject::SetToPretty();
     }
@@ -44,7 +42,6 @@ public:
         if (itsMPS) delete itsMPS;
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
         itsMPS=itsH->CreateMPS(D);
-        itsMPS->Inject(itsLogger);
         itsMPS->InitializeWith(TensorNetworks::Random);
     }
 
@@ -53,7 +50,6 @@ public:
     TensorNetworks::Factory*          itsFactory;
     TensorNetworks::Hamiltonian*      itsH;
     TensorNetworks::MPS*              itsMPS;
-    rc_ptr<TensorNetworks::TNSLogger> itsLogger;
 };
 
 
@@ -306,6 +302,7 @@ TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotter)
     double E2=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46664265599414939,1e-4);
 }
+
 TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
 {
     int D=16,Dcompress=16,L=16; //Set DMax high

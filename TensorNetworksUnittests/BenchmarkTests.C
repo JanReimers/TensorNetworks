@@ -4,7 +4,6 @@
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Factory.H"
-#include "TensorNetworksImp/SPDLogger.H"
 #include <omp.h>
 
 //#include "oml/stream.h"
@@ -20,7 +19,6 @@ public:
     , itsFactory(TensorNetworks::Factory::GetFactory())
     , itsH(0)
     , itsMPS(0)
-    , itsLogger(new TensorNetworks::SPDLogger(-1))
     {
         StreamableObject::SetToPretty();
     }
@@ -36,7 +34,6 @@ public:
     {
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
         itsMPS=itsH->CreateMPS(D,1e-12,1e-12);
-        itsMPS->Inject(itsLogger);
     }
 
 
@@ -44,7 +41,6 @@ public:
     TensorNetworks::Factory*          itsFactory;
     TensorNetworks::Hamiltonian*      itsH;
     TensorNetworks::MPS*              itsMPS;
-    rc_ptr<TensorNetworks::TNSLogger> itsLogger;
 };
 
 #ifndef DEBUG

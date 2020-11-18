@@ -25,6 +25,7 @@ double MPSImp::FindVariationalGroundState(const Hamiltonian* H,const IterationSc
 
 double MPSImp::FindVariationalGroundState(const Hamiltonian* H, const IterationScheduleLine& isl)
 {
+    assert(Logger); //Make sure we have global logger.
     int Dmax=GetMaxD();
     MPO* H2=H->CreateH2Operator();
     double DE2=0;
@@ -39,9 +40,9 @@ double MPSImp::FindVariationalGroundState(const Hamiltonian* H, const IterationS
         int in=0;
         for (; in<isl.itsMaxGSSweepIterations; in++)
         {
-            if (itsLogger) itsLogger->LogInfo(2,"Sweep Right");
+            Logger->LogInfo(2,"Sweep Right");
             Sweep(DLeft,H,isl.itsEps);  //This actually sweeps to the right, but leaves left normalized sites in its wake
-            if (itsLogger) itsLogger->LogInfo(2,"Sweep Left");
+            Logger->LogInfo(2,"Sweep Left");
             Sweep(DRight,H,isl.itsEps);
             double dE=GetMaxDeltaE();
             //cout << "dE=" << dE << endl;
@@ -52,7 +53,7 @@ double MPSImp::FindVariationalGroundState(const Hamiltonian* H, const IterationS
         double E1=GetExpectation(H);
         double E2=GetExpectation(H2);
         DE2=E2-E1*E1;
-        if (itsLogger) itsLogger->LogInfoV(0,"Variational GS D=%4d, %4d iterations, <E>=%.9f, <E^2>-<E>^2=%.2e",D,in,E1,DE2);
+        Logger->LogInfoV(0,"Variational GS D=%4d, %4d iterations, <E>=%.9f, <E^2>-<E>^2=%.2e",D,in,E1,DE2);
         IterationEnergy(E1);
     }
     delete H2;
@@ -77,13 +78,14 @@ void MPSImp::Sweep(Direction lr,const Hamiltonian* h,const Epsilons& eps)
 void MPSImp::Refine(Direction lr,const Hamiltonian *h,const Epsilons& eps,int isite)
 {
 //    assert(CheckNormalized(isite,eps.itsNormalizationEpsilon));
+    assert(Logger); //Make sure we have global logger.
     CheckSiteNumber(isite);
     assert(IsRLNormalized(isite));
     if (!itsSites[isite]->IsFrozen())
     {
-        if (itsLogger) itsLogger->LogInfo(2,isite,"Calculating Heff"); //Logger will update the graphs
+        Logger->LogInfo(2,isite,"Calculating Heff"); //Logger will update the graphs
         Matrix6CT Heff6=GetHeffIterate(h,isite); //New iterative version
-        if (itsLogger) itsLogger->LogInfo(2,isite,"Running eigen solver"); //Logger will update the graphs
+        Logger->LogInfo(2,isite,"Running eigen solver"); //Logger will update the graphs
         itsSites[isite]->Refine(Heff6.Flatten(),eps);
     }
     UpdateEnergyData(isite);

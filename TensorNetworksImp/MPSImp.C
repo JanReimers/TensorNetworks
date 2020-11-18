@@ -25,12 +25,12 @@ MPSImp::MPSImp(int L, double S, int D,double normEps,double epsSV)
     , itsd(2*S+1)
     , itsNSweep(0)
     , itsNormEps(normEps)
-    , itsLogger(0)
 {
     assert(itsL>0);
     assert(isValidSpin(S));
     assert(itsS>=0.5);
     assert(D>0);
+    assert(Logger); //Make sure we have global logger.
 
     InitSitesAndBonds(D,epsSV);
 }
@@ -41,8 +41,8 @@ MPSImp::MPSImp(const MPSImp& mps)
     , itsd           (mps.itsd)
     , itsNSweep      (mps.itsNSweep)
     , itsNormEps     (mps.itsNormEps)
-    , itsLogger      (mps.itsLogger) //rc_ptr should handle this
 {
+    assert(Logger); //Make sure we have global logger.
     int D=mps.GetMaxD();
     assert(D>0);
     InitSitesAndBonds(D,0); //Clone state should transfer ,double epsSV
@@ -59,6 +59,7 @@ MPSImp::MPSImp(int L, double S,Direction lr,double normEps)
     , itsNSweep(0)
     , itsNormEps(normEps)
 {
+    assert(Logger); //Make sure we have global logger.
     assert(itsL>0);
     assert(isValidSpin(S));
 
@@ -113,13 +114,6 @@ MPS* MPSImp::Clone() const
 {
     return new MPSImp(*this);
 }
-
-void MPSImp::Inject(rc_ptr<TNSLogger>& l)
-{
-    itsLogger=l;
-}
-
-
 
 
 void MPSImp::InitializeWith(State state)

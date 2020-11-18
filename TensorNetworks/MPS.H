@@ -19,7 +19,6 @@ public:
     virtual void InitializeWith(State)=0;
     virtual void Freeze(int isite,double s)=0;
     virtual MPS* Clone() const=0;
-    virtual void Inject(rc_ptr<TNSLogger>&)=0;
 //--------------------------------------------------------------------------------------
 //
 //  Normalization members with and without SVD compression
