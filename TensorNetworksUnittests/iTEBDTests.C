@@ -547,15 +547,25 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     eps.itsDelatEnergy1Epsilon=1e-3;
     is.Insert({20,Dstart,0.5,eps});
     eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({50,4,0.2,eps});
+    is.Insert({50,8,0.2,eps});
+#ifndef DEBUG
     eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({50,Dmax,0.1,eps});
+    is.Insert({50,16,0.1,eps});
+    eps.itsDelatEnergy1Epsilon=1e-5;
+    is.Insert({50,16,0.05,eps});
+    eps.itsDelatEnergy1Epsilon=5e-6;
+    is.Insert({50,16,0.02,eps});
+    eps.itsDelatEnergy1Epsilon=2e-6;
+    is.Insert({50,16,0.01,eps});
     eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({50,Dmax,0.05,eps});
-    eps.itsDelatEnergy1Epsilon=1e-7;
-    is.Insert({50,Dmax,0.02,eps});
-    eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({50,Dmax,0.01,eps});
+    is.Insert({50,16,0.005,eps});
+#endif
+//    eps.itsDelatEnergy1Epsilon=1e-6;
+//    is.Insert({50,Dmax,0.05,eps});
+//    eps.itsDelatEnergy1Epsilon=1e-7;
+//    is.Insert({50,Dmax,0.02,eps});
+//    eps.itsDelatEnergy1Epsilon=1e-8;
+//    is.Insert({50,Dmax,0.01,eps});
 
     itsState->FindiTimeGroundState(itsH,is);
     itsState->Report(cout);

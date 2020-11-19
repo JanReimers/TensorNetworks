@@ -62,14 +62,13 @@
 			<Add option="-Wall" />
 			<Add option="-std=c++17" />
 			<Add option="-m64" />
-			<Add option="-fopenmp" />
+			<Add option="-Wno-unknown-pragmas" />
 			<Add directory="../oml/include" />
 			<Add directory="../ITensor" />
 			<Add directory="../" />
 		</Compiler>
 		<Linker>
 			<Add option="-m64" />
-			<Add option="-fopenmp" />
 			<Add library="TensorNetworks" />
 			<Add library="oml" />
 			<Add library="gtest" />

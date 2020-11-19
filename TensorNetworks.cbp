@@ -36,6 +36,7 @@
 					<Add option="-Wall" />
 					<Add option="-std=c++17" />
 					<Add option="-pg" />
+					<Add option="-g" />
 					<Add option="-DNDEBUG" />
 					<Add directory="NumericalMethods" />
 				</Compiler>
@@ -48,6 +49,7 @@
 		<Compiler>
 			<Add option="-std=c++17" />
 			<Add option="-fPIC" />
+			<Add option="-Wno-unknown-pragmas" />
 			<Add directory="oml/include" />
 			<Add directory="./" />
 		</Compiler>

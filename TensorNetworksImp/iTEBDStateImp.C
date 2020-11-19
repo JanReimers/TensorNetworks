@@ -362,6 +362,112 @@ ONErrors iTEBDStateImp::GetOrthonormalityErrors() const
     return {right_norm_error,left__norm_error,right_orth_error,left__orth_error};
 }
 
+Matrix4CT iTEBDStateImp::GetTransferMatrix(const dVectorT& M) const
+{
+    int d=M.size();
+    assert(d>0);
+    int D=M[0].GetNumRows();
+    assert(D==M[0].GetNumCols());
+    Matrix4CT E(D,D,D,D);
+
+    for (int i1=1; i1<=D; i1++)
+        for (int j1=1; j1<=D; j1++)
+            for (int i3=1; i3<=D; i3++)
+                for (int j3=1; j3<=D; j3++)
+                {
+                    dcmplx e(0);
+                    for (int n=0; n<d; n++)
+                        e+=M[n](i1,i3)*conj(M[n](j1,j3));
+                    E(i1,j1,i3,j3)=e;
+                }
+    return E;
+}
+
+MatrixCT  iTEBDStateImp::GetNormMatrix(Direction lr,const dVectorT& M) const //Er*I or I*El
+{
+    int d=M.size();
+    assert(d>0);
+    int D=M[0].GetNumRows();
+    assert(D==M[0].GetNumCols());
+    MatrixCT N(D,D);
+    switch (lr)
+    {
+        case DLeft:
+        {
+            for (int i3=1; i3<=D; i3++)
+            for (int j3=1; j3<=D; j3++)
+            {
+                dcmplx e(0);
+                for (int i1=1; i1<=D; i1++)
+                    for (int n=0; n<d; n++)
+                        e+=M[n](i1,i3)*conj(M[n](i1,j3));
+                N(i3,j3)=e;
+            }
+            break;
+        }
+        case DRight:
+        {
+            for (int i1=1; i1<=D; i1++)
+            for (int j1=1; j1<=D; j1++)
+            {
+                dcmplx e(0);
+                for (int i3=1; i3<=D; i3++)
+                    for (int n=0; n<d; n++)
+                        e+=M[n](i1,i3)*conj(M[n](j1,i3));
+                N(i1,j1)=e;
+            }
+            break;
+        }
+    }
+    return N;
+}
+//
+//  Assume two site for now
+//
+Matrix4CT iTEBDStateImp::GetTransferMatrix(Direction lr) const
+{
+    assert(s1.siteA->GetD1()==s1.siteA->GetD2());
+    assert(s1.siteA->GetD1()==s1.siteB->GetD1());
+    assert(s1.siteA->GetD1()==s1.siteB->GetD2());
+
+    dVectorT gamma(itsd*itsd);
+    int nab=0;
+    for (int nb=0; nb<itsd; nb++)
+        for (int na=0; na<itsd; na++,nab++)
+            gamma[nab]=GammaA()[na]*lambdaA()*GammaB()[nb];
+    Matrix4CT E;
+    switch (lr)
+    {
+    case DRight :
+        E=GetTransferMatrix(gamma*lambdaB());
+        break;
+    case DLeft :
+        E=GetTransferMatrix(lambdaB()*gamma);
+        break;
+    }
+
+    return E;
+}
+
+
+Matrix4CT iTEBDStateImp::GetTransferMatrix(const Matrix4CT& theta) const
+{
+    int D=s1.siteA->GetD1();
+    Matrix4CT E(D,D,D,D);
+
+    for (int i1=1; i1<=D; i1++)
+        for (int j1=1; j1<=D; j1++)
+            for (int i3=1; i3<=D; i3++)
+                for (int j3=1; j3<=D; j3++)
+                {
+                    dcmplx e(0);
+                    for (int na=1; na<=itsd; na++)
+                    for (int nb=1; nb<=itsd; nb++)
+                        e+=conj(theta(na,j1,nb,j3))*(theta(na,i1,nb,i3));
+                    E(i1,j1,i3,j3)=e;
+                }
+    return E;
+}
 
 iTEBDStateImp::MdType iTEBDStateImp::GetEigenMatrix(TensorNetworks::Direction lr, const Matrix4CT& theta)
 {
@@ -458,45 +564,59 @@ iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMat
     assert(d>0);
     int D=gamma[0].GetNumRows();
     assert(D==gamma[0].GetNumCols());
-    double eps=1e-12;
+    double eps=1e-6;
     MatrixCT Vr,Vl,I(D,D); //Right ei
     Unit(I);
-
+    SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
+    dcmplx er;
+    dcmplx el;
     int niter=0;
     do
     {
         Vr=GetNormMatrix(DRight,gamma*lambda); //=Er*I
         Vl=GetNormMatrix(DLeft ,lambda*gamma); //=I*El
-        double deltar=Max(fabs(Vr-I));
-        double deltal=Max(fabs(Vl-I));
-        if (deltar<eps && deltal < eps) break;
+        if (Min(fabs(Vr.GetDiagonal()))<1e-10)
+        {
+            cout << "Singular Vr, bailing" << endl;
+            return std::make_tuple(gamma,lambda); //Bail if V is singular. THis can happen when increasing D.
+        }
+        if (Min(fabs(Vl.GetDiagonal()))<1e-10)
+        {
+            cout << "Singular Vl, bailing" << endl;
+            return std::make_tuple(gamma,lambda); //Bail if V is singular. THis can happen when increasing D.
+        }
+//
+//  Try to normalize
+//
+        er=Vr(1,1);
+        el=Vl(1,1);
+        Vr/=er;
+        Vl/=el;
 
-    //
-    //  Make sure Vr and Vl are as Hermitian as they can get.
-    //
+//
+//  Make sure Vr and Vl are loosely Hermitian.
+//
         assert(IsHermitian(Vr,1e-10));
         assert(IsHermitian(Vl,1e-10));
-        Vr=0.5*(Vr+~Vr); //Try and clean up non-Hermitian round-off noise.
-        Vl=0.5*(Vl+~Vl);
-        assert(IsHermitian(Vr,1e-13));
-        assert(IsHermitian(Vl,1e-13));
     //
     //  Decompose eigen matrices
     //
-        auto [X,Xinv]=Factor(Vr);
-        auto [Y,Yinv]=Factor(Vl);
-        MatrixCT YT   =Transpose(Y);
-        MatrixCT YTinv=Transpose(Yinv);
+        auto [X ,Xinv ]=Factor(Vr);
+        auto [Yd,Ydinv]=Factor(Vl);
+//        MatrixCT YT   =conj(Yd); Y_Transpose should be conj(Ydagger) but this doesn't seem to work!!
+//        MatrixCT YTinv=conj(Ydinv);
+        MatrixCT YT   =Transpose(Yd);
+        MatrixCT YTinv=Transpose(Ydinv);
         assert(IsUnit(X*Xinv,1e-13));
         assert(IsUnit(YT*YTinv,1e-12));
         //
         //  Transform lambda and SVD
         //
         MatrixCT YlX=YT*lambda*X; //THis will scale lambda by 1/D since YT and X are both O(1/sqrt(D))
-        SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
         auto [U,lambda_prime,VT]=svd_solver->SolveAll(YlX,1e-13);
-        delete svd_solver;
-
+        //
+        //  Normalize lambda'
+        //
         double s2=lambda_prime.GetDiagonal()*lambda_prime.GetDiagonal();
         lambda_prime/=sqrt(s2);
         //
@@ -507,10 +627,18 @@ iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMat
             MatrixCT gamma_prime=VT*Xinv*gamma[n]*YTinv*U;
             gamma[n]=gamma_prime;
         }
+        double deltal=Max(fabs(lambda-lambda_prime));
         lambda=lambda_prime;
+//        cout << "deltal,er,el,er-el=" << deltal << " " << fabs(er-1.0) << " " << fabs(el-1.0) << " " << fabs(er-el) << endl;
+        if (deltal<eps) break;
         niter++;
-    } while (niter<1000);
-    cout << "niter=" << niter << endl;;
+    } while (niter<100);
+    delete svd_solver;
+//
+//  Normalize
+//
+        for (int n=0;n<d;n++)
+            gamma[n]/=sqrt(er);
 
     //
     //  Verify orthogonaly
@@ -519,14 +647,17 @@ iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMat
     MatrixCT Nl=GetNormMatrix(DLeft ,lambda*gamma); //=I*El
     double  left_error=Max(fabs(Nr-I));
     double right_error=Max(fabs(Nl-I));
-    if (left_error>1e-12)
+    if (left_error>D*eps)
     {
         cout << std::scientific << "Warning: Left orthogonality error=" << left_error  << endl;
+        cout << "Nl=" << Nl << endl;
     }
-    if (right_error>1e-12)
+    if (right_error>D*eps)
     {
         cout << std::scientific << "Warning: Right orthogonality error=" << right_error  << endl;
+        cout << "Nr=" << Nr << endl;
     }
+//    cout << niter << " " << D << endl;
 
     return std::make_tuple(gamma,lambda);
 }
@@ -540,12 +671,16 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
     assert(d>0);
     int D=gamma[0].GetNumRows();
     assert(D==gamma[0].GetNumCols());
+    MatrixCT I(D,D); //Right ei
+    Unit(I);
     //
     //  Calculate right and left transfer matrices and the R/L eigen vectors
     //  Transform the eigen vectors into Hermitian eigen matrices
     //
     Matrix4CT Er=GetTransferMatrix(gamma*lambda);
     Matrix4CT El=GetTransferMatrix(lambda*gamma);
+//    cout << "Er*I=" << Er*I << endl;
+//    cout << "I*El=" << I*El << endl;
 
     auto [Vr,er]=GetEigenMatrix(DRight,Er);
     if (Min(fabs(Vr.GetDiagonal()))<1e-10) return std::make_tuple(gamma,lambda); //Bail if V is singular. THis can happen when increasing D.
@@ -613,8 +748,6 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
     //
     MatrixCT Nr=GetNormMatrix(DRight,gamma_prime*lambda_prime); //=Er*I
     MatrixCT Nl=GetNormMatrix(DLeft ,lambda_prime*gamma_prime); //=I*El
-    MatrixCT I(D,D); //Right ei
-    Unit(I);
     double  left_error=Max(fabs(Nr-I));
     double right_error=Max(fabs(Nl-I));
     if (left_error>1e-12)
@@ -629,129 +762,6 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
     return std::make_tuple(gamma_prime,lambda_prime);
 }
 
-Matrix4CT iTEBDStateImp::GetTransferMatrix(const dVectorT& M) const
-{
-    int d=M.size();
-    assert(d>0);
-    int D=M[0].GetNumRows();
-    assert(D==M[0].GetNumCols());
-    Matrix4CT E(D,D,D,D);
-
-    for (int i1=1; i1<=D; i1++)
-        for (int j1=1; j1<=D; j1++)
-            for (int i3=1; i3<=D; i3++)
-                for (int j3=1; j3<=D; j3++)
-                {
-                    dcmplx e(0);
-                    for (int n=0; n<d; n++)
-                        e+=M[n](i1,i3)*conj(M[n](j1,j3));
-                    E(i1,j1,i3,j3)=e;
-                }
-    return E;
-}
-
-MatrixCT  iTEBDStateImp::GetNormMatrix(Direction lr,const dVectorT& M) const //Er*I or I*El
-{
-    int d=M.size();
-    assert(d>0);
-    int D=M[0].GetNumRows();
-    assert(D==M[0].GetNumCols());
-    MatrixCT N(D,D);
-    switch (lr)
-    {
-        case DLeft:
-        {
-            for (int i3=1; i3<=D; i3++)
-            for (int j3=1; j3<=D; j3++)
-            {
-                dcmplx e(0);
-                for (int i1=1; i1<=D; i1++)
-                    for (int n=0; n<d; n++)
-                        e+=M[n](i1,i3)*conj(M[n](i1,j3));
-                N(i3,j3)=e;
-            }
-            break;
-        }
-        case DRight:
-        {
-            for (int i1=1; i1<=D; i1++)
-            for (int j1=1; j1<=D; j1++)
-            {
-                dcmplx e(0);
-                for (int i3=1; i3<=D; i3++)
-                    for (int n=0; n<d; n++)
-                        e+=M[n](i1,i3)*conj(M[n](j1,i3));
-                N(i1,j1)=e;
-            }
-            break;
-        }
-    }
-    return N;
-}
-//
-//  Assume two site for now
-//
-Matrix4CT iTEBDStateImp::GetTransferMatrix(Direction lr) const
-{
-    assert(s1.siteA->GetD1()==s1.siteA->GetD2());
-    assert(s1.siteA->GetD1()==s1.siteB->GetD1());
-    assert(s1.siteA->GetD1()==s1.siteB->GetD2());
-
-    dVectorT gamma(itsd*itsd);
-    int nab=0;
-    for (int nb=0; nb<itsd; nb++)
-        for (int na=0; na<itsd; na++,nab++)
-            gamma[nab]=GammaA()[na]*lambdaA()*GammaB()[nb];
-    Matrix4CT E;
-    switch (lr)
-    {
-    case DRight :
-        E=GetTransferMatrix(gamma*lambdaB());
-        break;
-    case DLeft :
-        E=GetTransferMatrix(lambdaB()*gamma);
-        break;
-    }
-
-
-//    Matrix4CT E(D,D,D,D);
-//    E.Fill(0);
-//    for (int na=0; na<itsd; na++)
-//        for (int nb=0; nb<itsd; nb++)
-//        {
-//            MatrixCT theta13=GammaA()[na]*lambdaA()*GammaB()[nb]*lambdaB();
-//            MatrixCT theta13c=conj(GammaA()[na])*lambdaA()*conj(GammaB()[nb])*lambdaB();
-//            assert(conj(theta13c)==theta13);
-//            assert(theta13.GetNumRows()==D);
-//            assert(theta13.GetNumCols()==D);
-//            for (int i1=1; i1<=D; i1++)
-//                for (int j1=1; j1<=D; j1++)
-//                    for (int i3=1; i3<=D; i3++)
-//                        for (int j3=1; j3<=D; j3++)
-//                            E(i1,j1,i3,j3)+=theta13c(i1,i3)*theta13(j1,j3);
-//        }
-    return E;
-}
-
-
-Matrix4CT iTEBDStateImp::GetTransferMatrix(const Matrix4CT& theta) const
-{
-    int D=s1.siteA->GetD1();
-    Matrix4CT E(D,D,D,D);
-
-    for (int i1=1; i1<=D; i1++)
-        for (int j1=1; j1<=D; j1++)
-            for (int i3=1; i3<=D; i3++)
-                for (int j3=1; j3<=D; j3++)
-                {
-                    dcmplx e(0);
-                    for (int na=1; na<=itsd; na++)
-                    for (int nb=1; nb<=itsd; nb++)
-                        e+=conj(theta(na,j1,nb,j3))*(theta(na,i1,nb,i3));
-                    E(i1,j1,i3,j3)=e;
-                }
-    return E;
-}
 //-----------------------------------------------------------------------------
 //
 //  THis follows PHYSICAL REVIEW B 78, 155117 2008 figure 14
@@ -784,7 +794,14 @@ void iTEBDStateImp::Apply(const Matrix4RT& expH,SVCompressorC* comp)
             Thetap[nab]+= theta13*expH(ma,na,mb,nb);
     }
 
-    auto [gammap,lambdap]=Orthogonalize(Thetap,lambdaB());
+    DiagonalMatrixRT lb=lambdaB();
+//    auto [gammap,lambdap]  =Orthogonalize(Thetap,lb);
+//    auto [gammapI,lambdapI]=OrthogonalizeI(gammap,lambdap);
+    auto [gammap,lambdap]=OrthogonalizeI(Thetap,lb);
+//    cout << "Max(fabs(lambdapI-lambdap))=" << Max(fabs(lambdapI.GetDiagonal()-lambdap.GetDiagonal())) << endl;
+//    cout << "lambdapI=" << lambdapI.GetDiagonal() << endl;
+//    cout << "lambdap =" << lambdap .GetDiagonal()  << endl;
+//    assert(false);
     UnpackOrthonormal(gammap,lambdap,comp);
 }
 
