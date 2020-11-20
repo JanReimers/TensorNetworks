@@ -350,7 +350,7 @@ TEST_F(iTEBDTests,TestApplyIdentity)
     itsState->Canonicalize(TensorNetworks::DLeft);
     Matrix4RT Hlocal=itsH->BuildLocalMatrix();
     Matrix4RT IdentityOp=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
-    itsState->Apply(IdentityOp,itsCompressor);
+    itsState->ApplyOrtho(IdentityOp,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
 
@@ -372,9 +372,9 @@ TEST_F(iTEBDTests,TestApplyIdentityRangeSD)
             itsState->Orthogonalize(itsCompressor);
             Matrix4RT Hlocal=itsH->BuildLocalMatrix();
             Matrix4RT IdentityOp=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
-            itsState->Apply(IdentityOp,itsCompressor);
+            itsState->ApplyOrtho(IdentityOp,itsCompressor);
             itsState->ReCenter(2);
-            itsState->Apply(IdentityOp,itsCompressor);
+            itsState->ApplyOrtho(IdentityOp,itsCompressor);
             EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
         }
 }
@@ -389,7 +389,7 @@ TEST_F(iTEBDTests,TestApplyExpH)
     itsState->Orthogonalize(itsCompressor);
     Matrix4RT Hlocal=itsH->BuildLocalMatrix();
     Matrix4RT IdentityOp=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
-    itsState->Apply(IdentityOp,itsCompressor);
+    itsState->ApplyOrtho(IdentityOp,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
 }
 
@@ -403,9 +403,9 @@ TEST_F(iTEBDTests,TestApplyExpH2)
     itsState->Orthogonalize(itsCompressor);
     Matrix4RT Hlocal=itsH->BuildLocalMatrix();
     Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
-    itsState->Apply(expH,itsCompressor);
+    itsState->ApplyOrtho(expH,itsCompressor);
     itsState->ReCenter(2);
-    itsState->Apply(expH,itsCompressor);
+    itsState->ApplyOrtho(expH,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"rl");
 }
 TEST_F(iTEBDTests,TestApplyExpH3)
@@ -418,9 +418,9 @@ TEST_F(iTEBDTests,TestApplyExpH3)
     itsState->Orthogonalize(itsCompressor);
     Matrix4RT Hlocal=itsH->BuildLocalMatrix();
     Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
-    itsState->Apply(expH,itsCompressor);
+    itsState->ApplyOrtho(expH,itsCompressor);
     itsState->ReCenter(2);
-    itsState->Apply(expH,itsCompressor);
+    itsState->ApplyOrtho(expH,itsCompressor);
     itsState->Orthogonalize(itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
@@ -442,9 +442,9 @@ TEST_F(iTEBDTests,TestApplyExpHRangeSD)
             itsState->Orthogonalize(itsCompressor);
             Matrix4RT Hlocal=itsH->BuildLocalMatrix();
             Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
-            itsState->Apply(expH,itsCompressor);
+            itsState->ApplyOrtho(expH,itsCompressor);
             itsState->ReCenter(2);
-            itsState->Apply(expH,itsCompressor);
+            itsState->ApplyOrtho(expH,itsCompressor);
             itsState->Orthogonalize(itsCompressor);
             EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
         }
@@ -535,7 +535,7 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     int UnitCell=2,Dstart=2,Dmax=32;
     double S=0.5,epsSVD=0.0;
 #ifdef DEBUG
-    Dmax=16;
+    Dmax=8;
 #endif // DEBUG
     Setup(UnitCell,S,Dstart,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
@@ -549,16 +549,18 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     eps.itsDelatEnergy1Epsilon=1e-5;
     is.Insert({50,8,0.2,eps});
 #ifndef DEBUG
-    eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({50,16,0.1,eps});
-    eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({50,16,0.05,eps});
-    eps.itsDelatEnergy1Epsilon=5e-6;
-    is.Insert({50,16,0.02,eps});
-    eps.itsDelatEnergy1Epsilon=2e-6;
-    is.Insert({50,16,0.01,eps});
     eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({50,16,0.005,eps});
+    is.Insert({50,16,4,0.1,eps});
+    eps.itsDelatEnergy1Epsilon=1e-6;
+    is.Insert({50,Dmax,8,0.1,eps});
+    eps.itsDelatEnergy1Epsilon=5e-7;
+    is.Insert({50,Dmax,0.05,eps});
+    eps.itsDelatEnergy1Epsilon=5e-7;
+    is.Insert({50,Dmax,0.02,eps});
+    eps.itsDelatEnergy1Epsilon=2e-7;
+    is.Insert({50,Dmax,0.01,eps});
+    eps.itsDelatEnergy1Epsilon=1e-7;
+    is.Insert({50,Dmax,0.005,eps});
 #endif
 //    eps.itsDelatEnergy1Epsilon=1e-6;
 //    is.Insert({50,Dmax,0.05,eps});
@@ -572,39 +574,4 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     EXPECT_GT(itsState->GetExpectation(itsH),-0.4431471805599453094172);
 }
 
-
-TEST_F(iTEBDTests,TestiTimeIterate)
-{
-    int UnitCell=2,D=8;
-    double S=0.5,dt=0.2,epsSVD=0.0;
-#ifdef DEBUG
-    D=4;
-#endif // DEBUG
-    Setup(UnitCell,S,D,epsSVD);
-    itsState->InitializeWith(TensorNetworks::Random);
-    itsState->Canonicalize(TensorNetworks::DLeft);
-    itsState->Orthogonalize(itsCompressor);
-    itsState->Report(cout);
-
-    Matrix4RT Hlocal=itsH->BuildLocalMatrix();
-    for (int it=1;it<=8;it++)
-    {
-        Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal);
-        //cout << std::setprecision(6) << "expH=" << expH << endl;
-        for (int i=1;i<40;i++)
-        {
-            itsState->ReCenter(1);
-            itsState->Apply(expH,itsCompressor);
-            itsState->ReCenter(2);
-            itsState->Apply(expH,itsCompressor);
-            itsState->ReCenter(1);
-        }
-        itsState->Orthogonalize(itsCompressor);
-//            itsState->Report(cout);
-        cout << std::fixed << std::setprecision(5) << "E=" << itsState->GetExpectationmmnn(Hlocal) << " " << itsState->GetExpectation(itsH) << endl;
-        dt/=2.0;
-    }
-    itsState->Report(cout);
-    EXPECT_GT(itsState->GetExpectationmmnn(Hlocal),-0.4431471805599453094172);
-}
 

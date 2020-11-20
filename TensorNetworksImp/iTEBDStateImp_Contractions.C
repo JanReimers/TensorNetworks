@@ -20,6 +20,40 @@
 namespace TensorNetworks
 {
 
+MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const Matrix4RT& expH) const
+{
+    //
+    //  Make sure everything is square
+    //
+    assert(s1.siteA->GetD2()==s1.siteB->GetD1());
+    assert(s1.siteA->GetD1()==s1.siteB->GetD2());
+    assert(s1.siteA->GetD1()==s1.siteA->GetD2());
+    int D=s1.siteA->GetD1();
+    //
+    //  Create empty theta tensor
+    //
+    dVectorT  Thetap(itsd*itsd);
+    for (int n=0;n<itsd*itsd;n++)
+    {
+        Thetap[n].SetLimits(D,D);
+        Fill(Thetap[n],dcmplx(0.0));
+    }
+    //
+    //  Contract
+    //
+    for (int mb=0; mb<itsd; mb++)
+    for (int ma=0; ma<itsd; ma++)
+    {
+        MatrixCT theta13  =GammaA()[ma]*lambdaA()*GammaB()[mb];  //Figure 14 v
+        int nab=0;
+        for (int nb=0; nb<itsd; nb++)
+        for (int na=0; na<itsd; na++,nab++)
+            Thetap[nab]+= theta13*expH(ma,na,mb,nb);
+    }
+
+    return Thetap;
+}
+
 Matrix4CT iTEBDStateImp::GetTransferMatrix(const dVectorT& M) const
 {
     int d=M.size();

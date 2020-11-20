@@ -42,13 +42,13 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const IterationS
 double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const IterationScheduleLine& isl)
 {
     assert(isl.itsDmax>0 || isl.itsEps.itsMPSCompressEpsilon>0);
-
+    double dt=isl.itsdt;
 
     Matrix4RT Hlocal=H->BuildLocalMatrix();
-    Matrix4RT expH=Hamiltonian::ExponentH(isl.itsdt,Hlocal);
+    Matrix4RT expH=Hamiltonian::ExponentH(dt,Hlocal);
     int Dmax=GetMaxD();
     Logger->LogInfoV(1,"FindiTimeGroundState: begin iterations, dt=%.3f, epsE=%.2e D=%4d, isl.Dmax=%4d, Dw=%4d"
-                     ,isl.itsdt,isl.itsEps.itsDelatEnergy1Epsilon,Dmax,isl.itsDmax,H->GetMaxDw());
+                     ,dt,isl.itsEps.itsDelatEnergy1Epsilon,Dmax,isl.itsDmax,H->GetMaxDw());
     SVCompressorC* mps_compressor =Factory::GetFactory()->MakeMPSCompressor(Dmax,0.0);
     Orthogonalize(mps_compressor);
     ReCenter(1);
@@ -62,63 +62,63 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const IterationS
             delete mps_compressor;
             mps_compressor =Factory::GetFactory()->MakeMPSCompressor(D,0.0);
             Logger->LogInfoV(0,"Increasing D to %4d, isl.Dmax=%4d",D,isl.itsDmax);
+            //
+            //  Warm the state, i.e. get some real numbers in the matrix areas
+            //
+            Apply(expH,mps_compressor);
+            ReCenter(2);
+            Apply(expH,mps_compressor);
+            ReCenter(1);
         }
         int niter=1;
         for (; niter<isl.itsMaxGSSweepIterations; niter++)
         {
-            Apply(expH,mps_compressor);
+            ApplyOrtho(expH,mps_compressor,dt*dt,5);
             ReCenter(2);
-            Apply(expH,mps_compressor);
+            ApplyOrtho(expH,mps_compressor,dt*dt,5);
             ReCenter(1);
             double Enew=GetExpectation(H)/(itsL-1);
             double dE=Enew-E1;
             E1=Enew;
             Logger->LogInfoV(3,"E=%.9f, dE=%.2e, niter=%4d",E1,dE,niter);
-            if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon || dE>0.0) break;
+            if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon) break;
         }
         Orthogonalize(mps_compressor);
         E1=GetExpectation(H)/(itsL-1);
-        Logger->LogInfoV(1,"End %4d iterations, dt=%.3f,   E=%.9f, D=%4d, isl.Dmax=%4d",niter,isl.itsdt,E1,D,isl.itsDmax);
+        Logger->LogInfoV(1,"End %4d iterations, dt=%.3f,   E=%.9f, D=%4d, isl.Dmax=%4d",niter,dt,E1,D,isl.itsDmax);
     }
     delete mps_compressor;
     return E1;
+}
+
+void iTEBDStateImp::ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp,double eps,int maxIter)
+{
+    assert(comp);
+    dVectorT theta=ContractTheta(expH);
+    DiagonalMatrixRT lb=lambdaB();
+    auto [gammap,lambdap]=OrthogonalizeI(theta,lb,eps,maxIter);
+    UnpackOrthonormal(gammap,lambdap,comp);
+
 }
 
 //-----------------------------------------------------------------------------
 //
 //  THis follows PHYSICAL REVIEW B 78, 155117 2008 figure 14
 //
-void iTEBDStateImp::Apply(const Matrix4RT& expH,SVCompressorC* comp)
+void iTEBDStateImp::Apply(const Matrix4RT& expH,SVCompressorC* comp,bool orthogonalize)
 {
     assert(comp);
-//    assert(TestOrthogonal(1e-9));
-    //
-    //  Make sure everything is square
-    assert(s1.siteA->GetD2()==s1.siteB->GetD1());
-    assert(s1.siteA->GetD1()==s1.siteB->GetD2());
-    assert(s1.siteA->GetD1()==s1.siteA->GetD2());
-    int D=s1.siteA->GetD1();
-
-    dVectorT  Thetap(itsd*itsd);
-    for (int n=0;n<itsd*itsd;n++)
-    {
-        Thetap[n].SetLimits(D,D);
-        Fill(Thetap[n],dcmplx(0.0));
-    }
-
-    for (int mb=0; mb<itsd; mb++)
-    for (int ma=0; ma<itsd; ma++)
-    {
-        MatrixCT theta13  =GammaA()[ma]*lambdaA()*GammaB()[mb];  //Figure 14 v
-        int nab=0;
-        for (int nb=0; nb<itsd; nb++)
-        for (int na=0; na<itsd; na++,nab++)
-            Thetap[nab]+= theta13*expH(ma,na,mb,nb);
-    }
-
+    dVectorT theta=ContractTheta(expH);
     DiagonalMatrixRT lb=lambdaB();
-    auto [gammap,lambdap]=Orthogonalize(Thetap,lb);
-    UnpackOrthonormal(gammap,lambdap,comp);
+    if (orthogonalize)
+    {
+        auto [gammap,lambdap]=Orthogonalize(theta,lb);
+        UnpackOrthonormal(gammap,lambdap,comp);
+    }
+    else
+    {
+        UnpackOrthonormal(theta,lb,comp);
+    }
 }
 
 

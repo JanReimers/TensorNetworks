@@ -6,7 +6,7 @@
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
-    TensorNetworks::SPDLogger itsLogger(0);
+    TensorNetworks::SPDLogger itsLogger(3);
 //    testing::GTEST_FLAG(filter) = "ExactDiagTests.*";
 //    testing::GTEST_FLAG(filter) = "ExpectationsTests.*";
 //    testing::GTEST_FLAG(filter) = "LinearAlgebraTests.*";

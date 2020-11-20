@@ -37,7 +37,8 @@ public:
 // Find ground state.  Return <E^2>-<E>^2
 //
     virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&);
-    virtual void Apply(const Matrix4RT& expH,SVCompressorC*);
+    virtual void Apply     (const Matrix4RT& expH,SVCompressorC* comp) {Apply(expH,comp,false);}
+    virtual void ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp) {Apply(expH,comp,true);}
 //--------------------------------------------------------------------------------------
 //
 //  Normalization members with and without SVD compression
@@ -59,22 +60,24 @@ protected:
     typedef std::tuple<MatrixCT,MatrixCT> MMType;
     typedef std::tuple<MatrixCT,double  > MdType;
 
-    int GetModSite(int isite) const;
-//        const DiagonalMatrixRT& GetLambda(int isite) const;
-//        const         MatrixCT& GetGamma (int isite,int n) const ;
-    double FindiTimeGroundState(const Hamiltonian*,const IterationScheduleLine&);
-    double GetExpectation (const MPO* o,int center) const;
-    virtual ONErrors GetOrthonormalityErrors() const;
+    int       GetModSite(int isite) const;
+    double    FindiTimeGroundState(const Hamiltonian*,const IterationScheduleLine&);
+    void      Apply     (const Matrix4RT& expH,SVCompressorC*,bool orthogonalize);
+    void      ApplyOrtho(const Matrix4RT& expH,SVCompressorC*,double eps,int maxIter);
+
+    double    GetExpectation (const MPO* o,int center) const;
+    virtual   ONErrors GetOrthonormalityErrors() const;
     Matrix4CT GetTransferMatrix(Direction lr) const;
     Matrix4CT GetTransferMatrix(const dVectorT& M) const;
     Matrix4CT GetTransferMatrix(const Matrix4CT& theta) const;
     MatrixCT  GetNormMatrix(Direction lr,const dVectorT& M) const; //Er*I or I*El
+    dVectorT  ContractTheta(const Matrix4RT& expH) const;
 
+    GLType   Orthogonalize (dVectorT& gamma, const DiagonalMatrixRT& lambda);
+    GLType   OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda,double eps,int maxIter);
     ONErrors UnpackOrthonormal(const dVectorT& gammap,DiagonalMatrixRT& lambdap,SVCompressorC*);
-    GLType Orthogonalize (dVectorT& gamma, const DiagonalMatrixRT& lambda);
-    GLType OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda);
-    MdType GetEigenMatrix(TensorNetworks::Direction lr, const Matrix4CT& theta);
-    MMType Factor(const MatrixCT m);
+    MdType   GetEigenMatrix(TensorNetworks::Direction lr, const Matrix4CT& theta);
+    MMType   Factor(const MatrixCT m);
 
     struct Sites
     {

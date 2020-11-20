@@ -255,20 +255,19 @@ iTEBDStateImp::MMType iTEBDStateImp::Factor(const MatrixCT m)
 // Iterative version Ho N. Phien, Ian P. McCulloch, and Guifré Vidal, "Fast convergence of imaginary
 // time evolution tensor network algorithms by recycling the environment", Physical Review B 91, 11 (2015).
 //
-iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda)
+iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda,double eps,int maxIter)
 {
     int d=gamma.size();
     assert(d>0);
     int D=gamma[0].GetNumRows();
     assert(D==gamma[0].GetNumCols());
-    double eps=1e-6;
     MatrixCT Vr,Vl,I(D,D); //Right ei
     Unit(I);
     SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
     dcmplx er;
     dcmplx el;
     int niter=0;
-    Logger->LogInfoV(2,"iTEBDStateImp::OrthogonalizeI Starting iterations, eps=%.1e, D=%4d, d=%4d",eps,D,d);
+    Logger->LogInfoV(3,"iTEBDStateImp::OrthogonalizeI Starting iterations, eps=%.1e, D=%4d, d=%4d",eps,D,d);
     do
     {
         Vr=GetNormMatrix(DRight,gamma*lambda); //=Er*I
@@ -326,11 +325,11 @@ iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMat
         }
         double deltal=Max(fabs(lambda-lambda_prime));
         lambda=lambda_prime;
-        Logger->LogInfoV(3,"iTEBDStateImp::OrthogonalizeI %4d iterations, er/el=(%.5f,%.1e)/(%.5f,%.1e), er-el=%.1e, er-1=%.1e, el-1=%.1e"
-                         ,niter,real(er),imag(er),real(el),imag(el),fabs(er-el),fabs(er-1.0),fabs(el-1.0));
+        Logger->LogInfoV(4,"iTEBDStateImp::OrthogonalizeI %4d iterations, deltal=%.1e, er/el=(%.5f,%.1e)/(%.5f,%.1e), er-el=%.1e, er-1=%.1e, el-1=%.1e"
+                         ,niter,deltal,real(er),imag(er),real(el),imag(el),fabs(er-el),fabs(er-1.0),fabs(el-1.0));
         if (deltal<eps) break;
         niter++;
-    } while (niter<100);
+    } while (niter<maxIter);
     delete svd_solver;
 //
 //  Normalize
@@ -350,7 +349,7 @@ iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMat
         Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Left  orthogonality error=%.1e > %.1e",left_error,epsO);
     if (right_error>epsO)
         Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Right orthogonality error=%.1e > %.1e",right_error,epsO);
-    Logger->LogInfoV(2,"iTEBDStateImp::OrthogonalizeI End %4d iterations, eps=%.1e Right/Left orthogonality error2=%.1e / %.1e",niter,eps,right_error,left_error);
+    Logger->LogInfoV(3,"iTEBDStateImp::OrthogonalizeI End %4d iterations, eps=%.1e Right/Left orthogonality error2=%.1e / %.1e",niter,eps,right_error,left_error);
 
     return std::make_tuple(gamma,lambda);
 }

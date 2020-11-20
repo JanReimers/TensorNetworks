@@ -40,7 +40,8 @@ public:
 //
 //  iTime evolution
 //
-    virtual void Apply(const Matrix4RT& expH,SVCompressorC*)=0;
+    virtual void Apply     (const Matrix4RT& expH,SVCompressorC*)=0;
+    virtual void ApplyOrtho(const Matrix4RT& expH,SVCompressorC*)=0;
 
 //--------------------------------------------------------------------------------------
 //
