@@ -17,12 +17,6 @@ SPDLogger::~SPDLogger()
     if (Logger==this) Logger=nullptr;
 }
 
-void SPDLogger::ReadyToStart(c_str message)
-{
-    if (itsLevel>=0)
-        spdlog::info("Start {}", message);
-}
-
 void SPDLogger::LogInfo(int level,c_str message)
 {
     if (itsLevel>=level)
@@ -38,5 +32,14 @@ void SPDLogger::LogInfo(int level,int site, c_str message)
         spdlog::info("Site {}: {}",site,message);
     }
 }
+
+void SPDLogger::LogWarn(int level,c_str message)
+{
+    if (itsLevel>=level)
+    {
+        spdlog::warn(message);
+    }
+}
+
 
 } // namespace

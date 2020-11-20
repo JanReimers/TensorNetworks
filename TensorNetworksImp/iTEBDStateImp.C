@@ -6,6 +6,7 @@
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/Factory.H"
+#include "TensorNetworks/TNSLogger.H"
 
 #include "TensorNetworksImp/Bond.H"
 
@@ -130,12 +131,11 @@ void iTEBDStateImp::Normalize(Direction lr)
         left_eigenValue=d(1);
     }
     delete solver;
-    assert(fabs(imag(left_eigenValue))<1e-10);
+    Logger->LogInfoV(2,"iTEBDStateImp::Normalize eigenvalue=(%.5f,%.1e)",real(left_eigenValue),imag(left_eigenValue));
+    if (fabs(imag(left_eigenValue))>1e-10)
+        Logger->LogWarnV(0,"iTEBDStateImp::Normalize eigenvalue=(%.5f,%.1e) has large imaginary component",real(left_eigenValue),imag(left_eigenValue));
+
     double lnorm=sqrt(real(left_eigenValue));
-//    double rnorm=sqrt(real(right_eigenValue));
-//    double fa=itsSites[1]->FrobeniusNorm();
-//    double fb=itsSites[2]->FrobeniusNorm();
-//    cout << "lnorm, fa,fb=" << lnorm << " " << fa << " " << fb << endl;
     s1.siteA->Rescale(sqrt(lnorm));
     s1.siteB->Rescale(sqrt(lnorm));
 
@@ -164,7 +164,7 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const IterationS
 {
     assert(Logger); //Make sure we have global logger.
     Canonicalize(TensorNetworks::DLeft);
-    Logger->LogInfoV(1,"Initiate iTime GS iterations, Dmax=%4d, Norm status=%s",GetMaxD(),GetNormStatus().c_str());
+    Logger->LogInfoV(0,"Initiate iTime GS iterations, D=%4d, Norm status=%s",GetMaxD(),GetNormStatus().c_str());
 
     double E1=0;
     for (is.begin(); !is.end(); is++)
@@ -186,7 +186,8 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const IterationS
     Matrix4RT Hlocal=H->BuildLocalMatrix();
     Matrix4RT expH=Hamiltonian::ExponentH(isl.itsdt,Hlocal);
     int Dmax=GetMaxD();
-    Logger->LogInfoV(1,"   Begin iterations, dt=%.3f,  GetMaxD=%4d, isl.Dmax=%4d",isl.itsdt,Dmax,isl.itsDmax);
+    Logger->LogInfoV(1,"FindiTimeGroundState: begin iterations, dt=%.3f, epsE=%.2e D=%4d, isl.Dmax=%4d, Dw=%4d"
+                     ,isl.itsdt,isl.itsEps.itsDelatEnergy1Epsilon,Dmax,isl.itsDmax,H->GetMaxDw());
     SVCompressorC* mps_compressor =Factory::GetFactory()->MakeMPSCompressor(Dmax,0.0);
     Orthogonalize(mps_compressor);
     ReCenter(1);
@@ -199,6 +200,7 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const IterationS
             IncreaseBondDimensions(D);
             delete mps_compressor;
             mps_compressor =Factory::GetFactory()->MakeMPSCompressor(D,0.0);
+            Logger->LogInfoV(0,"Increasing D to %4d, isl.Dmax=%4d",D,isl.itsDmax);
         }
         int niter=1;
         for (; niter<isl.itsMaxGSSweepIterations; niter++)
@@ -210,15 +212,13 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const IterationS
             double Enew=GetExpectation(H)/(itsL-1);
             double dE=Enew-E1;
             E1=Enew;
-            Logger->LogInfoV(2,"      E=%.9f, dE=%.2e, niter=%4d",E1,dE,niter);
+            Logger->LogInfoV(3,"E=%.9f, dE=%.2e, niter=%4d",E1,dE,niter);
             if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon || dE>0.0) break;
         }
         Orthogonalize(mps_compressor);
         E1=GetExpectation(H)/(itsL-1);
-        Logger->LogInfoV(2,"      E=%.9f, niter=%4d",E1,niter);
-        Logger->LogInfoV(1,"   End  iterations, dt=%.3f,   E=%.9f, D=%4d, isl.Dmax=%4d",isl.itsdt,E1,D,isl.itsDmax);
+        Logger->LogInfoV(1,"End %4d iterations, dt=%.3f,   E=%.9f, D=%4d, isl.Dmax=%4d",niter,isl.itsdt,E1,D,isl.itsDmax);
     }
-    Logger->LogInfoV(1,"   End D iterations, dt=%.3f, D=%4d, E=%.9f.",isl.itsdt,GetMaxD(),E1);
     delete mps_compressor;
     return E1;
 }
@@ -305,7 +305,8 @@ ONErrors iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrix
 //  Unpack P into GammaA and Q into GammaB
 //
     if (Min(lambdaB())<1e-10)
-        std::cerr << "Warning  small lambda min(lambda)=" << Min(lambdaB()) << std::endl;
+        Logger->LogWarnV(1,"iTEBDStateImp::UnpackOrthonormal small lambda min(lambda)=%.1e", Min(lambdaB()) );
+
     DiagonalMatrixRT lbinv=1.0/lambdaB(); //inverse of LambdaB
     for (int n=0; n<itsd; n++)
         for (int i=1; i<=D; i++)
@@ -486,8 +487,7 @@ iTEBDStateImp::MdType iTEBDStateImp::GetEigenMatrix(TensorNetworks::Direction lr
          {
             auto [U,e]=solver->SolveLeft_NonSym(theta.Flatten(),1e-13,1);
             if (fabs(imag(e(1)))>1e-13)
-                std::cerr << std::scientific << "Warning: Dominant eigenvalue has large imaginary component e=" << e(1) << std::endl;
-//            assert(imag(e(1))<1e-13);
+                Logger->LogWarnV(2,"iTEBDStateImp::GetEigenMatrix Dominant left eigenvalue has large imaginary component e=(%.6f,%.1e)",real(e(1)),imag(e(1)));
             eigenValue=real(e(1));
             eigenVector=U.GetColumn(1);
             break;
@@ -496,14 +496,12 @@ iTEBDStateImp::MdType iTEBDStateImp::GetEigenMatrix(TensorNetworks::Direction lr
         {
             auto [U,e]=solver->SolveRightNonSym(theta.Flatten(),1e-13,1);
             if (fabs(imag(e(1)))>1e-13)
-                std::cerr << std::scientific << "Warning: Dominant eigenvalue has large imaginary component e=" << e(1) << std::endl;
-//            assert(imag(e(1))<1e-13);
+                Logger->LogWarnV(2,"iTEBDStateImp::GetEigenMatrix Dominant right eigenvalue has large imaginary component e=(%.6f,%.1e)",real(e(1)),imag(e(1)));
             eigenValue=real(e(1));
             eigenVector=U.GetColumn(1);
             break;
         }
     }
-//    cout << "eigen value=" << eigenValue << endl;
     //
     //  Unpack eigenVector into a matrix
     //
@@ -524,7 +522,9 @@ iTEBDStateImp::MdType iTEBDStateImp::GetEigenMatrix(TensorNetworks::Direction lr
         case DLeft  : err=Max(fabs(V*theta-eigenValue*V));break;
         case DRight : err=Max(fabs(theta*V-eigenValue*V));break;
     }
-    if (err>1e-13) cout  << std::scientific << "Eigen vector error=" << err << endl;
+    if (err>1e-13)
+        Logger->LogWarnV(2,"iTEBDStateImp::GetEigenMatrix large eigen error=%.1e",err);
+
     assert(err<1e-10);
     return std::make_tuple(V,eigenValue);
 }
@@ -543,11 +543,7 @@ iTEBDStateImp::MMType iTEBDStateImp::Factor(const MatrixCT m)
     delete solver;
     X=U*DiagonalMatrix<double>(sqrt(e));
     if (Min(e)<1e-10)
-    {
-        std::cerr << "iTEBDStateImp::Factor Warning  small eigen min(e)=" << Min(e) << std::endl;
-        std::cerr << "  mh.diag=" << mh.GetDiagonal() << std::endl;
-        std::cerr << "   e=" << e << std::endl;
-    }
+        Logger->LogWarnV(2,"iTEBDStateImp::Factor small eigenvalue min(e)==%.1e", Min(e));
 
     Xinv=DiagonalMatrix<double>(1.0/sqrt(e))*Transpose(conj(U));
     assert(IsUnit(X*Xinv,1e-13));
@@ -571,20 +567,20 @@ iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMat
     dcmplx er;
     dcmplx el;
     int niter=0;
+    Logger->LogInfoV(2,"iTEBDStateImp::OrthogonalizeI Starting iterations, eps=%.1e, D=%4d, d=%4d",eps,D,d);
     do
     {
         Vr=GetNormMatrix(DRight,gamma*lambda); //=Er*I
         Vl=GetNormMatrix(DLeft ,lambda*gamma); //=I*El
-        if (Min(fabs(Vr.GetDiagonal()))<1e-10)
-        {
-            cout << "Singular Vr, bailing" << endl;
+        double minVr=Min(fabs(Vr.GetDiagonal()));
+        double minVl=Min(fabs(Vl.GetDiagonal()));
+        double epsV=1e-10;
+        if (minVr<epsV)
+            Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Singular Vr=%.1e < %.1e, Niter=%4d, bailing out",minVr,epsV,niter);
+        if (minVl<epsV)
+            Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Singular Vl=%.1e < %.1e, Niter=%4d, bailing out",minVl,epsV,niter);
+        if (minVr<epsV|| minVl<epsV)
             return std::make_tuple(gamma,lambda); //Bail if V is singular. THis can happen when increasing D.
-        }
-        if (Min(fabs(Vl.GetDiagonal()))<1e-10)
-        {
-            cout << "Singular Vl, bailing" << endl;
-            return std::make_tuple(gamma,lambda); //Bail if V is singular. THis can happen when increasing D.
-        }
 //
 //  Try to normalize
 //
@@ -629,7 +625,8 @@ iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMat
         }
         double deltal=Max(fabs(lambda-lambda_prime));
         lambda=lambda_prime;
-//        cout << "deltal,er,el,er-el=" << deltal << " " << fabs(er-1.0) << " " << fabs(el-1.0) << " " << fabs(er-el) << endl;
+        Logger->LogInfoV(3,"iTEBDStateImp::OrthogonalizeI %4d iterations, er/el=(%.5f,%.1e)/(%.5f,%.1e), er-el=%.1e, er-1=%.1e, el-1=%.1e"
+                         ,niter,real(er),imag(er),real(el),imag(el),fabs(er-el),fabs(er-1.0),fabs(el-1.0));
         if (deltal<eps) break;
         niter++;
     } while (niter<100);
@@ -647,17 +644,12 @@ iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMat
     MatrixCT Nl=GetNormMatrix(DLeft ,lambda*gamma); //=I*El
     double  left_error=Max(fabs(Nr-I));
     double right_error=Max(fabs(Nl-I));
-    if (left_error>D*eps)
-    {
-        cout << std::scientific << "Warning: Left orthogonality error=" << left_error  << endl;
-        cout << "Nl=" << Nl << endl;
-    }
-    if (right_error>D*eps)
-    {
-        cout << std::scientific << "Warning: Right orthogonality error=" << right_error  << endl;
-        cout << "Nr=" << Nr << endl;
-    }
-//    cout << niter << " " << D << endl;
+    double epsO=D*10*eps;
+    if (left_error>epsO)
+        Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Left  orthogonality error=%.1e > %.1e",left_error,epsO);
+    if (right_error>epsO)
+        Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Right orthogonality error=%.1e > %.1e",right_error,epsO);
+    Logger->LogInfoV(2,"iTEBDStateImp::OrthogonalizeI End %4d iterations, eps=%.1e Right/Left orthogonality error2=%.1e / %.1e",niter,eps,right_error,left_error);
 
     return std::make_tuple(gamma,lambda);
 }
@@ -679,20 +671,24 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
     //
     Matrix4CT Er=GetTransferMatrix(gamma*lambda);
     Matrix4CT El=GetTransferMatrix(lambda*gamma);
-//    cout << "Er*I=" << Er*I << endl;
-//    cout << "I*El=" << I*El << endl;
 
     auto [Vr,er]=GetEigenMatrix(DRight,Er);
-    if (Min(fabs(Vr.GetDiagonal()))<1e-10) return std::make_tuple(gamma,lambda); //Bail if V is singular. THis can happen when increasing D.
-
     auto [Vl,el]=GetEigenMatrix(DLeft ,El);
-    if (Min(fabs(Vl.GetDiagonal()))<1e-10) return std::make_tuple(gamma,lambda); //Bail if V is singular. THis can happen when increasing D.
+    double minVr=Min(fabs(Vr.GetDiagonal()));
+    double minVl=Min(fabs(Vl.GetDiagonal()));
+    double epsV=1e-10;
+    if (minVr<epsV)
+        Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize Singular Vr=%.1e > %.1e, bailing out",minVr,epsV);
+    if (minVl<epsV)
+        Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize Singular Vl=%.1e > %.1e, bailing out",minVl,epsV);
+    if (minVr<epsV || minVl<epsV)
+        return std::make_tuple(gamma,lambda); //Bail if V is singular. THis can happen when increasing D.
 //
 //  Normalize
 //
-    if (fabs(er-el)>=2e-13)
-        cout << fabs(er-el) << endl;
-    assert(fabs(er-el)<2e-13);
+    double epsA=2e-13;
+    if (fabs(er-el)>=epsA)
+        Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize large eigenvalue asymmetry er-el=%.1e > %.1e, bailing out",fabs(er-el),epsA);
     Er.Flatten()/=er;
     El.Flatten()/=el;
     s1.siteA->Rescale(sqrt(sqrt(er)));
@@ -703,21 +699,19 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
 // Check eigen matrix accuracy.
 //
     double rerr=Max(fabs(Er*Vr-Vr));
-    if (rerr>1e-13) cout  << std::scientific << "rerr=" << rerr << endl;
+    if (rerr>1e-13)
+        Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize Large right eigen error=%.1e",rerr);
     assert(rerr<1e-10);
 
     double lerr=Max(fabs(Vl*El-Vl));
-    if (lerr>1e-13) cout  << std::scientific << "lerr=" << lerr << endl;
+    if (lerr>1e-13)
+        Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize Large left  eigen error=%.1e",lerr);
     assert(lerr<1e-10);
 //
-//  Make sure Vr and Vl are as Hermitian as they can get.
+//  Make sure Vr and Vl are roughly Hermitian, Factor will try and remove assym noise.
 //
     assert(IsHermitian(Vr,1e-10));
     assert(IsHermitian(Vl,1e-10));
-    Vr=0.5*(Vr+~Vr); //Try and clean up non-Hermitian round-off noise.
-    Vl=0.5*(Vl+~Vl);
-    assert(IsHermitian(Vr,1e-13));
-    assert(IsHermitian(Vl,1e-13));
 
 //
 //  Decompose eigen matrices
@@ -726,8 +720,12 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
     auto [Y,Yinv]=Factor(Vl);
     MatrixCT YT   =Transpose(Y);
     MatrixCT YTinv=Transpose(Yinv);
-    assert(IsUnit(X*Xinv,1e-13));
-    //assert(IsUnit(YT*YTinv,1e-12));
+
+    double epsInv=1e-13;
+    if(!IsUnit(X*Xinv,epsInv))
+        Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize Large inversions X error=%.1e > %.1e",Max(fabs(X*Xinv-I)),epsInv);
+    if(!IsUnit(YT*YTinv,epsInv))
+        Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize Large inversions X error=%.1e > %.1e",Max(fabs(YT*YTinv-I)),epsInv);
     //
     //  Transform lambda and SVD
     //
@@ -750,14 +748,13 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
     MatrixCT Nl=GetNormMatrix(DLeft ,lambda_prime*gamma_prime); //=I*El
     double  left_error=Max(fabs(Nr-I));
     double right_error=Max(fabs(Nl-I));
-    if (left_error>1e-12)
-    {
-        cout << std::scientific << "Warning: Left orthogonality error=" << left_error  << endl;
-    }
-    if (right_error>1e-12)
-    {
-        cout << std::scientific << "Warning: Right orthogonality error=" << right_error  << endl;
-    }
+    double eps=1e-12;
+    if (left_error>D*eps)
+        Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize Large left  orthonormaility error=%.1e > %.1e",left_error,D*eps);
+    if (right_error>D*eps)
+        Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize Large right orthonormaility error=%.1e > %.1e",right_error,D*eps);
+
+    Logger->LogInfoV(2,"iTEBDStateImp::Orthogonalize complete R/L orthonormaility error=%.1e / %.1e",right_error,left_error);
 
     return std::make_tuple(gamma_prime,lambda_prime);
 }
@@ -795,13 +792,7 @@ void iTEBDStateImp::Apply(const Matrix4RT& expH,SVCompressorC* comp)
     }
 
     DiagonalMatrixRT lb=lambdaB();
-//    auto [gammap,lambdap]  =Orthogonalize(Thetap,lb);
-//    auto [gammapI,lambdapI]=OrthogonalizeI(gammap,lambdap);
-    auto [gammap,lambdap]=OrthogonalizeI(Thetap,lb);
-//    cout << "Max(fabs(lambdapI-lambdap))=" << Max(fabs(lambdapI.GetDiagonal()-lambdap.GetDiagonal())) << endl;
-//    cout << "lambdapI=" << lambdapI.GetDiagonal() << endl;
-//    cout << "lambdap =" << lambdap .GetDiagonal()  << endl;
-//    assert(false);
+    auto [gammap,lambdap]=Orthogonalize(Thetap,lb);
     UnpackOrthonormal(gammap,lambdap,comp);
 }
 
@@ -831,7 +822,8 @@ double iTEBDStateImp::GetExpectationmmnn (const Matrix4RT& Hlocal) const
                             expectation1+=theta13_m(i1,i3)*Hlocal(ma,mb,na,nb)*theta13_n(i1,i3);
                 }
         }
-    assert(fabs(imag(expectation1))<1e-10);
+    if (fabs(imag(expectation1))>=1e-10)
+        Logger->LogWarnV(0,"iTEBDStateImp::GetExpectation expectation=(%.5f,%.1e) has large imaginary component",real(expectation1),imag(expectation1));
     return real(expectation1);
 
 }
@@ -861,7 +853,8 @@ double iTEBDStateImp::GetExpectationmnmn (const Matrix4RT& expH) const
                             expectation1+=theta13_m(i1,i3)*expH(ma,na,mb,nb)*theta13_n(i1,i3);
                 }
         }
-    assert(fabs(imag(expectation1))<1e-10);
+    if (fabs(imag(expectation1))>=1e-10)
+        Logger->LogWarnV(0,"iTEBDStateImp::GetExpectation expectation=(%.5f,%.1e) has large imaginary component",real(expectation1),imag(expectation1));
     return real(expectation1);
 
 }
@@ -925,8 +918,7 @@ double iTEBDStateImp::GetExpectation (const MPO* o,int center) const
         }
 
     if (fabs(imag(expectation1))>=1e-10)
-        std::cerr << "Warning high imaginary part in expectation " << expectation1 << std::endl;
-    assert(fabs(imag(expectation1))<1e-10);
+        Logger->LogWarnV(0,"iTEBDStateImp::GetExpectation expectation=(%.5f,%.1e) has large imaginary component",real(expectation1),imag(expectation1));
     return real(expectation1);
 }
 

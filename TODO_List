@@ -18,6 +18,8 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     Done: -Use the name CompressionError consistently.
     Done: -Use Factor and EigenMatrix functions
     -Fix up logging.  Add warnings.
+    -Should epsOrth drop and espE and dt drop?
+-Save wave functions to disk.
 -Make and iTimeGroundState abstract base class to handle iterations.
     Need global logger first, since this is heavily logger dependent.
     I think this is a failed idea.  The iterations are fundamentally different right now.

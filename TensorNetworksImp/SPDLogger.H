@@ -12,9 +12,9 @@ class SPDLogger : public virtual TNSLogger
     public:
         SPDLogger(int level);
         virtual ~SPDLogger();
-        virtual void ReadyToStart(c_str /*currentOperation*/);
         virtual void LogInfo(int level,c_str message);
         virtual void LogInfo(int level,int site,c_str message);
+        virtual void LogWarn(int level,c_str message);
 
     protected:
 
