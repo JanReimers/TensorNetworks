@@ -21,6 +21,7 @@ struct IterationScheduleLine
     // Use these constructors for iTime GS searches
     //
     IterationScheduleLine(int maxiter,int Dmax,double dt,const Epsilons&);
+    IterationScheduleLine(int maxiter,int Dmax,int DeltaD,double dt,const Epsilons&);
     IterationScheduleLine(int maxiter,int Dmax,double dt,TrotterOrder,const Epsilons&);
     IterationScheduleLine(int maxiter,int Dmax,int maxOptIter,double dt,TrotterOrder,const Epsilons&);
 
