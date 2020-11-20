@@ -4,6 +4,7 @@
 #include "TensorNetworks/iTEBDState.H"
 #include "TensorNetworks/Typedefs.H"
 #include "TensorNetworksImp/MPSImp.H"
+#include "oml/diagonalmatrix.h"
 
 namespace TensorNetworks
 {
@@ -103,5 +104,24 @@ private:
     mutable Sites s1; //ReCenter member function will build this structure.
 };
 
+
+
+inline MPSSite::dVectorT operator*(const MPSSite::dVectorT& gamma, const DiagonalMatrixRT& lambda)
+{
+    int d=gamma.size();
+    MPSSite::dVectorT gl(d);
+    for (int n=0; n<d; n++)
+        gl[n]=gamma[n]*lambda;
+    return gl;
 }
+inline MPSSite::dVectorT operator*(const DiagonalMatrixRT& lambda, const MPSSite::dVectorT& gamma)
+{
+    int d=gamma.size();
+    MPSSite::dVectorT lg(d);
+    for (int n=0; n<d; n++)
+        lg[n]=lambda*gamma[n];
+    return lg;
+}
+
+} //namespace
 #endif // ITEBDSTATEIMP_H
