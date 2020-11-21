@@ -39,13 +39,15 @@ public:
     virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&);
     virtual void Apply     (const Matrix4RT& expH,SVCompressorC* comp) {Apply(expH,comp,false);}
     virtual void ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp) {Apply(expH,comp,true);}
+    virtual void ApplyOrtho(const Matrix4RT& expH,SVCompressorC*,double eps,int maxIter);
 //--------------------------------------------------------------------------------------
 //
 //  Normalization members with and without SVD compression
 //
     virtual void Canonicalize(Direction);  //Vidals L-G-L-G-L canonical form
     virtual void Normalize(Direction LR);
-    virtual ONErrors Orthogonalize(SVCompressorC*);
+    virtual ONErrors Orthogonalize (SVCompressorC*);
+    virtual ONErrors OrthogonalizeI(SVCompressorC*,double eps,int maxIter);
 
     virtual double GetExpectation (const MPO* o) const;
     virtual double GetExpectationmmnn (const Matrix4RT& Hlocal) const;
@@ -61,9 +63,8 @@ protected:
     typedef std::tuple<MatrixCT,double  > MdType;
 
     int       GetModSite(int isite) const;
-    double    FindiTimeGroundState(const Hamiltonian*,const IterationScheduleLine&);
+    double    FindiTimeGroundState(const Hamiltonian*,const MPO* H2, const IterationScheduleLine&);
     void      Apply     (const Matrix4RT& expH,SVCompressorC*,bool orthogonalize);
-    void      ApplyOrtho(const Matrix4RT& expH,SVCompressorC*,double eps,int maxIter);
 
     double    GetExpectation (const MPO* o,int center) const;
     virtual   ONErrors GetOrthonormalityErrors() const;

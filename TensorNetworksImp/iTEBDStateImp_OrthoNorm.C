@@ -95,6 +95,28 @@ ONErrors iTEBDStateImp::GetOrthonormalityErrors() const
     return {right_norm_error,left__norm_error,right_orth_error,left__orth_error};
 }
 
+ONErrors iTEBDStateImp::OrthogonalizeI(SVCompressorC* comp, double eps, int niter)
+{
+    //
+    //  Build Gamma[n] = GammaA[na]*lambdaA*GammaB[nb]
+    //
+    dVectorT gamma(itsd*itsd);
+    int nab=0;
+    for (int nb=0; nb<itsd; nb++)
+        for (int na=0; na<itsd; na++,nab++)
+            gamma[na+itsd*nb]=GammaA()[na]*lambdaA()*GammaB()[nb];
+    //
+    //  Run the one site orthogonalization algorithm.
+    //
+    DiagonalMatrixRT lb=lambdaB();
+    auto [gammap,lambdap]=OrthogonalizeI(gamma,lb,eps,niter);
+    //
+    //  Unpack gammap into GammaA*lambdaA*GammaB, and lambdap into lambdaB.
+    //
+    return UnpackOrthonormal(gammap,lambdap,comp); //No compressions required.
+}
+
+
 ONErrors iTEBDStateImp::Orthogonalize(SVCompressorC* comp)
 {
     //
@@ -156,8 +178,8 @@ ONErrors iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrix
 //
 //  Unpack P into GammaA and Q into GammaB
 //
-    if (Min(lambdaB())<1e-10)
-        Logger->LogWarnV(1,"iTEBDStateImp::UnpackOrthonormal small lambda min(lambda)=%.1e", Min(lambdaB()) );
+    if (Min(lambdaB())<1e-13)
+        Logger->LogWarnV(0,"iTEBDStateImp::UnpackOrthonormal small lambda min(lambda)=%.1e", Min(lambdaB()) );
 
     DiagonalMatrixRT lbinv=1.0/lambdaB(); //inverse of LambdaB
     for (int n=0; n<itsd; n++)
@@ -266,8 +288,9 @@ iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMat
     SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
     dcmplx er;
     dcmplx el;
+    double deltal=0;
     int niter=0;
-    Logger->LogInfoV(3,"iTEBDStateImp::OrthogonalizeI Starting iterations, eps=%.1e, D=%4d, d=%4d",eps,D,d);
+    Logger->LogInfoV(4,"iTEBDStateImp::OrthogonalizeI Starting iterations, eps=%.1e, D=%4d, d=%4d",eps,D,d);
     do
     {
         Vr=GetNormMatrix(DRight,gamma*lambda); //=Er*I
@@ -318,18 +341,23 @@ iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMat
         //
         //  Transform Gamma
         //
+        MatrixCT VX=VT*Xinv;
+        MatrixCT YU=YTinv*U;
         for (int n=0;n<d;n++)
         {
-            MatrixCT gamma_prime=VT*Xinv*gamma[n]*YTinv*U;
-            gamma[n]=gamma_prime;
+            MatrixCT gamma_prime=VX*gamma[n];
+            gamma[n]=gamma_prime*YU;
         }
-        double deltal=Max(fabs(lambda-lambda_prime));
+        deltal=Max(fabs(lambda-lambda_prime));
         lambda=lambda_prime;
-        Logger->LogInfoV(4,"iTEBDStateImp::OrthogonalizeI %4d iterations, deltal=%.1e, er/el=(%.5f,%.1e)/(%.5f,%.1e), er-el=%.1e, er-1=%.1e, el-1=%.1e"
+        Logger->LogInfoV(5,"iTEBDStateImp::OrthogonalizeI %4d iterations, deltal=%.1e, er/el=(%.5f,%.1e)/(%.5f,%.1e), er-el=%.1e, er-1=%.1e, el-1=%.1e"
                          ,niter,deltal,real(er),imag(er),real(el),imag(el),fabs(er-el),fabs(er-1.0),fabs(el-1.0));
         if (deltal<eps) break;
         niter++;
     } while (niter<maxIter);
+    if (niter==maxIter)
+        Logger->LogWarnV(1,"iTEBDStateImp::OrthogonalizeI not converged after=%4d iterations, eps=%.1e, deltal=%.1e",niter,eps,deltal);
+
     delete svd_solver;
 //
 //  Normalize
@@ -349,7 +377,7 @@ iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMat
         Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Left  orthogonality error=%.1e > %.1e",left_error,epsO);
     if (right_error>epsO)
         Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Right orthogonality error=%.1e > %.1e",right_error,epsO);
-    Logger->LogInfoV(3,"iTEBDStateImp::OrthogonalizeI End %4d iterations, eps=%.1e Right/Left orthogonality error2=%.1e / %.1e",niter,eps,right_error,left_error);
+    Logger->LogInfoV(4,"iTEBDStateImp::OrthogonalizeI End %4d iterations, eps=%.1e Right/Left orthogonality error2=%.1e / %.1e",niter,eps,right_error,left_error);
 
     return std::make_tuple(gamma,lambda);
 }
@@ -436,10 +464,13 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
     //
     //  Transform Gamma
     //
+    MatrixCT VX=VT*Xinv;
+    MatrixCT YU=YTinv*U;
     dVectorT gamma_prime(d);
     for (int n=0;n<d;n++)
     {
-        gamma_prime[n]=VT*Xinv*gamma[n]*YTinv*U;
+        gamma_prime[n]=VX*gamma[n];
+        gamma_prime[n]*=YU;
     }
     //
     //  Verify orthogonaly

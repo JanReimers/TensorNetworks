@@ -530,9 +530,68 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12)
     EXPECT_GT(itsState->GetExpectation(itsH),-0.4431471805599453094172);
 }
 
+////#include <omp.h>
+////
+////TEST_F(iTEBDTests,OrthoIterTiming)
+////{
+////    int UnitCell=2,Dstart=2,Dmax=64;
+////    double S=0.5,epsSVD=0.0,dt=0.1;
+////    Setup(UnitCell,S,2,epsSVD);
+////    itsState->InitializeWith(TensorNetworks::Random);
+////    Matrix4RT Hlocal=itsH->BuildLocalMatrix();
+////    Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
+////    TensorNetworks::SVCompressorC* comp=0;
+////    for (int D=2;D<=Dmax;D++)
+////    {
+////        itsState->IncreaseBondDimensions(D);
+////        comp=itsFactory->MakeMPSCompressor(D,epsSVD);
+////        itsState->Apply(expH,comp);
+////        itsState->ReCenter(2);
+////        itsState->Apply(expH,comp);
+////        itsState->ReCenter(1);
+////        double t_start=omp_get_wtime();
+////        itsState->ApplyOrtho(expH,comp,0.0,1);
+////        double t_stop =omp_get_wtime();
+////        delete comp;
+////        double dt=t_stop-t_start;
+////        cout << D << std::scientific << std::setw(8) << " " << dt << " " << dt/D << " " << dt/(D*D) << " " << dt/(D*D*D*D) << " " << dt/(D*D*D*D*D*D) << endl;
+////    }
+////
+////
+////}
+////
+////TEST_F(iTEBDTests,OrthoEigenTiming)
+////{
+////    int UnitCell=2,Dstart=2,Dmax=32;
+////    double S=0.5,epsSVD=0.0,dt=0.1;
+////    Setup(UnitCell,S,2,epsSVD);
+////    itsState->InitializeWith(TensorNetworks::Random);
+////    Matrix4RT Hlocal=itsH->BuildLocalMatrix();
+////    Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
+////    TensorNetworks::SVCompressorC* comp=0;
+////    for (int D=2;D<=Dmax;D++)
+////    {
+////        itsState->IncreaseBondDimensions(D);
+////        comp=itsFactory->MakeMPSCompressor(D,epsSVD);
+////        itsState->Apply(expH,comp);
+////        itsState->ReCenter(2);
+////        itsState->Apply(expH,comp);
+////        itsState->ReCenter(1);
+////        double t_start=omp_get_wtime();
+////        itsState->ApplyOrtho(expH,comp);
+////        double t_stop =omp_get_wtime();
+////        delete comp;
+////        double dt=t_stop-t_start;
+////        cout << D << std::scientific << std::setw(8) << " " << dt << " " << dt/D << " " << dt/(D*D) << " " << dt/(D*D*D*D) << " " << dt/(D*D*D*D*D*D) << endl;
+////    }
+////
+//
+//}
+
+
 TEST_F(iTEBDTests,FindiTimeGSD32S12)
 {
-    int UnitCell=2,Dstart=2,Dmax=32;
+    int UnitCell=2,Dstart=2,Dmax=64;
     double S=0.5,epsSVD=0.0;
 #ifdef DEBUG
     Dmax=8;
@@ -550,17 +609,21 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     is.Insert({50,8,0.2,eps});
 #ifndef DEBUG
     eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({50,16,4,0.1,eps});
+    is.Insert({50,16,0.1,eps});
     eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({50,Dmax,8,0.1,eps});
+    is.Insert({50,16,0.1,eps});
     eps.itsDelatEnergy1Epsilon=5e-7;
-    is.Insert({50,Dmax,0.05,eps});
+    is.Insert({50,16,0.05,eps});
     eps.itsDelatEnergy1Epsilon=5e-7;
-    is.Insert({50,Dmax,0.02,eps});
-    eps.itsDelatEnergy1Epsilon=2e-7;
-    is.Insert({50,Dmax,0.01,eps});
+    is.Insert({50,16,0.02,eps});
+    eps.itsDelatEnergy1Epsilon=5e-7;
+    is.Insert({50,16,0.01,eps});
+    eps.itsDelatEnergy1Epsilon=5e-7;
+    is.Insert({50,16,0.005,eps});
+    eps.itsDelatEnergy1Epsilon=5e-7;
+    is.Insert({50,Dmax,8,0.002,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
-    is.Insert({50,Dmax,0.005,eps});
+    is.Insert({50,Dmax,8,0.001,eps});
 #endif
 //    eps.itsDelatEnergy1Epsilon=1e-6;
 //    is.Insert({50,Dmax,0.05,eps});

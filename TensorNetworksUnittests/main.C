@@ -6,7 +6,7 @@
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
-    TensorNetworks::SPDLogger itsLogger(3);
+    TensorNetworks::SPDLogger itsLogger(-1);
 //    testing::GTEST_FLAG(filter) = "ExactDiagTests.*";
 //    testing::GTEST_FLAG(filter) = "ExpectationsTests.*";
 //    testing::GTEST_FLAG(filter) = "LinearAlgebraTests.*";
@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 //    testing::GTEST_FLAG(filter) = "MPOTests*";
 //    testing::GTEST_FLAG(filter) = "VariationalGroundStateTests.*";
 //    testing::GTEST_FLAG(filter) = "ImaginaryTimeTests.TestITimeSecondOrderTrotter_EpsLimitedCompression";
-    testing::GTEST_FLAG(filter) = "iTEBDTests.FindiTimeGSD32S12";
+    testing::GTEST_FLAG(filter) = "iTEBDTests.TestRandomEnergyRangeSD";
 //    testing::GTEST_FLAG(filter) = "ITensorTests*";
 //    testing::GTEST_FLAG(filter) = "BenchmarkTests.*";
 
