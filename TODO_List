@@ -19,6 +19,8 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     Done: -Use Factor and EigenMatrix functions
     Done: -Fix up logging.  Add warnings.
     -Should epsOrth drop and espE and dt drop?
+    -<E2> is not working, MPO get compressed to 1x4 - 4x1.  We need to learn how contract
+     a Dw x Dw - Dw x Dw open MPO with eigen vectors to get <E2>.
 
 -Save wave functions to disk.
 -Make and iTimeGroundState abstract base class to handle iterations.

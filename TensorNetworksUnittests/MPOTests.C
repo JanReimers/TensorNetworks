@@ -332,13 +332,10 @@ TEST_F(MPOTests,TestTimingE2_S1D16)
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
-    StopWatch sw;
-    sw.Start();
     TensorNetworks::MPO* H2=itsH->CreateH2Operator();
     double EE=itsMPS->GetExpectation(H2);
     delete H2;
-    sw.Stop();
-    cout << "<E^2> contraction for L=" << L << ", S=" << S << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
+    cout << "<E^2> contraction for L=" << L << ", S=" << S << ", D=" << D  << endl;
     (void)EE; //Avoid warning
 }
 #endif

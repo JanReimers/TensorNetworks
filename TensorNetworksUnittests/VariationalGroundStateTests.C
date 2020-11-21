@@ -288,11 +288,8 @@ TEST_F(VariationalGroundStateTests,TestSweepL19S1D8)
     TensorNetworks::IterationSchedule is;
     is.Insert({maxIter,D,eps});
 
-    StopWatch sw;
-    sw.Start();
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
-    sw.Stop();
-    cout << "FindGroundState for L=" << L << ", S=" << S << ", D=" << D << " took " << sw.GetTime() << " seconds." << endl;
+    cout << "FindGroundState for L=" << L << ", S=" << S << ", D=" << D  << endl;
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.45535447609272839,1e-7);
