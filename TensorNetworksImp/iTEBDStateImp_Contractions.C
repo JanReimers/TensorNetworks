@@ -160,9 +160,19 @@ Matrix4CT iTEBDStateImp::GetTransferMatrix(const Matrix4CT& theta) const
                 }
     return E;
 }
+
 double iTEBDStateImp::GetExpectationmmnn (const Matrix4RT& Hlocal) const
 {
-//    assert(TestOrthogonal(1e-11));
+    int oldCenter=s1.leftSiteNumber;
+    double e1=GetExpectationmmnn(Hlocal,1);
+    double e2=GetExpectationmmnn(Hlocal,2);
+    ReCenter(oldCenter);
+    return 0.5*(e1+e2);
+}
+
+double iTEBDStateImp::GetExpectationmmnn (const Matrix4RT& Hlocal, int center) const
+{
+    ReCenter(center);
     int D=s1.siteA->GetD1();
     assert(D==s1.siteA->GetD2());
     assert(D==s1.siteB->GetD1());

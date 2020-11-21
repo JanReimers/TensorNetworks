@@ -66,7 +66,8 @@ protected:
     double    FindiTimeGroundState(const Hamiltonian*,const MPO* H2, const IterationScheduleLine&);
     void      Apply     (const Matrix4RT& expH,SVCompressorC*,bool orthogonalize);
 
-    double    GetExpectation (const MPO* o,int center) const;
+    double    GetExpectation    (const MPO*       o     ,int center) const;
+    double    GetExpectationmmnn(const Matrix4RT& Hlocal,int center) const;
     virtual   ONErrors GetOrthonormalityErrors() const;
     Matrix4CT GetTransferMatrix(Direction lr) const;
     Matrix4CT GetTransferMatrix(const dVectorT& M) const;

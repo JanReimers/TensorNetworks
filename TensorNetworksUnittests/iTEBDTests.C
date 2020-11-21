@@ -505,7 +505,7 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12)
 #ifdef DEBUG
     D=4;
 #endif // DEBUG
-    Setup(UnitCell,S,D,epsSVD);
+    Setup(UnitCell,S,2,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
 
     TensorNetworks::Epsilons eps(1e-12);
@@ -513,21 +513,29 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12)
 
     TensorNetworks::IterationSchedule is;
     eps.itsDelatEnergy1Epsilon=1e-3;
-    is.Insert({20,D,0.5,eps});
+    is.Insert({20,2,0.5,eps});
     eps.itsDelatEnergy1Epsilon=1e-5;
     is.Insert({50,D,0.2,eps});
     eps.itsDelatEnergy1Epsilon=1e-5;
     is.Insert({50,D,0.1,eps});
-    eps.itsDelatEnergy1Epsilon=1e-6;
+    eps.itsDelatEnergy1Epsilon=5e-6;
     is.Insert({50,D,0.05,eps});
-    eps.itsDelatEnergy1Epsilon=1e-7;
+    eps.itsDelatEnergy1Epsilon=2e-6;
     is.Insert({50,D,0.02,eps});
-    eps.itsDelatEnergy1Epsilon=1e-8;
+    eps.itsDelatEnergy1Epsilon=1e-6;
     is.Insert({50,D,0.01,eps});
+    eps.itsDelatEnergy1Epsilon=5e-7;
+    is.Insert({50,D,0.005,eps});
+    eps.itsDelatEnergy1Epsilon=2e-7;
+    is.Insert({50,D,0.002,eps});
+    eps.itsDelatEnergy1Epsilon=1e-7;
+    is.Insert({50,D,0.001,eps});
 
     itsState->FindiTimeGroundState(itsH,is);
     itsState->Report(cout);
-    EXPECT_GT(itsState->GetExpectation(itsH),-0.4431471805599453094172);
+    double E=itsState->GetExpectation(itsH);
+    EXPECT_LT(E,-0.4426);
+    EXPECT_GT(E,-0.4431471805599453094172);
 }
 
 ////#include <omp.h>
@@ -591,7 +599,7 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12)
 
 TEST_F(iTEBDTests,FindiTimeGSD32S12)
 {
-    int UnitCell=2,Dstart=2,Dmax=64;
+    int UnitCell=2,Dstart=2,Dmax=32;
     double S=0.5,epsSVD=0.0;
 #ifdef DEBUG
     Dmax=8;
@@ -608,13 +616,13 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     eps.itsDelatEnergy1Epsilon=1e-5;
     is.Insert({50,8,0.2,eps});
 #ifndef DEBUG
-    eps.itsDelatEnergy1Epsilon=1e-6;
+    eps.itsDelatEnergy1Epsilon=3e-6;
     is.Insert({50,16,0.1,eps});
     eps.itsDelatEnergy1Epsilon=1e-6;
     is.Insert({50,16,0.1,eps});
-    eps.itsDelatEnergy1Epsilon=5e-7;
+    eps.itsDelatEnergy1Epsilon=1e-6;
     is.Insert({50,16,0.05,eps});
-    eps.itsDelatEnergy1Epsilon=5e-7;
+    eps.itsDelatEnergy1Epsilon=1e-6;
     is.Insert({50,16,0.02,eps});
     eps.itsDelatEnergy1Epsilon=5e-7;
     is.Insert({50,16,0.01,eps});
@@ -634,7 +642,9 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
 
     itsState->FindiTimeGroundState(itsH,is);
     itsState->Report(cout);
-    EXPECT_GT(itsState->GetExpectation(itsH),-0.4431471805599453094172);
+    double E=itsState->GetExpectation(itsH);
+    EXPECT_LT(E,-0.44302);
+    EXPECT_GT(E,-0.4431471805599453094172);
 }
 
 
