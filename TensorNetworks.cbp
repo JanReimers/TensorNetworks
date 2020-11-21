@@ -245,6 +245,15 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/iTEBDStateImp.H" />
+		<Unit filename="TensorNetworksImp/iTEBDStateImp_Contractions.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/iTEBDStateImp_OrthoNorm.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/iTEBDStateImp_iTime.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="wx/wxHamiltonianPanel.py" />
 		<Unit filename="wx/wxMPS.py" />
 		<Unit filename="wx/wxMPSApproximationsPanel.py" />
