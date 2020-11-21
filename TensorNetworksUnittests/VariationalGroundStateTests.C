@@ -198,12 +198,6 @@ TEST_F(VariationalGroundStateTests,TestSweepL7S1GrowD27)
     is.Insert({30,Dend,6,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
     is.Insert({30,Dend,eps});
-    eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({30,Dend,eps});
-    eps.itsDelatEnergy1Epsilon=1e-9;
-    is.Insert({30,Dend,eps});
-//    eps.itsDelatEnergy1Epsilon=1e-10;
-//    is.Insert({30,Dend,eps});
     itsMPS->FindVariationalGroundState(itsH,is);
 
     double E=itsMPS->GetExpectation(itsH);

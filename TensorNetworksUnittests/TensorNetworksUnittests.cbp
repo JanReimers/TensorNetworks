@@ -34,7 +34,6 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />
-					<Add option="-fopenmp" />
 					<Add library="itensor" />
 					<Add directory="../Release" />
 				</Linker>
@@ -69,6 +68,7 @@
 		</Compiler>
 		<Linker>
 			<Add option="-m64" />
+			<Add option="-fopenmp" />
 			<Add library="TensorNetworks" />
 			<Add library="oml" />
 			<Add library="gtest" />
