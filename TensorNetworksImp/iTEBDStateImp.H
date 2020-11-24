@@ -68,11 +68,14 @@ protected:
 
     double    GetExpectation    (const MPO*       o     ,int center) const;
     double    GetExpectationmmnn(const Matrix4RT& Hlocal,int center) const;
+
     virtual   ONErrors GetOrthonormalityErrors() const;
+
     Matrix4CT GetTransferMatrix(Direction lr) const;
     Matrix4CT GetTransferMatrix(const dVectorT& M) const;
-    Matrix4CT GetTransferMatrix(const Matrix4CT& theta) const;
     MatrixCT  GetNormMatrix(Direction lr,const dVectorT& M) const; //Er*I or I*El
+    dVectorT  ContractAlB() const;
+
     dVectorT  ContractTheta(const Matrix4RT& expH) const;
 
     GLType   Orthogonalize (dVectorT& gamma, const DiagonalMatrixRT& lambda);

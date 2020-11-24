@@ -100,11 +100,7 @@ ONErrors iTEBDStateImp::OrthogonalizeI(SVCompressorC* comp, double eps, int nite
     //
     //  Build Gamma[n] = GammaA[na]*lambdaA*GammaB[nb]
     //
-    dVectorT gamma(itsd*itsd);
-    int nab=0;
-    for (int nb=0; nb<itsd; nb++)
-        for (int na=0; na<itsd; na++,nab++)
-            gamma[na+itsd*nb]=GammaA()[na]*lambdaA()*GammaB()[nb];
+    dVectorT gamma=ContractAlB();
     //
     //  Run the one site orthogonalization algorithm.
     //
@@ -122,11 +118,7 @@ ONErrors iTEBDStateImp::Orthogonalize(SVCompressorC* comp)
     //
     //  Build Gamma[n] = GammaA[na]*lambdaA*GammaB[nb]
     //
-    dVectorT gamma(itsd*itsd);
-    int nab=0;
-    for (int nb=0; nb<itsd; nb++)
-        for (int na=0; na<itsd; na++,nab++)
-            gamma[na+itsd*nb]=GammaA()[na]*lambdaA()*GammaB()[nb];
+    dVectorT gamma=ContractAlB();
     //
     //  Run the one site orthogonalization algorithm.
     //

@@ -113,6 +113,19 @@ MatrixCT  iTEBDStateImp::GetNormMatrix(Direction lr,const dVectorT& M) const //E
     }
     return N;
 }
+
+//
+//  Contract GammaA()[na]*lambdaA()*GammaB()[nb]
+//
+iTEBDStateImp::dVectorT iTEBDStateImp::ContractAlB() const
+{
+    dVectorT gamma(itsd*itsd);
+    int nab=0;
+    for (int nb=0; nb<itsd; nb++)
+        for (int na=0; na<itsd; na++,nab++)
+            gamma[nab]=GammaA()[na]*lambdaA()*GammaB()[nb];
+    return gamma;
+}
 //
 //  Assume two site for now
 //
@@ -122,11 +135,8 @@ Matrix4CT iTEBDStateImp::GetTransferMatrix(Direction lr) const
     assert(s1.siteA->GetD1()==s1.siteB->GetD1());
     assert(s1.siteA->GetD1()==s1.siteB->GetD2());
 
-    dVectorT gamma(itsd*itsd);
-    int nab=0;
-    for (int nb=0; nb<itsd; nb++)
-        for (int na=0; na<itsd; na++,nab++)
-            gamma[nab]=GammaA()[na]*lambdaA()*GammaB()[nb];
+    dVectorT gamma=ContractAlB();
+
     Matrix4CT E;
     switch (lr)
     {
@@ -141,25 +151,6 @@ Matrix4CT iTEBDStateImp::GetTransferMatrix(Direction lr) const
     return E;
 }
 
-
-Matrix4CT iTEBDStateImp::GetTransferMatrix(const Matrix4CT& theta) const
-{
-    int D=s1.siteA->GetD1();
-    Matrix4CT E(D,D,D,D);
-
-    for (int i1=1; i1<=D; i1++)
-        for (int j1=1; j1<=D; j1++)
-            for (int i3=1; i3<=D; i3++)
-                for (int j3=1; j3<=D; j3++)
-                {
-                    dcmplx e(0);
-                    for (int na=1; na<=itsd; na++)
-                    for (int nb=1; nb<=itsd; nb++)
-                        e+=conj(theta(na,j1,nb,j3))*(theta(na,i1,nb,i3));
-                    E(i1,j1,i3,j3)=e;
-                }
-    return E;
-}
 
 double iTEBDStateImp::GetExpectationmmnn (const Matrix4RT& Hlocal) const
 {

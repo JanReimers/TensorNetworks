@@ -5,7 +5,7 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     Done: -Implement iterative orthogonality method.
     Done: -Do normalization inside Orthogonal
     Fixed: Dunno why?!-Try and get rid off ambiguous op overload warnings.
-    Done -Stop checking orthogonality everywhere, just report it
+    Done: -Stop checking orthogonality everywhere, just report it
     Done: -Optimize GetExpectation functions, assumes orthonormality
     Done: -Where to put Sv normalization
         Inside Bond.C
@@ -16,12 +16,29 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     Done: -Bond.C don't overwrite SVerror
     Done: -Store sqrt(s*s) for SV error.
     Done: -Use the name CompressionError consistently.
+        THis is usually called TruncationError
     Done: -Use Factor and EigenMatrix functions
     Done: -Fix up logging.  Add warnings.
     -Should epsOrth drop and espE and dt drop?
     -<E2> is not working, MPO get compressed to 1x4 - 4x1.  We need to learn how contract
      a Dw x Dw - Dw x Dw open MPO with eigen vectors to get <E2>.
-
+    -Refactor:
+        -Too many GetTransferMatrix functions
+        -Use TestOrtho for checking orthogonality
+    -Convergence
+        -restore dE>0 break
+        -Try ApplyOrtho with only one iteration.
+            Does the WF eventually become orthogonal?
+        -Calculate fidelity
+        -Support Apply(MPO*)
+        -Use trotter 2nd and 4rth order MPO instead of expH. Do we run into the same problem as with <E2>?
+        -MP toolkit uses Optimized 4th order 11-term decomposition.  What is that?
+    -Add environment recycling into the Lyx notes.
+    -Code up environment recycling
+        Complicated enough for one site unit cell, see notes.
+        Strategy for two sites is unclear.  One option is to make a renormalized gate for each site.
+    -Apparently running 100 steps with dt=0 will also orthogonalize a state.
+    -Log ortho error.
 -Save wave functions to disk.
 -Make and iTimeGroundState abstract base class to handle iterations.
     Need global logger first, since this is heavily logger dependent.
