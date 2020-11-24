@@ -3714,8 +3714,7 @@ Maintaining Orthogonality
 \end_layout
 
 \begin_layout Standard
-If we keep the full SVD in step 4 above then we would aloways keep orthonormalit
-y
+If we keep the full SVD in step 4 above then we would always keep orthonormality
 \begin_inset Formula 
 \[
 U^{\dagger}U=VV^{\dagger}=1
@@ -3757,8 +3756,8 @@ VV^{\dagger}=\sum_{n_{a}}\Gamma^{n_{a}}\lambda^{A}\left(\Gamma^{n_{a}}\lambda^{A
 
 In step 5 we truncate the singluar values, after witch the orthonormality
  no longer holds true.
- The canonical form is by definition when Schmidt deomposition about any
- bond 
+ The canonical form is by definition when the Schmidt deomposition about
+ any bond 
 \begin_inset Formula $A$
 \end_inset
 
@@ -3865,8 +3864,8 @@ One site unit cell, direct
 \end_layout
 
 \begin_layout Standard
-The algorithm orthongalizing a system with a one site unit is reusable for
- larger unit cells
+The algorithm orthongalizing a system with a one site unit cell is reusable
+ for larger unit cells
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Orus2008"
@@ -3909,7 +3908,7 @@ L_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}=\sum_{n}\left(\lambda_{i_{1}}
 \end_layout
 
 \begin_layout Enumerate
-calculate the eigen matrices then solve
+Calculate the eigen matrices by solving
 \begin_inset Formula 
 \[
 \sum_{i_{1}j_{1}}V_{i_{1}j_{1}}^{LT}L_{\left(i_{1}j_{1}\right)\left(i_{3}j_{3}\right)}=\eta_{L}V_{i_{3}j_{3}}^{LT}
@@ -4003,9 +4002,9 @@ We can define the new
 
  as
 \begin_inset Formula 
-\[
-\Gamma^{\prime}=V^{\dagger}X^{-1}\varGamma Y^{T^{-1}}U
-\]
+\begin{equation}
+\Gamma^{\prime}=V^{\dagger}X^{-1}\varGamma Y^{T^{-1}}U\label{eq:CononicalGammap}
+\end{equation}
 
 \end_inset
 
@@ -4025,7 +4024,7 @@ L_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}^{\prime}=\sum_{n}\left(\lambd
 
 \end_inset
 
-which should have unit matrix as eigen matrices
+should have the unit matrix as eigen matrices
 \begin_inset Formula 
 \[
 \sum_{i_{1}j_{1}}\delta_{i_{1}j_{1}}L_{\left(i_{1}j_{1}\right)\left(i_{3}j_{3}\right)}^{\prime}=\eta_{L}\delta_{i_{3}j_{3}}
@@ -4057,7 +4056,7 @@ name "subsec:One-site-unit-cell"
 
 \begin_layout Standard
 In order to avoid large scale eigen vector calculations one can also use
- an iteractive method to get and orthogonal state
+ an iterative method to get and orthogonal state
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Phien2015"
@@ -4472,7 +4471,806 @@ Details of the orthogonalized iTEBD procedure for a system with two sites
 \end_layout
 
 \begin_layout Subsection
-Infinite Density Matrix Renormalization Group 
+Environment Recycling: One site Cell
+\end_layout
+
+\begin_layout Standard
+This is described in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Phien2015"
+literal "false"
+
+\end_inset
+
+ section V.
+ They use a MPO version of applying 
+\begin_inset Formula $\exp\left(-\tau H\right)$
+\end_inset
+
+ this is achived by doing a standard SVD decomposition of two site gate
+ they call 
+\begin_inset Formula $g$
+\end_inset
+
+.
+\begin_inset Formula 
+\[
+g_{w_{1}w_{3}}^{m_{a}n_{a}m_{b}n_{b}}=\sum_{w_{2}}g_{w_{1}w_{2}}^{m_{a}n_{a}}g_{w_{2}w_{3}}^{m_{b}n_{b}}
+\]
+
+\end_inset
+
+As usual they do everything for a one site unit which makes it almost useless
+ for real iTEBD.
+ In addition they omit all physical indicies from 
+\begin_inset Formula $A$
+\end_inset
+
+ and 
+\begin_inset Formula $\Theta$
+\end_inset
+
+ so that we cannot tell how the physical indices are incorporated in reshaping
+ for SVD.
+ Starting with a wave function
+\begin_inset Formula 
+\[
+\left|\psi_{A_{0}}\right\rangle =\cdots A_{0i_{1}i_{2}}^{n_{a}}\cdots=\cdots\lambda_{0i_{1}}^{A}\varGamma_{0i_{1}i_{2}}^{n_{a}}\cdots
+\]
+
+\end_inset
+
+after operating with one gate
+\begin_inset Formula 
+\[
+\Theta_{\left(w_{1}i_{1}\right)\left(w_{2}i_{2}\right)}^{m_{a}}=\sum_{n_{a}}g_{w_{1}w_{2}}^{m_{a}n_{a}}A_{0i_{1}i_{2}}^{n_{a}}
+\]
+
+\end_inset
+
+if we SVD 
+\begin_inset Formula $\Theta=UsV^{\dagger}$
+\end_inset
+
+ and truncate
+\begin_inset Formula 
+\[
+\Theta_{\left(w_{1}i_{1}\right)\left(w_{2}i_{2}\right)}^{m_{a}}=\Theta_{\left(m_{a}w_{1}i_{1}\right)\left(w_{2}i_{2}\right)}=\sum_{k=1}^{DD_{w}}U_{\left(m_{a}w_{1}i_{1}\right)k}s_{kk}V_{k\left(w_{2}i_{2}\right)}^{\dagger}\sim\sum_{k=1}^{D}U_{\left(w_{1}i_{1}\right)k}^{m_{a}}s_{kk}V_{k\left(w_{2}i_{2}\right)}^{\dagger}
+\]
+
+\end_inset
+
+On an infinite lattice this sequence repeats so we can move 
+\begin_inset Formula $V$
+\end_inset
+
+ and 
+\begin_inset Formula $\sqrt{s}$
+\end_inset
+
+ over to the left 
+\begin_inset Formula 
+\[
+\sqrt{s_{kk}}V_{k\left(w_{2}i_{2}\right)}^{\dagger}U_{\left(w_{1}i_{1}\right)k_{2}}^{m_{a}}\sqrt{s_{k_{2}k_{2}}}
+\]
+
+\end_inset
+
+and define
+\begin_inset Formula 
+\[
+\tilde{A}^{m_{a}}=\sum_{i_{2}=1}^{DD_{w}}\sqrt{s_{i_{1}i_{1}}}V_{i_{1}i_{2}}^{\dagger}U_{i_{2}i_{3}}^{m_{a}}\sqrt{s_{i_{3}i_{3}}}=\sqrt{\tilde{\lambda}}\tilde{\varGamma}^{m_{a}}\sqrt{\tilde{\lambda}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $i_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $i_{3}$
+\end_inset
+
+ range from 1 to 
+\begin_inset Formula $D$
+\end_inset
+
+ (not 
+\begin_inset Formula $DD_{w}$
+\end_inset
+
+).
+ This truncation is equivalent to finding matrices 
+\begin_inset Formula $Q$
+\end_inset
+
+ and 
+\begin_inset Formula $P$
+\end_inset
+
+ such than
+\begin_inset Formula 
+\[
+\tilde{A}^{m_{a}}=Q\Theta^{m_{a}}P
+\]
+
+\end_inset
+
+ where 
+\begin_inset Formula $Q$
+\end_inset
+
+ is a 
+\begin_inset Formula $D\times DD_{w}$
+\end_inset
+
+ matrix and 
+\begin_inset Formula $P$
+\end_inset
+
+ is 
+\begin_inset Formula $DD_{w}\times D$
+\end_inset
+
+.These matrices are said to carry information about the environment.
+ The article fails to mention how one finds 
+\begin_inset Formula $Q$
+\end_inset
+
+ and 
+\begin_inset Formula $P$
+\end_inset
+
+.
+ If we define 
+\begin_inset Formula $s^{\prime}$
+\end_inset
+
+ as the compressed version 
+\begin_inset Formula $s$
+\end_inset
+
+ and substitue
+\begin_inset Formula 
+\[
+\tilde{A}^{m_{a}}=s^{\prime}V^{\dagger}U^{m_{a}}=QU^{m_{a}}sV^{\dagger}P
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+s^{\prime}=QUsV^{\dagger}PU^{\dagger}V
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+s^{\prime}=Q^{\prime}sP^{\prime}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+s_{ii}^{\prime}=\sum_{k}Q_{ik}^{\prime}s_{kk}P_{ki}^{\prime}
+\]
+
+\end_inset
+
+we can see that
+\begin_inset Formula 
+\[
+Q_{ik}^{\prime}=\begin{cases}
+\delta_{ik} & k\leq D\\
+0 & k>D
+\end{cases}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+P_{ki}^{\prime}=\begin{cases}
+\delta_{ki} & k\leq D\\
+0 & k>D
+\end{cases}
+\]
+
+\end_inset
+
+and we get
+\begin_inset Formula 
+\[
+Q=Q^{\prime}U^{\dagger}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+P=VP^{\prime}V^{\dagger}U
+\]
+
+\end_inset
+
+On the other hand if we are using 
+\begin_inset Formula $A=\sqrt{s^{\prime}}V^{\dagger}U\sqrt{s^{\prime}}$
+\end_inset
+
+ then it gets a little more complicated
+\begin_inset Formula 
+\[
+\sqrt{s^{\prime}}V^{\dagger}U\sqrt{s^{\prime}}=QUsV^{\dagger}P
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+I_{D}=V\frac{1}{\sqrt{s^{\prime}}}QUsV^{\dagger}P\frac{1}{\sqrt{s^{\prime}}}U^{\dagger}=V\frac{1}{\sqrt{s^{\prime}}}QU\sqrt{s}I_{DD_{w}}\sqrt{s}V^{\dagger}P\frac{1}{\sqrt{s^{\prime}}}U^{\dagger}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+I_{D}=Q^{\prime}I_{DD_{w}}P^{\prime}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $Q^{\prime}$
+\end_inset
+
+ and 
+\begin_inset Formula $P^{\prime}$
+\end_inset
+
+ have the same definition as above.
+ Now
+\begin_inset Formula 
+\[
+Q=\sqrt{s^{\prime}}V^{\dagger}Q^{\prime}\frac{1}{\sqrt{s}}U^{\dagger}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+P=V\frac{1}{\sqrt{s}}P^{\prime}U\sqrt{s^{\prime}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Proceeding in an optamistic fog the next step is to run 
+\begin_inset Formula $\tilde{\lambda}\tilde{\varGamma}^{m_{a}}$
+\end_inset
+
+ throught the orthogonalization mill to get 
+\begin_inset Formula 
+\[
+\tilde{\lambda}\tilde{\varGamma}^{m_{a}}\underset{\longrightarrow}{orth}\tilde{\lambda}_{1}\tilde{\varGamma}_{1}^{m_{a}}
+\]
+
+\end_inset
+
+and define
+\begin_inset Formula 
+\[
+\tilde{A}_{1}=\sqrt{\tilde{\lambda}_{1}}\tilde{\varGamma}_{1}^{m_{a}}\sqrt{\tilde{\lambda}_{1}}=Q_{c}\tilde{A}P_{c}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $Q_{c}$
+\end_inset
+
+ and 
+\begin_inset Formula $P_{c}$
+\end_inset
+
+ are both 
+\begin_inset Formula $D\times D$
+\end_inset
+
+.
+ Now we use eq 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:CononicalGammap"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ (which implies usage the direct orthogonalization as opposed to the iterative
+ one)
+\begin_inset Formula 
+\[
+\sqrt{\tilde{\lambda}_{1}}\tilde{\varGamma}_{1}^{m_{a}}\sqrt{\tilde{\lambda}_{1}}=\sqrt{\tilde{\lambda}_{1}}V^{\dagger}X^{-1}\tilde{\varGamma}^{m_{a}}Y^{T^{-1}}U\sqrt{\tilde{\lambda}_{1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sqrt{\tilde{\lambda}_{1}}V^{\dagger}X^{-1}\tilde{\lambda}^{-\nicefrac{1}{2}}\tilde{A}^{m_{a}}\tilde{\lambda}^{-\nicefrac{1}{2}}Y^{T^{-1}}U\sqrt{\tilde{\lambda}_{1}}
+\]
+
+\end_inset
+
+from which we can read off
+\begin_inset Formula 
+\[
+Q_{c}=\sqrt{\tilde{\lambda}_{1}}V^{\dagger}X^{-1}\tilde{\lambda}^{-\nicefrac{1}{2}}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+P_{c}=\tilde{\lambda}^{-\nicefrac{1}{2}}Y^{T^{-1}}U\sqrt{\tilde{\lambda}_{1}}
+\]
+
+\end_inset
+
+The next step is to relate
+\begin_inset Formula 
+\[
+\tilde{A}_{1}=UA_{0}U^{\dagger}
+\]
+
+\end_inset
+
+From section III B1 of 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Phien2015"
+literal "false"
+
+\end_inset
+
+ we know that 
+\begin_inset Formula $U$
+\end_inset
+
+ is just the dominant eigen matrix of the transfer matrix
+\begin_inset Formula 
+\[
+E=\sum_{m_{a}}\left(\tilde{A}_{1}^{m_{a}}\right)^{\dagger}A_{0}^{m_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+E_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}=\sum_{m_{a}}\tilde{A}_{1j_{1}j_{2}}^{*m_{a}}A_{0i_{1}i_{2}}^{m_{a}}
+\]
+
+\end_inset
+
+FInally we combine everything into a gate
+\begin_inset Formula 
+\[
+G=U^{\dagger}Q_{c}QgPP_{c}U
+\]
+
+\end_inset
+
+which from the diagram 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:The-renormalized-gate"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ has 6 indices
+\begin_inset Formula 
+\[
+G_{i_{1}i_{1}j_{1}j_{2}}^{m_{a}n_{a}}=U^{\dagger}Q_{c}Qg^{m_{a}n_{a}}PP_{c}U
+\]
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename RenormalizedGate.png
+	scale 40
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:The-renormalized-gate"
+
+\end_inset
+
+The renormalized gate used for environment recycling in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Phien2015"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Environment Recycling: Two site unit cell
+\end_layout
+
+\begin_layout Standard
+I think it makes sense to make separate renormalized gates for sites A and
+ B.
+ Let's see what happens when we do this:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left|\psi_{A_{0}B_{0}}\right\rangle =\cdots A_{0i_{1}i_{2}}^{n_{a}}B_{0i_{2}i_{3}}^{n_{b}}\cdots=\cdots\lambda_{0i_{1}}^{A}\varGamma_{0i_{1}i_{2}}^{n_{a}}\lambda_{0i_{2}}^{B}\varGamma_{0i_{2}i_{3}}^{n_{b}}\cdots
+\]
+
+\end_inset
+
+after operating with one gate
+\begin_inset Formula 
+\[
+\Theta_{\left(w_{1}i_{1}\right)\left(w_{2}i_{2}\right)}^{m_{a}}=\sum_{n_{a}}g_{w_{1}w_{2}}^{m_{a}n_{a}}A_{0i_{1}i_{2}}^{n_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Theta_{\left(2_{1}i_{2}\right)\left(w_{3}i_{3}\right)}^{m_{b}}=\sum_{n_{b}}g_{w_{2}3_{2}}^{m_{b}n_{b}}B_{0i_{2}i_{3}}^{n_{b}}
+\]
+
+\end_inset
+
+if we SVD 
+\begin_inset Formula $\Theta=UsV^{\dagger}$
+\end_inset
+
+ and truncate
+\begin_inset Formula 
+\[
+\Theta_{\left(w_{1}i_{1}\right)\left(w_{2}i_{2}\right)}^{m_{a}}=\Theta_{\left(m_{a}w_{1}i_{1}\right)\left(w_{2}i_{2}\right)}=\sum_{k=1}^{DD_{w}}U_{\left(m_{a}w_{1}i_{1}\right)k}s_{kk}^{A}V_{k\left(w_{2}i_{2}\right)}^{A\dagger}\sim\sum_{k=1}^{D}U_{\left(w_{1}i_{1}\right)k}^{m_{a}}s_{kk}^{\prime A}V_{k\left(w_{2}i_{2}\right)}^{A\dagger}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Theta_{\left(w_{2}i_{2}\right)\left(w_{3}i_{3}\right)}^{m_{b}}=\Theta_{\left(m_{b}w_{2}i_{2}\right)\left(w_{3}i_{3}\right)}=\sum_{k=1}^{DD_{w}}U_{\left(m_{b}w_{2}i_{2}\right)k}s_{kk}^{B}V_{k\left(w_{3}i_{3}\right)}^{A\dagger}\sim\sum_{k=1}^{D}U_{\left(w_{1}i_{1}\right)k}^{m_{b}}s_{kk}^{\prime B}V_{k\left(w_{3}i_{3}\right)}^{B\dagger}
+\]
+
+\end_inset
+
+On an infinite lattice we new have two sequences repeating
+\begin_inset Formula 
+\[
+U^{m_{a}}s^{\prime A}V^{A\dagger}U^{m_{b}}s^{\prime B}V^{B\dagger}
+\]
+
+\end_inset
+
+whihc means we ned up rotating 
+\begin_inset Formula $\sqrt{s^{\prime B}}V^{B\dagger}$
+\end_inset
+
+ over to the left side
+\begin_inset Formula 
+\[
+\sqrt{s^{\prime B}}V^{B\dagger}U^{m_{a}}\sqrt{s^{\prime A}}\sqrt{s^{\prime A}}V^{A\dagger}U^{m_{b}}\sqrt{s^{\prime B}}
+\]
+
+\end_inset
+
+which shows us that
+\begin_inset Formula 
+\[
+\tilde{A}^{m_{a}}=\sqrt{s^{\prime B}}V^{B\dagger}U^{m_{a}}\sqrt{s^{\prime A}}=\sqrt{\tilde{\lambda}^{B}}\tilde{\varGamma}^{m_{a}}\sqrt{\tilde{\lambda}^{A}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\tilde{B}^{m_{b}}=\sqrt{s^{\prime A}}V^{A\dagger}U^{m_{b}}\sqrt{s^{\prime B}}=\sqrt{\tilde{\lambda}^{A}}\tilde{\varGamma}^{m_{b}}\sqrt{\tilde{\lambda}^{B}}
+\]
+
+\end_inset
+
+This truncation is equivalent to finding matrices 
+\begin_inset Formula $Q$
+\end_inset
+
+ and 
+\begin_inset Formula $P$
+\end_inset
+
+ such than
+\begin_inset Formula 
+\[
+\tilde{A}^{m_{a}}=Q^{A}\Theta^{m_{a}}P^{A}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sqrt{s^{\prime B}}V^{B\dagger}U^{m_{a}}\sqrt{s^{\prime A}}=Q^{A}U^{m_{a}}s^{A}V^{A\dagger}P^{A}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+I_{D}=V^{B}\frac{1}{\sqrt{s^{\prime B}}}Q^{A}U^{m_{a}}sV^{A\dagger}P^{A}\frac{1}{\sqrt{s^{\prime A}}}U^{\dagger m_{a}}=V^{B}\frac{1}{\sqrt{s^{\prime B}}}Q^{A}U^{m_{a}}\sqrt{s^{A}}I_{DD_{w}}\sqrt{s^{A}}V^{A\dagger}P^{A}\frac{1}{\sqrt{s^{A\prime}}}U^{\dagger m_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+I_{D}=Q^{A\prime}I_{DD_{w}}P^{A\prime}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $Q^{\prime}$
+\end_inset
+
+ and 
+\begin_inset Formula $P^{\prime}$
+\end_inset
+
+ have the same definition as above.
+ Now
+\begin_inset Formula 
+\[
+Q^{A}=\sqrt{s^{B\prime}}V^{B\dagger}Q^{A\prime}\frac{1}{\sqrt{s^{A}}}U^{\dagger m_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+P^{A}=V^{A}\frac{1}{\sqrt{s^{A}}}P^{A\prime}U^{m_{a}}\sqrt{s^{A\prime}}
+\]
+
+\end_inset
+
+similarly we find
+\begin_inset Formula 
+\[
+\tilde{B}^{m_{a}}=Q^{B}\Theta^{m_{b}}P^{B}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\sqrt{s^{\prime A}}V^{A\dagger}U^{m_{b}}\sqrt{s^{\prime B}}=Q^{B}U^{m_{b}}s^{B}V^{B\dagger}P^{B}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+I_{D}=V^{A}\frac{1}{\sqrt{s^{\prime A}}}Q^{B}U^{m_{b}}\sqrt{s^{B}}I_{DD_{w}}\sqrt{s^{B}}V^{B\dagger}P^{B}\frac{1}{\sqrt{s^{\prime B}}}U^{\dagger m_{b}}=Q^{B\prime}I_{DD_{w}}P^{B\prime}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+Q^{B}=\sqrt{s^{A\prime}}V^{A\dagger}Q^{\prime}\frac{1}{\sqrt{s^{B}}}U^{\dagger m_{b}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+P^{B}=V^{B}\frac{1}{\sqrt{s^{B}}}P^{\prime}U^{m_{b}}\sqrt{s^{B\prime}}
+\]
+
+\end_inset
+
+THe next step is to orthogonalize the whole unite cell
+\begin_inset Formula 
+\[
+\tilde{\varGamma}^{m_{a}}\tilde{\lambda}^{A}\tilde{\varGamma}^{m_{b}}\tilde{\lambda}^{B}
+\]
+
+\end_inset
+
+which achieved by grouping 
+\begin_inset Formula $\tilde{\varGamma}^{m}=\tilde{\varGamma}^{m_{a}}\tilde{\lambda}^{A}\tilde{\varGamma}^{m_{b}}$
+\end_inset
+
+ and orthogonalizing 
+\begin_inset Formula $\tilde{\varGamma}^{m}\tilde{\lambda}^{B}$
+\end_inset
+
+ yielding 
+\begin_inset Formula $\tilde{\varGamma_{1}}^{m}\tilde{\lambda}_{1}^{B}$
+\end_inset
+
+ which must then be unpacked to get 
+\begin_inset Formula $\tilde{\varGamma}_{1}^{m_{a}}\tilde{\lambda}_{1}^{A}\tilde{\varGamma}_{1}^{m_{b}}\tilde{\lambda_{1}}^{B}$
+\end_inset
+
+.
+\begin_inset Formula 
+\[
+\tilde{A}_{1}=\sqrt{\tilde{\lambda}_{1}^{B}}\tilde{\varGamma}_{1}^{m_{a}}\sqrt{\tilde{\lambda}_{1}^{A}}=Q_{c}^{A}\tilde{A}P_{c}^{A}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\tilde{B}_{1}=\sqrt{\tilde{\lambda}_{1}^{A}}\tilde{\varGamma}_{1}^{m_{b}}\sqrt{\tilde{\lambda}_{1}^{B}}=Q_{c}^{B}\tilde{B}P_{c}^{B}
+\]
+
+\end_inset
+
+From the unpacking process we have 
+\begin_inset Formula 
+\[
+\tilde{\varGamma}_{1}^{m_{a}}=\frac{1}{\tilde{\lambda}_{1}^{B}}P^{n_{a}},
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\tilde{\varGamma}_{1}^{m_{b}}=Q^{n_{b}}\frac{1}{\tilde{\lambda}_{1}^{B}}
+\]
+
+\end_inset
+
+where we now have all too many 
+\begin_inset Formula $Ps$
+\end_inset
+
+and Qs.
+ I think this is dead end becuase for example 
+\begin_inset Formula $P^{n_{a}}$
+\end_inset
+
+ is not a function of 
+\begin_inset Formula $\tilde{A}$
+\end_inset
+
+.
+ THis where we need to think about a two site gate (whihc can possible be
+ decomposed via SVD into the two one site gates.
+ Define
+\begin_inset Formula 
+\[
+\tilde{A}_{1}\tilde{B}_{1}=Q_{c}\tilde{A}\tilde{B}P_{c}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sqrt{\tilde{\lambda}_{1}^{B}}\tilde{\varGamma_{1}}^{m}\sqrt{\tilde{\lambda}_{1}^{B}}=Q_{c}\tilde{A}\tilde{B}P_{c}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sqrt{\tilde{\lambda}_{1}^{B}}V^{\dagger}X^{-1}\tilde{\varGamma}^{m}Y^{T^{-1}}U\sqrt{\tilde{\lambda}_{1}^{B}}=Q_{c}\tilde{A}\tilde{B}P_{c}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sqrt{\tilde{\lambda}_{1}^{B}}V^{\dagger}X^{-1}\tilde{\varGamma}^{m_{a}}\tilde{\lambda}^{A}\tilde{\varGamma}^{m_{b}}Y^{T^{-1}}U\sqrt{\tilde{\lambda}_{1}^{B}}=Q_{c}\tilde{A}\tilde{B}P_{c}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sqrt{\tilde{\lambda}_{1}^{B}}V^{\dagger}X^{-1}\tilde{A}\tilde{B}\frac{1}{\tilde{\lambda}^{B}}Y^{T^{-1}}U\sqrt{\tilde{\lambda}_{1}^{B}}=Q_{c}\tilde{A}\tilde{B}P_{c}
+\]
+
+\end_inset
+
+from whihc we can read off
+\begin_inset Formula 
+\[
+Q_{c}=\sqrt{\tilde{\lambda}_{1}^{B}}V^{\dagger}X^{-1},\quad P_{c}=\frac{1}{\tilde{\lambda}^{B}}Y^{T^{-1}}U\sqrt{\tilde{\lambda}_{1}^{B}}
+\]
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -6723,6 +7521,235 @@ status open
 
 \begin_layout Plain Layout
 Ground state energies for OBC finite chains using the mp-dmrg app.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+We can also calculate the 
+\begin_inset Formula $D$
+\end_inset
+
+ dependence infinite lattices
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="8" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $D$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $E$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $-0.440206467793605$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $-0.442607382097140$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $-0.443081778062480$
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $-0.443134779580595$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+32
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $-0.443144786802265$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+64
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $-0.443145797781275$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+128
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $-0.443145969741740$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+iDRM GS energies, mp-toolkit, SU(2) lattice with 2 site unit cell.
 \end_layout
 
 \end_inset
