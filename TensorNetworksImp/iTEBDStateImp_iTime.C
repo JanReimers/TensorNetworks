@@ -45,8 +45,10 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
     assert(isl.itsDmax>0 || isl.itsEps.itsMPSCompressEpsilon>0);
     double dt=isl.itsdt;
 
-    Matrix4RT Hlocal=H->BuildLocalMatrix();
-    Matrix4RT expH=Hamiltonian::ExponentH(dt,Hlocal);
+//    Matrix4RT Hlocal=H->BuildLocalMatrix();
+//    Matrix4RT expH=Hamiltonian::ExponentH(dt,Hlocal);
+    MPO* expH=H->CreateOperator(dt,TensorNetworks::FourthOrder);
+
     int Dmax=GetMaxD();
     SVCompressorC* mps_compressor =Factory::GetFactory()->MakeMPSCompressor(Dmax,0.0);
     int nOrthIter=100;
@@ -69,7 +71,7 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
             Apply(expH,mps_compressor);
             ReCenter(1);
         }
-        Logger->LogInfo(2,"           E          dE      niter    Ortho errors");
+        Logger->LogInfo(2,"      Dw       E          dE      niter    Ortho errors");
         double oerr1,oerr2;
         int niter=1;
         for (; niter<=isl.itsMaxGSSweepIterations; niter++)
@@ -81,7 +83,7 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
             double Enew=GetExpectation(H)/(itsL-1);
             double dE=Enew-E1;
             E1=Enew;
-            Logger->LogInfoV(2,"%.9f %.2e %4d     %.1e/%.1e",E1,dE,niter,oerr1, oerr2);
+            Logger->LogInfoV(2,"%4d %.9f %.2e %4d     %.1e/%.1e",expH->GetMaxDw(),E1,dE,niter,oerr1, oerr2);
             if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon || dE>0.0) break;
         }
         oerr1=OrthogonalizeI(mps_compressor,1e-10,nOrthIter);
@@ -92,10 +94,19 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
                         isl.itsdt,isl.itsEps.itsDelatEnergy1Epsilon,D,isl.itsDmax,H->GetMaxDw(),niter,E1,oerr1);
     }
     delete mps_compressor;
+    delete expH;
     return E1;
 }
 
 double iTEBDStateImp::ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp,double eps,int maxIter)
+{
+    assert(comp);
+    dVectorT theta=ContractTheta(expH);
+    DiagonalMatrixRT lb=lambdaB();
+    auto [gammap,lambdap]=OrthogonalizeI(theta,lb,eps,maxIter);
+    return UnpackOrthonormal(gammap,lambdap,comp);
+}
+double iTEBDStateImp::ApplyOrtho(const MPO* expH,SVCompressorC* comp,double eps,int maxIter)
 {
     assert(comp);
     dVectorT theta=ContractTheta(expH);
@@ -109,6 +120,23 @@ double iTEBDStateImp::ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp,doubl
 //  THis follows PHYSICAL REVIEW B 78, 155117 2008 figure 14
 //
 double iTEBDStateImp::Apply(const Matrix4RT& expH,SVCompressorC* comp,bool orthogonalize)
+{
+    assert(comp);
+    dVectorT theta=ContractTheta(expH);
+    DiagonalMatrixRT lb=lambdaB();
+    double orthError=0.0;
+    if (orthogonalize)
+    {
+        auto [gammap,lambdap]=Orthogonalize(theta,lb);
+        orthError=UnpackOrthonormal(gammap,lambdap,comp);
+    }
+    else
+    {
+        orthError=UnpackOrthonormal(theta,lb,comp);
+    }
+    return orthError;
+}
+double iTEBDStateImp::Apply(const MPO* expH,SVCompressorC* comp,bool orthogonalize)
 {
     assert(comp);
     dVectorT theta=ContractTheta(expH);

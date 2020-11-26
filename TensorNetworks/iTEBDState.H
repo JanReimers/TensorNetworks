@@ -36,6 +36,9 @@ public:
     virtual double ApplyOrtho(const Matrix4RT& expH,SVCompressorC*)=0;
     virtual double ApplyOrtho(const Matrix4RT& expH,SVCompressorC*,double eps,int maxIter)=0;
 
+    virtual void   Apply     (const MPO* expH,SVCompressorC*)=0;
+    virtual double ApplyOrtho(const MPO* expH,SVCompressorC*)=0;
+    virtual double ApplyOrtho(const MPO* expH,SVCompressorC*,double eps,int maxIter)=0;
 //--------------------------------------------------------------------------------------
 //
 //  Normalization, Conoization and orthogonalization.

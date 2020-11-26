@@ -54,6 +54,67 @@ MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const Matrix4RT& expH) const
     return Thetap;
 }
 
+MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const MPO* o) const
+{
+    //
+    //  Make sure everything is square
+    //
+    assert(s1.siteA->GetD2()==s1.siteB->GetD1());
+    assert(s1.siteA->GetD1()==s1.siteB->GetD2());
+    assert(s1.siteA->GetD1()==s1.siteA->GetD2());
+    int D=s1.siteA->GetD1();
+    //
+    //  Set up two site operators
+    //
+    assert(o->GetL()==2);
+    const SiteOperator* soA=o->GetSiteOperator(1);
+    const SiteOperator* soB=o->GetSiteOperator(2);
+    int DwA2=soA->GetDw12().Dw2;
+#ifdef DEBUG
+    int DwA1=soA->GetDw12().Dw1;
+    int DwB1=soB->GetDw12().Dw1;
+    int DwB2=soB->GetDw12().Dw2;
+#endif
+    assert(DwA1==1);
+    assert(DwB2==1);
+    assert(DwA2==DwB1);
+    //
+    //  Create empty theta tensor
+    //
+    dVectorT  Thetap(itsd*itsd);
+    for (int n=0;n<itsd*itsd;n++)
+    {
+        Thetap[n].SetLimits(D,D);
+        Fill(Thetap[n],dcmplx(0.0));
+    }
+    //
+    //  Contract
+    //
+    for (int mb=0; mb<itsd; mb++)
+    for (int ma=0; ma<itsd; ma++)
+    {
+        MatrixCT theta13  =GammaA()[ma]*lambdaA()*GammaB()[mb];  //Figure 14 v
+        int nab=0;
+        for (int nb=0; nb<itsd; nb++)
+        for (int na=0; na<itsd; na++,nab++)
+        {
+            const MatrixRT& WAmn=soA->GetW(ma,na);
+            const MatrixRT& WBmn=soB->GetW(mb,nb);
+            assert(WAmn.GetNumRows()==1);
+            assert(WAmn.GetNumCols()==DwA2);
+            assert(WBmn.GetNumRows()==DwA2);
+            assert(WBmn.GetNumCols()==1);
+            double Omn(0);
+            for (int w2=1; w2<=DwA2; w2++)
+                Omn+=WAmn(1,w2)*WBmn(w2,1);
+
+            Thetap[nab]+= theta13*Omn;
+        }
+    }
+
+    return Thetap;
+}
+
 Matrix4CT iTEBDStateImp::GetTransferMatrix(const dVectorT& M) const
 {
     int d=M.size();

@@ -37,9 +37,13 @@ public:
 // Find ground state.  Return <E^2>-<E>^2
 //
     virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&);
-    virtual void   Apply     (const Matrix4RT& expH,SVCompressorC* comp) {Apply(expH,comp,false);}
-    virtual double ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp) {return Apply(expH,comp,true);}
+    virtual void   Apply     (const Matrix4RT& expH,SVCompressorC* comp) {       Apply(expH,comp,false);}
+    virtual double ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp) {return Apply(expH,comp,true );}
     virtual double ApplyOrtho(const Matrix4RT& expH,SVCompressorC*,double eps,int maxIter);
+
+    virtual void   Apply     (const MPO* expH,SVCompressorC* comp) {       Apply(expH,comp,false);}
+    virtual double ApplyOrtho(const MPO* expH,SVCompressorC* comp) {return Apply(expH,comp,true );}
+    virtual double ApplyOrtho(const MPO* expH,SVCompressorC*,double eps,int maxIter);
 //--------------------------------------------------------------------------------------
 //
 //  Normalization members with and without SVD compression
@@ -65,6 +69,7 @@ protected:
     int       GetModSite(int isite) const;
     double    FindiTimeGroundState(const Hamiltonian*,const MPO* H2, const IterationScheduleLine&);
     double    Apply     (const Matrix4RT& expH,SVCompressorC*,bool orthogonalize);
+    double    Apply     (const MPO*       expH,SVCompressorC*,bool orthogonalize);
 
     double    GetExpectation    (const MPO*       o     ,int center) const;
     double    GetExpectationmmnn(const Matrix4RT& Hlocal,int center) const;
@@ -77,6 +82,7 @@ protected:
     dVectorT  ContractAlB() const;
 
     dVectorT  ContractTheta(const Matrix4RT& expH) const;
+    dVectorT  ContractTheta(const MPO*       expH) const;
 
     GLType   Orthogonalize (dVectorT& gamma, const DiagonalMatrixRT& lambda);
     GLType   OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda,double eps,int maxIter);

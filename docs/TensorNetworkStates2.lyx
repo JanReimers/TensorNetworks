@@ -4953,6 +4953,10 @@ literal "false"
 Environment Recycling: Two site unit cell
 \end_layout
 
+\begin_layout Paragraph
+Try and create two gates
+\end_layout
+
 \begin_layout Standard
 I think it makes sense to make separate renormalized gates for sites A and
  B.
@@ -5270,7 +5274,104 @@ Q_{c}=\sqrt{\tilde{\lambda}_{1}^{B}}V^{\dagger}X^{-1},\quad P_{c}=\frac{1}{\tild
 
 \end_inset
 
- 
+
+\end_layout
+
+\begin_layout Paragraph
+Try and create two , two site gates
+\end_layout
+
+\begin_layout Standard
+The idea here is the same as for orthogonalizing.
+ Define 
+\begin_inset Formula $\varGamma^{m}=\varGamma^{m_{a}}\lambda^{A}\varGamma^{m_{b}}$
+\end_inset
+
+ and create a gate for the 
+\begin_inset Formula $d^{2}$
+\end_inset
+
+ Hilbert space of two sites using 
+\begin_inset Formula $A_{o}^{m}=\varGamma^{m}\lambda^{B}$
+\end_inset
+
+ and a two site gate
+\begin_inset Formula 
+\[
+g_{w_{1}w_{3}}^{mn}=g_{w_{1}w_{3}}^{m_{a}n_{a}m_{b}n_{b}}=\sum_{w_{2}}g_{w_{1}w_{2}}^{m_{a}n_{a}}g_{w_{2}w_{3}}^{m_{b}n_{b}}
+\]
+
+\end_inset
+
+at the end we get 
+\begin_inset Formula 
+\[
+G^{mn}=U^{\dagger}Q_{c}Qg^{mn}PP_{c}U
+\]
+
+\end_inset
+
+ whihc can be unpacked into
+\begin_inset Formula 
+\[
+G^{mn}\rightarrow G^{m_{a}n_{a}m_{b}n_{b}}
+\]
+
+\end_inset
+
+Then we shift the center and define 
+\begin_inset Formula $\varGamma^{m}=\varGamma^{m_{b}}\lambda^{B}\varGamma^{m_{a}}$
+\end_inset
+
+, 
+\begin_inset Formula $A_{o}^{m}=\varGamma^{m}\lambda^{A}$
+\end_inset
+
+ adn finally get a two site gate 
+\begin_inset Formula $G^{m_{b}n_{b}m_{a}n_{a}}$
+\end_inset
+
+.
+ Then we alternae applying these gates.
+ THis all depends on whether the ansatz than the enviroment is stable under
+ iteration holds true.
+ What if the 
+\begin_inset Formula $AB$
+\end_inset
+
+ and 
+\begin_inset Formula $BA$
+\end_inset
+
+ enviroments interacto strongly? Then the ansatz fails.
+\end_layout
+
+\begin_layout Standard
+It may even be possible to decompose it into two gates
+\begin_inset Formula 
+\[
+G^{m_{a}n_{a}m_{b}n_{b}}\underset{\longrightarrow}{SVD}U^{m_{a}n_{a}}sV^{\dagger m_{b}n_{b}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\left(U^{m_{a}n_{a}}\sqrt{s}\right)\left(\sqrt{s}V^{\dagger m_{b}n_{b}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=G^{m_{a}n_{a}}G^{m_{b}n_{b}}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
