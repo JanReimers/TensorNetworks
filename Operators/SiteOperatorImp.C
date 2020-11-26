@@ -184,12 +184,8 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
 {
     assert(comp);
     MatrixRT  A=Reshape(lr);
-
     LapackSVDSolver<double> solver;
     auto [U,sm,VT]=solver.Solve(A,1e-12,Min(A.GetNumRows(),A.GetNumCols())); //Solves A=U * s * VT
-//    VectorRT s=sm.GetDiagonal();
-//    cout << "error1=" << std::scientific << Max(abs(MatrixRT(U*sm*VT-A))) << endl;
-//    assert(Max(abs(MatrixRT(U*sm*VT-A)))<1e-10);
     //
     //  Rescaling
     //
@@ -206,16 +202,12 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
     }
 
     comp->Compress(U,sm,VT);
-//    cout << "error2=" << Max(abs(MatrixRT(U*sm*VT-A))) << endl;
-//    s=sm.GetDiagonal();
     MatrixRT UV;// This get transferred through the bond to a neighbouring site.
     switch (lr)
     {
         case DRight:
         {
             UV=U;
-
-            //cout << "After compress V=" << " "<< V << endl;
             Reshape(lr,VT);  //A is now Vdagger
             if (itsLeft_Neighbour) itsLeft_Neighbour->SVDTransfer(lr,sm,UV);
             break;
@@ -223,7 +215,6 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
         case DLeft:
         {
             UV=VT; //Set Vdagger
-//            cout << "After compress A=" << " "<< A << endl;
             Reshape(lr,U);  //A is now U
             if (itsRightNeighbour) itsRightNeighbour->SVDTransfer(lr,sm,UV);
             break;
