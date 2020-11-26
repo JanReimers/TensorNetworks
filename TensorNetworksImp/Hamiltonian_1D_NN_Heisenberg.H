@@ -25,7 +25,7 @@ class Hamiltonian_1D_NN_Heisenberg
         //
         virtual int GetL () const {return itsL;}
         virtual int Getd () const {return 2*itsS+1;}
-        virtual int GetMaxDw() const {return Dw;}
+        virtual int GetMaxDw() const {return MPOImp::GetMaxDw();}
 
         virtual MPS*        CreateMPS         (int D,double normEps,double epsSV) const;
         virtual iTEBDState* CreateiTEBDState  (int D,double normEps,double epsSV) const;
