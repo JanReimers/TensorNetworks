@@ -24,9 +24,10 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
 
     MPO* H2=H->CreateH2Operator();
     double E2=GetExpectation(H2);
+    E2=E2-E1*E1;
     delete H2;
     Logger->LogInfoV(0,"Finished iTime GS iterations D=%4d, <E>=%.9f, <E^2>-<E>^2=%.2e",GetMaxD(),E1,E2);
-    return E2-E1*E1;
+    return E2;
 }
 
 double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationScheduleLine& isl)
