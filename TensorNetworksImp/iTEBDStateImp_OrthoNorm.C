@@ -75,11 +75,6 @@ double iTEBDStateImp::GetOrthonormalityErrors() const
     MatrixCT I(D,D); //Right ei
     Unit(I);
 
-//    int nab=0;
-//    for (int na=0; na<itsd; na++)
-//        for (int nb=0; nb<itsd; nb++,nab++)
-//            gamma[nab]=GammaA()[na]*lambdaA()*GammaB()[nb];
-
     MatrixCT Nr=GetNormMatrix(DRight,gamma*lambdaB());
     MatrixCT Nl=GetNormMatrix(DLeft ,lambdaB()*gamma);
     dcmplx right_norm=Sum(Nr.GetDiagonal())/static_cast<double>(D);
@@ -469,20 +464,13 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
         gamma_prime[n]=VX*gamma[n];
         gamma_prime[n]*=YU;
     }
-    //
-    //  Verify orthogonaly
-    //
-    MatrixCT Nr=GetNormMatrix(DRight,gamma_prime*lambda_prime); //=Er*I
-    MatrixCT Nl=GetNormMatrix(DLeft ,lambda_prime*gamma_prime); //=I*El
-    double  left_error=Max(fabs(Nr-I));
-    double right_error=Max(fabs(Nl-I));
-    double eps=1e-12;
-    if (left_error>D*eps)
-        Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize Large left  orthonormaility error=%.1e > %.1e",left_error,D*eps);
-    if (right_error>D*eps)
-        Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize Large right orthonormaility error=%.1e > %.1e",right_error,D*eps);
 
-    Logger->LogInfoV(2,"iTEBDStateImp::Orthogonalize complete R/L orthonormaility error=%.1e / %.1e",right_error,left_error);
+    double Oerror=GetOrthonormalityErrors();
+    double eps=D*1e-12;
+    if (Oerror>eps)
+        Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize Large orthonormaility error=%.1e > %.1e",Oerror,eps);
+
+    Logger->LogInfoV(2,"iTEBDStateImp::Orthogonalize complete R/L orthonormaility error=%.1e",Oerror);
 
     return std::make_tuple(gamma_prime,lambda_prime);
 }
