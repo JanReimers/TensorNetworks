@@ -37,17 +37,17 @@ public:
 // Find ground state.  Return <E^2>-<E>^2
 //
     virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&);
-    virtual void Apply     (const Matrix4RT& expH,SVCompressorC* comp) {Apply(expH,comp,false);}
-    virtual void ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp) {Apply(expH,comp,true);}
-    virtual void ApplyOrtho(const Matrix4RT& expH,SVCompressorC*,double eps,int maxIter);
+    virtual void   Apply     (const Matrix4RT& expH,SVCompressorC* comp) {Apply(expH,comp,false);}
+    virtual double ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp) {return Apply(expH,comp,true);}
+    virtual double ApplyOrtho(const Matrix4RT& expH,SVCompressorC*,double eps,int maxIter);
 //--------------------------------------------------------------------------------------
 //
 //  Normalization members with and without SVD compression
 //
     virtual void Canonicalize(Direction);  //Vidals L-G-L-G-L canonical form
     virtual void Normalize(Direction LR);
-    virtual ONErrors Orthogonalize (SVCompressorC*);
-    virtual ONErrors OrthogonalizeI(SVCompressorC*,double eps,int maxIter);
+    virtual double Orthogonalize (SVCompressorC*);
+    virtual double OrthogonalizeI(SVCompressorC*,double eps,int maxIter);
 
     virtual double GetExpectation (const MPO* o) const;
     virtual double GetExpectationmmnn (const Matrix4RT& Hlocal) const;
@@ -64,12 +64,12 @@ protected:
 
     int       GetModSite(int isite) const;
     double    FindiTimeGroundState(const Hamiltonian*,const MPO* H2, const IterationScheduleLine&);
-    void      Apply     (const Matrix4RT& expH,SVCompressorC*,bool orthogonalize);
+    double    Apply     (const Matrix4RT& expH,SVCompressorC*,bool orthogonalize);
 
     double    GetExpectation    (const MPO*       o     ,int center) const;
     double    GetExpectationmmnn(const Matrix4RT& Hlocal,int center) const;
 
-    virtual   ONErrors GetOrthonormalityErrors() const;
+    virtual   double GetOrthonormalityErrors() const;
 
     Matrix4CT GetTransferMatrix(Direction lr) const;
     Matrix4CT GetTransferMatrix(const dVectorT& M) const;
@@ -80,7 +80,7 @@ protected:
 
     GLType   Orthogonalize (dVectorT& gamma, const DiagonalMatrixRT& lambda);
     GLType   OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda,double eps,int maxIter);
-    ONErrors UnpackOrthonormal(const dVectorT& gammap,DiagonalMatrixRT& lambdap,SVCompressorC*);
+    double   UnpackOrthonormal(const dVectorT& gammap,DiagonalMatrixRT& lambdap,SVCompressorC*);
     MdType   GetEigenMatrix(TensorNetworks::Direction lr, const Matrix4CT& theta);
     MMType   Factor(const MatrixCT m);
 

@@ -68,17 +68,17 @@ void iTEBDStateImp::Normalize(Direction lr)
 
 }
 
-ONErrors iTEBDStateImp::GetOrthonormalityErrors() const
+double iTEBDStateImp::GetOrthonormalityErrors() const
 {
-    dVectorT gamma(itsd*itsd);
+    dVectorT gamma=ContractAlB();
     int D=lambdaA().size();
     MatrixCT I(D,D); //Right ei
     Unit(I);
 
-    int nab=0;
-    for (int na=0; na<itsd; na++)
-        for (int nb=0; nb<itsd; nb++,nab++)
-            gamma[nab]=GammaA()[na]*lambdaA()*GammaB()[nb];
+//    int nab=0;
+//    for (int na=0; na<itsd; na++)
+//        for (int nb=0; nb<itsd; nb++,nab++)
+//            gamma[nab]=GammaA()[na]*lambdaA()*GammaB()[nb];
 
     MatrixCT Nr=GetNormMatrix(DRight,gamma*lambdaB());
     MatrixCT Nl=GetNormMatrix(DLeft ,lambdaB()*gamma);
@@ -91,11 +91,16 @@ ONErrors iTEBDStateImp::GetOrthonormalityErrors() const
     double left__norm_error=fabs(left__norm-1.0);
     double right_orth_error= FrobeniusNorm(Nr-I);
     double left__orth_error= FrobeniusNorm(Nl-I);
+    if (right_norm_error>right_orth_error && right_norm_error>1e-14)
+        Logger->LogWarnV(0,"iTEBDStateImp::GetOrthonormalityErrors large right norm error=%.1e", right_norm_error );
+    if (left__norm_error>left__orth_error && left__norm_error>1e-14)
+        Logger->LogWarnV(0,"iTEBDStateImp::GetOrthonormalityErrors large left  norm error=%.1e", left__norm_error );
 
-    return {right_norm_error,left__norm_error,right_orth_error,left__orth_error};
+
+    return Max(right_orth_error,left__orth_error);
 }
 
-ONErrors iTEBDStateImp::OrthogonalizeI(SVCompressorC* comp, double eps, int niter)
+double iTEBDStateImp::OrthogonalizeI(SVCompressorC* comp, double eps, int niter)
 {
     //
     //  Build Gamma[n] = GammaA[na]*lambdaA*GammaB[nb]
@@ -113,7 +118,7 @@ ONErrors iTEBDStateImp::OrthogonalizeI(SVCompressorC* comp, double eps, int nite
 }
 
 
-ONErrors iTEBDStateImp::Orthogonalize(SVCompressorC* comp)
+double iTEBDStateImp::Orthogonalize(SVCompressorC* comp)
 {
     //
     //  Build Gamma[n] = GammaA[na]*lambdaA*GammaB[nb]
@@ -130,7 +135,7 @@ ONErrors iTEBDStateImp::Orthogonalize(SVCompressorC* comp)
     return UnpackOrthonormal(gammap,lambdap,comp); //No compressions required.
 }
 
-ONErrors iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT& lambdap,SVCompressorC* comp)
+double iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT& lambdap,SVCompressorC* comp)
 {
     assert(comp);
     assert(gammap.size()==itsd*itsd);

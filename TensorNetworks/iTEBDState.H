@@ -7,14 +7,6 @@
 namespace TensorNetworks
 {
 
-struct ONErrors
-{
-    double RightNormError;
-    double Left_NormError;
-    double RightOrthError;
-    double Left_OrthError;
-};
-
 class iTEBDState
 {
 public:
@@ -40,17 +32,17 @@ public:
 //
 //  iTime evolution
 //
-    virtual void Apply     (const Matrix4RT& expH,SVCompressorC*)=0;
-    virtual void ApplyOrtho(const Matrix4RT& expH,SVCompressorC*)=0;
-    virtual void ApplyOrtho(const Matrix4RT& expH,SVCompressorC*,double eps,int maxIter)=0;
+    virtual void   Apply     (const Matrix4RT& expH,SVCompressorC*)=0;
+    virtual double ApplyOrtho(const Matrix4RT& expH,SVCompressorC*)=0;
+    virtual double ApplyOrtho(const Matrix4RT& expH,SVCompressorC*,double eps,int maxIter)=0;
 
 //--------------------------------------------------------------------------------------
 //
 //  Normalization, Conoization and orthogonalization.
 //
-    virtual void     Canonicalize (Direction)=0;  //Vidals L-G-L-G-L canonical form
-    virtual void     Normalize    (Direction)=0; //Use largest eigen value of transfer matrix
-    virtual ONErrors Orthogonalize(SVCompressorC*)=0;
+    virtual void   Canonicalize (Direction)=0;  //Vidals L-G-L-G-L canonical form
+    virtual void   Normalize    (Direction)=0; //Use largest eigen value of transfer matrix
+    virtual double Orthogonalize(SVCompressorC*)=0;
 //--------------------------------------------------------------------------------------
 //
 //  Contract expectation values.  Requires orthogonal state.

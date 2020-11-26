@@ -43,15 +43,6 @@ public:
         itsCompressor=itsFactory->MakeMPSCompressor(D,epsSVD);
     }
 
-    void Check(const TensorNetworks::ONErrors& err) const
-    {
-//        int D=itsState->GetD();
-        EXPECT_LT(err.RightNormError,epsOrth);
-        EXPECT_LT(err.RightOrthError,epsOrth);
-        EXPECT_LT(err.Left_NormError,epsOrth);
-        EXPECT_LT(err.Left_OrthError,epsOrth);
-    }
-
     using MPO=TensorNetworks::MPO;
 
     double CalculateE(int L, double S)
@@ -164,7 +155,7 @@ TEST_F(iTEBDTests,TestOrthogonalLeft)
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
-    Check(itsState->Orthogonalize(itsCompressor));
+    EXPECT_LT(itsState->Orthogonalize(itsCompressor),epsOrth);
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
 TEST_F(iTEBDTests,TestOrthogonalRight)
@@ -174,7 +165,7 @@ TEST_F(iTEBDTests,TestOrthogonalRight)
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DRight);
-    Check(itsState->Orthogonalize(itsCompressor));
+    EXPECT_LT(itsState->Orthogonalize(itsCompressor),epsOrth);
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
 
@@ -186,7 +177,7 @@ TEST_F(iTEBDTests,TestOrthogonalLeftReCenter1)
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
     itsState->ReCenter(2);
-    Check(itsState->Orthogonalize(itsCompressor));
+    EXPECT_LT(itsState->Orthogonalize(itsCompressor),epsOrth);
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
 TEST_F(iTEBDTests,TestOrthogonalRightReCenter1)
@@ -197,7 +188,7 @@ TEST_F(iTEBDTests,TestOrthogonalRightReCenter1)
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DRight);
     itsState->ReCenter(2);
-    Check(itsState->Orthogonalize(itsCompressor));
+    EXPECT_LT(itsState->Orthogonalize(itsCompressor),epsOrth);
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
 TEST_F(iTEBDTests,TestOrthogonalLeftReCenter2)
@@ -207,7 +198,7 @@ TEST_F(iTEBDTests,TestOrthogonalLeftReCenter2)
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
-    Check(itsState->Orthogonalize(itsCompressor));
+    EXPECT_LT(itsState->Orthogonalize(itsCompressor),epsOrth);
     itsState->ReCenter(2);
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
@@ -218,7 +209,7 @@ TEST_F(iTEBDTests,TestOrthogonalRightReCenter2)
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DRight);
-    Check(itsState->Orthogonalize(itsCompressor));
+    EXPECT_LT(itsState->Orthogonalize(itsCompressor),epsOrth);
     itsState->ReCenter(2);
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
 }
@@ -238,12 +229,12 @@ TEST_F(iTEBDTests,TestOrthogonalRangeSD)
             itsState->InitializeWith(TensorNetworks::Random);
             itsState->Canonicalize(TensorNetworks::DLeft);
 
-            Check(itsState->Orthogonalize(itsCompressor));
+            EXPECT_LT(itsState->Orthogonalize(itsCompressor),epsOrth);
             EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
 
             itsState->ReCenter(2);
 
-            Check(itsState->Orthogonalize(itsCompressor));
+            EXPECT_LT(itsState->Orthogonalize(itsCompressor),epsOrth);
             EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
 
              itsState->ReCenter(1);
@@ -615,26 +606,19 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     eps.itsMPSCompressEpsilon=0;
 
     TensorNetworks::IterationSchedule is;
-    eps.itsDelatEnergy1Epsilon=1e-3;
+    eps.itsDelatEnergy1Epsilon=1e-6;
     is.Insert({20,Dstart,0.5,eps});
-    eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({50,8,0.2,eps});
-    eps.itsDelatEnergy1Epsilon=3e-6;
+    is.Insert({50,8,2,0.2,eps});
     is.Insert({50,8,0.1,eps});
-    eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({50,8,0.1,eps});
-    eps.itsDelatEnergy1Epsilon=1e-6;
     is.Insert({50,8,0.05,eps});
-    eps.itsDelatEnergy1Epsilon=1e-6;
     is.Insert({50,8,0.02,eps});
-    eps.itsDelatEnergy1Epsilon=5e-7;
-    is.Insert({50,8,0.01,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
-    is.Insert({50,8,0.005,eps});
-    eps.itsDelatEnergy1Epsilon=1e-7;
-    is.Insert({50,Dmax,8,0.002,eps});
-    eps.itsDelatEnergy1Epsilon=1e-7;
-    is.Insert({50,Dmax,0.001,eps});
+    is.Insert({500,8,0.01,eps});
+    eps.itsDelatEnergy1Epsilon=1e-8;
+    is.Insert({500,8,0.005,eps});
+    is.Insert({500,Dmax,8,0.002,eps});
+    is.Insert({500,Dmax,0.001,eps});
+    is.Insert({500,Dmax,0.0  ,eps});
 //    eps.itsDelatEnergy1Epsilon=1e-6;
 //    is.Insert({50,Dmax,0.05,eps});
 //    eps.itsDelatEnergy1Epsilon=1e-7;
@@ -646,9 +630,10 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     itsState->Report(cout);
     double E=itsState->GetExpectation(itsH);
 #ifdef DEBUG
-    EXPECT_LT(E,-0.4426);
+//    EXPECT_LT(E,-0.44308); //From mp-toolkit
+    EXPECT_LT(E,-0.44275);
 #else
-//    EXPECT_LT(E,-0.44302); //From mp-toolkit
+//    EXPECT_LT(E,-0.4431447); //From mp-toolkit
     EXPECT_LT(E,-0.4428); //We only seem to get this far
 #endif
     EXPECT_GT(E,-0.4431471805599453094172);
