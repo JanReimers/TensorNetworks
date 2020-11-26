@@ -264,6 +264,127 @@ TEST_F(ImaginaryTimeTests,MPOCompressFourthOrderTrotter)
 
 }
 
+TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotterL2)
+{
+    int D=4,L=2;
+    Setup(L,0.5,D);
+
+    itsMPS->Normalize(TensorNetworks::DLeft);
+    itsMPS->Normalize(TensorNetworks::DRight);
+
+    TensorNetworks::Epsilons eps(1e-12);
+    eps.itsMPOCompressEpsilon=1e-5;
+    eps.itsDelatNormEpsilon=1e-5;
+    eps.itsMPSCompressEpsilon=0;
+
+    TensorNetworks::IterationSchedule is;
+    eps.itsDelatEnergy1Epsilon=1e-3;
+    is.Insert({50,D,0,0.5,FirstOrder,eps});
+    eps.itsDelatEnergy1Epsilon=1e-5;
+    is.Insert({500,D,0,0.2,FirstOrder,eps});
+    eps.itsDelatEnergy1Epsilon=1e-5;
+    is.Insert({500,D,1,0.1,FirstOrder,eps});
+    eps.itsDelatEnergy1Epsilon=1e-6;
+    is.Insert({500,D,2,0.05,FirstOrder,eps});
+    eps.itsDelatEnergy1Epsilon=1e-7;
+    is.Insert({500,D,3,0.02,FirstOrder,eps});
+    eps.itsDelatEnergy1Epsilon=1e-8;
+    is.Insert({500,D,4,0.01,FirstOrder,eps});
+    //eps.itsDelatEnergy1Epsilon=3e-9;
+    //is.Insert({500,D,5,0.005,FirstOrder,eps});
+    //eps.itsDelatEnergy1Epsilon=1e-9;
+    //is.Insert({500,D,6,0.002,FirstOrder,eps});
+//    cout << is;
+
+    itsMPS->FindiTimeGroundState(itsH,is);
+    double E1=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E1/(L-1),-0.75,1e-6);
+
+    TensorNetworks::MPO* H2=itsH->CreateH2Operator();
+    double E2=itsMPS->GetExpectation(H2);
+    EXPECT_NEAR(E2,E1*E1,1e-6);
+}
+
+TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotterL2)
+{
+    int D=2,L=2;
+    Setup(L,0.5,D);
+    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
+    Psi1->InitializeWith(TensorNetworks::Random);
+    Psi1->Normalize(TensorNetworks::DRight);
+
+    TensorNetworks::Epsilons eps(1e-12);
+    eps.itsMPOCompressEpsilon=1e-14;
+    eps.itsMPSCompressEpsilon=0.0; //Just Dmax for compression
+    eps.itsDelatNormEpsilon=1e-5;
+
+    TensorNetworks::IterationSchedule is;
+    eps.itsDelatEnergy1Epsilon=1e-5;
+    eps.itsMPSCompressEpsilon=0.0; //Just Dmax for compression
+    is.Insert({50 ,D,0,0.5,SecondOrder,eps});
+    eps.itsDelatEnergy1Epsilon=1e-8;
+    is.Insert({500,D,3,0.1,SecondOrder,eps});
+    eps.itsDelatEnergy1Epsilon=1e-10;
+    is.Insert({500,D,3,0.05,SecondOrder,eps});
+    is.Insert({500,D,3,0.02,SecondOrder,eps});
+    is.Insert({500,D,3,0.01,SecondOrder,eps});
+    is.Insert({500,D,5,0.005,SecondOrder,eps});
+    is.Insert({500,D,5,0.002,SecondOrder,eps});
+    is.Insert({500,D,5,0.001,SecondOrder,eps});
+
+ //   cout << is;
+
+    Psi1->FindiTimeGroundState(itsH,is);
+
+    double E1=Psi1->GetExpectation(itsH);
+    EXPECT_NEAR(E1/(L-1),-0.75,1e-9);
+
+    TensorNetworks::MPO* H2=itsH->CreateH2Operator();
+    double E2=Psi1->GetExpectation(H2);
+    EXPECT_NEAR(E2,E1*E1,1e-9);
+    delete Psi1;
+}
+TEST_F(ImaginaryTimeTests,TestITimeFourthOrderTrotterL2)
+{
+    int D=2,L=2;
+    Setup(L,0.5,D);
+    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
+    Psi1->InitializeWith(TensorNetworks::Random);
+    Psi1->Normalize(TensorNetworks::DRight);
+
+    TensorNetworks::Epsilons eps(1e-12);
+    eps.itsMPOCompressEpsilon=1e-8;
+    eps.itsMPSCompressEpsilon=0.0;
+    eps.itsDelatNormEpsilon=1e-5;
+
+    TensorNetworks::IterationSchedule is;
+    eps.itsDelatEnergy1Epsilon=1e-5;
+    is.Insert({50,D,0,0.5,FourthOrder,eps});
+    eps.itsDelatEnergy1Epsilon=1e-6;
+    is.Insert({500,D,1,0.2,FourthOrder,eps});
+    eps.itsDelatEnergy1Epsilon=1e-9;
+    is.Insert({500,D,3,0.1,FourthOrder,eps});
+    eps.itsDelatEnergy1Epsilon=1e-11;
+    is.Insert({500,D,5,0.05,FourthOrder,eps});
+//    is.Insert({500,D,5,0.02,FourthOrder,eps});
+    is.Insert({500,D,5,0.01,FourthOrder,eps});
+//    is.Insert({500,D,5,0.005,FourthOrder,eps});
+//    is.Insert({500,D,5,0.002,FourthOrder,eps});
+//    is.Insert({500,D,5,0.001,FourthOrder,eps});
+
+//    cout << is;
+
+    Psi1->FindiTimeGroundState(itsH,is);
+
+    double E1=Psi1->GetExpectation(itsH);
+    EXPECT_NEAR(E1/(L-1),-0.75,1e-10);
+    TensorNetworks::MPO* H2=itsH->CreateH2Operator();
+    double E2=Psi1->GetExpectation(H2);
+    EXPECT_NEAR(E2,E1*E1,1e-10);
+    delete Psi1;
+}
+
+
 TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotter)
 {
     int D=4,L=9;
