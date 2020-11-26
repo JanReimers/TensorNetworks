@@ -20,6 +20,7 @@ class MPOImp : public virtual MPO
         enum LoadWith {Identity,LoadLater};
         MPOImp(int L, double S,LoadWith);
         virtual ~MPOImp();
+        virtual void ConvertToiMPO(int UnitCell); //Strip away edge sites with w=1.
 
         virtual int   GetL() const {return itsL;}
         virtual SiteOperator* GetSiteOperator(int isite)

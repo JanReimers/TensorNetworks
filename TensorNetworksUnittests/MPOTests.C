@@ -345,6 +345,46 @@ TEST_F(MPOTests,TestMPOCompressForE2)
     delete H2;
 }
 
+TEST_F(MPOTests,TestL2iMPOTrotter1)
+{
+    int L=2,D=2;
+    double S=0.5,dt=0.1;
+    Setup(L,S,D);
+    TensorNetworks::MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder);
+    for (int is=1;is<=L;is++)
+    {
+        TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
+        EXPECT_EQ(Dw.Dw1,4);
+        EXPECT_EQ(Dw.Dw2,4);
+    }
+}
+TEST_F(MPOTests,TestL2iMPOTrotter2)
+{
+    int L=2,D=2;
+    double S=0.5,dt=0.1;
+    Setup(L,S,D);
+    TensorNetworks::MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder);
+    for (int is=1;is<=L;is++)
+    {
+        TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
+        EXPECT_EQ(Dw.Dw1,4);
+        EXPECT_EQ(Dw.Dw2,4);
+    }
+}
+TEST_F(MPOTests,TestL2iMPOTrotter4)
+{
+    int L=2,D=2;
+    double S=0.5,dt=0.1;
+    Setup(L,S,D);
+    TensorNetworks::MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder);
+    for (int is=1;is<=L;is++)
+    {
+        TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
+        EXPECT_EQ(Dw.Dw1,16);
+        EXPECT_EQ(Dw.Dw2,16);
+    }
+}
+
 #ifndef DEBUG
 
 TEST_F(MPOTests,TestTimingE2_S5D4)

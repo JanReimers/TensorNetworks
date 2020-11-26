@@ -27,6 +27,8 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     -Apparently running 100 steps with dt=0 will also orthogonalize a state. Lets confirm.
     -Still getting noise about norm errors in Utests.
 
+-Refactor: MPO_SpatialTrotter takes Hlocal, should work from H or expH.  Right it duplicates code
+    for calculating expH.
 -Logging: only LogInfoV does indenting
 -Save wave functions to disk.
 -We need to be able to add (rather than combine) MPOs to do:

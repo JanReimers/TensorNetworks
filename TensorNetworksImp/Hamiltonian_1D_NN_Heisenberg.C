@@ -250,6 +250,72 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TrotterOrder order)
     return W;
 }
 
+MPO* Hamiltonian_1D_NN_Heisenberg::CreateiMPO(double dt, TrotterOrder order) const
+{
+    double epsMPO=1e-14;
+    MPO* W(nullptr);
+    Matrix4RT H12=BuildLocalMatrix(); //Full H matrix for two sites 1&2
+    switch (order)
+    {
+        case None :
+        {
+            assert(false);
+            break;
+        }
+        case FirstOrder :
+        {
+            int L=itsL+2;
+            W=new MPOImp(L,itsS,MPOImp::Identity);
+            MPO_SpatialTrotter Wodd (dt,Odd ,L,itsS,H12);
+            MPO_SpatialTrotter Weven(dt,Even,L,itsS,H12);
+            W->Combine(&Wodd);
+            W->Combine(&Weven);
+            W->Compress(0,epsMPO);
+            break;
+        }
+        case SecondOrder :
+        {
+            int L=itsL+2;
+            MPO_SpatialTrotter Weven(dt/2.0,Even,L,itsS,H12);
+            MPO_SpatialTrotter Wodd (dt    ,Odd ,L,itsS,H12);
+            W=new MPOImp(L,itsS,MPOImp::Identity);
+            W->Combine(&Weven);
+            W->Combine(&Wodd);
+            W->Combine(&Weven);
+            W->Compress(0,epsMPO);
+            break;
+        }
+        case FourthOrder :
+        {
+            int L=itsL+4;
+            W=new MPOImp(L,itsS,MPOImp::Identity);
+            //
+            //  At this order we must compress as we go or we risk consuming all memory
+            //
+            VectorRT ts(5);
+            ts(1)=dt/(4-pow(4.0,1.0/3.0));
+            ts(2)=ts(1);
+            ts(3)=dt-2*ts(1)-2*ts(2);
+            ts(4)=ts(2);
+            ts(5)=ts(1);
+            for (int it=1;it<=5;it++)
+            {
+                MPOImp U(L,itsS,MPOImp::Identity);
+                MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,L,itsS,H12);
+                MPO_SpatialTrotter Weven(ts(it)    ,Even,L,itsS,H12);
+                U.Combine(&Wodd);
+                U.Combine(&Weven);
+                U.Combine(&Wodd);
+                W->Combine(&U);
+                W->Compress(0,epsMPO);
+            }
+            break;
+        }
+    } //End switch
+    W->ConvertToiMPO(itsL);
+    return W;
+}
+
 FullState* Hamiltonian_1D_NN_Heisenberg::CreateFullState () const
  {
     return new FullStateImp<double>(itsL,itsS);

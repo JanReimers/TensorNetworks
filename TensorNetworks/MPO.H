@@ -16,6 +16,7 @@ class MPO
     public:
         MPO() {};
         virtual ~MPO() {};
+        virtual void ConvertToiMPO(int UnitCell)=0; //Strip away edge sites with w=1.
 
         virtual int   GetL() const=0;
         virtual int   GetMaxDw() const;

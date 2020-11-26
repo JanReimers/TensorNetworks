@@ -12,10 +12,10 @@ int main(int argc, char **argv)
 //    testing::GTEST_FLAG(filter) = "LinearAlgebraTests.*";
 //    testing::GTEST_FLAG(filter) = "MPSTests*";
 //    testing::GTEST_FLAG(filter) = "MPSNormTests*";
-//    testing::GTEST_FLAG(filter) = "MPOTests.*";
+//    testing::GTEST_FLAG(filter) = "MPOTests.TestL2iMPOTrotter*";
 //    testing::GTEST_FLAG(filter) = "VariationalGroundStateTests.TestSweepL2S1D2";
 //    testing::GTEST_FLAG(filter) = "ImaginaryTimeTests.TestITimeFourthOrderTrotterL2";
-    testing::GTEST_FLAG(filter) = "iTEBDTests.FindiTimeGSD4S12";
+//    testing::GTEST_FLAG(filter) = "iTEBDTests.FindiTimeGSD4S12";
 //    testing::GTEST_FLAG(filter) = "ITensorTests*";
 //    testing::GTEST_FLAG(filter) = "BenchmarkTests.*";
 

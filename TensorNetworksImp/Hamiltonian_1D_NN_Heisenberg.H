@@ -31,6 +31,7 @@ class Hamiltonian_1D_NN_Heisenberg
         virtual iTEBDState* CreateiTEBDState  (int D,double normEps,double epsSV) const;
         virtual MPO*        CreateUnitOperator() const;
         virtual MPO*        CreateOperator    (double dt, TrotterOrder) const;
+        virtual MPO*        CreateiMPO        (double dt, TrotterOrder) const;
         virtual Matrix4RT   BuildLocalMatrix  () const;
         virtual FullState*  CreateFullState   () const;
 
