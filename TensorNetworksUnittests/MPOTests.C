@@ -277,12 +277,51 @@ TEST_F(MPOTests,TestMPOCompressForH2)
 
 TEST_F(MPOTests,TestHamiltonianCreateH2)
 {
-    int L=10,D=8;
+    int L=10;
+    Setup(L,0.5,1);
+    TensorNetworks::MPO* H2=itsH->CreateH2Operator();
+    EXPECT_EQ(H2->GetMaxDw(),9);
+    delete H2;
+}
+
+TEST_F(MPOTests,TestHamiltonianCompressL2)
+{
+    int L=2;
+    Setup(L,0.5,1);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::DRight);
+    double E1=itsMPS->GetExpectation(itsH);
+    itsH->Compress(0,1e-13);
+    double E2=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E1,E2,1e-13);
+    EXPECT_EQ(itsH->GetMaxDw(),3);
+}
+
+TEST_F(MPOTests,TestH2CompressL2)
+{
+    int L=2,D=8;
     Setup(L,0.5,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
+    TensorNetworks::MPO* H2=itsH->CreateUnitOperator();
+    H2->Combine(itsH);
+    H2->Combine(itsH);
+    double E21=itsMPS->GetExpectation(H2);
+    EXPECT_EQ(H2->GetMaxDw(),25);
+    H2->Compress(0,1e-13);
+    double E22=itsMPS->GetExpectation(H2);
+    EXPECT_NEAR(E21,E22,1e-13);
+    EXPECT_EQ(H2->GetMaxDw(),4);
+}
+
+
+TEST_F(MPOTests,TestHamiltonianCreateH2L2)
+{
+    int L=2;
+    Setup(L,0.5,1);
     TensorNetworks::MPO* H2=itsH->CreateH2Operator();
-    EXPECT_EQ(H2->GetMaxDw(),9);
+    EXPECT_EQ(H2->GetMaxDw(),4);
+//    EXPECT_EQ(H2->GetMaxDw(),9); was expecting 9 but SVD for L=2 only gives Dw=4 = d*d
     delete H2;
 }
 
