@@ -54,6 +54,30 @@ TEST_F(VariationalGroundStateTests,TestIdentityOperator)
     delete IO;
 }
 
+TEST_F(VariationalGroundStateTests,TestSweepL2S1D2)
+{
+    int L=2,D=2,maxIter=100;
+    double S=0.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+
+    TensorNetworks::Epsilons eps(1e-12);
+    eps.itsDelatEnergy1Epsilon=1e-9;
+    TensorNetworks::IterationSchedule is;
+    is.Insert({maxIter,D,eps});
+
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+
+    double E1=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E1/(L-1),-0.75,1e-7);
+    EXPECT_LT(nSweep,maxIter);
+
+    TensorNetworks::MPO* H2=itsH->CreateH2Operator();
+    double E2=itsMPS->GetExpectation(H2);
+    EXPECT_EQ(H2->GetMaxDw(),4);
+    EXPECT_NEAR(E2,E1*E1,1e-14);
+}
+
 
 TEST_F(VariationalGroundStateTests,TestSweepL9S1D2)
 {
