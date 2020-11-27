@@ -69,26 +69,38 @@ MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const MPO* o) const
     assert(o->GetL()==2);
     const SiteOperator* soA=o->GetSiteOperator(1);
     const SiteOperator* soB=o->GetSiteOperator(2);
-    int DwA2=soA->GetDw12().Dw2;
-#ifdef DEBUG
-    int DwA1=soA->GetDw12().Dw1;
-    int DwB1=soB->GetDw12().Dw1;
-    int DwB2=soB->GetDw12().Dw2;
-#endif
-    assert(DwA1==1);
-    assert(DwB2==1);
-    assert(DwA2==DwB1);
+    assert(soA->GetDw12().Dw2==soB->GetDw12().Dw1);
+    assert(soA->GetDw12().Dw1==soB->GetDw12().Dw2);
+    int Dw2=soA->GetDw12().Dw2;
+    int Dw1=soA->GetDw12().Dw1; //Same as Dw3
     //
     //  Create empty theta tensor
     //
+    int DDw=D*Dw1;
     dVectorT  Thetap(itsd*itsd);
     for (int n=0;n<itsd*itsd;n++)
     {
-        Thetap[n].SetLimits(D,D);
+        Thetap[n].SetLimits(DDw,DDw);
         Fill(Thetap[n],dcmplx(0.0));
     }
     //
-    //  Contract
+    //  Contract i1 -- GammaA -- LambdaA -- GammaB -- i3
+    //                    |na                  |nb
+    //                    |                    |
+    //         w1 --------o--------w2----------o----- w3
+    //                    |                    |
+    //                    |                    |
+    //
+    //  We really need 3 versions:
+    //      1) LambdaB -- GammaA -- LambdaA -- GammaB --
+    //      2)         -- GammaA -- LambdaA -- GammaB -- LambdaB
+    //      3) LambdaB -- GammaA -- LambdaA -- GammaB -- LambdaB
+    //
+    //  Here we choose the contract the core part of the diagram and add on the lambdaB's
+    //  later, as needed.  When Dw===w1==w3==1 (i.e. open legs at the edges of the operator) then this is
+    //  easy.  But when Dw > 1 then this become non-trivial because the indices get combined (i1,w1) (i3,w3).
+    //  One solution is to simply make all three versions listed above in this routine.  The other is to extend
+    //  lambdaB with Dw copies of itself.
     //
     for (int mb=0; mb<itsd; mb++)
     for (int ma=0; ma<itsd; ma++)
@@ -100,16 +112,22 @@ MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const MPO* o) const
         {
             const MatrixRT& WAmn=soA->GetW(ma,na);
             const MatrixRT& WBmn=soB->GetW(mb,nb);
-            assert(WAmn.GetNumRows()==1);
-            assert(WAmn.GetNumCols()==DwA2);
-            assert(WBmn.GetNumRows()==DwA2);
-            assert(WBmn.GetNumCols()==1);
-            double Omn(0);
-            for (int w2=1; w2<=DwA2; w2++)
-                Omn+=WAmn(1,w2)*WBmn(w2,1);
+            assert(WAmn.GetNumCols()==Dw2);
+            assert(WBmn.GetNumRows()==Dw2);
+            Matrix4CT thetaw(D,Dw1,D,Dw1);
+            for (int w3=1;w3<=Dw1;w3++)
+            for (int w1=1;w1<=Dw1;w1++)
+            {
+                double Omn(0);
+                for (int w2=1; w2<=Dw2; w2++)
+                    Omn+=WAmn(w1,w2)*WBmn(w2,w3);
 
-            Thetap[nab]+= theta13*Omn;
-        }
+                for (int i1=1;i1<=D;i1++)
+                for (int i3=1;i3<=D;i3++)
+                    thetaw(i1,w1,i3,w3)=theta13(i1,i3)*Omn;
+            }
+            Thetap[nab]+= thetaw.Flatten();;
+       }
     }
 
     return Thetap;

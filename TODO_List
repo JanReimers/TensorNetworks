@@ -9,6 +9,8 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
     -Can we generalize GetExpectation to MPOs with arbitrary L?
     -Calculate fidelity
 
+    -Refactor:
+        Code duplication in SVCompressorImp.C
     -FOr efficiency check Omn or expH for zero, before contracting it.
     Done: -Use the name CompressionError consistently.
         THis is usually called TruncationError

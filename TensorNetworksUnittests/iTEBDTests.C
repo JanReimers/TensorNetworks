@@ -356,6 +356,18 @@ TEST_F(iTEBDTests,TestApplyMPOIdentity)
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
     delete IdentityOp;
 }
+TEST_F(iTEBDTests,TestApplyiMPOIdentity)
+{
+    int UnitCell=2,D=2;
+    double S=0.5,epsSVD=0.0,dt=0.0;
+    Setup(UnitCell,S,D,epsSVD);
+    itsState->InitializeWith(TensorNetworks::Random);
+    itsState->Canonicalize(TensorNetworks::DLeft);
+    MPO* IdentityOp=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder);
+    itsState->ApplyOrtho(IdentityOp,itsCompressor);
+    EXPECT_EQ(itsState->GetNormStatus(),"GG");
+    delete IdentityOp;
+}
 
 
 TEST_F(iTEBDTests,TestApplyIdentityRangeSD)
@@ -430,6 +442,21 @@ TEST_F(iTEBDTests,TestApplyExpH)
     itsState->ApplyOrtho(IMPO,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
     delete IMPO;
+}
+
+TEST_F(iTEBDTests,TestApplyiMPOExpH)
+{
+    int UnitCell=2,D=2;
+    double S=0.5,epsSVD=0.0,dt=0.2;
+    Setup(UnitCell,S,D,epsSVD);
+    itsState->InitializeWith(TensorNetworks::Random);
+    itsState->Canonicalize(TensorNetworks::DLeft);
+    itsState->Orthogonalize(itsCompressor);
+    MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder);
+    itsState->ApplyOrtho(expH,itsCompressor);
+    itsState->Report(cout);
+    EXPECT_EQ(itsState->GetNormStatus(),"lr");
+    delete expH;
 }
 
 TEST_F(iTEBDTests,TestApplyExpH2)
@@ -705,12 +732,12 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     is.Insert({50,8,0.05,eps});
     is.Insert({50,8,0.02,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
-    is.Insert({500,8,0.01,eps});
+    is.Insert({50,8,0.01,eps});
     eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({500,8,0.005,eps});
-    is.Insert({500,Dmax,8,0.002,eps});
-    is.Insert({500,Dmax,0.001,eps});
-    is.Insert({500,Dmax,0.0  ,eps});
+    is.Insert({50,8,0.005,eps});
+    is.Insert({50,Dmax,8,0.002,eps});
+    is.Insert({50,Dmax,0.001,eps});
+    is.Insert({50,Dmax,0.0  ,eps});
 //    eps.itsDelatEnergy1Epsilon=1e-6;
 //    is.Insert({50,Dmax,0.05,eps});
 //    eps.itsDelatEnergy1Epsilon=1e-7;

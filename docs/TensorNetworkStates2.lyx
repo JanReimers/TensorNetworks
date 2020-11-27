@@ -4471,6 +4471,158 @@ Details of the orthogonalized iTEBD procedure for a system with two sites
 \end_layout
 
 \begin_layout Subsection
+Apply iMPO operator
+\end_layout
+
+\begin_layout Standard
+An MPO operator has has now external virtual legs.
+ In other words the interal dimensions 
+\begin_inset Formula $D_{w}$
+\end_inset
+
+ at the edges of the lattice is one.
+ However and iMPO has 
+\begin_inset Formula $D_{w}>1$
+\end_inset
+
+ at the edges of the iMPS unit cell, as the operator must connect to the
+ next unit cell in each direction.
+ This means that when we contract and iMPO with a iMPS we get a tensor with
+ dimension 
+\begin_inset Formula $DD_{w}$
+\end_inset
+
+ on each internal leg.
+ For example for one site
+\begin_inset Formula 
+\[
+\Theta_{\left(w_{1}i_{1}\right)\left(w_{2}i_{2}\right)}^{m_{a}}=\sum_{n_{a}}g_{w_{1}w_{2}}^{m_{a}n_{a}}A_{0i_{1}i_{2}}^{n_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Theta_{\left(w_{2}i_{2}\right)\left(w_{3}i_{3}\right)}^{m_{b}}=\sum_{n_{b}}g_{w_{2}3_{2}}^{m_{b}n_{b}}B_{0i_{2}i_{3}}^{n_{b}}
+\]
+
+\end_inset
+
+and for the two sites
+\begin_inset Formula 
+\[
+\Theta_{\left(w_{1}i_{1}\right)\left(w_{3}i_{3}\right)}^{m_{a}m_{b}}=\sum_{i_{2}=1}^{D}\sum_{w_{2}=1}^{D_{w}}\Theta_{\left(w_{1}i_{1}\right)\left(w_{2}i_{2}\right)}^{m_{a}}\Theta_{\left(w_{2}i_{2}\right)\left(w_{3}i_{3}\right)}^{m_{b}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The best strategy is to orthogonalize first and then SVD compress.
+ At the end of the orth process we have 
+\begin_inset Formula $\lambda^{\prime B}$
+\end_inset
+
+ with dimension 
+\begin_inset Formula $DD_{w}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Gamma^{\prime m}$
+\end_inset
+
+ with dimension 
+\begin_inset Formula $DD_{w}\times DD_{w}$
+\end_inset
+
+ we need a way to SVD compress these down 
+\begin_inset Formula $D$
+\end_inset
+
+ and 
+\begin_inset Formula $D\times D$
+\end_inset
+
+ respectively before doing the unpack process whihc involes one more level
+ of compression.
+\end_layout
+
+\begin_layout Subsubsection
+Direct Orthogonalization
+\end_layout
+
+\begin_layout Standard
+In direct orth algorithm we end up with 
+\begin_inset Formula 
+\[
+Y^{T}\lambda X=U\lambda^{\prime}V^{\dagger}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Gamma^{\prime m}=V^{\dagger}X^{-1}\varGamma^{m}Y^{T^{-1}}U
+\]
+
+\end_inset
+
+so if we simply compress 
+\begin_inset Formula $\left(U,\lambda^{\prime},V^{\dagger}\right)$
+\end_inset
+
+ together we will end up with a compressed 
+\begin_inset Formula $\Gamma^{\prime}$
+\end_inset
+
+ becuase 
+\begin_inset Formula $U$
+\end_inset
+
+ and 
+\begin_inset Formula $V$
+\end_inset
+
+ are now rectangular.
+\end_layout
+
+\begin_layout Subsubsection
+Iterative Orthogonalization
+\end_layout
+
+\begin_layout Standard
+Things appear not so simple in the iterative scheme since the transforms
+ are iterated many time and we don't want compress until right at the end.
+ The oggd thing is that at the end of iterations the transform matrix all
+ approach unity, 
+\begin_inset Formula $Y\approx X\approx U\approx V\approx I$
+\end_inset
+
+.
+ AS a result compressing 
+\begin_inset Formula $\Gamma^{\prime}$
+\end_inset
+
+ simply corresponds to keeping the first 
+\begin_inset Formula $D$
+\end_inset
+
+ rows and columns of 
+\begin_inset Formula $\Gamma^{\prime m}$
+\end_inset
+
+.
+ No need to group the physical indices into the mix.
+\end_layout
+
+\begin_layout Subsection
 Environment Recycling: One site Cell
 \end_layout
 

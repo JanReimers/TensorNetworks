@@ -360,16 +360,22 @@ iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMat
     //
     //  Verify orthogonaly
     //
-    MatrixCT Nr=GetNormMatrix(DRight,gamma*lambda); //=Er*I
-    MatrixCT Nl=GetNormMatrix(DLeft ,lambda*gamma); //=I*El
-    double  left_error=Max(fabs(Nr-I));
-    double right_error=Max(fabs(Nl-I));
-    double epsO=D*10*eps;
-    if (left_error>epsO)
-        Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Left  orthogonality error=%.1e > %.1e",left_error,epsO);
-    if (right_error>epsO)
-        Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Right orthogonality error=%.1e > %.1e",right_error,epsO);
-    Logger->LogInfoV(4,"iTEBDStateImp::OrthogonalizeI End %4d iterations, eps=%.1e Right/Left orthogonality error2=%.1e / %.1e",niter,eps,right_error,left_error);
+    double Oerror=GetOrthonormalityErrors();
+    double epsO=D*eps;
+    if (Oerror>epsO)
+        Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Large orthonormaility error=%.1e > %.1e",Oerror,epsO);
+
+    Logger->LogInfoV(2,"iTEBDStateImp::OrthogonalizeI complete R/L orthonormaility error=%.1e",Oerror);
+//    MatrixCT Nr=GetNormMatrix(DRight,gamma*lambda); //=Er*I
+//    MatrixCT Nl=GetNormMatrix(DLeft ,lambda*gamma); //=I*El
+//    double  left_error=Max(fabs(Nr-I));
+//    double right_error=Max(fabs(Nl-I));
+//    double epsO=D*10*eps;
+//    if (left_error>epsO)
+//        Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Left  orthogonality error=%.1e > %.1e",left_error,epsO);
+//    if (right_error>epsO)
+//        Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Right orthogonality error=%.1e > %.1e",right_error,epsO);
+//    Logger->LogInfoV(4,"iTEBDStateImp::OrthogonalizeI End %4d iterations, eps=%.1e Right/Left orthogonality error2=%.1e / %.1e",niter,eps,right_error,left_error);
 
     return std::make_tuple(gamma,lambda);
 }

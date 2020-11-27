@@ -136,19 +136,44 @@ double iTEBDStateImp::Apply(const Matrix4RT& expH,SVCompressorC* comp,bool ortho
     }
     return orthError;
 }
+
+DiagonalMatrixRT Extend(const DiagonalMatrixRT& lambda,const MPO* o)
+{
+    // Extract Dw from the MPO
+    assert(o->GetL()==2);
+    const SiteOperator* soA=o->GetSiteOperator(1);
+    const SiteOperator* soB=o->GetSiteOperator(2);
+    assert(soA->GetDw12().Dw2==soB->GetDw12().Dw1);
+    assert(soA->GetDw12().Dw1==soB->GetDw12().Dw2);
+    int Dw=soA->GetDw12().Dw1; //Same as Dw3
+    //
+    //  Now load Dw copies of lb into the extended lambdaB
+    //
+    int D=lambda.GetDiagonal().size();
+    DiagonalMatrixRT extended_lambda(D*Dw);
+    int iw=1;
+    for (int w=1;w<=Dw;w++)
+        for (int i=1;i<=D;i++,iw++)
+            extended_lambda(iw)=lambda(i,i);
+
+    return extended_lambda;
+}
+
 double iTEBDStateImp::Apply(const MPO* expH,SVCompressorC* comp,bool orthogonalize)
 {
     assert(comp);
     dVectorT theta=ContractTheta(expH);
-    DiagonalMatrixRT lb=lambdaB();
     double orthError=0.0;
     if (orthogonalize)
     {
-        auto [gammap,lambdap]=Orthogonalize(theta,lb);
+        DiagonalMatrixRT lb=Extend(lambdaB(),expH);
+        auto [gammap,lambdap]=OrthogonalizeI(theta,lb,1e-13,100);
+        comp->Compress(gammap,lambdap); //Reduce form DDw to D.
         orthError=UnpackOrthonormal(gammap,lambdap,comp);
     }
     else
     {
+        DiagonalMatrixRT lb=lambdaB();
         orthError=UnpackOrthonormal(theta,lb,comp);
     }
     return orthError;

@@ -2,6 +2,7 @@
 #define SVCOMPRESSOR_H
 
 #include "TensorNetworks/Namespace.H"
+#include <vector>
 
 namespace TensorNetworks
 {
@@ -10,6 +11,7 @@ template <class T> class SVCompressor
 {
     public:
         typedef Matrix<T> MatrixT;
+        typedef std::vector<MatrixT> dVectorT;
 
         SVCompressor() {};
         virtual ~SVCompressor() {};
@@ -18,6 +20,7 @@ template <class T> class SVCompressor
         virtual bool Donly  () const=0;
         // Returns compression error of discarded vector space. =sqrt(Sum(s^2)) for discarded Svs
         virtual double Compress(MatrixT& U, DiagonalMatrixRT& s, MatrixT& Vdagger) const=0;
+        virtual double Compress(dVectorT& gamma, DiagonalMatrixRT& lambda) const=0;
 };
 
 
