@@ -70,13 +70,17 @@ void iTEBDStateImp::Normalize(Direction lr)
 
 double iTEBDStateImp::GetOrthonormalityErrors() const
 {
-    dVectorT gamma=ContractAlB();
-    int D=lambdaA().size();
+    return GetOrthonormalityErrors(ContractAlB(),lambdaB());
+}
+
+double iTEBDStateImp::GetOrthonormalityErrors(const dVectorT& gamma, const DiagonalMatrixRT& lambda)
+{
+    int D=lambda.size();
     MatrixCT I(D,D); //Right ei
     Unit(I);
 
-    MatrixCT Nr=GetNormMatrix(DRight,gamma*lambdaB());
-    MatrixCT Nl=GetNormMatrix(DLeft ,lambdaB()*gamma);
+    MatrixCT Nr=GetNormMatrix(DRight,gamma*lambda);
+    MatrixCT Nl=GetNormMatrix(DLeft ,lambda*gamma);
     dcmplx right_norm=Sum(Nr.GetDiagonal())/static_cast<double>(D);
     dcmplx left__norm=Sum(Nl.GetDiagonal())/static_cast<double>(D);
     Nr/=right_norm; //Get diagonals as close 1.0 as we can
@@ -95,6 +99,7 @@ double iTEBDStateImp::GetOrthonormalityErrors() const
     return Max(right_orth_error,left__orth_error);
 }
 
+
 double iTEBDStateImp::OrthogonalizeI(SVCompressorC* comp, double eps, int niter)
 {
     //
@@ -104,12 +109,13 @@ double iTEBDStateImp::OrthogonalizeI(SVCompressorC* comp, double eps, int niter)
     //
     //  Run the one site orthogonalization algorithm.
     //
-    DiagonalMatrixRT lb=lambdaB();
-    auto [gammap,lambdap]=OrthogonalizeI(gamma,lb,eps,niter);
+    DiagonalMatrixRT lambda=lambdaB();
+    OrthogonalizeI(gamma,lambda,eps,niter);
     //
     //  Unpack gammap into GammaA*lambdaA*GammaB, and lambdap into lambdaB.
     //
-    return UnpackOrthonormal(gammap,lambdap,comp); //No compressions required.
+    s1.bondB->SetSingularValues(lambda,0.0);
+    return UnpackOrthonormal(gamma,comp); //No compressions required.
 }
 
 
@@ -122,15 +128,16 @@ double iTEBDStateImp::Orthogonalize(SVCompressorC* comp)
     //
     //  Run the one site orthogonalization algorithm.
     //
-    DiagonalMatrixRT lb=lambdaB();
-    auto [gammap,lambdap]=Orthogonalize(gamma,lb);
+    DiagonalMatrixRT lambda=lambdaB();
+    Orthogonalize(gamma,lambda);
     //
     //  Unpack gammap into GammaA*lambdaA*GammaB, and lambdap into lambdaB.
     //
-    return UnpackOrthonormal(gammap,lambdap,comp); //No compressions required.
+    s1.bondB->SetSingularValues(lambda,0.0);
+    return UnpackOrthonormal(gamma,comp); //No compressions required.
 }
 
-double iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT& lambdap,SVCompressorC* comp)
+double iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, SVCompressorC* comp)
 {
     assert(comp);
     assert(gammap.size()==itsd*itsd);
@@ -139,7 +146,7 @@ double iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT
     //
     //  Set lambdaB=lambdap (=lambda prime)
     //
-    s1.bondB->SetSingularValues(lambdap,0.0); //Don't use lambdap any more in case it is not normalized
+    //s1.bondB->SetSingularValues(lambdap,0.0); //Don't use lambdap any more in case it is not normalized
     //
     //  Create lambdaB*gammap*lambdaB and re-shape for SVD
     //
@@ -185,9 +192,8 @@ double iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, DiagonalMatrixRT
     return GetOrthonormalityErrors();
 }
 
-iTEBDStateImp::MdType iTEBDStateImp::GetEigenMatrix(TensorNetworks::Direction lr, const Matrix4CT& theta)
+iTEBDStateImp::MdType iTEBDStateImp::GetEigenMatrix(TensorNetworks::Direction lr, int D, const Matrix4CT& theta)
 {
-    int D=s1.siteA->GetD1();
     EigenSolver<dcmplx>* solver=0;
     if (D==1)
         solver=new LapackEigenSolver<dcmplx>;
@@ -269,7 +275,7 @@ iTEBDStateImp::MMType iTEBDStateImp::Factor(const MatrixCT m)
 // Iterative version Ho N. Phien, Ian P. McCulloch, and Guifré Vidal, "Fast convergence of imaginary
 // time evolution tensor network algorithms by recycling the environment", Physical Review B 91, 11 (2015).
 //
-iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda,double eps,int maxIter)
+void iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda,double eps,int maxIter)
 {
     int d=gamma.size();
     assert(d>0);
@@ -295,7 +301,7 @@ iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMat
         if (minVl<epsV)
             Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Singular Vl=%.1e < %.1e, Niter=%4d, bailing out",minVl,epsV,niter);
         if (minVr<epsV|| minVl<epsV)
-            return std::make_tuple(gamma,lambda); //Bail if V is singular. THis can happen when increasing D.
+            return; //Bail if V is singular. THis can happen when increasing D.
 //
 //  Try to normalize
 //
@@ -358,32 +364,20 @@ iTEBDStateImp::GLType iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMat
             gamma[n]/=sqrt(er);
 
     //
-    //  Verify orthogonaly
+    //  Verify orthogonaly  .. we haven't assigned anything yet
     //
-    double Oerror=GetOrthonormalityErrors();
+    double Oerror=GetOrthonormalityErrors(gamma,lambda);
     double epsO=D*eps;
     if (Oerror>epsO)
         Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Large orthonormaility error=%.1e > %.1e",Oerror,epsO);
 
     Logger->LogInfoV(2,"iTEBDStateImp::OrthogonalizeI complete R/L orthonormaility error=%.1e",Oerror);
-//    MatrixCT Nr=GetNormMatrix(DRight,gamma*lambda); //=Er*I
-//    MatrixCT Nl=GetNormMatrix(DLeft ,lambda*gamma); //=I*El
-//    double  left_error=Max(fabs(Nr-I));
-//    double right_error=Max(fabs(Nl-I));
-//    double epsO=D*10*eps;
-//    if (left_error>epsO)
-//        Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Left  orthogonality error=%.1e > %.1e",left_error,epsO);
-//    if (right_error>epsO)
-//        Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Right orthogonality error=%.1e > %.1e",right_error,epsO);
-//    Logger->LogInfoV(4,"iTEBDStateImp::OrthogonalizeI End %4d iterations, eps=%.1e Right/Left orthogonality error2=%.1e / %.1e",niter,eps,right_error,left_error);
-
-    return std::make_tuple(gamma,lambda);
 }
 
 //
 // Eigen vector version as per PHYSICAL REVIEW B 78, 155117 2008
 //
-iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const DiagonalMatrixRT& lambda)
+void iTEBDStateImp::Orthogonalize(dVectorT& gamma, DiagonalMatrixRT& lambda)
 {
     int d=gamma.size();
     assert(d>0);
@@ -398,8 +392,8 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
     Matrix4CT Er=GetTransferMatrix(gamma*lambda);
     Matrix4CT El=GetTransferMatrix(lambda*gamma);
 
-    auto [Vr,er]=GetEigenMatrix(DRight,Er);
-    auto [Vl,el]=GetEigenMatrix(DLeft ,El);
+    auto [Vr,er]=GetEigenMatrix(DRight,D,Er);
+    auto [Vl,el]=GetEigenMatrix(DLeft ,D,El);
     double minVr=Min(fabs(Vr.GetDiagonal()));
     double minVl=Min(fabs(Vl.GetDiagonal()));
     double epsV=1e-10;
@@ -408,7 +402,7 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
     if (minVl<epsV)
         Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize Singular Vl=%.1e > %.1e, bailing out",minVl,epsV);
     if (minVr<epsV || minVl<epsV)
-        return std::make_tuple(gamma,lambda); //Bail if V is singular. THis can happen when increasing D.
+        return; //Bail if V is singular. THis can happen when increasing D.
 //
 //  Normalize
 //
@@ -417,8 +411,6 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
         Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize large eigenvalue asymmetry er-el=%.1e > %.1e, bailing out",fabs(er-el),epsA);
     Er.Flatten()/=er;
     El.Flatten()/=el;
-    s1.siteA->Rescale(sqrt(sqrt(er)));
-    s1.siteB->Rescale(sqrt(sqrt(er)));
     for (int n=0;n<d;n++)
         gamma[n]/=sqrt(er);
 //
@@ -459,26 +451,24 @@ iTEBDStateImp::GLType iTEBDStateImp::Orthogonalize(dVectorT& gamma, const Diagon
     SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
     auto [U,lambda_prime,VT]=svd_solver->SolveAll(YlX,1e-13);
     delete svd_solver;
+    lambda=lambda_prime;
     //
     //  Transform Gamma
     //
     MatrixCT VX=VT*Xinv;
     MatrixCT YU=YTinv*U;
-    dVectorT gamma_prime(d);
     for (int n=0;n<d;n++)
     {
-        gamma_prime[n]=VX*gamma[n];
-        gamma_prime[n]*=YU;
+        MatrixCT VXG=VX*gamma[n];
+        gamma[n]=VXG*YU;
     }
 
-    double Oerror=GetOrthonormalityErrors();
+    double Oerror=GetOrthonormalityErrors(gamma,lambda);
     double eps=D*1e-12;
     if (Oerror>eps)
         Logger->LogWarnV(2,"iTEBDStateImp::Orthogonalize Large orthonormaility error=%.1e > %.1e",Oerror,eps);
 
     Logger->LogInfoV(2,"iTEBDStateImp::Orthogonalize complete R/L orthonormaility error=%.1e",Oerror);
-
-    return std::make_tuple(gamma_prime,lambda_prime);
 }
 
 

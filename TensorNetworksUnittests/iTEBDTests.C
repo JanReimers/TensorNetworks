@@ -426,8 +426,12 @@ TEST_F(iTEBDTests,TestApplyExpH)
     itsState->Orthogonalize(itsCompressor);
     Matrix4RT Hlocal=itsH->BuildLocalMatrix();
     Matrix4RT IdentityOp=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
+
     itsState->ApplyOrtho(IdentityOp,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
+    itsState->ApplyOrtho(IdentityOp,itsCompressor,1e-13,100);
+    EXPECT_EQ(itsState->GetNormStatus(),"lr");
+
     MPO* IMPO=itsH->CreateOperator(dt,TensorNetworks::FirstOrder);
     itsState->ApplyOrtho(IMPO,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
@@ -444,6 +448,31 @@ TEST_F(iTEBDTests,TestApplyExpH)
     delete IMPO;
 }
 
+TEST_F(iTEBDTests,TestApplyOrthoiMPOExpH)
+{
+    int UnitCell=2,D=2;
+    double S=0.5,epsSVD=0.0,dt=0.2;
+    Setup(UnitCell,S,D,epsSVD);
+    itsState->InitializeWith(TensorNetworks::Random);
+    itsState->Canonicalize(TensorNetworks::DLeft);
+    itsState->Orthogonalize(itsCompressor);
+
+    MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder);
+    itsState->ApplyOrtho(expH,itsCompressor);
+    EXPECT_EQ(itsState->GetNormStatus(),"lr");
+    delete expH;
+
+    expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder);
+    itsState->ApplyOrtho(expH,itsCompressor);
+    EXPECT_EQ(itsState->GetNormStatus(),"lr");
+    delete expH;
+
+    expH=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder);
+    itsState->ApplyOrtho(expH,itsCompressor);
+    EXPECT_EQ(itsState->GetNormStatus(),"lr");
+    delete expH;
+}
+
 TEST_F(iTEBDTests,TestApplyiMPOExpH)
 {
     int UnitCell=2,D=2;
@@ -452,9 +481,19 @@ TEST_F(iTEBDTests,TestApplyiMPOExpH)
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
     itsState->Orthogonalize(itsCompressor);
+
     MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder);
-    itsState->ApplyOrtho(expH,itsCompressor);
-    itsState->Report(cout);
+    itsState->Apply(expH,itsCompressor);
+    EXPECT_EQ(itsState->GetNormStatus(),"lr");
+    delete expH;
+
+    expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder);
+    itsState->Apply(expH,itsCompressor);
+    EXPECT_EQ(itsState->GetNormStatus(),"lr");
+    delete expH;
+
+    expH=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder);
+    itsState->Apply(expH,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
     delete expH;
 }

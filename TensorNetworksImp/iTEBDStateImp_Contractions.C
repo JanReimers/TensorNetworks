@@ -133,7 +133,7 @@ MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const MPO* o) const
     return Thetap;
 }
 
-Matrix4CT iTEBDStateImp::GetTransferMatrix(const dVectorT& M) const
+Matrix4CT iTEBDStateImp::GetTransferMatrix(const dVectorT& M)
 {
     int d=M.size();
     assert(d>0);
@@ -154,7 +154,7 @@ Matrix4CT iTEBDStateImp::GetTransferMatrix(const dVectorT& M) const
     return E;
 }
 
-MatrixCT  iTEBDStateImp::GetNormMatrix(Direction lr,const dVectorT& M) const //Er*I or I*El
+MatrixCT  iTEBDStateImp::GetNormMatrix(Direction lr,const dVectorT& M)  //Er*I or I*El
 {
     int d=M.size();
     assert(d>0);
@@ -210,24 +210,17 @@ iTEBDStateImp::dVectorT iTEBDStateImp::ContractAlB() const
 //
 Matrix4CT iTEBDStateImp::GetTransferMatrix(Direction lr) const
 {
-    assert(s1.siteA->GetD1()==s1.siteA->GetD2());
-    assert(s1.siteA->GetD1()==s1.siteB->GetD1());
-    assert(s1.siteA->GetD1()==s1.siteB->GetD2());
-
-    dVectorT gamma=ContractAlB();
-
-    Matrix4CT E;
+    dVectorT gamma;
     switch (lr)
     {
     case DRight :
-        E=GetTransferMatrix(gamma*lambdaB());
+        gamma=ContractAlB()*lambdaB();
         break;
     case DLeft :
-        E=GetTransferMatrix(lambdaB()*gamma);
+        gamma=lambdaB()*ContractAlB();
         break;
     }
-
-    return E;
+    return GetTransferMatrix(gamma);;
 }
 
 

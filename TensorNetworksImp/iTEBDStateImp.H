@@ -19,6 +19,11 @@ namespace TensorNetworks
 class iTEBDStateImp : public virtual iTEBDState,
     private MPSImp
 {
+    using dVectorT=MPSSite::dVectorT;
+//    typedef std::tuple<dVectorT,DiagonalMatrixRT> GLType;
+    typedef std::tuple<MatrixCT,MatrixCT> MMType;
+    typedef std::tuple<MatrixCT,double  > MdType;
+
 public:
     iTEBDStateImp(int L,double S, int D,double normEps,double epsSV);
     virtual ~iTEBDStateImp();
@@ -44,51 +49,53 @@ public:
     virtual void   Apply     (const MPO* expH,SVCompressorC* comp) {       Apply(expH,comp,false);}
     virtual double ApplyOrtho(const MPO* expH,SVCompressorC* comp) {return Apply(expH,comp,true );}
     virtual double ApplyOrtho(const MPO* expH,SVCompressorC*,double eps,int maxIter);
+
+    double    Apply     (const Matrix4RT& expH,SVCompressorC*,bool orthogonalize);
+    double    Apply     (const MPO*       expH,SVCompressorC*,bool orthogonalize);
 //--------------------------------------------------------------------------------------
 //
 //  Normalization members with and without SVD compression
 //
     virtual void Canonicalize(Direction);  //Vidals L-G-L-G-L canonical form
     virtual void Normalize(Direction LR);
+
     virtual double Orthogonalize (SVCompressorC*);
     virtual double OrthogonalizeI(SVCompressorC*,double eps,int maxIter);
 
     virtual double GetExpectation (const MPO* o) const;
     virtual double GetExpectationmmnn (const Matrix4RT& Hlocal) const;
     virtual double GetExpectationmnmn (const Matrix4RT& expH) const;
+    double    GetExpectation    (const MPO*       o     ,int center) const;
+    double    GetExpectationmmnn(const Matrix4RT& Hlocal,int center) const;
 
     virtual void Report(std::ostream&) const;
     virtual std::string GetNormStatus () const {return MPSImp::GetNormStatus();};
 
 protected:
-    using dVectorT=MPSSite::dVectorT;
-    typedef std::tuple<dVectorT,DiagonalMatrixRT> GLType;
-    typedef std::tuple<MatrixCT,MatrixCT> MMType;
-    typedef std::tuple<MatrixCT,double  > MdType;
 
     int       GetModSite(int isite) const;
     double    FindiTimeGroundState(const Hamiltonian*,const MPO* H2, const IterationScheduleLine&);
-    double    Apply     (const Matrix4RT& expH,SVCompressorC*,bool orthogonalize);
-    double    Apply     (const MPO*       expH,SVCompressorC*,bool orthogonalize);
 
-    double    GetExpectation    (const MPO*       o     ,int center) const;
-    double    GetExpectationmmnn(const Matrix4RT& Hlocal,int center) const;
 
     virtual   double GetOrthonormalityErrors() const;
 
     Matrix4CT GetTransferMatrix(Direction lr) const;
-    Matrix4CT GetTransferMatrix(const dVectorT& M) const;
-    MatrixCT  GetNormMatrix(Direction lr,const dVectorT& M) const; //Er*I or I*El
-    dVectorT  ContractAlB() const;
 
+    dVectorT  ContractAlB() const;
     dVectorT  ContractTheta(const Matrix4RT& expH) const;
     dVectorT  ContractTheta(const MPO*       expH) const;
 
-    GLType   Orthogonalize (dVectorT& gamma, const DiagonalMatrixRT& lambda);
-    GLType   OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda,double eps,int maxIter);
-    double   UnpackOrthonormal(const dVectorT& gammap,DiagonalMatrixRT& lambdap,SVCompressorC*);
-    MdType   GetEigenMatrix(TensorNetworks::Direction lr, const Matrix4CT& theta);
-    MMType   Factor(const MatrixCT m);
+    double   UnpackOrthonormal(const dVectorT& gammap,SVCompressorC*);
+//
+//  All these helper function are static to ensure no dependence on iTEBD state
+//
+    static void      Orthogonalize (dVectorT& gamma, DiagonalMatrixRT& lambda);
+    static void      OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda,double eps,int maxIter);
+    static double    GetOrthonormalityErrors(const dVectorT& gamma, const DiagonalMatrixRT& lambda);
+    static MdType    GetEigenMatrix(Direction lr, int D, const Matrix4CT& theta);
+    static MMType    Factor(const MatrixCT m);
+    static Matrix4CT GetTransferMatrix(const dVectorT& M); //M=lambda*gamma or gamma*lambda
+    static MatrixCT  GetNormMatrix(Direction lr,const dVectorT& M); //Er*I or I*El
 
     struct Sites
     {

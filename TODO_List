@@ -5,12 +5,26 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
         -Use trotter 1st, 2nd and 4rth order MPO instead of expH.
         Do we run into the same problem as with <E2>?
             Yes !!!!  We need an iMPO class
-    -Lookup theory for iMPO and add to notes if needed.
+    -Done: Lookup theory for iMPO and add to notes if needed.
     -Can we generalize GetExpectation to MPOs with arbitrary L?
     -Calculate fidelity
 
     -Refactor:
         Code duplication in SVCompressorImp.C
+        Too many Apply and Orthogonalize functions.  Issues:
+            OrthogonalizeI requires maxIter and eps for convergence,
+            Orthogonalize could use epsEigen, epsV, epsSVD, epsO
+        What does FindGroundState need?
+            Apply(iMPO) for fast iterations
+            ApplyOrtho(iMPO,eps,niter) for low precision iterations
+            OrthogonalizeI() before calling GetExpectation(H)
+        What do UnitTests need?
+            All of the above, plus:
+            Apply(Matrix4CT)
+            Orthogonalize()  //Slow but nice to have around for checking things
+            GetOrthonormalityErrors()
+            GetOverlap(Psi), cross overlap
+
     -FOr efficiency check Omn or expH for zero, before contracting it.
     Done: -Use the name CompressionError consistently.
         THis is usually called TruncationError
@@ -31,6 +45,8 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
 -Refactor: MPO_SpatialTrotter takes Hlocal, should work from H or expH.  Right it duplicates code
     for calculating expH.
+-Refactor: All find ground state routines should move to abstract base class, and work through public
+    interface.
 -Logging: only LogInfoV does indenting
 -Save wave functions to disk.
 -We need to be able to add (rather than combine) MPOs to do:

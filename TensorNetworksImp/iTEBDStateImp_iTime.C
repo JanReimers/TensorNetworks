@@ -98,45 +98,6 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
     return E1;
 }
 
-double iTEBDStateImp::ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp,double eps,int maxIter)
-{
-    assert(comp);
-    dVectorT theta=ContractTheta(expH);
-    DiagonalMatrixRT lb=lambdaB();
-    auto [gammap,lambdap]=OrthogonalizeI(theta,lb,eps,maxIter);
-    return UnpackOrthonormal(gammap,lambdap,comp);
-}
-double iTEBDStateImp::ApplyOrtho(const MPO* expH,SVCompressorC* comp,double eps,int maxIter)
-{
-    assert(comp);
-    dVectorT theta=ContractTheta(expH);
-    DiagonalMatrixRT lb=lambdaB();
-    auto [gammap,lambdap]=OrthogonalizeI(theta,lb,eps,maxIter);
-    return UnpackOrthonormal(gammap,lambdap,comp);
-}
-
-//-----------------------------------------------------------------------------
-//
-//  THis follows PHYSICAL REVIEW B 78, 155117 2008 figure 14
-//
-double iTEBDStateImp::Apply(const Matrix4RT& expH,SVCompressorC* comp,bool orthogonalize)
-{
-    assert(comp);
-    dVectorT theta=ContractTheta(expH);
-    DiagonalMatrixRT lb=lambdaB();
-    double orthError=0.0;
-    if (orthogonalize)
-    {
-        auto [gammap,lambdap]=Orthogonalize(theta,lb);
-        orthError=UnpackOrthonormal(gammap,lambdap,comp);
-    }
-    else
-    {
-        orthError=UnpackOrthonormal(theta,lb,comp);
-    }
-    return orthError;
-}
-
 DiagonalMatrixRT Extend(const DiagonalMatrixRT& lambda,const MPO* o)
 {
     // Extract Dw from the MPO
@@ -159,24 +120,55 @@ DiagonalMatrixRT Extend(const DiagonalMatrixRT& lambda,const MPO* o)
     return extended_lambda;
 }
 
+
+double iTEBDStateImp::ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp,double eps,int maxIter)
+{
+    assert(comp);
+    dVectorT gamma=ContractTheta(expH);
+    DiagonalMatrixRT lambda=lambdaB();
+    OrthogonalizeI(gamma,lambda,eps,maxIter);
+    s1.bondB->SetSingularValues(lambda,0.0);
+    return UnpackOrthonormal(gamma,comp);
+}
+
+double iTEBDStateImp::ApplyOrtho(const MPO* expH,SVCompressorC* comp,double eps,int maxIter)
+{
+    assert(comp);
+    dVectorT          gamma=ContractTheta(expH);
+    DiagonalMatrixRT lambda=Extend(lambdaB(),expH);
+    OrthogonalizeI(gamma,lambda,eps,maxIter);
+    double truncationError=comp->Compress(gamma,lambda); //Reduce form DDw to D.
+    s1.bondB->SetSingularValues(lambda,truncationError); //Don't use lambdap any more in case it is not normalized
+    return UnpackOrthonormal(gamma,comp);
+}
+
+//-----------------------------------------------------------------------------
+//
+//  THis follows PHYSICAL REVIEW B 78, 155117 2008 figure 14
+//
+double iTEBDStateImp::Apply(const Matrix4RT& expH,SVCompressorC* comp,bool orthogonalize)
+{
+    assert(comp);
+    dVectorT gamma=ContractTheta(expH);
+    if (orthogonalize)
+    {
+        DiagonalMatrixRT lambda=lambdaB();
+        Orthogonalize(gamma,lambda);
+        s1.bondB->SetSingularValues(lambda,0.0);
+    }
+    return UnpackOrthonormal(gamma,comp);
+}
+
+
 double iTEBDStateImp::Apply(const MPO* expH,SVCompressorC* comp,bool orthogonalize)
 {
     assert(comp);
-    dVectorT theta=ContractTheta(expH);
-    double orthError=0.0;
-    if (orthogonalize)
-    {
-        DiagonalMatrixRT lb=Extend(lambdaB(),expH);
-        auto [gammap,lambdap]=OrthogonalizeI(theta,lb,1e-13,100);
-        comp->Compress(gammap,lambdap); //Reduce form DDw to D.
-        orthError=UnpackOrthonormal(gammap,lambdap,comp);
-    }
-    else
-    {
-        DiagonalMatrixRT lb=lambdaB();
-        orthError=UnpackOrthonormal(theta,lb,comp);
-    }
-    return orthError;
+    DiagonalMatrixRT lambda=Extend(lambdaB(),expH);
+    dVectorT gamma=ContractTheta(expH);
+    if (orthogonalize) OrthogonalizeI(gamma,lambda,1e-13,100);
+    double truncationError=comp->Compress(gamma,lambda); //Reduce form DDw to D.
+    s1.bondB->SetSingularValues(lambda,truncationError); //Don't use lambdap any more in case it is not normalized
+    return UnpackOrthonormal(gamma,comp);;
 }
 
 
