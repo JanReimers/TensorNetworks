@@ -3509,6 +3509,809 @@ which should ensure that the new
 .
 \end_layout
 
+\begin_layout Subsection
+Inifinite Matrix Product Operator (iMPO)
+\end_layout
+
+\begin_layout Standard
+In its simplest form and iMPO is just a infinite product of one MPO with
+ the only thing distinguishing sites is the label of the phisical indicies.
+\begin_inset Formula 
+\[
+\hat{O}=\cdots\hat{\boldsymbol{W}}^{m_{1}n_{1}}\hat{\boldsymbol{W}}^{m_{2}n_{2}}\hat{\boldsymbol{W}}^{m_{3}n_{3}}\cdots
+\]
+
+\end_inset
+
+where the internal indices 
+\begin_inset Formula $W_{ij}$
+\end_inset
+
+ have been suppressed.
+ This is what I would call a one site unit cell iMPO and extension to two
+ or more sites is also possible.
+ 
+\end_layout
+
+\begin_layout Standard
+The literature on iMPOs is relatively recent and starts with
+\begin_inset CommandInset citation
+LatexCommand cite
+key "McCulloch2008"
+literal "false"
+
+\end_inset
+
+ which mostly about improving iDMRG but also described how one goes about
+ a recursive calculation the expectation of a lower triangular operator
+ with edge vectors
+\begin_inset Formula 
+\[
+\hat{O}=\hat{\boldsymbol{l}}\hat{\boldsymbol{W}}^{m_{1}n_{1}}\hat{\boldsymbol{W}}^{m_{2}n_{2}}\hat{\boldsymbol{W}}^{m_{3}n_{3}}\hat{\boldsymbol{r}}
+\]
+
+\end_inset
+
+which we should be able to apply to an orthogonalized iMPS where the edge
+ vectors are unity.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Michel2010"
+literal "false"
+
+\end_inset
+
+ describes finding fixed points of recursion relations for triangular MPOs.
+ This includes Hamiltonian MPOs but excludes time evolution operators like
+ 
+\begin_inset Formula $\exp\left(-\tau\hat{H}\right)$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+In same year 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Pirvu2010"
+literal "false"
+
+\end_inset
+
+ describes construction of translationally invariant MPOs suitable for time
+ evolution.
+ The focuse is on the transverse ising model using a spin space space Trotter
+ decomposition in order to preserve translational symmetry.
+ Next up is 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Crosswhite2014"
+literal "false"
+
+\end_inset
+
+ which is a rather mathematical exposition on iMPS focusing on different
+ type of divergences.
+ Zaletel et.
+ al.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Zaletel2015"
+literal "false"
+
+\end_inset
+
+ make the first attempt to build higher order Trotter decompositions as
+ iMPOs with some specific examples we can code from.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Chan2016"
+literal "false"
+
+\end_inset
+
+ talks about iMPOs but mostly from a QChem point of view.
+ Hubig et.
+ al.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Hubig2017"
+literal "false"
+
+\end_inset
+
+ describe some genral methods for building MPOs by combining single site
+ operators using direct addition and direct multiplication of MPOs.
+ They are the first address the pitfals one encounters when one trys to
+ SVD compress an MPO.
+ They suffested at a minimum rescaling singular values so that all the weight
+ of the MPO does not bunched up at one end of the lattice.
+ They go one descibe more robust delinearization and (a hard to follow)
+ deparallization algorithms for compressing.
+ The names here suggest the equivalent of throwinf out singular reduancies
+ thet accumulate when combining MPOs.
+ FInally the most recent contribution is 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Parker2019"
+literal "false"
+
+\end_inset
+
+ which describe why standard SVD compression is unreliable or non-optimal
+ for IMPOs because extensive Schmidt values are mixed in with intensive
+ ones.
+ These need to be separated out before compression of the intensive SVs.
+ IN order learn about all this stuff we should go through the relevent parts
+ in each paper, and the see how to combine it all into the reusable software
+ module.
+\end_layout
+
+\begin_layout Subsubsection
+Infinite size density matrix renormalization group, revisited
+\begin_inset CommandInset citation
+LatexCommand cite
+key "McCulloch2008"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The most general 
+\begin_inset Formula $D_{w}=2$
+\end_inset
+
+ lower triangluar MPO matrix looks like
+\begin_inset Formula 
+\[
+W=\begin{bmatrix}C & 0\\
+B & A
+\end{bmatrix}
+\]
+
+\end_inset
+
+which when mutliplited with itsefl gives
+\begin_inset Formula 
+\[
+WW=\begin{bmatrix}C & 0\\
+B & A
+\end{bmatrix}\begin{bmatrix}C & 0\\
+B & A
+\end{bmatrix}=\begin{bmatrix}C^{2} & 0\\
+BC+AB & A^{2}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+W^{3}=\begin{bmatrix}C^{2} & 0\\
+BC+AB & A^{2}
+\end{bmatrix}\begin{bmatrix}C & 0\\
+B & A
+\end{bmatrix}=\begin{bmatrix}C^{3} & 0\\
+BC^{2}+ABC+A^{2}B & A^{3}
+\end{bmatrix}
+\]
+
+\end_inset
+
+We see all the action is in the lower left corner where we get a summ of
+ all strings with 
+\begin_inset Formula $A$
+\end_inset
+
+s on the left one 
+\begin_inset Formula $B$
+\end_inset
+
+ in the middle and 
+\begin_inset Formula $C$
+\end_inset
+
+s on the right, like
+\begin_inset Formula 
+\[
+B\otimes C\otimes C\otimes C\cdots+A\otimes B\otimes C\otimes C\cdots+A\otimes A\otimes B\otimes C\otimes C\cdots+\cdots+\cdots A\otimes A\otimes A\otimes B\otimes C+\cdots A\otimes A\otimes A\otimes B
+\]
+
+\end_inset
+
+Typically 
+\begin_inset Formula $A=C=1$
+\end_inset
+
+ and for example 
+\begin_inset Formula $B=h\hat{s}_{z}$
+\end_inset
+
+ so we get tensor sum of spin operators for each site.
+\end_layout
+
+\begin_layout Standard
+For 
+\begin_inset Formula $D_{w}=3$
+\end_inset
+
+ we can start to represent bond operators
+\begin_inset Formula 
+\[
+W=\begin{bmatrix}E & 0 & 0\\
+D & C & 0\\
+0 & B & A
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+WW=\begin{bmatrix}E & 0 & 0\\
+D & C & 0\\
+0 & B & A
+\end{bmatrix}\begin{bmatrix}E & 0 & 0\\
+D & C & 0\\
+0 & B & A
+\end{bmatrix}=\begin{bmatrix}E^{2} & 0 & 0\\
+DE+CD & C^{2} & 0\\
+BD & BC+AB & A^{2}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+W^{3}=\begin{bmatrix}E^{2} & 0 & 0\\
+DE+CD & C^{2} & 0\\
+BD & BC+AB & A^{2}
+\end{bmatrix}\begin{bmatrix}E & 0 & 0\\
+D & C & 0\\
+0 & B & A
+\end{bmatrix}=\begin{bmatrix}E^{3} & 0 & 0\\
+DE^{2}+CDE+C^{2}D & C^{3} & 0\\
+BDE+BCD+ABD & BC^{2}+ABC+A^{2}B & A^{3}
+\end{bmatrix}
+\]
+
+\end_inset
+
+which give a sum of all string like terms
+\begin_inset Formula 
+\[
+A\otimes\cdots\otimes A\otimes B\otimes C\otimes\cdots\otimes C\otimes D\otimes E\otimes\cdots\otimes E
+\]
+
+\end_inset
+
+again typically 
+\begin_inset Formula $A=E=1$
+\end_inset
+
+, 
+\begin_inset Formula $B$
+\end_inset
+
+and 
+\begin_inset Formula $D$
+\end_inset
+
+ are spin operators and 
+\begin_inset Formula $C<1$
+\end_inset
+
+ decides how they interact giving a power law decay with distance on the
+ lattice.
+\end_layout
+
+\begin_layout Standard
+It is well known that the transverse Ising model
+\begin_inset Formula 
+\[
+H=\sum_{i}\hat{S}_{i}^{z}\hat{S}_{i+1}^{z}+h\sum_{i}\hat{S}_{i}^{x}
+\]
+
+\end_inset
+
+can be compactly represented with 
+\begin_inset Formula 
+\[
+W=\begin{bmatrix}1 & 0 & 0\\
+\hat{S}^{z} & 0 & 0\\
+h\hat{S}^{x} & \hat{S}^{z} & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Non triangular MPOs show up in the Trotter decomposition of 
+\begin_inset Formula $\exp\left(-\tau\hat{H}\right)\simeq\exp\left(-\tau\hat{H}_{even}\right)\exp\left(-\tau\hat{H}_{odd}\right)$
+\end_inset
+
+ where the MPO for example 
+\begin_inset Formula $\exp\left(-\tau\hat{H}_{even}\right)$
+\end_inset
+
+ has a two site unit cell with alternating 
+\begin_inset Formula $1\times D_{w}$
+\end_inset
+
+ and 
+\begin_inset Formula $D_{w}\times1$
+\end_inset
+
+ matrices.
+ The product 
+\begin_inset Formula $\exp\left(-\tau\hat{H}_{even}\right)\exp\left(-\tau\hat{H}_{odd}\right)$
+\end_inset
+
+ will then be a sequence of 
+\begin_inset Formula $D_{w}\times D_{w}$
+\end_inset
+
+ MPOs which are not lower triangular.
+ This operator falls into the class of exponential MPO’s, with an expectation
+ value of the form 
+\begin_inset Formula $\lambda^{L}$
+\end_inset
+
+ for 
+\begin_inset Formula $L$
+\end_inset
+
+ sites, where 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is the eigenvalue corresponding to the fixed point 
+\begin_inset Formula $E^{\alpha}$
+\end_inset
+
+ eigenmatrices (see below).
+\end_layout
+
+\begin_layout Standard
+For a finite system the expectation of an MPO can be contracted recursively
+ from the left to right.
+ At lattice site 
+\begin_inset Formula $a$
+\end_inset
+
+(putting back in suppressed indicies in the paper)
+\begin_inset Formula 
+\[
+E_{aj_{2}i_{2}}^{w_{2}}=\sum_{m_{a}n_{a}}\sum_{w_{1}}W_{w_{1}w_{2}}^{m_{a}n_{a}}A_{j_{1}j_{2}}^{m_{a}\dagger}E_{a-1j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n_{a}}.
+\]
+
+\end_inset
+
+To kick off the recursion for 
+\begin_inset Formula $a=0$
+\end_inset
+
+ we use
+\begin_inset Formula 
+\[
+E_{0j_{1}i_{1}}^{w_{1}}=\delta_{w_{1},D_{w}}I_{left}=\delta_{w_{1},D_{w}}\delta_{i_{1},1}\delta_{j_{1},1}
+\]
+
+\end_inset
+
+Similarly one iterate from the left edge
+\begin_inset Formula 
+\[
+F_{ai_{1}j_{1}}^{w_{1}}=\sum_{m_{a}n_{a}}\sum_{w_{2}}W_{w_{1}w_{2}}^{m_{a}n_{a}}B_{i_{1}i_{2}}^{m_{a}}E_{a+1i_{2}j_{2}}^{w_{2}}B_{j_{1}j_{2}}^{n_{a}\dagger}
+\]
+
+\end_inset
+
+with
+\begin_inset Formula 
+\[
+F_{L}^{w_{L}}=\delta_{w_{L},1}\delta_{i_{L},1}\delta_{j_{L},1}
+\]
+
+\end_inset
+
+We can think of 
+\begin_inset Formula $E_{aj_{2}i_{2}}^{w_{2}}$
+\end_inset
+
+ is being 
+\begin_inset Formula $D_{w}$
+\end_inset
+
+ different matrices living on site 
+\begin_inset Formula $a$
+\end_inset
+
+and in the thermodynamic limit 
+\begin_inset Formula $L\rightarrow\infty$
+\end_inset
+
+ we should have
+\begin_inset Formula 
+\[
+E_{aj_{2}i_{2}}^{w_{2}}=E_{a-1j_{2}i_{2}}^{w_{2}}=\sum_{m_{a}n_{a}}\sum_{w_{1}}W_{w_{1}w_{2}}^{m_{a}n_{a}}A_{j_{1}j_{2}}^{m_{a}\dagger}E_{a-1j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n_{a}}
+\]
+
+\end_inset
+
+i.e.
+ they are site independent or translationally invarient.
+ Removing site labels
+\begin_inset Formula 
+\[
+E_{j_{2}i_{2}}^{w_{2}}=\sum_{mn}\sum_{w_{1}}W_{w_{1}w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+In the paper they have
+\begin_inset Formula 
+\[
+E_{j_{2}i_{2}}^{w_{2}}=\sum_{mn}\sum_{w_{1}}W_{w_{1}w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}-E_{0}\delta_{w_{2},1}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $E_{0}$
+\end_inset
+
+ is the expecataion per site.
+\end_layout
+
+\begin_layout Standard
+At this point we need to invoke the structural constraints on 
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+ which for NN interactions has the form
+\begin_inset Formula 
+\[
+\hat{W}=\begin{bmatrix}\hat{1} & \cdots & 0 & 0 & 0\\
+\hat{W}_{21} & \cdots & 0 & 0 & 0\\
+\hat{W}_{31} & \cdots & 0 & 0 & 0\\
+\vdots & \iddots & \vdots & \vdots & \vdots\\
+\hat{W}_{D_{w}1} & \cdots & \hat{W}_{D_{w}D_{w}-2} & \hat{W}_{D_{w}D_{w}-1} & \hat{1}
+\end{bmatrix}
+\]
+
+\end_inset
+
+Working one index at a time
+\begin_inset Formula 
+\[
+E_{j_{2}i_{2}}^{D_{w}}=\sum_{mn}\sum_{w_{1}}W_{w_{1}D_{w}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}=\sum_{mn}W_{D_{w}D_{w}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{D_{w}}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{mn}\hat{1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{D_{w}}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{n}A_{j_{1}j_{2}}^{n\dagger}E_{j_{1}i_{1}}^{D_{w}}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+ON a finite lattice the 
+\begin_inset Formula $A$
+\end_inset
+
+s are left normalized and on an infinite lattice they are orthogonalized
+ the solution to the recursion is simply
+\begin_inset Formula 
+\[
+E_{ji}^{D_{w}}=\delta_{j,i}
+\]
+
+\end_inset
+
+The next matrix is 
+\begin_inset Formula 
+\[
+E_{j_{2}i_{2}}^{D_{w}-1}=\sum_{mn}\sum_{w_{1}=1}^{D_{w}}W_{w_{1}D_{w}-1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{mn}\sum_{w_{1}=D_{w}-1}^{D_{w}}W_{w_{1}D_{w}-1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{mn}A_{j_{1}j_{2}}^{m\dagger}\left(W_{D_{w}-1D_{w}-1}^{mn}E_{j_{1}i_{1}}^{D_{w}-1}+W_{D_{w}D_{w}-1}^{mn}E_{j_{1}i_{1}}^{D_{w}}\right)A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{mn}A_{j_{1}j_{2}}^{m\dagger}\left(W_{D_{w}-1D_{w}-1}^{mn}E_{j_{1}i_{1}}^{D_{w}-1}+W_{D_{w}D_{w}-1}^{mn}\delta_{j_{1},i_{1}}\right)A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{mn}A_{j_{1}j_{2}}^{m\dagger}W_{D_{w}-1D_{w}-1}^{mn}E_{j_{1}i_{1}}^{D_{w}-1}A_{i_{1}i_{2}}^{n}+\sum_{mn}\sum_{i_{1}}A_{i_{1}j_{2}}^{m\dagger}W_{D_{w}D_{w}-1}^{mn}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+For short range interactions 
+\begin_inset Formula $W_{D_{w}-1D_{w}-1}^{mn}=0$
+\end_inset
+
+ so
+\begin_inset Formula 
+\[
+E_{j_{2}i_{2}}^{D_{w}-1}=\sum_{mn}\sum_{i_{1}}A_{i_{1}j_{2}}^{m\dagger}W_{D_{w}D_{w}-1}^{mn}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+Similarly
+\begin_inset Formula 
+\[
+E_{j_{2}i_{2}}^{D_{w}-2}=\sum_{mn}W_{D_{w}D_{w}-2}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{D_{w}}A_{i_{1}i_{2}}^{n}=\sum_{mn}W_{D_{w}D_{w}-2}^{mn}A_{i_{1}j_{2}}^{m\dagger}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+E_{j_{2}i_{2}}^{2}=\sum_{mn}W_{D_{w}2}^{mn}A_{i_{1}j_{2}}^{m\dagger}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+Finally the first column of 
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+ has no zeros so this last evaluation is non trivial
+\begin_inset Formula 
+\[
+E_{j_{2}i_{2}}^{1}=\sum_{mn}\sum_{w_{1}=1}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}-E_{0}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{mn}W_{11}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}-E_{0}+\sum_{mn}\sum_{w_{1}=2}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{mn}1^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}-E_{0}+\sum_{mn}\sum_{w_{1}=2}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+E_{j_{2}i_{2}}^{1}=\sum_{n}A_{j_{1}j_{2}}^{n\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}-E_{0}+\sum_{mn}\sum_{w_{1}=2}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+E_{j_{2}i_{2}}^{1}-\sum_{n}A_{j_{1}j_{2}}^{n\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}+E_{0}=\sum_{mn}\sum_{w_{1}=2}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+Now we take the trace of both sides
+\begin_inset Formula 
+\[
+LHS=\sum_{J_{2}i_{2}}\left(E_{j_{2}i_{2}}^{1}-\sum_{j_{1}i_{1}}\sum_{n}A_{j_{1}j_{2}}^{n\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{J_{2}i_{2}}E_{j_{2}i_{2}}^{1}-\sum_{j_{1}i_{1}}E_{j_{1}i_{1}}^{1}\sum_{J_{2}i_{2}}\sum_{n}A_{j_{1}j_{2}}^{n\dagger}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+and becuase of orthogonality of the state
+\begin_inset Formula 
+\[
+=\sum_{J_{2}i_{2}}E_{j_{2}i_{2}}^{1}-\sum_{j_{1}i_{1}}E_{j_{1}i_{1}}^{1}\sum_{J_{2}i_{2}}\delta_{j_{1}i_{1}}\delta_{j_{2}i_{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{J_{2}i_{2}}E_{j_{2}i_{2}}^{1}-\sum_{j_{1}i_{1}}E_{j_{1}i_{1}}^{1}=0
+\]
+
+\end_inset
+
+so we get 
+\begin_inset Formula 
+\[
+E_{0}=\frac{1}{D^{2}}\sum_{J_{2}i_{2}}\sum_{j_{1}i_{1}}\sum_{mn}\sum_{w_{1}=2}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+so we don;t need to solve for 
+\begin_inset Formula $E^{1}$
+\end_inset
+
+ if we only need to expectation value.
+\end_layout
+
+\begin_layout Subsection
+Matrix product operator representations
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Pirvu2010"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This paper has Frank Verstraete on it and one can therefore expect it to
+ be hard to follow for us non-geniouses:).
+ Anyway let's give it a go ...
+ this is yet another paper using the transverse Ising model for examples.
+ In general I don't like any example that assume a one site unit cell.
+ However if they explicitely state that extension to multi site unit cells
+ is trivial then at least I have confidence that if I work through the math
+ I won't hit a brick wall.
+ The Hamiltonian is
+\begin_inset Formula 
+\[
+\hat{H}=-\sum_{i}\hat{S}_{i}^{z}\hat{S}_{i+1}^{z}-h\sum_{i}\hat{S}_{i}^{x}=\hat{H}_{z}+\hat{H}_{x}
+\]
+
+\end_inset
+
+and they do a spin space Trotter decomposition
+\begin_inset Formula 
+\[
+\exp\left(\epsilon\hat{H}\right)=\exp\left(\epsilon\hat{H}_{z}\right)\exp\left(\epsilon\hat{H}_{x}\right)+O\left(\epsilon^{2}\right).
+\]
+
+\end_inset
+
+Now
+\begin_inset Formula 
+\[
+\exp\left(\epsilon\hat{S}_{i}^{z}\hat{S}_{i+1}^{z}\right)=\exp\left(\epsilon\begin{bmatrix}\frac{1}{4} & 0 & 0 & 0\\
+0 & -\frac{1}{4} & 0 & 0\\
+0 & 0 & -\frac{1}{4} & 0\\
+0 & 0 & 0 & \frac{1}{4}
+\end{bmatrix}\right)
+\]
+
+\end_inset
+
+They claim this is the same as
+\begin_inset Formula 
+\[
+\cosh\left(\epsilon\right)\begin{bmatrix}1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1
+\end{bmatrix}+\sinh\left(\epsilon\right)\begin{bmatrix}\frac{1}{4} & 0 & 0 & 0\\
+0 & -\frac{1}{4} & 0 & 0\\
+0 & 0 & -\frac{1}{4} & 0\\
+0 & 0 & 0 & \frac{1}{4}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\frac{\left(e^{\epsilon}+e^{-\epsilon}\right)}{2}\begin{bmatrix}1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1
+\end{bmatrix}+\frac{\left(e^{\epsilon}-e^{-\epsilon}\right)}{2}\begin{bmatrix}\frac{1}{4} & 0 & 0 & 0\\
+0 & -\frac{1}{4} & 0 & 0\\
+0 & 0 & -\frac{1}{4} & 0\\
+0 & 0 & 0 & \frac{1}{4}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+e^{\epsilon}\begin{bmatrix}\frac{3}{4} & 0 & 0 & 0\\
+0 & \frac{1}{4} & 0 & 0\\
+0 & 0 & \frac{1}{4} & 0\\
+0 & 0 & 0 & \frac{3}{4}
+\end{bmatrix}+e^{-\epsilon}\begin{bmatrix}\frac{1}{4} & 0 & 0 & 0\\
+0 & \frac{3}{4} & 0 & 0\\
+0 & 0 & \frac{3}{4} & 0\\
+0 & 0 & 0 & \frac{1}{4}
+\end{bmatrix}OK
+\]
+
+\end_inset
+
+so I am already lost on hte first equation ...
+ as predicted.
+ Next......
+\end_layout
+
+\begin_layout Subsection
+Time-evolving a matrix product state with long-ranged interactions
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Zaletel2015"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
 \begin_layout Section
 Infinite Time Evolved Block Decimation (iTBED)
 \begin_inset CommandInset label
@@ -4470,6 +5273,584 @@ Details of the orthogonalized iTEBD procedure for a system with two sites
 
 \end_layout
 
+\begin_layout Subsubsection
+McCulloch's version
+\end_layout
+
+\begin_layout Standard
+In 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "McCulloch2008"
+literal "false"
+
+\end_inset
+
+ Ian McCulloch propose and alternate method for the orhtogonalizing, that
+ does not required inverted matrices.
+ However he uses iDMRG language which we must translate to our notation
+ used herein.
+ SOme tranlations are shown in the table.
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="9" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+iDMRG
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+iTEBD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $A_{n}^{s}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda^{B}\Gamma^{n_{a}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Left normalized site tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $B_{n}^{s}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\Gamma^{n_{b}}\lambda^{B}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Right normalized site tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\Lambda_{n}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda^{A}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Center matrix, Bond singular values
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\Lambda_{n-1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda^{B}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+?
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $A_{n}^{s'}\Lambda_{n}B_{n}^{s}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda^{B}\Gamma^{n_{a}}\lambda^{A}\Gamma^{n_{b}}\lambda^{B}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+iDMRG central unit cell
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $A_{n-1}^{s'_{n-1}}A_{n}^{s'_{n}}\Lambda_{n}B_{n}^{s_{n}}B_{n-1}^{s_{n-1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda^{A}\Gamma^{n_{a-1}}\lambda^{B}\Gamma^{n_{a}}\lambda^{A}\Gamma^{n_{b}}\lambda^{B}\Gamma^{n_{b-1}}\lambda^{A}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+iDMGR two interations, or double cell
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $U_{n}^{s'}\Lambda_{n}^{L}V^{\dagger}\Lambda_{n}B_{n}^{s}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Translation between iDMRG and iTEBD language
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Starting with the central unit cell
+\begin_inset Formula 
+\[
+A_{n}^{s}\Lambda_{n}B_{n}^{s'}=\left(\lambda^{B}\Gamma^{n_{a}}\right)\lambda^{A}\left(\Gamma^{n_{b}}\lambda^{B}\right)
+\]
+
+\end_inset
+
+the actual repeating unit is
+\begin_inset Formula 
+\[
+A_{n}^{s}\Lambda_{n}B_{n}^{s'}\frac{1}{\Lambda_{n-1}}=\left(\lambda^{B}\Gamma^{n_{a}}\right)\lambda^{A}\left(\Gamma^{n_{b}}\lambda^{B}\right)\frac{1}{\lambda^{B}}=\lambda^{B}\Gamma^{n_{a}}\lambda^{A}\Gamma^{n_{b}}
+\]
+
+\end_inset
+
+which is much easier to see in the iTEBD language.
+ The first step is rotate the center to the right by decomposing
+\begin_inset Formula 
+\[
+\Lambda_{n}B_{n}^{s'}=U_{\left(s'n\right)}sV^{\dagger}=A_{n+1}^{s_{n+1}^{\prime}}\Lambda_{n}^{R}
+\]
+
+\end_inset
+
+.
+ The non-trivial catch here is that 
+\begin_inset Formula $\Lambda_{n}^{R}=sV^{\dagger}$
+\end_inset
+
+ is NOT diagonal.
+ Putting it all together we have
+\begin_inset Formula 
+\[
+A_{n}^{s}\Lambda_{n}B_{n}^{s'}\frac{1}{\Lambda_{n-1}}\longrightarrow A_{n}^{s_{n}}A_{n+1}^{s_{n+1}^{\prime}}\Lambda_{n}^{R}\frac{1}{\Lambda_{n-1}}=A_{n}^{s_{n}}A_{n+1}^{s_{n+1}^{\prime}}P
+\]
+
+\end_inset
+
+where we have defined 
+\begin_inset Formula $P=\Lambda_{n}^{R}\frac{1}{\Lambda_{n-1}}.$
+\end_inset
+
+ The iMPS state is now
+\begin_inset Formula 
+\[
+\cdots A_{n}^{s_{n}}A_{n+1}^{s_{n+1}^{\prime}}PA_{n}^{s_{n+2}}A_{n+1}^{s_{n+3}^{\prime}}PA_{n}^{s_{n+4}}A_{n+1}^{s_{n+5}^{\prime}}P\cdots
+\]
+
+\end_inset
+
+As with standard orthogonalization we still need to decompose the transfer
+ matrix eigen vectors
+\begin_inset Formula 
+\[
+V^{L}=XX^{\dagger}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+V^{R}=Y^{\dagger}Y
+\]
+
+\end_inset
+
+notice 
+\begin_inset Formula $X$
+\end_inset
+
+and 
+\begin_inset Formula $Y$
+\end_inset
+
+are swapped relative to the previous versions above.
+ Now the orthogonal state is given by
+\begin_inset Formula 
+\[
+A_{n}^{s_{1}}\rightarrow XA_{n}^{s_{1}}=\tilde{A}_{n}^{s_{1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+B_{n+1}^{s_{2}}\rightarrow YB_{n+1}^{s_{2}}=\tilde{B}_{n+1}^{s_{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Lambda_{n-1}\rightarrow X\Lambda_{n-1}Y=\tilde{\Lambda}_{n-1}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Lambda_{n}^{R}\rightarrow\Lambda_{n}^{R}Y
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Lambda_{n}^{L}\rightarrow X\Lambda_{n}^{L}
+\]
+
+\end_inset
+
+It looks like 
+\begin_inset Formula $\tilde{\Lambda}_{n-1}$
+\end_inset
+
+ is no longer diagonal, which complicates things.
+ The new unit cell is now
+\begin_inset Formula 
+\[
+\tilde{A}_{n}^{s_{1}}\Lambda_{n}\tilde{B}_{n+1}^{s_{2}}\frac{1}{\tilde{\Lambda}_{n-1}}=\tilde{\lambda}^{B}\tilde{\Gamma}^{n_{a}}\lambda^{A}\tilde{\Gamma}^{n_{b}}
+\]
+
+\end_inset
+
+How can we translate this into iTEBD language? We get
+\begin_inset Formula 
+\[
+\lambda^{B}\Gamma^{n_{a}}\rightarrow X\lambda^{B}\Gamma^{n_{a}}=\tilde{\lambda}^{B}\tilde{\Gamma}^{n_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Gamma^{n_{b}}\rightarrow Y\Gamma^{n_{b}}=\tilde{\Gamma}^{n_{b}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\lambda^{B}\rightarrow X\lambda^{B}Y=\tilde{\lambda}^{B}
+\]
+
+\end_inset
+
+if 
+\begin_inset Formula $\tilde{\lambda}^{B}$
+\end_inset
+
+ then is easy to extract 
+\begin_inset Formula $\tilde{\Gamma}^{n_{a}}$
+\end_inset
+
+ using the inverse.
+ If it is not then we need to decompose it
+\begin_inset Formula 
+\[
+\tilde{\lambda}^{B}=U\tilde{\tilde{\lambda}}^{B}V^{\dagger}
+\]
+
+\end_inset
+
+and absorb 
+\begin_inset Formula $U$
+\end_inset
+
+ and 
+\begin_inset Formula $V^{\dagger}$
+\end_inset
+
+ by defining
+\begin_inset Formula 
+\[
+\tilde{\tilde{\Gamma}}^{n_{a}}=V^{\dagger}\tilde{\Gamma}^{n_{a}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\tilde{\tilde{\Gamma}}^{n_{b}}=\tilde{\Gamma}^{n_{b}}U
+\]
+
+\end_inset
+
+To get 
+\begin_inset Formula $\tilde{\tilde{\Gamma}}^{n_{a}}$
+\end_inset
+
+ we need to solve
+\begin_inset Formula 
+\[
+X\lambda^{B}\Gamma^{n_{a}}=\tilde{\lambda}^{B}\tilde{\Gamma}^{n_{a}}=U\tilde{\tilde{\lambda}}^{B}V^{\dagger}\tilde{\Gamma}^{n_{a}}=U\tilde{\tilde{\lambda}}^{B}\tilde{\tilde{\Gamma}}^{n_{a}}
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+\frac{1}{\tilde{\tilde{\lambda}}^{B}}U^{\dagger}X\lambda^{B}\Gamma^{n_{a}}=\tilde{\tilde{\Gamma}}^{n_{a}}
+\]
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Apply iMPO operator
 \end_layout
@@ -4620,6 +6001,40 @@ Things appear not so simple in the iterative scheme since the transforms
 
 .
  No need to group the physical indices into the mix.
+\end_layout
+
+\begin_layout Subsubsection
+No Orthogonalization
+\end_layout
+
+\begin_layout Standard
+There may be situation where went to do a number of fast iteration with
+ no orthogonalization.
+ Starting from 
+\begin_inset Formula $\Theta_{\left(w_{1}i_{1}\right)\left(w_{3}i_{3}\right)}^{m_{a}m_{b}}=\Theta_{\left(w_{1}i_{1}\right)\left(w_{3}i_{3}\right)}^{m}$
+\end_inset
+
+ we need SVD 
+\begin_inset Formula 
+\[
+\lambda^{e}\Theta^{m}\lambda^{e}\rightarrow U^{m_{a}}sV^{\dagger m_{b}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\lambda^{e}$
+\end_inset
+
+ is the extended version with 
+\begin_inset Formula $D_{w}$
+\end_inset
+
+ copies of 
+\begin_inset Formula $\lambda^{B}$
+\end_inset
+
+ inside.
 \end_layout
 
 \begin_layout Subsection
@@ -8002,7 +9417,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-iDRM GS energies, mp-toolkit, SU(2) lattice with 2 site unit cell.
+iDGRM GS energies, mp-toolkit, SU(2) lattice with 2 site unit cell.
 \end_layout
 
 \end_inset
