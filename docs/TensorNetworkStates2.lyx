@@ -803,7 +803,7 @@ where
 \begin_inset Formula $\boldsymbol{V}$
 \end_inset
 
- are ortho-normal matrices satisfying
+ are orthonormal matrices satisfying
 \begin_inset Formula 
 \begin{equation}
 \boldsymbol{U}^{\dagger}\boldsymbol{U}=\text{𝕀},\;\boldsymbol{V}\boldsymbol{V}^{\dagger}=\text{𝕀}.\label{eq:SVDOrthoNormConditions}
@@ -1047,11 +1047,11 @@ These states are optimal for calculating the expectation value of a one
 \end_layout
 
 \begin_layout Subsubsection
-Vidals Canonical Form
+Vidal's Canonical Form
 \end_layout
 
 \begin_layout Standard
-Yet another cononical form due to Videl
+Yet another canonical form due to Vidal
 \begin_inset CommandInset citation
 LatexCommand cite
 key "vidal_efficient_2003"
@@ -1100,8 +1100,8 @@ noprefix "false"
 \end_inset
 
 and repeat this process across the lattice.
- The difference here is that we do not absrobe the singular values into
- the next site, instead we keep them separate, living on the bond.
+ The difference here is that we do not absorb the singular values into the
+ next site, instead we keep them separate, living on the bond.
  We end up with
 \begin_inset Formula 
 \begin{equation}
@@ -1126,7 +1126,7 @@ noprefix "false"
 \begin_inset Formula $\lambda^{[1]}$
 \end_inset
 
- should really be labeld 
+ should really be labeled 
 \begin_inset Formula $\lambda^{[12]}$
 \end_inset
 
@@ -1179,7 +1179,7 @@ name "fig:Vidal's-canonial-form"
 
 \end_inset
 
-Vidal's canonial form
+Vidal's canonical form
 \end_layout
 
 \end_inset
@@ -1249,7 +1249,7 @@ canonical bond dimensions
  singular values at each bond.
  However for a left normalization sweep no such automatic sizing happens
  on the right hand side of the lattice.
- SImilarly if you only do a right normalization sweep, then left side ends
+ Similarly if you only do a right normalization sweep, then left side ends
  up with non-canonical bond dimension.
  The last site will always be 
 \begin_inset Formula $D\times1$
@@ -1268,7 +1268,7 @@ Always do a left then a right sweep for normalization.
 \end_layout
 
 \begin_layout Enumerate
-Add code to the left sweep to reshape the right side with canonical dimansions.
+Add code to the left sweep to reshape the right side with canonical dimensions.
  And similarly for right sweeps.
 \end_layout
 
@@ -1278,7 +1278,7 @@ Add code to the MPS constructor so that canonical bond dimensions are built
 \end_layout
 
 \begin_layout Standard
-What we want to avoid is if statments sprinkled randomly throughout the
+What we want to avoid is if statements sprinkled randomly throughout the
  code trying fix up the bond dimensions as problems (usually failed asserts)
  arise.
  In addition we may need to enforce canonical bond dimensions when applying
@@ -1378,7 +1378,7 @@ noprefix "false"
 \begin_inset Formula $2$
 \end_inset
 
- quantum numbers un-contracted.
+ quantum numbers uncontracted.
 \begin_inset Float figure
 wide false
 sideways false
@@ -2294,7 +2294,7 @@ In statistical mechanics the limit
  So it is like we are annealing the wave function towards its ground state.
  This sounds rather hand-waving but it is related to the power method for
  finding the extreme eigen value and eigen vector of a matrix.
- This is known to be a slowely converging method but it works as long as
+ This is known to be a slowly converging method but it works as long as
  the original wave function (or some starting guess) has a non-zero overlap
  with the ground state wave function.
 \end_layout
@@ -2351,7 +2351,7 @@ where
 
 \end_inset
 
-However further neightbours do commute 
+However further neighbours do commute 
 \begin_inset Formula 
 \[
 \left[\mathcal{\hat{H}}_{i},\mathcal{\hat{H}}_{i+2}\right]=0
@@ -2541,7 +2541,7 @@ This may be fine for first order trotter decomposition since that also throws
 \begin_inset Formula $d^{2}\times d^{2}$
 \end_inset
 
- hamiltonian.
+ Hamiltonian.
 \begin_inset Formula 
 \[
 O^{\left(m_{1}m_{2}\right)\left(n_{1}n_{2}\right)}=O^{ij}=\left\langle i\right|e^{-\tau\mathcal{\hat{H}}_{1}}\left|j\right\rangle 
@@ -2697,7 +2697,7 @@ SVD
 \begin_inset Formula $O^{\left(n_{1}m_{1}\right)\left(n_{2}m_{2}\right)}=\sum_{k=1}^{d^{2}}U_{\left(n_{1}m_{1}\right),k}s_{k}\left(V^{\dagger}\right)_{k,\left(n_{2}m_{2}\right)}$
 \end_inset
 
-, note that this a new/diffrerent 
+, note that this a new/different 
 \begin_inset Formula $U$
 \end_inset
 
@@ -2856,11 +2856,11 @@ literal "false"
 
  (page 108) talks about re-scaling the singular values in order maintain
  normalization but leaves out the details.
- Since the trunctation error is defined in terms of squares 
+ Since the truncation error is defined in terms of squares 
 \begin_inset Formula $\epsilon=\sqrt{\sum_{k=D+1}^{D_{w}D}s_{k}^{2}}$
 \end_inset
 
- I can think of three ways to rescale
+ I can think of three ways to re-scale
 \begin_inset Formula 
 \[
 \tilde{s}_{k}=s_{k}\frac{\sum_{i=1}^{D_{w}D}s_{i}}{\sum_{i=1}^{d}s_{i}}
@@ -3268,7 +3268,7 @@ Infinite Lattice Systems
 \end_layout
 
 \begin_layout Standard
-In order to estimate physics for infinite systems one must somehow extroplate
+In order to estimate physics for infinite systems one must somehow extrapolate
  both 
 \begin_inset Formula $L\rightarrow\infty$
 \end_inset
@@ -3280,8 +3280,8 @@ In order to estimate physics for infinite systems one must somehow extroplate
 .
  Another approach is to represent the wave function as an infinite product
  of some repeating unit cell.
- For example if the unit cell is four lattice site (corresponding to a wavevecto
-r 
+ For example if the unit cell is four lattice sites (corresponding to a
+ wave vector 
 \begin_inset Formula $k=\nicefrac{1}{4}$
 \end_inset
 
@@ -3293,13 +3293,13 @@ r
 
 \end_inset
 
-where the elipses represent infite repeat of the unit cell to the left and
- right.
+where the ellipsis represent infinite repeat of the unit cell to the left
+ and right.
  Notice there are only four distinct matrices but the quantum numbers 
 \begin_inset Formula $n_{i}$
 \end_inset
 
- do not repeat, there are iniftly many 
+ do not repeat, there are infinitely many 
 \begin_inset Formula $n_{i}$
 \end_inset
 
@@ -3309,8 +3309,8 @@ where the elipses represent infite repeat of the unit cell to the left and
 \end_inset
 
  in the square brackets.
- In this example the quantum number to the left could take on negative indices.
- Standard notation is put the reapting unit cell in brackets
+ In this example the site labels to the left could take on negative values.
+ Standard notation is put the repeating unit cell in brackets
 \begin_inset Formula 
 \begin{equation}
 \ldots\left(\boldsymbol{M}^{[1]n_{1}}\boldsymbol{M}^{[2]n_{2}}\boldsymbol{M}^{[3]n_{3}}\boldsymbol{M}^{[4]n_{4}}\right)\ldots\label{eq:iMPS1}
@@ -3328,8 +3328,8 @@ the corresponding wave function is
 
 One draw back of this idea is that part of the answer is already built into
  the choice unit cell.
- So for a ferromagnet we know ind advance that a one site unit cell is sufficien
-t to the present the answer.
+ So for a ferromagnet we know in advance that a one site unit cell is sufficient
+ to the present the answer.
  For an unfrustrated antiferromagnet we know in advance that a two site
  unit cell should suffice.
  But if there are any competing interactions the choice of unit cell become
@@ -3445,7 +3445,7 @@ noprefix "false"
 b) is
 \begin_inset Formula 
 \[
-E_{r\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}=\sum_{n}M_{i_{i}i_{2}}^{n}\left(M_{j_{2}j_{1}}^{n}\right)^{\dagger}=\sum_{n_{1}}\varGamma_{i_{1}i_{2}}^{n}\lambda_{i_{2}}\left(\lambda_{j_{2}}\varGamma_{j_{2}j_{1}}^{n}\right)^{\dagger}=\sum_{n_{1}}\varGamma_{i_{1}i_{2}}^{n}\lambda_{i_{2}}\left(\varGamma_{j_{1}j_{2}}^{n}\lambda_{j_{2}}\right)^{*}
+E_{r\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}=\sum_{n}M_{i_{i}i_{2}}^{n}\left(M_{j_{2}j_{1}}^{n}\right)^{\dagger}=\sum_{n_{1}}\varGamma_{i_{1}i_{2}}^{n}\lambda_{i_{2}}\left(\varGamma_{j_{2}j_{1}}^{n}\lambda_{j_{1}}\right)^{\dagger}=\sum_{n_{1}}\varGamma_{i_{1}i_{2}}^{n}\lambda_{i_{2}}\left(\lambda_{j_{1}}\varGamma_{j_{1}j_{2}}^{n}\right)^{*}
 \]
 
 \end_inset
@@ -3477,8 +3477,8 @@ Strictly speaking this expression is not a scalar but just wait.
 \end_inset
 
 which is matrix of eigen values to the high power.
- Of course all the eigemodes are irrelevant except for dominant one so the
- 
+ Of course all the eigen modes are irrelevant except for dominant one so
+ the 
 \begin_inset Formula $U$
 \end_inset
 
@@ -3490,7 +3490,7 @@ s cancel and in the end we get
 
 \end_inset
 
-So we can easily normalize and iMPS by rescaling the 
+So we can easily normalize an iMPS by re-scaling the 
 \begin_inset Formula $\varGamma$
 \end_inset
 
@@ -3510,12 +3510,12 @@ which should ensure that the new
 \end_layout
 
 \begin_layout Subsection
-Inifinite Matrix Product Operator (iMPO)
+Infinite Matrix Product Operator (iMPO)
 \end_layout
 
 \begin_layout Standard
 In its simplest form and iMPO is just a infinite product of one MPO with
- the only thing distinguishing sites is the label of the phisical indicies.
+ the only thing distinguishing sites is the label of the physical indices.
 \begin_inset Formula 
 \[
 \hat{O}=\cdots\hat{\boldsymbol{W}}^{m_{1}n_{1}}\hat{\boldsymbol{W}}^{m_{2}n_{2}}\hat{\boldsymbol{W}}^{m_{3}n_{3}}\cdots
@@ -3542,7 +3542,7 @@ literal "false"
 
 \end_inset
 
- which mostly about improving iDMRG but also described how one goes about
+ which mostly about improving iDMRG but also describes how one goes about
  a recursive calculation the expectation of a lower triangular operator
  with edge vectors
 \begin_inset Formula 
@@ -3583,7 +3583,7 @@ literal "false"
 
  describes construction of translationally invariant MPOs suitable for time
  evolution.
- The focuse is on the transverse ising model using a spin space space Trotter
+ The focus is on the transverse Ising model using a spin space space Trotter
  decomposition in order to preserve translational symmetry.
  Next up is 
 \begin_inset CommandInset citation
@@ -3594,7 +3594,7 @@ literal "false"
 \end_inset
 
  which is a rather mathematical exposition on iMPS focusing on different
- type of divergences.
+ types of divergences.
  Zaletel et.
  al.
  
@@ -3626,17 +3626,17 @@ literal "false"
 
 \end_inset
 
- describe some genral methods for building MPOs by combining single site
+ describe some general methods for building MPOs by combining single site
  operators using direct addition and direct multiplication of MPOs.
- They are the first address the pitfals one encounters when one trys to
+ They are the first address the pitfalls one encounters when one try's to
  SVD compress an MPO.
- They suffested at a minimum rescaling singular values so that all the weight
- of the MPO does not bunched up at one end of the lattice.
- They go one descibe more robust delinearization and (a hard to follow)
- deparallization algorithms for compressing.
- The names here suggest the equivalent of throwinf out singular reduancies
- thet accumulate when combining MPOs.
- FInally the most recent contribution is 
+ They suggested at a minimum re-scaling singular values so that all the
+ weight of the MPO does not bunched up at one end of the lattice.
+ They go on to describe more robust de-linearization and (a hard to follow)
+ de-parallelization algorithms for compressing.
+ The names here suggest the equivalent of throwing out singular redundancies
+ that accumulate when combining MPOs.
+ Finally the most recent contribution is 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Parker2019"
@@ -3644,13 +3644,13 @@ literal "false"
 
 \end_inset
 
- which describe why standard SVD compression is unreliable or non-optimal
- for IMPOs because extensive Schmidt values are mixed in with intensive
+ which describes why standard SVD compression is unreliable or non-optimal
+ for iMPOs because extensive Schmidt values are mixed in with intensive
  ones.
  These need to be separated out before compression of the intensive SVs.
- IN order learn about all this stuff we should go through the relevent parts
- in each paper, and the see how to combine it all into the reusable software
- module.
+ In order to learn about all this stuff we should go through the relevant
+ parts in each paper, and the see how to combine it all into the reusable
+ software module.
 \end_layout
 
 \begin_layout Subsubsection
@@ -3670,7 +3670,7 @@ The most general
 \begin_inset Formula $D_{w}=2$
 \end_inset
 
- lower triangluar MPO matrix looks like
+ lower triangular MPO matrix looks like
 \begin_inset Formula 
 \[
 W=\begin{bmatrix}C & 0\\
@@ -3680,7 +3680,7 @@ B & A
 
 \end_inset
 
-which when mutliplited with itsefl gives
+which when multiplied with itself gives
 \begin_inset Formula 
 \[
 WW=\begin{bmatrix}C & 0\\
@@ -3708,7 +3708,7 @@ BC^{2}+ABC+A^{2}B & A^{3}
 
 \end_inset
 
-We see all the action is in the lower left corner where we get a summ of
+We see all the action is in the lower left corner where we get a sum of
  all strings with 
 \begin_inset Formula $A$
 \end_inset
@@ -3806,7 +3806,7 @@ again typically
 \begin_inset Formula $B$
 \end_inset
 
-and 
+ and 
 \begin_inset Formula $D$
 \end_inset
 
@@ -3895,7 +3895,7 @@ For a finite system the expectation of an MPO can be contracted recursively
 \begin_inset Formula $a$
 \end_inset
 
-(putting back in suppressed indicies in the paper)
+ (putting back in suppressed indices in the paper)
 \begin_inset Formula 
 \[
 E_{aj_{2}i_{2}}^{w_{2}}=\sum_{m_{a}n_{a}}\sum_{w_{1}}W_{w_{1}w_{2}}^{m_{a}n_{a}}A_{j_{1}j_{2}}^{m_{a}\dagger}E_{a-1j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n_{a}}.
@@ -3943,7 +3943,7 @@ We can think of
 \begin_inset Formula $a$
 \end_inset
 
-and in the thermodynamic limit 
+ and in the thermodynamic limit 
 \begin_inset Formula $L\rightarrow\infty$
 \end_inset
 
@@ -3956,7 +3956,7 @@ E_{aj_{2}i_{2}}^{w_{2}}=E_{a-1j_{2}i_{2}}^{w_{2}}=\sum_{m_{a}n_{a}}\sum_{w_{1}}W
 \end_inset
 
 i.e.
- they are site independent or translationally invarient.
+ they are site independent or translationally invariant.
  Removing site labels
 \begin_inset Formula 
 \[
@@ -3977,7 +3977,7 @@ where
 \begin_inset Formula $E_{0}$
 \end_inset
 
- is the expecataion per site.
+ is the expectation per site.
 \end_layout
 
 \begin_layout Standard
@@ -3988,11 +3988,12 @@ At this point we need to invoke the structural constraints on
  which for NN interactions has the form
 \begin_inset Formula 
 \[
-\hat{W}=\begin{bmatrix}\hat{1} & \cdots & 0 & 0 & 0\\
-\hat{W}_{21} & \cdots & 0 & 0 & 0\\
-\hat{W}_{31} & \cdots & 0 & 0 & 0\\
-\vdots & \iddots & \vdots & \vdots & \vdots\\
-\hat{W}_{D_{w}1} & \cdots & \hat{W}_{D_{w}D_{w}-2} & \hat{W}_{D_{w}D_{w}-1} & \hat{1}
+\hat{W}=\begin{bmatrix}\hat{1} & 0 & \cdots & 0 & 0 & 0\\
+\hat{W}_{21} & 0 & \cdots & 0 & 0 & 0\\
+\hat{W}_{31} & 0 & \cdots & 0 & 0 & 0\\
+\vdots & 0 & \iddots & \vdots & \vdots & \vdots\\
+\hat{W}_{D_{w}-1,1} & 0 & 0 & 0 & 0 & 0\\
+\hat{W}_{D_{w}1} & \hat{W}_{D_{w}2} & \cdots & \hat{W}_{D_{w}D_{w}-2} & \hat{W}_{D_{w}D_{w}-1} & \hat{1}
 \end{bmatrix}
 \]
 
@@ -4022,12 +4023,12 @@ E_{j_{2}i_{2}}^{D_{w}}=\sum_{mn}\sum_{w_{1}}W_{w_{1}D_{w}}^{mn}A_{j_{1}j_{2}}^{m
 
 \end_inset
 
-ON a finite lattice the 
+On a finite lattice the 
 \begin_inset Formula $A$
 \end_inset
 
-s are left normalized and on an infinite lattice they are orthogonalized
- the solution to the recursion is simply
+s are left normalized and on an infinite lattice they are orthogonalized,
+ so the solution to the recursion is simply
 \begin_inset Formula 
 \[
 E_{ji}^{D_{w}}=\delta_{j,i}
@@ -4098,7 +4099,7 @@ E_{j_{2}i_{2}}^{D_{w}-2}=\sum_{mn}W_{D_{w}D_{w}-2}^{mn}A_{j_{1}j_{2}}^{m\dagger}
 
 \begin_inset Formula 
 \[
-E_{j_{2}i_{2}}^{2}=\sum_{mn}W_{D_{w}2}^{mn}A_{i_{1}j_{2}}^{m\dagger}A_{i_{1}i_{2}}^{n}
+E_{j_{2}i_{2}}^{2}=\sum_{mn}W_{D_{w},D_{w}-2}^{mn}A_{i_{1}j_{2}}^{m\dagger}A_{i_{1}i_{2}}^{n}
 \]
 
 \end_inset
@@ -4163,7 +4164,7 @@ LHS=\sum_{J_{2}i_{2}}\left(E_{j_{2}i_{2}}^{1}-\sum_{j_{1}i_{1}}\sum_{n}A_{j_{1}j
 
 \end_inset
 
-and becuase of orthogonality of the state
+and because of orthogonality of the state
 \begin_inset Formula 
 \[
 =\sum_{J_{2}i_{2}}E_{j_{2}i_{2}}^{1}-\sum_{j_{1}i_{1}}E_{j_{1}i_{1}}^{1}\sum_{J_{2}i_{2}}\delta_{j_{1}i_{1}}\delta_{j_{2}i_{2}}
@@ -4187,7 +4188,7 @@ E_{0}=\frac{1}{D^{2}}\sum_{J_{2}i_{2}}\sum_{j_{1}i_{1}}\sum_{mn}\sum_{w_{1}=2}^{
 
 \end_inset
 
-so we don;t need to solve for 
+so we don't need to solve for 
 \begin_inset Formula $E^{1}$
 \end_inset
 
@@ -4208,11 +4209,11 @@ literal "false"
 
 \begin_layout Standard
 This paper has Frank Verstraete on it and one can therefore expect it to
- be hard to follow for us non-geniouses:).
+ be hard to follow for us non-geniuses:).
  Anyway let's give it a go ...
  this is yet another paper using the transverse Ising model for examples.
- In general I don't like any example that assume a one site unit cell.
- However if they explicitely state that extension to multi site unit cells
+ In general I don't like any example that assumes a one site unit cell.
+ However if they explicitly state that extension to multi site unit cells
  is trivial then at least I have confidence that if I work through the math
  I won't hit a brick wall.
  The Hamiltonian is
@@ -4286,12 +4287,13 @@ e^{\epsilon}\begin{bmatrix}\frac{3}{4} & 0 & 0 & 0\\
 0 & \frac{3}{4} & 0 & 0\\
 0 & 0 & \frac{3}{4} & 0\\
 0 & 0 & 0 & \frac{1}{4}
-\end{bmatrix}OK
+\end{bmatrix}
 \]
 
 \end_inset
 
-so I am already lost on hte first equation ...
+OK ...
+ so I am already lost on the first equation ...
  as predicted.
  Next......
 \end_layout
@@ -4309,6 +4311,654 @@ literal "false"
 \end_layout
 
 \begin_layout Standard
+They start by dividing the system into left and right half's, centered on
+ the bond between sites 
+\begin_inset Formula $i$
+\end_inset
+
+ and 
+\begin_inset Formula $i+1$
+\end_inset
+
+.
+ The Hamiltonian is then
+\begin_inset Formula 
+\[
+\hat{H}=\hat{H}_{L_{i}}\otimes𝕀_{R_{i}}+𝕀_{L_{i}}\otimes\hat{H}_{R_{i}}+\sum_{a_{i}=1}^{N_{i}}\hat{h}_{L_{i},a_{i}}\otimes\hat{h}_{R_{i},a_{i}}
+\]
+
+\end_inset
+
+where the sum is over the 
+\begin_inset Formula $N_{i}$
+\end_inset
+
+ interaction terms across the bond.
+ For example a Heisenberg interactions would look like
+\begin_inset Formula 
+\[
+\sum_{a_{i}=1}^{N_{i}}\hat{h}_{L_{i},a_{i}}\otimes\hat{h}_{R_{i},a_{i}}=\hat{S}_{i}^{x}\hat{S}_{i+1}^{x}+\hat{S}_{i}^{y}\hat{S}_{i+1}^{y}+\hat{S}_{i}^{z}\hat{S}_{i+1}^{z}.
+\]
+
+\end_inset
+
+The is a recursion relationship between the bond at 
+\begin_inset Formula $i$
+\end_inset
+
+ and 
+\begin_inset Formula $i-1$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{bmatrix}\hat{H}_{R_{i-1}}\\
+\hat{h}_{R_{i-1},a_{i-1}}\\
+𝕀_{R_{i-1}}
+\end{bmatrix}=\begin{bmatrix}\hat{𝕀} & \hat{C} & \hat{B}\\
+0 & \hat{A} & \hat{D}\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}\begin{bmatrix}\hat{H}_{R_{i}}\\
+\hat{h}_{R_{i},a_{i}}\\
+𝕀_{R_{i}}
+\end{bmatrix}
+\]
+
+\end_inset
+
+where the block matrix in the middle is the MPO for site 
+\begin_inset Formula $i$
+\end_inset
+
+, 
+\begin_inset Formula $\hat{W}_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Generic construction of efficient matrix product operators
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Hubig2017"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This paper describes how to build up arbitrary MPOs by adding and multiplying
+ simple MPO with one site operators.
+ When one does this more often than not, resulting MPO representation is
+ reducible.
+ In other words under SVD compression there will be many zero singular values,
+ and the MPO can be compressed without making any approximations.
+ As an example adding an MPO to itself will result in an MPO with dimension
+ 
+\begin_inset Formula $2D_{w}$
+\end_inset
+
+ but we know that multiplying the same MPO 
+\begin_inset Formula $\times2$
+\end_inset
+
+ will give an MPO with dimension 
+\begin_inset Formula $D_{w}$
+\end_inset
+
+, so the added version must compress from 
+\begin_inset Formula $2D_{w}$
+\end_inset
+
+ down to 
+\begin_inset Formula $D_{w}$
+\end_inset
+
+ with no approximations.
+\end_layout
+
+\begin_layout Standard
+The paper then explores applying standard MPS compression techniques
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Froewis2010,schollwoeck_density-matrix_2010"
+literal "false"
+
+\end_inset
+
+ to MPOs.
+ They claim some modifications are necessary in order to avoid numerical
+ instabilities.
+ Starting with any MPO tensor, we group the indices and SVD
+\begin_inset Formula 
+\[
+W_{w_{1}w_{2}}^{nm}\rightarrow W_{\left(w_{1}mn\right),w_{2}}\rightarrow\sum_{k=1}^{d^{2}D_{w}}U_{\left(w_{1}mn\right),k}s_{kk}V_{w_{2}}^{\dagger}\rightarrow\sum_{k=1}^{d^{2}D_{w}}\tilde{W}_{w_{1}k}^{mn}s_{kk}V_{w_{2}}^{\dagger}
+\]
+
+\end_inset
+
+and as usual 
+\begin_inset Formula $s_{kk}V_{w_{2}}^{\dagger}$
+\end_inset
+
+ get transferred over to the next site.
+ Usually one sweeps left to right and back again to complete the compression
+ across the lattice.
+\end_layout
+
+\begin_layout Standard
+If you try this for a mid sized lattice 
+\begin_inset Formula $L=20-40$
+\end_inset
+
+ you will find that singular values get extremely large, reference 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Parker2019"
+literal "false"
+
+\end_inset
+
+ explains why.
+ A simple work around is to simply re-scale the SVs with arithmetic average
+\begin_inset Formula 
+\[
+a_{s}=\frac{\sum_{k=1}^{d^{2}D_{w}}s_{kk}}{d^{2}D_{w}}
+\]
+
+\end_inset
+
+and re-scale
+\begin_inset Formula 
+\[
+s_{kk}\rightarrow\frac{1}{a_{s}}s_{kk},\quad\tilde{W}_{w_{1}k}^{mn}\rightarrow a_{s}\tilde{W}_{w_{1}k}^{mn}.
+\]
+
+\end_inset
+
+They go on to recommend de-linearization and de-parallelization algorithms
+ to replace SVD in certain situations where even re-scaled SVD fails.
+ But the necessity of using these algorithm may be eclipsed by the deeper
+ understanding of where large SVs come from as described in the next paper.
+\end_layout
+
+\begin_layout Subsection
+Local Matrix Product Operators:Canonical Form, Compression, and Control
+ Theory
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Parker2019"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Following 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Zaletel2015"
+literal "false"
+
+\end_inset
+
+ they start with an 
+\begin_inset Formula $L/R$
+\end_inset
+
+ partitioned Hamiltonian
+\begin_inset Formula 
+\begin{equation}
+\hat{H}=\hat{H}_{L_{i}}\otimes𝕀_{R_{i}}+𝕀_{L_{i}}\otimes\hat{H}_{R_{i}}+\sum_{ab=1}^{\chi}M_{ab}\hat{h}_{L}^{a}\otimes\hat{h}_{R}^{b}\label{eq:PartitionedHamiltonian}
+\end{equation}
+
+\end_inset
+
+The first two terms are extensive, and the third local term is intensive.
+ In this paper they use 
+\begin_inset Formula $\chi=D_{w}-2$
+\end_inset
+
+, which counts the 
+\emph on
+intensive
+\emph default
+ degrees of freedom in the MPO.
+ The key idea is to SVD the intensive part only and leave the extensive
+ parts untouched.
+ In order to make the SVD compression optimal they also purpose bringing
+ the MPO into canonical form such that
+\begin_inset Formula 
+\[
+Tr\left(\hat{h}_{L/R}^{a}\hat{h}_{L/R}^{b}\right)\propto\delta_{ab}
+\]
+
+\end_inset
+
+Eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:PartitionedHamiltonian"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ can be re-written as
+\begin_inset Formula 
+\begin{equation}
+\hat{H}=\begin{bmatrix}\hat{𝕀}_{L} & \hat{\boldsymbol{h}}_{L} & \hat{H}_{L}\end{bmatrix}\begin{bmatrix}1\\
+ & \boldsymbol{M}\\
+ &  & 1
+\end{bmatrix}\begin{bmatrix}\hat{𝕀}_{R}\\
+\hat{\boldsymbol{h}}_{R}\\
+\hat{H}_{R}
+\end{bmatrix}\label{eq:HPartition1}
+\end{equation}
+
+\end_inset
+
+Where 
+\begin_inset Formula $\boldsymbol{M}$
+\end_inset
+
+ is a 
+\begin_inset Formula $\chi\times\chi$
+\end_inset
+
+ matrix.
+ As usual I need a hard example.
+ So for a simple Heisenberg interaction we would have
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{h}}_{L}=\begin{bmatrix}\hat{S}_{i}^{x} & \hat{S}_{i}^{y} & \hat{S}_{i}^{z}\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{h}}_{R}=\begin{bmatrix}\hat{S}_{i+1}^{x} & \hat{S}_{i+1}^{y} & \hat{S}_{i+1}^{z}\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boldsymbol{M}=\begin{bmatrix}J & 0 & 0\\
+0 & J & 0\\
+0 & 0 & J
+\end{bmatrix}
+\]
+
+\end_inset
+
+In this case 
+\begin_inset Formula $\boldsymbol{M}$
+\end_inset
+
+ is already diagonal and requires no compression.
+ OK enough operators, lets start talking MPOs:
+\end_layout
+
+\begin_layout Subsubsection
+Finite MPO Left Canoncial Form
+\end_layout
+
+\begin_layout Standard
+They define a 
+\emph on
+regular
+\emph default
+ MPO as having the form
+\begin_inset Formula 
+\[
+\hat{W}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}} & \hat{d}\\
+0 & \hat{\boldsymbol{A}} & \hat{\boldsymbol{b}}\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\hat{\boldsymbol{c}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\boldsymbol{b}}$
+\end_inset
+
+ are operator valued vectors of length 
+\begin_inset Formula $\chi$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\boldsymbol{A}}$
+\end_inset
+
+ is an upper triangular operator valued 
+\begin_inset Formula $\chi\times\chi$
+\end_inset
+
+ matrix.
+ This MPO is said to be in left canonical form if it's upper left block
+\begin_inset Formula 
+\begin{equation}
+\hat{V}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}\\
+0 & \hat{\boldsymbol{A}}
+\end{bmatrix}\label{eq:WupperLeft}
+\end{equation}
+
+\end_inset
+
+has orthogonal columns
+\begin_inset Formula 
+\[
+\sum_{a=0}^{\chi}\left\langle \hat{W}_{ab},\hat{W}_{ac}\right\rangle =\frac{\sum_{a=0}^{\chi}Tr\left[\hat{W}_{ab}^{\dagger}\hat{W}_{ac}\right]}{Tr\left[\hat{𝕀}\right]}=\delta_{bc}
+\]
+
+\end_inset
+
+The right canonical form is the 
+\emph on
+mirror
+\emph default
+ of this.
+ If the MPO is in left canonical form the eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:HPartition1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ simplifies to
+\begin_inset Formula 
+\[
+\hat{H}=\begin{bmatrix}\hat{𝕀}_{L} & \hat{\boldsymbol{h}}_{L} & \hat{H}_{L}\end{bmatrix}\begin{bmatrix}\hat{𝕀}_{R}\\
+\hat{\boldsymbol{h}}_{R}\\
+\hat{H}_{R}
+\end{bmatrix}
+\]
+
+\end_inset
+
+in addition the operators on neigbouring sites are related by recursion
+\begin_inset Formula 
+\[
+\begin{bmatrix}\hat{𝕀}_{L}^{n-1} & \hat{\boldsymbol{h}}_{L}^{n-1}\end{bmatrix}\hat{V}^{n}=\begin{bmatrix}\hat{𝕀}_{L}^{n} & \hat{\boldsymbol{h}}_{L}^{n}\end{bmatrix}
+\]
+
+\end_inset
+
+So how do we get into left canonicla form? MPOs have a similar guage freedom
+ as MPSs, so we need to find a guage transformation that brings the MPO
+ into left canoncial form.
+ Suppose 
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+ is an MPO with internal dimensions 
+\begin_inset Formula $D_{w}\times D_{w}=\left(1+\chi+1\right)\times\left(1+\chi+1\right)$
+\end_inset
+
+ with 
+\begin_inset Formula $\hat{V}$
+\end_inset
+
+ as in eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:WupperLeft"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ then we can group the indices and reshapve 
+\begin_inset Formula $V$
+\end_inset
+
+ as
+\begin_inset Formula 
+\[
+V_{w_{1}w_{2}}^{mn}\rightarrow V_{\left(w_{1}mn\right),w_{2}}
+\]
+
+\end_inset
+
+which is a 
+\begin_inset Formula $d^{2}\left(1+\chi\right)\times\left(1+\chi\right)$
+\end_inset
+
+ matrix.
+ In the paper do a thin QR decomposition
+\begin_inset Formula 
+\[
+V_{\left(w_{1}mn\right),w_{2}}=\sum_{k=1}^{\left(1+\chi\right)}Q_{\left(w_{1}mn\right),k}R_{k,w_{2}}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}^{\prime}\\
+0 & \hat{\boldsymbol{A}}^{\prime}
+\end{bmatrix}\begin{bmatrix}1 & t\\
+0 & \mathsf{R}
+\end{bmatrix}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $R$
+\end_inset
+
+ is upper triangular.
+ They now define block respectiong QR decomposition of 
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+ as
+\begin_inset Formula 
+\[
+QR\left(\hat{W}\right)=\hat{Q}R=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}^{\prime} & \hat{d}\\
+0 & \hat{\boldsymbol{A}}^{\prime} & \hat{\boldsymbol{b}}\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}\begin{bmatrix}1 & t & 0\\
+0 & \mathsf{R} & 0\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+In this context, block respecting just means ignoe the last column and row.
+ Now one can sweep throught the lattice
+\begin_inset Formula 
+\[
+\boldsymbol{l}\hat{W}^{1}\hat{W}^{2}\hat{W}^{2}\cdots
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\boldsymbol{l}\hat{Q}^{1}R^{1}\hat{W}^{2}\hat{W}^{2}\cdots
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\boldsymbol{l}\hat{Q}^{1}\hat{W}^{2\prime}\hat{W}^{2}\cdots
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\boldsymbol{l}\hat{Q}^{1}\hat{Q}^{2}R^{2}\hat{W}^{2}\cdots
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Finite MPO Compression
+\end_layout
+
+\begin_layout Standard
+We start with a right canonical MPO
+\begin_inset Formula 
+\[
+\hat{H}=\boldsymbol{l}\hat{W}_{R}\hat{W}_{R}\hat{W}_{R}\cdots
+\]
+
+\end_inset
+
+and QR the first 
+\begin_inset Formula $W$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{H}=\boldsymbol{l}\hat{W}_{L}R\hat{W}_{R}\hat{W}_{R}\cdots
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $R$
+\end_inset
+
+ always has the block structure 
+\begin_inset Formula 
+\[
+R=\begin{bmatrix}1 & t & 0\\
+0 & \mathsf{R} & 0\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+which can be decomposed as
+\begin_inset Formula 
+\[
+R=MR^{\prime}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{M} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & t & 0\\
+0 & 𝕀 & 0\\
+0 & 0 & 1
+\end{bmatrix}=\begin{bmatrix}1 & t & 0\\
+0 & \mathsf{M} & 0\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+So 
+\begin_inset Formula $\mathsf{M}=\mathsf{R}$
+\end_inset
+
+ so why did they introduce 
+\begin_inset Formula $\mathsf{M}$
+\end_inset
+
+ at all??!? Any way the secret sauce here is to just SVD compress 
+\begin_inset Formula $\mathsf{R}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathsf{R}=UsV^{\dagger}
+\]
+
+\end_inset
+
+which gives us 
+\begin_inset Formula $\chi$
+\end_inset
+
+ singular values to look at and cull.
+ These should all be intensive, i.e.
+ not grow exponentially with system size.
+ We can absorbe 
+\begin_inset Formula $U$
+\end_inset
+
+ to the left 
+\begin_inset Formula $\hat{W}_{L}^{\prime}=\hat{W}_{L}U$
+\end_inset
+
+ and maintain canonical form, and similarly we can absorb 
+\begin_inset Formula $V^{\dagger}$
+\end_inset
+
+ and 
+\begin_inset Formula $R^{\prime}$
+\end_inset
+
+ to the right 
+\begin_inset Formula $\hat{W}_{R}^{\prime}=V^{\dagger}R^{\prime}\hat{W}_{R}$
+\end_inset
+
+.
+ We can truncate 
+\begin_inset Formula $s$
+\end_inset
+
+ and drop the corresponding rows of 
+\begin_inset Formula $\hat{W}_{L}^{\prime}$
+\end_inset
+
+ and columns of 
+\begin_inset Formula $\hat{W}_{R}^{\prime}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+This algorithm fails to explain what happens to the diagonal matrix 
+\begin_inset Formula $s$
+\end_inset
+
+?! For a conventional MPS compression left sweep it get absorbed to right,
+ leaving site to the right un-normalized or non-canonical, but that's ok
+ as it get processed next.
+ 
+\end_layout
+
+\begin_layout Standard
+A version for two site unit cell appears in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Soejima2020"
+literal "false"
+
+\end_inset
+
 
 \end_layout
 
@@ -4324,7 +4974,7 @@ name "subsec:Infinite-Time-Evolved"
 \end_layout
 
 \begin_layout Standard
-This technique usualy starts Vidal's canonical form, eq.
+This technique usually starts Vidal's canonical form, eq.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -4375,7 +5025,7 @@ name "fig:Vidals-original-iTEBD"
 
 \end_inset
 
-Vidals original iTEBD algorithm for a 1D lattice with a two site unit cell
+Vidal's original iTEBD algorithm for a 1D lattice with a two site unit cell
 \end_layout
 
 \end_inset
@@ -4445,7 +5095,7 @@ For
 \end_layout
 
 \begin_layout Enumerate
-Constract 
+Contract 
 \begin_inset Formula $\varTheta_{i_{a}i_{b}}^{m_{a}m_{b}}=\sum_{n_{a}n_{b}k}A_{i_{a}k}^{n_{a}}\lambda_{k}^{A}B_{ki_{b}}^{n_{b}}U_{m_{a}m_{b}}^{n_{a}n_{b}}$
 \end_inset
 
@@ -4493,7 +5143,7 @@ Now
 \end_layout
 
 \begin_layout Enumerate
-This leave us witht he structure 
+This leave us with he structure 
 \begin_inset Formula $\lambda^{B}\tilde{\Gamma}^{n_{a}}\tilde{\lambda}^{A}\tilde{\Gamma}^{n_{b}}\lambda^{B}$
 \end_inset
 
@@ -4557,9 +5207,9 @@ VV^{\dagger}=\sum_{n_{a}}\Gamma^{n_{a}}\lambda^{A}\left(\Gamma^{n_{a}}\lambda^{A
 
 \end_inset
 
-In step 5 we truncate the singluar values, after witch the orthonormality
+In step 5 we truncate the singular values, after witch the orthonormality
  no longer holds true.
- The canonical form is by definition when the Schmidt deomposition about
+ The canonical form is by definition when the Schmidt decomposition about
  any bond 
 \begin_inset Formula $A$
 \end_inset
@@ -4643,7 +5293,7 @@ name "fig:Canonical One SIte"
 
 \end_inset
 
-Proceedure for getting an iTEBD state into canonical form, which also restores
+Procedure for getting an iTEBD state into canonical form, which also restores
  orthogonality.
  
 \end_layout
@@ -4667,8 +5317,8 @@ One site unit cell, direct
 \end_layout
 
 \begin_layout Standard
-The algorithm orthongalizing a system with a one site unit cell is reusable
- for larger unit cells
+The algorithm for orthogonalizing a system with a one site unit cell is
+ reusable for larger unit cells
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Orus2008"
@@ -4691,7 +5341,7 @@ noprefix "false"
 \end_layout
 
 \begin_layout Enumerate
-Calculate the right and left transfer matricies
+Calculate the right and left transfer matrices
 \begin_inset Formula 
 \[
 R_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}=\sum_{n}\left(\varGamma_{i_{1}i_{2}}^{n}\lambda_{i_{2}}\right)\left(\varGamma_{j_{1}j_{2}}^{*n}\lambda_{j_{2}}\right)
@@ -4920,7 +5570,7 @@ V^{L}=UdU^{\dagger}=U\sqrt{d}\sqrt{d}U^{\dagger}=Y^{\dagger}Y
 \end_layout
 
 \begin_layout Enumerate
-Insert the resulotions into
+Insert the resolutions into
 \begin_inset Formula 
 \[
 \lambda\varGamma^{n}\lambda\rightarrow Y^{T-1}Y^{T}\lambda XX^{-1}\varGamma^{n}Y^{T-1}Y^{T}\lambda XX^{-1}
@@ -5286,11 +5936,11 @@ literal "false"
 
 \end_inset
 
- Ian McCulloch propose and alternate method for the orhtogonalizing, that
+ Ian McCulloch propose and alternate method for the orthogonalizing, that
  does not required inverted matrices.
  However he uses iDMRG language which we must translate to our notation
  used herein.
- SOme tranlations are shown in the table.
+ Some translations are shown in the table.
 \begin_inset Float table
 wide false
 sideways false
@@ -5540,7 +6190,7 @@ iDMRG central unit cell
 \begin_inset Text
 
 \begin_layout Plain Layout
-iDMGR two interations, or double cell
+iDMRG two interations, or double cell
 \end_layout
 
 \end_inset
@@ -5684,7 +6334,7 @@ where we have defined
 
 \end_inset
 
-As with standard orthogonalization we still need to decompose the transfer
+As with standard Orthogonalization we still need to decompose the transfer
  matrix eigen vectors
 \begin_inset Formula 
 \[
@@ -5857,7 +6507,7 @@ Apply iMPO operator
 
 \begin_layout Standard
 An MPO operator has has now external virtual legs.
- In other words the interal dimensions 
+ In other words the internal dimensions 
 \begin_inset Formula $D_{w}$
 \end_inset
 
@@ -5903,7 +6553,7 @@ and for the two sites
 
 \begin_layout Standard
 The best strategy is to orthogonalize first and then SVD compress.
- At the end of the orth process we have 
+ At the end of the orthogonalization process we have 
 \begin_inset Formula $\lambda^{\prime B}$
 \end_inset
 
@@ -5936,7 +6586,7 @@ Direct Orthogonalization
 \end_layout
 
 \begin_layout Standard
-In direct orth algorithm we end up with 
+In direct orthogonalization algorithm we end up with 
 \begin_inset Formula 
 \[
 Y^{T}\lambda X=U\lambda^{\prime}V^{\dagger}
@@ -5963,7 +6613,7 @@ so if we simply compress
 \begin_inset Formula $\Gamma^{\prime}$
 \end_inset
 
- becuase 
+ because 
 \begin_inset Formula $U$
 \end_inset
 
@@ -5981,7 +6631,7 @@ Iterative Orthogonalization
 \begin_layout Standard
 Things appear not so simple in the iterative scheme since the transforms
  are iterated many time and we don't want compress until right at the end.
- The oggd thing is that at the end of iterations the transform matrix all
+ The odd thing is that at the end of iterations the transform matrix all
  approach unity, 
 \begin_inset Formula $Y\approx X\approx U\approx V\approx I$
 \end_inset
@@ -6055,7 +6705,7 @@ literal "false"
 \begin_inset Formula $\exp\left(-\tau H\right)$
 \end_inset
 
- this is achived by doing a standard SVD decomposition of two site gate
+ this is achieved by doing a standard SVD decomposition of two site gate
  they call 
 \begin_inset Formula $g$
 \end_inset
@@ -6070,7 +6720,7 @@ g_{w_{1}w_{3}}^{m_{a}n_{a}m_{b}n_{b}}=\sum_{w_{2}}g_{w_{1}w_{2}}^{m_{a}n_{a}}g_{
 
 As usual they do everything for a one site unit which makes it almost useless
  for real iTEBD.
- In addition they omit all physical indicies from 
+ In addition they omit all physical indices from 
 \begin_inset Formula $A$
 \end_inset
 
@@ -6199,7 +6849,7 @@ where
 \begin_inset Formula $s$
 \end_inset
 
- and substitue
+ and substitute
 \begin_inset Formula 
 \[
 \tilde{A}^{m_{a}}=s^{\prime}V^{\dagger}U^{m_{a}}=QU^{m_{a}}sV^{\dagger}P
@@ -6326,11 +6976,11 @@ P=V\frac{1}{\sqrt{s}}P^{\prime}U\sqrt{s^{\prime}}
 \end_layout
 
 \begin_layout Standard
-Proceeding in an optamistic fog the next step is to run 
+Proceeding in an optimistic fog the next step is to run 
 \begin_inset Formula $\tilde{\lambda}\tilde{\varGamma}^{m_{a}}$
 \end_inset
 
- throught the orthogonalization mill to get 
+ through the orthogonalization mill to get 
 \begin_inset Formula 
 \[
 \tilde{\lambda}\tilde{\varGamma}^{m_{a}}\underset{\longrightarrow}{orth}\tilde{\lambda}_{1}\tilde{\varGamma}_{1}^{m_{a}}
@@ -6438,7 +7088,7 @@ E_{\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}=\sum_{m_{a}}\tilde{A}_{1j_{1}
 
 \end_inset
 
-FInally we combine everything into a gate
+Finally we combine everything into a gate
 \begin_inset Formula 
 \[
 G=U^{\dagger}Q_{c}QgPP_{c}U
@@ -6582,7 +7232,7 @@ U^{m_{a}}s^{\prime A}V^{A\dagger}U^{m_{b}}s^{\prime B}V^{B\dagger}
 
 \end_inset
 
-whihc means we ned up rotating 
+whihc means we end up rotating 
 \begin_inset Formula $\sqrt{s^{\prime B}}V^{B\dagger}$
 \end_inset
 
@@ -6721,7 +7371,7 @@ P^{B}=V^{B}\frac{1}{\sqrt{s^{B}}}P^{\prime}U^{m_{b}}\sqrt{s^{B\prime}}
 
 \end_inset
 
-THe next step is to orthogonalize the whole unite cell
+The next step is to orthogonalize the whole unite cell
 \begin_inset Formula 
 \[
 \tilde{\varGamma}^{m_{a}}\tilde{\lambda}^{A}\tilde{\varGamma}^{m_{b}}\tilde{\lambda}^{B}
@@ -6782,7 +7432,7 @@ where we now have all too many
 \end_inset
 
 and Qs.
- I think this is dead end becuase for example 
+ I think this is dead end because for example 
 \begin_inset Formula $P^{n_{a}}$
 \end_inset
 
@@ -6791,7 +7441,7 @@ and Qs.
 \end_inset
 
 .
- THis where we need to think about a two site gate (whihc can possible be
+ This where we need to think about a two site gate (whihc can possible be
  decomposed via SVD into the two one site gates.
  Define
 \begin_inset Formula 
@@ -6894,13 +7544,13 @@ Then we shift the center and define
 \begin_inset Formula $A_{o}^{m}=\varGamma^{m}\lambda^{A}$
 \end_inset
 
- adn finally get a two site gate 
+ and finally get a two site gate 
 \begin_inset Formula $G^{m_{b}n_{b}m_{a}n_{a}}$
 \end_inset
 
 .
- Then we alternae applying these gates.
- THis all depends on whether the ansatz than the enviroment is stable under
+ Then we alternate applying these gates.
+ This all depends on whether the ansatz than the environment is stable under
  iteration holds true.
  What if the 
 \begin_inset Formula $AB$
@@ -6910,7 +7560,7 @@ Then we shift the center and define
 \begin_inset Formula $BA$
 \end_inset
 
- enviroments interacto strongly? Then the ansatz fails.
+ environments interact strongly? Then the ansatz fails.
 \end_layout
 
 \begin_layout Standard
@@ -6999,7 +7649,7 @@ which is just the full wavefunction (not an MPS) and
 \begin_inset Formula $d^{2}\times d^{2}$
 \end_inset
 
- Hamiltonian matrix and reshaping the ground state eigvector
+ Hamiltonian matrix and reshaping the ground state eigenvector
 \begin_inset Formula 
 \[
 U_{1,i}\rightarrow U_{1,(n_{1}^{A}n_{1}^{B})}=\boldsymbol{C}^{n_{1}^{A}n_{1}^{B}}
@@ -7055,7 +7705,7 @@ This assumes that
 \begin_inset Formula $i_{1}$
 \end_inset
 
- at this statge.
+ at this stage.
 \end_layout
 
 \begin_layout Standard
@@ -7174,7 +7824,7 @@ We need to solve
 
 \end_inset
 
-From the diagram we see use the rulle for 
+From the diagram we see use the rule for 
 \begin_inset Formula $H_{eff}$
 \end_inset
 
@@ -7268,7 +7918,7 @@ Finite lattice MPS with open boundary conditions
 \end_layout
 
 \begin_layout Enumerate
-MPOs with optimized conractions routines
+MPOs with optimized contractions routines
 \end_layout
 
 \begin_layout Enumerate
@@ -7291,7 +7941,7 @@ Embryonic UI using wxPython using the wxPlotting library
 
 \begin_deeper
 \begin_layout Enumerate
-Run time is not reliable, crashes when inializing graphs on home PC
+Run time is not reliable, crashes when initializing graphs on home PC
 \end_layout
 
 \end_deeper
@@ -7586,7 +8236,7 @@ literal "false"
 \end_deeper
 \begin_layout Itemize
 Try making Itensor and Fastor versions of the MPSSite class.
- How much code needs to sequestored behind an interface in order to do this?
+ How much code needs to sequestered behind an interface in order to do this?
 \end_layout
 
 \begin_layout Subsection
@@ -7616,7 +8266,7 @@ status open
 \begin_inset Text
 
 \begin_layout Plain Layout
-Desciption
+Description
 \end_layout
 
 \end_inset
@@ -8439,7 +9089,7 @@ Puzzle #1
 \end_layout
 
 \begin_layout Standard
-Schollwoeck eq.
+Schollwoek eq.
  eq 150 is
 \begin_inset Formula 
 \[
@@ -8519,7 +9169,7 @@ literal "false"
 \end_inset
 
 .
- THis is useful for checking iTEBD results, but for other methods we need
+ This is useful for checking iTEBD results, but for other methods we need
  to know GS energies for finite lattices with open boundary conditions.
  There are few numbers in phys.
  stat.
@@ -8761,7 +9411,7 @@ Using the MPtoolkit mp-dmrg program we get good agreement for
 \begin_inset Formula $L=6,8$
 \end_inset
 
- but a significant discrepency for 
+ but a significant discrepancy for 
 \begin_inset Formula $L=4$
 \end_inset
 
@@ -9417,7 +10067,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-iDGRM GS energies, mp-toolkit, SU(2) lattice with 2 site unit cell.
+iDMRG GS energies, mp-toolkit, SU(2) lattice with 2 site unit cell.
 \end_layout
 
 \end_inset
