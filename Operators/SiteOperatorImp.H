@@ -65,6 +65,7 @@ class SiteOperatorImp : public virtual SiteOperator
 
         int itsd; //2*S+1
         Dw12 itsDw12;
+        double itsTruncationError;
 
         TensorT itsWs;
         SiteOperatorImp* itsLeft_Neighbour;

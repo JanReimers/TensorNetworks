@@ -17,6 +17,7 @@ namespace TensorNetworks
 SiteOperatorImp::SiteOperatorImp(int d)
     : itsd(d)
     , itsDw12(1,1,Vector<int>(1),Vector<int>(1))
+    , itsTruncationError(0.0)
     , itsWs(d,d)
 {
     itsDw12.w1_first(1)=1;
@@ -38,6 +39,7 @@ SiteOperatorImp::SiteOperatorImp(int d)
 SiteOperatorImp::SiteOperatorImp(int d, double S, SpinOperator so) //Construct spin operator
     : itsd(d)
     , itsDw12(1,1,Vector<int>(1),Vector<int>(1))
+    , itsTruncationError(0.0)
     , itsWs(d,d)
 {
     itsDw12.w1_first(1)=1;
@@ -57,6 +59,7 @@ SiteOperatorImp::SiteOperatorImp(int d, double S, SpinOperator so) //Construct s
 SiteOperatorImp::SiteOperatorImp(int d, Position lbr, const OperatorClient* H)
     : itsd(d)
     , itsDw12(H->GetDw12(lbr))
+    , itsTruncationError(0.0)
     , itsWs(d,d)
 {
     for (int m=0; m<itsd; m++)
@@ -73,6 +76,7 @@ SiteOperatorImp::SiteOperatorImp(int d, Position lbr, const OperatorClient* H)
 SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s)
     : itsd(d)
     , itsDw12()
+    , itsTruncationError(0.0)
     , itsWs(d,d)
 {
     int Dw=s.GetNumRows();
@@ -185,11 +189,12 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
     assert(comp);
     MatrixRT  A=Reshape(lr);
     LapackSVDSolver<double> solver;
-    auto [U,sm,VT]=solver.Solve(A,1e-12,Min(A.GetNumRows(),A.GetNumCols())); //Solves A=U * s * VT
+    auto [U,sm,VT]=solver.SolveAll(A,1e-14); //Solves A=U * s * VT
     //
     //  Rescaling
     //
     double s_avg=Sum(sm.GetDiagonal())/sm.size();
+//    cout << "s_avg, sm=" << s_avg << " " << sm << endl;
     sm*=1.0/s_avg;
      switch (lr)
     {
@@ -201,7 +206,7 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
             break;
     }
 
-    comp->Compress(U,sm,VT);
+    itsTruncationError=comp->Compress(U,sm,VT);
     MatrixRT UV;// This get transferred through the bond to a neighbouring site.
     switch (lr)
     {
@@ -374,7 +379,7 @@ void SiteOperatorImp::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const M
 
 void SiteOperatorImp::Report(std::ostream& os) const
 {
-    os << itsDw12.Dw1 << " " << itsDw12.Dw2;
+    os << itsDw12.Dw1 << " " << itsDw12.Dw2 << " " << itsTruncationError;
 }
 
 } //namespace
