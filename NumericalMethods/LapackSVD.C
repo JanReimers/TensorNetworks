@@ -101,14 +101,13 @@ LapackSVDSolver<T>::SolveAll(const MatrixT& A,double eps)
     return Solve(A,eps,mn);
 }
 
-//using std::real;
-
 template <class T> typename LapackSVDSolver<T>::UsVType
 LapackSVDSolver<T>::Solve(const MatrixT& A,double eps, int NumSingularValues)
 {
     assert(eps<1.0);
     assert(NumSingularValues>0);
     assert(NumSingularValues<=Min(A.GetNumRows(),A.GetNumCols()));
+    assert(!isnan(A));
     int M=A.GetNumRows(),N=A.GetNumCols(),mn=Min(M,N);
 
     //
@@ -129,6 +128,12 @@ LapackSVDSolver<T>::Solve(const MatrixT& A,double eps, int NumSingularValues)
     //  Now do the actual SVD work
     //
     gesvd<T>(&jobu,&jobv,&M,&N,&U(1,1),&M,&s(1),0,&M,&VT(1,1),&N,&work(1),&lwork,&info);
+    if (info!=0)
+    {
+        std::cerr << "Warning: LapackSVDSolver info=" << info << std::endl;
+//        std::cout << std::fixed << "A=" << A << std::endl;
+//        std::cout << "s=" << s << std::endl;
+    }
     assert(info==0);
     //
     //  Now fix up the matrix limits
