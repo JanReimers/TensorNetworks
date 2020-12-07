@@ -2,6 +2,7 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/MPO.H"
+#include "TensorNetworks/iMPO.H"
 #include "TensorNetworks/Factory.H"
 #include "Operators/SiteOperatorImp.H"
 #include "Containers/Matrix6.H"
@@ -344,26 +345,50 @@ TEST_F(MPOTests,TestMPOCompressForE2)
     delete H1;
     delete H2;
 }
-
-TEST_F(MPOTests,TestL2iMPOTrotter1)
+TEST_F(MPOTests,TestL2MPOTrotter2)
 {
-    int L=2,D=2;
+    int L=4,D=2;
     double S=0.5,dt=0.1;
     Setup(L,S,D);
-    TensorNetworks::MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder);
-    for (int is=1;is<=L;is++)
+    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
+    expH->Compress(0,1e-4);
+    expH->Report(cout);
+    for (int is=2;is<=L-1;is++)
     {
         TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
         EXPECT_EQ(Dw.Dw1,4);
         EXPECT_EQ(Dw.Dw2,4);
     }
 }
+
+TEST_F(MPOTests,TestL2iMPOTrotter1)
+{
+    int L=2,D=2;
+    double S=0.5,dt=0.00001,epsMPO=1e-14;
+    Setup(L,S,D);
+    TensorNetworks::iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
+//    expH->Report(cout);
+    for (int is=1;is<=L;is++)
+    {
+        TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
+        EXPECT_EQ(Dw.Dw1,4);
+        EXPECT_EQ(Dw.Dw2,4);
+
+//        int d=2*S+1;
+//        TensorNetworks::SiteOperator* so=expH->GetSiteOperator(is);
+//        cout << std::fixed << endl;
+//        for (int m=0;m<d;m++)
+//            for (int n=0;n<d;n++)
+//                cout << "W(" << m << "," << n << ")=" << so->GetW(m,n) << endl;
+    }
+}
 TEST_F(MPOTests,TestL2iMPOTrotter2)
 {
     int L=2,D=2;
-    double S=0.5,dt=0.1;
+    double S=0.5,dt=0.1,epsMPO=1e-4;
     Setup(L,S,D);
-    TensorNetworks::MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder);
+    TensorNetworks::iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder,epsMPO);
+    expH->Report(cout);
     for (int is=1;is<=L;is++)
     {
         TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
@@ -374,14 +399,14 @@ TEST_F(MPOTests,TestL2iMPOTrotter2)
 TEST_F(MPOTests,TestL2iMPOTrotter4)
 {
     int L=2,D=2;
-    double S=0.5,dt=0.1;
+    double S=0.5,dt=0.1,epsMPO=1e-4;
     Setup(L,S,D);
-    TensorNetworks::MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder);
+    TensorNetworks::iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder,epsMPO);
     for (int is=1;is<=L;is++)
     {
         TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
-        EXPECT_EQ(Dw.Dw1,16);
-        EXPECT_EQ(Dw.Dw2,16);
+        EXPECT_EQ(Dw.Dw1,4);
+        EXPECT_EQ(Dw.Dw2,4);
     }
 }
 

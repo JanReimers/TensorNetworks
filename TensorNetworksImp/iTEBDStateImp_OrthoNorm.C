@@ -264,10 +264,10 @@ iTEBDStateImp::MMType iTEBDStateImp::Factor(const MatrixCT m)
     delete solver;
     X=U*DiagonalMatrix<double>(sqrt(e));
     if (Min(e)<1e-10)
-        Logger->LogWarnV(2,"iTEBDStateImp::Factor small eigenvalue min(e)==%.1e", Min(e));
+        Logger->LogWarnV(1,"iTEBDStateImp::Factor small eigenvalue min(e)==%.1e", Min(e));
 
     Xinv=DiagonalMatrix<double>(1.0/sqrt(e))*Transpose(conj(U));
-    assert(IsUnit(X*Xinv,1e-13));
+    //assert(IsUnit(X*Xinv,1e-13));
     return std::make_tuple(X,Xinv);
 }
 
@@ -288,7 +288,9 @@ void iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda,dou
     dcmplx el;
     double deltal=0;
     int niter=0;
-    Logger->LogInfoV(4,"iTEBDStateImp::OrthogonalizeI Starting iterations, eps=%.1e, D=%4d, d=%4d",eps,D,d);
+    Logger->LogInfoV(3,"iTEBDStateImp::OrthogonalizeI: D=%4d,eps=%.1e, maxIter=%4d",D,eps,maxIter);
+//    cout << "lambda=" << lambda.GetDiagonal() << endl;
+    Logger->LogInfoV(3," niter  deltal        er                  el           er-el     er-1     el-1");
     do
     {
         Vr=GetNormMatrix(DRight,gamma*lambda); //=Er*I
@@ -309,8 +311,9 @@ void iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda,dou
         el=Vl(1,1);
         Vr/=er;
         Vl/=el;
-
-//
+        for (int n=0;n<d;n++)
+            gamma[n]/=sqrt(el);
+////
 //  Make sure Vr and Vl are loosely Hermitian.
 //
         assert(IsHermitian(Vr,1e-10));
@@ -324,11 +327,29 @@ void iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda,dou
 //        MatrixCT YTinv=conj(Ydinv);
         MatrixCT YT   =Transpose(Yd);
         MatrixCT YTinv=Transpose(Ydinv);
-        assert(IsUnit(X*Xinv,1e-13));
-        assert(IsUnit(YT*YTinv,1e-12));
+        if (niter>0)
+        {
+            double errx=Max(fabs(X*Xinv-I));
+            double erry=Max(fabs(YT*YTinv-I));
+            if (errx>D*1e-13)
+                Logger->LogWarnV(1,"iTEBDStateImp::OrthogonalizeI large error in X*Xinv-I=%.1e, niter=%4d",errx,niter);
+            if (erry>D*1e-13)
+                Logger->LogWarnV(1,"iTEBDStateImp::OrthogonalizeI large error in YT*YTinv-I=%.1e, niter=%4d",erry,niter);
+            assert(IsUnit(X *Xinv ,D*1e-10));
+            assert(IsUnit(YT*YTinv,D*1e-10));
+        }
+        if (isnan(YT))
+        {
+            cout << "Vl.diag=" << Vl.GetDiagonal() << endl;
+            cout << "Vl=" << Vl << endl;
+            cout << "Yd=" << Yd << endl;
+        }
         //
         //  Transform lambda and SVD
         //
+        assert(!isnan(YT));
+        assert(!isnan(X));
+        assert(!isnan(lambda));
         MatrixCT YlX=YT*lambda*X; //THis will scale lambda by 1/D since YT and X are both O(1/sqrt(D))
         auto [U,lambda_prime,VT]=svd_solver->SolveAll(YlX,1e-13);
         //
@@ -348,8 +369,8 @@ void iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda,dou
         }
         deltal=Max(fabs(lambda-lambda_prime));
         lambda=lambda_prime;
-        Logger->LogInfoV(5,"iTEBDStateImp::OrthogonalizeI %4d iterations, deltal=%.1e, er/el=(%.5f,%.1e)/(%.5f,%.1e), er-el=%.1e, er-1=%.1e, el-1=%.1e"
-                         ,niter,deltal,real(er),imag(er),real(el),imag(el),fabs(er-el),fabs(er-1.0),fabs(el-1.0));
+        Logger->LogInfoV(3," %4d  %.1e  (%.5f,%.1e) (%.5f,%.1e)   %.1e  %.1e   %.1e"
+           ,niter,deltal,real(er),imag(er),real(el),imag(el),fabs(er-el),fabs(er-1.0),fabs(el-1.0));
         if (deltal<eps) break;
         niter++;
     } while (niter<maxIter);
@@ -367,11 +388,10 @@ void iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda,dou
     //  Verify orthogonaly  .. we haven't assigned anything yet
     //
     double Oerror=GetOrthonormalityErrors(gamma,lambda);
-    double epsO=D*eps;
+    double epsO=D*D*eps;
     if (Oerror>epsO)
-        Logger->LogWarnV(2,"iTEBDStateImp::OrthogonalizeI Large orthonormaility error=%.1e > %.1e",Oerror,epsO);
+        Logger->LogWarnV(3,"iTEBDStateImp::OrthogonalizeI Large orthonormaility error=%.1e > %.1e",Oerror,epsO);
 
-    Logger->LogInfoV(2,"iTEBDStateImp::OrthogonalizeI complete R/L orthonormaility error=%.1e",Oerror);
 }
 
 //

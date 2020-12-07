@@ -62,6 +62,15 @@ void MPOImp::ConvertToiMPO(int UnitCell)
         itsSites.erase(is);
     }
     itsL=UnitCell;
+    //
+    //  Link first and last sites.
+    //
+    SiteOperatorImp* s=dynamic_cast<SiteOperatorImp*>(itsSites[1]);
+    assert(s);
+    s->SetNeighbours(itsSites[itsL  ],itsSites[2]);
+    s=dynamic_cast<SiteOperatorImp*>(itsSites[itsL]);
+    assert(s);
+    s->SetNeighbours(itsSites[itsL-1],itsSites[1]);
 
 }
 

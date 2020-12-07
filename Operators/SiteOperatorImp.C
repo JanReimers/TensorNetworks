@@ -1,10 +1,8 @@
 #include "Operators/SiteOperatorImp.H"
-//#include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 #include "NumericalMethods/LapackSVD.H"
 #include "Containers/Vector3.H"
-//#include "oml/minmax.h"
 #include "oml/diagonalmatrix.h"
 #include <complex>
 

@@ -384,6 +384,7 @@ TEST_F(ImaginaryTimeTests,TestITimeFourthOrderTrotterL2)
     delete Psi1;
 }
 
+#ifndef DEBUG
 
 TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotter)
 {
@@ -422,7 +423,6 @@ TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotter)
     double E2=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E2/(L-1),-0.46664265599414939,1e-4);
 }
-#ifndef DEBUG
 
 TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
 {

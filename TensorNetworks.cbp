@@ -129,6 +129,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/SiteOperatorImp.H" />
+		<Unit filename="Operators/iMPOImp.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/iMPOImp.H" />
 		<Unit filename="TODO_List" />
 		<Unit filename="TensorNetworks/CheckSpin.C">
 			<Option compilerVar="CC" />
@@ -170,6 +174,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworks/VNEntropy.H" />
+		<Unit filename="TensorNetworks/iMPO.H" />
 		<Unit filename="TensorNetworks/iTEBDState.H" />
 		<Unit filename="TensorNetworksImp/Bond.C">
 			<Option compilerVar="CC" />

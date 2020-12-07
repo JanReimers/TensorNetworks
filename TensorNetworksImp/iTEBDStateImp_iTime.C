@@ -1,7 +1,7 @@
 #include "TensorNetworksImp/iTEBDStateImp.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/SVCompressor.H"
-#include "TensorNetworks/MPO.H"
+#include "TensorNetworks/iMPO.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworks/IterationSchedule.H"
@@ -45,9 +45,10 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
     assert(isl.itsDmax>0 || isl.itsEps.itsMPSCompressEpsilon>0);
     double dt=isl.itsdt;
 
-//    Matrix4RT Hlocal=H->BuildLocalMatrix();
-//    Matrix4RT expH=Hamiltonian::ExponentH(dt,Hlocal);
-    MPO* expH=H->CreateOperator(dt,TensorNetworks::FourthOrder);
+    Matrix4RT Hlocal=H->BuildLocalMatrix();
+    Matrix4RT expH=Hamiltonian::ExponentH(dt,Hlocal);
+//    MPO* expH=H->CreateOperator(dt,TensorNetworks::SecondOrder);
+//    MPO* expH=H->CreateiMPO(dt,TensorNetworks::FirstOrder);
 
     int Dmax=GetMaxD();
     SVCompressorC* mps_compressor =Factory::GetFactory()->MakeMPSCompressor(Dmax,0.0);
@@ -76,17 +77,19 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
         int niter=1;
         for (; niter<=isl.itsMaxGSSweepIterations; niter++)
         {
-            oerr1=ApplyOrtho(expH,mps_compressor,dt*dt/100,nOrthIter);
+            Apply(expH,mps_compressor);
+//            oerr1=ApplyOrtho(expH,mps_compressor,dt*dt/100,nOrthIter);
             ReCenter(2);
-            oerr2=ApplyOrtho(expH,mps_compressor,dt*dt/100,nOrthIter);
+            Apply(expH,mps_compressor);
+//            oerr2=ApplyOrtho(expH,mps_compressor,dt*dt/100,nOrthIter);
             ReCenter(1);
             double Enew=GetExpectation(H)/(itsL-1);
             double dE=Enew-E1;
             E1=Enew;
-            Logger->LogInfoV(2,"%4d %.9f %.2e %4d     %.1e/%.1e",expH->GetMaxDw(),E1,dE,niter,oerr1, oerr2);
-            if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon || dE>0.0) break;
+            Logger->LogInfoV(2,"%4d %.9f %.2e %4d     %.1e/%.1e",H->GetMaxDw(),E1,dE,niter,oerr1, oerr2);
+            if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon /*|| dE>0.0*/) break;
         }
-        oerr1=OrthogonalizeI(mps_compressor,1e-10,nOrthIter);
+        oerr1=OrthogonalizeI(mps_compressor,1e-13,nOrthIter);
         E1=GetExpectation(H);
         double E2=GetExpectation(H2);
         E2= E2-E1*E1;
@@ -94,7 +97,7 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
                         isl.itsdt,isl.itsEps.itsDelatEnergy1Epsilon,D,isl.itsDmax,H->GetMaxDw(),niter,E1,oerr1);
     }
     delete mps_compressor;
-    delete expH;
+//    delete expH;
     return E1;
 }
 

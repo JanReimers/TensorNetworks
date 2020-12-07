@@ -1,6 +1,7 @@
 #include "Tests.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/iTEBDState.H"
+#include "TensorNetworks/iMPO.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/IterationSchedule.H"
@@ -359,11 +360,11 @@ TEST_F(iTEBDTests,TestApplyMPOIdentity)
 TEST_F(iTEBDTests,TestApplyiMPOIdentity)
 {
     int UnitCell=2,D=2;
-    double S=0.5,epsSVD=0.0,dt=0.0;
+    double S=0.5,epsSVD=0.0,epsMPO=1e-14,dt=0.0;
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
-    MPO* IdentityOp=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder);
+    MPO* IdentityOp=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
     itsState->ApplyOrtho(IdentityOp,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
     delete IdentityOp;
@@ -451,23 +452,23 @@ TEST_F(iTEBDTests,TestApplyExpH)
 TEST_F(iTEBDTests,TestApplyOrthoiMPOExpH)
 {
     int UnitCell=2,D=2;
-    double S=0.5,epsSVD=0.0,dt=0.2;
+    double S=0.5,epsSVD=0.0,epsMPO=1e-14,dt=0.2;
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
     itsState->Orthogonalize(itsCompressor);
 
-    MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder);
+    MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
     itsState->ApplyOrtho(expH,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
     delete expH;
 
-    expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder);
+    expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder,epsMPO);
     itsState->ApplyOrtho(expH,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
     delete expH;
 
-    expH=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder);
+    expH=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder,epsMPO);
     itsState->ApplyOrtho(expH,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
     delete expH;
@@ -476,23 +477,23 @@ TEST_F(iTEBDTests,TestApplyOrthoiMPOExpH)
 TEST_F(iTEBDTests,TestApplyiMPOExpH)
 {
     int UnitCell=2,D=2;
-    double S=0.5,epsSVD=0.0,dt=0.2;
+    double S=0.5,epsSVD=0.0,epsMPO=1e-14,dt=0.2;
     Setup(UnitCell,S,D,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
     itsState->Orthogonalize(itsCompressor);
 
-    MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder);
+    MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
     itsState->Apply(expH,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
     delete expH;
 
-    expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder);
+    expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder,epsMPO);
     itsState->Apply(expH,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
     delete expH;
 
-    expH=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder);
+    expH=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder,epsMPO);
     itsState->Apply(expH,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
     delete expH;
@@ -662,23 +663,26 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12)
 
     TensorNetworks::IterationSchedule is;
     eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({20,2,0.5,eps});
-    eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({50,D,0.2,eps});
-    eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({50,D,0.1,eps});
-    eps.itsDelatEnergy1Epsilon=5e-6;
-    is.Insert({50,D,0.05,eps});
-    eps.itsDelatEnergy1Epsilon=2e-6;
-    is.Insert({50,D,0.02,eps});
-    eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({50,D,0.01,eps});
-    eps.itsDelatEnergy1Epsilon=5e-7;
-    is.Insert({50,D,0.005,eps});
-    eps.itsDelatEnergy1Epsilon=2e-7;
-    is.Insert({50,D,0.002,eps});
-    eps.itsDelatEnergy1Epsilon=1e-7;
-    is.Insert({50,D,0.001,eps});
+    is.Insert({1000,2,0.5,eps});
+    eps.itsDelatEnergy1Epsilon=1e-8;
+    is.Insert({1000,D,0.2,eps});
+    eps.itsDelatEnergy1Epsilon=1e-9;
+    is.Insert({1000,D,0.1,eps});
+    is.Insert({1000,D,0.05,eps});
+//    is.Insert({1000,D,0.01,eps});
+//    is.Insert({1000,D,0.001,eps});
+//    eps.itsDelatEnergy1Epsilon=5e-6;
+//    is.Insert({50,D,0.05,eps});
+//    eps.itsDelatEnergy1Epsilon=2e-6;
+//    is.Insert({50,D,0.02,eps});
+//    eps.itsDelatEnergy1Epsilon=1e-6;
+//    is.Insert({50,D,0.01,eps});
+//    eps.itsDelatEnergy1Epsilon=5e-7;
+//    is.Insert({50,D,0.005,eps});
+//    eps.itsDelatEnergy1Epsilon=2e-7;
+//    is.Insert({50,D,0.002,eps});
+//    eps.itsDelatEnergy1Epsilon=1e-7;
+//    is.Insert({50,D,0.001,eps});
 
     itsState->FindiTimeGroundState(itsH,is);
     itsState->Report(cout);
@@ -752,7 +756,7 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12)
 
 TEST_F(iTEBDTests,FindiTimeGSD32S12)
 {
-    int UnitCell=2,Dstart=2,Dmax=32;
+    int UnitCell=2,Dstart=2,Dmax=32,maxIter=1000;
     double S=0.5,epsSVD=0.0;
 #ifdef DEBUG
     Dmax=8;
@@ -766,17 +770,17 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     TensorNetworks::IterationSchedule is;
     eps.itsDelatEnergy1Epsilon=1e-6;
     is.Insert({20,Dstart,0.5,eps});
-    is.Insert({50,8,2,0.2,eps});
-    is.Insert({50,8,0.1,eps});
-    is.Insert({50,8,0.05,eps});
-    is.Insert({50,8,0.02,eps});
+    is.Insert({maxIter,8,2,0.2,eps});
+    is.Insert({maxIter,8,0.1,eps});
+    is.Insert({maxIter,8,0.05,eps});
+    is.Insert({maxIter,8,0.02,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
-    is.Insert({50,8,0.01,eps});
+    is.Insert({maxIter,8,0.01,eps});
     eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({50,8,0.005,eps});
-    is.Insert({50,Dmax,8,0.002,eps});
-    is.Insert({50,Dmax,0.001,eps});
-    is.Insert({50,Dmax,0.0  ,eps});
+    is.Insert({maxIter,8,0.005,eps});
+    is.Insert({maxIter,Dmax,8,0.002,eps});
+    is.Insert({maxIter,Dmax,0.001,eps});
+    is.Insert({maxIter,Dmax,0.0  ,eps});
 //    eps.itsDelatEnergy1Epsilon=1e-6;
 //    is.Insert({50,Dmax,0.05,eps});
 //    eps.itsDelatEnergy1Epsilon=1e-7;
@@ -789,7 +793,7 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     double E=itsState->GetExpectation(itsH);
 #ifdef DEBUG
 //    EXPECT_LT(E,-0.44308); //From mp-toolkit
-    EXPECT_LT(E,-0.44275);
+    EXPECT_LT(E,-0.44272);
 #else
 //    EXPECT_LT(E,-0.4431447); //From mp-toolkit
     EXPECT_LT(E,-0.4428); //We only seem to get this far

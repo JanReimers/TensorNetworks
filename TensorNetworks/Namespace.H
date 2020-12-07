@@ -12,6 +12,7 @@ namespace TensorNetworks
 
     class Hamiltonian;
     class MPO;
+    class iMPO;
     class SiteOperator;
     class Dw12;
 
