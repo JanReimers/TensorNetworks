@@ -286,8 +286,8 @@ TEST_F(LinearAlgebraTests,omlDiagonalMatrix_complex_double)
 TEST_F(LinearAlgebraTests,LapackQRSolverReal)
 {
     QRTester<double>(new LapackQRSolver<double>(),Nqr  ,Nqr  ).RunTests();
-    QRTester<double>(new LapackQRSolver<double>(),Nqr  ,Nqr/2).RunTests();
     QRTester<double>(new LapackQRSolver<double>(),Nqr/2,Nqr  ).RunTests();
+    QRTester<double>(new LapackQRSolver<double>(),Nqr  ,Nqr/2).RunTests();
 }
 TEST_F(LinearAlgebraTests,LapackQRSolverComplex)
 {

@@ -580,15 +580,9 @@ public:
         return ret;
     }
 
-    virtual void Validate(const Matrix<T>& Q, const Matrix<T>& R)
+    virtual void Validate(const Matrix<T>& Q)
     {
 
-        Matrix<T> QT=Transpose(conj(Q));
-        EXPECT_NEAR(Max(fabs(QT*Q-I)),0.0,2*sqrt(N*M)*eps);
-        if (N==M)
-        {
-            EXPECT_NEAR(Max(fabs(Q*QT-I)),0.0,2*sqrt(N*M)*eps);
-        }
     }
 
 
@@ -622,15 +616,45 @@ public:
     {
         A=Base::MakeMatrix();
         {
-            auto [Q,R]=itsSolver->SolveThin(A);
-            Validate(Q,R);
+            auto [Q,R]=itsSolver->SolveThinQR(A);
+            ValidateQR(Q,R);
+        }
+        if (N>M)
+        {
+            auto [R,Q]=itsSolver->SolveThinRQ(A);
+            ValidateRQ(R,Q);
         }
 
     }
-    virtual void Validate(const Matrix<T>& Q, const Matrix<T>& R)
+    virtual void ValidateQR(const Matrix<T>& Q, const Matrix<T>& R)
     {
-        Base::Validate(Q,R); //Check U,V orthonormality
+
+        Matrix<T> QT=Transpose(conj(Q));
+        int mn=Q.GetNumCols();
+        Matrix<T> Iq(mn,mn);
+        Unit(Iq);
+        EXPECT_NEAR(Max(fabs(QT*Q-Iq)),0.0,2*sqrt(N*M)*eps);
+        if (N==M)
+        {
+            EXPECT_NEAR(Max(fabs(Q*QT-Iq)),0.0,2*sqrt(N*M)*eps);
+        }
         Matrix<T> A1=Q*R;
+        Matrix<T> dA=A-A1;
+        EXPECT_NEAR(Max(MyAbs(dA)),0.0,2*sqrt(N*M)*eps);
+    }
+    virtual void ValidateRQ(const Matrix<T>& R, const Matrix<T>& Q)
+    {
+
+        Matrix<T> QT=Transpose(conj(Q));
+        int mn=Q.GetNumRows();
+        Matrix<T> Iq(mn,mn);
+        Unit(Iq);
+        EXPECT_NEAR(Max(fabs(Q*QT-Iq)),0.0,2*sqrt(N*M)*eps);
+        if (N==M)
+        {
+            EXPECT_NEAR(Max(fabs(QT*Q-Iq)),0.0,2*sqrt(N*M)*eps);
+        }
+        Matrix<T> A1=R*Q;
         Matrix<T> dA=A-A1;
         EXPECT_NEAR(Max(MyAbs(dA)),0.0,2*sqrt(N*M)*eps);
     }

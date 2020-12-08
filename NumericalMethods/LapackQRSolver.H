@@ -16,7 +16,8 @@ public:
     virtual ~LapackQRSolver() {};
 
 //    virtual QRType  Solve    (const MatrixT&);
-    virtual QRType  SolveThin(const MatrixT&);
+    virtual QRType  SolveThinQR(const MatrixT&); // returns [Q,R]
+    virtual QRType  SolveThinRQ(const MatrixT&); // mirror image version returns [R,Q]
 
 };
 
