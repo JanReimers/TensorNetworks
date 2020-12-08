@@ -2,7 +2,7 @@
 #include "TensorNetworksImp/Typedefs.H"
 #include "Containers/Matrix4.H"
 #include "Operators/SiteOperatorImp.H"
-#include "NumericalMethods/LapackSVD.H"
+#include "NumericalMethods/LapackSVDSolver.H"
 #include "TensorNetworks/CheckSpin.H"
 #include "oml/diagonalmatrix.h"
 #include "oml/numeric.h"

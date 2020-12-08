@@ -1,9 +1,7 @@
-#ifndef LAPACKSVD_H
-#define LAPACKSVD_H
+#ifndef LAPACKSVDSOLVER_H
+#define LAPACKSVDSOLVER_H
 
 #include "NumericalMethods/SVDSolver.H"
-
-template <class T> class DiagonalMatrix;
 
 template <class T> class LapackSVDSolver
     : public virtual SVDSolver<T>
@@ -18,4 +16,4 @@ template <class T> class LapackSVDSolver
     virtual UsVType  Solve   (const MatrixT&,double eps, int NumSingluarValues);
     virtual UsVType  SolveAll(const MatrixT&,double eps                       );
 };
-#endif // LAPACKSVD_H
+#endif // LAPACKSVDSOLVER_H

@@ -3,7 +3,7 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/Dw12.H"
-#include "NumericalMethods/LapackSVD.H"
+#include "NumericalMethods/LapackSVDSolver.H"
 #include "NumericalMethods/ArpackEigenSolver.H"
 #include "Containers/Matrix4.H"
 #include "oml/cnumeric.h"

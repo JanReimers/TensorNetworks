@@ -3,7 +3,7 @@
 #include "TensorNetworksUnittests/LinearAlgebraTests.H"
 #include "NumericalMethods/PrimeSVDSolver.H"
 #include "NumericalMethods/PrimeEigenSolver.H"
-#include "NumericalMethods/LapackSVD.H"
+#include "NumericalMethods/LapackSVDSolver.H"
 #include "NumericalMethods/LapackEigenSolver.H"
 #include "NumericalMethods/ArpackEigenSolver.H"
 #include "NumericalMethods/LapackQRSolver.H"

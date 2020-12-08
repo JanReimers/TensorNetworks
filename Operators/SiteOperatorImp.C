@@ -1,7 +1,7 @@
 #include "Operators/SiteOperatorImp.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworksImp/SpinCalculator.H"
-#include "NumericalMethods/LapackSVD.H"
+#include "NumericalMethods/LapackSVDSolver.H"
 #include "Containers/Vector3.H"
 #include "oml/diagonalmatrix.h"
 #include <complex>

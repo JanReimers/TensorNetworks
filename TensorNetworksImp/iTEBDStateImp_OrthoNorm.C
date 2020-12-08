@@ -13,7 +13,7 @@
 #include "NumericalMethods/ArpackEigenSolver.H"
 #include "NumericalMethods/PrimeEigenSolver.H"
 #include "NumericalMethods/LapackEigenSolver.H"
-#include "NumericalMethods/LapackSVD.H"
+#include "NumericalMethods/LapackSVDSolver.H"
 #include "oml/cnumeric.h"
 #include <iomanip>
 

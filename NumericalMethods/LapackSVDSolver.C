@@ -1,4 +1,4 @@
-#include "LapackSVD.H"
+#include "LapackSVDSolver.H"
 #include "oml/matrix.h"
 #include "oml/diagonalmatrix.h"
 #include "oml/vector.h"
@@ -17,68 +17,6 @@ int* LDU,dcmplx* VT,int* LDVT,dcmplx* WORK,int* LWORK,double* RWORK, int* INFO);
 }
 
 
-//template <class TM> void LaSVDecomp(TM& A, Vector<double>& s, TM& VT)
-//{
-//    int M=A.GetNumRows(),N=A.GetNumCols(),mn=Min(M,N);
-//    assert(s.size()==mn);
-//    assert(VT.GetNumRows()==N);
-//    assert(VT.GetNumCols()==N);
-//
-//    //
-//    //  Decide how much work space lapack needs
-//    //
-//    int info=0,lwork=-1;
-//    Vector<double> work(1);
-//    char jobu='O',jobv='A';
-//    dgesvd_(&jobu,&jobv,&M,&N,&A(1,1),&M,&s(1),0,&M,&VT(1,1),&N,&work(1),&lwork,&info);
-//    lwork=work(1);
-//    work.SetLimits(lwork);
-//    //
-//    //  Now do the actual SVD work
-//    //
-//    dgesvd_(&jobu,&jobv,&M,&N,&A(1,1),&M,&s(1),0,&M,&VT(1,1),&N,&work(1),&lwork,&info);
-//    assert(info==0);
-//    //
-//    //  Now fix up the matrix limits
-//    //
-//    A.SetLimits(M,mn,true); //Throw away last N-mn columns
-//    VT.SetLimits(mn,N,true); // Throw away last N-mn rows
-//
-//    return;
-//}
-
-/*
-std::tuple<Matrix<double>,DiagonalMatrix<double>,Matrix<double>> LaSVDecomp(const Matrix<double>& A)
-{
-    int M=A.GetNumRows(),N=A.GetNumCols(),mn=Min(M,N);
-
-    //
-    //  Diced how much work space lapack needs
-    //
-    int info=0,lwork=-1;
-    Vector<double> s(mn),work(1);
-    Matrix<double> U(A),VT(N,N);
-    char jobu='O',jobv='A';
-    //
-    //  Initial call to see how much work space is needed
-    //
-    dgesvd_(&jobu,&jobv,&M,&N,&U(1,1),&M,&s(1),0,&M,&VT(1,1),&N,&work(1),&lwork,&info);
-    lwork=work(1);
-    work.SetLimits(lwork);
-    //
-    //  Now do the actual SVD work
-    //
-    dgesvd_(&jobu,&jobv,&M,&N,&U(1,1),&M,&s(1),0,&M,&VT(1,1),&N,&work(1),&lwork,&info);
-    assert(info==0);
-    //
-    //  Now fix up the matrix limits
-    //
-    U .SetLimits(M,mn,true); //Throw away last N-mn columns
-    VT.SetLimits(mn,N,true); // Throw away last N-mn rows
-    DiagonalMatrix<double> ds(s);
-    return std::make_tuple(std::move(U),std::move(ds),std::move(VT));
-}
-*/
 template <class T> void gesvd(char* JOBU,char* JOBV,int* M,int* N,T* A,int* LDA, double* S,T* U,
 int* LDU,T* VT,int* LDVT,T* WORK,int* LWORK,int* INFO);
 
@@ -151,4 +89,3 @@ LapackSVDSolver<T>::Solve(const MatrixT& A,double eps, int NumSingularValues)
 
 template class LapackSVDSolver<double>;
 template class LapackSVDSolver<dcmplx>;
-//template void LaSVDecomp<Matrix<double> >(Matrix<double>& A, Vector<double>& s, Matrix<double>& VT);

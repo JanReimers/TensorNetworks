@@ -95,10 +95,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="NumericalMethods/LapackQRSolver.H" />
-		<Unit filename="NumericalMethods/LapackSVD.C">
+		<Unit filename="NumericalMethods/LapackSVDSolver.C">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="NumericalMethods/LapackSVD.H" />
+		<Unit filename="NumericalMethods/LapackSVDSolver.H" />
 		<Unit filename="NumericalMethods/PrimeEigenSolver.C">
 			<Option compilerVar="CC" />
 		</Unit>
