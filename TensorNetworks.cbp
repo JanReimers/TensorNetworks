@@ -91,6 +91,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="NumericalMethods/LapackEigenSolver.H" />
+		<Unit filename="NumericalMethods/LapackQRSolver.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="NumericalMethods/LapackQRSolver.H" />
 		<Unit filename="NumericalMethods/LapackSVD.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -103,6 +107,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="NumericalMethods/PrimeSVDSolver.H" />
+		<Unit filename="NumericalMethods/QRSolver.H" />
 		<Unit filename="NumericalMethods/SVDSolver.H" />
 		<Unit filename="NumericalMethods/Solvers.C">
 			<Option compilerVar="CC" />

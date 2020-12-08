@@ -6,6 +6,7 @@
 #include "NumericalMethods/EigenSolver.H"
 #include "NumericalMethods/SparseEigenSolver.H"
 #include "NumericalMethods/LapackEigenSolver.H"
+#include "NumericalMethods/QRSolver.H"
 #include "oml/random.h"
 #include "oml/diagonalmatrix.h"
 #include "oml/fakedouble.h"
@@ -214,8 +215,10 @@ public:
     virtual void ValidateSymmetric(const Matrix<T>& U, const Vector<double>& d)
     {
         Matrix<T> UT=Transpose(conj(U));
-//        cout << "U*UT=" << UT*U << endl;
-        EXPECT_NEAR(Max(fabs(UT*U-I)),0.0,2*N*eps);
+        int mn=U.GetNumCols();
+        Matrix<T> Iu(mn,mn);
+        Unit(Iu);
+        EXPECT_NEAR(Max(fabs(UT*U-Iu)),0.0,2*N*eps);
         Matrix<T> diag=UT*A*U;
 //        cout << "diag=" << diag << endl;
         int Ne=d.size();
@@ -348,8 +351,11 @@ public:
     virtual void ValidateSymmetric(const Matrix<T>& U, const Vector<double>& d)
     {
         Matrix<T> UT=Transpose(conj(U));
+        int mn=U.GetNumCols();
+        Matrix<T> Iu(mn,mn);
+        Unit(Iu);
         //cout << "U*UT=" << UT*U << endl;
-        EXPECT_NEAR(Max(fabs(UT*U-I)),0.0,2*N*eps);
+        EXPECT_NEAR(Max(fabs(UT*U-Iu)),0.0,2*N*eps);
         Matrix<T> diag=UT*A*U;
 //        cout << "diag=" << diag << endl;
         int Ne=d.size();
@@ -364,7 +370,7 @@ public:
             for (int i=1; i<=Ne; i++)
             {
                 Vector<dcmplx> Ui=U.GetColumn(i);
-                Vector<dcmplx> residuals=A*Ui-d(i)*Ui;
+                Vector<dcmplx> residuals=A*Ui-d(i)*Ui; //Anonymous warning from here
                 double res=Max(fabs(residuals));
                 EXPECT_NEAR(res,0.0,15*eps);
             }
@@ -550,6 +556,87 @@ public:
 private:
     SparseSVDSolver<T>* itsSolver;
     SparseMatrix   <T>  A;
+};
+
+
+//
+//   QR Tester classes
+//
+template <typename T> class QRBase
+{
+public:
+
+    QRBase(int m, int n,double density=1.0)
+        : M(m), N(n), Density(density),eps(1e-13)
+        , I(Min(M,N),Min(M,N))
+    {
+        Unit(I);
+    }
+    Matrix<T> MakeMatrix()
+    {
+        Matrix<T> ret(M,N);
+        FillRandom(ret);
+        MakeSparse(ret,Density);
+        return ret;
+    }
+
+    virtual void Validate(const Matrix<T>& Q, const Matrix<T>& R)
+    {
+
+        Matrix<T> QT=Transpose(conj(Q));
+        EXPECT_NEAR(Max(fabs(QT*Q-I)),0.0,2*sqrt(N*M)*eps);
+        if (N==M)
+        {
+            EXPECT_NEAR(Max(fabs(Q*QT-I)),0.0,2*sqrt(N*M)*eps);
+        }
+    }
+
+
+protected:
+    int M,N;
+    double Density;
+    double eps;
+    Matrix<T> I;
+};
+
+template <typename T>
+class QRTester : public QRBase<T>
+{
+    using Base=QRBase<T>;
+    using Base::M;
+    using Base::N;
+    using Base::eps;
+    using Base::I;
+public:
+    QRTester(QRSolver<T>* s, int m, int n,double density=1.0)
+        : Base(m,n,density)
+        , itsSolver(s)
+        , A(m,n)
+    {}
+    ~QRTester()
+    {
+        delete itsSolver;
+    }
+
+    virtual void RunTests()
+    {
+        A=Base::MakeMatrix();
+        {
+            auto [Q,R]=itsSolver->SolveThin(A);
+            Validate(Q,R);
+        }
+
+    }
+    virtual void Validate(const Matrix<T>& Q, const Matrix<T>& R)
+    {
+        Base::Validate(Q,R); //Check U,V orthonormality
+        Matrix<T> A1=Q*R;
+        Matrix<T> dA=A-A1;
+        EXPECT_NEAR(Max(MyAbs(dA)),0.0,2*sqrt(N*M)*eps);
+    }
+
+    QRSolver<T>* itsSolver;
+    Matrix  <T>  A;
 };
 
 #endif // LINEARALGEBRATESTS_H_INCLUDED
