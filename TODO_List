@@ -2,14 +2,17 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
 -iTEBD
     issues:
-        1) <E2> doesn't work. Maybe McCullochs recursive expectation is needed.
+        1) <E2> doesn't work. Maybe McCulloch's recursive expectation is needed.
         2) Trotter 2nd and fourth order iMPOs behave exactly like first order.
             Simple compression is possibly pushing important info to edges where it gets cutoff.
         3) All energies are in the ball park but too low compared to mp-toolkit. Maybe <E> is also wrong?
     Countermeasures:
-        -Implement McCullochs recursion for expectations
+        -Implement transverse Ising model with one site unit cell.
+        -Implement McCulloch's recursion for expectations, for one unite cell
+
         -Implement proper compression as per Parker.  BIG job, needs QR decomp
         -Try and hand code 2nd order trotter with gates.
+
 
 
     Done -Support Apply(MPO*)
