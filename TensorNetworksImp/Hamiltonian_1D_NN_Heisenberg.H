@@ -23,7 +23,7 @@ class Hamiltonian_1D_NN_Heisenberg
         //
         //  Hamiltonian interface
         //
-        virtual int GetL () const {return itsL;}
+        virtual int GetL () const {return MPOImp::GetL();}
         virtual int Getd () const {return 2*itsS+1;}
         virtual int GetMaxDw() const {return MPOImp::GetMaxDw();}
 
@@ -51,7 +51,7 @@ class Hamiltonian_1D_NN_Heisenberg
         double I    (int m, int n) const;
 
         static const int Dw=5;
-        int    itsL; //Number of lattice sites
+//        int    itsL  MPOImp has L
         double itsS; //
         double itsJxy,itsJz,itshz; //NN coupling constants and external field
         Dw12 itsDw12s[3]; //Dw2[w1] for left bulk and right

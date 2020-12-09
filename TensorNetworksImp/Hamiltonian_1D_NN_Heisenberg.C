@@ -11,7 +11,6 @@ namespace TensorNetworks
 
 Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, double Jxy,double Jz, double hz)
     : MPOImp(L,S,MPOImp::LoadLater)
-    , itsL(L)
     , itsS(S)
     , itsJxy(Jxy)
     , itsJz(Jz)
@@ -22,7 +21,6 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
 //    cout << "Jxy=" << Jxy << endl;
 //    cout << "Jz=" << Jz << endl;
 //    cout << "hz=" << hz << endl;
-    assert(itsL>=1);
     assert(isValidSpin(S));
     assert(fabs(itsJxy)+fabs(Jz)>0.0);
 
@@ -54,7 +52,7 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, doub
     //
     int d=2*S+1;
     Insert(new SiteOperatorImp(d,PLeft ,this));
-    for (int ia=2;ia<=itsL-1;ia++)
+    for (int ia=2;ia<=GetL()-1;ia++)
         Insert(new SiteOperatorImp(d,PBulk ,this));
     Insert(new SiteOperatorImp(d,PRight,this));
 }
@@ -180,18 +178,18 @@ namespace TensorNetworks
 //
 MPS* Hamiltonian_1D_NN_Heisenberg::CreateMPS(int D,double normEps, double epsSV) const
 {
-    return new MPSImp(itsL,itsS,D,normEps,epsSV);
+    return new MPSImp(GetL(),itsS,D,normEps,epsSV);
 }
 
 iTEBDState* Hamiltonian_1D_NN_Heisenberg::CreateiTEBDState(int D,double normEps, double epsSV) const
 {
-    return new iTEBDStateImp(itsL,itsS,D,normEps,epsSV);
+    return new iTEBDStateImp(GetL(),itsS,D,normEps,epsSV);
 }
 
 
 MPO* Hamiltonian_1D_NN_Heisenberg::CreateUnitOperator() const
 {
-    return new MPOImp(itsL,itsS,MPOImp::Identity);
+    return new MPOImp(GetL(),itsS,MPOImp::Identity);
 }
 
 MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TrotterOrder order) const
@@ -207,16 +205,16 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TrotterOrder order)
         }
         case FirstOrder :
         {
-            MPO_SpatialTrotter Wodd (dt,Odd ,itsL,itsS,H12);
-            MPO_SpatialTrotter Weven(dt,Even,itsL,itsS,H12);
+            MPO_SpatialTrotter Wodd (dt,Odd ,GetL(),itsS,H12);
+            MPO_SpatialTrotter Weven(dt,Even,GetL(),itsS,H12);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             break;
         }
         case SecondOrder :
         {
-            MPO_SpatialTrotter Wodd (dt/2.0,Odd ,itsL,itsS,H12);
-            MPO_SpatialTrotter Weven(dt    ,Even,itsL,itsS,H12);
+            MPO_SpatialTrotter Wodd (dt/2.0,Odd ,GetL(),itsS,H12);
+            MPO_SpatialTrotter Weven(dt    ,Even,GetL(),itsS,H12);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             W->Combine(&Wodd);
@@ -235,9 +233,9 @@ MPO* Hamiltonian_1D_NN_Heisenberg::CreateOperator(double dt, TrotterOrder order)
             ts(5)=ts(1);
             for (int it=1;it<=5;it++)
             {
-                MPOImp U(itsL,itsS,MPOImp::Identity);
-                MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,itsL,itsS,H12);
-                MPO_SpatialTrotter Weven(ts(it)    ,Even,itsL,itsS,H12);
+                MPOImp U(GetL(),itsS,MPOImp::Identity);
+                MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,GetL(),itsS,H12);
+                MPO_SpatialTrotter Weven(ts(it)    ,Even,GetL(),itsS,H12);
                 U.Combine(&Wodd);
                 U.Combine(&Weven);
                 U.Combine(&Wodd);
@@ -264,19 +262,19 @@ iMPO* Hamiltonian_1D_NN_Heisenberg::CreateiMPO(double dt, TrotterOrder order, do
         }
         case FirstOrder :
         {
-            int L=itsL+2;
+            int L=GetL()+2;
             W=new iMPOImp(L,itsS,MPOImp::Identity);
             MPO_SpatialTrotter Wodd (dt,Odd ,L,itsS,H12);
             MPO_SpatialTrotter Weven(dt,Even,L,itsS,H12);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             W->Compress(0,epsMPO);
-            W->ConvertToiMPO(itsL);
+            W->ConvertToiMPO(GetL());
             break;
         }
         case SecondOrder :
         {
-            int L=itsL+2;
+            int L=GetL()+2;
             MPO_SpatialTrotter Weven(dt    ,Even,L,itsS,H12);
             MPO_SpatialTrotter Wodd (dt/2.0,Odd ,L,itsS,H12);
             W=new iMPOImp(L,itsS,MPOImp::Identity);
@@ -284,12 +282,12 @@ iMPO* Hamiltonian_1D_NN_Heisenberg::CreateiMPO(double dt, TrotterOrder order, do
             W->Combine(&Weven);
             W->Combine(&Wodd);
             W->Compress(0,epsMPO);
-            W->ConvertToiMPO(itsL);
+            W->ConvertToiMPO(GetL());
             break;
         }
         case FourthOrder :
         {
-            int L=itsL+4;
+            int L=GetL()+4;
             W=new iMPOImp(L,itsS,MPOImp::Identity);
             //
             //  At this order we must compress as we go or we risk consuming all memory
@@ -311,7 +309,7 @@ iMPO* Hamiltonian_1D_NN_Heisenberg::CreateiMPO(double dt, TrotterOrder order, do
                 W->Combine(&U);
                 W->Compress(0,epsMPO);
             }
-            W->ConvertToiMPO(itsL);
+            W->ConvertToiMPO(GetL());
             break;
         }
     } //End switch
@@ -320,7 +318,7 @@ iMPO* Hamiltonian_1D_NN_Heisenberg::CreateiMPO(double dt, TrotterOrder order, do
 
 FullState* Hamiltonian_1D_NN_Heisenberg::CreateFullState () const
  {
-    return new FullStateImp<double>(itsL,itsS);
+    return new FullStateImp<double>(GetL(),itsS);
  }
 
 
