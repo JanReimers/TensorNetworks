@@ -62,7 +62,8 @@ public:
     virtual double Orthogonalize (SVCompressorC*);
     virtual double OrthogonalizeI(SVCompressorC*,double eps,int maxIter);
 
-    virtual double GetExpectation (const MPO* o) const;
+    virtual double GetExpectation (const  MPO* o) const;
+    virtual double GetExpectation (const iMPO* o) const; //Recursive for triangular MPOs
     virtual double GetExpectationmmnn (const Matrix4RT& Hlocal) const;
     virtual double GetExpectationmnmn (const Matrix4RT& expH) const;
     double    GetExpectation    (const MPO*       o     ,int center) const;

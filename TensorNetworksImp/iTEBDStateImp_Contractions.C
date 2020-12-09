@@ -2,6 +2,7 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/MPO.H"
+#include "TensorNetworks/iMPO.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworks/IterationSchedule.H"
@@ -294,6 +295,127 @@ double iTEBDStateImp::GetExpectationmnmn (const Matrix4RT& expH) const
         Logger->LogWarnV(0,"iTEBDStateImp::GetExpectation expectation=(%.5f,%.1e) has large imaginary component",real(expectation1),imag(expectation1));
     return real(expectation1);
 
+}
+
+// This code follows: McCulloch, I. P. Infinite size density matrix renormalization group, revisited
+//                    http://arxiv.org/pdf/0804.2509v1
+//
+double iTEBDStateImp::GetExpectation (const iMPO* o) const
+{
+    assert(o->GetL()==2);
+    ReCenter(1);
+//
+//  Make sure everything int iMPS is square.
+//
+    int D=s1.siteA->GetD1();
+    assert(D==s1.siteA->GetD2());
+    assert(D==s1.siteB->GetD1());
+    assert(D==s1.siteB->GetD2());
+
+    const SiteOperator* so=o->GetSiteOperator(1);
+    int Dw=so->GetDw12().Dw1;
+    assert(Dw==so->GetDw12().Dw2);
+//
+//  Lets check that W has the correct shape
+//
+    for (int ma=0; ma<itsd; ma++)
+        for (int na=0; na<itsd; na++)
+        {
+            const MatrixRT& Wmn=so->GetW(ma,na);
+            for (int w1=1;w1<=Dw-1;w1++)
+                for (int w2=2;w2<=Dw;w2++)
+                    assert(Wmn(w1,w2)==0.0);
+        }
+//
+//  The first recursion relation for E^Dw is the just orthonormality condition
+//
+    cout << "oerr=" << GetOrthonormalityErrors() << endl;
+    assert(GetOrthonormalityErrors()<1e-12);
+//
+//  Fill out E[1]
+//
+    dVectorT E(Dw+1);
+    E[1]=MatrixCT(D,D);
+    Unit(E[1]);
+//
+//  Check E[1] is self consisteny
+//
+    MatrixCT E1(D,D);
+    Fill(E1,dcmplx(0));
+    for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
+        {
+            const MatrixRT& Wmn=so->GetW(m,n);
+            for (int i2=1;i2<=D;i2++)
+            for (int j2=1;j2<=D;j2++)
+                for (int i1=1;i1<=D;i1++)
+                    E1(i2,j2)+=conj(GammaA()[m](i2,i1))*lambdaB()(i1,i1)*Wmn(1,1)*lambdaB()(i1,i1)*GammaA()[n](i1,j2);
+        }
+    cout << "E1=" << E1 << endl;
+    assert(E[1]==E1);
+
+//
+//  Now loop down from 2 to Dw-1
+//
+    for (int w=2;w<=Dw-1;w++)
+    {
+        E[w]=MatrixCT(D,D);
+        Fill(E[w],dcmplx(0));
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++)
+            {
+                const MatrixRT& Wmn=so->GetW(m,n);
+                for (int i2=1;i2<=D;i2++)
+                for (int j2=1;j2<=D;j2++)
+                    for (int i1=1;i1<=D;i1++)
+                        E[w](i2,j2)+=conj(GammaA()[m](i2,i1))*lambdaB()(i1,i1)*Wmn(w,1)*lambdaB()(i1,i1)*GammaA()[n](i1,j2);
+            }
+        cout << "E[" << w << "]=" << E[w] << endl;
+    }
+//
+//  Now do the final contraction to get E[1]
+//
+    if (Dw>1)
+    {
+        E[Dw]=MatrixCT(D,D);
+        Fill(E[Dw],dcmplx(0));
+        for (int w=1;w<=Dw-1;w++)
+        {
+            for (int m=0; m<itsd; m++)
+                for (int n=0; n<itsd; n++)
+                {
+                    const MatrixRT& Wmn=so->GetW(m,n);
+                    //cout << "W" << m << n << "=" << Wmn << endl;
+                    for (int i2=1;i2<=D;i2++)
+                    for (int j2=1;j2<=D;j2++)
+                        for (int i1=1;i1<=D;i1++)
+                        for (int j1=1;j1<=D;j1++)
+                            E[Dw](i2,j2)+=conj(GammaA()[m](j2,j1))
+                                *lambdaB()(j1,j1)
+                                *Wmn(Dw,w)
+                                *E[w](j1,i1)
+                                *lambdaB()(i1,i1)
+                                *GammaA()[n](i1,i2);
+                }
+        }
+
+    }
+    cout << "E[" << Dw << "]=" << E[Dw] << endl;
+
+//
+//  Take the trace of E1
+//
+    dcmplx E0=0.0;
+    for (int i2=1;i2<=D;i2++)
+    for (int j2=1;j2<=D;j2++)
+        E0+=E[Dw](i2,j2);
+    cout << "E0=" << E0 << endl;
+    E0/=D;
+//    E0/=D;
+    cout << "E0=" << E0 << endl;
+    if (fabs(imag(E0))>=1e-10)
+        Logger->LogWarnV(0,"iTEBDStateImp::GetExpectation(iMPO) E0=(%.5f,%.1e) has large imaginary component",real(E0),imag(E0));
+    return real(E0);
 }
 
 double iTEBDStateImp::GetExpectation (const MPO* o) const

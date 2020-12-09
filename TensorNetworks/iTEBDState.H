@@ -52,7 +52,8 @@ public:
 //  Hlocal and expH have different index ordering (for good reason) so they need
 //  different implementations.
 //
-    virtual double GetExpectation (const MPO* o) const=0;
+    virtual double GetExpectation (const  MPO* o) const=0;
+    virtual double GetExpectation (const iMPO* o) const=0; //Recursive for triangular MPOs
     virtual double GetExpectationmmnn (const Matrix4RT& Hlocal) const=0;
     virtual double GetExpectationmnmn (const Matrix4RT& expH  ) const=0;
 //--------------------------------------------------------------------------------------

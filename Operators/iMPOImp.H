@@ -19,6 +19,7 @@ class iMPOImp : public virtual iMPO
         {
             return MPOImp::GetSiteOperator(isite);
         }
+
 //        virtual double Compress(const SVCompressorR*);
 };
 
