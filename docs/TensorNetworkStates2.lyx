@@ -3898,7 +3898,7 @@ For a finite system the expectation of an MPO can be contracted recursively
  (putting back in suppressed indices in the paper)
 \begin_inset Formula 
 \[
-E_{aj_{2}i_{2}}^{w_{2}}=\sum_{m_{a}n_{a}}\sum_{w_{1}}W_{w_{1}w_{2}}^{m_{a}n_{a}}A_{j_{1}j_{2}}^{m_{a}\dagger}E_{a-1j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n_{a}}.
+E_{aj_{2}i_{2}}^{w_{1}}=\sum_{m_{a}n_{a}}\sum_{w_{2}}W_{w_{1}w_{2}}^{m_{a}n_{a}}A_{j_{1}j_{2}}^{m_{a}\dagger}E_{a-1j_{1}i_{1}}^{w_{2}}A_{i_{1}i_{2}}^{n_{a}}.
 \]
 
 \end_inset
@@ -3950,7 +3950,7 @@ We can think of
  we should have
 \begin_inset Formula 
 \[
-E_{aj_{2}i_{2}}^{w_{2}}=E_{a-1j_{2}i_{2}}^{w_{2}}=\sum_{m_{a}n_{a}}\sum_{w_{1}}W_{w_{1}w_{2}}^{m_{a}n_{a}}A_{j_{1}j_{2}}^{m_{a}\dagger}E_{a-1j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n_{a}}
+E_{aj_{2}i_{2}}^{w_{1}}=E_{a-1j_{2}i_{2}}^{w_{1}}=\sum_{m_{a}n_{a}}\sum_{w_{2}}W_{w_{1}w_{2}}^{m_{a}n_{a}}A_{j_{1}j_{2}}^{m_{a}\dagger}E_{a-1j_{1}i_{1}}^{w_{2}}A_{i_{1}i_{2}}^{n_{a}}
 \]
 
 \end_inset
@@ -3960,16 +3960,16 @@ i.e.
  Removing site labels
 \begin_inset Formula 
 \[
-E_{j_{2}i_{2}}^{w_{2}}=\sum_{mn}\sum_{w_{1}}W_{w_{1}w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+E_{j_{2}i_{2}}^{w_{1}}=\sum_{mn}\sum_{w_{2}}W_{w_{1}w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{2}}A_{i_{1}i_{2}}^{n}
 \]
 
 \end_inset
 
 In the paper they have
 \begin_inset Formula 
-\[
-E_{j_{2}i_{2}}^{w_{2}}=\sum_{mn}\sum_{w_{1}}W_{w_{1}w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}-E_{0}\delta_{w_{2},1}
-\]
+\begin{equation}
+E_{j_{2}i_{2}}^{w_{1}}=\sum_{mn}\sum_{w_{2}}W_{w_{1}w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{2}}A_{i_{1}i_{2}}^{n}-E_{0}\delta_{w_{1},1}\label{eq:Erecursion}
+\end{equation}
 
 \end_inset
 
@@ -3999,10 +3999,63 @@ At this point we need to invoke the structural constraints on
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+In the paper 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "McCulloch2007,Michel2010"
+literal "false"
+
+\end_inset
+
+ he talks about a lower triangular MPO and starting the evaluation at 
+\begin_inset Formula $E^{D_{w}}$
+\end_inset
+
+ since the bottom right is the identity operator, which is true, but eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Erecursion"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ would then be a sum over columns on row 
+\begin_inset Formula $D_{w}$
+\end_inset
+
+ which is obviously not a row of zeros with a 
+\begin_inset Formula $\hat{1}$
+\end_inset
+
+ at the end.
+ It looks like the text says lower-traingular bu thte recusion relations
+ seem to be written out for an upper triangular 
+\begin_inset Formula $W$
+\end_inset
+
+ matrix.
+\end_layout
+
+\begin_layout Standard
 Working one index at a time
 \begin_inset Formula 
 \[
-E_{j_{2}i_{2}}^{D_{w}}=\sum_{mn}\sum_{w_{1}}W_{w_{1}D_{w}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}=\sum_{mn}W_{D_{w}D_{w}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{D_{w}}A_{i_{1}i_{2}}^{n}
+E_{j_{2}i_{2}}^{D_{w}}=\sum_{mn}\sum_{w_{2}}W_{D_{w}w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{2}}A_{i_{1}i_{2}}^{n}\neq\sum_{mn}W_{D_{w}D_{w}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{D_{w}}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+However if start at 1 we can get the desired effect
+\begin_inset Formula 
+\[
+E_{j_{2}i_{2}}^{1}=\sum_{mn}\sum_{w_{2}}W_{1w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{2}}A_{i_{1}i_{2}}^{n}=\sum_{mn}W_{11}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}
 \]
 
 \end_inset
@@ -4010,7 +4063,7 @@ E_{j_{2}i_{2}}^{D_{w}}=\sum_{mn}\sum_{w_{1}}W_{w_{1}D_{w}}^{mn}A_{j_{1}j_{2}}^{m
 
 \begin_inset Formula 
 \[
-=\sum_{mn}\hat{1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{D_{w}}A_{i_{1}i_{2}}^{n}
+=\sum_{mn}\hat{1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}
 \]
 
 \end_inset
@@ -4018,7 +4071,7 @@ E_{j_{2}i_{2}}^{D_{w}}=\sum_{mn}\sum_{w_{1}}W_{w_{1}D_{w}}^{mn}A_{j_{1}j_{2}}^{m
 
 \begin_inset Formula 
 \[
-=\sum_{n}A_{j_{1}j_{2}}^{n\dagger}E_{j_{1}i_{1}}^{D_{w}}A_{i_{1}i_{2}}^{n}
+=\sum_{n}A_{j_{1}j_{2}}^{n\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}
 \]
 
 \end_inset
@@ -4031,15 +4084,43 @@ s are left normalized and on an infinite lattice they are orthogonalized,
  so the solution to the recursion is simply
 \begin_inset Formula 
 \[
-E_{ji}^{D_{w}}=\delta_{j,i}
+E_{ji}^{1}=\delta_{j,i}
 \]
 
 \end_inset
 
+which gives
+\begin_inset Formula 
+\[
+\delta_{j_{2},i_{2}}=\sum_{n}\sum_{i_{1}j_{1}}A_{j_{1}j_{2}}^{n\dagger}\delta_{j_{1}i_{1}}A_{i_{1}i_{2}}^{n}=\sum_{n}\sum_{i_{1}}A_{i_{1}j_{2}}^{n\dagger}A_{i_{1}i_{2}}^{n}=\sum_{n}\sum_{i_{1}}A_{j_{2}i_{1}}^{n*}A_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+or in iTEBD langauge where 
+\begin_inset Formula $A^{n_{a}}=\lambda^{B}\Gamma^{n_{a}}$
+\end_inset
+
+, 
+\begin_inset Formula $B^{n_{b}}=\Gamma^{n_{b}}\lambda^{B}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\delta_{j_{2},i_{2}}=\sum_{n}\sum_{i_{1}}\Gamma_{j_{2}i_{1}}^{n*}\lambda_{i_{1}}^{B^{2}}\Gamma_{i_{1}i_{2}}^{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 The next matrix is 
 \begin_inset Formula 
 \[
-E_{j_{2}i_{2}}^{D_{w}-1}=\sum_{mn}\sum_{w_{1}=1}^{D_{w}}W_{w_{1}D_{w}-1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+E_{j_{2}i_{2}}^{2}=\sum_{mn}\sum_{w_{2}=1}^{D_{w}}W_{2w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{2}}A_{i_{1}i_{2}}^{n}
 \]
 
 \end_inset
@@ -4047,7 +4128,7 @@ E_{j_{2}i_{2}}^{D_{w}-1}=\sum_{mn}\sum_{w_{1}=1}^{D_{w}}W_{w_{1}D_{w}-1}^{mn}A_{
 
 \begin_inset Formula 
 \[
-=\sum_{mn}\sum_{w_{1}=D_{w}-1}^{D_{w}}W_{w_{1}D_{w}-1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+=\sum_{mn}W_{21}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}
 \]
 
 \end_inset
@@ -4055,7 +4136,7 @@ E_{j_{2}i_{2}}^{D_{w}-1}=\sum_{mn}\sum_{w_{1}=1}^{D_{w}}W_{w_{1}D_{w}-1}^{mn}A_{
 
 \begin_inset Formula 
 \[
-=\sum_{mn}A_{j_{1}j_{2}}^{m\dagger}\left(W_{D_{w}-1D_{w}-1}^{mn}E_{j_{1}i_{1}}^{D_{w}-1}+W_{D_{w}D_{w}-1}^{mn}E_{j_{1}i_{1}}^{D_{w}}\right)A_{i_{1}i_{2}}^{n}
+=\sum_{mn}W_{21}^{mn}A_{j_{1}j_{2}}^{m\dagger}\delta_{j_{1},i_{1}}A_{i_{1}i_{2}}^{n}
 \]
 
 \end_inset
@@ -4063,27 +4144,7 @@ E_{j_{2}i_{2}}^{D_{w}-1}=\sum_{mn}\sum_{w_{1}=1}^{D_{w}}W_{w_{1}D_{w}-1}^{mn}A_{
 
 \begin_inset Formula 
 \[
-=\sum_{mn}A_{j_{1}j_{2}}^{m\dagger}\left(W_{D_{w}-1D_{w}-1}^{mn}E_{j_{1}i_{1}}^{D_{w}-1}+W_{D_{w}D_{w}-1}^{mn}\delta_{j_{1},i_{1}}\right)A_{i_{1}i_{2}}^{n}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-=\sum_{mn}A_{j_{1}j_{2}}^{m\dagger}W_{D_{w}-1D_{w}-1}^{mn}E_{j_{1}i_{1}}^{D_{w}-1}A_{i_{1}i_{2}}^{n}+\sum_{mn}\sum_{i_{1}}A_{i_{1}j_{2}}^{m\dagger}W_{D_{w}D_{w}-1}^{mn}A_{i_{1}i_{2}}^{n}
-\]
-
-\end_inset
-
-For short range interactions 
-\begin_inset Formula $W_{D_{w}-1D_{w}-1}^{mn}=0$
-\end_inset
-
- so
-\begin_inset Formula 
-\[
-E_{j_{2}i_{2}}^{D_{w}-1}=\sum_{mn}\sum_{i_{1}}A_{i_{1}j_{2}}^{m\dagger}W_{D_{w}D_{w}-1}^{mn}A_{i_{1}i_{2}}^{n}
+=\sum_{mn}W_{21}^{mn}A_{i_{1}j_{2}}^{m\dagger}A_{i_{1}i_{2}}^{n}
 \]
 
 \end_inset
@@ -4091,27 +4152,19 @@ E_{j_{2}i_{2}}^{D_{w}-1}=\sum_{mn}\sum_{i_{1}}A_{i_{1}j_{2}}^{m\dagger}W_{D_{w}D
 Similarly
 \begin_inset Formula 
 \[
-E_{j_{2}i_{2}}^{D_{w}-2}=\sum_{mn}W_{D_{w}D_{w}-2}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{D_{w}}A_{i_{1}i_{2}}^{n}=\sum_{mn}W_{D_{w}D_{w}-2}^{mn}A_{i_{1}j_{2}}^{m\dagger}A_{i_{1}i_{2}}^{n}
+E_{j_{2}i_{2}}^{3}=\sum_{mn}W_{31}^{mn}A_{i_{1}j_{2}}^{m\dagger}A_{i_{1}i_{2}}^{n}
 \]
 
 \end_inset
 
-
-\begin_inset Formula 
-\[
-E_{j_{2}i_{2}}^{2}=\sum_{mn}W_{D_{w},D_{w}-2}^{mn}A_{i_{1}j_{2}}^{m\dagger}A_{i_{1}i_{2}}^{n}
-\]
-
-\end_inset
-
-Finally the first column of 
+Finally the last row of 
 \begin_inset Formula $\hat{W}$
 \end_inset
 
  has no zeros so this last evaluation is non trivial
 \begin_inset Formula 
 \[
-E_{j_{2}i_{2}}^{1}=\sum_{mn}\sum_{w_{1}=1}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}-E_{0}
+E_{j_{2}i_{2}}^{D_{w}}=\sum_{mn}\sum_{w_{2}=1}^{D_{w}}W_{D_{w}w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{2}}A_{i_{1}i_{2}}^{n}-E_{0}
 \]
 
 \end_inset
@@ -4119,7 +4172,7 @@ E_{j_{2}i_{2}}^{1}=\sum_{mn}\sum_{w_{1}=1}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^
 
 \begin_inset Formula 
 \[
-=\sum_{mn}W_{11}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}-E_{0}+\sum_{mn}\sum_{w_{1}=2}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+E_{j_{2}i_{2}}^{D_{w}}=\sum_{mn}\left(\sum_{w_{2}=1}^{D_{w}-1}W_{D_{w}w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{2}}A_{i_{1}i_{2}}^{n}+W_{D_{w}D_{w}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{D_{w}}A_{i_{1}i_{2}}^{n}\right)-E_{0}
 \]
 
 \end_inset
@@ -4127,7 +4180,7 @@ E_{j_{2}i_{2}}^{1}=\sum_{mn}\sum_{w_{1}=1}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^
 
 \begin_inset Formula 
 \[
-=\sum_{mn}1^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}-E_{0}+\sum_{mn}\sum_{w_{1}=2}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+=\sum_{mn}\left(\sum_{w_{2}=1}^{D_{w}-1}W_{D_{w}w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{2}}A_{i_{1}i_{2}}^{n}+\hat{1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{D_{w}}A_{i_{1}i_{2}}^{n}\right)-E_{0}
 \]
 
 \end_inset
@@ -4135,7 +4188,7 @@ E_{j_{2}i_{2}}^{1}=\sum_{mn}\sum_{w_{1}=1}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^
 
 \begin_inset Formula 
 \[
-E_{j_{2}i_{2}}^{1}=\sum_{n}A_{j_{1}j_{2}}^{n\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}-E_{0}+\sum_{mn}\sum_{w_{1}=2}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+=\sum_{mn}\sum_{w_{2}=1}^{D_{w}-1}W_{D_{w}w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{2}}A_{i_{1}i_{2}}^{n}+\sum_{n}A_{j_{1}j_{2}}^{n\dagger}E_{j_{1}i_{1}}^{D_{w}}A_{i_{1}i_{2}}^{n}-E_{0}
 \]
 
 \end_inset
@@ -4143,7 +4196,7 @@ E_{j_{2}i_{2}}^{1}=\sum_{n}A_{j_{1}j_{2}}^{n\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_
 or
 \begin_inset Formula 
 \[
-E_{j_{2}i_{2}}^{1}-\sum_{n}A_{j_{1}j_{2}}^{n\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}+E_{0}=\sum_{mn}\sum_{w_{1}=2}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+E_{j_{2}i_{2}}^{D_{w}}-\sum_{n}A_{j_{1}j_{2}}^{n\dagger}E_{j_{1}i_{1}}^{D_{w}}A_{i_{1}i_{2}}^{n}+E_{0}=\sum_{mn}\sum_{w_{2}=1}^{D_{w}-1}W_{D_{w}w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{2}}A_{i_{1}i_{2}}^{n}
 \]
 
 \end_inset
@@ -4151,7 +4204,7 @@ E_{j_{2}i_{2}}^{1}-\sum_{n}A_{j_{1}j_{2}}^{n\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_
 Now we take the trace of both sides
 \begin_inset Formula 
 \[
-LHS=\sum_{J_{2}i_{2}}\left(E_{j_{2}i_{2}}^{1}-\sum_{j_{1}i_{1}}\sum_{n}A_{j_{1}j_{2}}^{n\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}\right)
+LHS=\sum_{J_{2}i_{2}}\left(E_{j_{2}i_{2}}^{1}-\sum_{j_{1}i_{1}}\sum_{n}A_{j_{1}j_{2}}^{n\dagger}E_{j_{1}i_{1}}^{1}A_{i_{1}i_{2}}^{n}+E_{0}\right)
 \]
 
 \end_inset
@@ -4159,7 +4212,7 @@ LHS=\sum_{J_{2}i_{2}}\left(E_{j_{2}i_{2}}^{1}-\sum_{j_{1}i_{1}}\sum_{n}A_{j_{1}j
 
 \begin_inset Formula 
 \[
-=\sum_{J_{2}i_{2}}E_{j_{2}i_{2}}^{1}-\sum_{j_{1}i_{1}}E_{j_{1}i_{1}}^{1}\sum_{J_{2}i_{2}}\sum_{n}A_{j_{1}j_{2}}^{n\dagger}A_{i_{1}i_{2}}^{n}
+=\sum_{J_{2}i_{2}}E_{j_{2}i_{2}}^{1}-\sum_{j_{1}i_{1}}E_{j_{1}i_{1}}^{1}\sum_{J_{2}i_{2}}\sum_{n}A_{j_{1}j_{2}}^{n\dagger}A_{i_{1}i_{2}}^{n}+D^{2}E_{0}
 \]
 
 \end_inset
@@ -4183,13 +4236,13 @@ and because of orthogonality of the state
 so we get 
 \begin_inset Formula 
 \[
-E_{0}=\frac{1}{D^{2}}\sum_{J_{2}i_{2}}\sum_{j_{1}i_{1}}\sum_{mn}\sum_{w_{1}=2}^{D_{w}}W_{w_{1}1}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{2}}^{n}
+E_{0}=\frac{1}{D^{2}}\sum_{J_{2}i_{2}}\sum_{j_{1}i_{1}}\sum_{mn}\sum_{w_{2}=1}^{D_{w}-1}W_{D_{w}w_{2}}^{mn}A_{j_{1}j_{2}}^{m\dagger}E_{j_{1}i_{1}}^{w_{2}}A_{i_{1}i_{2}}^{n}
 \]
 
 \end_inset
 
 so we don't need to solve for 
-\begin_inset Formula $E^{1}$
+\begin_inset Formula $E^{D_{w}}$
 \end_inset
 
  if we only need to expectation value.
