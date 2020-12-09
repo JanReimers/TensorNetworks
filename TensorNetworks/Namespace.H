@@ -15,6 +15,7 @@ namespace TensorNetworks
     class iMPO;
     class SiteOperator;
     class Dw12;
+    class OperatorClient;
 
     template <class T> class SVCompressor;
     typedef SVCompressor<dcmplx> SVCompressorC;

@@ -17,6 +17,7 @@ class Hamiltonian : public virtual MPO
         virtual int Getd    () const=0; //Dimension of the one site Hilbert space
         virtual int GetMaxDw() const=0;
 
+        virtual const OperatorClient* GetClient() const=0;
         //  Creates an MPS or operators with the correct lattice size and spin space.
         virtual MPS*        CreateMPS       (int D,double normEps=1e-12,double epsSV=1e-12) const=0;
         virtual iTEBDState* CreateiTEBDState(int D,double normEps=1e-12,double epsSV=1e-12) const=0;

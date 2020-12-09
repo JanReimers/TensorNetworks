@@ -801,29 +801,29 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     EXPECT_GT(E,-0.4431471805599453094172);
 }
 
-#include "Operators/iMPOImp.H"
-
-TEST_F(iTEBDTests,TestiMPOExpectation)
-{
-    int UnitCell=2,D=2;
-    double S=0.5,epsSVD=0.0;
-    Setup(UnitCell,S,D,epsSVD);
-    itsState->InitializeWith(TensorNetworks::Random);
-    cout << itsState->GetNormStatus() << endl;
-    itsState->Canonicalize(TensorNetworks::DLeft);
-    cout << itsState->GetNormStatus() << endl;
-    itsState->Orthogonalize(itsCompressor);
-    cout << itsState->GetNormStatus() << endl;
-
-    TensorNetworks::Hamiltonian* H4=itsFactory->Make1D_NN_HeisenbergHamiltonian(UnitCell+2,S,1.0,1.0,0.0);
-    H4->Report(cout);
-    H4->ConvertToiMPO(UnitCell);
-    H4->Report(cout);
-    TensorNetworks::iMPO* iH=new TensorNetworks::iMPOImp(UnitCell,S,TensorNetworks::MPOImp::Identity);
-    iH->Combine(H4);
-    iH->Report(cout);
-
-    double E=itsState->GetExpectation(itsH);
-
-    EXPECT_NEAR(itsState->GetExpectation(iH),E,1e-10);
-}
+//#include "Operators/iMPOImp.H"
+//
+//TEST_F(iTEBDTests,TestiMPOExpectation)
+//{
+//    int UnitCell=2,D=2;
+//    double S=0.5,epsSVD=0.0;
+//    Setup(UnitCell,S,D,epsSVD);
+//    itsState->InitializeWith(TensorNetworks::Random);
+//    cout << itsState->GetNormStatus() << endl;
+//    itsState->Canonicalize(TensorNetworks::DLeft);
+//    cout << itsState->GetNormStatus() << endl;
+//    itsState->Orthogonalize(itsCompressor);
+//    cout << itsState->GetNormStatus() << endl;
+//
+//    TensorNetworks::Hamiltonian* H4=itsFactory->Make1D_NN_HeisenbergHamiltonian(UnitCell+2,S,1.0,1.0,0.0);
+//    H4->Report(cout);
+//    H4->ConvertToiMPO(UnitCell);
+//    H4->Report(cout);
+//    TensorNetworks::iMPO* iH=new TensorNetworks::iMPOImp(UnitCell,S,TensorNetworks::MPOImp::Identity);
+//    iH->Combine(H4);
+//    iH->Report(cout);
+//
+//    double E=itsState->GetExpectation(itsH);
+//
+//    EXPECT_NEAR(itsState->GetExpectation(iH),E,1e-10);
+//}

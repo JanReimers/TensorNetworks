@@ -1,11 +1,7 @@
 #ifndef HAMILTONIAN_1D_NN_HEISENBERG_H
 #define HAMILTONIAN_1D_NN_HEISENBERG_H
 
-#include "TensorNetworks/Hamiltonian.H"
-#include "Operators/SiteOperatorImp.H"
-#include "Operators/MPOImp.H"
-#include "TensorNetworks/Dw12.H"
-#include "TensorNetworksImp/SpinCalculator.H"
+#include "TensorNetworksImp/HamiltonianImp.H"
 
 namespace TensorNetworks
 {
@@ -15,32 +11,20 @@ namespace TensorNetworks
 class Hamiltonian_1D_NN_Heisenberg
     : public virtual Hamiltonian
     , public virtual OperatorClient
-    , private MPOImp
+    , private HamiltonianImp
 {
     public:
         Hamiltonian_1D_NN_Heisenberg(int L, double S, double Jxy,double Jz, double hz);
         virtual ~Hamiltonian_1D_NN_Heisenberg();
-        //
-        //  Hamiltonian interface
-        //
-        virtual int GetL () const {return MPOImp::GetL();}
-        virtual int Getd () const {return 2*itsS+1;}
-        virtual int GetMaxDw() const {return MPOImp::GetMaxDw();}
 
-        virtual MPS*        CreateMPS         (int D,double normEps,double epsSV) const;
-        virtual iTEBDState* CreateiTEBDState  (int D,double normEps,double epsSV) const;
-        virtual MPO*        CreateUnitOperator() const;
-        virtual MPO*        CreateOperator    (double dt, TrotterOrder) const;
-        virtual iMPO*       CreateiMPO        (double dt, TrotterOrder, double epsMPO) const;
-        virtual Matrix4RT   BuildLocalMatrix  () const;
-        virtual FullState*  CreateFullState   () const;
+        virtual const OperatorClient* GetClient() const {return this;} //dynamic cast was unreliable
 
     private:
         //
         //  OperatorClient interface
         //
         virtual MatrixRT GetW   (Position,int m, int n) const;
-        virtual Dw12     GetDw12(Position lbr) const;
+        virtual Dw12     GetDw12(Position lbr) const {return HamiltonianImp::GetDw12(lbr);}
 
         double GetH(int ma,int na,int mb,int nb,const SpinCalculator& sc) const
         {
@@ -48,13 +32,10 @@ class Hamiltonian_1D_NN_Heisenberg
             +itsJz*sc.GetSz(ma,na)*sc.GetSz(mb,nb)
             +itshz*(sc.GetSz(ma,na)+sc.GetSz(mb,nb)); //Should we only include one stie here?
         }
-        double I    (int m, int n) const;
 
         static const int Dw=5;
 //        int    itsL  MPOImp has L
-        double itsS; //
         double itsJxy,itsJz,itshz; //NN coupling constants and external field
-        Dw12 itsDw12s[3]; //Dw2[w1] for left bulk and right
 };
 }
 

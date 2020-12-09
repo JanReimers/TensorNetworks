@@ -41,7 +41,8 @@ public:
         if (itsH) delete itsH;
         if (itsMPS) delete itsMPS;
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsOperatorClient=dynamic_cast<TensorNetworks::OperatorClient*>(itsH);
+        itsOperatorClient=itsH->GetClient();
+        assert(itsOperatorClient);
         itsMPS=itsH->CreateMPS(D);
     }
     double ENeel(double S) const;
@@ -57,10 +58,10 @@ public:
     const TensorNetworks::MPSImp* GetMPSImp() const {return dynamic_cast<const TensorNetworks::MPSImp*>(itsMPS);}
 
     double eps;
-    TensorNetworks::Factory*        itsFactory;
-    TensorNetworks::Hamiltonian*    itsH;
-    TensorNetworks::OperatorClient* itsOperatorClient;
-    TensorNetworks::MPS*            itsMPS;
+           TensorNetworks::Factory*        itsFactory;
+           TensorNetworks::Hamiltonian*    itsH;
+    const  TensorNetworks::OperatorClient* itsOperatorClient;
+           TensorNetworks::MPS*            itsMPS;
 };
 
 
