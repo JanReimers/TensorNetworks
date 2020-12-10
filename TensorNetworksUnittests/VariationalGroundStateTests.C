@@ -28,10 +28,16 @@ public:
         if (itsH) delete itsH;
         if (itsMPS) delete itsMPS;
     }
-
+// Heisenberg Hamiltonian
     void Setup(int L, double S, int D)
     {
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
+        itsMPS=itsH->CreateMPS(D,1e-12,1e-12);
+    }
+// Transverse Ising Hamiltonian
+    void SetupTI(int L, double S, int D, double hx)
+    {
+        itsH=itsFactory->Make1D_NN_TransverseIsingHamiltonian(L,S,1.0,hx);
         itsMPS=itsH->CreateMPS(D,1e-12,1e-12);
     }
 
@@ -343,6 +349,107 @@ TEST_F(GroundStateTesting,TestNeelStateSurvey)
             }
 }
 */
+
+TEST_F(VariationalGroundStateTests,TestTransverIsingL2S1D2Hx0)
+{
+    int L=2,D=2,maxIter=100;
+    double S=0.5,hx=0.0;
+    SetupTI(L,S,D,hx);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+
+    TensorNetworks::Epsilons eps(1e-12);
+    eps.itsDelatEnergy1Epsilon=1e-9;
+    TensorNetworks::IterationSchedule is;
+    is.Insert({maxIter,D,eps});
+
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+
+    double E1=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E1/(L-1),-0.25,1e-7);
+    EXPECT_LT(nSweep,maxIter);
+
+    TensorNetworks::MPO* H2=itsH->CreateH2Operator();
+    double E2=itsMPS->GetExpectation(H2);
+    EXPECT_EQ(H2->GetMaxDw(),1); //if hx=0 it compresses a lot
+    EXPECT_NEAR(E2,E1*E1,1e-14);
+}
+
+TEST_F(VariationalGroundStateTests,TestTransverIsingL9S1D2Hx0)
+{
+    int L=9,D=2,maxIter=100;
+    double S=0.5,hx=0.0;
+    SetupTI(L,S,D,hx);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+
+    TensorNetworks::Epsilons eps(1e-12);
+    eps.itsDelatEnergy1Epsilon=1e-9;
+    TensorNetworks::IterationSchedule is;
+    is.Insert({maxIter,D,eps});
+
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+
+    double E1=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E1/(L-1),-0.25,1e-7);
+    EXPECT_LT(nSweep,maxIter);
+
+    TensorNetworks::MPO* H2=itsH->CreateH2Operator();
+    double E2=itsMPS->GetExpectation(H2);
+    EXPECT_EQ(H2->GetMaxDw(),5); //if hx=0 it compresses a lot
+    EXPECT_NEAR(E2,E1*E1,1e-14);
+}
+
+
+TEST_F(VariationalGroundStateTests,TestTransverIsingL9S1D2Hx1)
+{
+    int L=9,D=2,maxIter=100;
+    double S=0.5,hx=1.0;
+    SetupTI(L,S,D,hx);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+
+    TensorNetworks::Epsilons eps(1e-12);
+    eps.itsDelatEnergy1Epsilon=1e-9;
+    TensorNetworks::IterationSchedule is;
+    is.Insert({maxIter,D,eps});
+
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+
+    double E1=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E1/(L-1),-0.598239208,1e-7);
+    EXPECT_LT(nSweep,maxIter);
+
+    TensorNetworks::MPO* H2=itsH->CreateH2Operator();
+    double E2=itsMPS->GetExpectation(H2);
+    EXPECT_EQ(H2->GetMaxDw(),5); //if hx=0 it compresses a lot
+    EXPECT_NEAR(E2,E1*E1,1e-4);
+}
+
+TEST_F(VariationalGroundStateTests,TestTransverIsingL9S1D8Hx1)
+{
+    int L=9,DStart=2,D=8,maxIter=100;
+    double S=0.5,hx=1.0;
+    SetupTI(L,S,DStart,hx);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+
+    TensorNetworks::Epsilons eps(1e-12);
+    eps.itsDelatEnergy1Epsilon=1e-9;
+    TensorNetworks::IterationSchedule is;
+    is.Insert({maxIter,DStart,eps});
+    is.Insert({maxIter,D,eps});
+
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+
+    double E1=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E1/(L-1),-0.598243716,1e-7);
+    EXPECT_LT(nSweep,maxIter);
+
+    TensorNetworks::MPO* H2=itsH->CreateH2Operator();
+    double E2=itsMPS->GetExpectation(H2);
+    EXPECT_EQ(H2->GetMaxDw(),5); //if hx=0 it compresses a lot
+    EXPECT_NEAR(E2,E1*E1,1e-14);
+}
+
+
+
 
 
 

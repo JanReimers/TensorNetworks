@@ -193,10 +193,18 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/FullStateImp.H" />
+		<Unit filename="TensorNetworksImp/HamiltonianImp.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/HamiltonianImp.H" />
 		<Unit filename="TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.C">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H" />
+		<Unit filename="TensorNetworksImp/Hamiltonian_1D_NN_TransverseIsing.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/Hamiltonian_1D_NN_TransverseIsing.H" />
 		<Unit filename="TensorNetworksImp/MPSImp.C">
 			<Option compilerVar="CC" />
 		</Unit>
