@@ -28,15 +28,18 @@ protected:
 
 class SiteOperatorImp : public virtual SiteOperator
 {
+        typedef Matrix<MatrixRT> TensorT;
     public:
         SiteOperatorImp(int d); //Construct with identity operator
         SiteOperatorImp(int d, double S, SpinOperator so); //Construct with identity operator
         SiteOperatorImp(int d, Position  lbr, const OperatorClient* O);
         SiteOperatorImp(int d, Direction lr , const MatrixRT& U, const DiagonalMatrixRT& expEvs);
+        SiteOperatorImp(int d, const TensorT& W); //Construct with W operator
         virtual ~SiteOperatorImp();
         void SetNeighbours(SiteOperator* left, SiteOperator* right);
 
-        virtual const Dw12&    GetDw12() const {return itsDw12;}
+        virtual int             Getd   () const {return itsd;}
+        virtual const Dw12&     GetDw12() const {return itsDw12;}
         virtual const MatrixRT& GetW(int m, int n) const
         {
             return itsWs(m+1,n+1);
@@ -61,7 +64,6 @@ class SiteOperatorImp : public virtual SiteOperator
         void     Reshape(int D1, int D2, bool saveData=false);
         void     Reshape(Direction lr,const MatrixRT& UV);
 
-        typedef Matrix<MatrixRT> TensorT;
 
         int itsd; //2*S+1
         Dw12 itsDw12;

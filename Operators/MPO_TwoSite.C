@@ -23,7 +23,7 @@ MPO_TwoSite::MPO_TwoSite(int L, double S ,int isite1,int isite2, SpinOperator so
         else
             Insert(new SiteOperatorImp(d)); //Identity op
     }
-
+    LinkSites();
 }
 
 

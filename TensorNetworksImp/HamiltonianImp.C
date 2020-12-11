@@ -31,6 +31,7 @@ void HamiltonianImp::InitializeSites()
     for (int ia=2;ia<=GetL()-1;ia++)
         Insert(new SiteOperatorImp(d,PBulk ,this));
     Insert(new SiteOperatorImp(d,PRight,this));
+    LinkSites();
 }
 
 HamiltonianImp::~HamiltonianImp()

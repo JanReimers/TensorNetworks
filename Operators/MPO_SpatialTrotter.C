@@ -79,7 +79,7 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, double S, 
             assert(false);
         }
     }
-
+    LinkSites();
 }
 
 MPO_SpatialTrotter::~MPO_SpatialTrotter()

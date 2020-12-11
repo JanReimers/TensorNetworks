@@ -97,6 +97,7 @@ protected:
     static MMType    Factor(const MatrixCT m);
     static Matrix4CT GetTransferMatrix(const dVectorT& M); //M=lambda*gamma or gamma*lambda
     static MatrixCT  GetNormMatrix(Direction lr,const dVectorT& M); //Er*I or I*El
+    static double    GetExpectation (const dVectorT& gamma,const iMPO* o); //Recursive for triangular MPOs
 
     struct Sites
     {

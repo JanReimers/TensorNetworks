@@ -84,7 +84,7 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const Di
         Vector<int> first(Dw);
         Vector<int> last (1);
         Fill(first,1);
-        Fill(last,5);
+        Fill(last,Dw);
         itsDw12=Dw12(1,Dw,first,last);
         int i1=1; //Linear index for (m,n) = 1+m+p*n
         //  Fill W^(m,n)_w matrices
@@ -105,7 +105,7 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const Di
         Vector<int> first(1);
         Vector<int> last (Dw);
         Fill(first,1);
-        Fill(last,5);
+        Fill(last,Dw);
         itsDw12=Dw12(Dw,1,first,last);
         int i2=1; //Linear index for (m,n) = 1+m+p*n
         //  Fill W^(m,n)_w matrices
@@ -125,6 +125,24 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const Di
         // Must be been called with one of the spin decomposition types.
         assert(false);
     }
+}
+//
+// Construct with W operator
+//
+SiteOperatorImp::SiteOperatorImp(int d, const TensorT& W)
+    : itsd(d)
+    , itsDw12()
+    , itsTruncationError(0.0)
+    , itsWs(W)
+{
+    int Dw=itsWs(1,1).GetNumRows();
+    assert(itsWs(1,1).GetNumCols()==Dw);
+// Build up w limits
+    Vector<int> first(Dw);
+    Vector<int> last (Dw);
+    Fill(first,1);
+    Fill(last,Dw);
+    itsDw12=Dw12(Dw,Dw,first,last);
 }
 
 

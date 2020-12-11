@@ -8,6 +8,7 @@ namespace TensorNetworks
 
 MPOImp::MPOImp(int L, double S,LoadWith loadWith)
     : itsL(L)
+    , itsS(S)
     , areSitesLinked(false)
     , itsSites()
 {
@@ -19,23 +20,43 @@ MPOImp::MPOImp(int L, double S,LoadWith loadWith)
     switch (loadWith)
     {
     case Identity:
-        {
-            //
-            //  Load up the sites with unit operators
-            //
+    {
+        //
+        //  Load up the sites with unit operators
+        //  TODO tidy up loop and unit test.
+        //
+        Insert(new SiteOperatorImp(d));
+        for (int ia=2; ia<=itsL-1; ia++)
             Insert(new SiteOperatorImp(d));
-            for (int ia=2;ia<=itsL-1;ia++)
-                  Insert(new SiteOperatorImp(d));
-            Insert(new SiteOperatorImp(d));
-            break;
-        }
+        Insert(new SiteOperatorImp(d));
+        LinkSites();
+        break;
+    }
     case LoadLater:
-        {
-            break;
-        }
+    {
+        break;
+    }
     }
 
 }
+
+MPOImp::MPOImp(int L, double S, const TensorT& W)
+    : itsL(L)
+    , itsS(S)
+    , areSitesLinked(false)
+    , itsSites()
+{
+    assert(isValidSpin(S));
+    int d=2*S+1;
+    assert(itsL>=1);
+    assert(d>1);
+    //
+    //  Load up the sites with copies of the W operator
+    //
+    for (int ia=1; ia<=itsL; ia++)
+        Insert(new SiteOperatorImp(d,W));
+}
+
 
 MPOImp::~MPOImp()
 {
@@ -49,16 +70,16 @@ void MPOImp::ConvertToiMPO(int UnitCell)
     //
     //  This ends up being a #$*#(*$^# mess because ptr_vector doesn't support revers iterators.
     //
-    for (int in=1;in<=n;in++)
+    for (int in=1; in<=n; in++)
     {
         auto is=itsSites.begin();
         is++; // skip dummy site a index [0]
         itsSites.erase(is);
     }
-    for (int in=1;in<=n;in++)
+    for (int in=1; in<=n; in++)
     {
         auto is=itsSites.begin();
-        for (int i=0;i<=UnitCell;i++,is++);
+        for (int i=0; i<=UnitCell; i++,is++);
         itsSites.erase(is);
     }
     itsL=UnitCell;
@@ -81,7 +102,8 @@ void MPOImp::Insert(SiteOperator* so)
     assert(!areSitesLinked);
     if (itsSites.size()==0) itsSites.push_back(0); //Dummy at index 0 so we start counting at index 1
     itsSites.push_back(so);
-    if (static_cast<int>(itsSites.size())==itsL+1) LinkSites(); //Dummy at index 0 so we start counting at index 1
+//  This is too clever by half, derived constructor should call LinkSites.
+//    if (static_cast<int>(itsSites.size())==itsL+1) LinkSites(); //Dummy at index 0 so we start counting at index 1
 }
 
 //
@@ -93,16 +115,23 @@ void MPOImp::LinkSites()
     assert(static_cast<int>(itsSites.size())-1==itsL);
     SiteOperatorImp* s=dynamic_cast<SiteOperatorImp*>(itsSites[1]);
     assert(s);
-    s->SetNeighbours(0,itsSites[2]);
-    for (int ia=2;ia<=itsL-1;ia++)
+    if (itsL>1)
     {
-        s=dynamic_cast<SiteOperatorImp*>(itsSites[ia]);
+        s->SetNeighbours(0,itsSites[2]);
+        for (int ia=2; ia<=itsL-1; ia++)
+        {
+            s=dynamic_cast<SiteOperatorImp*>(itsSites[ia]);
+            assert(s);
+            s->SetNeighbours(itsSites[ia-1],itsSites[ia+1]);
+        }
+        s=dynamic_cast<SiteOperatorImp*>(itsSites[itsL]);
         assert(s);
-        s->SetNeighbours(itsSites[ia-1],itsSites[ia+1]);
+        s->SetNeighbours(itsSites[itsL-1],0);
     }
-    s=dynamic_cast<SiteOperatorImp*>(itsSites[itsL]);
-    assert(s);
-    s->SetNeighbours(itsSites[itsL-1],0);
+    else
+    {
+        s->SetNeighbours(0,0);
+    }
     areSitesLinked=true;
 }
 

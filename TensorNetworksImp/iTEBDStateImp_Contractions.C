@@ -297,40 +297,77 @@ double iTEBDStateImp::GetExpectationmnmn (const Matrix4RT& expH) const
 
 }
 
-// This code follows: McCulloch, I. P. Infinite size density matrix renormalization group, revisited
-//                    http://arxiv.org/pdf/0804.2509v1
-//
 double iTEBDStateImp::GetExpectation (const iMPO* o) const
 {
-    assert(o->GetL()==2);
+    int L=GetL();
+    assert(L==2);
+    assert(o->GetL()==L);
+//
+//  The first recursion relation for E^Dw is the just orthonormality condition
+//
+    double E1,E2;
     ReCenter(1);
+    {
+        cout << "oerr=" << GetOrthonormalityErrors() << endl;
+        assert(GetOrthonormalityErrors()<1e-11);
+
+        dVectorT gamma=lambdaB()*ContractAlB();
+        assert(gamma.size()==itsd*itsd);
+        iMPO* cellMPO=o->MakeUnitcelliMPO(L);
+
+        E1=GetExpectation(gamma,cellMPO);
+        delete cellMPO;
+    }
+    ReCenter(2);
+    {
+        cout << "oerr=" << GetOrthonormalityErrors() << endl;
+        assert(GetOrthonormalityErrors()<1e-11);
+
+        dVectorT gamma=lambdaB()*ContractAlB();
+        assert(gamma.size()==itsd*itsd);
+        iMPO* cellMPO=o->MakeUnitcelliMPO(L);
+
+        E2=GetExpectation(gamma,cellMPO);
+        delete cellMPO;
+    }
+
+    return (E1+E2)/sqrt(1.0);
+}
+
+
+// This code follows: McCulloch, I. P. Infinite size density matrix renormalization group, revisited
+//                    http://arxiv.org/pdf/0804.2509v1
+//  On entry gamma[n]=A^na * A^nb ... A^nx = Gamma(na)*LambdaB() *  Gamma(nb)*LambdaC() ...  Gamma(nx)*LambdaA()
+//
+double iTEBDStateImp::GetExpectation (const dVectorT& gamma, const iMPO* o)
+{
+    assert(o);
+    assert(o->GetL()>=1);
+    o->Report(cout);
 //
 //  Make sure everything int iMPS is square.
 //
-    int D=s1.siteA->GetD1();
-    assert(D==s1.siteA->GetD2());
-    assert(D==s1.siteB->GetD1());
-    assert(D==s1.siteB->GetD2());
+    int d=gamma.size();
+    assert(d>0);
+    int D=gamma[0].GetNumRows();
+    assert(D==gamma[0].GetNumCols());
 
     const SiteOperator* so=o->GetSiteOperator(1);
     int Dw=so->GetDw12().Dw1;
     assert(Dw==so->GetDw12().Dw2);
+#ifdef DEBUG
 //
 //  Lets check that W has the correct shape
 //
-    for (int ma=0; ma<itsd; ma++)
-        for (int na=0; na<itsd; na++)
+    for (int ma=0; ma<d; ma++)
+        for (int na=0; na<d; na++)
         {
             const MatrixRT& Wmn=so->GetW(ma,na);
             for (int w1=1;w1<=Dw-1;w1++)
                 for (int w2=2;w2<=Dw;w2++)
                     assert(Wmn(w1,w2)==0.0);
         }
-//
-//  The first recursion relation for E^Dw is the just orthonormality condition
-//
-    cout << "oerr=" << GetOrthonormalityErrors() << endl;
-    assert(GetOrthonormalityErrors()<1e-12);
+#endif
 //
 //  Fill out E[1]
 //
@@ -342,35 +379,35 @@ double iTEBDStateImp::GetExpectation (const iMPO* o) const
 //
     MatrixCT E1(D,D);
     Fill(E1,dcmplx(0));
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
+    for (int m=0; m<d; m++)
+        for (int n=0; n<d; n++)
         {
             const MatrixRT& Wmn=so->GetW(m,n);
             for (int i2=1;i2<=D;i2++)
             for (int j2=1;j2<=D;j2++)
                 for (int i1=1;i1<=D;i1++)
-                    E1(i2,j2)+=conj(GammaA()[m](i2,i1))*lambdaB()(i1,i1)*Wmn(1,1)*lambdaB()(i1,i1)*GammaA()[n](i1,j2);
+                    E1(i2,j2)+=conj(gamma[m](i1,i2))*Wmn(1,1)*gamma[n](i1,j2);
         }
-    cout << "E1=" << E1 << endl;
-    assert(E[1]==E1);
+//    cout << "E1=" << E1 << endl;
+    assert(Max(fabs(E[1]-E1))<1e-12);
 
 //
-//  Now loop down from 2 to Dw-1
+//  Now loop down from 2 to Dw-1.  Only column 1 in W is non-zero.
 //
     for (int w=2;w<=Dw-1;w++)
     {
         E[w]=MatrixCT(D,D);
         Fill(E[w],dcmplx(0));
-        for (int m=0; m<itsd; m++)
-            for (int n=0; n<itsd; n++)
+        for (int m=0; m<d; m++)
+            for (int n=0; n<d; n++)
             {
                 const MatrixRT& Wmn=so->GetW(m,n);
                 for (int i2=1;i2<=D;i2++)
                 for (int j2=1;j2<=D;j2++)
                     for (int i1=1;i1<=D;i1++)
-                        E[w](i2,j2)+=conj(GammaA()[m](i2,i1))*lambdaB()(i1,i1)*Wmn(w,1)*lambdaB()(i1,i1)*GammaA()[n](i1,j2);
+                        E[w](i2,j2)+=conj(gamma[m](i1,i2))*Wmn(w,1)*gamma[n](i1,j2);
             }
-        cout << "E[" << w << "]=" << E[w] << endl;
+//        cout << "E[" << w << "]=" << E[w] << endl;
     }
 //
 //  Now do the final contraction to get E[1]
@@ -381,8 +418,8 @@ double iTEBDStateImp::GetExpectation (const iMPO* o) const
         Fill(E[Dw],dcmplx(0));
         for (int w=1;w<=Dw-1;w++)
         {
-            for (int m=0; m<itsd; m++)
-                for (int n=0; n<itsd; n++)
+            for (int m=0; m<d; m++)
+                for (int n=0; n<d; n++)
                 {
                     const MatrixRT& Wmn=so->GetW(m,n);
                     //cout << "W" << m << n << "=" << Wmn << endl;
@@ -390,17 +427,12 @@ double iTEBDStateImp::GetExpectation (const iMPO* o) const
                     for (int j2=1;j2<=D;j2++)
                         for (int i1=1;i1<=D;i1++)
                         for (int j1=1;j1<=D;j1++)
-                            E[Dw](i2,j2)+=conj(GammaA()[m](j2,j1))
-                                *lambdaB()(j1,j1)
-                                *Wmn(Dw,w)
-                                *E[w](j1,i1)
-                                *lambdaB()(i1,i1)
-                                *GammaA()[n](i1,i2);
+                            E[Dw](i2,j2)+=Wmn(Dw,w)*conj(gamma[m](i1,i2))*E[w](i1,j1)*gamma[n](j1,j2);
                 }
         }
 
     }
-    cout << "E[" << Dw << "]=" << E[Dw] << endl;
+//    cout << "E[" << Dw << "]=" << E[Dw] << endl;
 
 //
 //  Take the trace of E1
@@ -409,10 +441,10 @@ double iTEBDStateImp::GetExpectation (const iMPO* o) const
     for (int i2=1;i2<=D;i2++)
     for (int j2=1;j2<=D;j2++)
         E0+=E[Dw](i2,j2);
-    cout << "E0=" << E0 << endl;
+//    cout << "E0=" << E0 << endl;
     E0/=D;
-//    E0/=D;
-    cout << "E0=" << E0 << endl;
+    E0/=D;
+//    cout << "E0=" << E0 << endl;
     if (fabs(imag(E0))>=1e-10)
         Logger->LogWarnV(0,"iTEBDStateImp::GetExpectation(iMPO) E0=(%.5f,%.1e) has large imaginary component",real(E0),imag(E0));
     return real(E0);

@@ -16,6 +16,8 @@ class iMPO : public virtual MPO
         iMPO() {};
         virtual ~iMPO() {};
 
+        virtual iMPO* MakeUnitcelliMPO(int unitcell) const=0; //Contract horizontally to make iMPO for the whole unit cell.
+
         virtual int   GetL() const=0;
         virtual const SiteOperator* GetSiteOperator(int isite) const
         {

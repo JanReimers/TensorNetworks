@@ -16,13 +16,18 @@ namespace TensorNetworks
 //
 class MPOImp : public virtual MPO
 {
+protected:
+    typedef Matrix<MatrixRT> TensorT;
+
     public:
         enum LoadWith {Identity,LoadLater};
         MPOImp(int L, double S,LoadWith);
+        MPOImp(int L, double S,const TensorT& W);
         virtual ~MPOImp();
         virtual void ConvertToiMPO(int UnitCell); //Strip away edge sites with w=1.
 
-        virtual int   GetL() const {return itsL;}
+        virtual int    GetL() const {return itsL;}
+        virtual double GetS() const {return itsS;}
         virtual SiteOperator* GetSiteOperator(int isite)
         {
             assert(isite>0);
@@ -32,12 +37,12 @@ class MPOImp : public virtual MPO
         }
 
     protected:
-        void LinkSites();
+        virtual void LinkSites();
         void Insert(SiteOperator*);
-    private:
         typedef optr_vector<SiteOperator*> SitesType;
 
         int itsL;
+        double itsS;
         bool areSitesLinked;
         SitesType itsSites;
 

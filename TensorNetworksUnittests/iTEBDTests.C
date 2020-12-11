@@ -801,29 +801,48 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     EXPECT_GT(E,-0.4431471805599453094172);
 }
 
-//#include "Operators/iMPOImp.H"
-//
-//TEST_F(iTEBDTests,TestiMPOExpectation)
-//{
-//    int UnitCell=2,D=2;
-//    double S=0.5,epsSVD=0.0;
-//    Setup(UnitCell,S,D,epsSVD);
-//    itsState->InitializeWith(TensorNetworks::Random);
+#include "Operators/iMPOImp.H"
+
+TEST_F(iTEBDTests,TestiMPOExpectation)
+{
+    int UnitCell=2,D=2,maxIter=1000;
+    double S=0.5,epsSVD=0.0;
+    Setup(UnitCell,S,D,epsSVD);
+    itsState->InitializeWith(TensorNetworks::Random);
 //    cout << itsState->GetNormStatus() << endl;
-//    itsState->Canonicalize(TensorNetworks::DLeft);
+    itsState->Canonicalize(TensorNetworks::DLeft);
 //    cout << itsState->GetNormStatus() << endl;
-//    itsState->Orthogonalize(itsCompressor);
+    itsState->Orthogonalize(itsCompressor);
 //    cout << itsState->GetNormStatus() << endl;
-//
-//    TensorNetworks::Hamiltonian* H4=itsFactory->Make1D_NN_HeisenbergHamiltonian(UnitCell+2,S,1.0,1.0,0.0);
+    TensorNetworks::Epsilons eps(1e-12);
+    eps.itsMPSCompressEpsilon=0;
+
+    TensorNetworks::IterationSchedule is;
+    eps.itsDelatEnergy1Epsilon=1e-6;
+    is.Insert({20,D,0.5,eps});
+    is.Insert({maxIter,D,2,0.2,eps});
+    is.Insert({maxIter,D,0.1,eps});
+    is.Insert({maxIter,D,0.05,eps});
+    is.Insert({maxIter,D,0.02,eps});
+    eps.itsDelatEnergy1Epsilon=1e-7;
+    is.Insert({maxIter,D,0.01,eps});
+    eps.itsDelatEnergy1Epsilon=1e-8;
+    is.Insert({maxIter,D,0.005,eps});
+    is.Insert({maxIter,D,0.002,eps});
+    is.Insert({maxIter,D,0.001,eps});
+    is.Insert({maxIter,D,0.0  ,eps});
+    itsState->FindiTimeGroundState(itsH,is);
+
+    TensorNetworks::Hamiltonian* H4=itsFactory->Make1D_NN_HeisenbergHamiltonian(UnitCell+2,S,1.0,1.0,0.0);
 //    H4->Report(cout);
-//    H4->ConvertToiMPO(UnitCell);
+    H4->ConvertToiMPO(UnitCell);
 //    H4->Report(cout);
-//    TensorNetworks::iMPO* iH=new TensorNetworks::iMPOImp(UnitCell,S,TensorNetworks::MPOImp::Identity);
-//    iH->Combine(H4);
+    TensorNetworks::iMPO* iH=new TensorNetworks::iMPOImp(UnitCell,S,TensorNetworks::MPOImp::Identity);
+    iH->Combine(H4);
 //    iH->Report(cout);
-//
-//    double E=itsState->GetExpectation(itsH);
-//
-//    EXPECT_NEAR(itsState->GetExpectation(iH),E,1e-10);
-//}
+
+    double E=itsState->GetExpectation(itsH);
+    double Er=itsState->GetExpectation(iH);
+    cout << "Er/E=" << Er/E << endl;
+    EXPECT_NEAR(Er,E,1e-10);
+}
