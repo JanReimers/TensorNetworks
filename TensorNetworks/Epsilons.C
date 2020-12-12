@@ -15,6 +15,7 @@ Epsilons::Epsilons(double default_eps)
     , itsMPSCompressEpsilon         (default_eps)
     , itsMPOCompressEpsilon         (default_eps)
     , itsSparseMatrixEpsilon        (default_eps)
+    , itsDeltaLambdaEpsilon         (default_eps)
 {}
 
 
@@ -23,14 +24,15 @@ std::ostream& operator<<(std::ostream& os,const Epsilons& eps)
     os.precision(1);
     const static int width=3;
     os
-    << std::setw(width) << std::scientific << eps.itsDelatEnergy1Epsilon << " "
-    << std::setw(width) << std::scientific << eps.itsDelatEnergy2Epsilon << " "
-    << std::setw(width) << std::scientific << eps.itsDelatNormEpsilon    << " "
-    << std::setw(width) << std::scientific << eps.itsEigenSolverEpsilon  << " "
-    << std::setw(width) << std::scientific << eps.itsNormalizationEpsilon  << " "
-    << std::setw(width) << std::scientific << eps.itsMPSCompressEpsilon  << " "
-    << std::setw(width) << std::scientific << eps.itsMPOCompressEpsilon  << " "
+    << std::setw(width) << std::scientific << eps.itsDelatEnergy1Epsilon  << " "
+    << std::setw(width) << std::scientific << eps.itsDelatEnergy2Epsilon  << " "
+    << std::setw(width) << std::scientific << eps.itsDelatNormEpsilon     << " "
+    << std::setw(width) << std::scientific << eps.itsEigenSolverEpsilon   << " "
+    << std::setw(width) << std::scientific << eps.itsNormalizationEpsilon << " "
+    << std::setw(width) << std::scientific << eps.itsMPSCompressEpsilon   << " "
+    << std::setw(width) << std::scientific << eps.itsMPOCompressEpsilon   << " "
     << std::setw(width) << std::scientific << eps.itsSparseMatrixEpsilon  << " "
+    << std::setw(width) << std::scientific << eps.itsDeltaLambdaEpsilon   << " "
     ;
     return os;
 }
@@ -38,7 +40,7 @@ std::ostream& operator<<(std::ostream& os,const Epsilons& eps)
 std::string Epsilons::Header()
 {
     std::ostringstream os;
-    os << " <E>    <E^2>-<E>^2 1-<|>  Eigen  Norm    SVD1  SVD2   Sparse" << std::ends;
+    os << " <E>    <E^2>-<E>^2 1-<|>  Eigen  Norm    SVD1  SVD2   Sparse dLambda" << std::ends;
     return os.str();
 }
 

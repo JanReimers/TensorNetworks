@@ -19,6 +19,7 @@ struct Epsilons
     double itsMPSCompressEpsilon;       // s is deemed to be zero if s<eps
     double itsMPOCompressEpsilon;       // s is deemed to be zero if s<eps
     double itsSparseMatrixEpsilon;      // matrix element A_ij is deemed to be zero if A_ij <eps
+    double itsDeltaLambdaEpsilon;       // assume convergence when delta lambdaA or B < eps
 
     friend std::ostream& operator<<(std::ostream&,const Epsilons&);
     static std::string Header();

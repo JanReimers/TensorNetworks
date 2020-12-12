@@ -10,17 +10,18 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
         Done: -Implement transverse Ising model with one site unit cell.
             Need to make one site gates to do iTime iterations to get GS.
         Done: -Implement McCulloch's recursion for expectations, for one site unit cell
-        -Implement McCulloch's recursion for expectations, for two unit cell
-            -Contract MPO horizontally to get a unit cell W which is still DwxDw on internal indices
+        Done: -Implement McCulloch's recursion for expectations, for two unit cell
+            Done:-Contract MPO horizontally to get a unit cell W which is still DwxDw on internal indices
              but d^n x d^n on physic indices
-
+        -McCulloch's recursion for expectations gives the wrong number. Why?
         -Implement proper compression as per Parker.  BIG job, needs QR decomp
         Done: -Support QR decomp from Lapack.
         -Try and hand code 2nd order trotter with gates.
 
 
-    -Decide convergence based on SV spectrum (lambda A or B), instead of E.
-    Done -Support Apply(MPO*)
+    -Create iMPOs directly, get rid of the convert method.
+    Done:-Decide convergence based on SV spectrum (lambda A or B), instead of E.
+    Done:-Support Apply(MPO*)
         -Use trotter 1st, 2nd and 4rth order MPO instead of expH.
         Do we run into the same problem as with <E2>?
             Yes !!!!  We need an iMPO class

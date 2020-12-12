@@ -650,10 +650,11 @@ TEST_F(iTEBDTests,TestRandomEnergyRangeSD)
 
 TEST_F(iTEBDTests,FindiTimeGSD4S12)
 {
-    int UnitCell=2,D=8;
+    int UnitCell=2,D=8,maxIter=10000;
     double S=0.5,epsSVD=0.0;
 #ifdef DEBUG
     D=4;
+    maxIter=1000;
 #endif // DEBUG
     Setup(UnitCell,S,2,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
@@ -663,14 +664,20 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12)
 
     TensorNetworks::IterationSchedule is;
     eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({1000,2,0.5,eps});
+    eps.itsDeltaLambdaEpsilon=1e-5;
+    is.Insert({maxIter,2,0.5,eps});
     eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({1000,D,0.2,eps});
+    eps.itsDeltaLambdaEpsilon=1e-10;
+    is.Insert({maxIter,D,0.2,eps});
     eps.itsDelatEnergy1Epsilon=1e-9;
-    is.Insert({1000,D,0.1,eps});
-    is.Insert({1000,D,0.05,eps});
-//    is.Insert({1000,D,0.01,eps});
-//    is.Insert({1000,D,0.001,eps});
+    eps.itsDeltaLambdaEpsilon=1e-10;
+    is.Insert({maxIter,D,0.1,eps});
+    is.Insert({maxIter,D,0.05,eps});
+    is.Insert({maxIter,D,0.02,eps});
+    is.Insert({maxIter,D,0.01,eps});
+    is.Insert({maxIter,D,0.005,eps});
+    is.Insert({maxIter,D,0.002,eps});
+    is.Insert({maxIter,D,0.001,eps});
 //    eps.itsDelatEnergy1Epsilon=5e-6;
 //    is.Insert({50,D,0.05,eps});
 //    eps.itsDelatEnergy1Epsilon=2e-6;
@@ -688,9 +695,11 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12)
     itsState->Report(cout);
     double E=itsState->GetExpectation(itsH);
 #ifdef DEBUG
-    EXPECT_LT(E,-0.4409); //we only seem to get this far right now.
+    EXPECT_LT(E,-0.4409);   //D=4 we only seem to get this far right now.
+//    EXPECT_LT(E,-0.442607); //D=4 From mps-tools.
 #else
-    EXPECT_LT(E,-0.4426); //From mps-tools
+    EXPECT_LT(E,-0.4426); //D=8 we only seem to get this far right now.
+//    EXPECT_LT(E,-0.4430818); //From mps-tools
 #endif
     EXPECT_GT(E,-0.4431471805599453094172);
 }
@@ -760,6 +769,7 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     double S=0.5,epsSVD=0.0;
 #ifdef DEBUG
     Dmax=8;
+    maxIter=1000;
 #endif // DEBUG
     Setup(UnitCell,S,Dstart,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
@@ -769,16 +779,19 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
 
     TensorNetworks::IterationSchedule is;
     eps.itsDelatEnergy1Epsilon=1e-6;
+    eps.itsDeltaLambdaEpsilon=1e-7;
     is.Insert({20,Dstart,0.5,eps});
     is.Insert({maxIter,8,2,0.2,eps});
     is.Insert({maxIter,8,0.1,eps});
     is.Insert({maxIter,8,0.05,eps});
     is.Insert({maxIter,8,0.02,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
-    is.Insert({maxIter,8,0.01,eps});
+    eps.itsDeltaLambdaEpsilon=1e-8;
+    is.Insert({maxIter,Dmax,8,0.01,eps});
     eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({maxIter,8,0.005,eps});
-    is.Insert({maxIter,Dmax,8,0.002,eps});
+    eps.itsDeltaLambdaEpsilon=1e-9;
+    is.Insert({maxIter,Dmax,0.005,eps});
+    is.Insert({maxIter,Dmax,0.002,eps});
     is.Insert({maxIter,Dmax,0.001,eps});
     is.Insert({maxIter,Dmax,0.0  ,eps});
 //    eps.itsDelatEnergy1Epsilon=1e-6;
@@ -793,10 +806,10 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     double E=itsState->GetExpectation(itsH);
 #ifdef DEBUG
 //    EXPECT_LT(E,-0.44308); //From mp-toolkit
-    EXPECT_LT(E,-0.44272);
+    EXPECT_LT(E,-0.44284);
 #else
 //    EXPECT_LT(E,-0.4431447); //From mp-toolkit
-    EXPECT_LT(E,-0.4428); //We only seem to get this far
+    EXPECT_LT(E,-0.443132); //We only seem to get this far
 #endif
     EXPECT_GT(E,-0.4431471805599453094172);
 }

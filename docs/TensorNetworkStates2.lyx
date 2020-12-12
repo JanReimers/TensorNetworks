@@ -4320,7 +4320,7 @@ W_{w_{1}w_{3}}^{mn}=W_{w_{1}w_{3}}^{\left(m_{a}m_{a+1}\right)\left(n_{a}n_{a+1}\
 and now define
 \begin_inset Formula 
 \[
-E_{j_{3}i_{3}}^{w_{3}}=\sum_{n,m}W_{w_{3}w_{1}}^{mn}A_{j_{1}j_{3}}^{m\dagger}E_{a-2j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{3}}^{n}
+E_{aj_{3}i_{3}}^{w_{3}}=\sum_{n,m}W_{w_{3}w_{1}}^{mn}A_{j_{3}j_{1}}^{m\dagger}E_{a-2j_{1}i_{1}}^{w_{1}}A_{i_{1}i_{3}}^{n}
 \]
 
 \end_inset

@@ -26,7 +26,7 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const IterationS
     assert(Logger); //Make sure we have global logger.
     Canonicalize(TensorNetworks::DLeft);
     Logger->LogInfoV(0,"Initiate iTime GS iterations, D=%4d, Norm status=%s",GetMaxD(),GetNormStatus().c_str());
-    Logger->LogInfo(1,"     dt    epsE      D  Dmax   Dw niter   E        Ortho eror");
+    Logger->LogInfo(1,"     dt    epsE      D  Dmax   Dw niter   E        Ortho error dE  DlambdaA DlambdaB");
     MPO* H2=H->CreateH2Operator();
 
     double E1=0;
@@ -72,11 +72,14 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
             Apply(expH,mps_compressor);
             ReCenter(1);
         }
-        Logger->LogInfo(2,"      Dw       E          dE      niter    Ortho errors");
-        double oerr1,oerr2;
+        Logger->LogInfo(2,"      Dw       E          dE      niter    Ortho errors  DlambdaA DlambdaB");
+        double oerr1,oerr2,dE,dA,dB;
         int niter=1;
         for (; niter<=isl.itsMaxGSSweepIterations; niter++)
         {
+            DiagonalMatrixRT lA=lambdaA();
+            DiagonalMatrixRT lB=lambdaB();
+
             Apply(expH,mps_compressor);
 //            oerr1=ApplyOrtho(expH,mps_compressor,dt*dt/100,nOrthIter);
             ReCenter(2);
@@ -84,17 +87,24 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
 //            oerr2=ApplyOrtho(expH,mps_compressor,dt*dt/100,nOrthIter);
             ReCenter(1);
             double Enew=GetExpectation(H)/(itsL-1);
-            double dE=Enew-E1;
+            dE=Enew-E1;
             E1=Enew;
-            Logger->LogInfoV(2,"%4d %.9f %.2e %4d     %.1e/%.1e",H->GetMaxDw(),E1,dE,niter,oerr1, oerr2);
-            if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon /*|| dE>0.0*/) break;
+
+            dA=Max(fabs(lA-lambdaA()));
+            dB=Max(fabs(lB-lambdaB()));
+
+            Logger->LogInfoV(2,"%4d %.9f %.2e %4d     %.1e/%.1e  %.1e  %.1e",H->GetMaxDw(),E1,dE,niter,oerr1, oerr2, dA, dB);
+            if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon
+                && dA <=isl.itsEps.itsDeltaLambdaEpsilon
+                && dB <=isl.itsEps.itsDeltaLambdaEpsilon) break;
         }
         oerr1=OrthogonalizeI(mps_compressor,1e-13,nOrthIter);
         E1=GetExpectation(H);
         double E2=GetExpectation(H2);
         E2= E2-E1*E1;
-       Logger->LogInfoV(1,"%.3f %.2e %4d %4d %4d %4d %.9f %.1e",
-                        isl.itsdt,isl.itsEps.itsDelatEnergy1Epsilon,D,isl.itsDmax,H->GetMaxDw(),niter,E1,oerr1);
+       Logger->LogInfoV(1,"%.3f %.2e %4d %4d %4d %4d %.9f %.1e  %.1e  %.1e  %.1e",
+                        isl.itsdt,isl.itsEps.itsDelatEnergy1Epsilon,D,
+                        isl.itsDmax,H->GetMaxDw(),niter,E1,oerr1,dE,dA,dB);
     }
     delete mps_compressor;
 //    delete expH;
