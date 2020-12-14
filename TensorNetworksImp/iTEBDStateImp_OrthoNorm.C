@@ -192,7 +192,7 @@ double iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, SVCompressorC* c
 //
 //  SVD gamma into GammaA, lambdaA, GammaB
 //
-double iTEBDStateImp::Unpack(const dVectorT& gamma,SVCompressorC* comp)
+void iTEBDStateImp::Unpack(const dVectorT& gamma,SVCompressorC* comp)
 {
     int d=gamma.size();
     int D2=lambdaA().size();
@@ -253,7 +253,6 @@ double iTEBDStateImp::Unpack(const dVectorT& gamma,SVCompressorC* comp)
             GammaB()[n](j,i)=         Vd(     j,n*D1+i)*lbinv(i);
         }
 
-    return GetOrthonormalityErrors();
 }
 
 iTEBDStateImp::MdType iTEBDStateImp::GetEigenMatrix(TensorNetworks::Direction lr, int D, const Matrix4CT& theta)

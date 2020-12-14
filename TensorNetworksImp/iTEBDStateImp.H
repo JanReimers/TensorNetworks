@@ -89,7 +89,7 @@ protected:
     dVectorT  ContractTheta(const MPO*       expH) const;
 
     double   UnpackOrthonormal(const dVectorT& gammap,SVCompressorC*);
-    double   Unpack           (const dVectorT& gammap,SVCompressorC*);
+    void     Unpack           (const dVectorT& gammap,SVCompressorC*);
 //
 //  All these helper function are static to ensure no dependence on iTEBD state
 //
