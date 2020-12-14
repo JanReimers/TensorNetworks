@@ -5110,6 +5110,18 @@ name "subsec:Infinite-Time-Evolved"
 
 \end_layout
 
+\begin_layout Subsection
+Original algorithm 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Vidal2007"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
 This technique usually starts Vidal's canonical form, eq.
  
@@ -5297,6 +5309,170 @@ Repeat steps 2-7 with the structure
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsubsection
+Second order Trotter version
+\end_layout
+
+\begin_layout Standard
+In order to adapt this for the a second order trotter approximation we can
+ define
+\begin_inset Formula 
+\[
+\hat{U}^{AB}=\exp\left(-\frac{\tau}{2}\hat{H}^{AB}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{U}^{BA}=\exp\left(-\tau\hat{H}^{AB}\right)
+\]
+
+\end_inset
+
+We need to do:
+\end_layout
+
+\begin_layout Enumerate
+Start with the structure 
+\begin_inset Formula $\lambda^{B}\Gamma^{n_{a}}\lambda^{A}\Gamma^{n_{b}}\lambda^{B}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+For 
+\begin_inset Formula $A^{n_{a}}=\lambda^{B}\Gamma^{n_{a}}$
+\end_inset
+
+, 
+\begin_inset Formula $B^{n_{b}}=\Gamma^{n_{b}}\lambda^{B}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Contract 
+\begin_inset Formula $\boldsymbol{\varTheta}^{m_{a}m_{b}}=\sum_{n_{a}n_{b}}\boldsymbol{A}^{n_{a}}\boldsymbol{\lambda}^{A}\boldsymbol{B}^{n_{b}}U_{m_{a}m_{b}}^{ABn_{a}n_{b}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+SVD 
+\begin_inset Formula $\varTheta_{i_{a}i_{b}}^{m_{a}m_{b}}=\sum_{k=1}^{dD}U_{\left(i_{a}m_{a}\right),k}s_{k}\left(V^{\dagger}\right)_{k,\left(i_{b}m_{b}\right)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Now 
+\begin_inset Formula $\tilde{\lambda}^{A}=s_{k}$
+\end_inset
+
+, 
+\begin_inset Formula $\tilde{\Gamma}_{i_{a}i_{a+1}}^{n_{a}}=\frac{1}{\lambda_{i_{a}}^{B}}U_{\left(i_{a}n_{a}\right),i_{a+1}}$
+\end_inset
+
+, 
+\begin_inset Formula $\tilde{\Gamma}_{i_{b-1}i_{b}}^{n_{b}}=\left(V^{\dagger}\right)_{i_{b-1},\left(i_{b}n_{b}\right)}\frac{1}{\lambda_{i_{b}}^{B}}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Enumerate
+Contract 
+\begin_inset Formula $\boldsymbol{\varTheta}^{m_{a}m_{b}}=\sum_{n_{a}n_{b}}\boldsymbol{B}^{n_{a}}\boldsymbol{\lambda}^{B}A^{n_{b}}U_{m_{a}m_{b}}^{BAn_{a}n_{b}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Now 
+\begin_inset Formula $\tilde{\lambda}^{B}=s_{k}$
+\end_inset
+
+, 
+\begin_inset Formula $\tilde{\Gamma}_{i_{b}i_{b+1}}^{n_{b}}=\frac{1}{\lambda_{i_{b}}^{A}}U_{\left(i_{b}n_{b}\right),i_{b+1}}$
+\end_inset
+
+, 
+\begin_inset Formula $\tilde{\Gamma}_{i_{a-1}i_{a}}^{n_{a}}=\left(V^{\dagger}\right)_{i_{a-1},\left(i_{a}n_{a}\right)}\frac{1}{\lambda_{i_{a}}^{A}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Contract 
+\begin_inset Formula $\boldsymbol{\varTheta}^{m_{a}m_{b}}=\sum_{n_{a}n_{b}}\boldsymbol{A}^{n_{a}}\boldsymbol{\lambda}^{A}\boldsymbol{B}^{n_{b}}U_{m_{a}m_{b}}^{ABn_{a}n_{b}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Now 
+\begin_inset Formula $\tilde{\lambda}^{A}=s_{k}$
+\end_inset
+
+, 
+\begin_inset Formula $\tilde{\Gamma}_{i_{a}i_{a+1}}^{n_{a}}=\frac{1}{\lambda_{i_{a}}^{B}}U_{\left(i_{a}n_{a}\right),i_{a+1}}$
+\end_inset
+
+, 
+\begin_inset Formula $\tilde{\Gamma}_{i_{b-1}i_{b}}^{n_{b}}=\left(V^{\dagger}\right)_{i_{b-1},\left(i_{b}n_{b}\right)}\frac{1}{\lambda_{i_{b}}^{B}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Do SVD compression the throw out 
+\begin_inset Formula $\left(d^{3}-1\right)D$
+\end_inset
+
+ columns of 
+\begin_inset Formula $U$
+\end_inset
+
+ and rows of 
+\begin_inset Formula $V^{\dagger}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Repeat steps 2-10.
+\end_layout
+
+\begin_layout Standard
+This looks tedious.
+ We should be able SVD 
+\begin_inset Formula $\hat{U}^{AB}$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{U}^{BA}$
+\end_inset
+
+ into iMPOs and avoid 2/3s the SVDs during the iterations.
+ If that works then we should also be able the Combine the MPOs into one
+ MPO and apply that.
+ If the works then we should be able to compress the combined iMPO and still
+ get a meaningful second order iteration.
+ Somewhere in this chain of reasoning, the second order effect seems to
+ vanish, but where?
 \end_layout
 
 \begin_layout Subsection
