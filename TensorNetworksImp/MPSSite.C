@@ -165,8 +165,8 @@ void MPSSite::NewBondDimensions(int D1, int D2, bool saveData)
         itsMs[in].SetLimits(D1,D2,saveData);
         for (int i1=itsD1;i1<=D1;i1++)
             for (int i2=itsD2;i2<=D2;i2++)
-//                itsMs[in](i1,i2)=dcmplx(0.0);
-                itsMs[in](i1,i2)=OMLRand<dcmplx>()*0.001;
+                itsMs[in](i1,i2)=dcmplx(0.0);
+//                itsMs[in](i1,i2)=OMLRand<dcmplx>()*0.001; //If you compress to remove zero SVs in the right placese you should not need this trick
     }
     itsD1=D1;
     itsD2=D2;
