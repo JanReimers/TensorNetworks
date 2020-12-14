@@ -24,19 +24,19 @@ namespace TensorNetworks
 MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const Matrix4RT& expH) const
 {
     //
-    //  Make sure everything is square
+    //  Make sure Ds line up
     //
     assert(s1.siteA->GetD2()==s1.siteB->GetD1());
     assert(s1.siteA->GetD1()==s1.siteB->GetD2());
-    assert(s1.siteA->GetD1()==s1.siteA->GetD2());
-    int D=s1.siteA->GetD1();
+    int D1=s1.siteA->GetD1();
+//    int D2=s1.siteA->GetD2();
     //
     //  Create empty theta tensor
     //
     dVectorT  Thetap(itsd*itsd);
     for (int n=0;n<itsd*itsd;n++)
     {
-        Thetap[n].SetLimits(D,D);
+        Thetap[n].SetLimits(D1,D1);
         Fill(Thetap[n],dcmplx(0.0));
     }
     //
