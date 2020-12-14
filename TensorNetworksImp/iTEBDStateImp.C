@@ -70,6 +70,17 @@ void iTEBDStateImp::IncreaseBondDimensions(int D)
     }
 }
 
+//
+//  Assumes sites are arranged ... - BondB - SiteA - BondA - SiteB - BondB - ...
+//
+void iTEBDStateImp::NewBondDimensions(int D1,int D2)
+{
+    s1.siteA->NewBondDimensions(D1,D2,true);
+    s1.siteB->NewBondDimensions(D2,D1,true);
+    s1.bondA->NewBondDimension(D2);
+    s1.bondB->NewBondDimension(D1);
+}
+
 
 void iTEBDStateImp::ReCenter(int isite) const
 {

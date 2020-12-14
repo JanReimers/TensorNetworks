@@ -102,6 +102,7 @@ double iTEBDStateImp::GetOrthonormalityErrors(const dVectorT& gamma, const Diago
 
 double iTEBDStateImp::OrthogonalizeI(SVCompressorC* comp, double eps, int niter)
 {
+    assert(eps>0.0);
     //
     //  Build Gamma[n] = GammaA[na]*lambdaA*GammaB[nb]
     //
@@ -144,10 +145,6 @@ double iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, SVCompressorC* c
     int D=lambdaA().size();
     assert(gammap[0].GetLimits()==MatLimits(D,D));
     //
-    //  Set lambdaB=lambdap (=lambda prime)
-    //
-    //s1.bondB->SetSingularValues(lambdap,0.0); //Don't use lambdap any more in case it is not normalized
-    //
     //  Create lambdaB*gammap*lambdaB and re-shape for SVD
     //
     dVectorT bgb(itsd*itsd);
@@ -187,6 +184,73 @@ double iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, SVCompressorC* c
         {
             GammaA()[n](i,j)=lbinv(i)*P(n*D+i,       j);
             GammaB()[n](i,j)=         Q(       i,n*D+j)*lbinv(j);
+        }
+
+    return GetOrthonormalityErrors();
+}
+
+//
+//  SVD gamma into GammaA, lambdaA, GammaB
+//
+double iTEBDStateImp::Unpack(const dVectorT& gamma,SVCompressorC* comp)
+{
+    int d=gamma.size();
+    int D2=lambdaA().size();
+    int D1=lambdaB().size();
+//    cout << "d,D1,D2,gamma[0]=" << d << " " << D1 << " " << D2 << " " << gamma[0].GetLimits() << endl;
+//    assert(gamma[0].GetLimits()==MatLimits(D1,D2));
+    //
+    //  Create lambdaB*gammap*lambdaB and re-shape for SVD
+    //
+    dVectorT bgb(d);
+    for (int n=0; n<d; n++)
+        bgb[n]=lambdaB()*gamma[n]*lambdaB(); // Sandwich LambdaB*gammap*LambdaB
+
+    MatrixCT bgb4=ReshapeForSVD(itsd,bgb);
+//    cout << "bgb4=" << bgb4 << endl;
+    //
+    //  Now unpack  lambdaB*gammap[n]*lambdaB into P[na]*lambdaA'*Q[nb]'
+    //
+    SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
+    auto [U,s,Vd]=svd_solver->SolveAll(bgb4,1e-13); //only keep D svs.
+    assert(Max(fabs(U*s*Vd-bgb4))<1e-13);
+    delete svd_solver;
+    double trunc_error=0.0;
+    if (comp) trunc_error=comp->Compress(U,s,Vd);
+//    cout << "U=" << U << endl;
+//    cout << "s=" << s << endl;
+//    cout << "Vd=" << Vd << endl;
+//
+//  Set and normalize lambdaA.
+//
+    s1.bondA->SetSingularValues(s,trunc_error);
+//
+//  Unpack P into GammaA and Q into GammaB
+//
+    if (Min(lambdaA())<1e-13)
+    {
+        // Did we forget to remove smalle SVs on this call??
+        Logger->LogWarnV(0,"iTEBDStateImp::Unpack small lambdaA min(lambda)=%.1e", Min(lambdaA()) );
+        cout << "LambdaA=" << lambdaA().GetDiagonal() << endl;
+    }
+
+    if (Min(lambdaB())<1e-13)
+    {
+        // Did we forget to remove smalle SVs on the previous call??
+        Logger->LogWarnV(0,"iTEBDStateImp::Unpack small lambdaB min(lambda)=%.1e", Min(lambdaB()) );
+        cout << "LambdaB=" << lambdaB().GetDiagonal() << endl;
+    }
+
+    D1=U.GetNumRows()/itsd;
+    D2=s.GetDiagonal().size();
+    NewBondDimensions(D1,D2);
+    DiagonalMatrixRT lbinv=1.0/lambdaB(); //inverse of LambdaB
+    for (int n=0; n<itsd; n++)
+        for (int i=1; i<=D1; i++)
+        for (int j=1; j<=D2; j++)
+        {
+            GammaA()[n](i,j)=lbinv(i)*U (n*D1+i,     j);
+            GammaB()[n](j,i)=         Vd(     j,n*D1+i)*lbinv(i);
         }
 
     return GetOrthonormalityErrors();

@@ -23,13 +23,14 @@ class iTEBDStateImp : public virtual iTEBDState,
 //    typedef std::tuple<dVectorT,DiagonalMatrixRT> GLType;
     typedef std::tuple<MatrixCT,MatrixCT> MMType;
     typedef std::tuple<MatrixCT,double  > MdType;
-
+    typedef std::vector<Matrix4RT>        MultigateType; // sequence of Trotter gates
 public:
     iTEBDStateImp(int L,double S, int D,double normEps,double epsSV);
     virtual ~iTEBDStateImp();
     virtual void InitializeWith(State);
     virtual void ReCenter(int isite) const;
     virtual void IncreaseBondDimensions(int D);
+    virtual void NewBondDimensions(int D1, int D2);
 //--------------------------------------------------------------------------------------
 //
 //  Access to information
@@ -42,9 +43,10 @@ public:
 // Find ground state.  Return <E^2>-<E>^2
 //
     virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&);
-    virtual void   Apply     (const Matrix4RT& expH,SVCompressorC* comp) {       Apply(expH,comp,false);}
-    virtual double ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp) {return Apply(expH,comp,true );}
-    virtual double ApplyOrtho(const Matrix4RT& expH,SVCompressorC*,double eps,int maxIter);
+    virtual void   Apply     (const Matrix4RT&     expH,SVCompressorC* comp) {       Apply(expH,comp,false);}
+    virtual void   Apply     (const MultigateType& expH,SVCompressorC* comp,int center);
+    virtual double ApplyOrtho(const Matrix4RT&     expH,SVCompressorC* comp) {return Apply(expH,comp,true );}
+    virtual double ApplyOrtho(const Matrix4RT&     expH,SVCompressorC*,double eps,int maxIter);
 
     virtual void   Apply     (const MPO* expH,SVCompressorC* comp) {       Apply(expH,comp,false);}
     virtual double ApplyOrtho(const MPO* expH,SVCompressorC* comp) {return Apply(expH,comp,true );}
@@ -87,6 +89,7 @@ protected:
     dVectorT  ContractTheta(const MPO*       expH) const;
 
     double   UnpackOrthonormal(const dVectorT& gammap,SVCompressorC*);
+    double   Unpack           (const dVectorT& gammap,SVCompressorC*);
 //
 //  All these helper function are static to ensure no dependence on iTEBD state
 //

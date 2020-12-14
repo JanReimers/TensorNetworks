@@ -663,33 +663,17 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12)
     eps.itsMPSCompressEpsilon=0;
 
     TensorNetworks::IterationSchedule is;
-    eps.itsDelatEnergy1Epsilon=1e-5;
     eps.itsDeltaLambdaEpsilon=1e-5;
-    is.Insert({maxIter,2,0.5,eps});
-    eps.itsDelatEnergy1Epsilon=1e-8;
-    eps.itsDeltaLambdaEpsilon=1e-10;
+    is.Insert({maxIter,D,0.5,eps});
+    eps.itsDeltaLambdaEpsilon=1e-6;
     is.Insert({maxIter,D,0.2,eps});
-    eps.itsDelatEnergy1Epsilon=1e-9;
-    eps.itsDeltaLambdaEpsilon=1e-10;
     is.Insert({maxIter,D,0.1,eps});
-    is.Insert({maxIter,D,0.05,eps});
-    is.Insert({maxIter,D,0.02,eps});
+//    is.Insert({maxIter,D,0.05,eps});
+//    is.Insert({maxIter,D,0.02,eps});
     is.Insert({maxIter,D,0.01,eps});
-    is.Insert({maxIter,D,0.005,eps});
-    is.Insert({maxIter,D,0.002,eps});
+//    is.Insert({maxIter,D,0.005,eps});
+//    is.Insert({maxIter,D,0.002,eps});
     is.Insert({maxIter,D,0.001,eps});
-//    eps.itsDelatEnergy1Epsilon=5e-6;
-//    is.Insert({50,D,0.05,eps});
-//    eps.itsDelatEnergy1Epsilon=2e-6;
-//    is.Insert({50,D,0.02,eps});
-//    eps.itsDelatEnergy1Epsilon=1e-6;
-//    is.Insert({50,D,0.01,eps});
-//    eps.itsDelatEnergy1Epsilon=5e-7;
-//    is.Insert({50,D,0.005,eps});
-//    eps.itsDelatEnergy1Epsilon=2e-7;
-//    is.Insert({50,D,0.002,eps});
-//    eps.itsDelatEnergy1Epsilon=1e-7;
-//    is.Insert({50,D,0.001,eps});
 
     itsState->FindiTimeGroundState(itsH,is);
     itsState->Report(cout);
@@ -698,74 +682,15 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12)
     EXPECT_LT(E,-0.4409);   //D=4 we only seem to get this far right now.
 //    EXPECT_LT(E,-0.442607); //D=4 From mps-tools.
 #else
-    EXPECT_LT(E,-0.4426); //D=8 we only seem to get this far right now.
+    EXPECT_LT(E,-0.442846); //D=8 we only seem to get this far right now.
 //    EXPECT_LT(E,-0.4430818); //From mps-tools
 #endif
     EXPECT_GT(E,-0.4431471805599453094172);
 }
 
-////#include <omp.h>
-////
-////TEST_F(iTEBDTests,OrthoIterTiming)
-////{
-////    int UnitCell=2,Dstart=2,Dmax=64;
-////    double S=0.5,epsSVD=0.0,dt=0.1;
-////    Setup(UnitCell,S,2,epsSVD);
-////    itsState->InitializeWith(TensorNetworks::Random);
-////    Matrix4RT Hlocal=itsH->BuildLocalMatrix();
-////    Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
-////    TensorNetworks::SVCompressorC* comp=0;
-////    for (int D=2;D<=Dmax;D++)
-////    {
-////        itsState->IncreaseBondDimensions(D);
-////        comp=itsFactory->MakeMPSCompressor(D,epsSVD);
-////        itsState->Apply(expH,comp);
-////        itsState->ReCenter(2);
-////        itsState->Apply(expH,comp);
-////        itsState->ReCenter(1);
-////        double t_start=omp_get_wtime();
-////        itsState->ApplyOrtho(expH,comp,0.0,1);
-////        double t_stop =omp_get_wtime();
-////        delete comp;
-////        double dt=t_stop-t_start;
-////        cout << D << std::scientific << std::setw(8) << " " << dt << " " << dt/D << " " << dt/(D*D) << " " << dt/(D*D*D*D) << " " << dt/(D*D*D*D*D*D) << endl;
-////    }
-////
-////
-////}
-////
-////TEST_F(iTEBDTests,OrthoEigenTiming)
-////{
-////    int UnitCell=2,Dstart=2,Dmax=32;
-////    double S=0.5,epsSVD=0.0,dt=0.1;
-////    Setup(UnitCell,S,2,epsSVD);
-////    itsState->InitializeWith(TensorNetworks::Random);
-////    Matrix4RT Hlocal=itsH->BuildLocalMatrix();
-////    Matrix4RT expH=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
-////    TensorNetworks::SVCompressorC* comp=0;
-////    for (int D=2;D<=Dmax;D++)
-////    {
-////        itsState->IncreaseBondDimensions(D);
-////        comp=itsFactory->MakeMPSCompressor(D,epsSVD);
-////        itsState->Apply(expH,comp);
-////        itsState->ReCenter(2);
-////        itsState->Apply(expH,comp);
-////        itsState->ReCenter(1);
-////        double t_start=omp_get_wtime();
-////        itsState->ApplyOrtho(expH,comp);
-////        double t_stop =omp_get_wtime();
-////        delete comp;
-////        double dt=t_stop-t_start;
-////        cout << D << std::scientific << std::setw(8) << " " << dt << " " << dt/D << " " << dt/(D*D) << " " << dt/(D*D*D*D) << " " << dt/(D*D*D*D*D*D) << endl;
-////    }
-////
-//
-//}
-
-
 TEST_F(iTEBDTests,FindiTimeGSD32S12)
 {
-    int UnitCell=2,Dstart=2,Dmax=32,maxIter=1000;
+    int UnitCell=2,Dstart=2,Dmax=32,maxIter=10000;
     double S=0.5,epsSVD=0.0;
 #ifdef DEBUG
     Dmax=8;
@@ -778,38 +703,36 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     eps.itsMPSCompressEpsilon=0;
 
     TensorNetworks::IterationSchedule is;
-    eps.itsDelatEnergy1Epsilon=1e-6;
-    eps.itsDeltaLambdaEpsilon=1e-7;
-    is.Insert({20,Dstart,0.5,eps});
-    is.Insert({maxIter,8,2,0.2,eps});
-    is.Insert({maxIter,8,0.1,eps});
-    is.Insert({maxIter,8,0.05,eps});
-    is.Insert({maxIter,8,0.02,eps});
-    eps.itsDelatEnergy1Epsilon=1e-7;
-    eps.itsDeltaLambdaEpsilon=1e-8;
-    is.Insert({maxIter,Dmax,8,0.01,eps});
-    eps.itsDelatEnergy1Epsilon=1e-8;
-    eps.itsDeltaLambdaEpsilon=1e-9;
+    eps.itsDeltaLambdaEpsilon=1e-5;
+    is.Insert({maxIter,Dstart,0.5,eps});
+    is.Insert({maxIter,8   ,1,0.5,eps});
+    is.Insert({maxIter,Dmax,8,0.5,eps});
+    is.Insert({maxIter,Dmax,0.35,eps});
+    is.Insert({maxIter,Dmax,0.2,eps});
+    is.Insert({maxIter,Dmax,0.1,eps});
+
+
+    eps.itsDeltaLambdaEpsilon=5e-6;
+    is.Insert({maxIter,Dmax,0.05,eps});
+    eps.itsDeltaLambdaEpsilon=2e-6;
+    is.Insert({maxIter,Dmax,0.02,eps});
+    eps.itsDeltaLambdaEpsilon=1e-6;
+    is.Insert({maxIter,Dmax,0.01,eps});
     is.Insert({maxIter,Dmax,0.005,eps});
     is.Insert({maxIter,Dmax,0.002,eps});
     is.Insert({maxIter,Dmax,0.001,eps});
-    is.Insert({maxIter,Dmax,0.0  ,eps});
-//    eps.itsDelatEnergy1Epsilon=1e-6;
-//    is.Insert({50,Dmax,0.05,eps});
-//    eps.itsDelatEnergy1Epsilon=1e-7;
-//    is.Insert({50,Dmax,0.02,eps});
-//    eps.itsDelatEnergy1Epsilon=1e-8;
-//    is.Insert({50,Dmax,0.01,eps});
+//    eps.itsDeltaLambdaEpsilon=0.0;
+//    is.Insert({maxIter,Dmax,0.0  ,eps});
 
     itsState->FindiTimeGroundState(itsH,is);
     itsState->Report(cout);
     double E=itsState->GetExpectation(itsH);
 #ifdef DEBUG
 //    EXPECT_LT(E,-0.44308); //From mp-toolkit
-    EXPECT_LT(E,-0.44284);
+    EXPECT_LT(E,-0.442846);
 #else
 //    EXPECT_LT(E,-0.4431447); //From mp-toolkit
-    EXPECT_LT(E,-0.443132); //We only seem to get this far
+    EXPECT_LT(E,-0.443137); //We only seem to get this far
 #endif
     EXPECT_GT(E,-0.4431471805599453094172);
 }
