@@ -5099,6 +5099,256 @@ literal "false"
 
 \end_layout
 
+\begin_layout Subsection
+Contracting iTEBD state with an iMPO
+\end_layout
+
+\begin_layout Standard
+In order for the resulting singulr values to be interpreted as Schmidt coefficie
+nts we need contract a symmetric state like 
+\begin_inset Formula $\cdots\boldsymbol{\lambda}^{A}\boldsymbol{\Gamma}^{m_{b}}\boldsymbol{\lambda}^{B}\boldsymbol{\Gamma}^{m_{a}}\boldsymbol{\lambda}^{A}\cdots$
+\end_inset
+
+ (with hindsight we start backwards with 
+\begin_inset Formula $\lambda^{B}$
+\end_inset
+
+ in the middle).
+ But in the second step we need a repeating unit cell like 
+\begin_inset Formula $\cdots\boldsymbol{\lambda}^{A}\boldsymbol{\Gamma}^{m_{b}}\boldsymbol{\lambda}^{B}\boldsymbol{\Gamma}^{m_{a}}\cdots$
+\end_inset
+
+.
+ The solution is to start with 
+\begin_inset Formula $\cdots\boldsymbol{\lambda}^{A}\boldsymbol{\Gamma}^{m_{b}}\boldsymbol{\lambda}^{B}\boldsymbol{\Gamma}^{m_{a}}\boldsymbol{\lambda}^{A}\frac{1}{\boldsymbol{\lambda}^{A}}\cdots$
+\end_inset
+
+ and only contract the symmetric part in the first step.
+ But before we proceed with contractin not that the 
+\begin_inset Formula $\frac{1}{\boldsymbol{\lambda}^{A}}$
+\end_inset
+
+ factor on the right has dimension 
+\begin_inset Formula $D$
+\end_inset
+
+ and is only connected to the internal iMPS index, and is not connected
+ to the 
+\begin_inset Formula $D_{w}$
+\end_inset
+
+ internal indices of the iMPO.
+ 
+\end_layout
+
+\begin_layout Standard
+We wish to contract 
+\begin_inset Formula $\cdots\boldsymbol{\lambda}^{A}\boldsymbol{\Gamma}^{m_{b}}\boldsymbol{\lambda}^{B}\boldsymbol{\Gamma}^{m_{a}}\boldsymbol{\lambda}^{A}\cdots$
+\end_inset
+
+ with an iMPO
+\begin_inset Formula 
+\[
+\Theta_{ij}^{n}=\Theta_{\left(i_{1}w_{1}\right)\left(i_{3}w_{3}\right)}^{\left(n_{b}n_{a}\right)}=\sum_{m_{b}m_{a}=0}^{d-1}\sum_{i_{2}=1}^{D}\sum_{w_{2}=1}^{D_{w}}\lambda_{i_{1}}^{A}\Gamma_{i_{1}i_{2}}^{m_{b}}\lambda_{i_{2}}^{B}\Gamma_{i_{2}i_{3}}^{m_{a}}\lambda_{i_{3}}^{A}W_{w_{1}w_{2}}^{m_{b}n_{b}}W_{w_{2}w_{3}}^{m_{a}n_{a}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\Theta_{ij}^{n}$
+\end_inset
+
+ has one physical index with dimension 
+\begin_inset Formula $d^{2}$
+\end_inset
+
+ and two internal indices with dimension 
+\begin_inset Formula $DD_{w}$
+\end_inset
+
+.
+ We can reshape we get a 
+\begin_inset Formula $dDD_{w}\times dDD_{w}$
+\end_inset
+
+ matrix and we can SVD this beast 
+\begin_inset Formula 
+\[
+\Theta_{ij}^{n}\rightarrow\Theta_{\left(i_{1}w_{1}n_{b}\right)\left(i_{3}w_{3}n_{a}\right)}=\sum_{k=1}^{dDD_{w}}U_{\left(i_{1}w_{1}n_{b}\right)k}\tilde{\lambda}_{k}^{B}V_{k\left(i_{3}w_{3}n_{a}\right)}^{\dagger}.
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\approx\sum_{k=1}^{dD}\tilde{U}_{\left(i_{1}w_{1}n_{b}\right)k}\tilde{\lambda}_{k}^{B}\tilde{V}_{k\left(i_{3}w_{3}n_{a}\right)}^{\dagger}=\tilde{\Theta}_{\left(i_{1}w_{1}n_{b}\right)\left(i_{3}w_{3}n_{a}\right)}
+\]
+
+\end_inset
+
+This gives us singular values that are interpreted as an updated 
+\begin_inset Formula $\boldsymbol{\lambda}^{B}$
+\end_inset
+
+ which we mark with a tilde, 
+\begin_inset Formula $\tilde{\boldsymbol{\lambda}}^{B}$
+\end_inset
+
+.
+ We then compress 
+\begin_inset Formula $\tilde{\boldsymbol{\lambda}}^{B}$
+\end_inset
+
+ from dimension 
+\begin_inset Formula $dDD_{w}$
+\end_inset
+
+ down to 
+\begin_inset Formula $D_{x}$
+\end_inset
+
+ which is yet to be determined.
+ 
+\begin_inset Formula $\tilde{U}$
+\end_inset
+
+ now had 
+\begin_inset Formula $D_{x}$
+\end_inset
+
+columns and 
+\begin_inset Formula $\tilde{V}^{\dagger}$
+\end_inset
+
+ has 
+\begin_inset Formula $D_{x}$
+\end_inset
+
+ rows.
+ At this point our repeating state vector looks like
+\begin_inset Formula 
+\[
+\cdots\tilde{\Theta}_{\left(i_{1}w_{1}n_{b}\right)\left(i_{3}w_{3}n_{a}\right)}\frac{1}{\lambda_{i_{3}}^{A}}\tilde{\Theta}_{\left(i_{3}w_{3}n_{b+1}\right)\left(i_{5}w_{5}n_{a+1}\right)}\frac{1}{\lambda_{i_{5}}^{A}}\cdots=\cdots\tilde{\boldsymbol{U}}^{n_{b}}\tilde{\boldsymbol{\lambda}}^{B}\boldsymbol{\tilde{V}}^{\dagger n_{a}}\frac{1}{\boldsymbol{\lambda}^{A}}\tilde{\boldsymbol{U}}^{n_{b+1}}\tilde{\boldsymbol{\lambda}}^{B}\boldsymbol{\tilde{V}}^{\dagger n_{a+1}}\cdots
+\]
+
+\end_inset
+
+We need to contract 
+\begin_inset Formula 
+\[
+\boldsymbol{\Gamma}^{n}=\tilde{\boldsymbol{\lambda}}^{B}\tilde{\boldsymbol{V}}^{\dagger n_{a}}\frac{1}{\boldsymbol{\lambda}^{A}}\tilde{\boldsymbol{U}}^{n_{b}}\tilde{\boldsymbol{\lambda}}^{B}
+\]
+
+\end_inset
+
+or with all indices
+\begin_inset Formula 
+\[
+\Gamma_{x_{1}x_{3}}^{\left(n_{a}n_{b}\right)}=\sum_{i_{2}=1}^{D}\sum_{w_{2}=1}^{D_{w}}\tilde{\lambda}_{x_{1}}^{B}V_{x_{1}\left(i_{2}w_{2}n_{a}\right)}^{\dagger}\frac{1}{\lambda_{i_{2}}^{A}}U_{\left(i_{2}w_{2}n_{b}\right)x_{3}}\tilde{\lambda}_{x_{3}}^{B},\;1\leq x_{1},x_{3}\leq D_{x}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=
+\]
+
+\end_inset
+
+Notice again that 
+\begin_inset Formula $\lambda_{i_{2}}^{A}$
+\end_inset
+
+ has no 
+\begin_inset Formula $w_{2}$
+\end_inset
+
+ index.
+ In software we can make a diagonal 
+\begin_inset Formula $\frac{1}{\lambda_{i_{2}w_{2}}^{A}}$
+\end_inset
+
+ matrix which is just 
+\begin_inset Formula $D_{w}$
+\end_inset
+
+ copies of 
+\begin_inset Formula $\frac{1}{\lambda_{i_{2}}^{A}}$
+\end_inset
+
+.
+ Before proceeding with a second SVD we need to reshape 
+\begin_inset Formula $V^{\dagger}$
+\end_inset
+
+ and 
+\begin_inset Formula $U$
+\end_inset
+
+.
+ The key here is to move the physical indices from the inside to the outside
+ of the 
+\begin_inset Formula $VU$
+\end_inset
+
+ matrix product.)
+\begin_inset Formula 
+\[
+U_{\left(iwn_{b}\right)x}\rightarrow U_{\left(iw\right)x}^{n_{b}}\rightarrow U_{\left(iw\right)\left(xn_{b}\right)},\quad DD_{w}d\times D_{x}\rightarrow DD_{w}\times D_{x}d
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+V_{x\left(iwn_{a}\right)}^{\dagger}\rightarrow V_{x\left(iw\right)}^{\dagger n_{a}}\rightarrow V_{\left(xn_{a}\right)\left(iw\right)}^{\dagger},\quad D_{x}\times DD_{w}d\rightarrow D_{x}d\times DD_{w}
+\]
+
+\end_inset
+
+and define
+\begin_inset Formula 
+\[
+\Gamma_{\left(x_{1}n_{a}\right)\left(x_{3}n_{b}\right)}=\sum_{i_{2}=1}^{D_{A}}\sum_{w_{2}=1}^{D_{w}}V_{\left(x_{1}n_{a}\right)\left(i_{2}w_{2}\right)}^{\dagger}\frac{1}{\lambda_{i_{2}}^{A}}U_{\left(i_{2}w_{2}\right)\left(x_{3}n_{b}\right)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now we proceed as before and SVD/compress 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ (which has dimensions 
+\begin_inset Formula $D_{x}d\times D_{x}d$
+\end_inset
+
+)
+\begin_inset Formula 
+\[
+\Gamma_{\left(x_{1}n_{a}\right)\left(x_{3}n_{b}\right)}=\sum_{k=1}^{D_{x}d}P_{x_{1}k}^{n_{a}}\tilde{\lambda}_{k}^{A}Q_{kx_{3}}^{\dagger n_{b}}\approx\sum_{k=1}^{D}\tilde{P}_{x_{1}k}^{n_{a}}\tilde{\lambda}_{k}^{A}\tilde{Q}_{kx_{3}}^{\dagger n_{b}}.
+\]
+
+\end_inset
+
+Now we can recover
+\begin_inset Formula 
+\[
+\tilde{\Gamma}_{ik}^{n_{a}}=\frac{\tilde{P}_{ik}^{n_{a}}}{\tilde{\lambda}_{i}^{B}},\;\tilde{\Gamma}_{kj}^{n_{b}}=\frac{V_{kj}^{\dagger n_{b}}}{\tilde{\lambda}_{j}^{B}}
+\]
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Infinite Time Evolved Block Decimation (iTBED)
 \begin_inset CommandInset label
