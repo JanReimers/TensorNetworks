@@ -4,6 +4,7 @@
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "oml/vector.h"
+#include "oml/matrix.h"
 #include <cassert>
 
 namespace TensorNetworks
@@ -32,6 +33,21 @@ void MPO::Report(std::ostream& os) const
     }
 }
 
+void  MPO::Dump(std::ostream& os) const
+{
+    int L=GetL();
+    os << "Matrix Product Operator for " << L << " sites." << std::endl;
+    for (int ia=1;ia<=L;ia++)
+    {
+        os << "   Site " << ia << ": " << std::fixed << std::setprecision(3);
+        const SiteOperator* so=GetSiteOperator(ia);
+        int d=so->Getd();
+        for (int m=0;m<d;m++)
+        for (int n=0;n<d;n++)
+            os << "W(" << m << "," << n << ")=" << so->GetW(m,n) << std::endl;
+        os << std::endl;
+    }
+}
 const SiteOperator* MPO::GetSiteOperator(int isite) const
 {
     return const_cast<MPO*>(this)->GetSiteOperator(isite);
@@ -50,6 +66,7 @@ void MPO::Combine(const MPO* O2,double factor)
     for (int ia=1;ia<=L;ia++)
     {
         GetSiteOperator(ia)->Combine(O2->GetSiteOperator(ia),factor);
+        Report(std::cout);
     }
 }
 
