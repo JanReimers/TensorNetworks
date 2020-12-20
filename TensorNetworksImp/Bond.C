@@ -53,8 +53,9 @@ void Bond::NewBondDimension(int D)
     if (D>itsD)
     { //Grow
         itsSingularValues.SetLimits(D,true);
+
         for (int i=itsD+1;i<=D;i++)
-            itsSingularValues(i)=1.0/D;
+            itsSingularValues(i)=0.0;
         itsD=D;
         itsRank=D;
     }
@@ -68,6 +69,7 @@ void Bond::NewBondDimension(int D)
         itsD=D;
         UpdateBondEntropy();
     }
+    itsSingularValues/=GetNorm();
 }
 
 void Bond::SetSingularValues(const DiagonalMatrixRT& s,double compressionError)
@@ -76,14 +78,19 @@ void Bond::SetSingularValues(const DiagonalMatrixRT& s,double compressionError)
     itsD=s.GetNumRows();
 //    itsSingularValues.SetLimits(itsD);
     double s2=s.GetDiagonal()*s.GetDiagonal();
-    itsSingularValues=s/sqrt(s2);
+    itsSingularValues=s;
+    itsSingularValues/=GetNorm();
 
     itsRank=itsD;
     itsMinSV=itsSingularValues(itsD);
     if (compressionError>0.0) itsCompessionError=compressionError;
     UpdateBondEntropy();
+}
 
-
+double Bond::GetNorm() const
+{
+    double s2=itsSingularValues.GetDiagonal()*itsSingularValues.GetDiagonal();
+    return sqrt(s2);
 }
 
 void Bond::UpdateBondEntropy()

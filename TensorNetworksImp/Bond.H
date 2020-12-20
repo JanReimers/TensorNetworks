@@ -24,6 +24,7 @@ class Bond
 
         double GetBondEntropy() const {return itsBondEntropy;}
         double GetMinSV      () const {return itsMinSV;}
+        double GetNorm       () const;
         int    GetD          () const {return itsD;}
         int    GetRank       () const {return itsRank;}
         const DiagonalMatrixRT& GetSVs () const {return itsSingularValues;}
