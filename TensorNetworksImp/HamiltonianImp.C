@@ -106,6 +106,11 @@ MPO* HamiltonianImp::CreateUnitOperator() const
     return new MPOImp(GetL(),itsS,MPOImp::Identity);
 }
 
+iMPO* HamiltonianImp::CreateiUnitOperator() const
+{
+    return new iMPOImp(GetL(),itsS,MPOImp::Identity);
+}
+
 MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
 {
     MPO* W=CreateUnitOperator();
@@ -180,10 +185,10 @@ iMPO* HamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) c
             W=new iMPOImp(L,itsS,MPOImp::Identity);
             MPO_SpatialTrotter Wodd (dt,Odd ,L,itsS,H12);
             MPO_SpatialTrotter Weven(dt,Even,L,itsS,H12);
-            W->Combine(&Wodd);
             W->Combine(&Weven);
-            W->Compress(0,epsMPO);
+            W->Combine(&Wodd);
             W->ConvertToiMPO(GetL());
+//            W->Compress(0,epsMPO);
             break;
         }
         case SecondOrder :
