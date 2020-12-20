@@ -42,7 +42,6 @@ MatrixCT ReshapeForSVD(int d,const MPSSite::dVectorT& M)
 }
 
 
-
 void iTEBDStateImp::Normalize(Direction lr)
 {
     int D=lambdaA().size();
@@ -162,7 +161,9 @@ double iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, SVCompressorC* c
 //
 //  Compress from d*D back to D
 //
+//    cout << "lambdaA_prime=" << lambdaA_prime.GetDiagonal() << endl;
     double compessionError =comp->Compress(P,lambdaA_prime,Q);
+//    cout << "lambdaA_prime=" << lambdaA_prime.GetDiagonal() << " " << D << " " << itsd << endl;
     assert(P.GetNumCols()==D);
     assert(P.GetNumRows()==D*itsd);
     assert(Q.GetNumCols()==D*itsd);
@@ -189,37 +190,40 @@ double iTEBDStateImp::UnpackOrthonormal(const dVectorT& gammap, SVCompressorC* c
     return GetOrthonormalityErrors();
 }
 
+
 //
 //  SVD gamma into GammaA, lambdaA, GammaB
 //
 void iTEBDStateImp::Unpack(const dVectorT& gamma,SVCompressorC* comp)
 {
-    int d=gamma.size();
+//    int d=gamma.size();
     int D2=lambdaA().size();
     int D1=lambdaB().size();
 //    cout << "d,D1,D2,gamma[0]=" << d << " " << D1 << " " << D2 << " " << gamma[0].GetLimits() << endl;
 //    assert(gamma[0].GetLimits()==MatLimits(D1,D2));
-    //
-    //  Create lambdaB*gammap*lambdaB and re-shape for SVD
-    //
-    dVectorT bgb(d);
-    for (int n=0; n<d; n++)
-        bgb[n]=lambdaB()*gamma[n]*lambdaB(); // Sandwich LambdaB*gammap*LambdaB
 
-    MatrixCT bgb4=ReshapeForSVD(itsd,bgb);
-//    cout << "bgb4=" << bgb4 << endl;
+    MatrixCT bgb4=ReshapeForSVD(itsd,gamma);
+//    cout << "bgb4=" << bgb4.GetLimits() << endl;
     //
     //  Now unpack  lambdaB*gammap[n]*lambdaB into P[na]*lambdaA'*Q[nb]'
     //
     SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
     auto [U,s,Vd]=svd_solver->SolveAll(bgb4,1e-13); //only keep D svs.
-    assert(Max(fabs(U*s*Vd-bgb4))<1e-13);
+    double svdError=Max(fabs(U*s*Vd-bgb4));
+    if (svdError>bgb4.GetNumRows()*bgb4.GetNumCols()*1e-13)
+    {
+//        Logger->LogWarnV(0,"iTEBDStateImp::Unpack large SVD error=%.1e",svdError  );
+    }
     delete svd_solver;
     double trunc_error=0.0;
+//    cout << "U=" << U.GetLimits() << endl;
+//    cout << "s=" << s.GetLimits() << endl;
+//    cout << "Vd=" << Vd.GetLimits() << endl;
+//    cout << "s=" << s.GetDiagonal() << endl;
     if (comp) trunc_error=comp->Compress(U,s,Vd);
-//    cout << "U=" << U << endl;
-//    cout << "s=" << s << endl;
-//    cout << "Vd=" << Vd << endl;
+//    cout << "U=" << U.GetLimits() << endl;
+//    cout << "s=" << s.GetLimits() << endl;
+//    cout << "Vd=" << Vd.GetLimits() << endl;
 //
 //  Set and normalize lambdaA.
 //
@@ -254,6 +258,158 @@ void iTEBDStateImp::Unpack(const dVectorT& gamma,SVCompressorC* comp)
         }
 
 }
+void iTEBDStateImp::CalculateLambdaB(const dVectorT& theta_BA,SVCompressorC* comp)
+{
+    assert(comp);
+    MatrixCT theta4=ReshapeForSVD(itsd,theta_BA);
+    SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
+    auto [U,s,Vd]=svd_solver->SolveAll(theta4,1e-13); //only keep D svs.
+    double svdError=Max(fabs(U*s*Vd-theta4));
+    if (svdError>theta4.GetNumRows()*theta4.GetNumCols()*1e-13)
+    {
+        Logger->LogWarnV(0,"iTEBDStateImp::CalculateLambdaB large SVD error=%.1e",svdError  );
+    }
+    double trunct_error=0.0;//comp->Compress(U,s,Vd);
+    s1.bondB->SetSingularValues(s,trunct_error); //Keep all SVs for now
+//    cout << "LambdaB=" << lambdaB().GetDiagonal() << endl;
+}
+
+
+// move physical indices from inside to outside.
+//
+//    U(i,n)(j) -> U(i)(j,n)
+//    V(i)(j,n) -> V(i,n)(j)
+//
+std::tuple<MatrixCT,MatrixCT> ReshapeVU(int d,const MatrixCT& Vd,const MatrixCT& U)
+{
+    int Dx=U.GetNumCols();
+    int DDw=U.GetNumRows()/d;
+    assert( U.GetNumRows()==d*DDw);
+    assert(Vd.GetNumCols()==d*DDw);
+    assert(Vd.GetNumRows()==  Dx);
+    MatrixCT Ur(DDw,d*Dx),Vdr(d*Dx,DDw);
+    for (int n=0;n<d;n++)
+    {
+        int nDx =n*Dx;
+        int nDDw=n*DDw;
+        for (int i=1;i<=DDw;i++)
+            for (int j=1;j<=Dx;j++)
+            {
+                Ur (i    ,j+nDx)=U (i+nDDw,j     );
+                Vdr(j+nDx,i    )=Vd(j     ,i+nDDw);
+            }
+    }
+    return std::make_tuple(Vdr,Ur);
+}
+
+DiagonalMatrixRT Extend(const DiagonalMatrixRT& lambda,int Dw)
+{
+    //
+    //  Now load Dw copies of lb into the extended lambdaB
+    //
+    int D=lambda.GetDiagonal().size();
+    DiagonalMatrixRT extended_lambda(D*Dw);
+    int iw=1;
+    for (int w=1;w<=Dw;w++)
+        for (int i=1;i<=D;i++,iw++)
+            extended_lambda(iw)=lambda(i,i);
+
+    return extended_lambda;
+}
+//
+//  See section on notes "Contracting iTEBD state with an iMPO"
+//
+void iTEBDStateImp::Unpack_iMPO(const dVectorT& theta_BA,SVCompressorC* D_compressor)
+{
+    assert(D_compressor);
+    int D=lambdaA().GetDiagonal().size();
+    assert(D==lambdaB().GetDiagonal().size());
+    MatrixCT theta_BAr=ReshapeForSVD(itsd,theta_BA);
+//    cout << "theta_BAr=" << theta_BAr.GetLimits() << endl;
+    assert(theta_BA[0].GetNumRows()%D==0);
+    int Dw=theta_BA[0].GetNumRows()/D;
+    //
+    //  Now SVD theta_BAr to for U*lambdaA*Vd
+    //
+    SVDSolver<dcmplx>* svd_solver=new LapackSVDSolver<dcmplx>();
+    MatrixCT theta_AB;
+    {
+        auto [U,s,Vd]=svd_solver->SolveAll(theta_BAr,1e-13);
+        double svdError=Max(fabs(U*s*Vd-theta_BAr));
+        if (svdError>theta_BAr.GetNumRows()*theta_BAr.GetNumCols()*1e-13)
+        {
+            Logger->LogWarnV(0,"iTEBDStateImp::Unpack_iMPO large #1 SVD error=%.1e",svdError  );
+        }
+//        cout << "SVD #1 Min(s)=" << Min(s) << endl;
+        SVCompressorC* eps_compressor =Factory::GetFactory()->MakeMPSCompressor(0.0,1e-13);
+        double trunc_error=D_compressor->Compress(U,s,Vd); //Compress down to D
+        delete eps_compressor;
+        int Dx=s.GetDiagonal().size();
+//        cout << "Dx=" << Dx << endl;
+    //    cout << s.GetDiagonal() << endl;
+        s1.bondB->SetSingularValues(s,trunc_error);
+        cout << "LambdaB=" << lambdaB().GetDiagonal() << endl;
+//        cout << "Vd=" << Vd.GetLimits() << endl;
+//        cout << "U =" << U.GetLimits() << endl;
+        auto [Vdr,Ur]=ReshapeVU(itsd,Vd,U); // move physical indices from inside to outside.
+//        cout << "Vdr=" << Vdr.GetLimits() << endl;
+//        cout << "Ur =" << Ur.GetLimits() << endl;
+        DiagonalMatrixRT lB=Extend(lambdaB(),itsd);
+//        cout << "lB=" << lB << endl;
+        if (Min(lambdaA())<1e-13)
+        {
+            // Did we forget to remove smalle SVs on the previous call??
+            Logger->LogWarnV(0,"iTEBDStateImp::Unpack_iMPO small lambdaA min(lambda)=%.1e", Min(lambdaA()) );
+            cout << "LambdaA=" << lambdaA().GetDiagonal() << endl;
+        }
+        DiagonalMatrixRT lainv=Extend(1.0/lambdaA(),Dw); //extended inverse of LambdaA
+        // If we just resized (increased D) then some of the lambdaA's could be zero.
+        for (int i=1;i<=lainv.GetDiagonal().size();i++)
+            if (isinf(lainv(i,i)))
+                lainv(i)=0.0;
+//        cout << "lainv=" << lainv.GetDiagonal() << endl;
+
+        theta_AB=lB*Vdr*lainv*Ur*lB;
+//        theta_AB=Vdr*Ur;
+//        cout << "theta_AB=" << theta_AB.GetLimits() << endl;
+    }
+    auto [U,s,Vd]=svd_solver->SolveAll(theta_AB,1e-13);
+    double svdError=Max(fabs(U*s*Vd-theta_AB));
+    if (svdError>theta_AB.GetNumRows()*theta_AB.GetNumCols()*1e-13)
+    {
+        Logger->LogWarnV(0,"iTEBDStateImp::Unpack_iMPO large #2 SVD error=%.1e",svdError  );
+    }
+//    cout << s.GetDiagonal() << endl;
+    double trunc_error=D_compressor->Compress(U,s,Vd);
+//    cout << s.GetDiagonal() << endl;
+    s1.bondA->SetSingularValues(s,trunc_error);
+    cout << "LambdaA=" << lambdaA().GetDiagonal() << endl;
+    delete svd_solver;
+//    cout << "U,Vd=" << U.GetLimits() << " " << Vd.GetLimits() << endl;
+
+    int D1=U.GetNumRows()/itsd;
+    int D2=U.GetNumCols();
+//    cout << "New dimensions = " << D1 << " " << D2 << endl;
+//    NewBondDimensions(D1,D2);
+    if (Min(lambdaB())<1e-13)
+    {
+        // Did we forget to remove smalle SVs on the previous call??
+        Logger->LogWarnV(0,"iTEBDStateImp::Unpack_iMPO small lambdaB min(lambda)=%.1e", Min(lambdaB()) );
+        cout << "LambdaB=" << lambdaB().GetDiagonal() << endl;
+    }
+    DiagonalMatrixRT lbinv=1.0/lambdaB(); //inverse of LambdaB
+    for (int n=0; n<itsd; n++)
+        for (int i=1; i<=D1; i++)
+        for (int j=1; j<=D2; j++)
+        {
+            GammaA()[n](i,j)=lbinv(i)*U (n*D1+i,     j);
+            GammaB()[n](j,i)=         Vd(     j,n*D1+i)*lbinv(i);
+//            GammaA()[n](i,j)=U (n*D1+i,     j);
+//            GammaB()[n](j,i)=Vd(     j,n*D1+i);
+        }
+
+}
+
 
 iTEBDStateImp::MdType iTEBDStateImp::GetEigenMatrix(TensorNetworks::Direction lr, int D, const Matrix4CT& theta)
 {

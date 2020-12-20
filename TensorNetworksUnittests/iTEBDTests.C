@@ -654,7 +654,7 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12)
     double S=0.5,epsSVD=0.0;
 #ifdef DEBUG
     D=4;
-    maxIter=1000;
+    maxIter=20;
 #endif // DEBUG
     Setup(UnitCell,S,2,epsSVD);
     itsState->InitializeWith(TensorNetworks::Random);
@@ -663,7 +663,7 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12)
     eps.itsMPSCompressEpsilon=0;
 
     TensorNetworks::IterationSchedule is;
-    eps.itsDeltaLambdaEpsilon=1e-5;
+    eps.itsDeltaLambdaEpsilon=1e-6;
     is.Insert({maxIter,D,0.5,eps});
     eps.itsDeltaLambdaEpsilon=1e-6;
     is.Insert({maxIter,D,0.2,eps});
@@ -679,7 +679,7 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12)
     itsState->Report(cout);
     double E=itsState->GetExpectation(itsH);
 #ifdef DEBUG
-    EXPECT_LT(E,-0.4409);   //D=4 we only seem to get this far right now.
+    EXPECT_LT(E,-0.44105);   //D=4 we only seem to get this far right now.
 //    EXPECT_LT(E,-0.442607); //D=4 From mps-tools.
 #else
     EXPECT_LT(E,-0.442846); //D=8 we only seem to get this far right now.

@@ -21,7 +21,7 @@
 namespace TensorNetworks
 {
 
-MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const Matrix4RT& expH) const
+MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const Matrix4RT& expH, ThetaType tt) const
 {
     //
     //  Make sure Ds line up
@@ -45,31 +45,70 @@ MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const Matrix4RT& expH) const
     for (int mb=0; mb<itsd; mb++)
     for (int ma=0; ma<itsd; ma++)
     {
-        MatrixCT theta13  =GammaA()[ma]*lambdaA()*GammaB()[mb];  //Figure 14 v
+        MatrixCT theta13  =ContractTheta(ma,mb,tt);  //Figure 14 v
         int nab=0;
         for (int nb=0; nb<itsd; nb++)
         for (int na=0; na<itsd; na++,nab++)
-            Thetap[nab]+= theta13*expH(ma,na,mb,nb);
+            if (expH(ma,na,mb,nb)!=0.0)
+                Thetap[nab]+= theta13*expH(ma,na,mb,nb);
     }
 
     return Thetap;
 }
 
-MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const MPO* o) const
+MatrixCT iTEBDStateImp::ContractTheta(int ma, int mb,ThetaType tt) const
+{
+    MatrixCT theta;
+    switch (tt)
+    {
+    case AlB:
+        theta=          GammaA()[ma]*lambdaA()*GammaB()[mb];
+        break;
+    case lAlB:
+        theta=lambdaB()*GammaA()[ma]*lambdaA()*GammaB()[mb];
+        break;
+    case lBlA:
+        theta=lambdaA()*GammaB()[mb]*lambdaB()*GammaA()[ma];
+        break;
+    case lAlBl:
+        theta=lambdaB()*GammaA()[ma]*lambdaA()*GammaB()[mb]*lambdaB();
+        break;
+    case lBlAl:
+        theta=lambdaA()*GammaB()[mb]*lambdaB()*GammaA()[ma]*lambdaA();
+        break;
+    }
+    return theta;
+}
+
+MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const MPO* o,ThetaType tt) const
 {
     //
     //  Make sure everything is square
     //
     assert(s1.siteA->GetD2()==s1.siteB->GetD1());
     assert(s1.siteA->GetD1()==s1.siteB->GetD2());
-    assert(s1.siteA->GetD1()==s1.siteA->GetD2());
+//    assert(s1.siteA->GetD1()==s1.siteA->GetD2());
     int D=s1.siteA->GetD1();
     //
     //  Set up two site operators
     //
     assert(o->GetL()==2);
-    const SiteOperator* soA=o->GetSiteOperator(1);
-    const SiteOperator* soB=o->GetSiteOperator(2);
+    const SiteOperator* soA=0;
+    const SiteOperator* soB=0;
+    switch (tt)
+    {
+    case AlB:
+    case lAlB:
+    case lAlBl:
+        soA=o->GetSiteOperator(1);
+        soB=o->GetSiteOperator(2);
+        break;
+    case lBlA:
+    case lBlAl:
+        soA=o->GetSiteOperator(2);
+        soB=o->GetSiteOperator(1);
+        break;
+    }
     assert(soA->GetDw12().Dw2==soB->GetDw12().Dw1);
     assert(soA->GetDw12().Dw1==soB->GetDw12().Dw2);
     int Dw2=soA->GetDw12().Dw2;
@@ -97,16 +136,14 @@ MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const MPO* o) const
     //      2)         -- GammaA -- LambdaA -- GammaB -- LambdaB
     //      3) LambdaB -- GammaA -- LambdaA -- GammaB -- LambdaB
     //
-    //  Here we choose the contract the core part of the diagram and add on the lambdaB's
-    //  later, as needed.  When Dw===w1==w3==1 (i.e. open legs at the edges of the operator) then this is
+    //  When Dw===w1==w3==1 (i.e. open legs at the edges of the operator) then this is
     //  easy.  But when Dw > 1 then this become non-trivial because the indices get combined (i1,w1) (i3,w3).
-    //  One solution is to simply make all three versions listed above in this routine.  The other is to extend
-    //  lambdaB with Dw copies of itself.
     //
     for (int mb=0; mb<itsd; mb++)
     for (int ma=0; ma<itsd; ma++)
     {
-        MatrixCT theta13  =GammaA()[ma]*lambdaA()*GammaB()[mb];  //Figure 14 v
+//        MatrixCT theta13  =GammaA()[ma]*lambdaA()*GammaB()[mb];  //Figure 14 v
+        MatrixCT theta13  =ContractTheta(ma,mb,tt);  //Figure 14 v
         int nab=0;
         for (int nb=0; nb<itsd; nb++)
         for (int na=0; na<itsd; na++,nab++)
@@ -126,6 +163,82 @@ MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const MPO* o) const
                 for (int i1=1;i1<=D;i1++)
                 for (int i3=1;i3<=D;i3++)
                     thetaw(i1,w1,i3,w3)=theta13(i1,i3)*Omn;
+            }
+            Thetap[nab]+= thetaw.Flatten();;
+       }
+    }
+
+    return Thetap;
+}
+
+MPSSite::dVectorT  iTEBDStateImp::ContractThetaDw(const MPO* o) const
+{
+    //
+    //  Make sure everything is square
+    //
+    assert(s1.siteA->GetD2()==s1.siteB->GetD1());
+    assert(s1.siteA->GetD1()==s1.siteB->GetD2());
+//    assert(s1.siteA->GetD1()==s1.siteA->GetD2());
+    int D=s1.siteA->GetD1();
+    //
+    //  Set up two site operators
+    //
+    assert(o->GetL()==2);
+    const SiteOperator* soA=o->GetSiteOperator(1);
+    const SiteOperator* soB=o->GetSiteOperator(2);
+    assert(soA->GetDw12().Dw2==soB->GetDw12().Dw1);
+    assert(soA->GetDw12().Dw1==soB->GetDw12().Dw2);
+    int Dw2=soA->GetDw12().Dw2;
+    int Dw1=soA->GetDw12().Dw1; //Same as Dw3
+    //
+    //  Create empty theta tensor
+    //
+    int DDw=D*Dw1;
+    dVectorT  Thetap(itsd*itsd);
+    for (int n=0;n<itsd*itsd;n++)
+    {
+        Thetap[n].SetLimits(DDw,DDw);
+        Fill(Thetap[n],dcmplx(0.0));
+    }
+    //
+    //  Contract
+    //            i1 -- GammaA -- LambdaA -- GammaB -- i3
+    //           /         |na                  |nb      \_LambdaB
+    //    LambdaB\         |                    |        /
+    //            w1-------o--------w2----------o----- w3
+    //                     |                    |
+    //                     |                    |
+    //
+    //  When Dw===w1==w3==1 (i.e. open legs at the edges of the operator) then this is
+    //  easy.  But when Dw > 1 then this become non-trivial because the indices get combined (i1,w1) (i3,w3).
+    //
+    for (int mb=0; mb<itsd; mb++)
+    for (int ma=0; ma<itsd; ma++)
+    {
+        MatrixCT theta13  =ContractTheta(ma,mb,AlB);  //Figure 14 v
+        int nab=0;
+        for (int nb=0; nb<itsd; nb++)
+        for (int na=0; na<itsd; na++,nab++)
+        {
+            const MatrixRT& WAmn=soA->GetW(ma,na);
+            const MatrixRT& WBmn=soB->GetW(mb,nb);
+            assert(WAmn.GetNumCols()==Dw2);
+            assert(WBmn.GetNumRows()==Dw2);
+            Matrix4CT thetaw(D,Dw1,D,Dw1);
+            for (int w3=1;w3<=Dw1;w3++)
+            for (int w1=1;w1<=Dw1;w1++)
+            {
+                double Omn(0);
+                for (int w2=1; w2<=Dw2; w2++)
+                    Omn+=WAmn(w1,w2)*WBmn(w2,w3);
+
+                for (int i1=1;i1<=D;i1++)
+                for (int i3=1;i3<=D;i3++)
+                {
+                    int iw1=D*w1+i1;
+                    int iw3=D*w3+i3;
+                    thetaw(i1,w1,i3,w3)=lambdaB()(iw1,iw1)*theta13(i1,i3)*Omn*lambdaB()(iw3,iw3);
+                }
             }
             Thetap[nab]+= thetaw.Flatten();;
        }

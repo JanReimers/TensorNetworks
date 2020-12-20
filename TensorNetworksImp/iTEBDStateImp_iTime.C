@@ -14,6 +14,7 @@
 #include "NumericalMethods/PrimeEigenSolver.H"
 #include "NumericalMethods/LapackEigenSolver.H"
 #include "NumericalMethods/LapackSVDSolver.H"
+#include "Containers/ptr_vector.h"
 #include "oml/cnumeric.h"
 #include <iomanip>
 
@@ -46,24 +47,37 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
     double dt=isl.itsdt;
 
     Matrix4RT Hlocal=H->BuildLocalMatrix();
-    Matrix4RT expH=Hamiltonian::ExponentH(dt,Hlocal);
+//    Matrix4RT expH=Hamiltonian::ExponentH(dt,Hlocal);
     MultigateType gates;
+    MultiMPOType  mpos;
+    Multi_iMPOType impos;
     //
     //  first order trotter.
     //
-//    gates.push_back(Hamiltonian::ExponentH(dt,Hlocal));
-//    gates.push_back(Hamiltonian::ExponentH(dt,Hlocal));
+    gates.push_back(Hamiltonian::ExponentH(dt,Hlocal));
+    gates.push_back(Hamiltonian::ExponentH(dt,Hlocal));
     //
     // 2nd order trotter
     //
-    gates.push_back(Hamiltonian::ExponentH(dt/2,Hlocal));
-    gates.push_back(Hamiltonian::ExponentH(dt  ,Hlocal));
-    gates.push_back(Hamiltonian::ExponentH(dt/2,Hlocal));
-//    MPO* expH=H->CreateOperator(dt,TensorNetworks::SecondOrder);
-//    MPO* expH=H->CreateiMPO(dt,TensorNetworks::FirstOrder);
+//    gates.push_back(Hamiltonian::ExponentH(dt/2,Hlocal));
+//    gates.push_back(Hamiltonian::ExponentH(dt  ,Hlocal));
+//    gates.push_back(Hamiltonian::ExponentH(dt/2,Hlocal));
+//      MPO* expH=H->CreateOperator(dt,TensorNetworks::FirstOrder);
+//    iMPO* expH=H->CreateiMPO(dt,TensorNetworks::FirstOrder,1e-13);
+//    mpos.push_back(H->CreateOperator(dt/2,TensorNetworks::FirstOrder));
+//    mpos.push_back(H->CreateOperator(dt  ,TensorNetworks::FirstOrder));
+//    mpos.push_back(H->CreateOperator(dt/2,TensorNetworks::FirstOrder));
+
+//    mpos.push_back(H->CreateOperator(dt  ,TensorNetworks::SecondOrder));
+//    mpos.push_back(H->CreateOperator(dt  ,TensorNetworks::SecondOrder));
+//    mpos[0]->Report(cout);
+//    mpos[1]->Report(cout);
+    iMPO* expH=H->CreateiMPO(dt  ,TensorNetworks::FirstOrder,1e-13);
+    expH->Report(cout);
+//    expH->Dump(cout);
 
     int Dmax=GetMaxD();
-    double epsCompress=1e-13;
+    double epsCompress=1e-16;
     SVCompressorC* mps_compressor =Factory::GetFactory()->MakeMPSCompressor(Dmax,epsCompress);
     int nOrthIter=100;
     double epsOrth= dt==0.0 ? 1e-13 : dt*dt/1000.0;
@@ -80,11 +94,6 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
             IncreaseBondDimensions(D);
             delete mps_compressor;
             mps_compressor =Factory::GetFactory()->MakeMPSCompressor(D,epsCompress);
-            //
-            //  Warm the state, i.e. get some real numbers in the matrix areas
-            //
-            //Apply(gates,mps_compressor,1);
-            //Apply(gates,mps_compressor,2);
         }
         Logger->LogInfo(2,"      Dw       E          dE      niter    Ortho errors  DlambdaA DlambdaB");
         double oerr1,oerr2,dA,dB;
@@ -94,7 +103,12 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
             DiagonalMatrixRT lA=lambdaA();
             DiagonalMatrixRT lB=lambdaB();
 
-            Apply(gates,mps_compressor,1);
+            Apply(expH,mps_compressor,1);
+//            Apply(expH,mps_compressor,2);
+//            oerr1=OrthogonalizeI(mps_compressor,epsOrth,nOrthIter);
+//            Apply(expH,mps_compressor,2);
+//            Apply(gates,mps_compressor,1);
+//            Apply(gates,mps_compressor,niter%2+1);
 //            if (D==isl.itsDmax)
 //                Apply(gates,mps_compressor,2); //If you while D is growing both the energy does not converge as well?!?!
             dA=Max(fabs(lA-lambdaA()));
@@ -124,6 +138,57 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
     return E1;
 }
 
+//
+//  Apply single impo gate and compress at the end
+//
+void iTEBDStateImp::Apply(const iMPO* expH,SVCompressorC* D_compressor,int center)
+{
+    ReCenter(center);
+    dVectorT theta_BA=ContractTheta(expH,lBlAl); //is root(lA)*GB*lB*GA*root(lA) better?
+    Unpack_iMPO(theta_BA,D_compressor);
+}
+
+//
+//  Apply multiple gates and compress at the end
+//
+void iTEBDStateImp::Apply(const MultigateType& expH,SVCompressorC* comp,int center)
+{
+    SVCompressorC* eps_compressor =Factory::GetFactory()->MakeMPSCompressor(0,1e-13);
+    int Ngate=expH.size();
+    int isite=center;
+    int igate=1; //We need to know when the second last gate occurs.
+    for (auto& gate:expH)
+    {
+        ReCenter(isite++);
+        dVectorT gamma=ContractTheta(gate,lAlBl);
+        if (igate++<=Ngate-2)
+            Unpack(gamma,eps_compressor); //only eps compression before the last two gates.
+        else
+            Unpack(gamma,comp); //Compression after the last two gates. Each compression truncates a different bond.
+    }
+}
+
+//
+//  Apply multiple mpo gates and compress at the end
+//
+void iTEBDStateImp::Apply(const MultiMPOType& expH,SVCompressorC* comp,int center)
+{
+    SVCompressorC* eps_compressor =Factory::GetFactory()->MakeMPSCompressor(0,1e-13);
+    int Ngate=expH.size();
+    int isite=center;
+    int igate=1; //We need to know when the second last gate occurs.
+    for (auto& gate:expH)
+    {
+        ReCenter(isite++);
+        dVectorT gamma=ContractTheta(&gate,lAlBl);
+        if (igate++<=Ngate-2)
+            Unpack(gamma,eps_compressor); //only eps compression before the last two gates.
+        else
+            Unpack(gamma,comp); //Compression after the last two gates. Each compression truncates a different bond.
+    }
+}
+
+
 DiagonalMatrixRT Extend(const DiagonalMatrixRT& lambda,const MPO* o)
 {
     // Extract Dw from the MPO
@@ -150,7 +215,7 @@ DiagonalMatrixRT Extend(const DiagonalMatrixRT& lambda,const MPO* o)
 double iTEBDStateImp::ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp,double eps,int maxIter)
 {
     assert(comp);
-    dVectorT gamma=ContractTheta(expH);
+    dVectorT gamma=ContractTheta(expH,AlB);
     DiagonalMatrixRT lambda=lambdaB();
     OrthogonalizeI(gamma,lambda,eps,maxIter);
     s1.bondB->SetSingularValues(lambda,0.0);
@@ -160,7 +225,7 @@ double iTEBDStateImp::ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp,doubl
 double iTEBDStateImp::ApplyOrtho(const MPO* expH,SVCompressorC* comp,double eps,int maxIter)
 {
     assert(comp);
-    dVectorT          gamma=ContractTheta(expH);
+    dVectorT          gamma=ContractTheta(expH,AlB);
     DiagonalMatrixRT lambda=Extend(lambdaB(),expH);
     OrthogonalizeI(gamma,lambda,eps,maxIter);
     double truncationError=comp->Compress(gamma,lambda); //Reduce form DDw to D.
@@ -168,25 +233,7 @@ double iTEBDStateImp::ApplyOrtho(const MPO* expH,SVCompressorC* comp,double eps,
     return UnpackOrthonormal(gamma,comp);
 }
 
-//
-//  Apply multiple gates and compress at the end
-//
-void iTEBDStateImp::Apply(const MultigateType& expH,SVCompressorC* comp,int center)
-{
-    SVCompressorC* eps_compressor =Factory::GetFactory()->MakeMPSCompressor(0,1e-13);
-    int Ngate=expH.size();
-    int isite=center;
-    int igate=1; //We need to know when the second last gate occurs.
-    for (auto& gate:expH)
-    {
-        ReCenter(isite++);
-        dVectorT gamma=ContractTheta(gate);
-        if (igate++<=Ngate-2)
-            Unpack(gamma,eps_compressor); //only eps compression before the last two gates.
-        else
-            Unpack(gamma,comp); //Compression after the last two gates. Each compression truncates a different bond.
-    }
-}
+
 
 //-----------------------------------------------------------------------------
 //
@@ -195,7 +242,7 @@ void iTEBDStateImp::Apply(const MultigateType& expH,SVCompressorC* comp,int cent
 double iTEBDStateImp::Apply(const Matrix4RT& expH,SVCompressorC* comp,bool orthogonalize)
 {
     assert(comp);
-    dVectorT gamma=ContractTheta(expH);
+    dVectorT gamma=ContractTheta(expH,AlB);
     if (orthogonalize)
     {
         DiagonalMatrixRT lambda=lambdaB();
@@ -210,7 +257,7 @@ double iTEBDStateImp::Apply(const MPO* expH,SVCompressorC* comp,bool orthogonali
 {
     assert(comp);
     DiagonalMatrixRT lambda=Extend(lambdaB(),expH);
-    dVectorT gamma=ContractTheta(expH);
+    dVectorT gamma=ContractTheta(expH,AlB);
     if (orthogonalize) OrthogonalizeI(gamma,lambda,1e-13,100);
     double truncationError=comp->Compress(gamma,lambda); //Reduce form DDw to D.
     s1.bondB->SetSingularValues(lambda,truncationError); //Don't use lambdap any more in case it is not normalized

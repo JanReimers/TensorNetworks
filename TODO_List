@@ -16,7 +16,8 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
         -McCulloch's recursion for expectations gives the wrong number. Why?
         -Implement proper compression as per Parker.  BIG job, needs QR decomp
         Done: -Support QR decomp from Lapack.
-        -Try and hand code 2nd order trotter with gates.
+        Done: -Try and hand code 2nd order trotter with gates.
+
 
 
     -Create iMPOs directly, get rid of the convert method.

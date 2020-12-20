@@ -24,6 +24,8 @@ class iTEBDStateImp : public virtual iTEBDState,
     typedef std::tuple<MatrixCT,MatrixCT> MMType;
     typedef std::tuple<MatrixCT,double  > MdType;
     typedef std::vector<Matrix4RT>        MultigateType; // sequence of Trotter gates
+    typedef  ptr_vector< MPO*>            MultiMPOType; // sequence of Trotter gates as MPOs
+    typedef  ptr_vector<iMPO*>            Multi_iMPOType; // sequence of Trotter gates as MPOs
 public:
     iTEBDStateImp(int L,double S, int D,double normEps,double epsSV);
     virtual ~iTEBDStateImp();
@@ -43,10 +45,12 @@ public:
 // Find ground state.  Return <E^2>-<E>^2
 //
     virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&);
-    virtual void   Apply     (const Matrix4RT&     expH,SVCompressorC* comp) {       Apply(expH,comp,false);}
-    virtual void   Apply     (const MultigateType& expH,SVCompressorC* comp,int center);
-    virtual double ApplyOrtho(const Matrix4RT&     expH,SVCompressorC* comp) {return Apply(expH,comp,true );}
-    virtual double ApplyOrtho(const Matrix4RT&     expH,SVCompressorC*,double eps,int maxIter);
+    virtual void   Apply     (const Matrix4RT&      expH,SVCompressorC* comp) {       Apply(expH,comp,false);}
+    virtual void   Apply     (const MultigateType & expH,SVCompressorC* comp,int center);
+    virtual void   Apply     (const MultiMPOType  & expH,SVCompressorC* comp,int center);
+    virtual void   Apply     (const iMPO*           expH,SVCompressorC* comp,int center);
+    virtual double ApplyOrtho(const Matrix4RT&      expH,SVCompressorC* comp) {return Apply(expH,comp,true );}
+    virtual double ApplyOrtho(const Matrix4RT&      expH,SVCompressorC*,double eps,int maxIter);
 
     virtual void   Apply     (const MPO* expH,SVCompressorC* comp) {       Apply(expH,comp,false);}
     virtual double ApplyOrtho(const MPO* expH,SVCompressorC* comp) {return Apply(expH,comp,true );}
@@ -84,11 +88,17 @@ protected:
 
     Matrix4CT GetTransferMatrix(Direction lr) const;
 
-    dVectorT  ContractAlB() const;
-    dVectorT  ContractTheta(const Matrix4RT& expH) const;
-    dVectorT  ContractTheta(const MPO*       expH) const;
+    enum ThetaType    {AlB,lAlB,lBlA,lAlBl,lBlAl};
 
+    MatrixCT  ContractTheta(int ma, int mb,ThetaType tt) const;
+    dVectorT  ContractAlB() const;
+    dVectorT  ContractTheta(const Matrix4RT& expH,ThetaType) const;
+    dVectorT  ContractTheta(const MPO*       expH,ThetaType) const;
+    dVectorT  ContractThetaDw(const MPO*     expH) const;
+
+    void     CalculateLambdaB (const dVectorT& thetaBA,SVCompressorC*);
     double   UnpackOrthonormal(const dVectorT& gammap,SVCompressorC*);
+    void     Unpack_iMPO      (const dVectorT& gammap,SVCompressorC*);
     void     Unpack           (const dVectorT& gammap,SVCompressorC*);
 //
 //  All these helper function are static to ensure no dependence on iTEBD state
