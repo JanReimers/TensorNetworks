@@ -19,8 +19,8 @@ class Hamiltonian : public virtual MPO
 
         virtual const OperatorClient* GetClient() const=0;
         //  Creates an MPS or operators with the correct lattice size and spin space.
-        virtual MPS*        CreateMPS       (int D,double normEps=1e-12,double epsSV=1e-12) const=0;
-        virtual iTEBDState* CreateiTEBDState(int D,double normEps=1e-12,double epsSV=1e-12) const=0;
+        virtual MPS*        CreateMPS       (int D          ,double normEps=1e-12,double epsSV=1e-12) const=0;
+        virtual iTEBDState* CreateiTEBDState(int D,iTEBDType,double normEps=1e-12,double epsSV=1e-12) const=0;
         // Create an exact (full) wave function abject suitable for this Hamiltonian
         virtual FullState*  CreateFullState () const=0;
 

@@ -19,6 +19,7 @@ namespace TensorNetworks
 class iTEBDStateImp : public virtual iTEBDState,
     private MPSImp
 {
+protected:
     using dVectorT=MPSSite::dVectorT;
 //    typedef std::tuple<dVectorT,DiagonalMatrixRT> GLType;
     typedef std::tuple<MatrixCT,MatrixCT> MMType;
@@ -45,10 +46,13 @@ public:
 // Find ground state.  Return <E^2>-<E>^2
 //
     virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&);
+    virtual void   InitGates (const Hamiltonian*,double dt,TrotterOrder)=0;
+    virtual void   Apply     (SVCompressorC*, int center)=0;
+
     virtual void   Apply     (const Matrix4RT&      expH,SVCompressorC* comp) {       Apply(expH,comp,false);}
     virtual void   Apply     (const MultigateType & expH,SVCompressorC* comp,int center);
     virtual void   Apply     (const MultiMPOType  & expH,SVCompressorC* comp,int center);
-    virtual void   Apply     (const iMPO*           expH,SVCompressorC* comp,int center);
+    virtual void   Apply     (const Multi_iMPOType& expH,SVCompressorC* comp,int center);
     virtual double ApplyOrtho(const Matrix4RT&      expH,SVCompressorC* comp) {return Apply(expH,comp,true );}
     virtual double ApplyOrtho(const Matrix4RT&      expH,SVCompressorC*,double eps,int maxIter);
 
@@ -88,7 +92,7 @@ protected:
 
     Matrix4CT GetTransferMatrix(Direction lr) const;
 
-    enum ThetaType    {AlB,lAlB,lBlA,lAlBl,lBlAl};
+    enum ThetaType    {AlB,lAlB,lBlA,lAlBl,lBlAl,rBlAr};
 
     MatrixCT  ContractTheta(int ma, int mb,ThetaType tt) const;
     dVectorT  ContractAlB() const;

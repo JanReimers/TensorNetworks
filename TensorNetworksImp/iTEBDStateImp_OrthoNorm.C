@@ -199,7 +199,7 @@ void iTEBDStateImp::Unpack(const dVectorT& gamma,SVCompressorC* comp)
 //    int d=gamma.size();
     int D2=lambdaA().size();
     int D1=lambdaB().size();
-//    cout << "d,D1,D2,gamma[0]=" << d << " " << D1 << " " << D2 << " " << gamma[0].GetLimits() << endl;
+//    cout << "D1,D2,gamma[0]=" << D1 << " " << D2 << " " << gamma[0].GetLimits() << endl;
 //    assert(gamma[0].GetLimits()==MatLimits(D1,D2));
 
     MatrixCT bgb4=ReshapeForSVD(itsd,gamma);
@@ -236,6 +236,7 @@ void iTEBDStateImp::Unpack(const dVectorT& gamma,SVCompressorC* comp)
         // Did we forget to remove smalle SVs on this call??
         Logger->LogWarnV(0,"iTEBDStateImp::Unpack small lambdaA min(lambda)=%.1e", Min(lambdaA()) );
         cout << "LambdaA=" << lambdaA().GetDiagonal() << endl;
+        assert(Min(lambdaA())>0.0);
     }
 
     if (Min(lambdaB())<1e-13)
@@ -243,10 +244,12 @@ void iTEBDStateImp::Unpack(const dVectorT& gamma,SVCompressorC* comp)
         // Did we forget to remove smalle SVs on the previous call??
         Logger->LogWarnV(0,"iTEBDStateImp::Unpack small lambdaB min(lambda)=%.1e", Min(lambdaB()) );
         cout << "LambdaB=" << lambdaB().GetDiagonal() << endl;
+        assert(Min(lambdaB())>0.0);
     }
 
     D1=U.GetNumRows()/itsd;
     D2=s.GetDiagonal().size();
+//    cout << "D1,D2=" << D1 << " " << D2 << endl;
     NewBondDimensions(D1,D2);
     DiagonalMatrixRT lbinv=1.0/lambdaB(); //inverse of LambdaB
     for (int n=0; n<itsd; n++)
@@ -341,14 +344,14 @@ void iTEBDStateImp::Unpack_iMPO(const dVectorT& theta_BA,SVCompressorC* D_compre
             Logger->LogWarnV(0,"iTEBDStateImp::Unpack_iMPO large #1 SVD error=%.1e",svdError  );
         }
 //        cout << "SVD #1 Min(s)=" << Min(s) << endl;
-        SVCompressorC* eps_compressor =Factory::GetFactory()->MakeMPSCompressor(0.0,1e-13);
+//        SVCompressorC* eps_compressor =Factory::GetFactory()->MakeMPSCompressor(0.0,1e-13);
         double trunc_error=D_compressor->Compress(U,s,Vd); //Compress down to D
-        delete eps_compressor;
-        int Dx=s.GetDiagonal().size();
+//        delete eps_compressor;
+//        int Dx=s.GetDiagonal().size();
 //        cout << "Dx=" << Dx << endl;
     //    cout << s.GetDiagonal() << endl;
         s1.bondB->SetSingularValues(s,trunc_error);
-        cout << "LambdaB=" << lambdaB().GetDiagonal() << endl;
+//        cout << "LambdaB=" << lambdaB().GetDiagonal() << endl;
 //        cout << "Vd=" << Vd.GetLimits() << endl;
 //        cout << "U =" << U.GetLimits() << endl;
         auto [Vdr,Ur]=ReshapeVU(itsd,Vd,U); // move physical indices from inside to outside.
@@ -370,8 +373,8 @@ void iTEBDStateImp::Unpack_iMPO(const dVectorT& theta_BA,SVCompressorC* D_compre
 //        cout << "lainv=" << lainv.GetDiagonal() << endl;
 
         theta_AB=lB*Vdr*lainv*Ur*lB;
-//        theta_AB=Vdr*Ur;
-//        cout << "theta_AB=" << theta_AB.GetLimits() << endl;
+//        theta_AB=lB*Vdr*Ur*lB;
+//        theta_AB=Vdr*lainv*Ur;
     }
     auto [U,s,Vd]=svd_solver->SolveAll(theta_AB,1e-13);
     double svdError=Max(fabs(U*s*Vd-theta_AB));
@@ -383,7 +386,7 @@ void iTEBDStateImp::Unpack_iMPO(const dVectorT& theta_BA,SVCompressorC* D_compre
     double trunc_error=D_compressor->Compress(U,s,Vd);
 //    cout << s.GetDiagonal() << endl;
     s1.bondA->SetSingularValues(s,trunc_error);
-    cout << "LambdaA=" << lambdaA().GetDiagonal() << endl;
+//    cout << "LambdaA=" << lambdaA().GetDiagonal() << endl;
     delete svd_solver;
 //    cout << "U,Vd=" << U.GetLimits() << " " << Vd.GetLimits() << endl;
 

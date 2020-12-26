@@ -401,17 +401,17 @@ TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotter)
 
     TensorNetworks::IterationSchedule is;
     eps.itsDelatEnergy1Epsilon=1e-3;
-    is.Insert({50,D,0,0.5,FirstOrder,eps});
+    is.Insert({50 ,D,1,0,0.5,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({500,D,0,0.2,FirstOrder,eps});
+    is.Insert({500,D,1,0,0.2,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({500,D,1,0.1,FirstOrder,eps});
+    is.Insert({500,D,1,1,0.1,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({500,D,2,0.05,FirstOrder,eps});
+    is.Insert({500,D,1,2,0.05,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
-    is.Insert({500,D,3,0.02,FirstOrder,eps});
+    is.Insert({500,D,1,3,0.02,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({500,D,4,0.01,FirstOrder,eps});
+    is.Insert({500,D,1,4,0.01,FirstOrder,eps});
     //eps.itsDelatEnergy1Epsilon=3e-9;
     //is.Insert({500,D,5,0.005,FirstOrder,eps});
     //eps.itsDelatEnergy1Epsilon=1e-9;
@@ -440,25 +440,25 @@ TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
     eps.itsMPOCompressEpsilon=1e-4;
     eps.itsMPSCompressEpsilon=1e-4; //Just Eps for compression
     eps.itsDelatNormEpsilon=1e-4;
-    is.Insert({50 ,Dcompress,5,0.5,SecondOrder,eps});
+    is.Insert({50 ,Dcompress,1,5,0.5,SecondOrder,eps});
 
     eps.itsDelatEnergy1Epsilon=1e-4;
     eps.itsMPOCompressEpsilon=1e-4;
     eps.itsMPSCompressEpsilon=1e-4; //Just Eps for compression
     eps.itsDelatNormEpsilon=1e-5;
-    is.Insert({500,Dcompress,5,0.2,SecondOrder,eps});
+    is.Insert({500,Dcompress,1,5,0.2,SecondOrder,eps});
 
     eps.itsDelatEnergy1Epsilon=1e-5;
     eps.itsMPOCompressEpsilon=1e-6;
     eps.itsMPSCompressEpsilon=1e-6; //Just Eps for compression
     eps.itsDelatNormEpsilon=1e-7;
-    is.Insert({500,Dcompress,5,0.1,SecondOrder,eps});
+    is.Insert({500,Dcompress,1,5,0.1,SecondOrder,eps});
 
     eps.itsDelatEnergy1Epsilon=1e-6;
     eps.itsMPOCompressEpsilon=1e-9;
     eps.itsMPSCompressEpsilon=1e-7; //Just Eps for compression
     eps.itsDelatNormEpsilon=1e-10;
-    is.Insert({500,Dcompress,5,0.1,SecondOrder,eps});
+    is.Insert({500,Dcompress,1,5,0.1,SecondOrder,eps});
 
 //    eps.itsDelatEnergy1Epsilon=2e-7;
 //    eps.itsMPOCompressEpsilon=1e-10;

@@ -9,6 +9,7 @@ namespace TensorNetworks
     enum SpinOperator{Sx,Sy,Sz,Sp,Sm};
     enum Trotter     {Odd,Even,TrotterX,TrotterY,TrotterZ};
     enum TrotterOrder{None,FirstOrder,SecondOrder,FourthOrder};
+    enum iTEBDType   {Gates,MPOs,iMPOs};
 };
 
 #endif // ENUMS_H

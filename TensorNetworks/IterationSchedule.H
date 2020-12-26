@@ -23,7 +23,8 @@ struct IterationScheduleLine
     IterationScheduleLine(int maxiter,int Dmax,double dt,const Epsilons&);
     IterationScheduleLine(int maxiter,int Dmax,int DeltaD,double dt,const Epsilons&);
     IterationScheduleLine(int maxiter,int Dmax,double dt,TrotterOrder,const Epsilons&);
-    IterationScheduleLine(int maxiter,int Dmax,int maxOptIter,double dt,TrotterOrder,const Epsilons&);
+    IterationScheduleLine(int maxiter,int Dmax,int DeltaD,double dt,TrotterOrder,const Epsilons&);
+    IterationScheduleLine(int maxiter,int Dmax,int DeltaD,int maxOptIter,double dt,TrotterOrder,const Epsilons&);
 
     int      itsMaxGSSweepIterations;  // Primary # of sweeps for variational GS search or i-time evolution
     int      itsMaxOptimizeIterations; // For post SVD compress optimization iterations

@@ -84,6 +84,10 @@ void iTEBDStateImp::NewBondDimensions(int D1,int D2)
 
 void iTEBDStateImp::ReCenter(int isite) const
 {
+    while (isite>2)
+    {
+        isite-=2;
+    }
     s1=Sites(isite,this);
     assert(s1.siteA!=s1.siteB);
     assert(s1.bondA!=s1.bondB);

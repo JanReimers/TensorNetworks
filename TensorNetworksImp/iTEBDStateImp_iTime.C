@@ -46,35 +46,7 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
     assert(isl.itsDmax>0 || isl.itsEps.itsMPSCompressEpsilon>0);
     double dt=isl.itsdt;
 
-    Matrix4RT Hlocal=H->BuildLocalMatrix();
-//    Matrix4RT expH=Hamiltonian::ExponentH(dt,Hlocal);
-    MultigateType gates;
-    MultiMPOType  mpos;
-    Multi_iMPOType impos;
-    //
-    //  first order trotter.
-    //
-    gates.push_back(Hamiltonian::ExponentH(dt,Hlocal));
-    gates.push_back(Hamiltonian::ExponentH(dt,Hlocal));
-    //
-    // 2nd order trotter
-    //
-//    gates.push_back(Hamiltonian::ExponentH(dt/2,Hlocal));
-//    gates.push_back(Hamiltonian::ExponentH(dt  ,Hlocal));
-//    gates.push_back(Hamiltonian::ExponentH(dt/2,Hlocal));
-//      MPO* expH=H->CreateOperator(dt,TensorNetworks::FirstOrder);
-//    iMPO* expH=H->CreateiMPO(dt,TensorNetworks::FirstOrder,1e-13);
-//    mpos.push_back(H->CreateOperator(dt/2,TensorNetworks::FirstOrder));
-//    mpos.push_back(H->CreateOperator(dt  ,TensorNetworks::FirstOrder));
-//    mpos.push_back(H->CreateOperator(dt/2,TensorNetworks::FirstOrder));
-
-//    mpos.push_back(H->CreateOperator(dt  ,TensorNetworks::SecondOrder));
-//    mpos.push_back(H->CreateOperator(dt  ,TensorNetworks::SecondOrder));
-//    mpos[0]->Report(cout);
-//    mpos[1]->Report(cout);
-    iMPO* expH=H->CreateiMPO(dt  ,TensorNetworks::FirstOrder,1e-13);
-    expH->Report(cout);
-//    expH->Dump(cout);
+    InitGates(H,dt,isl.itsTrotterOrder);
 
     int Dmax=GetMaxD();
     double epsCompress=1e-16;
@@ -103,14 +75,8 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
             DiagonalMatrixRT lA=lambdaA();
             DiagonalMatrixRT lB=lambdaB();
 
-            Apply(expH,mps_compressor,1);
-//            Apply(expH,mps_compressor,2);
-//            oerr1=OrthogonalizeI(mps_compressor,epsOrth,nOrthIter);
-//            Apply(expH,mps_compressor,2);
-//            Apply(gates,mps_compressor,1);
-//            Apply(gates,mps_compressor,niter%2+1);
-//            if (D==isl.itsDmax)
-//                Apply(gates,mps_compressor,2); //If you while D is growing both the energy does not converge as well?!?!
+            Apply(mps_compressor,1);
+            ReCenter(1);
             dA=Max(fabs(lA-lambdaA()));
             dB=Max(fabs(lB-lambdaB()));
 
@@ -134,17 +100,16 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
                         isl.itsDmax,H->GetMaxDw(),niter,E1,oerr1,dE,dA,dB);
     }
     delete mps_compressor;
-//    delete expH;
     return E1;
 }
 
 //
 //  Apply single impo gate and compress at the end
 //
-void iTEBDStateImp::Apply(const iMPO* expH,SVCompressorC* D_compressor,int center)
+void iTEBDStateImp::Apply(const Multi_iMPOType& expH,SVCompressorC* D_compressor,int center)
 {
     ReCenter(center);
-    dVectorT theta_BA=ContractTheta(expH,lBlAl); //is root(lA)*GB*lB*GA*root(lA) better?
+    dVectorT theta_BA=ContractTheta(expH[0],lBlAl); //is root(lA)*GB*lB*GA*root(lA) better?
     Unpack_iMPO(theta_BA,D_compressor);
 }
 
@@ -153,8 +118,9 @@ void iTEBDStateImp::Apply(const iMPO* expH,SVCompressorC* D_compressor,int cente
 //
 void iTEBDStateImp::Apply(const MultigateType& expH,SVCompressorC* comp,int center)
 {
-    SVCompressorC* eps_compressor =Factory::GetFactory()->MakeMPSCompressor(0,1e-13);
+    SVCompressorC* eps_compressor =Factory::GetFactory()->MakeMPSCompressor(0,1e-7);
     int Ngate=expH.size();
+    assert(Ngate>0);
     int isite=center;
     int igate=1; //We need to know when the second last gate occurs.
     for (auto& gate:expH)
@@ -175,6 +141,7 @@ void iTEBDStateImp::Apply(const MultiMPOType& expH,SVCompressorC* comp,int cente
 {
     SVCompressorC* eps_compressor =Factory::GetFactory()->MakeMPSCompressor(0,1e-13);
     int Ngate=expH.size();
+    assert(Ngate>0);
     int isite=center;
     int igate=1; //We need to know when the second last gate occurs.
     for (auto& gate:expH)

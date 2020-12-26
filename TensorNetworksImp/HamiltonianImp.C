@@ -74,7 +74,9 @@ Matrix4RT HamiltonianImp::BuildLocalMatrix() const
 }
 } //namespace
 
-#include "TensorNetworksImp/iTEBDStateImp.H"
+#include "TensorNetworksImp/iTEBDGates.H"
+#include "TensorNetworksImp/iTEBDMPOs.H"
+#include "TensorNetworksImp/iTEBDiMPOs.H"
 #include "TensorNetworksImp/FullStateImp.H"
 #include "TensorNetworksImp/MPSImp.H"
 #include "Operators/MPO_SpatialTrotter.H"
@@ -95,9 +97,22 @@ MPS* HamiltonianImp::CreateMPS(int D,double normEps, double epsSV) const
     return new MPSImp(GetL(),itsS,D,normEps,epsSV);
 }
 
-iTEBDState* HamiltonianImp::CreateiTEBDState(int D,double normEps, double epsSV) const
+iTEBDState* HamiltonianImp::CreateiTEBDState(int D,iTEBDType type,double normEps, double epsSV) const
 {
-    return new iTEBDStateImp(GetL(),itsS,D,normEps,epsSV);
+    iTEBDState* ret=nullptr;
+    switch (type)
+    {
+    case Gates :
+        ret=new iTEBDGates(GetL(),itsS,D,normEps,epsSV);
+        break;
+    case MPOs :
+        ret=new iTEBDMPOs(GetL(),itsS,D,normEps,epsSV);
+        break;
+    case iMPOs :
+        ret=new iTEBDiMPOs(GetL(),itsS,D,normEps,epsSV);
+        break;
+    }
+    return ret;
 }
 
 
@@ -137,6 +152,7 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
             W->Combine(&Wodd);
             W->Combine(&Weven);
             W->Combine(&Wodd);
+//            W->Compress(0,1e-12);
             break;
         }
         case FourthOrder :
@@ -188,7 +204,7 @@ iMPO* HamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) c
             W->Combine(&Weven);
             W->Combine(&Wodd);
             W->ConvertToiMPO(GetL());
-//            W->Compress(0,epsMPO);
+            W->Compress(0,epsMPO);
             break;
         }
         case SecondOrder :
@@ -200,8 +216,8 @@ iMPO* HamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) c
             W->Combine(&Wodd);
             W->Combine(&Weven);
             W->Combine(&Wodd);
-            W->Compress(0,epsMPO);
             W->ConvertToiMPO(GetL());
+            W->Compress(0,epsMPO);
             break;
         }
         case FourthOrder :

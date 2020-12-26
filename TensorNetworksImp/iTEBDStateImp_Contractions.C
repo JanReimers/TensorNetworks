@@ -76,6 +76,9 @@ MatrixCT iTEBDStateImp::ContractTheta(int ma, int mb,ThetaType tt) const
     case lBlAl:
         theta=lambdaA()*GammaB()[mb]*lambdaB()*GammaA()[ma]*lambdaA();
         break;
+    case rBlAr:
+        theta=sqrt(lambdaA())*GammaB()[mb]*lambdaB()*GammaA()[ma]*sqrt(lambdaA());
+        break;
     }
     return theta;
 }
@@ -100,13 +103,34 @@ MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const MPO* o,ThetaType tt) const
     case AlB:
     case lAlB:
     case lAlBl:
-        soA=o->GetSiteOperator(1);
-        soB=o->GetSiteOperator(2);
+        if (s1.leftSiteNumber==1)
+        {
+            soA=o->GetSiteOperator(1);
+            soB=o->GetSiteOperator(2);
+        }
+        else if(s1.leftSiteNumber==2)
+        {
+            soA=o->GetSiteOperator(1);
+            soB=o->GetSiteOperator(2);
+        }
+        else
+            assert(false);
         break;
     case lBlA:
     case lBlAl:
-        soA=o->GetSiteOperator(2);
-        soB=o->GetSiteOperator(1);
+    case rBlAr:
+        if (s1.leftSiteNumber==1)
+        {
+            soA=o->GetSiteOperator(2);
+            soB=o->GetSiteOperator(1);
+        }
+        else if(s1.leftSiteNumber==2)
+        {
+            soA=o->GetSiteOperator(1);
+            soB=o->GetSiteOperator(2);
+        }
+        else
+            assert(false);
         break;
     }
     assert(soA->GetDw12().Dw2==soB->GetDw12().Dw1);

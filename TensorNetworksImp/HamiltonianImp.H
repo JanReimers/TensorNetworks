@@ -27,8 +27,8 @@ public:
     virtual int Getd () const {return 2*itsS+1;}
     virtual int GetMaxDw() const {return MPOImp::GetMaxDw();}
 
-    virtual MPS*        CreateMPS          (int D,double normEps,double epsSV) const;
-    virtual iTEBDState* CreateiTEBDState   (int D,double normEps,double epsSV) const;
+    virtual MPS*        CreateMPS          (int D          ,double normEps,double epsSV) const;
+    virtual iTEBDState* CreateiTEBDState   (int D,iTEBDType,double normEps,double epsSV) const;
     virtual  MPO*       CreateUnitOperator () const;
     virtual iMPO*       CreateiUnitOperator() const;
     virtual  MPO*       CreateOperator     (double dt, TrotterOrder) const;
