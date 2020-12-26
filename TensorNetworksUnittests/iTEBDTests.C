@@ -865,6 +865,7 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     double S=0.5,epsSVD=0.0;
 #ifdef DEBUG
     Dmax=8;
+    Dstart=2;
     deltaD=2;
     maxIter=1000;
 #endif // DEBUG

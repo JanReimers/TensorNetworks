@@ -66,7 +66,6 @@ void MPO::Combine(const MPO* O2,double factor)
     for (int ia=1;ia<=L;ia++)
     {
         GetSiteOperator(ia)->Combine(O2->GetSiteOperator(ia),factor);
-        Report(std::cout);
     }
 }
 
