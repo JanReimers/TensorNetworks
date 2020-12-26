@@ -483,7 +483,10 @@ iTEBDStateImp::MMType iTEBDStateImp::Factor(const MatrixCT m)
     delete solver;
     X=U*DiagonalMatrix<double>(sqrt(e));
     if (Min(e)<1e-10)
+    {
         Logger->LogWarnV(1,"iTEBDStateImp::Factor small eigenvalue min(e)==%.1e", Min(e));
+        cout << "e=" << e << endl;
+    }
 
     Xinv=DiagonalMatrix<double>(1.0/sqrt(e))*Transpose(conj(U));
     //assert(IsUnit(X*Xinv,1e-13));
@@ -557,11 +560,17 @@ void iTEBDStateImp::OrthogonalizeI(dVectorT& gamma, DiagonalMatrixRT& lambda,dou
             assert(IsUnit(X *Xinv ,D*1e-10));
             assert(IsUnit(YT*YTinv,D*1e-10));
         }
-        if (isnan(YT))
+        if (isnan(X))
         {
-            cout << "Vl.diag=" << Vl.GetDiagonal() << endl;
-            cout << "Vl=" << Vl << endl;
-            cout << "Yd=" << Yd << endl;
+            Logger->LogWarnV(1,"iTEBDStateImp::OrthogonalizeI Singular Vr Niter=%4d, bailing out",niter);
+            cout << "lambda=" << lambda.GetDiagonal() << endl;
+            return; //Bail out
+        }
+        if (isnan(Yd))
+        {
+            Logger->LogWarnV(1,"iTEBDStateImp::OrthogonalizeI Singular Vl Niter=%4d, bailing out",niter);
+            cout << "lambda=" << lambda.GetDiagonal() << endl;
+            return; //Bail out
         }
         //
         //  Transform lambda and SVD
