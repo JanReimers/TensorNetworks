@@ -4842,7 +4842,7 @@ in addition the operators on neigbouring sites are related by recursion
 
 \end_inset
 
-So how do we get into left canonicla form? MPOs have a similar guage freedom
+So how do we get into left canonical form? MPOs have a similar guage freedom
  as MPSs, so we need to find a guage transformation that brings the MPO
  into left canoncial form.
  Suppose 
@@ -4868,7 +4868,7 @@ noprefix "false"
 
 \end_inset
 
- then we can group the indices and reshapve 
+ then we can group the indices and reshape 
 \begin_inset Formula $V$
 \end_inset
 
@@ -4920,7 +4920,8 @@ QR\left(\hat{W}\right)=\hat{Q}R=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}
 
 \end_inset
 
-In this context, block respecting just means ignoe the last column and row.
+In this context, block respecting just means ignore the last column and
+ row for the QR decomposition.
  Now one can sweep throught the lattice
 \begin_inset Formula 
 \[
@@ -5049,7 +5050,7 @@ which gives us
 \end_inset
 
  and maintain canonical form, and similarly we can absorb 
-\begin_inset Formula $V^{\dagger}$
+\begin_inset Formula $sV^{\dagger}$
 \end_inset
 
  and 
@@ -5057,7 +5058,7 @@ which gives us
 \end_inset
 
  to the right 
-\begin_inset Formula $\hat{W}_{R}^{\prime}=V^{\dagger}R^{\prime}\hat{W}_{R}$
+\begin_inset Formula $\hat{W}_{R}^{\prime}=sV^{\dagger}R^{\prime}\hat{W}_{R}$
 \end_inset
 
 .
@@ -5074,17 +5075,6 @@ which gives us
 \end_inset
 
 .
-\end_layout
-
-\begin_layout Standard
-This algorithm fails to explain what happens to the diagonal matrix 
-\begin_inset Formula $s$
-\end_inset
-
-?! For a conventional MPS compression left sweep it get absorbed to right,
- leaving site to the right un-normalized or non-canonical, but that's ok
- as it get processed next.
- 
 \end_layout
 
 \begin_layout Standard
@@ -5429,10 +5419,6 @@ Now we can recover
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 
 \end_layout
 
@@ -7091,7 +7077,7 @@ if
 \begin_inset Formula $\tilde{\lambda}^{B}$
 \end_inset
 
- then is easy to extract 
+ is diagonal then it is easy to extract 
 \begin_inset Formula $\tilde{\Gamma}^{n_{a}}$
 \end_inset
 
@@ -7156,8 +7142,8 @@ Apply iMPO operator
 \end_layout
 
 \begin_layout Standard
-An MPO operator has has now external virtual legs.
- In other words the internal dimensions 
+An MPO operator no external virtual legs.
+ In other words the internal dimension 
 \begin_inset Formula $D_{w}$
 \end_inset
 
