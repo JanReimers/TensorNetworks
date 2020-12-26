@@ -52,10 +52,11 @@ void Bond::NewBondDimension(int D)
     assert(itsD==itsSingularValues.size());
     if (D>itsD)
     { //Grow
+        double fill=Min(itsSingularValues)/10.0;
         itsSingularValues.SetLimits(D,true);
 
         for (int i=itsD+1;i<=D;i++)
-            itsSingularValues(i)=0.0;
+            itsSingularValues(i)=fill;
         itsD=D;
         itsRank=D;
     }
