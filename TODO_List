@@ -1,11 +1,45 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
+Next steps:
+    -Try coding up iTEBD using iTensor library
+        -Start with one site TI model
+        -Do we get the same issues?
+    -Sort out iMPOS
+        -Study Parker
+            Local Matrix Product Operators: Canonical Form, Compression, & Control Theory
+            Efficient simulation of moire materials using the density matrix renormalization group appendix
+        -Create iMPOs directly, get rid of the convert method.
+        -Code up  MPO compression as per Parker
+        -Code up iMPO compression as per Parker.
+    -Understand trotter gates better
+        -schachenmayer_diploma_thesis
+        -Higher-order methods for simulations on quantum computers
+    -Recursion expectation
+        -Look at Infinite boundary conditions for MPS calculations
+    -Code up environment recycling
+        Start with transverse Ising model as that only needs one site.
+        Complicated enough for one site unit cell, see notes.
+        Strategy for two sites is probably to make a two site gate.
+    -UI work
+        1) Get python interfaces working again
+        2) Run in JupyterLab notebook
+        3) Get a matplotlib graph running
+        4) Plot something with Maya
+        5) Figure best way to get data from C++ to matplotling AND Maya
+        6) Can python Panel help
+    -Variational methods for iMPS
+        VUMPS: 2018-VUMPS-1Dand2D.pdf
+            -Add to notes
+            -Try coding
+
 -iTEBD
     issues:
         1) <E2> doesn't work. Maybe McCulloch's recursive expectation is needed.
         2) Trotter 2nd and fourth order iMPOs behave exactly like first order.
             Simple compression is possibly pushing important info to edges where it gets cutoff.
         3) All energies are in the ball park but too low compared to mp-toolkit. Maybe <E> is also wrong?
+        4) TestApplyiMPOIdentity always fails.  OrthonormalizeI bails because Vl is singular.  Gets 4/8 zero
+           eigen values.
     Countermeasures:
         Done: -Implement transverse Ising model with one site unit cell.
             Need to make one site gates to do iTime iterations to get GS.
@@ -18,9 +52,25 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
         Done: -Support QR decomp from Lapack.
         Done: -Try and hand code 2nd order trotter with gates.
 
+    -Tidy up or ra-factor iTEBD before moving on
+        Currently we can iterate with MPO, iMPO, gateList, or expH matrix.  We need a separately coded version
+        of iTEBDStateImp::FindiTimeGroundState.
+        What can we do with virtual dispatch to select the type of iterations?
+        - common imp inside FindiTimeGroundState
+            -Make a compressor
+            -Recenter to site 1
+            -OrthogonalizeI
+            -Init iter variables: Dmax, epsCompress, epsOrth, E1, dE, oerr1,oerr2,dA,dB,niter
+            -Loop over D
+            -Cache lambdaA/B
+            -Apply(X)
+        -Re-org TensorNetworksImp folder. SUbfolders:
+            Hamiltonians
+            iTEBD
+            MPS
 
 
-    -Create iMPOs directly, get rid of the convert method.
+
     Done:-Decide convergence based on SV spectrum (lambda A or B), instead of E.
     Done:-Support Apply(MPO*)
         -Use trotter 1st, 2nd and 4rth order MPO instead of expH.
@@ -57,10 +107,6 @@ sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
             Does the WF eventually become orthogonal?
 
         -MP toolkit uses Optimized 4th order 11-term decomposition.  What is that?
-    -Code up environment recycling
-        First we should create and Ham for the transverse ising model as that only needs one site.
-        Complicated enough for one site unit cell, see notes.
-        Strategy for two sites is unclear.
     -Apparently running 100 steps with dt=0 will also orthogonalize a state. Lets confirm.
     -Still getting noise about norm errors in Utests.
 
