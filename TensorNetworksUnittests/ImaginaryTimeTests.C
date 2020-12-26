@@ -1,4 +1,5 @@
 #include "Tests.H"
+#include "TensorNetworks/MPS.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/IterationSchedule.H"

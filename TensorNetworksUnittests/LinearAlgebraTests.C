@@ -1,5 +1,6 @@
 #include "Tests.H"
 
+#include "TensorNetworks/Epsilons.H"
 #include "TensorNetworksUnittests/LinearAlgebraTests.H"
 #include "NumericalMethods/PrimeSVDSolver.H"
 #include "NumericalMethods/PrimeEigenSolver.H"

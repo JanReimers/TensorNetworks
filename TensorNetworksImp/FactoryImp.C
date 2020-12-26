@@ -1,6 +1,6 @@
 #include "TensorNetworksImp/FactoryImp.H"
-#include "TensorNetworksImp/Hamiltonian_1D_NN_Heisenberg.H"
-#include "TensorNetworksImp/Hamiltonian_1D_NN_TransverseIsing.H"
+#include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.H"
+#include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_TransverseIsing.H"
 #include "TensorNetworksImp/SVCompressorImp.H"
 #include "TensorNetworksImp/SVMPOCompressor.H"
 

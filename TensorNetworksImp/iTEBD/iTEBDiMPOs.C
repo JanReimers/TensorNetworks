@@ -1,4 +1,4 @@
-#include "TensorNetworksImp/iTEBDiMPOs.H"
+#include "TensorNetworksImp/iTEBD/iTEBDiMPOs.H"
 #include "TensorNetworks/Hamiltonian.H"
 
 

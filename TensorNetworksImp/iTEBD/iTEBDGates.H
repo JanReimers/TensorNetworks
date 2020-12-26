@@ -1,7 +1,7 @@
 #ifndef ITEBDGATES_H
 #define ITEBDGATES_H
 
-#include "TensorNetworksImp/iTEBDStateImp.H"
+#include "TensorNetworksImp/iTEBD/iTEBDStateImp.H"
 
 namespace TensorNetworks
 {

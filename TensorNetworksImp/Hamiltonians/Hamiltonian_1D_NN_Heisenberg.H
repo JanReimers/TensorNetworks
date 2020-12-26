@@ -1,7 +1,7 @@
 #ifndef HAMILTONIAN_1D_NN_HEISENBERG_H
 #define HAMILTONIAN_1D_NN_HEISENBERG_H
 
-#include "TensorNetworksImp/HamiltonianImp.H"
+#include "TensorNetworksImp/Hamiltonians/HamiltonianImp.H"
 
 namespace TensorNetworks
 {

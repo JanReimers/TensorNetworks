@@ -1,5 +1,5 @@
-#include "Bond.H"
-#include "TensorNetworksImp/MPSSite.H"
+#include "TensorNetworksImp/MPS/Bond.H"
+#include "TensorNetworksImp/MPS/MPSSite.H"
 #include "oml/diagonalmatrix.h"
 #include <iostream>
 #include <iomanip>

@@ -2,7 +2,7 @@
 #define TESTS_H_INCLUDED
 
 #include "gtest/gtest.h"
-#include "TensorNetworksImp/MPSImp.H"
+#include "oml/imp/stream.h"
 #include <iostream>
 #include <string>
 
@@ -16,9 +16,5 @@ template <class Ob> std::string ToString(const Ob& result)
     res_stream << result;
     return res_stream.str();
 }
-
-void VerifyUnit(const TensorNetworks::MatrixCT& Norm, double eps);
-
-
 
 #endif // TESTS_H_INCLUDED

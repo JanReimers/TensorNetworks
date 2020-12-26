@@ -1,5 +1,5 @@
-#include "TensorNetworksImp/MPSSite.H"
-#include "TensorNetworksImp/Bond.H"
+#include "TensorNetworksImp/MPS/MPSSite.H"
+#include "TensorNetworksImp/MPS/Bond.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworks/Epsilons.H"

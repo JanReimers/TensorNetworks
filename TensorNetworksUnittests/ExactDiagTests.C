@@ -1,9 +1,12 @@
 #include "Tests.H"
+#include "TensorNetworks/Typedefs.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/FullState.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworksImp/StateIterator.H"
+#include "Containers/Matrix4.H"
+#include "oml/matrix.h"
 #include "oml/numeric.h"
 
 using TensorNetworks::MatrixRT;

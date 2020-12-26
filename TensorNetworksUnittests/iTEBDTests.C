@@ -6,6 +6,7 @@
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "Operators/MPO_TwoSite.H"
+#include "Containers/Matrix4.H"
 
 using std::setw;
 

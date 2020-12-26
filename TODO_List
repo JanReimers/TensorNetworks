@@ -53,18 +53,10 @@ Next steps:
         Done: -Try and hand code 2nd order trotter with gates.
 
     -Tidy up or ra-factor iTEBD before moving on
-        Currently we can iterate with MPO, iMPO, gateList, or expH matrix.  We need a separately coded version
-        of iTEBDStateImp::FindiTimeGroundState.
-        What can we do with virtual dispatch to select the type of iterations?
-        - common imp inside FindiTimeGroundState
-            -Make a compressor
-            -Recenter to site 1
-            -OrthogonalizeI
-            -Init iter variables: Dmax, epsCompress, epsOrth, E1, dE, oerr1,oerr2,dA,dB,niter
-            -Loop over D
-            -Cache lambdaA/B
-            -Apply(X)
-        -Re-org TensorNetworksImp folder. SUbfolders:
+        Done: Currently we can iterate with MPO, iMPO, gateList, or expH matrix.  We need a separately coded version
+              of iTEBDStateImp::FindiTimeGroundState.
+              What can we do with virtual dispatch to select the type of iterations?
+        Done -Re-org TensorNetworksImp folder. SUbfolders:
             Hamiltonians
             iTEBD
             MPS

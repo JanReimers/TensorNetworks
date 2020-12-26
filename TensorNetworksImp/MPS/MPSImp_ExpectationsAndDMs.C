@@ -1,4 +1,4 @@
-#include "TensorNetworksImp/MPSImp.H"
+#include "TensorNetworksImp/MPS/MPSImp.H"
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/TNSLogger.H"
 //#include <iostream>

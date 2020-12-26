@@ -3,7 +3,7 @@
 
 #include "TensorNetworks/MPS.H"
 #include "TensorNetworks/Epsilons.H"
-#include "TensorNetworksImp/MPSSite.H"
+#include "TensorNetworksImp/MPS/MPSSite.H"
 #include "Containers/ptr_vector.h"
 #include "Containers/rc_ptr.h"
 

@@ -1,7 +1,7 @@
 #ifndef ITEBDiMPOS_H
 #define ITEBDiMPOS_H
 
-#include "TensorNetworksImp/iTEBDStateImp.H"
+#include "TensorNetworksImp/iTEBD/iTEBDStateImp.H"
 
 namespace TensorNetworks
 {

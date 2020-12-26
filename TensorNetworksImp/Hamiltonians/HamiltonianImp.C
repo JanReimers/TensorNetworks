@@ -1,4 +1,4 @@
-#include "TensorNetworksImp/HamiltonianImp.H"
+#include "TensorNetworksImp/Hamiltonians/HamiltonianImp.H"
 #include "Operators/iMPOImp.H"
 #include "TensorNetworks/CheckSpin.H"
 #include <iostream>
@@ -74,11 +74,11 @@ Matrix4RT HamiltonianImp::BuildLocalMatrix() const
 }
 } //namespace
 
-#include "TensorNetworksImp/iTEBDGates.H"
-#include "TensorNetworksImp/iTEBDMPOs.H"
-#include "TensorNetworksImp/iTEBDiMPOs.H"
+#include "TensorNetworksImp/iTEBD/iTEBDGates.H"
+#include "TensorNetworksImp/iTEBD/iTEBDMPOs.H"
+#include "TensorNetworksImp/iTEBD/iTEBDiMPOs.H"
 #include "TensorNetworksImp/FullStateImp.H"
-#include "TensorNetworksImp/MPSImp.H"
+#include "TensorNetworksImp/MPS/MPSImp.H"
 #include "Operators/MPO_SpatialTrotter.H"
 
 namespace TensorNetworks

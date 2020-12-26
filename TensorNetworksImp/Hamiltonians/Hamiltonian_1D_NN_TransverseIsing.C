@@ -1,4 +1,4 @@
-#include "TensorNetworksImp/Hamiltonian_1D_NN_TransverseIsing.H"
+#include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_TransverseIsing.H"
 #include "Operators/iMPOImp.H"
 #include "TensorNetworks/CheckSpin.H"
 #include <iostream>

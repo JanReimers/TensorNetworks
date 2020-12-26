@@ -1,4 +1,4 @@
-#include "TensorNetworksImp/iTEBDStateImp.H"
+#include "TensorNetworksImp/iTEBD/iTEBDStateImp.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/MPO.H"
@@ -8,7 +8,7 @@
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/TNSLogger.H"
 
-#include "TensorNetworksImp/Bond.H"
+#include "TensorNetworksImp/MPS/Bond.H"
 
 #include "NumericalMethods/ArpackEigenSolver.H"
 #include "NumericalMethods/PrimeEigenSolver.H"

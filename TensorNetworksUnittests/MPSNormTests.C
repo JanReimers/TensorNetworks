@@ -1,6 +1,6 @@
 #include "Tests.H"
 
-#include "TensorNetworksImp/MPSImp.H"
+#include "TensorNetworksImp/MPS/MPSImp.H"
 #include "TensorNetworks/Epsilons.H"
 
 //#include "oml/stream.h"

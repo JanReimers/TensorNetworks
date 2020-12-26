@@ -3,7 +3,7 @@
 
 #include "TensorNetworks/iTEBDState.H"
 #include "TensorNetworks/Typedefs.H"
-#include "TensorNetworksImp/MPSImp.H"
+#include "TensorNetworksImp/MPS/MPSImp.H"
 #include "oml/diagonalmatrix.h"
 
 namespace TensorNetworks

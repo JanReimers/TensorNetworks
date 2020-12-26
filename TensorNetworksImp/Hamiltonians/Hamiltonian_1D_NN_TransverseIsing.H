@@ -1,7 +1,7 @@
 #ifndef HAMILTONIAN_1D_NN_TRANSVERSE_ISING_H
 #define HAMILTONIAN_1D_NN_TRANSVERSE_ISING_H
 
-#include "TensorNetworksImp/HamiltonianImp.H"
+#include "TensorNetworksImp/Hamiltonians/HamiltonianImp.H"
 
 namespace TensorNetworks
 {

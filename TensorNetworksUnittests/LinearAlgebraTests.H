@@ -8,6 +8,7 @@
 #include "NumericalMethods/LapackEigenSolver.H"
 #include "NumericalMethods/QRSolver.H"
 #include "oml/random.h"
+#include "oml/matrix.h"
 #include "oml/diagonalmatrix.h"
 #include "oml/fakedouble.h"
 #include <iostream>

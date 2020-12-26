@@ -1,4 +1,4 @@
-#include "TensorNetworksImp/MPSImp.H"
+#include "TensorNetworksImp/MPS/MPSImp.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/TNSLogger.H"
 
