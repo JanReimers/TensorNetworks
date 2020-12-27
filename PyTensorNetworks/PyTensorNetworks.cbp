@@ -34,15 +34,15 @@
 		</Compiler>
 		<ExtraCommands>
 			<Add after="python3 configure.py;make -j4" />
-			<Add after="pkexec  make -C $(HOME)/CDT2/TensorNetworks/PyTensorNetworks install" />
+			<Add after="pkexec  make -C $(HOME)/Code/TensorNetworks/PyTensorNetworks install" />
 		</ExtraCommands>
 		<Unit filename="PyTensorNetworks.sip" />
 		<Unit filename="StdString.sip" />
 		<Unit filename="StdVector.sip" />
+		<Unit filename="Test.py">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="configure.py" />
-		<Extensions>
-			<code_completion />
-			<debugger />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
