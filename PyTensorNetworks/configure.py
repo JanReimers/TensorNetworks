@@ -35,7 +35,7 @@ makefile.extra_include_dirs=["../" ,"../oml/include/","/usr/include/python3.7m/"
 #  This may be important because its easy to wxWidget .so's sprinkled in various places in a linux dist.
 #
 #makefile.extra_lib_dirs=["../../Debug","/usr/local/lib/python3.7/dist-packages/wx"]
-makefile.extra_lib_dirs=["../Debug"]
+makefile.extra_lib_dirs=["../Release"]
 #makefile.extra_lflags=["-pthread"]
 # Add the library we are wrapping.  The name doesn't include any platform
 # specific prefixes or extensions (e.g. the "lib" prefix on UNIX, or the

@@ -9,6 +9,7 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/MPS.H"
+#include "TensorNetworks/FullState.H"
 #include "TensorNetworks/Epsilons.H"
 #include "TensorNetworks/TNSLogger.H"
 #include "TensorNetworksImp/SPDLogger.H"
@@ -75,7 +76,7 @@ struct IterationScheduleLine
 //    IterationScheduleLine(int maxiter,int Dmax,int DeltaD,double dt,const Epsilons&);
 //    IterationScheduleLine(int maxiter,int Dmax,double dt,TrotterOrder,const Epsilons&);
 //    IterationScheduleLine(int maxiter,int Dmax,int DeltaD,double dt,TrotterOrder,const Epsilons&);
-//    IterationScheduleLine(int maxiter,int Dmax,int DeltaD,int maxOptIter,double dt,TrotterOrder,const Epsilons&);
+    IterationScheduleLine(int maxiter,int Dmax,int DeltaD,int maxOptIter,double dt,TrotterOrder,const Epsilons&);
 
     int      itsMaxGSSweepIterations;  // Primary # of sweeps for variational GS search or i-time evolution
     int      itsMaxOptimizeIterations; // For post SVD compress optimization iterations
@@ -141,6 +142,22 @@ public:
 //    virtual void Report(std::ostream&) const=0;
 };
 
+class FullState /Abstract/
+{
+    public:
+        FullState();
+        virtual ~FullState();
+
+        virtual int      GetSize     () const=0; //d^L
+        virtual double   GetE        () const=0; //GS Eigen energy from power iterations
+        // Iteracte |Psi'>=H*|Psi> until convergence to a ground state
+        virtual double   PowerIterate   (const IterationScheduleLine&,const Hamiltonian&,bool quite=true)=0;
+        // Use proper Lanczos to find the ground state
+        virtual double   FindGroundState(const IterationScheduleLine&,const Hamiltonian&,bool quite=true)=0;
+
+};
+
+
 class Hamiltonian : public TensorNetworks::MPO /Abstract/
 {
     public:
@@ -149,6 +166,11 @@ class Hamiltonian : public TensorNetworks::MPO /Abstract/
         virtual int GetL() const=0;
         virtual int Getd() const=0;
         virtual MPS* CreateMPS(int D,double normEps=1e-12,double epsSV=1e-12) const=0/Factory/;
+        // Create an exact (full) wave function abject suitable for this Hamiltonian
+        virtual FullState*  CreateFullState () const=0/Factory/;
+
+        virtual  MPO*       CreateH2Operator  () const;
+
 };
 
 };

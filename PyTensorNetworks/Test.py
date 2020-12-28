@@ -8,5 +8,6 @@ psi.InitializeWith(TN.Random);
 eps=TN.Epsilons();
 isched=TN.IterationSchedule();
 isched.Insert(TN.IterationScheduleLine(100,4,eps))
+isched.Insert(TN.IterationScheduleLine(100,16,eps))
 psi.FindVariationalGroundState(H,isched)
 

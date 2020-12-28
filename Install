@@ -36,6 +36,9 @@ Non GUI
         make
         // NO install target!!  Need to point IDE at lib folder and include folder.
 
+Python
+    pip3 install pytest
+    sudo apt install python3-pytest
 
 GUI
     sudo apt install libgtk-3-dev
@@ -58,4 +61,6 @@ SIP
         download https://files.pythonhosted.org/packages/b9/8b/31267dd6d026a082faed35ec8d97522c0236f2e083bf15aff64d982215e1/wxPython-4.0.7.post2.tar.gz
         extract in home
         ln -s
+
+
 
