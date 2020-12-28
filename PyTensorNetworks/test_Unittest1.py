@@ -29,8 +29,8 @@ def test_MPS_VariationalGS(L,S,Dfinal,Eexpected,E2expected):
     epsNorm=1e-13;epsSV=1e-13
     epsE=1e-11
     Dstart=2;maxIter=100
-    logger=TN.SPDLogger(1)
     f=TN.Factory.GetFactory()
+    logger=f.MakeSPDLogger(1)
     H=f.Make1D_NN_HeisenbergHamiltonian(L,S,Jxy,Jz,Hz)
     psi=H.CreateMPS(Dstart,epsNorm,epsSV)
     psi.InitializeWith(TN.Random)
@@ -71,8 +71,8 @@ def test_FullWavefunctionGS(L,S,Eexpected):
     epsNorm=1e-13;epsSV=1e-13
     epsE=1e-11
     Dstart=2;maxIter=100
-    logger=TN.SPDLogger(1)
     f=TN.Factory.GetFactory()
+    logger=f.MakeSPDLogger(1)
     H=f.Make1D_NN_HeisenbergHamiltonian(L,S,Jxy,Jz,Hz)
     psi=H.CreateFullState()
 
@@ -130,8 +130,8 @@ def test_TEBD_GS(L,S,Dfinal,Eexpected,epsE,E2expected,TO):
     Jxy=1.0;Jz=1.0;Hz=0.0;
     epsNorm=1e-13;epsSV=1e-13
     Dstart=2;deltaD=1;maxIter=1000
-    logger=TN.SPDLogger(1)
     f=TN.Factory.GetFactory()
+    logger=f.MakeSPDLogger(1)
     H=f.Make1D_NN_HeisenbergHamiltonian(L,S,Jxy,Jz,Hz)
     psi=H.CreateMPS(Dstart,epsNorm,epsSV)
     psi.InitializeWith(TN.Random)

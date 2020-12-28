@@ -43,6 +43,7 @@
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="configure.py" />
+		<Unit filename="test_Unittest1.py" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

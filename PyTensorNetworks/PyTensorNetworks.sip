@@ -12,7 +12,6 @@
 #include "TensorNetworks/FullState.H"
 #include "TensorNetworks/Epsilons.H"
 #include "TensorNetworks/TNSLogger.H"
-#include "TensorNetworksImp/SPDLogger.H"
 %End
 
 
@@ -104,13 +103,6 @@ class TNSLogger /Abstract/
         virtual ~TNSLogger();
 };
 
-class SPDLogger : public TensorNetworks::TNSLogger
-{
-    public:
-        SPDLogger(int level);
-        virtual ~SPDLogger();
-};
-
 class MPO /Abstract/
 {};
 
@@ -186,6 +178,7 @@ namespace TensorNetworks
         static Factory* GetFactory();
 
         virtual Hamiltonian* Make1D_NN_HeisenbergHamiltonian(int L, double S, double Jxy,double Jz, double hz)=0 /Factory/;
+        virtual TNSLogger*   MakeSPDLogger(int level)=0 /Factory/;
     };
 
 };

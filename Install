@@ -36,8 +36,8 @@ Non GUI
         make
         // NO install target!!  Need to point IDE at lib folder and include folder.
 
-Python
-    pip3 install pytest
+Python:
+    pip3 install pytest pytest-xdist //xdist for running unit tests in parallel.
     sudo apt install python3-pytest
 
 GUI

@@ -84,3 +84,11 @@ PyTensorNetworks/sipPyTensorNetworksTensorNetworksSPDLogger.o
 PyTensorNetworks/sipPyTensorNetworksTensorNetworksTNSLogger.cpp
 
 PyTensorNetworks/sipPyTensorNetworksTensorNetworksTNSLogger.o
+
+PyTensorNetworks/sipPyTensorNetworksTensorNetworksFullState.cpp
+
+PyTensorNetworks/sipPyTensorNetworksTensorNetworksFullState.o
+
+PyTensorNetworks/PyTensorNetworks.exp
+
+*.pyc

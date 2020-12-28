@@ -17,6 +17,7 @@ public:
     virtual Hamiltonian*   Make1D_NN_TransverseIsingHamiltonian(int L, double S, double J, double hx)=0;
     virtual SVCompressorR* MakeMPOCompressor(int Dmax, double epsSV)=0;
     virtual SVCompressorC* MakeMPSCompressor(int Dmax, double epsSV)=0;
+    virtual TNSLogger*     MakeSPDLogger(int level)=0;
 };
 
 }; //namespace TensorNetworks

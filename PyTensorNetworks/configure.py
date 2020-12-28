@@ -17,7 +17,8 @@ config = sipconfig.Configuration()
 os.system(" ".join([config.sip_bin, "-c", ".", "-I/usr/include/python3.7m/","-b", build_file, "PyTensorNetworks.sip"]))
 
 # Create the Makefile.
-makefile = sipconfig.SIPModuleMakefile(config, build_file,warnings=None,debug=1)
+#makefile = sipconfig.SIPModuleMakefile(config, build_file,warnings=None,debug=1)
+makefile = sipconfig.SIPModuleMakefile(config, build_file,warnings=None)
 
 #
 #  Here is where we tell the build where to find sip.h and any other headers in wxPython-4.1 source tree

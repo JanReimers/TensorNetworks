@@ -3,6 +3,7 @@
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_TransverseIsing.H"
 #include "TensorNetworksImp/SVCompressorImp.H"
 #include "TensorNetworksImp/SVMPOCompressor.H"
+#include "TensorNetworksImp/SPDLogger.H"
 
 namespace TensorNetworks
 {
@@ -36,5 +37,9 @@ SVCompressorC* FactoryImp::MakeMPSCompressor(int Dmax, double epsSV)
     return new SVCompressorImpC(Dmax,epsSV);
 }
 
+TNSLogger* FactoryImp::MakeSPDLogger(int level)
+{
+    return new SPDLogger(level);
+}
 
 } //namespace
