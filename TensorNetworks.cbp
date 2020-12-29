@@ -238,6 +238,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/Namespace.H" />
+		<Unit filename="TensorNetworksImp/NullLogger.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/NullLogger.H" />
 		<Unit filename="TensorNetworksImp/SPDLogger.C">
 			<Option compilerVar="CC" />
 		</Unit>

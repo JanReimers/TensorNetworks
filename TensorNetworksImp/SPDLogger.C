@@ -1,15 +1,20 @@
-#include "SPDLogger.H"
-
+#include "TensorNetworksImp/SPDLogger.H"
+#include "TensorNetworksImp/NullLogger.H"
+#include "spdlog/spdlog.h"
+#include <iostream>
 
 namespace TensorNetworks
 {
-TNSLogger* Logger=nullptr;
 
 SPDLogger::SPDLogger(int level)
     : itsLevel(level)
 {
-    //Defulat logger is stdout
-    if (!Logger) Logger=this;
+    //Logger is null default the override.
+    if (!Logger  || dynamic_cast<NullLogger*>(Logger))
+    {
+        Logger=this;
+        std::cout << "Setting logger to SPD" << std::endl;
+    }
 }
 
 SPDLogger::~SPDLogger()

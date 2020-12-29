@@ -1,6 +1,6 @@
 import PyTensorNetworks as TN
-logger=TN.SPDLogger(1);
 f=TN.Factory.GetFactory();
+logger=f.MakeSPDLogger(1)
 H=f.Make1D_NN_HeisenbergHamiltonian(9,0.5,1.,1.,0.);
 psi=H.CreateMPS(4,1e-12,1e-12);
 psi.InitializeWith(TN.Random);
