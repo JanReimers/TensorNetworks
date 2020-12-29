@@ -75,7 +75,7 @@ Next steps:
     -Just pass epsEigen to full state, forget itsched.
     -FullState->FindGS seems to return zero instead of E.
     -Figure out hanging TEBD tests.
-    -TEBD  <E^2>-<E>^2 in log is wrong.
+    Fixed: -TEBD  <E^2>-<E>^2 in log is wrong.
     -TEBD and variational GS: converge on delta lambdas?
     Done: -Get spdlogger from Factor to we don't need to include the header.
 

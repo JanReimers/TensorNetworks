@@ -25,6 +25,7 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
     MPO* H2=H->CreateH2Operator();
     double E2=GetExpectation(H2);
     E2=E2-E1*E1;
+    E1/=itsL-1;
     delete H2;
     Logger->LogInfoV(0,"Finished iTime GS iterations D=%4d, <E>=%.9f, <E^2>-<E>^2=%.2e",GetMaxD(),E1,E2);
     return E2;
@@ -34,7 +35,7 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
 {
     assert(isl.itsDmax>0 || isl.itsEps.itsMPSCompressEpsilon>0);
 
-    double E1=GetExpectation(H)/(itsL-1);
+    double E1=GetExpectation(H);
 
     SVCompressorC* mps_compressor =Factory::GetFactory()->MakeMPSCompressor(isl.itsDmax,isl.itsEps.itsMPSCompressEpsilon);
     SVCompressorR* mpo_compressor =Factory::GetFactory()->MakeMPOCompressor(0          ,isl.itsEps.itsMPOCompressEpsilon);
@@ -62,7 +63,7 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
         //
         //  Check energy convergence
         //
-        double Enew=GetExpectation(H)/(itsL-1);
+        double Enew=GetExpectation(H);
         double dE=Enew-E1;
         E1=Enew;
         if (fabs(dE)<=isl.itsEps.itsDelatEnergy1Epsilon) break;

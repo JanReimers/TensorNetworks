@@ -280,17 +280,17 @@ TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotterL2)
 
     TensorNetworks::IterationSchedule is;
     eps.itsDelatEnergy1Epsilon=1e-3;
-    is.Insert({50,D,0,0.5,FirstOrder,eps});
+    is.Insert({50,D,1,0,0.5,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({500,D,0,0.2,FirstOrder,eps});
+    is.Insert({500,D,1,0,0.2,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({500,D,1,0.1,FirstOrder,eps});
+    is.Insert({500,D,1,1,0.1,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({500,D,2,0.05,FirstOrder,eps});
+    is.Insert({500,D,1,2,0.05,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-7;
-    is.Insert({500,D,3,0.02,FirstOrder,eps});
+    is.Insert({500,D,1,3,0.02,FirstOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({500,D,4,0.01,FirstOrder,eps});
+    is.Insert({500,D,1,4,0.01,FirstOrder,eps});
     //eps.itsDelatEnergy1Epsilon=3e-9;
     //is.Insert({500,D,5,0.005,FirstOrder,eps});
     //eps.itsDelatEnergy1Epsilon=1e-9;
@@ -322,16 +322,16 @@ TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotterL2)
     TensorNetworks::IterationSchedule is;
     eps.itsDelatEnergy1Epsilon=1e-5;
     eps.itsMPSCompressEpsilon=0.0; //Just Dmax for compression
-    is.Insert({50 ,D,0,0.5,SecondOrder,eps});
+    is.Insert({50 ,D,1,0,0.5,SecondOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({500,D,3,0.1,SecondOrder,eps});
+    is.Insert({500,D,1,3,0.1,SecondOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-10;
-    is.Insert({500,D,3,0.05,SecondOrder,eps});
-    is.Insert({500,D,3,0.02,SecondOrder,eps});
-    is.Insert({500,D,3,0.01,SecondOrder,eps});
-    is.Insert({500,D,5,0.005,SecondOrder,eps});
-    is.Insert({500,D,5,0.002,SecondOrder,eps});
-    is.Insert({500,D,5,0.001,SecondOrder,eps});
+    is.Insert({500,D,1,3,0.05,SecondOrder,eps});
+    is.Insert({500,D,1,3,0.02,SecondOrder,eps});
+    is.Insert({500,D,1,3,0.01,SecondOrder,eps});
+    is.Insert({500,D,1,5,0.005,SecondOrder,eps});
+    is.Insert({500,D,1,5,0.002,SecondOrder,eps});
+    is.Insert({500,D,1,5,0.001,SecondOrder,eps});
 
  //   cout << is;
 
@@ -360,15 +360,15 @@ TEST_F(ImaginaryTimeTests,TestITimeFourthOrderTrotterL2)
 
     TensorNetworks::IterationSchedule is;
     eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({50,D,0,0.5,FourthOrder,eps});
+    is.Insert({50,D,1,0,0.5,FourthOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({500,D,1,0.2,FourthOrder,eps});
+    is.Insert({500,D,1,1,0.2,FourthOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-9;
-    is.Insert({500,D,3,0.1,FourthOrder,eps});
+    is.Insert({500,D,1,3,0.1,FourthOrder,eps});
     eps.itsDelatEnergy1Epsilon=1e-11;
-    is.Insert({500,D,5,0.05,FourthOrder,eps});
+    is.Insert({500,D,1,5,0.05,FourthOrder,eps});
 //    is.Insert({500,D,5,0.02,FourthOrder,eps});
-    is.Insert({500,D,5,0.01,FourthOrder,eps});
+    is.Insert({500,D,1,5,0.01,FourthOrder,eps});
 //    is.Insert({500,D,5,0.005,FourthOrder,eps});
 //    is.Insert({500,D,5,0.002,FourthOrder,eps});
 //    is.Insert({500,D,5,0.001,FourthOrder,eps});
@@ -457,7 +457,7 @@ TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
 
     eps.itsDelatEnergy1Epsilon=1e-6;
     eps.itsMPOCompressEpsilon=1e-9;
-    eps.itsMPSCompressEpsilon=1e-7; //Just Eps for compression
+    eps.itsMPSCompressEpsilon=1e-8; //Just Eps for compression
     eps.itsDelatNormEpsilon=1e-10;
     is.Insert({500,Dcompress,1,5,0.1,SecondOrder,eps});
 
@@ -488,7 +488,7 @@ TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
     itsMPS->FindiTimeGroundState(itsH,is);
 
     double E2=itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(E2/(L-1),-0.4607585,1e-6);
+    EXPECT_NEAR(E2/(L-1),-0.4607783,1e-6);
 }
 #endif // DEBUG
 
