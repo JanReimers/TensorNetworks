@@ -72,14 +72,15 @@ Next steps:
     -Done: Lookup theory for iMPO and add to notes if needed.
     -Can we generalize GetExpectation to MPOs with arbitrary L?
     -Calculate fidelity
-    DOne: -Make a null logger if the user doesn't make one.
-    -Just pass epsEigen to full state, forget itsched.
-    -FullState->FindGS seems to return zero instead of E.
+    Done: -Make a null logger if the user doesn't make one.
+    Done: -Just pass epsEigen to full state, forget itsched.
+    Done: -FullState->FindGS seems to return zero instead of E.
     -Figure out hanging TEBD tests.
     Fixed: -TEBD  <E^2>-<E>^2 in log is wrong.
     -TEBD and variational GS: converge on delta lambdas?
     Done: -Get spdlogger from Factor to we don't need to include the header.
     -Handle Debug and Release modes for PyTensorNetworks.so
+    -Figure out how to handle std::ostream when using SIP to interface with python.
 
     -Refactor:
         Code duplication in SVCompressorImp.C

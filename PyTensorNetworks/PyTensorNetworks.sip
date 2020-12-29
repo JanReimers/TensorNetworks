@@ -143,9 +143,9 @@ class FullState /Abstract/
         virtual int      GetSize     () const=0; //d^L
         virtual double   GetE        () const=0; //GS Eigen energy from power iterations
         // Iteracte |Psi'>=H*|Psi> until convergence to a ground state
-        virtual double   PowerIterate   (const IterationScheduleLine&,const Hamiltonian&,bool quite=true)=0;
+        virtual double   PowerIterate   (const Hamiltonian&,double epsE,double epsPsi,int maxIter=1000)=0;
         // Use proper Lanczos to find the ground state
-        virtual double   FindGroundState(const IterationScheduleLine&,const Hamiltonian&,bool quite=true)=0;
+        virtual double   FindGroundState(const Hamiltonian&,double epsE)=0;
 
 };
 

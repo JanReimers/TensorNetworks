@@ -25,8 +25,8 @@ template <class T> class FullStateImp
         virtual long int GetSize     () const {return itsN;}
         virtual double   GetE        () const {return itsE;}
 
-        virtual double   PowerIterate   (const IterationScheduleLine&,const Hamiltonian&,bool quite=true);
-        virtual double   FindGroundState(const IterationScheduleLine&,const Hamiltonian&,bool quite=true);
+        virtual double   PowerIterate   (const Hamiltonian&,double epsE,double epsPsi,int maxIter=1000);
+        virtual double   FindGroundState(const Hamiltonian&,double epsE);
         virtual std::ostream& Dump(std::ostream&) const;
     protected:
 //

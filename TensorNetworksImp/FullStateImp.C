@@ -1,8 +1,8 @@
 #include "FullStateImp.H"
 #include "TensorNetworks/Hamiltonian.H"
-#include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworksImp/StateIterator.H"
 #include "TensorNetworks/CheckSpin.H"
+#include "TensorNetworks/TNSLogger.H"
 #include "NumericalMethods/PrimeEigenSolver.H"
 #include "Containers/SparseMatrix.H"
 #include "Containers/Matrix4.H"
@@ -153,35 +153,35 @@ template <class T> void FullStateImp<T>::Normalize(Vector<T>& amplitudes)
 
 
 
-template <class T> double FullStateImp<T>::PowerIterate(const IterationScheduleLine& sched,const Hamiltonian& H,bool quite)
+template <class T> double FullStateImp<T>::
+    PowerIterate(const Hamiltonian& H,double epsE,double epsPsi,int maxIter)
 {
     Normalize(itsAmplitudes);
     double E=0;
     itsHlocal=H.BuildLocalMatrix();
     assert(itsHlocal.Flatten().GetNumRows()==itsd*itsd);
     assert(itsHlocal.Flatten().GetNumCols()==itsd*itsd);
-//    os.setf(std::ios::floatfield,std::ios::fixed);
-    if (!quite)
-    {
-        cout.unsetf(std::ios_base::floatfield);
-        cout << "Iter#  dE    deltaPsi" << endl;
-        cout << "---------------------" << endl;
-    }
 
-    for (int n=1; n<sched.itsMaxGSSweepIterations; n++)
+    Logger->LogInfoV(2,"Initiate full wave function power GS iterations, N=%10d, epsE=%.1e, epsPsi=%.1e, maxIter=%8d "
+                     ,GetSize(),epsE,epsPsi,maxIter);
+    Logger->LogInfo(2,"      Iter#     dE        deltaPsi");
+
+    double deltaPsi=0.0, dE=0.0;
+    int niter=1;
+    for (; niter<maxIter; niter++)
     {
-        double deltaPsi=OperateOverLattice();
-        double dE=fabs(itsE-E);
+        deltaPsi=OperateOverLattice();
+        dE=fabs(itsE-E);
         E=itsE;
-        if (fabs(deltaPsi)<sched.itsEps.itsEigenSolverEpsilon
-                &&            dE<sched.itsEps.itsDelatEnergy1Epsilon) break;
-        if (!quite)
-            cout << n << " " << dE << " " << deltaPsi << endl;
+        Logger->LogInfoV(2,"%8d  %.4e  %.4e",niter,dE,deltaPsi);
+        if (fabs(deltaPsi)<epsPsi && dE<epsE) break;
     }
-    return E;
+    Logger->LogInfoV(1,"Full wave function power GS iterations, N=%10d, E=%.9f, niter/maxIter= %8d/%8d dE=%.1e, dPsi=%.1e"
+                     ,GetSize(),itsE,niter,maxIter,dE,deltaPsi,epsPsi,maxIter);
+    return itsE;
 }
 
-template <class T> double FullStateImp<T>::FindGroundState(const IterationScheduleLine& sched,const Hamiltonian& H,bool quite)
+template <class T> double FullStateImp<T>::FindGroundState(const Hamiltonian& H,double epsE)
 {
     itsHlocal=H.BuildLocalMatrix();
     assert(itsHlocal.Flatten().GetNumRows()==itsd*itsd);
@@ -189,7 +189,7 @@ template <class T> double FullStateImp<T>::FindGroundState(const IterationSchedu
     double E=0;
     int Neig=1;
     PrimeEigenSolver<T> solver;
-    solver.Solve(this,sched.itsEps.itsEigenSolverEpsilon,Neig);
+    solver.Solve(this,epsE,Neig);
     itsE=solver.GetEigenValues()(1);
     VectorRT amp=solver.GetEigenVector(1);
     for (int i=1; i<=itsN; i++)
