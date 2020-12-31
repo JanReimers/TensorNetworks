@@ -184,6 +184,12 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
     return W;
 }
 
+iMPO* HamiltonianImp::CreateiMPO() const
+{
+    iMPO* W=new iMPOImp(GetL(),itsS,this);
+    return W;
+}
+
 iMPO* HamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) const
 {
     iMPO* W(nullptr);

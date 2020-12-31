@@ -504,7 +504,11 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
             const MatrixRT& Wmn=so->GetW(ma,na);
             for (int w1=1;w1<=Dw-1;w1++)
                 for (int w2=2;w2<=Dw;w2++)
-                    assert(Wmn(w1,w2)==0.0);
+                    if (Wmn(w1,w2)!=0.0)
+                    {
+                        cout << "W(" << ma << "," << na << ")=" << Wmn << endl;
+                        assert(Wmn(w1,w2)==0.0);
+                    }
         }
 #endif
 //

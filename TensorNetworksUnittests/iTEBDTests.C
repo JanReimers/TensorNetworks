@@ -894,20 +894,21 @@ TEST_F(iTEBDTests,TestiMPOExpectation)
     int UnitCell=2,Dstart=2,D=4,deltaD=1,maxIter=1000;
     double S=0.5,epsSVD=0.0;
     Setup(UnitCell,S,Dstart,epsSVD,TensorNetworks::Gates);
+
+
     itsState->InitializeWith(TensorNetworks::Random);
     TensorNetworks::IterationSchedule is=MakeSchedule(maxIter,D,TensorNetworks::SecondOrder,deltaD);
     itsState->FindiTimeGroundState(itsH,is);
 
-    TensorNetworks::Hamiltonian* H4=itsFactory->Make1D_NN_HeisenbergHamiltonian(UnitCell+2,S,1.0,1.0,0.0);
-//    H4->Report(cout);
-    H4->ConvertToiMPO(UnitCell);
-//    H4->Report(cout);
-    TensorNetworks::iMPO* iH=new TensorNetworks::iMPOImp(UnitCell,S,TensorNetworks::MPOImp::Identity);
-    iH->Combine(H4);
-//    iH->Report(cout);
+    TensorNetworks::iMPO* iH=itsH->CreateiMPO();
+    iH->Report(cout);
 
     double E=itsState->GetExpectation(itsH);
     double Er=itsState->GetExpectation(iH);
     EXPECT_NEAR(Er,E,1e-10);
+    TensorNetworks::iMPO* iH2=itsH->CreateiH2Operator();
+    iH2->Report(cout);
+//    double Er2=itsState->GetExpectation(iH2); //Fail because shape of W is no longer lower triangular
+//    cout << "E, Er, Er2=" << E << " " << Er << " " << Er2 << endl;
 }
 

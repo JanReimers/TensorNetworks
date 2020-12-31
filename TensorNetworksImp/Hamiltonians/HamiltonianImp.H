@@ -33,6 +33,7 @@ public:
     virtual iMPO*       CreateiUnitOperator() const;
     virtual  MPO*       CreateOperator     (double dt, TrotterOrder) const;
     virtual iMPO*       CreateiMPO         (double dt, TrotterOrder, double epsMPO) const;
+    virtual iMPO*       CreateiMPO         () const; //iMPO rep of Hamiltonian
     virtual Matrix4RT   BuildLocalMatrix   () const;
     virtual FullState*  CreateFullState    () const;
 

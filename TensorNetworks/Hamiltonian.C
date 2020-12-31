@@ -1,5 +1,6 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/MPO.H"
+#include "TensorNetworks/iMPO.H"
 #include "Containers/Matrix4.H"
 #include "oml/numeric.h"
 
@@ -13,6 +14,16 @@ MPO* Hamiltonian::CreateH2Operator  () const
     H2->Combine(this);
     H2->Compress(0,1e-13);
     return H2;
+}
+
+iMPO* Hamiltonian::CreateiH2Operator  () const
+{
+    iMPO* iH2=CreateiUnitOperator();
+    iMPO* iH=CreateiMPO(); //Make a version of H with no Dw=1 boundary sites.
+    iH2->Combine(iH);
+    iH2->Combine(iH);
+    iH2->Compress(0,1e-13);
+    return iH2;
 }
 
 Matrix4RT Hamiltonian::ExponentH(double dt,const Matrix4RT& H12)

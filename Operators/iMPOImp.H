@@ -13,6 +13,8 @@ class iMPOImp : public virtual iMPO
     public:
         iMPOImp(int L, double S,MPOImp::LoadWith);
         iMPOImp(int L, double S,const TensorT& W);
+        iMPOImp(int L, double S,const OperatorClient* W);
+
         virtual ~iMPOImp();
 
         virtual iMPO* MakeUnitcelliMPO(int unitcell) const; //Contract horizontally to make iMPO for the whole unit cell.
@@ -27,7 +29,7 @@ class iMPOImp : public virtual iMPO
             return MPOImp::GetSiteOperator(isite);
         }
 
-//        virtual double Compress(const SVCompressorR*);
+        virtual double Compress(const SVCompressorR*);
     private:
          virtual void LinkSites();
 

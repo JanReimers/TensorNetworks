@@ -16,12 +16,26 @@ namespace TensorNetworks
 iMPOImp::iMPOImp(int L, double S,MPOImp::LoadWith loadWith)
     : MPOImp(L,S,loadWith)
 {
-
+    LinkSites();
 }
 
 iMPOImp::iMPOImp(int L, double S,const TensorT& W)
     : MPOImp(L,S,W)
 {
+    LinkSites();
+}
+
+iMPOImp::iMPOImp(int L, double S,const OperatorClient* W)
+    : MPOImp(L,S,MPOImp::LoadLater)
+{
+    int d=2*GetS()+1;
+    //
+    //  Load up the sites with copies of the W operator
+    //  For and iMPO the sites at the edge of the unit cell are considered Bulk
+    //
+    for (int ia=1; ia<=itsL; ia++)
+        Insert(new SiteOperatorImp(d,PBulk,W));
+
     LinkSites();
 }
 
@@ -112,28 +126,28 @@ iMPO* iMPOImp::MakeUnitcelliMPO(int unitcell) const
 }
 
 
-//
-//double iMPOImp::Compress(const SVCompressorR* compressor)
-//{
-//    int L=GetL();
-//    Vector<int> oldDws(L),newDws(L);
-//    double truncationError=0.0;
-//    for (int ia=1;ia<=L;ia++)
-//    {
-//        oldDws(ia)=GetSiteOperator(ia)->GetDw12().Dw2;
-//        GetSiteOperator(ia)->Compress(DLeft ,compressor);
-//    }
-//    oldDws(L)=0;
-////    for (int ia=L;ia>=1;ia--)
-////    {
-////        GetSiteOperator(ia)->Compress(DRight,compressor);
-////        newDws(ia)=GetSiteOperator(ia)->GetDw12().Dw1;
-////    }
-//    newDws(1)=0;
-//    double percent=100-(100.0*Sum(newDws))/static_cast<double>(Sum(oldDws));
-////    cout << "% compression=" << std::fixed << std::setprecision(2) << percent << endl;
-//    return percent;
-//}
+
+double iMPOImp::Compress(const SVCompressorR* compressor)
+{
+    int L=GetL();
+    Vector<int> oldDws(L),newDws(L);
+    double truncationError=0.0;
+    for (int ia=1;ia<=L;ia++)
+    {
+        oldDws(ia)=GetSiteOperator(ia)->GetDw12().Dw2;
+        GetSiteOperator(ia)->Compress(DLeft ,compressor);
+    }
+    oldDws(L)=0;
+    for (int ia=L;ia>=1;ia--)
+    {
+        GetSiteOperator(ia)->Compress(DRight,compressor);
+        newDws(ia)=GetSiteOperator(ia)->GetDw12().Dw1;
+    }
+    newDws(1)=0;
+    double percent=100-(100.0*Sum(newDws))/static_cast<double>(Sum(oldDws));
+    cout << "% compression=" << std::fixed << std::setprecision(2) << percent << endl;
+    return percent;
+}
 
 
 } //namespace

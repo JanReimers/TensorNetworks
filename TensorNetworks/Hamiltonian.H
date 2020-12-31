@@ -31,6 +31,8 @@ class Hamiltonian : public virtual MPO
         //  Create and exp(-dt*H) time evolution operator of a certain order in tau.
         virtual  MPO*       CreateOperator(double dt, TrotterOrder) const=0;
         virtual iMPO*       CreateiMPO    (double dt, TrotterOrder, double epsMPO) const=0;
+        virtual iMPO*       CreateiMPO    () const=0; //iMPO rep of Hamiltonian
+        virtual iMPO*       CreateiH2Operator() const; //iMPO rep of Hamiltonian^2 for <E^2> calculations
         // Get a 2 site local matrix of order p^2 x p^2
         virtual Matrix4RT   BuildLocalMatrix() const=0;
 
