@@ -82,7 +82,6 @@ IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,int deltaD,dou
     , itsEps(eps)
 {
     assert(itsMaxGSSweepIterations>0);
-    assert(itsdt>0);
     assert(o!=None);
 }
 

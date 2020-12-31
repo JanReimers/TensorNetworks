@@ -1,7 +1,7 @@
 sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
 
 Next steps:
-    -Try wave function optimization for improve iTEBD GS energies.  Get then closer to mp-toolkit results?
+    -Try wave function optimization for improve iTEBD GS energies.  Get them closer to mp-toolkit results?
     -Try coding up iTEBD using iTensor library
         -Start with one site TI model
         -Do we get the same issues?
@@ -12,17 +12,20 @@ Next steps:
         -Create iMPOs directly, get rid of the convert method.
         -Code up  MPO compression as per Parker
         -Code up iMPO compression as per Parker.
+        -<E2> is not working, MPO get compressed to 1x4 - 4x1.  We need to learn how contract
+         a Dw x Dw - Dw x Dw open MPO with eigen vectors to get <E2>.
+        -We need to be able to add (rather than combine) MPOs to do:
+            S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
     -Understand trotter gates better
         -schachenmayer_diploma_thesis
         -Higher-order methods for simulations on quantum computers
-    -Recursion expectation
-        -Look at Infinite boundary conditions for MPS calculations
+        -MP toolkit uses Optimized 4th order 11-term decomposition.  What is that?
     -Code up environment recycling
         Start with transverse Ising model as that only needs one site.
         Complicated enough for one site unit cell, see notes.
         Strategy for two sites is probably to make a two site gate.
     -UI work
-        1) Get python interfaces working again
+        Done: 1) Get python interfaces working again
         2) Run in JupyterLab notebook
         3) Get a matplotlib graph running
         4) Plot something with Maya
@@ -41,44 +44,11 @@ Next steps:
         3) All energies are in the ball park but too low compared to mp-toolkit. Maybe <E> is also wrong?
         4) TestApplyiMPOIdentity always fails.  OrthonormalizeI bails because Vl is singular.  Gets 4/8 zero
            eigen values.
-    Countermeasures:
-        Done: -Implement transverse Ising model with one site unit cell.
-            Need to make one site gates to do iTime iterations to get GS.
-        Done: -Implement McCulloch's recursion for expectations, for one site unit cell
-        Done: -Implement McCulloch's recursion for expectations, for two unit cell
-            Done:-Contract MPO horizontally to get a unit cell W which is still DwxDw on internal indices
-             but d^n x d^n on physic indices
-        -McCulloch's recursion for expectations gives the wrong number. Why?
-        -Implement proper compression as per Parker.  BIG job, needs QR decomp
-        Done: -Support QR decomp from Lapack.
-        Done: -Try and hand code 2nd order trotter with gates.
-
-    -Tidy up or ra-factor iTEBD before moving on
-        Done: Currently we can iterate with MPO, iMPO, gateList, or expH matrix.  We need a separately coded version
-              of iTEBDStateImp::FindiTimeGroundState.
-              What can we do with virtual dispatch to select the type of iterations?
-        Done -Re-org TensorNetworksImp folder. SUbfolders:
-            Hamiltonians
-            iTEBD
-            MPS
-
-
-
-    Done:-Decide convergence based on SV spectrum (lambda A or B), instead of E.
-    Done:-Support Apply(MPO*)
-        -Use trotter 1st, 2nd and 4rth order MPO instead of expH.
-        Do we run into the same problem as with <E2>?
-            Yes !!!!  We need an iMPO class
-    -Done: Lookup theory for iMPO and add to notes if needed.
     -Can we generalize GetExpectation to MPOs with arbitrary L?
     -Calculate fidelity
-    Done: -Make a null logger if the user doesn't make one.
-    Done: -Just pass epsEigen to full state, forget itsched.
-    Done: -FullState->FindGS seems to return zero instead of E.
+
     -Figure out hanging TEBD tests.
-    Fixed: -TEBD  <E^2>-<E>^2 in log is wrong.
     -TEBD and variational GS: converge on delta lambdas?
-    Done: -Get spdlogger from Factor to we don't need to include the header.
     -Handle Debug and Release modes for PyTensorNetworks.so
     -Figure out how to handle std::ostream when using SIP to interface with python.
 
@@ -99,52 +69,24 @@ Next steps:
             GetOverlap(Psi), cross overlap
 
     -FOr efficiency check Omn or expH for zero, before contracting it.
-    Done: -Use the name CompressionError consistently.
-        THis is usually called TruncationError
-    -Should epsOrth drop and espE and dt drop?
-    -<E2> is not working, MPO get compressed to 1x4 - 4x1.  We need to learn how contract
-     a Dw x Dw - Dw x Dw open MPO with eigen vectors to get <E2>.
-    -Convergence
-        -Try ApplyOrtho with only one iteration.
-            Does the WF eventually become orthogonal?
+        CompressionError is usually called TruncationError
 
-        -MP toolkit uses Optimized 4th order 11-term decomposition.  What is that?
-    -Apparently running 100 steps with dt=0 will also orthogonalize a state. Lets confirm.
     -Still getting noise about norm errors in Utests.
 
--Refactor: MPO_SpatialTrotter takes Hlocal, should work from H or expH.  Right it duplicates code
+-Refactor: MPO_SpatialTrotter takes Hlocal, should work from H or expH.  Right now it duplicates code
     for calculating expH.
--Refactor: All find ground state routines should move to abstract base class, and work through public
-    interface.
 -Logging: only LogInfoV does indenting
 -Save wave functions to disk.
--We need to be able to add (rather than combine) MPOs to do:
-    S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
 -Investigate sweep directions for normalization
 -Improve level two logging for variational ground states
 -Prime eigen solver -44 error.
--Done: Profiling
-	TestITimeSecondOrderTrotter_EpsLimitedCompression
-	oml_CSVDecomp used 29.8% 2.97 sec
-
-- Done: Try CSVD from LaPack and Primme
-    -Lapack takes SVD out of the top 25 fr CPU
-    -Some contractions MPSSite::IterateLeft_F, IterateLeft_R, ContractLRM
-        need optimization
-    SVDtransfer takes 28% of the cpu time
 - LinAlg solvers
-    Done: Make abstract interfaces for SVD and eigen
-    Done: Do left and right Evs for non sym
-    Done: Add Lapack non sym routines
     Options for largest or smallest evs
     Why is primme so slow
     Why is primme not converging well for non-sym matrices
     Make more general Normal matrices for prime, U*e*U_dagger where e is diagonal complex
         This might solve primmes not converging issues.
 - Try to use the factory more in all testing classes
-- Done: Valgrind issues:
-    Who owns Loggers?  Use rcptr?
-    Make a global variable that always has something as a logger.
 - clean up SpinCalculator
 - Optimization: Learn about OpenMP, try it on a hot loop.
 - Optimization: Learn about preconditioning, does that help with primme eigen solver?
@@ -160,17 +102,6 @@ Next steps:
     and the right sweeps we need to stop at site two since we can;t SVD transfer to site 1.
 - Profile iTime GS search, see if we need to optimize some contractions.
 - Spin space trotter decomp
-- Infinite methods iMPS, iTEBD, iDMRG
-    -iMPS class with small unit cell
-        -calculate largest EV of transfer matrix, use that to normalize.
-        -THen what??
-            See McCUllough Infnite boundary conditions for matrix product state calculations For
-            calculation of L/R eigen vectors
-    -iTEBD reasonably straight forward.
-            Requires the Vidal lambda-Gamma-Lambda canonical forms with singular values
-            stored on the bonds.
-            Can we reuse the MPS class for this?  All contractions need to be modified to incorporate
-            the SVs from the bonds.
 - Play with iTensor for 2D systems.
     -Done Try one tetrahedon.
     -Try iPEPS with iTEBD GS and Corner transfer matrix for contractions.
@@ -185,8 +116,75 @@ Backburner:
         -Jz
         -Might need to identify parameters with strings "Jxy"
 
+----------------------------------------------------------------------------------------------------------
+    Done: Make abstract interfaces for SVD and eigen
+    Done: Do left and right Evs for non sym
+    Done: Add Lapack non sym routines
+- Done: Valgrind issues:
+    Who owns Loggers?  Use rcptr?
+    Make a global variable that always has something as a logger.
+    Done: -Use the name CompressionError consistently.
+    Done: -Should epsOrth drop and espE and dt drop?
+-Done: Profiling
+	TestITimeSecondOrderTrotter_EpsLimitedCompression
+	oml_CSVDecomp used 29.8% 2.97 sec
+
+- Done: Try CSVD from LaPack and Primme
+    -Lapack takes SVD out of the top 25 fr CPU
+    -Some contractions MPSSite::IterateLeft_F, IterateLeft_R, ContractLRM
+        need optimization
+    SVDtransfer takes 28% of the cpu time
+
+    Done: -Make a null logger if the user doesn't make one.
+    Done: -Just pass epsE etc to full state, forget itsched.
+    Done: -FullState->FindGS seems to return zero instead of E.
+    Fixed: -TEBD  <E^2>-<E>^2 in log is wrong.
+    Done: -Get spdlogger from Factor to we don't need to include the header.
+
+
 
  -iTEBD
+     Done: -Recursion expectation
+        DOne: -Look at Infinite boundary conditions for MPS calculations
+- Done: Infinite methods iMPS, iTEBD, iDMRG
+    -iMPS class with small unit cell
+        -calculate largest EV of transfer matrix, use that to normalize.
+        -THen what??
+            See McCUllough Infnite boundary conditions for matrix product state calculations For
+            calculation of L/R eigen vectors
+    -iTEBD reasonably straight forward.
+            Requires the Vidal lambda-Gamma-Lambda canonical forms with singular values
+            stored on the bonds.
+            Can we reuse the MPS class for this?  All contractions need to be modified to incorporate
+            the SVs from the bonds.
+   Countermeasures:
+        Done: -Implement transverse Ising model with one site unit cell.
+            Need to make one site gates to do iTime iterations to get GS.
+        Done: -Implement McCulloch's recursion for expectations, for one site unit cell
+        Done: -Implement McCulloch's recursion for expectations, for two unit cell
+            Done:-Contract MPO horizontally to get a unit cell W which is still DwxDw on internal indices
+             but d^n x d^n on physic indices
+        Fixed: -McCulloch's recursion for expectations gives the wrong number. Why?
+        Done: -Support QR decomp from Lapack.
+        Done: -Try and hand code 2nd order trotter with gates.
+
+    -Tidy up or ra-factor iTEBD before moving on
+        Done: Currently we can iterate with MPO, iMPO, gateList, or expH matrix.  We need a separately coded version
+              of iTEBDStateImp::FindiTimeGroundState.
+              What can we do with virtual dispatch to select the type of iterations?
+        Done -Re-org TensorNetworksImp folder. SUbfolders:
+            Hamiltonians
+            iTEBD
+            MPS
+
+
+
+    Done:-Decide convergence based on SV spectrum (lambda A or B), instead of E.
+    Done:-Support Apply(MPO*)
+        -Use trotter 1st, 2nd and 4rth order MPO instead of expH.
+        Do we run into the same problem as with <E2>?
+            Yes !!!!  We need an iMPO class
+    -Done: Lookup theory for iMPO and add to notes if needed.
     Won;t do:  -Make and iTimeGroundState abstract base class to handle iterations.
         I think this is a failed idea.  The iterations are fundamentally different right now.
             Just look at MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationScheduleLine&);

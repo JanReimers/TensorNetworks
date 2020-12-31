@@ -71,3 +71,4 @@ int StateIterator::GetIndex(const Vector<int>& state) const
 }
 
 } // namespace
+

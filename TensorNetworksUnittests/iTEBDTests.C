@@ -660,7 +660,7 @@ TensorNetworks::IterationSchedule MakeSchedule(int maxIter,int D,TensorNetworks:
     TensorNetworks::IterationSchedule is;
     TensorNetworks::Epsilons eps(1e-12);
     eps.itsMPSCompressEpsilon=0;
-    double dts[] = {0.5,0.2,0.1,0.01,0.001};
+    double dts[] = {0.5,0.2,0.1,0.01,0.001,0.0};
     for (double dt:dts)
     {
          eps.itsDeltaLambdaEpsilon=5e-5*dt;
@@ -826,7 +826,7 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12_iMPOs_FirstOrder)
     itsState->Report(cout);
     double E=itsState->GetExpectation(itsH);
 #ifdef DEBUG
-    EXPECT_LT(E,-0.4269);   //The algo actually goes up in energy for small dt
+    EXPECT_LT(E,-0.4268);   //The algo actually goes up in energy for small dt
 //    EXPECT_LT(E,-0.442607); //D=4 From mps-tools.  This looks more like a D=8 result?!?
 #else
     EXPECT_LT(E,-0.4296); //The algo actually goes up in energy for small dt
@@ -887,36 +887,15 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
 }
 
 
-/*
+
 #include "Operators/iMPOImp.H"
 TEST_F(iTEBDTests,TestiMPOExpectation)
 {
-    int UnitCell=2,D=2,maxIter=1000;
+    int UnitCell=2,Dstart=2,D=4,deltaD=1,maxIter=1000;
     double S=0.5,epsSVD=0.0;
-    Setup(UnitCell,S,D,epsSVD,TensorNetworks::Gates);
+    Setup(UnitCell,S,Dstart,epsSVD,TensorNetworks::Gates);
     itsState->InitializeWith(TensorNetworks::Random);
-//    cout << itsState->GetNormStatus() << endl;
-    itsState->Canonicalize(TensorNetworks::DLeft);
-//    cout << itsState->GetNormStatus() << endl;
-    itsState->Orthogonalize(itsCompressor);
-//    cout << itsState->GetNormStatus() << endl;
-    TensorNetworks::Epsilons eps(1e-12);
-    eps.itsMPSCompressEpsilon=0;
-
-    TensorNetworks::IterationSchedule is;
-    eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({20,D,0.5,eps});
-    is.Insert({maxIter,D,2,0.2,eps});
-    is.Insert({maxIter,D,0.1,eps});
-    is.Insert({maxIter,D,0.05,eps});
-    is.Insert({maxIter,D,0.02,eps});
-    eps.itsDelatEnergy1Epsilon=1e-7;
-    is.Insert({maxIter,D,0.01,eps});
-    eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({maxIter,D,0.005,eps});
-    is.Insert({maxIter,D,0.002,eps});
-    is.Insert({maxIter,D,0.001,eps});
-    is.Insert({maxIter,D,0.0  ,eps});
+    TensorNetworks::IterationSchedule is=MakeSchedule(maxIter,D,TensorNetworks::SecondOrder,deltaD);
     itsState->FindiTimeGroundState(itsH,is);
 
     TensorNetworks::Hamiltonian* H4=itsFactory->Make1D_NN_HeisenbergHamiltonian(UnitCell+2,S,1.0,1.0,0.0);
@@ -929,7 +908,6 @@ TEST_F(iTEBDTests,TestiMPOExpectation)
 
     double E=itsState->GetExpectation(itsH);
     double Er=itsState->GetExpectation(iH);
-    cout << "Er/E=" << Er/E << endl;
     EXPECT_NEAR(Er,E,1e-10);
 }
-*/
+

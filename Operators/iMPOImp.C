@@ -5,6 +5,7 @@
 #include "TensorNetworks/Dw12.H"
 #include "oml/vector.h"
 #include "oml/matrix.h"
+//#include "oml/src/vector.cpp"
 
 using std::cout;
 using std::endl;
@@ -97,13 +98,13 @@ iMPO* iMPOImp::MakeUnitcelliMPO(int unitcell) const
             const Vector<int>& ms=m.GetQuantumNumbers();
             const Vector<int>& ns=n.GetQuantumNumbers();
 
-            MatrixRT W=GetSiteOperator(1)->GetW(ms(1),ns(1));
+            MatrixRT W=GetSiteOperator(1)->GetW(ms(unitcell),ns(unitcell));
             for (int ia=2;ia<=unitcell;ia++)
-                W*=GetSiteOperator(ia)->GetW(ms(ia),ns(ia));
+                W*=GetSiteOperator(ia)->GetW(ms(unitcell-ia+1),ns(unitcell-ia+1));
             int mab=m.GetLinearIndex(); //one based
             int nab=n.GetLinearIndex();
+//            cout << "mab, ms=" << mab << " " << ms << endl;
             Wcell(mab,nab)=W;
-//            cout << "W=" << W << endl;
         }
 
     return new iMPOImp(newL,newS,Wcell);
