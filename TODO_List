@@ -10,10 +10,12 @@ Next steps:
             Local Matrix Product Operators: Canonical Form, Compression, & Control Theory
             Efficient simulation of moire materials using the density matrix renormalization group appendix
         -Create iMPOs directly, get rid of the convert method.
+            Done for iH and iH^2
         -Code up  MPO compression as per Parker
         -Code up iMPO compression as per Parker.
         -<E2> is not working, MPO get compressed to 1x4 - 4x1.  We need to learn how contract
-         a Dw x Dw - Dw x Dw open MPO with eigen vectors to get <E2>.
+            a Dw x Dw - Dw x Dw open MPO with eigen vectors to get <E2>.
+            -We now have iH2, but after naive compression it is not even lower triangular.
         -We need to be able to add (rather than combine) MPOs to do:
             S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
         -iMPO-iTEBD starts anti-converging for small dt.  Also lambdas are wrong.
@@ -42,6 +44,7 @@ Next steps:
 -iTEBD
     issues:
         1) <E2> doesn't work. Maybe McCulloch's recursive expectation is needed.
+            Need a lower triangular iH2 to make this work.
         2) Trotter 2nd and fourth order iMPOs behave exactly like first order.
             Simple compression is possibly pushing important info to edges where it gets cutoff.
         3) All energies are in the ball park but too low compared to mp-toolkit. Maybe <E> is also wrong?
@@ -83,7 +86,8 @@ Next steps:
         3) handle MPOs with two sets of indices
 -Refactor: MPO_SpatialTrotter takes Hlocal, should work from H or expH.  Right now it duplicates code
     for calculating expH.
--Logging: only LogInfoV does indenting
+Done: -Logging: only LogInfoV does indenting
+    Done: Also fix warnings
 -Save wave functions to disk.
 -Investigate sweep directions for normalization
 -Improve level two logging for variational ground states
