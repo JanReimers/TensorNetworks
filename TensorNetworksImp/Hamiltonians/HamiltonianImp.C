@@ -173,9 +173,15 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
                 MPO_SpatialTrotter Weven(ts(it)    ,Even,GetL(),itsS,H12);
                 U.Combine(&Wodd);
                 U.Combine(&Weven);
+                //U.Compress(0,1e-12); //Does not seem to help
                 U.Combine(&Wodd);
+                //U.Report(cout);
+                U.Compress(0,1e-12); //Useful for large S
+                //U.Report(cout);
                 W->Combine(&U);
+                //W->Report(cout);
                 W->Compress(0,1e-12);
+                //W->Report(cout);
             }
             break;
         }

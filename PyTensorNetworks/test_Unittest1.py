@@ -98,20 +98,20 @@ def test_FullWavefunctionGS(L,S,Eexpected):
 (2 ,2.5,6,-8.750000000000000 ,1e-09,1e-9,TN.SecondOrder),
 (2 ,2.5,6,-8.750000000000000 ,1e-09,1e-9,TN.FourthOrder),
 (3 ,0.5,2,-0.500000000000000 ,1e-07,2e-7,TN.FirstOrder),
-(3 ,0.5,2,-0.500000000000000 ,1e-10,1e-9,TN.SecondOrder),
+(3 ,0.5,2,-0.500000000000000 ,1e-09,1e-9,TN.SecondOrder),
 (3 ,0.5,2,-0.500000000000000 ,1e-10,1e-9,TN.FourthOrder),
 (3 ,1.0,3,-1.500000000000000 ,1e-06,1e-6,TN.FirstOrder),
 (3 ,1.0,3,-1.500000000000000 ,1e-09,2e-9,TN.SecondOrder),
 (3 ,1.0,3,-1.500000000000000 ,1e-10,1e-9,TN.FourthOrder),
 (3 ,1.5,4,-3.000000000000000 ,5e-07,2e-6,TN.FirstOrder),
 (3 ,1.5,4,-3.000000000000000 ,1e-09,5e-9,TN.SecondOrder),
-#(3 ,1.5,4,-3.000000000000000 ,1e-9,1e-9,TN.FourthOrder), hangs
+(3 ,1.5,4,-3.000000000000000 ,1e-09,1e-9,TN.FourthOrder),
 (3 ,2.0,5,-5.000000000000000 ,2e-09,5e-9,TN.SecondOrder),
-#(3 ,2.5,6,-7.500000000000000 ,1e-8,1e-8,TN.SecondOrder), hangs
+#(3 ,2.5,6,-7.500000000000000 ,1e-08,1e-8,TN.SecondOrder), gets stuck building exp(-tH)
 (4 ,0.5,4,-0.538675134594813 ,1e-09,2e-9,TN.SecondOrder),
 (4 ,0.5,4,-0.538675134594813 ,1e-09,2e-9,TN.FourthOrder),
 (4 ,1.0,9,-1.548583770354863 ,1e-09,5e-9,TN.SecondOrder),
-#(4 ,1.0,9,-1.548583770354863 ,1e-9,5e-9,TN.FourthOrder), very slow
+(4 ,1.0,9,-1.548583770354863 ,1e-09,5e-9,TN.FourthOrder), #very slow
 (5 ,0.5,4,-0.481971563329499 ,1e-09,3e-9,TN.SecondOrder),
 (5 ,0.5,4,-0.481971563329499 ,1e-09,3e-9,TN.FourthOrder),
 (6 ,0.5,8,-0.498715426777585 ,1e-09,5e-9,TN.SecondOrder),

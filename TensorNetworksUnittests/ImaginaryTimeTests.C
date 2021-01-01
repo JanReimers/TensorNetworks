@@ -566,3 +566,39 @@ TEST_F(ImaginaryTimeTests,TestITimeFourthOrderTrotter)
 }
 
 #endif
+
+// Very slow to build fourth order exp(-tH)
+//TEST_F(ImaginaryTimeTests,TestITimeFourthOrderTrotter)
+//{
+//    int D=6,L=3,maxIter=1000,deltaD=1;
+//    double S=2.5;
+//    Setup(L,S,D);
+//    TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
+//    Psi1->InitializeWith(TensorNetworks::Random);
+//    Psi1->Normalize(TensorNetworks::DRight);
+//
+//    TensorNetworks::Epsilons eps(1e-12);
+//    eps.itsMPOCompressEpsilon=1e-14;
+//    eps.itsMPSCompressEpsilon=0.0;
+//    eps.itsDelatNormEpsilon=1e-5;
+//
+//    TensorNetworks::IterationSchedule is;
+//    eps.itsDelatEnergy1Epsilon=1e-5;
+//    is.Insert({maxIter,D,deltaD,0,0.5,FourthOrder,eps});
+//    eps.itsDelatEnergy1Epsilon=1e-7;
+//    is.Insert({maxIter,D,deltaD,1,0.2,FourthOrder,eps});
+//    eps.itsDelatEnergy1Epsilon=1e-9;
+//    is.Insert({maxIter,D,deltaD,3,0.1,FourthOrder,eps});
+//    eps.itsDelatEnergy1Epsilon=1e-11;
+//    is.Insert({maxIter,D,deltaD,5,0.01,FourthOrder,eps});
+//    is.Insert({maxIter,D,deltaD,5,0.001,FourthOrder,eps});
+//
+////    cout << is;
+//
+//    Psi1->FindiTimeGroundState(itsH,is);
+//
+//    double E2=Psi1->GetExpectation(itsH);
+//    EXPECT_NEAR(E2/(L-1),-7.5,1e-7);
+//
+//    delete Psi1;
+//}

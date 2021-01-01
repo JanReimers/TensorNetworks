@@ -50,6 +50,7 @@
 			<Add option="-std=c++17" />
 			<Add option="-fPIC" />
 			<Add option="-Wno-unknown-pragmas" />
+			<Add option="-Wno-format-security" />
 			<Add directory="oml/include" />
 			<Add directory="./" />
 		</Compiler>
@@ -173,6 +174,9 @@
 		<Unit filename="TensorNetworks/Namespace.H" />
 		<Unit filename="TensorNetworks/SVCompressor.H" />
 		<Unit filename="TensorNetworks/SiteOperator.H" />
+		<Unit filename="TensorNetworks/TNSLogger.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="TensorNetworks/TNSLogger.H" />
 		<Unit filename="TensorNetworks/Typedefs.H" />
 		<Unit filename="TensorNetworks/VNEntropy.C">

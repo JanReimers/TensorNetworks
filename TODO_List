@@ -53,7 +53,7 @@ Next steps:
     -Can we generalize GetExpectation to MPOs with arbitrary L?
     -Calculate fidelity
 
-    -Figure out hanging TEBD tests.
+    Done: -Figure out hanging TEBD tests.  fourth order exp(-tH) builds are slow.
     -TEBD and variational GS: converge on delta lambdas?
     -Handle Debug and Release modes for PyTensorNetworks.so
     -Figure out how to handle std::ostream when using SIP to interface with python.
