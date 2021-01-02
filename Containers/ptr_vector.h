@@ -213,13 +213,14 @@ template <class T> class optr_vector<T*>
 
 template <class T> void optr_vector<T*>::clear()
 {
-  for (iterator i=begin();i!=end();i++) delete &i;
+  for (iterator i=begin();i!=end();i++)
+    if (&i) delete &i;
   Base::clear();
 }
 
 template <class T> void optr_vector<T*>::erase(iterator i)
 {
-  delete &i;
+  if (&i)  delete &i;
   Base::erase(i);
 }
 
@@ -251,7 +252,12 @@ template <template <class> class vec, class T1, class T2>
 template <class T> optr_vector<T*>::optr_vector(const optr_vector& other)
 {
      for (const_iterator i=other.begin();i!=other.end();i++)
-       push_back(i->Clone());
+     {
+        if (&i)
+            push_back(i->Clone());
+        else
+            push_back(nullptr);
+     }
 
 }
 
