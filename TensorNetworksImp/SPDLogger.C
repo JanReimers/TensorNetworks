@@ -26,7 +26,8 @@ void SPDLogger::LogInfo(int level,c_str message)
 {
     if (itsLevel>=level)
     {
-        spdlog::info(message);
+        std::string m1=AddSpace(level,message);
+        spdlog::info(m1);
     }
 }
 
@@ -34,7 +35,8 @@ void SPDLogger::LogInfo(int level,int site, c_str message)
 {
     if (itsLevel>=level)
     {
-        spdlog::info("Site {}: {}",site,message);
+        std::string m1=AddSpace(level,message);
+        spdlog::info("Site {}: {}",site,m1);
     }
 }
 
@@ -42,7 +44,8 @@ void SPDLogger::LogWarn(int level,c_str message)
 {
     if (itsLevel>=level)
     {
-        spdlog::warn(message);
+        std::string m1=AddSpace(level,message);
+        spdlog::warn(m1);
     }
 }
 

@@ -17,8 +17,8 @@ class TNSLogger
         TNSLogger() {};
         virtual ~TNSLogger() {};
 
-        virtual void LogInfo(int level,c_str message)=0; //comment name to avoid warning
-        virtual void LogInfo(int level,int site,c_str message)=0; //comment name to avoid warning
+        virtual void LogInfo(int level,c_str message)=0;
+        virtual void LogInfo(int level,int site,c_str message)=0;
         virtual void LogWarn(int level,c_str message)=0;
 
         void LogInfo(int level,int site,const std::string& message) {LogInfo(level,site,message.c_str());} //comment name to avoid warning
@@ -29,23 +29,21 @@ class TNSLogger
         template<typename... Args>
         void LogInfoV(int level,c_str fmt, const Args &... args)
         {
-            std::string fmt1=AddSpace(level,fmt);
-            size_t n = snprintf( nullptr, 0, fmt1.c_str() ,args...) + 1; // Extra space for '\0'
+            size_t n = snprintf( nullptr, 0, fmt ,args...) + 1; // Extra space for '\0'
             std::unique_ptr<char[]> buf( new char[ n ] );
-            snprintf( buf.get(), n, fmt1.c_str(), args ... );
+            snprintf( buf.get(), n, fmt, args ... );
             LogInfo(level,buf.get());
         }
         template<typename... Args>
         void LogWarnV(int level,c_str fmt, const Args &... args)
         {
-            std::string fmt1=AddSpace(level,fmt);
-            size_t n = snprintf( nullptr, 0, fmt1.c_str() ,args...) + 1; // Extra space for '\0'
+            size_t n = snprintf( nullptr, 0, fmt ,args...) + 1; // Extra space for '\0'
             std::unique_ptr<char[]> buf( new char[ n ] );
-            snprintf( buf.get(), n,fmt1.c_str(), args ... );
+            snprintf( buf.get(), n,fmt, args ... );
             LogWarn(level,buf.get());
         }
 
-    private:
+    protected:
         static std::string AddSpace(int level,c_str fmt);
 };
 
