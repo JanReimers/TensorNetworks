@@ -387,7 +387,7 @@ TEST_F(MPOTests,TestL2iMPOTrotter1)
 TEST_F(MPOTests,TestL2iMPOTrotter2)
 {
     int L=2,D=2;
-    double S=0.5,dt=0.1,epsMPO=1e-3;
+    double S=0.5,dt=0.1,epsMPO=6e-3;
     Setup(L,S,D);
     TensorNetworks::iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder,epsMPO);
     expH->Report(cout);

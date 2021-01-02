@@ -105,6 +105,26 @@ TEST_F(VariationalGroundStateTests,TestSweepL9S1D2)
     EXPECT_LT(nSweep,maxIter);
 }
 
+TEST_F(VariationalGroundStateTests,TestSweepL9S1D8_growD)
+{
+    int L=9,Dstart=2,D=8,maxIter=100;
+    double S=0.5;
+    Setup(L,S,Dstart);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+
+    TensorNetworks::Epsilons eps(1e-12);
+    eps.itsDelatEnergy1Epsilon=1.0;
+    eps.itsDeltaLambdaEpsilon =1e-9; //Converge on wave function only.
+    TensorNetworks::IterationSchedule is;
+    is.Insert({maxIter,D,eps});
+
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+
+    double E=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E/(L-1),-0.46703753899,1e-10);
+    EXPECT_LT(nSweep,maxIter);
+}
+
 #ifndef DEBUG
 TEST_F(VariationalGroundStateTests,TestSweepL9S1D8)
 {

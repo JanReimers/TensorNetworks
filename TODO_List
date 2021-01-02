@@ -54,7 +54,10 @@ Next steps:
     -Calculate fidelity
 
     Done: -Figure out hanging TEBD tests.  fourth order exp(-tH) builds are slow.
-    -TEBD and variational GS: converge on delta lambdas?
+    Done: -TEBD and variational GS: converge on delta lambdas?
+        -or TEBD lambda gets modified many time in one iteration. As a consequence
+         Bond.C cannot easily save delta_lambda for the whole iteration, just part of the iteration.
+        -We could extract all the lambdas into a separate blob and diff against the blob at the end of the iteration
     -Handle Debug and Release modes for PyTensorNetworks.so
     -Figure out how to handle std::ostream when using SIP to interface with python.
 

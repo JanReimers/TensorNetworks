@@ -18,6 +18,12 @@ namespace TensorNetworks
 
 class MPSImp : public virtual MPS
 {
+//
+//  Container typedefs
+//
+        typedef optr_vector<MPSSite*> SitesType;
+        typedef optr_vector<Bond*>    BondsType;
+
 //--------------------------------------------------------------------------------------
 //
 //  Construction and initialization zone
@@ -38,6 +44,8 @@ public:
         virtual int     GetL        () const {return itsL;}
         virtual int     Getp        () const {return itsd;}
         virtual double  GetMaxDeltaE() const;
+        virtual double  GetMaxDeltal() const; //Max delta lambda on bonds
+        virtual double  GetMaxDeltal(const BondsType&) const; //Max delta lambda on bonds
 
 //--------------------------------------------------------------------------------------
 //
@@ -172,8 +180,6 @@ private:
 //
 //  Iterator Typedefs
 //
-        typedef optr_vector<MPSSite*> SitesType;
-        typedef optr_vector<Bond*>    BondsType;
         typedef SitesType::      iterator  SIter;
         typedef SitesType::const_iterator cSIter;
         typedef SitesType::      reverse_iterator  rSIter;

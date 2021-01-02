@@ -161,9 +161,11 @@ DiagonalMatrixRT Extend(const DiagonalMatrixRT& lambda,const MPO* o)
     // Extract Dw from the MPO
     assert(o->GetL()==2);
     const SiteOperator* soA=o->GetSiteOperator(1);
+#if DEBUG
     const SiteOperator* soB=o->GetSiteOperator(2);
     assert(soA->GetDw12().Dw2==soB->GetDw12().Dw1);
     assert(soA->GetDw12().Dw1==soB->GetDw12().Dw2);
+#endif
     int Dw=soA->GetDw12().Dw1; //Same as Dw3
     //
     //  Now load Dw copies of lb into the extended lambdaB

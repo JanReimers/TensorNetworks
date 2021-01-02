@@ -277,25 +277,21 @@ TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotterL2)
     eps.itsMPOCompressEpsilon=1e-5;
     eps.itsDelatNormEpsilon=1e-5;
     eps.itsMPSCompressEpsilon=0;
+    eps.itsDeltaLambdaEpsilon=1e-3;
 
     TensorNetworks::IterationSchedule is;
-    eps.itsDelatEnergy1Epsilon=1e-3;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-3;
     is.Insert({50,D,1,0,0.5,FirstOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-5;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-5;
     is.Insert({500,D,1,0,0.2,FirstOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-5;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-6;
     is.Insert({500,D,1,1,0.1,FirstOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-6;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-7;
     is.Insert({500,D,1,2,0.05,FirstOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-7;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-8;
     is.Insert({500,D,1,3,0.02,FirstOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-8;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-9;
     is.Insert({500,D,1,4,0.01,FirstOrder,eps});
-    //eps.itsDelatEnergy1Epsilon=3e-9;
-    //is.Insert({500,D,5,0.005,FirstOrder,eps});
-    //eps.itsDelatEnergy1Epsilon=1e-9;
-    //is.Insert({500,D,6,0.002,FirstOrder,eps});
-//    cout << is;
 
     itsMPS->FindiTimeGroundState(itsH,is);
     double E1=itsMPS->GetExpectation(itsH);
@@ -320,18 +316,13 @@ TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotterL2)
     eps.itsDelatNormEpsilon=1e-5;
 
     TensorNetworks::IterationSchedule is;
-    eps.itsDelatEnergy1Epsilon=1e-5;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-5;
     eps.itsMPSCompressEpsilon=0.0; //Just Dmax for compression
     is.Insert({50 ,D,1,0,0.5,SecondOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-8;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-8;
     is.Insert({500,D,1,3,0.1,SecondOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-10;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-10;
     is.Insert({500,D,1,3,0.05,SecondOrder,eps});
-    is.Insert({500,D,1,3,0.02,SecondOrder,eps});
-    is.Insert({500,D,1,3,0.01,SecondOrder,eps});
-    is.Insert({500,D,1,5,0.005,SecondOrder,eps});
-    is.Insert({500,D,1,5,0.002,SecondOrder,eps});
-    is.Insert({500,D,1,5,0.001,SecondOrder,eps});
 
  //   cout << is;
 
@@ -359,21 +350,11 @@ TEST_F(ImaginaryTimeTests,TestITimeFourthOrderTrotterL2)
     eps.itsDelatNormEpsilon=1e-5;
 
     TensorNetworks::IterationSchedule is;
-    eps.itsDelatEnergy1Epsilon=1e-5;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-5;
     is.Insert({50,D,1,0,0.5,FourthOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-6;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-8;
     is.Insert({500,D,1,1,0.2,FourthOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-9;
-    is.Insert({500,D,1,3,0.1,FourthOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-11;
-    is.Insert({500,D,1,5,0.05,FourthOrder,eps});
-//    is.Insert({500,D,5,0.02,FourthOrder,eps});
-    is.Insert({500,D,1,5,0.01,FourthOrder,eps});
-//    is.Insert({500,D,5,0.005,FourthOrder,eps});
-//    is.Insert({500,D,5,0.002,FourthOrder,eps});
-//    is.Insert({500,D,5,0.001,FourthOrder,eps});
-
-//    cout << is;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-9;
 
     Psi1->FindiTimeGroundState(itsH,is);
 
@@ -385,11 +366,12 @@ TEST_F(ImaginaryTimeTests,TestITimeFourthOrderTrotterL2)
     delete Psi1;
 }
 
+
 #ifndef DEBUG
 
 TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotter)
 {
-    int D=4,L=9;
+    int D=4,L=9,maxIter=1000,nopt=5;
     Setup(L,0.5,D);
 
     itsMPS->Normalize(TensorNetworks::DLeft);
@@ -401,32 +383,26 @@ TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotter)
     eps.itsMPSCompressEpsilon=0;
 
     TensorNetworks::IterationSchedule is;
-    eps.itsDelatEnergy1Epsilon=1e-3;
-    is.Insert({50 ,D,1,0,0.5,FirstOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({500,D,1,0,0.2,FirstOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({500,D,1,1,0.1,FirstOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({500,D,1,2,0.05,FirstOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-7;
-    is.Insert({500,D,1,3,0.02,FirstOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({500,D,1,4,0.01,FirstOrder,eps});
-    //eps.itsDelatEnergy1Epsilon=3e-9;
-    //is.Insert({500,D,5,0.005,FirstOrder,eps});
-    //eps.itsDelatEnergy1Epsilon=1e-9;
-    //is.Insert({500,D,6,0.002,FirstOrder,eps});
-//    cout << is;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-5;
+    is.Insert({maxIter,D,1,nopt,0.5,FirstOrder,eps});
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-6;
+    eps.itsDelatNormEpsilon=1e-10;
+    is.Insert({maxIter,D,1,nopt,0.2,FirstOrder,eps});
+    is.Insert({maxIter,D,1,nopt,0.1,FirstOrder,eps});
+    is.Insert({maxIter,D,1,nopt,0.05,FirstOrder,eps});
+    is.Insert({maxIter,D,1,nopt,0.02,FirstOrder,eps});
+    is.Insert({maxIter,D,1,nopt,0.01,FirstOrder,eps});
+    is.Insert({maxIter,D,1,nopt,0.005,FirstOrder,eps});
 
     itsMPS->FindiTimeGroundState(itsH,is);
 
     double E2=itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(E2/(L-1),-0.46664265599414939,1e-4);
+    EXPECT_NEAR(E2/(L-1),-0.46664265599414939,2e-6);
 }
 
 TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
 {
+    int maxIter=100,nopt=5;
     int D=16,Dcompress=16,L=16; //Set DMax high
 //    double epsSV=1e-9;
     Setup(L,0.5,D);
@@ -437,58 +413,35 @@ TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
 
     TensorNetworks::IterationSchedule is;
 
-    eps.itsDelatEnergy1Epsilon=1e-4;
-    eps.itsMPOCompressEpsilon=1e-4;
-    eps.itsMPSCompressEpsilon=1e-4; //Just Eps for compression
-    eps.itsDelatNormEpsilon=1e-4;
-    is.Insert({50 ,Dcompress,1,5,0.5,SecondOrder,eps});
-
-    eps.itsDelatEnergy1Epsilon=1e-4;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-3;
     eps.itsMPOCompressEpsilon=1e-4;
     eps.itsMPSCompressEpsilon=1e-4; //Just Eps for compression
     eps.itsDelatNormEpsilon=1e-5;
-    is.Insert({500,Dcompress,1,5,0.2,SecondOrder,eps});
+    is.Insert({maxIter ,Dcompress,1,nopt,2.0,SecondOrder,eps});
+    is.Insert({maxIter ,Dcompress,1,nopt,0.5,SecondOrder,eps});
 
-    eps.itsDelatEnergy1Epsilon=1e-5;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-4;
+    eps.itsMPOCompressEpsilon=1e-4;
+    eps.itsMPSCompressEpsilon=1e-4; //Just Eps for compression
+    eps.itsDelatNormEpsilon=1e-7;
+    is.Insert({maxIter,Dcompress,1,nopt,0.2,SecondOrder,eps});
+
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-5;
     eps.itsMPOCompressEpsilon=1e-6;
     eps.itsMPSCompressEpsilon=1e-6; //Just Eps for compression
-    eps.itsDelatNormEpsilon=1e-7;
-    is.Insert({500,Dcompress,1,5,0.1,SecondOrder,eps});
+    eps.itsDelatNormEpsilon=1e-8;
+    is.Insert({maxIter,Dcompress,1,nopt,0.1,SecondOrder,eps});
 
-    eps.itsDelatEnergy1Epsilon=1e-6;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-6;
     eps.itsMPOCompressEpsilon=1e-9;
     eps.itsMPSCompressEpsilon=1e-8; //Just Eps for compression
     eps.itsDelatNormEpsilon=1e-10;
-    is.Insert({500,Dcompress,1,5,0.1,SecondOrder,eps});
-
-//    eps.itsDelatEnergy1Epsilon=2e-7;
-//    eps.itsMPOCompressEpsilon=1e-10;
-//    eps.itsMPSCompressEpsilon=1e-8; //Just Eps for compression
-//    eps.itsDelatNormEpsilon=1e-11;
-//    is.Insert({500,D,5,0.1,SecondOrder,eps});
-
-//    eps.itsDelatEnergy1Epsilon=1e-7;
-//    eps.itsMPOCompressEpsilon=1e-14;
-//    eps.itsMPSCompressEpsilon=1e-10; //Just Eps for compression
-//    eps.itsDelatNormEpsilon=1e-12;
-//    is.Insert({500,Dcompress,5,0.1,SecondOrder,eps});
-
-//    eps.itsDelatEnergy1Epsilon=1e-8;
-//    eps.itsMPOCompressEpsilon=1e-16;
-//    eps.itsMPSCompressEpsilon=1e-9; //Just Eps for compression
-//    eps.itsDelatNormEpsilon=1e-12;
-//    is.Insert({500,Dcompress,5,0.1,SecondOrder,eps});
-//
-//    eps.itsDelatEnergy1Epsilon=1e-8;
-//    eps.itsMPOCompressEpsilon=1e-16;
-//    eps.itsMPSCompressEpsilon=1e-9; //Just Eps for compression
-//    eps.itsDelatNormEpsilon=1e-12;
-//    is.Insert({500,Dcompress,5,0.01,SecondOrder,eps});
+    is.Insert({maxIter,Dcompress,1,nopt,0.1,SecondOrder,eps});
 
     itsMPS->FindiTimeGroundState(itsH,is);
 
     double E2=itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(E2/(L-1),-0.4607783,1e-6);
+    EXPECT_NEAR(E2/(L-1),-0.46078193,1e-7);
 }
 #endif // DEBUG
 
@@ -496,6 +449,7 @@ TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter_EpsLimitedCompression)
 
 TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter)
 {
+    int maxIter=100,nopt=5;
     int D=4,L=9;
     Setup(L,0.5,D);
     TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
@@ -508,19 +462,16 @@ TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter)
     eps.itsDelatNormEpsilon=1e-5;
 
     TensorNetworks::IterationSchedule is;
-    eps.itsDelatEnergy1Epsilon=1e-5;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-5;
     eps.itsMPSCompressEpsilon=0.0; //Just Dmax for compression
-    is.Insert({50 ,D,0,0.5,SecondOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({500,D,1,0.2,SecondOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({500,D,3,0.1,SecondOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-9;
-    is.Insert({500,D,5,0.05,SecondOrder,eps});
-    is.Insert({500,D,5,0.02,SecondOrder,eps});
-    is.Insert({500,D,5,0.01,SecondOrder,eps});
-
- //   cout << is;
+    is.Insert({maxIter,D,1,nopt,2.0,SecondOrder,eps});
+    is.Insert({maxIter,D,1,nopt,0.5,SecondOrder,eps});
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-6;
+    is.Insert({maxIter,D,1,nopt,0.2,SecondOrder,eps});
+    is.Insert({maxIter,D,1,nopt,0.1,SecondOrder,eps});
+    is.Insert({maxIter,D,1,nopt,0.05,SecondOrder,eps});
+    is.Insert({maxIter,D,1,nopt,0.02,SecondOrder,eps});
+    is.Insert({maxIter,D,1,nopt,0.01,SecondOrder,eps});
 
     Psi1->FindiTimeGroundState(itsH,is);
 
@@ -532,6 +483,7 @@ TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotter)
 
 TEST_F(ImaginaryTimeTests,TestITimeFourthOrderTrotter)
 {
+    int maxIter=100,nopt=5;
     int D=4,L=9;
     Setup(L,0.5,D);
     TensorNetworks::MPS* Psi1=itsH->CreateMPS(D);
@@ -544,18 +496,14 @@ TEST_F(ImaginaryTimeTests,TestITimeFourthOrderTrotter)
     eps.itsDelatNormEpsilon=1e-5;
 
     TensorNetworks::IterationSchedule is;
-    eps.itsDelatEnergy1Epsilon=1e-5;
-    is.Insert({50,D,0,0.5,FourthOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-6;
-    is.Insert({500,D,1,0.2,FourthOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-8;
-    is.Insert({500,D,3,0.1,FourthOrder,eps});
-    eps.itsDelatEnergy1Epsilon=1e-9;
-    is.Insert({500,D,5,0.05,FourthOrder,eps});
-    is.Insert({500,D,5,0.02,FourthOrder,eps});
-    is.Insert({500,D,5,0.01,FourthOrder,eps});
-
-//    cout << is;
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-4;
+    is.Insert({maxIter,D,1,nopt,0.5,FourthOrder,eps});
+    eps.itsDeltaLambdaEpsilon=eps.itsDelatEnergy1Epsilon=1e-6;
+    is.Insert({maxIter,D,1,nopt,0.2,FourthOrder,eps});
+    is.Insert({maxIter,D,1,nopt,0.1,FourthOrder,eps});
+    is.Insert({maxIter,D,1,nopt,0.05,FourthOrder,eps});
+    is.Insert({maxIter,D,1,nopt,0.02,FourthOrder,eps});
+    is.Insert({maxIter,D,1,nopt,0.01,FourthOrder,eps});
 
     Psi1->FindiTimeGroundState(itsH,is);
 

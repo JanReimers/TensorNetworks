@@ -1,4 +1,5 @@
 #include "TensorNetworksImp/MPS/MPSImp.H"
+#include "TensorNetworksImp/MPS/Bond.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/IterationSchedule.H"
@@ -38,22 +39,22 @@ double MPSImp::FindVariationalGroundState(const Hamiltonian* H, const IterationS
             LoadHeffCaches(H);
         }
         int in=0;
+        Logger->LogInfo(2,"iter    D   dE    dlambda");
         for (; in<isl.itsMaxGSSweepIterations; in++)
         {
-            Logger->LogInfo(2,"Sweep Right");
             Sweep(DLeft,H,isl.itsEps);  //This actually sweeps to the right, but leaves left normalized sites in its wake
-            Logger->LogInfo(2,"Sweep Left");
             Sweep(DRight,H,isl.itsEps);
             double dE=GetMaxDeltaE();
-            //cout << "dE=" << dE << endl;
-            if (dE<isl.itsEps.itsDelatEnergy1Epsilon) break;
+            double dl=GetMaxDeltal(); //Max delta lambda on bonds
+            Logger->LogInfoV(2,"%4d %4d %.1e %.1e",in,D,dE,dl);
+            if (dE<isl.itsEps.itsDelatEnergy1Epsilon && dl<isl.itsEps.itsDeltaLambdaEpsilon) break;
         }
         in++;
 
         double E1=GetExpectation(H);
         double E2=GetExpectation(H2);
         DE2=E2-E1*E1;
-        Logger->LogInfoV(0,"Variational GS D=%4d, %4d iterations, <E>=%.9f, <E^2>-<E>^2=%.2e",D,in,E1,DE2);
+        Logger->LogInfoV(0,"Variational GS D=%4d, %4d iterations, <E>=%.11f, <E^2>-<E>^2=%.2e",D,in,E1/(itsL-1),DE2);
         IterationEnergy(E1);
     }
     delete H2;
@@ -156,5 +157,30 @@ double  MPSImp::GetMaxDeltaE() const
     }
     return MaxDeltaE;
 }
+
+
+double  MPSImp::GetMaxDeltal() const
+{
+    double MaxDeltal=0.0;
+    for (int ib=1; ib<itsL; ib++)
+    {
+        double dl=itsBonds[ib]->GetMaxDelta();
+        if (dl>MaxDeltal) MaxDeltal=dl;
+    }
+    return MaxDeltal;
+}
+
+double  MPSImp::GetMaxDeltal(const BondsType& bonds_cache) const
+{
+    assert(bonds_cache.size()==itsBonds.size());
+    double MaxDeltal=0.0;
+    for (int ib=1; ib<itsL; ib++)
+    {
+        double dl=itsBonds[ib]->GetMaxDelta(*bonds_cache[ib]);
+        if (dl>MaxDeltal) MaxDeltal=dl;
+    }
+    return MaxDeltal;
+}
+
 
 }; // namespace

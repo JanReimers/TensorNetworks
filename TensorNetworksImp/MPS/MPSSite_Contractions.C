@@ -142,7 +142,9 @@ MatrixCT MPSSite::GetCanonicalNorm(Direction lr) const
                 //  Sum_ip B(id) * gamma^2 * B^t(id)
                 //
                 for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
+                {
                     ret+=(*id)*lambda*lambda*conj(Transpose((*id)));
+                }
             }
             break;
         }

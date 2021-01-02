@@ -12,6 +12,7 @@ Bond::Bond(int D, double epsSV)
     , itsEpsSV(epsSV)
     , itsBondEntropy(0.0)
     , itsMinSV(0.0)
+    , itsMaxDelta(0.0)
     , itsCompessionError(-99)
     , itsD(D)
     , itsRank(0)
@@ -34,8 +35,17 @@ void Bond::CloneState(const Bond* b2)
     itsBondEntropy    =b2->itsBondEntropy;
     itsCompessionError=b2->itsCompessionError;
     itsMinSV          =b2->itsMinSV;
+    itsMaxDelta       =b2->itsMaxDelta;
     itsD              =b2->itsD;
     itsRank           =b2->itsRank;
+}
+
+Bond* Bond::Clone() const
+{
+    assert(this);
+    Bond* b=new Bond(itsD,itsEpsSV);
+    b->CloneState(this);
+    return b;
 }
 
 void Bond::SetSites(MPSSite* left, MPSSite* right)
@@ -70,17 +80,24 @@ void Bond::NewBondDimension(int D)
         itsD=D;
         UpdateBondEntropy();
     }
-    itsSingularValues/=GetNorm();
+    itsSingularValues/=GetNorm(itsSingularValues);
 }
 
 void Bond::SetSingularValues(const DiagonalMatrixRT& s,double compressionError)
 {
+    assert(itsD==itsSingularValues.GetNumRows());
     //std::cout << "SingularValues=" << s << std::endl;
+    DiagonalMatrixRT sn=s/GetNorm(s); //Make sure it is normalized
+    if (sn.GetNumRows()!=itsD)
+    { //Pad with zeros so we can get a delta l.
+        int newD=sn.GetNumRows();
+        itsSingularValues.SetLimits(newD,newD);
+        for (int i=itsD+1;i<=newD;i++) itsSingularValues(i)=0.0;
+    }
+    itsMaxDelta=Max(fabs(sn-itsSingularValues));
+//    std::cout << "new max delta =" << itsMaxDelta << " " << sn.GetDiagonal()-itsSingularValues.GetDiagonal() << std::endl;
+    itsSingularValues=sn;
     itsD=s.GetNumRows();
-//    itsSingularValues.SetLimits(itsD);
-    double s2=s.GetDiagonal()*s.GetDiagonal();
-    itsSingularValues=s;
-    itsSingularValues/=GetNorm();
 
     itsRank=itsD;
     itsMinSV=itsSingularValues(itsD);
@@ -88,9 +105,9 @@ void Bond::SetSingularValues(const DiagonalMatrixRT& s,double compressionError)
     UpdateBondEntropy();
 }
 
-double Bond::GetNorm() const
+double Bond::GetNorm(const DiagonalMatrixRT& s)
 {
-    double s2=itsSingularValues.GetDiagonal()*itsSingularValues.GetDiagonal();
+    double s2=s.GetDiagonal()*s.GetDiagonal();
     return sqrt(s2);
 }
 
@@ -141,5 +158,14 @@ void Bond::Report(std::ostream& os) const
 
 }
 
+ double Bond::GetMaxDelta(const Bond& cache) const
+ {
+     VectorRT s=cache.itsSingularValues.GetDiagonal();
+     int Dold=s.size();
+     s.SetLimits(itsD,true);
+     for (int i=Dold+1;i<=itsD;i++) s(i)=0.0;
+     assert(itsSingularValues.size()==s.size());
+     return Max(fabs(itsSingularValues.GetDiagonal()-s));
+ }
 
 } //namespace
