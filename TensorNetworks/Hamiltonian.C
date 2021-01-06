@@ -22,7 +22,7 @@ iMPO* Hamiltonian::CreateiH2Operator  () const
     iMPO* iH=CreateiMPO(); //Make a version of H with no Dw=1 boundary sites.
     iH2->Combine(iH);
     iH2->Combine(iH);
-    iH2->Compress(0,1e-13);
+//    iH2->Compress(0,1e-13);
     return iH2;
 }
 

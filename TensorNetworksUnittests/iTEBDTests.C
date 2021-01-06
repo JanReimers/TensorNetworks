@@ -891,7 +891,7 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
 #include "Operators/iMPOImp.H"
 TEST_F(iTEBDTests,TestiMPOExpectation)
 {
-    int UnitCell=2,Dstart=2,D=4,deltaD=1,maxIter=1000;
+    int UnitCell=2,Dstart=2,D=2,deltaD=1,maxIter=100;
     double S=0.5,epsSVD=0.0;
     Setup(UnitCell,S,Dstart,epsSVD,TensorNetworks::Gates);
 
@@ -901,14 +901,16 @@ TEST_F(iTEBDTests,TestiMPOExpectation)
     itsState->FindiTimeGroundState(itsH,is);
 
     TensorNetworks::iMPO* iH=itsH->CreateiMPO();
-    iH->Report(cout);
+//    iH->Report(cout);
 
     double E=itsState->GetExpectation(itsH);
     double Er=itsState->GetExpectation(iH);
     EXPECT_NEAR(Er,E,1e-10);
-    TensorNetworks::iMPO* iH2=itsH->CreateiH2Operator();
-    iH2->Report(cout);
+//  Recursive contraction of H^2 does not work because we get unsolvable, singular equations
+//  when diagonal Wmn(i,i) operators are present.
+//    TensorNetworks::iMPO* iH2=itsH->CreateiH2Operator();
+//    iH2->Report(cout);
 //    double Er2=itsState->GetExpectation(iH2); //Fail because shape of W is no longer lower triangular
-//    cout << "E, Er, Er2=" << E << " " << Er << " " << Er2 << endl;
+//    cout << "E, Er, Er2, <E^2>-<E>^2=" << E << " " << Er << " " << Er2 << " " << Er2-Er*Er <<  endl;
 }
 

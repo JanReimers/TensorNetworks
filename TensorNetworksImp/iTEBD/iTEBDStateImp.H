@@ -19,7 +19,7 @@ namespace TensorNetworks
 class iTEBDStateImp : public virtual iTEBDState,
     private MPSImp
 {
-protected:
+public:
     using dVectorT=MPSSite::dVectorT;
 //    typedef std::tuple<dVectorT,DiagonalMatrixRT> GLType;
     typedef std::tuple<MatrixCT,MatrixCT> MMType;

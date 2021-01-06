@@ -471,8 +471,64 @@ double iTEBDStateImp::GetExpectation (const iMPO* o) const
     return E1;
 }
 
+template <class T, class A, Data D> inline
+bool IsLowerTriangular(const Indexable<T,A,Full,D,MatrixShape>& m)
+{
+    bool ret=true;
+    for (index_t i: m.rows())
+        for (index_t j: m.cols(i+1))
+        {
+            ret = ret && (m(i,j)==0.0);
+            if (!ret) break;
+        }
+    return ret;
+}
+
+//
+//  We should be able to do these by simply handing off the data inside
+//
+template <class T> inline Vector<T> Flatten(const Matrix<T>& m)
+{
+    Vector<T> v(m.size());
+    int ij=1;
+    for (int j:m.cols())
+        for (int i:m.rows())
+            v(ij++)=m(i,j);
+    return v;
+}
+
+template <class T> inline Matrix<T> UnFlatten(const Vector<T>& v,int M, int N)
+{
+    assert(v.size()==M*N);
+    Matrix<T> m(M,N);
+    int ij=1;
+    for (int j:m.cols())
+        for (int i:m.rows())
+            m(i,j)=v(ij++);
+    return m;
+}
 
 
+Matrix4CT GetTransferMatrix1(const iTEBDStateImp::dVectorT& M)
+{
+    int d=M.size();
+    assert(d>0);
+    int D=M[0].GetNumRows();
+    assert(D==M[0].GetNumCols());
+    Matrix4CT E(D,D,D,D);
+
+    for (int i1=1; i1<=D; i1++)
+        for (int j1=1; j1<=D; j1++)
+            for (int i3=1; i3<=D; i3++)
+                for (int j3=1; j3<=D; j3++)
+                {
+                    dcmplx e(0);
+                    for (int n=0; n<d; n++)
+                        e+=conj(M[n](i1,i3))*M[n](j1,j3);
+                    E(i1,j1,i3,j3)=e;
+                }
+    return E;
+}
 // This code follows: Article (Phien2012) Phien, H. N.; Vidal, G. & McCulloch, I. P.
 // Infinite boundary conditions for matrix product state calculations
 // Physical Review B, American Physical Society (APS), 2012, 86
@@ -502,8 +558,9 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
         for (int na=0; na<d; na++)
         {
             const MatrixRT& Wmn=so->GetW(ma,na);
+            assert(IsLowerTriangular(Wmn));
             for (int w1=1;w1<=Dw-1;w1++)
-                for (int w2=2;w2<=Dw;w2++)
+                for (int w2=w1+1;w2<=Dw;w2++)
                     if (Wmn(w1,w2)!=0.0)
                     {
                         cout << "W(" << ma << "," << na << ")=" << Wmn << endl;
@@ -529,7 +586,8 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
             for (int i2=1;i2<=D;i2++)
             for (int j2=1;j2<=D;j2++)
                 for (int i1=1;i1<=D;i1++)
-                    EDw(i2,j2)+=conj(A[m](i1,i2))*Wmn(Dw,Dw)*A[n](i1,j2);
+                for (int j1=1;j1<=D;j1++)
+                    EDw(i2,j2)+=conj(A[m](i1,i2))*Wmn(Dw,Dw)*E[Dw](i1,j1)*A[n](j1,j2);
         }
 //    cout << "E1=" << E1 << endl;
     assert(Max(fabs(E[Dw]-EDw))<1e-12);
@@ -537,20 +595,104 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
 //
 //  Now loop down from Dw-1=4 down to 2.  Only Row Dw in W is non-zero when column w>1.
 //
-    for (int w=Dw-1;w>=2;w--)
+    MatrixCT T; //Transfer matrix
+    for (int w1=Dw-1;w1>=2;w1--)
     {
-        E[w]=MatrixCT(D,D);
-        Fill(E[w],dcmplx(0));
+        std::vector<int> diagonals;
+        MatrixCT C(D,D);
+        Fill(C,dcmplx(0));
         for (int m=0; m<d; m++)
             for (int n=0; n<d; n++)
             {
                 const MatrixRT& Wmn=so->GetW(m,n);
-                for (int i2=1;i2<=D;i2++)
-                for (int j2=1;j2<=D;j2++)
-                    for (int i1=1;i1<=D;i1++)
-                        E[w](i2,j2)+=conj(A[m](i1,i2))*Wmn(Dw,w)*A[n](i1,j2);
+                if (Wmn(w1,w1)!=0.0) //Make sure there is nothing on the diagonal.
+                {
+                    assert(m==n); //should be only unit ops on the diagonal
+                    assert(Wmn(w1,w1)==1.0);
+                    diagonals.push_back(w1);
+                    std::cerr << "diagonal W["<< m << "," << n << "](" << w1 << "," << w1 << ")=" << Wmn(w1,w1) << std::endl;
+                }
+                for (int w2=w1+1;w2<=Dw;w2++)
+                if (Wmn(w2,w1)!=0.0)
+                {
+                    for (int i2=1;i2<=D;i2++)
+                    for (int j2=1;j2<=D;j2++)
+                        for (int i1=1;i1<=D;i1++)
+                        for (int j1=1;j1<=D;j1++)
+                            C(i2,j2)+=conj(A[m](i1,i2))*Wmn(w2,w1)*E[w2](i1,j1)*A[n](j1,j2);
+                }
             }
-//        cout << "E[" << w << "]=" << E[w] << endl;
+
+        if (diagonals.size()==0)
+        {
+            E[w1]=C;
+//            cout << std::fixed << "E[" << w1 << "]=" << E[w1] << endl;
+        }
+        else
+        {
+            Fill(C,dcmplx(0.0));
+//            C(1,1)=C(2,2);
+//            C(2,2)=C(1,1);
+            cout << std::fixed << "C[" << w1 << "]=" << C << endl;
+            dcmplx c=Sum(C.GetDiagonal())/static_cast<double>(D);
+            MatrixCT I(D,D);
+            Unit(I);
+            MatrixCT Cperp=C-c*I;
+//            cout << std::fixed << "Cperp[" << w1 << "]=" << Cperp << endl;
+            if (T.size()==0)
+            {
+                T=-GetTransferMatrix1(A).Flatten();
+                for (int i=1;i<=D;i++) T(i,i)+=1.0;
+                cout << std::fixed << "1-T=" << T << endl;
+            }
+//            FillRandom(T);
+            LapackSVDSolver<dcmplx> solver;
+            auto [U,s,VT]=solver.SolveAll(T,1e-13);
+            SVCompressorC* comp =Factory::GetFactory()->MakeMPSCompressor(0,1e-13);
+            comp->Compress(U,s,VT);
+//            cout << std::fixed << "s=" << s.GetDiagonal() << endl;
+            DiagonalMatrixRT si=1.0/s;
+//            cout << std::fixed << "si=" << si.GetDiagonal() << endl;
+//            MatrixCT err2=U*s*VT-T;
+//            cout << "err2=" << std::fixed << err2 << endl;
+//            cout << std::scientific << Max(fabs(err2)) << endl;
+            MatrixCT V=conj(Transpose(VT));
+            MatrixCT UT=conj(Transpose(U));
+
+            MatrixCT Tinv=V*si*UT;
+//            MatrixCT err3=T*Tinv*T-T;
+//            cout << "err3=" << std::fixed << err3 << endl;
+//            cout << std::scientific << Max(fabs(err3)) << endl;
+
+
+//            cout << "T=" << std::fixed << T << endl;
+//            cout << "Tinv=" << std::fixed << Tinv << endl;
+            VectorCT Cf=Flatten(C);
+            VectorCT Ef=Tinv*Cf;
+//            cout << "Cf=" << std::fixed << Cf << endl;
+//            cout << "Ef=" << std::fixed << Ef << endl;
+//            cout << "T*Ef=" << std::fixed << T*Ef << endl;
+            VectorCT err1=T*Ef-Cf;
+            cout << "err1=" << std::fixed << err1 << endl;
+            cout << std::scientific << Max(fabs(err1)) << endl;
+            E[w1]=UnFlatten(Ef,D,D);
+            cout << std::fixed << "E[" << w1 << "]=" << E[w1] << endl;
+            //
+            //  Check solution
+            //
+            MatrixCT Echeck(D,D);
+            Fill(Echeck,dcmplx(0.0));
+            for (int i2=1;i2<=D;i2++)
+            for (int j2=1;j2<=D;j2++)
+                for (int i1=1;i1<=D;i1++)
+                for (int j1=1;j1<=D;j1++)
+                    for (int m=0; m<d; m++)
+                        Echeck(i2,j2)+=conj(A[m](i1,i2))*E[w1](i1,j1)*A[m](j1,j2);
+             MatrixCT err=E[w1]-Echeck-C;
+             cout << "err=" << std::fixed << err << endl;
+             cout << std::scientific << Max(fabs(err)) << endl;
+
+        }
     }
 //
 //  Now do the final contraction to get E[1]
@@ -577,7 +719,7 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
     }
 
 //  E[1] should now be the same as C in the paper.
-//    cout << "E[" << 1 << "]=" << E[1] << endl;
+    cout << "E[" << 1 << "]=" << E[1] << endl;
 
 //
 //  Take the trace of E1
