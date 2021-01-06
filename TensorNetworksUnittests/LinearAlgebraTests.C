@@ -290,6 +290,7 @@ TEST_F(LinearAlgebraTests,LapackQRSolverReal)
     QRTester<double>(new LapackQRSolver<double>(),Nqr/2,Nqr  ).RunTests();
     QRTester<double>(new LapackQRSolver<double>(),Nqr  ,Nqr/2).RunTests();
 }
+
 TEST_F(LinearAlgebraTests,LapackQRSolverComplex)
 {
     QRTester<dcmplx>(new LapackQRSolver<dcmplx>(),Nqr  ,Nqr  ).RunTests();

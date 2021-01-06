@@ -15,9 +15,10 @@ protected:
 public:
     virtual ~QRSolver() {};
 
-//    virtual QRType  Solve    (const MatrixT&,double eps)=0;
     virtual QRType  SolveThinQR(const MatrixT&)=0; // returns [Q,R]
     virtual QRType  SolveThinRQ(const MatrixT&)=0; // mirror image version returns [R,Q]
+    virtual QRType  SolveThinQL(const MatrixT&)=0; // returns [Q,L]
+    virtual QRType  SolveThinLQ(const MatrixT&)=0; // mirror image version returns [L,Q]
 
 };
 

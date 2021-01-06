@@ -14,10 +14,20 @@ void dgerqf_(int* M,int* N,double* Q,int* LDA,double* TAU,double* WORK,int* LWOR
 void zgeqrf_(int* M,int* N,dcmplx* Q,int* LDA,dcmplx* TAU,dcmplx* WORK,int* LWORK,int* INFO);
 void zgerqf_(int* M,int* N,dcmplx* Q,int* LDA,dcmplx* TAU,dcmplx* WORK,int* LWORK,int* INFO);
 
+void dgeqlf_(int* M,int* N,double* Q,int* LDA,double* TAU,double* WORK,int* LWORK,int* INFO);
+void dgelqf_(int* M,int* N,double* Q,int* LDA,double* TAU,double* WORK,int* LWORK,int* INFO);
+void zgeqlf_(int* M,int* N,dcmplx* Q,int* LDA,dcmplx* TAU,dcmplx* WORK,int* LWORK,int* INFO);
+void zgelqf_(int* M,int* N,dcmplx* Q,int* LDA,dcmplx* TAU,dcmplx* WORK,int* LWORK,int* INFO);
+
 void dorgqr_(int* M,int* N,int*	K,double* Q,int* LDA,double* TAU,double* WORK,int* LWORK,int* INFO);
 void dorgrq_(int* M,int* N,int*	K,double* Q,int* LDA,double* TAU,double* WORK,int* LWORK,int* INFO);
 void zungqr_(int* M,int* N,int*	K,dcmplx* Q,int* LDA,dcmplx* TAU,dcmplx* WORK,int* LWORK,int* INFO);
 void zungrq_(int* M,int* N,int*	K,dcmplx* Q,int* LDA,dcmplx* TAU,dcmplx* WORK,int* LWORK,int* INFO);
+
+void dorgql_(int* M,int* N,int*	K,double* Q,int* LDA,double* TAU,double* WORK,int* LWORK,int* INFO);
+void dorglq_(int* M,int* N,int*	K,double* Q,int* LDA,double* TAU,double* WORK,int* LWORK,int* INFO);
+void zungql_(int* M,int* N,int*	K,dcmplx* Q,int* LDA,dcmplx* TAU,dcmplx* WORK,int* LWORK,int* INFO);
+void zunglq_(int* M,int* N,int*	K,dcmplx* Q,int* LDA,dcmplx* TAU,dcmplx* WORK,int* LWORK,int* INFO);
 
 }
 
@@ -30,6 +40,27 @@ template <> void xgeqrf<dcmplx> (int* M,int* N,dcmplx* Q,int* LDA,dcmplx* TAU,dc
 {
     zgeqrf_(M,N,Q,LDA,TAU,WORK,LWORK,INFO); //complex<double>
 }
+
+template <class T> void xgeqlf  (int* M,int* N,T* Q,int* LDA,T* TAU,T* WORK,int* LWORK,int* INFO);
+template <> void xgeqlf<double> (int* M,int* N,double* Q,int* LDA,double* TAU,double* WORK,int* LWORK,int* INFO)
+{
+    dgeqlf_(M,N,Q,LDA,TAU,WORK,LWORK,INFO); //double
+}
+template <> void xgeqlf<dcmplx> (int* M,int* N,dcmplx* Q,int* LDA,dcmplx* TAU,dcmplx* WORK,int* LWORK,int* INFO)
+{
+    zgeqlf_(M,N,Q,LDA,TAU,WORK,LWORK,INFO); //complex<double>
+}
+
+template <class T> void xgelqf  (int* M,int* N,T* Q,int* LDA,T* TAU,T* WORK,int* LWORK,int* INFO);
+template <> void xgelqf<double> (int* M,int* N,double* Q,int* LDA,double* TAU,double* WORK,int* LWORK,int* INFO)
+{
+    dgelqf_(M,N,Q,LDA,TAU,WORK,LWORK,INFO); //double
+}
+template <> void xgelqf<dcmplx> (int* M,int* N,dcmplx* Q,int* LDA,dcmplx* TAU,dcmplx* WORK,int* LWORK,int* INFO)
+{
+    zgelqf_(M,N,Q,LDA,TAU,WORK,LWORK,INFO); //complex<double>
+}
+
 
 template <class T> void xgerqf  (int* M,int* N,T* Q,int* LDA,T* TAU,T* WORK,int* LWORK,int* INFO);
 template <> void xgerqf<double> (int* M,int* N,double* Q,int* LDA,double* TAU,double* WORK,int* LWORK,int* INFO)
@@ -51,6 +82,16 @@ template <> void xungqr<dcmplx> (int* M,int* N,int*	K,dcmplx* Q,int* LDA,dcmplx*
     zungqr_(M,N,K,Q,LDA,TAU,WORK,LWORK,INFO); //complex<double>
 }
 
+template <class T> void xungql  (int* M,int* N,int*	K,T* Q,int* LDA,T* TAU,T* WORK,int* LWORK,int* INFO);
+template <> void xungql<double> (int* M,int* N,int*	K,double* Q,int* LDA,double* TAU,double* WORK,int* LWORK,int* INFO)
+{
+    dorgql_(M,N,K,Q,LDA,TAU,WORK,LWORK,INFO); //double
+}
+template <> void xungql<dcmplx> (int* M,int* N,int*	K,dcmplx* Q,int* LDA,dcmplx* TAU,dcmplx* WORK,int* LWORK,int* INFO)
+{
+    zungql_(M,N,K,Q,LDA,TAU,WORK,LWORK,INFO); //complex<double>
+}
+
 template <class T> void xungrq  (int* M,int* N,int*	K,T* Q,int* LDA,T* TAU,T* WORK,int* LWORK,int* INFO);
 template <> void xungrq<double> (int* M,int* N,int*	K,double* Q,int* LDA,double* TAU,double* WORK,int* LWORK,int* INFO)
 {
@@ -59,6 +100,16 @@ template <> void xungrq<double> (int* M,int* N,int*	K,double* Q,int* LDA,double*
 template <> void xungrq<dcmplx> (int* M,int* N,int*	K,dcmplx* Q,int* LDA,dcmplx* TAU,dcmplx* WORK,int* LWORK,int* INFO)
 {
     zungrq_(M,N,K,Q,LDA,TAU,WORK,LWORK,INFO); //complex<double>
+}
+
+template <class T> void xunglq  (int* M,int* N,int*	K,T* Q,int* LDA,T* TAU,T* WORK,int* LWORK,int* INFO);
+template <> void xunglq<double> (int* M,int* N,int*	K,double* Q,int* LDA,double* TAU,double* WORK,int* LWORK,int* INFO)
+{
+    dorglq_(M,N,K,Q,LDA,TAU,WORK,LWORK,INFO); //double
+}
+template <> void xunglq<dcmplx> (int* M,int* N,int*	K,dcmplx* Q,int* LDA,dcmplx* TAU,dcmplx* WORK,int* LWORK,int* INFO)
+{
+    zunglq_(M,N,K,Q,LDA,TAU,WORK,LWORK,INFO); //complex<double>
 }
 
 
@@ -101,11 +152,63 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
     lwork=-1;
     info=0;
     xungqr<T>(&M,&mn,&mn,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    assert(info==0);
     lwork=static_cast<int>(real(work(1)));
     work.SetLimits(lwork);
     xungqr<T>(&M,&mn,&mn,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    assert(info==0);
     if (mn<N) Q.SetLimits(M,mn,true);
     return std::make_tuple(std::move(Q),std::move(R)); //return [Q,R]
+}
+
+template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveThinQL(const MatrixT& Ain)
+{
+    int M=Ain.GetNumRows(),N=Ain.GetNumCols(),mn=Min(M,N);
+    assert(M>=N); //M<N not supported by Lapack dorgql_or zungql_
+
+    //
+    //  Diced how much work space lapack needs
+    //
+    int info=0,lwork=-1;
+    Vector<T> tau(mn),work(1);
+    Matrix<T> Q(Ain);
+    //
+    //  Initial call to see how much work space is needed
+    //
+    xgeqlf<T>(&M,&N,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    assert(info==0);
+    lwork=static_cast<int>(real(work(1)));
+    work.SetLimits(lwork);
+    //
+    //  Now do the actual QL work
+    //
+    xgeqlf<T>(&M,&N,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    assert(info==0);
+    //
+    //  Grab L before xungql clobbers it.
+    //
+    Matrix<T> L(mn,N);
+    for (int i=1;i<=mn;i++)
+    {
+        for (int j=1;j<=i;j++)
+            L(i,j)=Q(i+M-N,j);
+        for (int j=i+1;j<=N;j++)
+            L(i,j)=0.0;
+
+    }
+    //
+    //  unpack Q
+    //
+    lwork=-1;
+    info=0;
+    xungql<T>(&M,&N,&N,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    assert(info==0);
+    lwork=static_cast<int>(real(work(1)));
+    work.SetLimits(lwork);
+    xungql<T>(&M,&N,&N,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    assert(info==0);
+    if (mn<N) Q.SetLimits(M,mn,true);
+    return std::make_tuple(std::move(Q),std::move(L)); //return [Q,R]
 }
 
 template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveThinRQ(const MatrixT& Ain)
@@ -146,10 +249,58 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
     lwork=-1;
     info=0;
     xungrq<T>(&M,&N,&M,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    assert(info==0);
     lwork=static_cast<int>(real(work(1)));
     work.SetLimits(lwork);
     xungrq<T>(&M,&N,&M,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    assert(info==0);
     return std::make_tuple(std::move(R),std::move(Q)); //Return [R,Q]
+}
+
+template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveThinLQ(const MatrixT& Ain)
+{
+    int M=Ain.GetNumRows(),N=Ain.GetNumCols(),mn=Min(M,N);
+    assert(N>=M); //M>N not supported by Lapack dorglq_or zunglq_
+    //
+    //  Diced how much work space lapack needs
+    //
+    int info=0,lwork=-1;
+    Vector<T> tau(mn),work(1);
+    Matrix<T> Q(Ain);
+    //
+    //  Initial call to see how much work space is needed
+    //
+    xgelqf<T>(&M,&N,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    lwork=static_cast<int>(real(work(1)));
+    work.SetLimits(lwork);
+    //
+    //  Now do the actual QR work
+    //
+    xgelqf<T>(&M,&N,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    assert(info==0);
+    //
+    //  Grab R before xungqr clobbers it.
+    //
+    Matrix<T> L(M,mn);
+    for (int j=1;j<=mn;j++)
+    {
+        for (int i=1;i<j;i++)
+            L(i,j)=0.0;
+        for (int i=j;i<=M;i++)
+            L(i,j)=Q(i,j);
+    }
+    //
+    //  unpack Q
+    //
+    lwork=-1;
+    info=0;
+    xunglq<T>(&M,&N,&M,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    assert(info==0);
+    lwork=static_cast<int>(real(work(1)));
+    work.SetLimits(lwork);
+    xunglq<T>(&M,&N,&M,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    assert(info==0);
+    return std::make_tuple(std::move(L),std::move(Q)); //Return [R,Q]
 }
 
 template class LapackQRSolver<double>;

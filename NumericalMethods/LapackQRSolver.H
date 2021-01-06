@@ -18,6 +18,8 @@ public:
 //    virtual QRType  Solve    (const MatrixT&);
     virtual QRType  SolveThinQR(const MatrixT&); // returns [Q,R]
     virtual QRType  SolveThinRQ(const MatrixT&); // mirror image version returns [R,Q]
+    virtual QRType  SolveThinQL(const MatrixT&); // returns [Q,L]
+    virtual QRType  SolveThinLQ(const MatrixT&); // mirror image version returns [L,Q]
 
 };
 
