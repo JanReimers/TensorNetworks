@@ -4,6 +4,7 @@
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/Dw12.H"
 #include "NumericalMethods/LapackSVDSolver.H"
+#include "NumericalMethods/LapackQRSolver.H"
 #include "NumericalMethods/ArpackEigenSolver.H"
 #include "Containers/Matrix4.H"
 #include "oml/cnumeric.h"
@@ -17,8 +18,9 @@ using std::endl;
 namespace TensorNetworks
 {
 
-void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
+bool MPSSite::HandleEdges(Direction lr)
 {
+    bool edge=false;
     // Handle edge cases first
     if (lr==DRight && !itsLeft_Bond)
     {
@@ -27,7 +29,7 @@ void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
         int newD2=Max(itsRightBond->GetD(),itsd); //Don't shrink below p
         if (newD2<itsD2) NewBondDimensions(itsD1,newD2,true); //But also don't grow D2
         Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
-        return;
+        edge=true;
     }
     if(lr==DLeft && !itsRightBond)
     {
@@ -36,8 +38,14 @@ void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
         int newD1=Max(itsLeft_Bond->GetD(),itsd); //Don't shrink below p
         if (newD1<itsD1) NewBondDimensions(newD1,itsD2,true); //But also don't grow D1
         Rescale(sqrt(std::real(GetNorm(lr)(1,1))));
-        return;
+        edge=true;
     }
+    return edge;
+}
+
+void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
+{
+    if (HandleEdges(lr)) return;
     MatrixCT A=ReshapeBeforeSVD(lr);
     LapackSVDSolver<dcmplx> solver;
     int D=Min(A.GetNumRows(),A.GetNumCols());
@@ -66,6 +74,33 @@ void MPSSite::SVDNormalize(Direction lr, SVCompressorC* comp)
         itsNormStatus=NormStatus::A;
         break;
     }
+    }
+    assert(GetNormStatus(1e-12)!='M');
+}
+
+void MPSSite::NormalizeQR(Direction lr)
+{
+    if (HandleEdges(lr)) return;
+    MatrixCT A=ReshapeBeforeSVD(lr);
+    LapackQRSolver<dcmplx> solver;
+    switch (lr)
+    {
+        case DRight:
+        {
+            auto [R,Q]=solver.SolveThinRQ(A); //Solves A=R*Q
+            GetBond(lr)->TransferQR(lr,R);
+            ReshapeAfter_SVD(lr,Q);  //A is now Q
+            itsNormStatus=NormStatus::B;
+            break;
+        }
+        case DLeft:
+        {
+            auto [Q,R]=solver.SolveThinQR(A); //Solves A=Q*R
+            GetBond(lr)->TransferQR(lr,R);
+            ReshapeAfter_SVD(lr,Q);  //A is now U
+            itsNormStatus=NormStatus::A;
+            break;
+        }
     }
     assert(GetNormStatus(1e-12)!='M');
 }

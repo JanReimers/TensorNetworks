@@ -319,8 +319,15 @@ dcmplx MPSSite::ContractWFA(int m, int w2, int i1, int j2, const SiteOperator* s
     {
         const MatrixRT& Wmn=so->GetW(m,n);
         assert(Wmn.GetNumRows()==Dws1.Dw1);
-//        for (int w1=1; w1<Dws1.w1_first(w2); w1++)
-//            assert(Wmn(w1,w2)==0);
+        for (int w1=1; w1<Dws1.w1_first(w2); w1++)
+        {
+            if (Wmn(w1,w2)!=0)
+            {
+                cout << "W"<< m << n <<"(" << w1 << "," << w2 << ")=" << Wmn(w1,w2) << endl;
+                cout << "Dws1.w1_first=" << Dws1.w1_first << endl;
+            }
+            assert(Wmn(w1,w2)==0);
+        }
         for (int w1=Dws1.w1_first(w2); w1<=Dws1.Dw1; w1++)
             if (Wmn(w1,w2)!=0.0)
             {
@@ -447,6 +454,11 @@ void MPSSite::SVDTransfer(Direction lr,const DiagonalMatrixRT& s, const MatrixCT
     }
 
     }
+}
+
+void MPSSite::TransferQR(Direction lr,const MatrixCT& R)
+{
+    SVDTransfer(lr,R);
 }
 
 void MPSSite::SVDTransfer(Direction lr,const MatrixCT& UV)
@@ -689,3 +701,6 @@ void  MPSSite::Apply(const SiteOperator* so, MPSSite* psiPrime)
 }
 
 } //namespace
+
+#define TYPE int
+#include "oml/src/vector.cpp"

@@ -70,9 +70,6 @@ TEST_F(MPSTests,LeftNormalMatricies)
     EXPECT_TRUE(IsUnit(GetNorm(TensorNetworks::DLeft,1),eps));
     EXPECT_TRUE(IsUnit(GetNorm(TensorNetworks::DLeft,2),eps));
     EXPECT_TRUE(IsUnit(GetNorm(TensorNetworks::DLeft,9),eps));
-//    VerifyUnit(GetNorm(TensorNetworks::DLeft,1),eps);
-//    VerifyUnit(GetNorm(TensorNetworks::DLeft,2),eps);
-//    VerifyUnit(GetNorm(TensorNetworks::DLeft,9),eps);
 }
 
 
@@ -84,9 +81,6 @@ TEST_F(MPSTests,RightNormalMatricies)
     EXPECT_TRUE(IsUnit(GetNorm(TensorNetworks::DRight,2),eps));
     EXPECT_TRUE(IsUnit(GetNorm(TensorNetworks::DRight,9),eps));
     EXPECT_TRUE(IsUnit(GetNorm(TensorNetworks::DRight,10),eps));
-//    VerifyUnit(GetNorm(TensorNetworks::DRight,2),eps);
-//    VerifyUnit(GetNorm(TensorNetworks::DRight,9),eps);
-//    VerifyUnit(GetNorm(TensorNetworks::DRight,10),eps);
 }
 
 
@@ -97,18 +91,12 @@ TEST_F(MPSTests,LeftNormalMatricies_S2)
     EXPECT_TRUE(IsUnit(GetNorm(TensorNetworks::DLeft,1),eps));
     EXPECT_TRUE(IsUnit(GetNorm(TensorNetworks::DLeft,2),eps));
     EXPECT_TRUE(IsUnit(GetNorm(TensorNetworks::DLeft,9),eps));
-//    VerifyUnit(GetNorm(TensorNetworks::DLeft,1),eps);
-//    VerifyUnit(GetNorm(TensorNetworks::DLeft,2),eps);
-//    VerifyUnit(GetNorm(TensorNetworks::DLeft,9),eps);
 }
 
 TEST_F(MPSTests,RightNormalMatricies_S2)
 {
     Setup(10,1.5,3);
     itsMPS->InitializeWith(TensorNetworks::Product);
-//    VerifyUnit(GetNorm(TensorNetworks::DRight,2),eps);
-//    VerifyUnit(GetNorm(TensorNetworks::DRight,9),eps);
-//    VerifyUnit(GetNorm(TensorNetworks::DRight,10),eps);
     EXPECT_TRUE(IsUnit(GetNorm(TensorNetworks::DRight,2),eps));
     EXPECT_TRUE(IsUnit(GetNorm(TensorNetworks::DRight,9),eps));
     EXPECT_TRUE(IsUnit(GetNorm(TensorNetworks::DRight,10),eps));

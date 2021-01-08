@@ -36,11 +36,26 @@ void MPSImp::NormalizeAndCompress(Direction LR,SVCompressorC* comp)
     ForLoop(LR)
          NormalizeAndCompressSite(LR,ia,comp);
 }
+void MPSImp::NormalizeQR(Direction LR)
+{
+    ForLoop(LR)
+         NormalizeQRSite(LR,ia);
+}
 
 void MPSImp::NormalizeAndCompressSite(Direction lr,int isite,SVCompressorC* comp)
 {
     CheckSiteNumber(isite);
     itsSites[isite]->SVDNormalize(lr,comp);
+
+    int bond_index=isite+( lr==DLeft ? 0 :-1);
+    if (bond_index<itsL && bond_index>=1)
+        UpdateBondData(bond_index);
+}
+
+void MPSImp::NormalizeQRSite(Direction lr,int isite)
+{
+    CheckSiteNumber(isite);
+    itsSites[isite]->NormalizeQR(lr);
 
     int bond_index=isite+( lr==DLeft ? 0 :-1);
     if (bond_index<itsL && bond_index>=1)

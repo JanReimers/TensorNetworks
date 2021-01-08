@@ -63,7 +63,8 @@ class MPSSite
 //
 // Normalization
 //
-        void SVDNormalize(Direction lr,SVCompressorC*);
+        void NormalizeQR  (Direction lr);
+        void SVDNormalize (Direction lr,SVCompressorC*);
         void Canonicalize1(Direction lr,SVCompressorC*);
         void Canonicalize2(Direction lr,SVCompressorC*);
 
@@ -117,7 +118,7 @@ private:
     Matrix4CT GetTransferMatrix(Direction lr) const;
     void      Update      (const VectorCT& newAs);
     void      iNormalize(Direction lr); //Use transfer matrix eigenvalue to rescale.
-//    static bool     IsUnit(const MatrixCT& m,double eps);
+    bool      HandleEdges(Direction lr);
 
     //
     //  lr is the normalization direction.  For normalization we need to access the right bond.
@@ -149,6 +150,7 @@ private:
 //
     void SVDTransfer(Direction lr,const DiagonalMatrixRT& s, const MatrixCT& UV);
     void SVDTransfer(Direction lr,const MatrixCT& UV);
+    void TransferQR (Direction lr,const MatrixCT& R);
 
     dcmplx ContractAWFA (int w2,int i2, int j2,         const SiteOperator* so, const Vector3CT& Fam1) const;
     dcmplx ContractWFA  (int m, int w2, int i1, int j2, const SiteOperator* so, const Vector3CT& Fam1) const;

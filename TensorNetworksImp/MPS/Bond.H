@@ -21,6 +21,7 @@ class Bond
         void NewBondDimension(int D);
 
         void SVDTransfer      (Direction lr,double compessionError,const DiagonalMatrixRT& s,const MatrixCT& UV);
+        void TransferQR       (Direction lr,const MatrixCT& R);
         void CanonicalTransfer(Direction lr,double compessionError,const DiagonalMatrixRT& s,const MatrixCT& UV);
 
         double GetBondEntropy() const {return itsBondEntropy;}
@@ -38,6 +39,7 @@ class Bond
     private:
         friend class iTEBDStateImp;
         void SetSingularValues(const DiagonalMatrixRT& s, double compessionError);
+        void ClearSingularValues(int D);
         void UpdateBondEntropy();
         static double GetNorm(const DiagonalMatrixRT&);
         //

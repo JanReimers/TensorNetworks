@@ -56,6 +56,7 @@ public:
         virtual void CanonicalizeSite2(Direction LR, int isite,SVCompressorC*); //...lambda-Gamma-lambda-Gamma-lambda...
 
         virtual void NormalizeAndCompress(Direction LR,SVCompressorC*);
+        virtual void NormalizeQR(Direction LR);
 //--------------------------------------------------------------------------------------
 //
 // Find ground state
@@ -100,7 +101,8 @@ protected:
     // Constructor used for iTEBD
         MPSImp(int L, double S, Direction lr,double normEps);
         void IncreaseBondDimensions(int D);
-        void   NormalizeAndCompressSite  (Direction lr,int isite,SVCompressorC*);
+        void NormalizeAndCompressSite(Direction lr,int isite,SVCompressorC*);
+        void NormalizeQRSite         (Direction lr,int isite);
 //--------------------------------------------------------------------------------------
 //
 //  Loop Control

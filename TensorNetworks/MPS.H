@@ -28,6 +28,7 @@ public:
     virtual void Normalize(Direction LR);
     virtual void NormalizeAndCompress(Direction LR,int Dmax,double eps);
     virtual void NormalizeAndCompress(Direction LR,SVCompressorC*)=0;
+    virtual void NormalizeQR(Direction LR)=0;
 //--------------------------------------------------------------------------------------
 //
 // Find ground state.  Return <E^2>-<E>^2

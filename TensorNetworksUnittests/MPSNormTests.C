@@ -183,4 +183,55 @@ TEST_F(MPSNormTests,SeflOverlapRandomStateL10S3D10)
     EXPECT_NEAR(itsMPS->GetOverlap(itsMPS),1.0,eps);
 }
 
+TEST_F(MPSNormTests,QRNormalL10S12D2)
+{
+    int L=10,D=2;
+    double S=0.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->NormalizeQR(TensorNetworks::DLeft);
+    EXPECT_EQ(itsMPS->GetNormStatus(),"AAAAAAAAAA");
+    itsMPS->NormalizeQR(TensorNetworks::DRight);
+    EXPECT_EQ(itsMPS->GetNormStatus(),"BBBBBBBBBB");
+//    itsMPS->Report(cout);
+}
+
+TEST_F(MPSNormTests,QRNormalL10S12D8)
+{
+    int L=10,D=8;
+    double S=0.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->NormalizeQR(TensorNetworks::DLeft);
+    EXPECT_EQ(itsMPS->GetNormStatus(),"AAAAAAAAAA");
+    itsMPS->NormalizeQR(TensorNetworks::DRight);
+    EXPECT_EQ(itsMPS->GetNormStatus(),"BBBBBBBBBB");
+//    itsMPS->Report(cout);
+}
+
+TEST_F(MPSNormTests,QRNormalL10S32D2)
+{
+    int L=10,D=2;
+    double S=1.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->NormalizeQR(TensorNetworks::DLeft);
+    EXPECT_EQ(itsMPS->GetNormStatus(),"AAAAAAAAAA");
+    itsMPS->NormalizeQR(TensorNetworks::DRight);
+    EXPECT_EQ(itsMPS->GetNormStatus(),"BBBBBBBBBB");
+//    itsMPS->Report(cout);
+}
+
+TEST_F(MPSNormTests,QRNormalL10S32D8)
+{
+    int L=10,D=8;
+    double S=1.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->NormalizeQR(TensorNetworks::DLeft);
+    EXPECT_EQ(itsMPS->GetNormStatus(),"AAAAAAAAAA");
+    itsMPS->NormalizeQR(TensorNetworks::DRight);
+    EXPECT_EQ(itsMPS->GetNormStatus(),"BBBBBBBBBB");
+//    itsMPS->Report(cout);
+}
 
