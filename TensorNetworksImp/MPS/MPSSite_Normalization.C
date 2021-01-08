@@ -87,8 +87,9 @@ void MPSSite::NormalizeQR(Direction lr)
     {
         case DRight:
         {
-            auto [R,Q]=solver.SolveThinRQ(A); //Solves A=R*Q
-            GetBond(lr)->TransferQR(lr,R);
+            auto [L,Q]=solver.SolveThinLQ(A); //Solves A=R*Q
+            assert(IsLowerTriangular(L));
+            GetBond(lr)->TransferQR(lr,L);
             ReshapeAfter_SVD(lr,Q);  //A is now Q
             itsNormStatus=NormStatus::B;
             break;
@@ -96,6 +97,7 @@ void MPSSite::NormalizeQR(Direction lr)
         case DLeft:
         {
             auto [Q,R]=solver.SolveThinQR(A); //Solves A=Q*R
+            assert(IsUpperTriangular(R));
             GetBond(lr)->TransferQR(lr,R);
             ReshapeAfter_SVD(lr,Q);  //A is now U
             itsNormStatus=NormStatus::A;
