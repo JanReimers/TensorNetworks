@@ -120,5 +120,14 @@ void MPO::CanonicalForm(Direction lr)
     }
 }
 
+std::string MPO::GetNormStatus () const
+{
+     int L=GetL();
+     std::string status(L,' ');
+     for (int ia=1;ia<=L;ia++)
+           status[ia-1]=GetSiteOperator(ia)->GetNormStatus(1e-13);
+     return status;
+}
+
 
 }

@@ -22,6 +22,7 @@ class MPO
         virtual int   GetMaxDw() const;
         virtual void  Report(std::ostream&) const; //Show Dws
         virtual void  Dump  (std::ostream&) const; //Show matrices
+        virtual std::string GetNormStatus () const;
         virtual const SiteOperator* GetSiteOperator(int isite) const;
         virtual       SiteOperator* GetSiteOperator(int isite)      =0;
 

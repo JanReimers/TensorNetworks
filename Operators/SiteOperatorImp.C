@@ -361,7 +361,7 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
 //  has the intrinsic portion of W.
 //  In simple terms we just leave out the {first/last} row and column
 //
-MatrixRT SiteOperatorImp::ReshapeV(Direction lr)
+MatrixRT SiteOperatorImp::ReshapeV(Direction lr) const
 {
     MatrixRT A;
     switch (lr)
@@ -443,7 +443,7 @@ void  SiteOperatorImp::ReshapeV(Direction lr,const MatrixRT& Q)
 }
 
 
-MatrixRT SiteOperatorImp::Reshape(Direction lr)
+MatrixRT SiteOperatorImp::Reshape(Direction lr) const
 {
     MatrixRT A;
     switch (lr)
@@ -594,11 +594,37 @@ void SiteOperatorImp::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const M
 
 
 
-
 void SiteOperatorImp::Report(std::ostream& os) const
 {
     os << itsDw12.Dw1 << " " << itsDw12.Dw2 << " " << itsTruncationError;
 }
+
+char SiteOperatorImp::GetNormStatus(double eps) const
+{
+    char ret='W'; //Not normalized
+    {
+        MatrixRT QL=ReshapeV(DLeft);
+        if (QL.GetNumRows()==0)
+            ret='l';
+        else if (IsUnit(Transpose(QL)*QL,eps))
+            ret='L';
+    }
+    if (ret!='l')
+    {
+        MatrixRT QR=ReshapeV(DRight);
+        if (QR.GetNumCols()==0)
+            ret='r';
+        else if (IsUnit(QR*Transpose(QR),eps))
+        {
+            if (ret=='L')
+                ret='I';
+            else
+                ret='R';
+        }
+    }
+    return ret;
+}
+
 
 } //namespace
 //---------------------------------------------------------------------------------

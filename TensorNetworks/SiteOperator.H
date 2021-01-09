@@ -38,7 +38,7 @@ public:
     virtual void CanonicalForm(Direction LR)=0;
 
     virtual void Report(std::ostream&) const=0;
-
+    virtual char GetNormStatus(double eps) const=0;
 };
 
 }
