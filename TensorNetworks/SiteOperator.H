@@ -30,6 +30,12 @@ public:
     //  SVD compress and normalize to reduce Dw
     //
     virtual void Compress(Direction,const SVCompressorR*)=0;
+    //
+    //  as per: Parker, D. E.; Cao, X. & Zaletel, M. P.
+    //          Local Matrix Product Operators: Canonical Form, Compression, and Control Theory
+    //          Phys. Rev. B 102, 035147 (2020), 2019
+    //
+    virtual void CanonicalForm(Direction LR)=0;
 
     virtual void Report(std::ostream&) const=0;
 

@@ -52,6 +52,10 @@ class SiteOperatorImp : public virtual SiteOperator
         //  SVD compress and normalize to reduce Dw
         //
         virtual void Compress(Direction,const SVCompressorR*);
+        //
+        //  As per Parker et. al.
+        //
+        virtual void CanonicalForm(Direction LR);
 
         virtual void Report(std::ostream&) const;
 
@@ -59,11 +63,14 @@ class SiteOperatorImp : public virtual SiteOperator
         friend class MPOTesting;
         MatrixRT& GetW(int m, int n) {return itsWs(m+1,n+1);}
         void SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV);
+        void  QLTransfer(Direction lr,const MatrixRT& L);
 
-        MatrixRT Reshape(Direction lr);
-        void     Reshape(int D1, int D2, bool saveData=false);
-        void     Reshape(Direction lr,const MatrixRT& UV);
-
+        MatrixRT Reshape (Direction lr);
+        MatrixRT ReshapeV(Direction lr);
+        void     Reshape (int D1, int D2, bool saveData=false);
+        void     Reshape (Direction lr,const MatrixRT& UV);
+        void     ReshapeV(Direction lr,const MatrixRT& Q);
+        void     SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
 
         int itsd; //2*S+1
         Dw12 itsDw12;

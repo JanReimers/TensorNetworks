@@ -471,18 +471,7 @@ double iTEBDStateImp::GetExpectation (const iMPO* o) const
     return E1;
 }
 
-template <class T, class A, Data D> inline
-bool IsLowerTriangular(const Indexable<T,A,Full,D,MatrixShape>& m)
-{
-    bool ret=true;
-    for (index_t i: m.rows())
-        for (index_t j: m.cols(i+1))
-        {
-            ret = ret && (m(i,j)==0.0);
-            if (!ret) break;
-        }
-    return ret;
-}
+
 
 //
 //  We should be able to do these by simply handing off the data inside

@@ -2,6 +2,7 @@
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 #include "NumericalMethods/LapackSVDSolver.H"
+#include "NumericalMethods/LapackQRSolver.H"
 #include "Containers/Vector3.H"
 #include "oml/diagonalmatrix.h"
 #include <complex>
@@ -160,6 +161,32 @@ void SiteOperatorImp::SetNeighbours(SiteOperator* left, SiteOperator* right)
     assert(!right || itsRightNeighbour);
 }
 
+void SiteOperatorImp::SetLimits()
+{
+    Fill(itsDw12.w1_first,1);
+    Fill(itsDw12.w2_last ,itsDw12.Dw2);
+//    Fill(itsDw12.w1_first,itsDw12.Dw1);
+//    Fill(itsDw12.w2_last ,1);
+//    for (int m=0; m<itsd; m++)
+//        for (int n=0; n<itsd; n++)
+//        {
+//            const MatrixRT& W=GetW(m,n);
+//            for (int w1=1; w1<=itsDw12.Dw1; w1++)
+//                for (int w2=1; w2<=itsDw12.Dw2; w2++)
+//                    if (W(w1,w2)!=0.0)
+//                    {
+//                        if (itsDw12.w1_first(w2)>w1) itsDw12.w1_first(w2)=w1;
+//                        if (itsDw12.w2_last (w1)<w2) itsDw12.w2_last (w1)=w2;
+//
+//                    }
+//            cout << "W(" << m << "," << n << ")=" << W << endl;
+//            cout << "w1_first=" << itsDw12.w1_first << endl;
+//            cout << "w2_last =" << itsDw12.w2_last  << endl;
+//        }
+
+}
+
+
 
 void SiteOperatorImp::Combine(const SiteOperator* O2,double factor)
 {
@@ -204,13 +231,16 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
 {
     assert(comp);
     MatrixRT  A=Reshape(lr);
+//    cout << "A=" << A << endl;
     LapackSVDSolver<double> solver;
     auto [U,sm,VT]=solver.SolveAll(A,1e-14); //Solves A=U * s * VT
+//    cout << "U=" << U << endl;
     //
     //  Rescaling
     //
     double s_avg=Sum(sm.GetDiagonal())/sm.size();
 //    cout << "s_avg, sm=" << s_avg << " " << sm << endl;
+//    cout << "VT=" << VT << endl;
     sm*=1.0/s_avg;
      switch (lr)
     {
@@ -241,8 +271,177 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
             break;
         }
     }
-
+    SetLimits();
 }
+
+MatrixRT MakeBlockMatrix(const MatrixRT& M,int D,int offset)
+{
+    MatrixRT ret(D,D);
+    Unit(ret);
+    int n=M.GetNumRows();
+    assert(n==M.GetNumCols());
+    assert(D>n);
+    assert(offset>=0);
+    assert(n+offset<=D);
+    for (int i:M.rows())  //Sub matrix multiply
+        for (int j:M.cols())
+            ret(i+offset,j+offset)=M(i,j);
+    return ret;
+}
+
+void SiteOperatorImp::CanonicalForm(Direction lr)
+{
+
+    MatrixRT  V=ReshapeV(lr);
+//    cout << "V=" << V << endl;
+    LapackQRSolver<double> solver;
+    switch (lr)
+    {
+        case DLeft:
+        {
+            auto [Q,L]=solver.SolveThinQL(V); //Solves V=Q*L
+            ReshapeV(lr,Q);  //A is now U
+            MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,1);
+            if (itsRightNeighbour) itsRightNeighbour->QLTransfer(lr,Lplus);
+            break;
+        }
+        case DRight:
+        {
+            auto [L,Q]=solver.SolveThinLQ(V); //Solves V=L*Q
+            ReshapeV(lr,Q);  //A is now U
+            MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,0);
+            if (itsLeft_Neighbour) itsLeft_Neighbour->QLTransfer(lr,Lplus);
+            break;
+        }
+
+    }
+    SetLimits();
+}
+//
+//  Do W = W*L, but L is (Dw-1)x(Dw-1) is smaller than W
+//
+void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
+{
+    switch (lr)
+    {
+    case DRight:
+    {
+
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++)
+            {
+                MatrixRT& W=GetW(m,n);
+                assert(W.GetNumCols()==L.GetNumRows());
+                MatrixRT temp=W*L;
+                W=temp; //Shallow copy
+                assert(W.GetNumCols()==itsDw12.Dw2); //Verify shape is correct;
+            }
+        break;
+    }
+    case DLeft:
+    {
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++)
+            {
+                MatrixRT& W=GetW(m,n);
+                assert(L.GetNumCols()==W.GetNumRows());
+                MatrixRT temp=L*W;
+                W=temp; //Shallow copy
+                assert(W.GetNumRows()==itsDw12.Dw1); //Verify shape is correct;
+            }
+        break;
+    }
+
+    }
+    SetLimits();
+}
+
+//
+//  For LR = {Left/Right} we need to reshape with only {bottom right/top left} portion of matrix which
+//  has the intrinsic portion of W.
+//  In simple terms we just leave out the {first/last} row and column
+//
+MatrixRT SiteOperatorImp::ReshapeV(Direction lr)
+{
+    MatrixRT A;
+    switch (lr)
+    {
+    case DLeft:
+    { //Leave out **first** row and column
+        A.SetLimits(itsd*itsd*(itsDw12.Dw1-1),itsDw12.Dw2-1);
+        int w=1;
+        for (int w1=2; w1<=itsDw12.Dw1; w1++)
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++,w++)
+            {
+                const MatrixRT& W=GetW(m,n);
+                    for (int w2=2; w2<=itsDw12.Dw2; w2++)
+                        A(w,w2-1)=W(w1,w2);
+            }
+        break;
+    }
+    case DRight:
+    { //Leave out **last** row and column
+        A.SetLimits(itsDw12.Dw1-1,itsd*itsd*(itsDw12.Dw2-1));
+        int w=1;
+        for (int w2=1; w2<=itsDw12.Dw2-1; w2++)
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++,w++)
+            {
+                const MatrixRT& W=GetW(m,n);
+                   for (int w1=1; w1<=itsDw12.Dw1-1; w1++)
+                        A(w1,w)=W(w1,w2);
+            }
+        break;
+    }
+    }
+    return A;
+}
+
+void  SiteOperatorImp::ReshapeV(Direction lr,const MatrixRT& Q)
+{
+    switch (lr)
+    {
+    case DLeft:
+    {
+        //  If L has less columns than the Ws then we need to reshape the whole site.
+        //  Typically this will happen at the edges of the lattice.
+        //
+        //if (L.GetNumCols()<itsDw12.Dw2) Reshape(itsDw12.Dw1,L.GetNumCols());//This throws away the old data
+        int w=1;
+        for (int w1=2; w1<=itsDw12.Dw1; w1++)
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++,w++)
+            {
+                MatrixRT& W=GetW(m,n);
+                for (int w2=2; w2<=itsDw12.Dw2; w2++)
+                    W(w1,w2)=Q(w,w2-1);
+            }
+//        for (int m=0; m<itsd; m++)
+//            for (int n=0; n<itsd; n++,w++)
+//               cout << "Wnew(" << m << n << ")=" << GetW(m,n) << endl;
+        break;
+    }
+    case DRight:
+    {
+        //  If Vdagger has less rows than the Ws then we need to reshape the whole site.
+        //  Typically this will happen at the edges of the lattice.
+        //
+        //if (UV.GetNumRows()<itsDw12.Dw1) Reshape(UV.GetNumRows(),itsDw12.Dw2,false);//This throws away the old data
+        int w=1;
+        for (int w2=1; w2<=itsDw12.Dw2-1; w2++)
+        for (int m=0; m<itsd; m++)
+            for (int n=0; n<itsd; n++,w++)
+            {
+                MatrixRT& W=GetW(m,n);
+                    for (int w1=1; w1<=itsDw12.Dw1-1; w1++)
+                        W(w1,w2)=Q(w1,w);
+            }
+        break;
+    }
+    }
+}
+
 
 MatrixRT SiteOperatorImp::Reshape(Direction lr)
 {
@@ -390,8 +589,11 @@ void SiteOperatorImp::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const M
     }
 
     }
-
+    SetLimits();
 }
+
+
+
 
 void SiteOperatorImp::Report(std::ostream& os) const
 {
@@ -405,3 +607,6 @@ void SiteOperatorImp::Report(std::ostream& os) const
 //
 #define TYPE Matrix<double>
 #include "oml/src/matrix.cpp"
+#undef TYPE
+#define TYPE int
+#include "oml/src/vector.cpp"

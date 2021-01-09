@@ -412,6 +412,22 @@ TEST_F(MPOTests,TestL2iMPOTrotter4)
     }
 }
 
+TEST_F(MPOTests,TestParkerCanonicalL9)
+{
+    int L=9,D=2;
+    double S=0.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+
+    double E=itsMPS->GetExpectation(itsH);
+    itsH->CanonicalForm(TensorNetworks::DLeft);
+    double Eleft=itsMPS->GetExpectation(itsH);
+    itsH->CanonicalForm(TensorNetworks::DRight);
+    double Eright=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E,Eleft ,1e-13);
+    EXPECT_NEAR(E,Eright,1e-13);
+}
+
 #ifndef DEBUG
 
 TEST_F(MPOTests,TestTimingE2_S5D4)

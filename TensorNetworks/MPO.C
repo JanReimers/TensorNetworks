@@ -82,6 +82,8 @@ double MPO::Compress(int Dmax, double epsSV)
 
 double MPO::Compress(const SVCompressorR* compressor)
 {
+//    GetSiteOperator(2)->Compress(DLeft ,compressor);
+//    return 0.0;
     int L=GetL();
     Vector<int> oldDws(L),newDws(L);
     for (int ia=1;ia<L;ia++)
@@ -97,10 +99,26 @@ double MPO::Compress(const SVCompressorR* compressor)
     }
     newDws(1)=0;
     double percent=100-(100.0*Sum(newDws))/static_cast<double>(Sum(oldDws));
-//    cout << "% compression=" << std::fixed << std::setprecision(2) << percent << endl;
+//    std::cout << "% compression=" << std::fixed << std::setprecision(2) << percent << std::endl;
     return percent;
 }
 
+void MPO::CanonicalForm(Direction lr)
+{
+//    GetSiteOperator(3)->CanonicalForm(lr);
+    int L=GetL();
+    switch (lr)
+    {
+        case DLeft:
+            for (int ia=2;ia<L;ia++)
+                GetSiteOperator(ia)->CanonicalForm(lr);
+            break;
+        case DRight:
+            for (int ia=L-1;ia>1;ia--)
+                GetSiteOperator(ia)->CanonicalForm(lr);
+            break;
+    }
+}
 
 
 }
