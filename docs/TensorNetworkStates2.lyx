@@ -5521,14 +5521,33 @@ V_{\left(w_{1}mn\right),w_{2}}=\sum_{k=1}^{1+\chi}Q_{\left(w_{1}mn\right),k}L_{k
 =\begin{bmatrix}\hat{\boldsymbol{A}}^{\prime} & 0\\
 \hat{\boldsymbol{b}}^{\prime} & \hat{𝕀}
 \end{bmatrix}\begin{bmatrix}\mathsf{L} & 0\\
-t & 1
+t & x
 \end{bmatrix}=\begin{bmatrix}\hat{\boldsymbol{A}}^{\prime}\mathsf{L} & 0\\
-\hat{\boldsymbol{b}}^{\prime}\mathsf{L}+t & \hat{𝕀}
+\hat{\boldsymbol{b}}^{\prime}\mathsf{L}+\hat{𝕀}t & \hat{𝕀}
 \end{bmatrix}
 \]
 
 \end_inset
 
+In the paper they have 
+\begin_inset Formula $x=1$
+\end_inset
+
+ on the lower right, but I am unable achieve this, I always get something
+ other that 
+\begin_inset Formula $1$
+\end_inset
+
+ for 
+\begin_inset Formula $x$
+\end_inset
+
+.
+ In prectice I see 
+\begin_inset Formula $x=-\sqrt{d}$
+\end_inset
+
+.
  The block respectiong QL decomposition of 
 \begin_inset Formula $\hat{W}$
 \end_inset
@@ -5541,9 +5560,9 @@ QL\left(\hat{W}\right)=\hat{Q}L=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
 \hat{d} & \hat{\boldsymbol{b}}^{\prime} & \hat{𝕀}
 \end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
 0 & \mathsf{L} & 0\\
-0 & t & 1
+0 & t & x
 \end{bmatrix}=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
-\hat{\boldsymbol{c}}^{\prime} & \hat{\boldsymbol{A}}^{\prime}\mathsf{L} & 0\\
+\hat{\boldsymbol{c}} & \hat{\boldsymbol{A}}^{\prime}\mathsf{L} & 0\\
 \hat{d} & \hat{\boldsymbol{b}}^{\prime}\mathsf{L}+t & \hat{𝕀}
 \end{bmatrix}
 \]
@@ -5627,66 +5646,208 @@ We start with a right canonical MPO
 
 \end_inset
 
-and QR the first 
-\begin_inset Formula $W$
+and QL the first 
+\begin_inset Formula $\hat{W}_{R}$
 \end_inset
 
 
 \begin_inset Formula 
 \[
-\hat{H}=\boldsymbol{l}\hat{W}_{L}R\hat{W}_{R}\hat{W}_{R}\cdots
+\hat{W}_{R}=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{c}} & \hat{\boldsymbol{A}}^{\prime} & 0\\
+\hat{d} & \hat{\boldsymbol{b}}^{\prime} & \hat{𝕀}
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{L} & 0\\
+0 & t & -\sqrt{d}
+\end{bmatrix}
 \]
 
 \end_inset
 
-where 
-\begin_inset Formula $R$
-\end_inset
-
- always has the block structure 
+then factor 
 \begin_inset Formula 
 \[
-R=\begin{bmatrix}1 & t & 0\\
-0 & \mathsf{R} & 0\\
+L=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{L} & 0\\
+0 & t & 1
+\end{bmatrix}=ML^{\prime}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{L} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{𝕀} & 0\\
+0 & t & -\sqrt{d}
+\end{bmatrix}
+\]
+
+\end_inset
+
+and then SVD 
+\begin_inset Formula $M=UsV^{\dagger}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{L} & 0\\
+0 & 0 & 1
+\end{bmatrix}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{U} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{s} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{V^{\dagger}} & 0\\
 0 & 0 & 1
 \end{bmatrix}
 \]
 
 \end_inset
 
-which can be decomposed as
+
 \begin_inset Formula 
 \[
-R=MR^{\prime}=\begin{bmatrix}1 & 0 & 0\\
-0 & \mathsf{M} & 0\\
+\hat{W}_{R}=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{c}} & \hat{\boldsymbol{A}}^{\prime} & 0\\
+\hat{d} & \hat{\boldsymbol{b}}^{\prime} & \hat{𝕀}
+\end{bmatrix}UsV^{\dagger}L^{\prime}
+\]
+
+\end_inset
+
+and then factorize 
+\begin_inset Formula $L$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{c}} & \hat{\boldsymbol{A}}^{\prime} & 0\\
+\hat{d} & \hat{\boldsymbol{b}}^{\prime} & \hat{𝕀}
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{U} & 0\\
 0 & 0 & 1
-\end{bmatrix}\begin{bmatrix}1 & t & 0\\
-0 & 𝕀 & 0\\
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{sV^{\dagger}} & 0\\
 0 & 0 & 1
-\end{bmatrix}=\begin{bmatrix}1 & t & 0\\
-0 & \mathsf{M} & 0\\
-0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{𝕀} & 0\\
+0 & t & -\sqrt{d}
 \end{bmatrix}
 \]
 
 \end_inset
 
-So 
-\begin_inset Formula $\mathsf{M}=\mathsf{R}$
+
+\begin_inset Formula $\mathsf{L}$
 \end_inset
 
- so why did they introduce 
-\begin_inset Formula $\mathsf{M}$
+and 
+\begin_inset Formula $L$
 \end_inset
 
- at all??!? Any way the secret sauce here is to just SVD compress 
-\begin_inset Formula $\mathsf{R}$
+are initially square.
+ But if we compress the singular values we lose columns in 
+\begin_inset Formula $\mathsf{U}$
+\end_inset
+
+ and rows in 
+\begin_inset Formula $\mathsf{sV^{\dagger}}$
+\end_inset
+
+.
+ 
+\begin_inset Formula 
+\[
+\mathsf{UsV^{\dagger}}\approx\mathsf{\tilde{U}\tilde{s}\tilde{V^{\dagger}}}
+\]
+
 \end_inset
 
 
 \begin_inset Formula 
 \[
-\mathsf{R}=UsV^{\dagger}
+\hat{W}_{R}\approx\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{c}} & \hat{\boldsymbol{A}}^{\prime} & 0\\
+\hat{d} & \hat{\boldsymbol{b}}^{\prime} & \hat{𝕀}
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{U}} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{s}\tilde{V^{\dagger}}} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{𝕀} & 0\\
+0 & t & -\sqrt{d}
+\end{bmatrix}
+\]
+
+\end_inset
+
+ and define
+\begin_inset Formula 
+\[
+\hat{W}_{L}=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{c}} & \hat{\boldsymbol{A}}^{\prime} & 0\\
+\hat{d} & \hat{\boldsymbol{b}}^{\prime} & \hat{𝕀}
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{U}} & 0\\
+0 & 0 & 1
+\end{bmatrix}=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{c}} & \hat{\boldsymbol{A}}^{\prime}\tilde{\mathsf{U}} & 0\\
+\hat{d} & \hat{\boldsymbol{b}}^{\prime}\tilde{\mathsf{U}} & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+L^{\prime}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{sV^{\dagger}} & 0\\
+0 & t & -\sqrt{d}
+\end{bmatrix}
+\]
+
+\end_inset
+
+Now 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\hat{H}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ looks like
+\begin_inset Formula 
+\[
+\hat{H}=\boldsymbol{l}\hat{W}_{L}\left(L^{\prime}\hat{W}_{R}\right)\hat{W}_{R}\cdots=\boldsymbol{l}\hat{W}_{L}\hat{W}_{R}^{\prime}\hat{W}_{R}\cdots
 \]
 
 \end_inset
@@ -5744,6 +5905,136 @@ literal "false"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsubsection
+Lattice edges
+\end_layout
+
+\begin_layout Standard
+They
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Parker2019"
+literal "false"
+
+\end_inset
+
+ write the Hamiltonian MPO for a finite lattice as
+\begin_inset Formula 
+\[
+\hat{H}=\boldsymbol{l}\hat{W}\hat{W}\hat{W}\cdots\hat{W}\hat{W}\boldsymbol{r}
+\]
+
+\end_inset
+
+where for an upper triangulr MPO
+\begin_inset Formula 
+\[
+\boldsymbol{l}=\begin{bmatrix}1 & 0 & 0 & 0 & 0\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boldsymbol{r}=\begin{bmatrix}0\\
+0\\
+0\\
+0\\
+1
+\end{bmatrix}
+\]
+
+\end_inset
+
+so at the left we get 
+\begin_inset Formula 
+\[
+\boldsymbol{l}\hat{W}=\begin{bmatrix}1 & 0 & 0 & 0 & 0\end{bmatrix}\begin{bmatrix}\mathbb{I} & \hat{S}_{+} & \hat{S}_{-} & \hat{S}_{z} & 0\\
+0 & 0 & 0 & 0 & \frac{1}{2}\hat{S}_{-}\\
+0 & 0 & 0 & 0 & \frac{1}{2}\hat{S}_{+}\\
+0 & 0 & 0 & 0 & \hat{S}_{z}\\
+0 & 0 & 0 & 0 & \mathbb{I}
+\end{bmatrix}=\begin{bmatrix}\mathbb{I} & \hat{S}_{+} & \hat{S}_{-} & \hat{S}_{z} & 0\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{W}\boldsymbol{r}=\begin{bmatrix}\mathbb{I} & \hat{S}_{+} & \hat{S}_{-} & \hat{S}_{z} & 0\\
+0 & 0 & 0 & 0 & \frac{1}{2}\hat{S}_{-}\\
+0 & 0 & 0 & 0 & \frac{1}{2}\hat{S}_{+}\\
+0 & 0 & 0 & 0 & \hat{S}_{z}\\
+0 & 0 & 0 & 0 & \mathbb{I}
+\end{bmatrix}\begin{bmatrix}0\\
+0\\
+0\\
+0\\
+1
+\end{bmatrix}=\begin{bmatrix}0\\
+\frac{1}{2}\hat{S}_{-}\\
+\frac{1}{2}\hat{S}_{+}\\
+\hat{S}_{z}\\
+\mathbb{I}
+\end{bmatrix}
+\]
+
+\end_inset
+
+For a lower triangular MPO we need
+\begin_inset Formula 
+\[
+\boldsymbol{l}=\begin{bmatrix}0 & 0 & 0 & 0 & 1\end{bmatrix}\boldsymbol{r}=\begin{bmatrix}1\\
+0\\
+0\\
+0\\
+0
+\end{bmatrix}
+\]
+
+\end_inset
+
+giving
+\begin_inset Formula 
+\[
+\boldsymbol{l}\hat{W}=\begin{bmatrix}0 & 0 & 0 & 0 & 1\end{bmatrix}\begin{bmatrix}\mathbb{I} & 0 & 0 & 0 & 0\\
+\hat{S}_{+} & 0 & 0 & 0 & 0\\
+\hat{S}_{-} & 0 & 0 & 0 & 0\\
+\hat{S}_{z} & 0 & 0 & 0 & 0\\
+0 & \frac{1}{2}\hat{S}_{-} & \frac{1}{2}\hat{S}_{+} & \hat{S}_{z} & \mathbb{I}
+\end{bmatrix}=\begin{bmatrix}0 & \frac{1}{2}\hat{S}_{-} & \frac{1}{2}\hat{S}_{+} & \hat{S}_{z} & \mathbb{I}\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{W}\boldsymbol{r}=\begin{bmatrix}\mathbb{I} & 0 & 0 & 0 & 0\\
+\hat{S}_{+} & 0 & 0 & 0 & 0\\
+\hat{S}_{-} & 0 & 0 & 0 & 0\\
+\hat{S}_{z} & 0 & 0 & 0 & 0\\
+0 & \frac{1}{2}\hat{S}_{-} & \frac{1}{2}\hat{S}_{+} & \hat{S}_{z} & \mathbb{I}
+\end{bmatrix}\begin{bmatrix}1\\
+0\\
+0\\
+0\\
+0
+\end{bmatrix}=\begin{bmatrix}\mathbb{I}\\
+\hat{S}_{+}\\
+\hat{S}_{-}\\
+\hat{S}_{z}\\
+0
+\end{bmatrix}
+\]
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Subsection
