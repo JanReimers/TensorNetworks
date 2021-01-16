@@ -66,11 +66,13 @@ class SiteOperatorImp : public virtual SiteOperator
         void SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV);
         void  QLTransfer(Direction lr,const MatrixRT& L);
 
-        MatrixRT Reshape (Direction lr) const;
-        MatrixRT ReshapeV(Direction lr) const;
-        void     Reshape (int D1, int D2, bool saveData=false);
-        void     Reshape (Direction lr,const MatrixRT& UV);
-        void     ReshapeV(Direction lr,const MatrixRT& Q);
+        MatrixRT Reshape  (Direction lr) const;
+        MatrixRT ReshapeV (Direction lr) const;
+        MatrixRT ReshapeV1(Direction lr) const;
+        void     Reshape  (int D1, int D2, bool saveData=false);
+        void     Reshape  (Direction lr,const MatrixRT& UV);
+        void     ReshapeV (Direction lr,const MatrixRT& Q);
+        void     ReshapeV1(Direction lr,const MatrixRT& Q);
         void     SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
 
         int itsd; //2*S+1

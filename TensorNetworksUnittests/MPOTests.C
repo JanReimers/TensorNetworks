@@ -431,6 +431,51 @@ TEST_F(MPOTests,TestParkerCanonicalL9)
     EXPECT_NEAR(E,Eright,1e-13);
 }
 
+TEST_F(MPOTests,TestParkerSVDCompressHL9)
+{
+    int L=9,D=2;
+    double S=0.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+
+
+    EXPECT_EQ(itsH->GetNormStatus(),"lWWWWWWWr");
+    double E=itsMPS->GetExpectation(itsH);
+//    itsH->CanonicalForm(TensorNetworks::DLeft); //Do we need to sweep both ways?
+    itsH->CanonicalForm(TensorNetworks::DRight);
+    EXPECT_EQ(itsH->GetNormStatus(),"lRRRRRRRr");
+    double Eright=itsMPS->GetExpectation(itsH);
+    itsH->Compress(0,1e-13);
+    double Ecomp=itsMPS->GetExpectation(itsH);
+    cout << itsH->GetNormStatus();
+    EXPECT_NEAR(E,Eright,1e-13);
+    EXPECT_NEAR(E,Ecomp ,1e-13);
+}
+
+TEST_F(MPOTests,TestParkerSVDCompressH2L9)
+{
+    int L=9,D=2;
+    double S=0.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(TensorNetworks::Neel);
+    TensorNetworks::MPO* H2=itsH->CreateH2Operator();
+
+    EXPECT_EQ(H2->GetNormStatus(),"lWWWWWWWr");
+    double E2=itsMPS->GetExpectation(H2);
+//    H2->CanonicalForm(TensorNetworks::DLeft); Do we need to sweep both ways?
+    H2->CanonicalForm(TensorNetworks::DRight);
+    EXPECT_EQ(H2->GetNormStatus(),"lRRRRRRRr");
+    double E2right=itsMPS->GetExpectation(H2);
+    H2->Compress(0,1e-13);
+    //H2->Compress(10,0.0);
+    cout << H2->GetNormStatus() << endl;
+    H2->Report(cout);
+    double E2comp=itsMPS->GetExpectation(H2);
+    EXPECT_NEAR(E2,E2right,1e-13);
+    EXPECT_NEAR(E2,E2comp ,1e-13);
+}
+
+
 #ifndef DEBUG
 
 TEST_F(MPOTests,TestTimingE2_S5D4)
