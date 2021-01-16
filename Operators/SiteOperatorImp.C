@@ -267,6 +267,22 @@ MatrixRT MakeBlockMatrix(const MatrixRT& M,int D,int offset)
             ret(i+offset,j+offset)=M(i,j);
     return ret;
 }
+
+std::tuple<MatrixRT,MatrixRT> ExtractM(const MatrixRT& Lp)
+{
+    int X2=Lp.GetNumRows()-1;
+    assert(X2==Lp.GetNumCols()-1);
+    MatrixRT M=Lp.SubMatrix(MatLimits(1,X2,1,X2));
+    MatrixRT Lprime=  MakeBlockMatrix(Lp,X2+2,X2+2,1);
+    for (int i=2;i<=X2+1;i++)
+    { //Clear out the M part of Lp
+        Lprime(i,i)=1.0;
+        for (int j=i+1;j<=X2+1;j++)
+            Lprime(i,j)=Lprime(j,i)=0.0;
+    }
+    return std::make_tuple(M,Lprime);
+}
+
 #define PARKER
 #ifdef  PARKER
 void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
@@ -278,9 +294,8 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
     int X1=Dw1-2,X2=Dw2-2,Xs=X2; //Chi and Chi_prime
 
     MatrixRT  V=ReshapeV(lr);
-//    cout << "V=" << V << endl;
-    assert(V.GetNumRows()==itsd*itsd*(X1+1));
-    assert(V.GetNumCols()==X2+1);
+    assert(V.GetNumRows()==itsd*itsd*(X1+1)); // Treate these like enforced comments on the
+    assert(V.GetNumCols()==X2+1);             // dimensions of each matrix.
 
     switch (lr)
     {
@@ -288,28 +303,14 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
         {
             auto [Qp,Lp]=QRsolver.SolveThinQL(V); //Solves V=Q*L
             assert(Max(fabs(Qp*Lp-V))<1e-13);
-            //assert(GetNormStatus(1e-13)=='R');
-//            cout << std::fixed << std::setprecision(1) << "Lp=" << Lp << endl;
             assert(Qp.GetNumRows()==itsd*itsd*(X1+1));
             assert(Qp.GetNumCols()==X2+1);
             assert(Lp.GetNumRows()==X2+1);
             assert(Lp.GetNumCols()==X2+1);
-            MatrixRT Lpp_save=MakeBlockMatrix(Lp,X2+2,X2+2,1);
-            MatrixRT Lprime=  MakeBlockMatrix(Lp,X2+2,X2+2,1);
-            MatrixRT Lprime1=  Lp;
-            for (int i=2;i<=X2+1;i++)
-            { //Clear out the M part of Lp
-                Lprime(i,i)=1.0;
-                Lprime1(i-1,i-1)=1.0;
-                for (int j=i+1;j<=X2+1;j++)
-                {
-                    Lprime(i,j)=Lprime(j,i)=0.0;
-                    Lprime1(i-1,j-1)=Lprime1(j-1,i-1)=0.0;
-                }
-            }
+            assert(IsUnit(Transpose(Qp)*Qp,1e-13));
+
             MatrixRT Lpp;
-            MatrixRT M=Lp.SubMatrix(MatLimits(1,X2,1,X2));
-//            cout << "M=" << M << endl;
+            auto [M,Lprime]=ExtractM(Lp);
             if (IsDiagonal(M,1e-14))
             {
                 ReshapeV(lr,Qp);  //W is now Q
@@ -318,38 +319,30 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
             else
             {
                 auto [U,s,VT]=SVDsolver.SolveAll(M,1e-14); //Solves M=U * s * VT
-//                cout << std::scientific << "s=" << s.GetDiagonal() << endl;
                 itsTruncationError=comp->Compress(U,s,VT);
                 cout << std::fixed << "s=" << s.GetDiagonal() << endl;
                 Xs=s.GetDiagonal().size();
                 MatrixRT sV=s*VT;
                 assert(sV.GetNumRows()==Xs);
                 assert(sV.GetNumCols()==X2);
-//                cout << "X1,X2,Xs,U=" << X1 << " " << X2 << " " << Xs << " " << U.GetLimits() << endl;
                 assert( U.GetNumRows()==X2);
                 assert( U.GetNumCols()==Xs);
                 assert(IsUnit(Transpose(U)*U,1e-13));
-                assert(IsUnit(Transpose(Qp)*Qp,1e-13));
-                // ADd lower right row and column
+
+                // Add lower right row and column
                 MatrixRT  Up=MakeBlockMatrix( U,X2+1,Xs+1,0);
                 MatrixRT sVp=MakeBlockMatrix(sV,Xs+1,X2+1,0);
-//                assert(Max(fabs(Qp*Up*sVp*Lprime1-V))<1e-13);
-                // Add upper right row and column
-                MatrixRT  Upp=MakeBlockMatrix( Up,X2+2,Xs+2,1);
-                MatrixRT sVpp=MakeBlockMatrix(sVp,Xs+2,X2+2,1);
-                Lpp=sVpp*Lprime; //This get passed on to the next site over.
-                assert(Max(fabs(Upp*Lpp-Lpp_save ))<1e-13);
                 assert(IsUnit(Transpose(Up)*Up,1e-13));
-                assert(IsUnit(Transpose(Upp)*Upp,1e-13));
-                assert(Max(fabs(Up*sVp*Lprime1-Lp))<1e-13);
+                // Add upper right row and column
+                MatrixRT sVpp=MakeBlockMatrix(sVp,Xs+2,X2+2,1);
+
+                Lpp=sVpp*Lprime; //This get passed on to the next site over.
                 Qp*=Up;
                 assert(IsUnit(Transpose(Qp)*Qp,1e-13));
-                ReshapeV(lr,Qp);  //W is now Q
-
+                ReshapeV(lr,Qp);  //W is now Qp
                 assert(GetNormStatus(1e-13)=='L');
             }
 
-//            cout << "Lpp=" << Lpp << endl;
             if (itsRightNeighbour) itsRightNeighbour->QLTransfer(lr,Lpp);
             break;
         }

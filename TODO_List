@@ -12,7 +12,14 @@ Next steps:
         -Create iMPOs directly, get rid of the convert method.
             Done for iH and iH^2
         -Test 25x25 uncompressed H2 operator in recursive expectation routine.
+            Fails: We get a unsolvable system to eqs when there are unit ops on the diagonal.
         -Code up  MPO compression as per Parker
+            -Underway
+            Done: -Clean DLeft code
+            -Mirror for DRight
+            -Support l*W*W*W...*W*r formalism, which will allow us to compress W[1] and W[L]
+                -This may also make MPOs and iMPOS almost identical
+
         -Code up iMPO compression as per Parker.
         -<E2> is not working, MPO get compressed to 1x4 - 4x1.  We need to learn how contract
             a Dw x Dw - Dw x Dw open MPO with eigen vectors to get <E2>.
