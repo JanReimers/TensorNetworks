@@ -1,5 +1,6 @@
 #include "TensorNetworksImp/FactoryImp.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.H"
+#include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg_Upper.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_TransverseIsing.H"
 #include "TensorNetworksImp/SVCompressorImp.H"
 #include "TensorNetworksImp/SVMPOCompressor.H"
@@ -18,6 +19,12 @@ Hamiltonian* FactoryImp::
 Make1D_NN_HeisenbergHamiltonian(int L, double S, double Jxy, double Jz, double hz)
 {
     return new Hamiltonian_1D_NN_Heisenberg(L,S,Jxy,Jz,hz);
+}
+
+Hamiltonian* FactoryImp::
+Make1D_NN_HeisenbergHamiltonian_Upper(int L, double S, double Jxy, double Jz, double hz)
+{
+    return new Hamiltonian_1D_NN_Heisenberg_Upper(L,S,Jxy,Jz,hz);
 }
 
 Hamiltonian*   FactoryImp::

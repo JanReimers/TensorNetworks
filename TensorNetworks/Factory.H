@@ -13,8 +13,9 @@ public:
     virtual ~Factory() {}
     static Factory* GetFactory();
 
-    virtual Hamiltonian*   Make1D_NN_HeisenbergHamiltonian     (int L, double S, double Jxy, double Jz, double hz)=0;
-    virtual Hamiltonian*   Make1D_NN_TransverseIsingHamiltonian(int L, double S, double J, double hx)=0;
+    virtual Hamiltonian*   Make1D_NN_HeisenbergHamiltonian      (int L, double S, double Jxy, double Jz, double hz)=0;
+    virtual Hamiltonian*   Make1D_NN_HeisenbergHamiltonian_Upper(int L, double S, double Jxy, double Jz, double hz)=0;
+    virtual Hamiltonian*   Make1D_NN_TransverseIsingHamiltonian (int L, double S, double J, double hx)=0;
     virtual SVCompressorR* MakeMPOCompressor(int Dmax, double epsSV)=0;
     virtual SVCompressorC* MakeMPSCompressor(int Dmax, double epsSV)=0;
     virtual TNSLogger*     MakeSPDLogger(int level)=0;
