@@ -5533,7 +5533,7 @@ In the paper they have
 \begin_inset Formula $x=1$
 \end_inset
 
- on the lower right, but I am unable achieve this, I always get something
+ on the lower right, but I am unable achieve this, I typicall get something
  other that 
 \begin_inset Formula $1$
 \end_inset
@@ -5543,8 +5543,14 @@ In the paper they have
 \end_inset
 
 .
- In prectice I see 
+ In practice I see 
 \begin_inset Formula $x=-\sqrt{d}$
+\end_inset
+
+.
+ It turns out that after doing canonical sweeps in both directions, one
+ will get 
+\begin_inset Formula $x=1$
 \end_inset
 
 .
@@ -5618,7 +5624,7 @@ The mirror of this is
 \[
 LQ\left(W\right)=\begin{bmatrix}1 & 0 & 0\\
 t & \mathsf{L} & 0\\
-0 & 0 & 1
+0 & 0 & x
 \end{bmatrix}\begin{bmatrix}\hat{𝕀} & 0 & 0\\
 \hat{\boldsymbol{c}}^{\prime} & \hat{\boldsymbol{A}}^{\prime} & 0\\
 \hat{d} & \hat{\boldsymbol{b}} & \hat{𝕀}
@@ -5635,6 +5641,24 @@ t+\mathsf{L}\hat{\boldsymbol{c}}^{\prime} & \mathsf{L}\hat{\boldsymbol{A}}^{\pri
 
 \begin_layout Subsubsection
 Finite MPO Compression
+\end_layout
+
+\begin_layout Standard
+Beore compression it is critical that one does canonical sweeps in BOTH
+ directiont first.
+ Otherwise you get some thing other that 
+\begin_inset Formula $1$
+\end_inset
+
+ in the lower left corner of the 
+\begin_inset Formula $L$
+\end_inset
+
+matrix.
+\end_layout
+
+\begin_layout Paragraph
+Left Sweep
 \end_layout
 
 \begin_layout Standard
@@ -5658,7 +5682,7 @@ and QL the first
 \hat{d} & \hat{\boldsymbol{b}}^{\prime} & \hat{𝕀}
 \end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
 0 & \mathsf{L} & 0\\
-0 & t & -\sqrt{d}
+0 & t & 1
 \end{bmatrix}
 \]
 
@@ -5675,7 +5699,7 @@ L=\begin{bmatrix}1 & 0 & 0\\
 0 & 0 & 1
 \end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
 0 & \mathsf{𝕀} & 0\\
-0 & t & -\sqrt{d}
+0 & t & 1
 \end{bmatrix}
 \]
 
@@ -5734,7 +5758,7 @@ and then factorize
 0 & 0 & 1
 \end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
 0 & \mathsf{𝕀} & 0\\
-0 & t & -\sqrt{d}
+0 & t & 1
 \end{bmatrix}
 \]
 
@@ -5780,7 +5804,7 @@ are initially square.
 0 & 0 & 1
 \end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
 0 & \mathsf{𝕀} & 0\\
-0 & t & -\sqrt{d}
+0 & t & 1
 \end{bmatrix}
 \]
 
@@ -5808,7 +5832,7 @@ are initially square.
 \[
 L^{\prime}=\begin{bmatrix}1 & 0 & 0\\
 0 & \mathsf{sV^{\dagger}} & 0\\
-0 & t & -\sqrt{d}
+0 & t & 1
 \end{bmatrix}
 \]
 
@@ -5893,6 +5917,244 @@ which gives us
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Paragraph
+Right Sweep
+\end_layout
+
+\begin_layout Standard
+We start with a right canonical MPO
+\begin_inset Formula 
+\[
+\hat{H}=\boldsymbol{l}\hat{W}_{L}\hat{W}_{L}\hat{W}_{L}\cdots\hat{W}_{L}\hat{W}_{L}\boldsymbol{r}
+\]
+
+\end_inset
+
+and LQ the last 
+\begin_inset Formula $\hat{W}_{L}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{W}_{L}=LQ=\begin{bmatrix}1 & 0 & 0\\
+t & \mathsf{L} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{c}}^{\prime} & \hat{\boldsymbol{A}}^{\prime} & 0\\
+\hat{d} & \hat{\boldsymbol{b}} & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+then factor 
+\begin_inset Formula 
+\[
+L=\begin{bmatrix}1 & 0 & 0\\
+t & \mathsf{L} & 0\\
+0 & 0 & 1
+\end{bmatrix}=L^{\prime}M=\begin{bmatrix}1 & 0 & 0\\
+t & \mathsf{𝕀} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{L} & 0\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+and then SVD 
+\begin_inset Formula $M=UsV^{\dagger}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{L} & 0\\
+0 & 0 & 1
+\end{bmatrix}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{U} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{s} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{V^{\dagger}} & 0\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{W}_{L}=L^{\prime}UsV^{\dagger}\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{c}}^{\prime} & \hat{\boldsymbol{A}}^{\prime} & 0\\
+\hat{d} & \hat{\boldsymbol{b}} & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+and then factorize 
+\begin_inset Formula $L$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\begin{bmatrix}1 & 0 & 0\\
+t & \mathsf{𝕀} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{Us} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{V^{\dagger}} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{c}}^{\prime} & \hat{\boldsymbol{A}}^{\prime} & 0\\
+\hat{d} & \hat{\boldsymbol{b}} & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula $\mathsf{L}$
+\end_inset
+
+and 
+\begin_inset Formula $L$
+\end_inset
+
+are initially square.
+ But if we compress the singular values we lose columns in 
+\begin_inset Formula $\mathsf{Us}$
+\end_inset
+
+ and rows in 
+\begin_inset Formula $\mathsf{V^{\dagger}}$
+\end_inset
+
+.
+ 
+\begin_inset Formula 
+\[
+\mathsf{UsV^{\dagger}}\approx\mathsf{\tilde{U}\tilde{s}\tilde{V^{\dagger}}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{W}_{L}\approx\begin{bmatrix}1 & 0 & 0\\
+t & \mathsf{𝕀} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{U}\tilde{s}} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{V^{\dagger}}} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{c}}^{\prime} & \hat{\boldsymbol{A}}^{\prime} & 0\\
+\hat{d} & \hat{\boldsymbol{b}} & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+ and define
+\begin_inset Formula 
+\[
+\hat{W}_{R}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{V^{\dagger}}} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{c}}^{\prime} & \hat{\boldsymbol{A}}^{\prime} & 0\\
+\hat{d} & \hat{\boldsymbol{b}} & \hat{𝕀}
+\end{bmatrix}=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\mathsf{\tilde{V^{\dagger}}}\hat{\boldsymbol{c}}^{\prime} & \mathsf{\tilde{V^{\dagger}}}\hat{\boldsymbol{A}}^{\prime} & 0\\
+\hat{d} & \hat{\boldsymbol{b}} & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+L^{\prime}=\begin{bmatrix}1 & 0 & 0\\
+t & \mathsf{\tilde{U}\tilde{s}} & 0\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+Now 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\hat{H}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ looks like
+\begin_inset Formula 
+\[
+\hat{H}=\boldsymbol{l}\hat{W}_{L}\hat{W}_{L}\hat{W}_{L}\cdots\hat{W}_{L}L^{\prime}\hat{W}_{R}\boldsymbol{r}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\boldsymbol{l}\hat{W}_{L}\hat{W}_{L}\hat{W}_{L}\cdots\left(\hat{W}_{L}L^{\prime}\right)\hat{W}_{R}\boldsymbol{r}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\boldsymbol{l}\hat{W}_{L}\hat{W}_{L}\hat{W}_{L}\cdots\hat{W}^{\prime}\hat{W}_{R}\boldsymbol{r}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

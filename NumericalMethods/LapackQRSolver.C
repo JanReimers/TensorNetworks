@@ -300,7 +300,7 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
     work.SetLimits(lwork);
     xunglq<T>(&M,&N,&M,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
     assert(info==0);
-    return std::make_tuple(std::move(L),std::move(Q)); //Return [R,Q]
+    return std::make_tuple(std::move(L),std::move(Q)); //Return [L,Q]
 }
 
 template class LapackQRSolver<double>;

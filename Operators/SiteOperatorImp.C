@@ -268,18 +268,38 @@ MatrixRT MakeBlockMatrix(const MatrixRT& M,int D,int offset)
     return ret;
 }
 
-std::tuple<MatrixRT,MatrixRT> ExtractM(const MatrixRT& Lp)
+std::tuple<MatrixRT,MatrixRT> ExtractM(Direction lr,const MatrixRT& Lp)
 {
-    int X2=Lp.GetNumRows()-1;
-    assert(X2==Lp.GetNumCols()-1);
-    MatrixRT M=Lp.SubMatrix(MatLimits(1,X2,1,X2));
-    MatrixRT Lprime=  MakeBlockMatrix(Lp,X2+2,X2+2,1);
-    for (int i=2;i<=X2+1;i++)
-    { //Clear out the M part of Lp
-        Lprime(i,i)=1.0;
-        for (int j=i+1;j<=X2+1;j++)
-            Lprime(i,j)=Lprime(j,i)=0.0;
+    int X=Lp.GetNumRows()-1;
+    assert(X==Lp.GetNumCols()-1);
+    MatrixRT M(X,X),Lprime;
+    switch(lr)
+    {
+    case DLeft:
+        M=Lp.SubMatrix(MatLimits(1,X,1,X));
+        Lprime=  MakeBlockMatrix(Lp,X+2,X+2,1);
+        for (int i=2;i<=X+1;i++)
+        { //Clear out the M part of Lp
+            Lprime(i,i)=1.0;
+            for (int j=i+1;j<=X+1;j++)
+                Lprime(i,j)=Lprime(j,i)=0.0;
+        }
+        break;
+    case DRight:
+        for (index_t i:M.rows())
+            for (index_t j:M.cols())
+                M(i,j)=Lp(i+1,j+1);
+
+        Lprime=  MakeBlockMatrix(Lp,X+2,X+2,0);
+        for (int i=2;i<=X+1;i++)
+        { //Clear out the M part of Lp
+            Lprime(i,i)=1.0;
+            for (int j=i+1;j<=X+1;j++)
+                Lprime(i,j)=Lprime(j,i)=0.0;
+        }
+        break;
     }
+
     return std::make_tuple(M,Lprime);
 }
 
@@ -294,14 +314,15 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
     int X1=Dw1-2,X2=Dw2-2,Xs=X2; //Chi and Chi_prime
 
     MatrixRT  V=ReshapeV(lr);
-    assert(V.GetNumRows()==itsd*itsd*(X1+1)); // Treate these like enforced comments on the
-    assert(V.GetNumCols()==X2+1);             // dimensions of each matrix.
 
     switch (lr)
     {
         case DLeft:
         {
+            assert(V.GetNumRows()==itsd*itsd*(X1+1)); // Treate these like enforced comments on the
+            assert(V.GetNumCols()==X2+1);             // dimensions of each matrix.
             auto [Qp,Lp]=QRsolver.SolveThinQL(V); //Solves V=Q*L
+            assert(fabs(Lp(X2+1,X2+1)-1.0)<1e-15);
             assert(Max(fabs(Qp*Lp-V))<1e-13);
             assert(Qp.GetNumRows()==itsd*itsd*(X1+1));
             assert(Qp.GetNumCols()==X2+1);
@@ -310,7 +331,7 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
             assert(IsUnit(Transpose(Qp)*Qp,1e-13));
 
             MatrixRT Lpp;
-            auto [M,Lprime]=ExtractM(Lp);
+            auto [M,Lprime]=ExtractM(lr,Lp);
             if (IsDiagonal(M,1e-14))
             {
                 ReshapeV(lr,Qp);  //W is now Q
@@ -333,7 +354,7 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
                 MatrixRT  Up=MakeBlockMatrix( U,X2+1,Xs+1,0);
                 MatrixRT sVp=MakeBlockMatrix(sV,Xs+1,X2+1,0);
                 assert(IsUnit(Transpose(Up)*Up,1e-13));
-                // Add upper right row and column
+                // Add upper left row and column
                 MatrixRT sVpp=MakeBlockMatrix(sVp,Xs+2,X2+2,1);
 
                 Lpp=sVpp*Lprime; //This get passed on to the next site over.
@@ -348,9 +369,56 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
         }
         case DRight:
         {
-//            UV=U;
-//            Reshape(lr,VT);  //A is now Vdagger
-//            if (itsLeft_Neighbour) itsLeft_Neighbour->SVDTransfer(lr,sm,UV);
+            assert(V.GetNumCols()==itsd*itsd*(X2+1)); // Treate these like enforced comments on the
+            assert(V.GetNumRows()==X1+1);             // dimensions of each matrix.
+            auto [Lp,Qp]=QRsolver.SolveThinLQ(V); //Solves V=Q*L
+            assert(fabs(Lp(1,1)-1.0)<1e-15);
+//            cout << std::setprecision(1) << std::fixed << "Lp=" << Lp << endl;
+            assert(Max(fabs(Lp*Qp-V))<1e-13);
+            assert(Qp.GetNumCols()==itsd*itsd*(X2+1));
+            assert(Qp.GetNumRows()==X1+1);
+            assert(Lp.GetNumRows()==X1+1);
+            assert(Lp.GetNumCols()==X1+1);
+            assert(IsUnit(Qp*Transpose(Qp),1e-13));
+
+            MatrixRT Lpp;
+            auto [M,Lprime]=ExtractM(lr,Lp);
+//            cout << "Lp=" << Lp << endl;
+//            cout << "M=" << M << endl;
+//            cout << "Lprime=" << Lprime << endl;
+            if (IsDiagonal(M,1e-14))
+            {
+                ReshapeV(lr,Qp);  //W is now Q
+                Lpp=MakeBlockMatrix(Lp,X1+2,0);
+            }
+            else
+            {
+                auto [U,s,VT]=SVDsolver.SolveAll(M,1e-14); //Solves M=U * s * VT
+                itsTruncationError=comp->Compress(U,s,VT);
+                cout << std::fixed << "s=" << s.GetDiagonal() << endl;
+                Xs=s.GetDiagonal().size();
+                MatrixRT Us=U*s;
+                assert(Us.GetNumRows()==X1);
+                assert(Us.GetNumCols()==Xs);
+                assert(VT.GetNumRows()==Xs);
+                assert(VT.GetNumCols()==X1);
+                assert(IsUnit(VT*Transpose(VT),1e-13));
+
+                // Add upper left row and column
+                MatrixRT VTp=MakeBlockMatrix(VT,Xs+1,X1+1,1);
+                MatrixRT Usp=MakeBlockMatrix(Us,X1+1,Xs+1,1);
+                // Add lower right row and column
+                MatrixRT Uspp=MakeBlockMatrix(Usp,X1+2,Xs+2,0);
+
+                Lpp=Lprime*Uspp; //This get passed on to the next site over.
+                Qp=MatrixRT(VTp*Qp);
+                assert(IsUnit(Qp*Transpose(Qp),1e-13));
+//                cout << "Qp=" << Qp << endl;
+                ReshapeV(lr,Qp);  //W is now Qp
+                assert(GetNormStatus(1e-13)=='R');
+            }
+
+            if (itsLeft_Neighbour) itsLeft_Neighbour->QLTransfer(lr,Lpp);
             break;
         }
 
@@ -557,7 +625,7 @@ MatrixRT SiteOperatorImp::ReshapeV(Direction lr) const
     switch (lr)
     {
     case DLeft:
-    { //Leave out **first** row and column
+    { //Leave out **first** row and column of W
         A.SetLimits(itsd*itsd*(itsDw12.Dw1-1),itsDw12.Dw2-1);
         int w=1;
         for (int w1=2; w1<=itsDw12.Dw1; w1++)
@@ -571,7 +639,7 @@ MatrixRT SiteOperatorImp::ReshapeV(Direction lr) const
         break;
     }
     case DRight:
-    { //Leave out **last** row and column
+    { //Leave out **last** row and column of W
         A.SetLimits(itsDw12.Dw1-1,itsd*itsd*(itsDw12.Dw2-1));
         int w=1;
         for (int w2=1; w2<=itsDw12.Dw2-1; w2++)
@@ -579,8 +647,8 @@ MatrixRT SiteOperatorImp::ReshapeV(Direction lr) const
             for (int n=0; n<itsd; n++,w++)
             {
                 const MatrixRT& W=GetW(m,n);
-                   for (int w1=1; w1<=itsDw12.Dw1-1; w1++)
-                        A(w1,w)=W(w1,w2);
+                for (int w1=1; w1<=itsDw12.Dw1-1; w1++)
+                    A(w1,w)=W(w1,w2);
             }
         break;
     }
@@ -635,6 +703,7 @@ void  SiteOperatorImp::ReshapeV(Direction lr,const MatrixRT& Q)
         //
         if (Q.GetNumCols()+1<itsDw12.Dw2)
             Reshape(itsDw12.Dw1,Q.GetNumCols()+1,true);//we must save the old since Q only holds part of W
+        //Leave out **first** row and column of W
         int w=1;
         for (int w1=2; w1<=itsDw12.Dw1; w1++)
         for (int m=0; m<itsd; m++)
@@ -654,15 +723,17 @@ void  SiteOperatorImp::ReshapeV(Direction lr,const MatrixRT& Q)
         //  If Vdagger has less rows than the Ws then we need to reshape the whole site.
         //  Typically this will happen at the edges of the lattice.
         //
-        if (Q.GetNumRows()+1<itsDw12.Dw1) Reshape(Q.GetNumRows(),itsDw12.Dw2+1,false);//This throws away the old data
+        if (Q.GetNumRows()+1<itsDw12.Dw1)
+            Reshape(Q.GetNumRows()+1,itsDw12.Dw2,true);//we must save the old since Q only holds part of W
+        //Leave out **last** row and column of W
         int w=1;
         for (int w2=1; w2<=itsDw12.Dw2-1; w2++)
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++,w++)
             {
                 MatrixRT& W=GetW(m,n);
-                    for (int w1=1; w1<=itsDw12.Dw1-1; w1++)
-                        W(w1,w2)=Q(w1,w);
+                for (int w1=1; w1<=itsDw12.Dw1-1; w1++)
+                    W(w1,w2)=Q(w1,w);
             }
         break;
     }
