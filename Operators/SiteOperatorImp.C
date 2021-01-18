@@ -303,9 +303,8 @@ std::tuple<MatrixRT,MatrixRT> ExtractM(Direction lr,const MatrixRT& Lp)
     return std::make_tuple(M,Lprime);
 }
 
-#define PARKER
-#ifdef  PARKER
-void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
+
+void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 {
     assert(comp);
     LapackQRSolver <double>  QRsolver;
@@ -322,6 +321,7 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
             assert(V.GetNumRows()==itsd*itsd*(X1+1)); // Treate these like enforced comments on the
             assert(V.GetNumCols()==X2+1);             // dimensions of each matrix.
             auto [Qp,Lp]=QRsolver.SolveThinQL(V); //Solves V=Q*L
+            cout << "Lp(X2+1,X2+1)=" << Lp(X2+1,X2+1) << endl;
             assert(fabs(Lp(X2+1,X2+1)-1.0)<1e-15);
             assert(Max(fabs(Qp*Lp-V))<1e-13);
             assert(Qp.GetNumRows()==itsd*itsd*(X1+1));
@@ -425,9 +425,9 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
     }
     SetLimits();
 }
-#else
 
-void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
+
+void SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
 {
     assert(comp);
     MatrixRT  A=Reshape(lr);
@@ -439,7 +439,7 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
     //  Rescaling
     //
     double s_avg=Sum(sm.GetDiagonal())/sm.size();
-    cout << "s_avg, sm=" << s_avg << " " << sm << endl;
+//    cout << "s_avg, sm=" << s_avg << " " << sm << endl;
 //    cout << "VT=" << VT << endl;
     sm*=1.0/s_avg;
      switch (lr)
@@ -474,7 +474,7 @@ void SiteOperatorImp::Compress(Direction lr,const SVCompressorR* comp)
     SetLimits();
 }
 
-#endif
+
 
 void SiteOperatorImp::CanonicalForm(Direction lr)
 {

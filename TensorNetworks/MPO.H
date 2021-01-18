@@ -28,8 +28,10 @@ class MPO
 
         virtual void   Combine(const MPO* O2);
         virtual void   Combine(const MPO* O2,double factor);
-        virtual double Compress(int Dmax, double epsSV);
-        virtual double Compress(const SVCompressorR*);
+        virtual double CompressStd   (int Dmax, double epsSV);
+        virtual double CompressStd   (const SVCompressorR*);
+        virtual double CompressParker(int Dmax, double epsSV);
+        virtual double CompressParker(const SVCompressorR*);
         virtual void   CanonicalForm(Direction LR);
 };
 

@@ -135,12 +135,12 @@ double iMPOImp::Compress(const SVCompressorR* compressor)
     for (int ia=1;ia<=L;ia++)
     {
         oldDws(ia)=GetSiteOperator(ia)->GetDw12().Dw2;
-        GetSiteOperator(ia)->Compress(DLeft ,compressor);
+        GetSiteOperator(ia)->CompressStd(DLeft ,compressor);
     }
     oldDws(L)=0;
     for (int ia=L;ia>=1;ia--)
     {
-        GetSiteOperator(ia)->Compress(DRight,compressor);
+        GetSiteOperator(ia)->CompressStd(DRight,compressor);
         newDws(ia)=GetSiteOperator(ia)->GetDw12().Dw1;
     }
     newDws(1)=0;

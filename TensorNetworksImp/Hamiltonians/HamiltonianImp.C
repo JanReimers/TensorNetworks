@@ -176,11 +176,11 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
                 //U.Compress(0,1e-12); //Does not seem to help
                 U.Combine(&Wodd);
                 //U.Report(cout);
-                U.Compress(0,1e-12); //Useful for large S
+                U.CompressStd(0,1e-12); //Useful for large S
                 //U.Report(cout);
                 W->Combine(&U);
                 //W->Report(cout);
-                W->Compress(0,1e-12);
+                W->CompressStd(0,1e-12);
                 //W->Report(cout);
             }
             break;
@@ -216,7 +216,7 @@ iMPO* HamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) c
             W->Combine(&Weven);
             W->Combine(&Wodd);
             W->ConvertToiMPO(GetL());
-            W->Compress(0,epsMPO);
+            W->CompressStd(0,epsMPO);
             break;
         }
         case SecondOrder :
@@ -229,7 +229,7 @@ iMPO* HamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) c
             W->Combine(&Weven);
             W->Combine(&Wodd);
             W->ConvertToiMPO(GetL());
-            W->Compress(0,epsMPO);
+            W->CompressStd(0,epsMPO);
             break;
         }
         case FourthOrder :
@@ -254,7 +254,7 @@ iMPO* HamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) c
                 U.Combine(&Weven);
                 U.Combine(&Wodd);
                 W->Combine(&U);
-                W->Compress(0,epsMPO);
+                W->CompressStd(0,epsMPO);
             }
             W->ConvertToiMPO(GetL());
             break;

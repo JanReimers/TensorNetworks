@@ -29,7 +29,8 @@ public:
     //
     //  SVD compress and normalize to reduce Dw
     //
-    virtual void Compress(Direction,const SVCompressorR*)=0;
+    virtual void CompressStd   (Direction,const SVCompressorR*)=0;
+    virtual void CompressParker(Direction,const SVCompressorR*)=0;
     //
     //  as per: Parker, D. E.; Cao, X. & Zaletel, M. P.
     //          Local Matrix Product Operators: Canonical Form, Compression, and Control Theory

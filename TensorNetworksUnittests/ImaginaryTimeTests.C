@@ -145,7 +145,7 @@ TEST_F(ImaginaryTimeTests,MPOCompressSeconderOrderTrotter_dt0)
 
     TensorNetworks::MPS* Psi2=itsMPS->Apply(W);
     EXPECT_NEAR(itsMPS->GetOverlap(Psi2),1.0,eps);
-    W->Compress(0,epsSVD);
+    W->CompressStd(0,epsSVD);
     TensorNetworks::MPS* Psi3=itsMPS->Apply(W);
     EXPECT_NEAR(itsMPS->GetOverlap(Psi3),1.0,1e-7);
     EXPECT_NEAR(Psi2->GetOverlap(Psi3),1.0,1e-7);
@@ -173,13 +173,13 @@ TEST_F(ImaginaryTimeTests,MPOCompressSeconderOrderTrotter_dt05_FixedEps)
 
     TensorNetworks::MPS* Psi2=Psi1->Apply(W);
 //    W->Report(cout);
-    W->Compress(0,epsSVD);
-    W->Compress(0,epsSVD); //Apparently one pass is insufficient to reach a fixed point.
+    W->CompressStd(0,epsSVD);
+    W->CompressStd(0,epsSVD); //Apparently one pass is insufficient to reach a fixed point.
 //    W->Report(cout);
     TensorNetworks::MPS* Psi3=Psi1->Apply(W);
 //    EXPECT_NEAR(Psi3->GetOverlap(Psi3),1.0,1e-6);
 //
-    W->Compress(0,epsSVD);
+    W->CompressStd(0,epsSVD);
 //    W->Report(cout);
 //    W->Report(cout);
     TensorNetworks::MPS* Psi4=Psi1->Apply(W);
@@ -221,12 +221,12 @@ TEST_F(ImaginaryTimeTests,MPOCompressSeconderOrderTrotter_dt05_FixedDw)
 
     TensorNetworks::MPS* Psi2=Psi1->Apply(W);
 //    W->Report(cout);
-    W->Compress(DwMax,epsSVD);
+    W->CompressStd(DwMax,epsSVD);
 //    W->Report(cout);
     TensorNetworks::MPS* Psi3=Psi1->Apply(W);
 //    EXPECT_NEAR(Psi3->GetOverlap(Psi3),1.0,1e-6);
 //
-    W->Compress(DwMax,epsSVD);
+    W->CompressStd(DwMax,epsSVD);
 //    W->Report(cout);
 //    W->Report(cout);
     TensorNetworks::MPS* Psi4=Psi1->Apply(W);

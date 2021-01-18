@@ -69,33 +69,60 @@ void MPO::Combine(const MPO* O2,double factor)
     }
 }
 
-double MPO::Compress(int Dmax, double epsSV)
+double MPO::CompressStd(int Dmax, double epsSV)
 {
     Factory* f=Factory::GetFactory();
     SVCompressorR* comp=f->MakeMPOCompressor(Dmax,epsSV);
-    double compressionError=Compress(comp);
+    double compressionError=CompressStd(comp);
+    delete comp;
+    delete f;
+    return compressionError;
+}
+
+double MPO::CompressParker(int Dmax, double epsSV)
+{
+    Factory* f=Factory::GetFactory();
+    SVCompressorR* comp=f->MakeMPOCompressor(Dmax,epsSV);
+    double compressionError=CompressParker(comp);
     delete comp;
     delete f;
     return compressionError;
 }
 
 
-double MPO::Compress(const SVCompressorR* compressor)
+double MPO::CompressStd(const SVCompressorR* compressor)
 {
-//    GetSiteOperator(2)->Compress(DLeft ,compressor);
-//    return 0.0;
     int L=GetL();
     Vector<int> oldDws(L),newDws(L);
-//    CanonicalForm(DRight);
+    for (int ia=1;ia<L;ia++)
+    {
+        oldDws(ia)=GetSiteOperator(ia)->GetDw12().Dw2;
+        GetSiteOperator(ia)->CompressStd(DLeft ,compressor);
+    }
+    oldDws(L)=0;
+    for (int ia=L;ia>1;ia--)
+    {
+        GetSiteOperator(ia)->CompressStd(DRight,compressor);
+        newDws(ia)=GetSiteOperator(ia)->GetDw12().Dw1;
+    }
+//    newDws(1)=0;
+//    double percent=100-(100.0*Sum(newDws))/static_cast<double>(Sum(oldDws));
+////    std::cout << "% compression=" << std::fixed << std::setprecision(2) << percent << std::endl;
+    return 0.0;
+}
+double MPO::CompressParker(const SVCompressorR* compressor)
+{
+    int L=GetL();
+    Vector<int> oldDws(L),newDws(L);
     for (int ia=2;ia<L;ia++)
     {
         oldDws(ia)=GetSiteOperator(ia)->GetDw12().Dw2;
-        GetSiteOperator(ia)->Compress(DLeft ,compressor);
+        GetSiteOperator(ia)->CompressParker(DLeft ,compressor);
     }
     oldDws(L)=0;
     for (int ia=L-1;ia>1;ia--)
     {
-        GetSiteOperator(ia)->Compress(DRight,compressor);
+        GetSiteOperator(ia)->CompressParker(DRight,compressor);
         newDws(ia)=GetSiteOperator(ia)->GetDw12().Dw1;
     }
 //    newDws(1)=0;
