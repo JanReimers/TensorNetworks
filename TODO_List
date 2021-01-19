@@ -12,13 +12,32 @@ Next steps:
         -Create iMPOs directly, get rid of the convert method.
             Done for iH and iH^2
         -Test 25x25 uncompressed H2 operator in recursive expectation routine.
-            Fails: We get a unsolvable system to eqs when there are unit ops on the diagonal.
+            Fails: We get a unsolvable system of eqs when there are unit ops on the diagonal.
         -Code up  MPO compression as per Parker
-            -Underway
             Done: -Clean DLeft code
-            -Mirror for DRight
+            Done: -Mirror for DRight
             -Support l*W*W*W...*W*r formalism, which will allow us to compress W[1] and W[L]
                 -This may also make MPOs and iMPOS almost identical
+                -Plan:
+                    Done: 1) Always store full W, even at edges
+                    Done: 2) GetW(m,n) will return l*W or W*r at edges
+                    Done: 3) GetiW(m,n) return full W in bulk and at edges.
+                    4) Fix l*W and W*r caching
+                        User virtual dispatch for GetW?
+                    5) Var GS energies for transverse Ising with field on changed.
+                    6) Fix up SetLimits for Dw
+                    7) Make a SetW function for writing to W. It needs to
+                        -SetW (obviously)
+                        -Update Dw limits
+                        -Update l*W or W*r cache
+                    8) Can we tidy up all the Reshape functions?
+            -Getting exponentially large SVs.
+                Std compression does the same thing, but scaling by s_avg fixes it.
+                Should we scale by s_avg for Parker compression?
+            -Try and make and (H-E)^2 operator
+            -Compress exp(-t*H) operator
+
+
 
         -Code up iMPO compression as per Parker.
         -<E2> is not working, MPO get compressed to 1x4 - 4x1.  We need to learn how contract

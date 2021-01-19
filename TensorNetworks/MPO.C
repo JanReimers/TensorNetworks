@@ -114,13 +114,14 @@ double MPO::CompressParker(const SVCompressorR* compressor)
 {
     int L=GetL();
     Vector<int> oldDws(L),newDws(L);
-    for (int ia=2;ia<L;ia++)
+    for (int ia=1;ia<L;ia++)
     {
         oldDws(ia)=GetSiteOperator(ia)->GetDw12().Dw2;
         GetSiteOperator(ia)->CompressParker(DLeft ,compressor);
     }
+    Report(std::cout);
     oldDws(L)=0;
-    for (int ia=L-1;ia>1;ia--)
+    for (int ia=L;ia>1;ia--)
     {
         GetSiteOperator(ia)->CompressParker(DRight,compressor);
         newDws(ia)=GetSiteOperator(ia)->GetDw12().Dw1;
@@ -138,11 +139,11 @@ void MPO::CanonicalForm(Direction lr)
     switch (lr)
     {
         case DLeft:
-            for (int ia=2;ia<L;ia++)
+            for (int ia=1;ia<L;ia++)
                 GetSiteOperator(ia)->CanonicalForm(lr);
             break;
         case DRight:
-            for (int ia=L-1;ia>1;ia--)
+            for (int ia=L;ia>1;ia--)
                 GetSiteOperator(ia)->CanonicalForm(lr);
             break;
     }

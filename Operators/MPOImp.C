@@ -25,10 +25,10 @@ MPOImp::MPOImp(int L, double S,LoadWith loadWith)
         //  Load up the sites with unit operators
         //  TODO tidy up loop and unit test.
         //
-        Insert(new SiteOperatorImp(d));
+        Insert(new SiteOperatorImp(d,PLeft));
         for (int ia=2; ia<=itsL-1; ia++)
-            Insert(new SiteOperatorImp(d));
-        Insert(new SiteOperatorImp(d));
+            Insert(new SiteOperatorImp(d,PBulk));
+        Insert(new SiteOperatorImp(d,PRight));
         LinkSites();
         break;
     }
@@ -54,7 +54,10 @@ MPOImp::MPOImp(int L, double S, const TensorT& W)
     //  Load up the sites with copies of the W operator
     //
     for (int ia=1; ia<=itsL; ia++)
-        Insert(new SiteOperatorImp(d,W));
+    {
+        Position lbr = ia==1 ? PLeft : (ia==L ? PRight : PBulk);
+        Insert(new SiteOperatorImp(d,lbr,W));
+    }
 }
 
 

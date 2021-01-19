@@ -30,17 +30,63 @@ class SiteOperatorImp : public virtual SiteOperator
 {
         typedef Matrix<MatrixRT> TensorT;
     public:
-        SiteOperatorImp(int d); //Construct with identity operator
-        SiteOperatorImp(int d, double S, SpinOperator so); //Construct with identity operator
+        SiteOperatorImp(int d, Position  lbr); //Construct with identity operator
+        SiteOperatorImp(int d, Position  lbr, double S, SpinOperator so); //Construct with identity operator
         SiteOperatorImp(int d, Position  lbr, const OperatorClient* O);
-        SiteOperatorImp(int d, Direction lr , const MatrixRT& U, const DiagonalMatrixRT& expEvs);
-        SiteOperatorImp(int d, const TensorT& W); //Construct with W operator
+        SiteOperatorImp(int d, Position  lbr, Direction lr , const MatrixRT& U, const DiagonalMatrixRT& expEvs);
+        SiteOperatorImp(int d, Position  lbr, const TensorT& W); //Construct with W operator
         virtual ~SiteOperatorImp();
         void SetNeighbours(SiteOperator* left, SiteOperator* right);
 
         virtual int             Getd   () const {return itsd;}
-        virtual const Dw12&     GetDw12() const {return itsDw12;}
+        virtual const Dw12&     GetDw12() const
+        {
+            static Dw12 Dw;
+            Dw=itsDw;
+            switch (itsLBR)
+            {
+            case PBulk:
+                break;
+            case PLeft:
+                Dw.Dw1=1;
+                Dw.w1_first.SetLimits(Dw.Dw2);
+                Dw.w2_last .SetLimits(Dw.Dw1);
+                Fill(Dw.w1_first,1);
+                Fill(Dw.w2_last ,Dw.Dw2);
+                break;
+            case PRight:
+                Dw.Dw2=1;
+                Dw.w1_first.SetLimits(Dw.Dw2);
+                Dw.w2_last .SetLimits(Dw.Dw1);
+                Fill(Dw.w1_first,1);
+                Fill(Dw.w2_last ,Dw.Dw2);
+                break;
+            default:
+                assert(false); //This can happen if itsLBR was never initialized.
+            }
+            return Dw;
+        }
         virtual const MatrixRT& GetW(int m, int n) const
+        {
+//            std::cout << "LBR,Dw1,Dw2,iW,W,lr=" << itsLBR << " " << itsDw.Dw1 << " " << itsDw.Dw2 <<
+//            std::endl << itsWs(m+1,n+1).GetLimits() << itslr.GetLimits() << std::endl << "---------------" << std::endl;
+            switch (itsLBR)
+            {
+            case PBulk:
+                itsW=itsWs(m+1,n+1);
+                break;
+            case PLeft:
+                itsW=itslr*itsWs(m+1,n+1);
+                break;
+            case PRight:
+                itsW=itsWs(m+1,n+1)*itslr;
+                break;
+            default:
+                assert(false); //This can happen if itsLBR was never initialized.
+            }
+            return itsW;
+        }
+        virtual const MatrixRT& GetiW(int m, int n) const
         {
             return itsWs(m+1,n+1);
         }
@@ -63,7 +109,8 @@ class SiteOperatorImp : public virtual SiteOperator
 
     private:
         friend class MPOTesting;
-        MatrixRT& GetW(int m, int n) {return itsWs(m+1,n+1);}
+        friend class iMPOImp;
+        MatrixRT& GetiW(int m, int n) {return itsWs(m+1,n+1);}
         void SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV);
         void  QLTransfer(Direction lr,const MatrixRT& L);
 
@@ -75,12 +122,16 @@ class SiteOperatorImp : public virtual SiteOperator
         void     ReshapeV (Direction lr,const MatrixRT& Q);
         void     ReshapeV1(Direction lr,const MatrixRT& Q);
         void     SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
+        void     Init_lr();
 
-        int itsd; //2*S+1
-        Dw12 itsDw12;
-        double itsTruncationError;
+        int      itsd; //2*S+1
+        Dw12     itsDw;
+        Position itsLBR;
+        double   itsTruncationError;
 
-        TensorT itsWs;
+        TensorT  itsWs;
+        MatrixRT itslr; //l or r in l*W*W*...*W*W*r
+        mutable MatrixRT itsW; //Used for return
         SiteOperatorImp* itsLeft_Neighbour;
         SiteOperatorImp* itsRightNeighbour;
 };

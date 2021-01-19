@@ -57,21 +57,21 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, double S, 
         {
             for (int ia=1;ia<L;ia+=2)
             {
-                Insert(new SiteOperatorImp(d,DLeft ,U ,sm));
-                Insert(new SiteOperatorImp(d,DRight,VT,sm));
+                Insert(new SiteOperatorImp(d,PBulk,DLeft ,U ,sm));
+                Insert(new SiteOperatorImp(d,PBulk,DRight,VT,sm));
             }
-            if (L%2) Insert(new SiteOperatorImp(d)); //if L is odd add one I op at the end
+            if (L%2) Insert(new SiteOperatorImp(d,PBulk)); //if L is odd add one I op at the end
             break;
         }
     case Odd : // ILRLRI or ILRLRLR
         {
-            Insert(new SiteOperatorImp(d)); //if L is odd add one I op at the start
+            Insert(new SiteOperatorImp(d,PBulk)); //if L is odd add one I op at the start
             for (int ia=2;ia<=L-1;ia+=2)
             {
-                Insert(new SiteOperatorImp(d,DLeft ,U ,sm));
-                Insert(new SiteOperatorImp(d,DRight,VT,sm));
+                Insert(new SiteOperatorImp(d,PBulk,DLeft ,U ,sm));
+                Insert(new SiteOperatorImp(d,PBulk,DRight,VT,sm));
             }
-            if (!(L%2)) Insert(new SiteOperatorImp(d)); //if L is odd add one I op at the end
+            if (!(L%2)) Insert(new SiteOperatorImp(d,PBulk)); //if L is odd add one I op at the end
             break;
         }
     default :

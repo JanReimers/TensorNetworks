@@ -81,7 +81,7 @@ TEST_F(VariationalGroundStateTests,TestSweepL2S1D2)
 
     TensorNetworks::MPO* H2=itsH->CreateH2Operator();
     double E2=itsMPS->GetExpectation(H2);
-    EXPECT_EQ(H2->GetMaxDw(),4);
+    EXPECT_EQ(H2->GetMaxDw(),10);
     EXPECT_NEAR(E2,E1*E1,1e-14);
 }
 
@@ -391,7 +391,7 @@ TEST_F(VariationalGroundStateTests,TestTransverIsingL2S1D2Hx0)
 
     TensorNetworks::MPO* H2=itsH->CreateH2Operator();
     double E2=itsMPS->GetExpectation(H2);
-    EXPECT_EQ(H2->GetMaxDw(),1); //if hx=0 it compresses a lot
+    EXPECT_EQ(H2->GetMaxDw(),6); //if hx=0 it compresses a lot
     EXPECT_NEAR(E2,E1*E1,1e-14);
 }
 
@@ -415,7 +415,7 @@ TEST_F(VariationalGroundStateTests,TestTransverIsingL9S1D2Hx0)
 
     TensorNetworks::MPO* H2=itsH->CreateH2Operator();
     double E2=itsMPS->GetExpectation(H2);
-    EXPECT_EQ(H2->GetMaxDw(),5); //if hx=0 it compresses a lot
+    EXPECT_EQ(H2->GetMaxDw(),6); //if hx=0 it compresses a lot
     EXPECT_NEAR(E2,E1*E1,1e-14);
 }
 
@@ -440,7 +440,7 @@ TEST_F(VariationalGroundStateTests,TestTransverIsingL9S1D2Hx1)
 
     TensorNetworks::MPO* H2=itsH->CreateH2Operator();
     double E2=itsMPS->GetExpectation(H2);
-    EXPECT_EQ(H2->GetMaxDw(),5); //if hx=0 it compresses a lot
+    EXPECT_EQ(H2->GetMaxDw(),6); //if hx=0 it compresses a lot
     EXPECT_NEAR(E2,E1*E1,1e-4);
 }
 
@@ -465,7 +465,7 @@ TEST_F(VariationalGroundStateTests,TestTransverIsingL9S1D8Hx1)
 
     TensorNetworks::MPO* H2=itsH->CreateH2Operator();
     double E2=itsMPS->GetExpectation(H2);
-    EXPECT_EQ(H2->GetMaxDw(),5); //if hx=0 it compresses a lot
+    EXPECT_EQ(H2->GetMaxDw(),6); //if hx=0 it compresses a lot
     EXPECT_NEAR(E2,E1*E1,1e-13);
 }
 

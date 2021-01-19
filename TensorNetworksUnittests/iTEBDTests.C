@@ -354,6 +354,7 @@ TEST_F(iTEBDTests,TestApplyMPOIdentity)
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
     MPO* IdentityOp=itsH->CreateOperator(dt,TensorNetworks::FirstOrder);
+    IdentityOp->Report(cout);
     itsState->ApplyOrtho(IdentityOp,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
     delete IdentityOp;
@@ -897,11 +898,10 @@ TEST_F(iTEBDTests,TestiMPOExpectation)
 
 
     itsState->InitializeWith(TensorNetworks::Random);
+    TensorNetworks::iMPO* iH=itsH->CreateiMPO();
+
     TensorNetworks::IterationSchedule is=MakeSchedule(maxIter,D,TensorNetworks::SecondOrder,deltaD);
     itsState->FindiTimeGroundState(itsH,is);
-
-    TensorNetworks::iMPO* iH=itsH->CreateiMPO();
-//    iH->Report(cout);
 
     double E=itsState->GetExpectation(itsH);
     double Er=itsState->GetExpectation(iH);

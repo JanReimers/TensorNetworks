@@ -15,10 +15,11 @@ MPO_OneSite::MPO_OneSite(int L, double S ,int isite, SpinOperator o)
 
     for (int ia=1;ia<=L;ia++)
     {
+        Position lbr = ia==1 ? PLeft : (ia==L ? PRight : PBulk);
         if (ia==isite)
-            Insert(new SiteOperatorImp(d,S,o));
+            Insert(new SiteOperatorImp(d,lbr,S,o));
         else
-            Insert(new SiteOperatorImp(d)); //Identity op
+            Insert(new SiteOperatorImp(d,lbr)); //Identity op
     }
     LinkSites();
 }

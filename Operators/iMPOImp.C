@@ -58,19 +58,23 @@ void iMPOImp::LinkSites()
     if (itsL>1)
     {
         s->SetNeighbours(itsSites[itsL],itsSites[2]);
+        s->itsLBR=PBulk;
         for (int ia=2; ia<=itsL-1; ia++)
         {
             s=dynamic_cast<SiteOperatorImp*>(itsSites[ia]);
             assert(s);
             s->SetNeighbours(itsSites[ia-1],itsSites[ia+1]);
+            assert(s->itsLBR==PBulk);
         }
         s=dynamic_cast<SiteOperatorImp*>(itsSites[itsL]);
         assert(s);
         s->SetNeighbours(itsSites[itsL-1],itsSites[1]);
+        s->itsLBR=PBulk;
     }
     else
     {
         s->SetNeighbours(s,s);
+        s->itsLBR=PBulk;
     }
     areSitesLinked=true;
 }
@@ -131,7 +135,7 @@ double iMPOImp::Compress(const SVCompressorR* compressor)
 {
     int L=GetL();
     Vector<int> oldDws(L),newDws(L);
-    double truncationError=0.0;
+//    double truncationError=0.0;
     for (int ia=1;ia<=L;ia++)
     {
         oldDws(ia)=GetSiteOperator(ia)->GetDw12().Dw2;

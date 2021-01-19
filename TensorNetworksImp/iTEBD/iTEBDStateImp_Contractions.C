@@ -537,6 +537,7 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
     assert(D==A[0].GetNumCols());
 
     const SiteOperator* so=o->GetSiteOperator(1);
+    so->Report(cout); cout << endl;
     int Dw=so->GetDw12().Dw1;
     assert(Dw==so->GetDw12().Dw2);
 #ifdef DEBUG

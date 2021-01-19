@@ -16,12 +16,13 @@ MPO_TwoSite::MPO_TwoSite(int L, double S ,int isite1,int isite2, SpinOperator so
 
     for (int ia=1;ia<=L;ia++)
     {
+        Position lbr = ia==1 ? PLeft : (ia==L ? PRight : PBulk);
         if (ia==isite1)
-            Insert(new SiteOperatorImp(d,S,so1));
+            Insert(new SiteOperatorImp(d,lbr,S,so1));
         else if (ia==isite2)
-            Insert(new SiteOperatorImp(d,S,so2));
+            Insert(new SiteOperatorImp(d,lbr,S,so2));
         else
-            Insert(new SiteOperatorImp(d)); //Identity op
+            Insert(new SiteOperatorImp(d,lbr)); //Identity op
     }
     LinkSites();
 }
