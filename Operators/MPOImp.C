@@ -1,5 +1,8 @@
 #include "Operators/MPOImp.H"
 #include "Operators/SiteOperatorImp.H"
+#include "Operators/SiteOperatorLeft.H"
+#include "Operators/SiteOperatorBulk.H"
+#include "Operators/SiteOperatorRight.H"
 #include "TensorNetworksImp/SVMPOCompressor.H"
 #include "TensorNetworks/CheckSpin.H"
 
@@ -25,10 +28,10 @@ MPOImp::MPOImp(int L, double S,LoadWith loadWith)
         //  Load up the sites with unit operators
         //  TODO tidy up loop and unit test.
         //
-        Insert(new SiteOperatorImp(d,PLeft));
+        Insert(new SiteOperatorLeft(d));
         for (int ia=2; ia<=itsL-1; ia++)
-            Insert(new SiteOperatorImp(d,PBulk));
-        Insert(new SiteOperatorImp(d,PRight));
+            Insert(new SiteOperatorBulk(d));
+        Insert(new SiteOperatorRight(d));
         LinkSites();
         break;
     }
@@ -53,10 +56,10 @@ MPOImp::MPOImp(int L, double S, const TensorT& W)
     //
     //  Load up the sites with copies of the W operator
     //
+
     for (int ia=1; ia<=itsL; ia++)
     {
-        Position lbr = ia==1 ? PLeft : (ia==L ? PRight : PBulk);
-        Insert(new SiteOperatorImp(d,lbr,W));
+        Insert(new SiteOperatorBulk(d,W));
     }
 }
 

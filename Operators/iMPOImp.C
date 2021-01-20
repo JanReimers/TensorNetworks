@@ -1,7 +1,7 @@
 #include "Operators/iMPOImp.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworksImp/StateIterator.H"
-#include "Operators/SiteOperatorImp.H"
+#include "Operators/SiteOperatorBulk.H"
 #include "TensorNetworks/Dw12.H"
 #include "oml/vector.h"
 #include "oml/matrix.h"
@@ -34,7 +34,7 @@ iMPOImp::iMPOImp(int L, double S,const OperatorClient* W)
     //  For and iMPO the sites at the edge of the unit cell are considered Bulk
     //
     for (int ia=1; ia<=itsL; ia++)
-        Insert(new SiteOperatorImp(d,PBulk,W));
+        Insert(new SiteOperatorBulk(d,W));
 
     LinkSites();
 }
@@ -58,23 +58,19 @@ void iMPOImp::LinkSites()
     if (itsL>1)
     {
         s->SetNeighbours(itsSites[itsL],itsSites[2]);
-        s->itsLBR=PBulk;
         for (int ia=2; ia<=itsL-1; ia++)
         {
             s=dynamic_cast<SiteOperatorImp*>(itsSites[ia]);
             assert(s);
             s->SetNeighbours(itsSites[ia-1],itsSites[ia+1]);
-            assert(s->itsLBR==PBulk);
         }
         s=dynamic_cast<SiteOperatorImp*>(itsSites[itsL]);
         assert(s);
         s->SetNeighbours(itsSites[itsL-1],itsSites[1]);
-        s->itsLBR=PBulk;
     }
     else
     {
         s->SetNeighbours(s,s);
-        s->itsLBR=PBulk;
     }
     areSitesLinked=true;
 }

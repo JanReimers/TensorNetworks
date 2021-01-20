@@ -11,7 +11,6 @@ namespace TensorNetworks
 SiteOperatorImp::SiteOperatorImp(int d, Position  lbr)
     : itsd(d)
     , itsDw(1,1,Vector<int>(1),Vector<int>(1))
-    , itsLBR(lbr)
     , itsTruncationError(0.0)
     , isShapeDirty(true) //Init_lr will turn this off
     , isData_Dirty(true) //Init_lr will turn this off
@@ -31,14 +30,11 @@ SiteOperatorImp::SiteOperatorImp(int d, Position  lbr)
             assert(itsWs(m+1,n+1).GetNumRows()==itsDw.Dw1);
             assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
         }
-    Init_lr();
-    CheckDws();
 }
 
 SiteOperatorImp::SiteOperatorImp(int d, Position  lbr, double S, SpinOperator so) //Construct spin operator
     : itsd(d)
     , itsDw(1,1,Vector<int>(1),Vector<int>(1))
-    , itsLBR(lbr)
     , itsTruncationError(0.0)
     , isShapeDirty(true) //Init_lr will turn this off
     , isData_Dirty(true) //Init_lr will turn this off
@@ -54,8 +50,6 @@ SiteOperatorImp::SiteOperatorImp(int d, Position  lbr, double S, SpinOperator so
             assert(itsWs(m+1,n+1).GetNumRows()==itsDw.Dw1);
             assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
         }
-    Init_lr();
-    CheckDws();
 }
 //
 //  Build from a W rep object
@@ -63,12 +57,10 @@ SiteOperatorImp::SiteOperatorImp(int d, Position  lbr, double S, SpinOperator so
 SiteOperatorImp::SiteOperatorImp(int d, Position lbr, const OperatorClient* H)
     : itsd(d)
     , itsDw(H->GetDw12(PBulk))
-    , itsLBR(lbr)
     , itsTruncationError(0.0)
     , isShapeDirty(true) //Init_lr will turn this off
     , isData_Dirty(true) //Init_lr will turn this off
     , itsWs(d,d)
-    , itslr()
 {
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)
@@ -77,8 +69,6 @@ SiteOperatorImp::SiteOperatorImp(int d, Position lbr, const OperatorClient* H)
             assert(itsWs(m+1,n+1).GetNumRows()==itsDw.Dw1);
             assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
         }
-    Init_lr();
-    CheckDws();
 }
 
 //
@@ -87,7 +77,6 @@ SiteOperatorImp::SiteOperatorImp(int d, Position lbr, const OperatorClient* H)
 SiteOperatorImp::SiteOperatorImp(int d, Position  lbr, Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s)
     : itsd(d)
     , itsDw()
-    , itsLBR(lbr)
     , itsTruncationError(0.0)
     , isShapeDirty(true) //Init_lr will turn this off
     , isData_Dirty(true) //Init_lr will turn this off
@@ -141,8 +130,6 @@ SiteOperatorImp::SiteOperatorImp(int d, Position  lbr, Direction lr,const Matrix
         // Must be been called with one of the spin decomposition types.
         assert(false);
     }
-    Init_lr();
-    CheckDws();
 }
 //
 // Construct with W operator
@@ -150,7 +137,6 @@ SiteOperatorImp::SiteOperatorImp(int d, Position  lbr, Direction lr,const Matrix
 SiteOperatorImp::SiteOperatorImp(int d, Position  lbr, const TensorT& W)
     : itsd(d)
     , itsDw()
-    , itsLBR(lbr)
     , itsTruncationError(0.0)
     , isShapeDirty(true) //Init_lr will turn this off
     , isData_Dirty(true) //Init_lr will turn this off
@@ -164,8 +150,6 @@ SiteOperatorImp::SiteOperatorImp(int d, Position  lbr, const TensorT& W)
     Fill(first,1);
     Fill(last,Dw);
     itsDw=Dw12(Dw,Dw,first,last);
-    Init_lr();
-    CheckDws();
 }
 
 
@@ -176,73 +160,15 @@ SiteOperatorImp::~SiteOperatorImp()
 
 void SiteOperatorImp::CheckDws() const
 {
+#ifdef DEBUG
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)
         {
-            {
-                const MatrixRT& W=GetiW(m,n);
-                assert(W.GetNumRows()==itsDw.Dw1);
-                assert(W.GetNumCols()==itsDw.Dw2);
-            }
-            const MatrixRT& W=GetW(m,n);
-            switch (itsLBR)
-            {
-            case PLeft:
-                assert(W.GetNumRows()==1);
-                if (W.GetNumCols()!=itsDw.Dw2)
-                    assert(W.GetNumCols()==itsDw.Dw2);
-                break;
-            case PRight:
-                assert(W.GetNumCols()==1);
-                assert(W.GetNumRows()==itsDw.Dw1);
-                break;
-            case PBulk:
-                break;
-            }
+            const MatrixRT& W=GetiW(m,n);
+            assert(W.GetNumRows()==itsDw.Dw1);
+            assert(W.GetNumCols()==itsDw.Dw2);
         }
-    switch (itsLBR)
-    {
-    case PLeft:
-        if (itslr.GetLimits()!=MatLimits(1,itsDw.Dw1))
-            assert(itslr.GetLimits()==MatLimits(1,itsDw.Dw1));
-        break;
-    case PRight:
-        assert(itslr.GetLimits()==MatLimits(itsDw.Dw2,1));
-        break;
-    case PBulk:
-        break;
-    default:
-        assert(false); //itsLBR no intiallized?
-    }
-}
-
-void SiteOperatorImp::Init_lr()
-{
-    if (isShapeDirty)
-    {
-        switch (itsLBR)
-        {
-        case PLeft:
-            itslr.SetLimits(1,itsDw.Dw1);
-            Fill(itslr,0.0);
-            itslr(1,itsDw.Dw1)=1.0;
-            break;
-        case PRight:
-            itslr.SetLimits(itsDw.Dw2,1);
-            Fill(itslr,0.0);
-            itslr(1,1)=1.0;
-            break;
-        case PBulk:
-            break;
-        }
-        isShapeDirty=false;
-    }
-    if (isData_Dirty)
-    {
-        SetLimits();
-        isData_Dirty=false;
-    }
-    CheckDws();
+#endif
 }
 
 void SiteOperatorImp::SetNeighbours(SiteOperator* left, SiteOperator* right)
@@ -333,7 +259,6 @@ void SiteOperatorImp::Combine(const SiteOperator* O2,double factor)
     itsWs=newWs;
 
     itsDw=Dw;
-    itsLBR=O2i->itsLBR;
     isShapeDirty=true;
     isData_Dirty=true;
     Init_lr();
@@ -349,7 +274,7 @@ void SiteOperatorImp::Report(std::ostream& os) const
     << std::setw(3) << itsDw.Dw1 << " "
     << std::setw(3) << itsDw.Dw2 << " "
     << std::scientific << std::setprecision(1) << itsTruncationError
-    << " " << GetNormStatus(1e-13) << " " << itsLBR
+    << " " << GetNormStatus(1e-13)
 //    << " " << itsDw12.w1_first << " " << itsDw12.w2_last
     ;
 }

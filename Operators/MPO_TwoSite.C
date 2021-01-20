@@ -1,5 +1,7 @@
 #include "Operators/MPO_TwoSite.H"
-#include "Operators/SiteOperatorImp.H"
+#include "Operators/SiteOperatorLeft.H"
+#include "Operators/SiteOperatorBulk.H"
+#include "Operators/SiteOperatorRight.H"
 #include "TensorNetworks/CheckSpin.H"
 
 namespace TensorNetworks
@@ -14,16 +16,29 @@ MPO_TwoSite::MPO_TwoSite(int L, double S ,int isite1,int isite2, SpinOperator so
     assert(L>1);
     assert(d>1);
 
-    for (int ia=1;ia<=L;ia++)
+
+    if (1==isite1)
+        Insert(new SiteOperatorLeft(d,S,so1));
+    else if (1==isite2)
+        Insert(new SiteOperatorLeft(d,S,so2));
+    else
+        Insert(new SiteOperatorLeft(d)); //Identity op
+    for (int ia=2;ia<=L-1;ia++)
     {
-        Position lbr = ia==1 ? PLeft : (ia==L ? PRight : PBulk);
         if (ia==isite1)
-            Insert(new SiteOperatorImp(d,lbr,S,so1));
+            Insert(new SiteOperatorBulk(d,S,so1));
         else if (ia==isite2)
-            Insert(new SiteOperatorImp(d,lbr,S,so2));
+            Insert(new SiteOperatorBulk(d,S,so2));
         else
-            Insert(new SiteOperatorImp(d,lbr)); //Identity op
+            Insert(new SiteOperatorBulk(d)); //Identity op
     }
+    if (L==isite1)
+        Insert(new SiteOperatorRight(d,S,so1));
+    else if (L==isite2)
+        Insert(new SiteOperatorRight(d,S,so2));
+    else
+        Insert(new SiteOperatorRight(d)); //Identity op
+
     LinkSites();
 }
 

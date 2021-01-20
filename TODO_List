@@ -1,4 +1,4 @@
-sudo modprobe -r rt2800pci;sudo modprobe rt2800pci nohwcrypt=1
+
 
 Next steps:
     -Try wave function optimization for improve iTEBD GS energies.  Get them closer to mp-toolkit results?
@@ -22,7 +22,7 @@ Next steps:
                     Done: 1) Always store full W, even at edges
                     Done: 2) GetW(m,n) will return l*W or W*r at edges
                     Done: 3) GetiW(m,n) return full W in bulk and at edges.
-                    4) Fix l*W and W*r caching
+                    Done: 4) Fix l*W and W*r caching
                         User virtual dispatch for GetW?
                     5) Var GS energies for transverse Ising with field on changed.
                     6) Fix up SetLimits for Dw
@@ -49,6 +49,7 @@ Next steps:
         -iMPO-iTEBD starts anti-converging for small dt.  Also lambdas are wrong.
             -Try unit operator, see if there is something obviously wrong.
             -Replace dVectorT idea may fix it.
+
     -Understand trotter gates better
         -schachenmayer_diploma_thesis
         -Higher-order methods for simulations on quantum computers
@@ -117,6 +118,7 @@ Next steps:
         3) handle MPOs with two sets of indices
 -Refactor: MPO_SpatialTrotter takes Hlocal, should work from H or expH.  Right now it duplicates code
     for calculating expH.
+-Move all oml instancing to oml side.
 Done: -Logging: only LogInfoV does indenting
     Done: Also fix warnings
 -Save wave functions to disk.

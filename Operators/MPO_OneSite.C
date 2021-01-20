@@ -1,5 +1,7 @@
 #include "Operators/MPO_OneSite.H"
-#include "Operators/SiteOperatorImp.H"
+#include "Operators/SiteOperatorLeft.H"
+#include "Operators/SiteOperatorBulk.H"
+#include "Operators/SiteOperatorRight.H"
 #include "TensorNetworks/CheckSpin.H"
 
 namespace TensorNetworks
@@ -13,14 +15,21 @@ MPO_OneSite::MPO_OneSite(int L, double S ,int isite, SpinOperator o)
     assert(L>1);
     assert(d>1);
 
-    for (int ia=1;ia<=L;ia++)
+    if (1==isite)
+        Insert(new SiteOperatorLeft(d,S,o));
+    else
+        Insert(new SiteOperatorLeft(d)); //Identity op
+    for (int ia=2;ia<=L-1;ia++)
     {
-        Position lbr = ia==1 ? PLeft : (ia==L ? PRight : PBulk);
         if (ia==isite)
-            Insert(new SiteOperatorImp(d,lbr,S,o));
+            Insert(new SiteOperatorBulk(d,S,o));
         else
-            Insert(new SiteOperatorImp(d,lbr)); //Identity op
+            Insert(new SiteOperatorBulk(d)); //Identity op
     }
+    if (L==isite)
+        Insert(new SiteOperatorRight(d,S,o));
+    else
+        Insert(new SiteOperatorRight(d)); //Identity op
     LinkSites();
 }
 

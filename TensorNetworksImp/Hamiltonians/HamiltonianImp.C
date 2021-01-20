@@ -1,4 +1,7 @@
 #include "TensorNetworksImp/Hamiltonians/HamiltonianImp.H"
+#include "Operators/SiteOperatorLeft.H"
+#include "Operators/SiteOperatorBulk.H"
+#include "Operators/SiteOperatorRight.H"
 #include "Operators/iMPOImp.H"
 #include "TensorNetworks/CheckSpin.H"
 #include <iostream>
@@ -27,10 +30,10 @@ HamiltonianImp::HamiltonianImp(int L, double S)
 void HamiltonianImp::InitializeSites()
 {
     int d=Getd();
-    Insert(new SiteOperatorImp(d,PLeft ,this));
+    Insert(new SiteOperatorLeft(d,this));
     for (int ia=2;ia<=GetL()-1;ia++)
-        Insert(new SiteOperatorImp(d,PBulk ,this));
-    Insert(new SiteOperatorImp(d,PRight,this));
+        Insert(new SiteOperatorBulk(d,this));
+    Insert(new SiteOperatorRight(d,this));
     LinkSites();
 }
 
