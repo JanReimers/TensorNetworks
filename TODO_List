@@ -26,7 +26,7 @@ Next steps:
                         User virtual dispatch for GetW?
                     5) Var GS energies for transverse Ising with field on changed.
                     6) Fix up SetLimits for Dw
-                    7) Make a SetW function for writing to W. It needs to
+                    Done 7) Make a SetW function for writing to W. It needs to
                         -SetW (obviously)
                         -Update Dw limits
                         -Update l*W or W*r cache
@@ -36,7 +36,8 @@ Next steps:
                 Should we scale by s_avg for Parker compression?
             -Try and make and (H-E)^2 operator
             -Compress exp(-t*H) operator
-
+            -Store accumulated truncation error for each site.
+                -Same for MPS?
 
 
         -Code up iMPO compression as per Parker.

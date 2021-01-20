@@ -1,5 +1,5 @@
-#ifndef MPOSITE_H
-#define MPOSITE_H
+#ifndef SITEOPERATORIMP_H
+#define SITEOPERATORIMP_H
 
 #include "TensorNetworks/Namespace.H"
 #include "TensorNetworks/SiteOperator.H"
@@ -19,15 +19,16 @@ class OperatorClient
 protected:
     OperatorClient() {}
     virtual ~OperatorClient() {}
-
+public:
     virtual MatrixRT GetW   (Position,int m, int n) const=0;
     virtual Dw12     GetDw12(Position) const=0;
-    friend class SiteOperatorImp;
+//    friend class SiteOperatorImp;
     friend class ::MPOTests;
 };
 
 class SiteOperatorImp : public virtual SiteOperator
 {
+    protected:
         typedef Matrix<MatrixRT> TensorT;
     public:
         SiteOperatorImp(int d, Position  lbr); //Construct with identity operator
@@ -110,7 +111,8 @@ class SiteOperatorImp : public virtual SiteOperator
     private:
         friend class MPOTesting;
         friend class iMPOImp;
-        MatrixRT& GetiW(int m, int n) {return itsWs(m+1,n+1);}
+        void SetiW(int m, int n, const MatrixRT& W);
+
         void SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV);
         void  QLTransfer(Direction lr,const MatrixRT& L);
 
@@ -123,11 +125,14 @@ class SiteOperatorImp : public virtual SiteOperator
         void     ReshapeV1(Direction lr,const MatrixRT& Q);
         void     SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
         void     Init_lr();
+        void     CheckDws() const;
 
         int      itsd; //2*S+1
         Dw12     itsDw;
         Position itsLBR;
         double   itsTruncationError;
+        bool     isShapeDirty; //Matrices got reshaped
+        bool     isData_Dirty; //Matrices got new data
 
         TensorT  itsWs;
         MatrixRT itslr; //l or r in l*W*W*...*W*W*r
@@ -137,4 +142,4 @@ class SiteOperatorImp : public virtual SiteOperator
 };
 
 }
-#endif // MPOSITE_H
+#endif // SITEOPERATORIMP_H
