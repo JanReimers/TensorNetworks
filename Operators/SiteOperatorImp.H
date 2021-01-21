@@ -81,6 +81,7 @@ class SiteOperatorImp : public virtual SiteOperator
         void     ReshapeV (Direction lr,const MatrixRT& Q);
         void     ReshapeV1(Direction lr,const MatrixRT& Q);
 
+        bool     isOrthonormal(Direction lr,const MatrixRT& Q) const;
         void     AccumulateTruncationError(double err);
     protected:
 

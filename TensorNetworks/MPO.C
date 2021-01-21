@@ -113,22 +113,8 @@ double MPO::CompressStd(const SVCompressorR* compressor)
 double MPO::CompressParker(const SVCompressorR* compressor)
 {
     int L=GetL();
-    Vector<int> oldDws(L),newDws(L);
     for (int ia=1;ia<L;ia++)
-    {
-        oldDws(ia)=GetSiteOperator(ia)->GetDw12().Dw2;
         GetSiteOperator(ia)->CompressParker(DLeft ,compressor);
-    }
-    Report(std::cout);
-    oldDws(L)=0;
-    for (int ia=L;ia>1;ia--)
-    {
-        GetSiteOperator(ia)->CompressParker(DRight,compressor);
-        newDws(ia)=GetSiteOperator(ia)->GetDw12().Dw1;
-    }
-//    newDws(1)=0;
-//    double percent=100-(100.0*Sum(newDws))/static_cast<double>(Sum(oldDws));
-////    std::cout << "% compression=" << std::fixed << std::setprecision(2) << percent << std::endl;
     return 0.0;
 }
 

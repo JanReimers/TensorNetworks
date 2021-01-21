@@ -1,5 +1,5 @@
 
-
+-MPSImp GetCanonicalD1 overflows.  Needs to go bye bye.
 Next steps:
     -Try wave function optimization for improve iTEBD GS energies.  Get them closer to mp-toolkit results?
     -Try coding up iTEBD using iTensor library
@@ -32,11 +32,13 @@ Next steps:
                         -Update l*W or W*r cache
                     8) Can we tidy up all the Reshape functions?
                     Done 9) Hamiltonians no longer need to serve edge Ws
-            -Getting exponentially large SVs.
-                Std compression does the same thing, but scaling by s_avg fixes it.
-                Should we scale by s_avg for Parker compression?
+            Done: -Getting exponentially large SVs.
             -Try and make and (H-E)^2 operator
             -Compress exp(-t*H) operator
+                -exp(-t*H) doesn't have unit ops in the same places
+                -exp(-t*H) is upper or lower triangular.
+                -We get a rectangular V(mnw1,w2) with more rows than columns.
+                    Lapack QL won't handle this'
             Done: -MPOs Store accumulated truncation error for each site.
             -MPS Store accumulated truncation error for each site.
 

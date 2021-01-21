@@ -58,9 +58,13 @@ MatrixRT SiteOperatorImp::ReshapeV1(Direction lr) const
             for (int n=0; n<itsd; n++)
             {
                 const MatrixRT& W=GetiW(m,n);
-                for (int w1=2; w1<=itsDw.Dw1; w1++,w++)
+                for (int w1=2; w1<=itsDw.Dw1; w1++)
+                {
+
                     for (int w2=2; w2<=itsDw.Dw2; w2++)
                         A(w,w2-1)=W(w1,w2);
+                    w++;
+                }
             }
         break;
     }

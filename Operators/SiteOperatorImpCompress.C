@@ -107,8 +107,8 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
             assert(V.GetNumRows()==itsd*itsd*(X1+1)); // Treate these like enforced comments on the
             assert(V.GetNumCols()==X2+1);             // dimensions of each matrix.
             auto [Qp,Lp]=QRsolver.SolveThinQL(V); //Solves V=Q*L
-//            cout << "Lp(X2+1,X2+1)=" << Lp(X2+1,X2+1) << endl;
-            assert(fabs(Lp(X2+1,X2+1)-1.0)<1e-15);
+            Lp*=1.0/sqrt(itsd);
+            Qp*=sqrt(itsd);
             double QLerr=Max(fabs(Qp*Lp-V));
             if (QLerr>1e-13)
                Logger->LogWarnV(1,"SiteOperatorImp::CompressParker QL error=%.1e ",QLerr);
@@ -117,7 +117,7 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
             assert(Qp.GetNumCols()==X2+1);
             assert(Lp.GetNumRows()==X2+1);
             assert(Lp.GetNumCols()==X2+1);
-            assert(IsUnit(Transpose(Qp)*Qp,1e-13));
+            assert(isOrthonormal(lr,Qp));
 
             MatrixRT Lpp;
             auto [M,Lprime]=ExtractM(lr,Lp);
@@ -132,7 +132,7 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
             {
                 auto [U,s,VT]=SVDsolver.SolveAll(M,1e-14); //Solves M=U * s * VT
                 AccumulateTruncationError(comp->Compress(U,s,VT));
-                cout << std::fixed << std::setprecision(2) << "s=" << s.GetDiagonal() << endl;
+                cout << std::fixed << std::setprecision(8) << "s=" << s.GetDiagonal() << endl;
                 Xs=s.GetDiagonal().size();
                 MatrixRT sV=s*VT;
                 assert(sV.GetNumRows()==Xs);
@@ -150,7 +150,7 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 
                 Lpp=sVpp*Lprime; //This get passed on to the next site over.
                 Qp*=Up;
-                assert(IsUnit(Transpose(Qp)*Qp,1e-13));
+                assert(isOrthonormal(lr,Qp));
                 ReshapeV(lr,Qp);  //W is now Qp
                 assert(GetNormStatus(1e-13)=='L');
             }
@@ -163,6 +163,8 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
             assert(V.GetNumCols()==itsd*itsd*(X2+1)); // Treate these like enforced comments on the
             assert(V.GetNumRows()==X1+1);             // dimensions of each matrix.
             auto [Lp,Qp]=QRsolver.SolveThinLQ(V); //Solves V=Q*L
+            Lp*=1.0/sqrt(itsd);
+            Qp*=sqrt(itsd);
             double QLerr=Max(fabs(Lp*Qp-V));
             if (QLerr>1e-13)
                Logger->LogWarnV(1,"SiteOperatorImp::CompressParker QL error=%.1e ",QLerr);
@@ -170,7 +172,7 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
             assert(Qp.GetNumRows()==X1+1);
             assert(Lp.GetNumRows()==X1+1);
             assert(Lp.GetNumCols()==X1+1);
-            assert(IsUnit(Qp*Transpose(Qp),1e-13));
+            assert(isOrthonormal(lr,Qp));
 
             MatrixRT Lpp;
             auto [M,Lprime]=ExtractM(lr,Lp);
@@ -205,8 +207,7 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 
                 Lpp=Lprime*Uspp; //This get passed on to the next site over.
                 Qp=MatrixRT(VTp*Qp);
-                assert(IsUnit(Qp*Transpose(Qp),1e-13));
-//                cout << "Qp=" << Qp << endl;
+                assert(isOrthonormal(lr,Qp));
                 ReshapeV(lr,Qp);  //W is now Qp
                 assert(GetNormStatus(1e-13)=='R');
             }
@@ -277,6 +278,8 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
         case DLeft:
         {
             auto [Q,L]=solver.SolveThinQL(V); //Solves V=Q*L
+            L*=1.0/sqrt(itsd);
+            Q*=sqrt(itsd);
             ReshapeV(lr,Q);  //A is now U
             MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,1);
             if (itsRightNeighbour) itsRightNeighbour->QLTransfer(lr,Lplus);
@@ -285,6 +288,8 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
         case DRight:
         {
             auto [L,Q]=solver.SolveThinLQ(V); //Solves V=L*Q
+            L*=1.0/sqrt(itsd);
+            Q*=sqrt(itsd);
             ReshapeV(lr,Q);  //A is now U
             MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,0);
             if (itsLeft_Neighbour) itsLeft_Neighbour->QLTransfer(lr,Lplus);

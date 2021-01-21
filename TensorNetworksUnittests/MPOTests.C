@@ -416,10 +416,8 @@ TEST_F(MPOTests,TestParkerSVDCompressHL9)
     EXPECT_EQ(itsH->GetNormStatus(),"WRRRRRRRR");
     double Eright=itsMPS->GetExpectation(itsH);
     itsH->CompressParker(0,1e-13);
-    EXPECT_EQ(itsH->GetNormStatus(),"WRRRRRRRR");
-    itsH->Report(cout);
+    EXPECT_EQ(itsH->GetNormStatus(),"LLLLLLLLW");
     double Ecomp=itsMPS->GetExpectation(itsH);
-    cout << itsH->GetNormStatus() << endl;;
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_NEAR(E,Ecomp ,1e-13);
     EXPECT_EQ(itsH->GetMaxDw(),5);
@@ -444,8 +442,7 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L9)
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     double E2right=itsMPS->GetExpectation(H2);
     H2->CompressParker(0,1e-13);
-    EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
-    H2->Report(cout);
+    EXPECT_EQ(H2->GetNormStatus(),"LLLLLLLLW");
     double E2comp=itsMPS->GetExpectation(H2);
     EXPECT_NEAR(E2,E2right,1e-13);
     EXPECT_NEAR(E2,E2comp ,1e-13);
@@ -463,11 +460,9 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L40)
     H2->Combine(itsH);
 
     double E2=itsMPS->GetExpectation(H2);
-    H2->CanonicalForm(TensorNetworks::DLeft); //Do we need to sweep both ways?
     H2->CanonicalForm(TensorNetworks::DRight);
     double E2right=itsMPS->GetExpectation(H2);
     H2->CompressParker(0,1e-13);
-    H2->Report(cout);
     double E2comp=itsMPS->GetExpectation(H2);
     EXPECT_NEAR(E2,E2right,1e-13);
     EXPECT_NEAR(E2,E2comp ,1e-13);
@@ -478,10 +473,11 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L40)
 TEST_F(MPOTests,TestParkerSVDCompressExpHL9)
 {
     int L=9,D=2;
-    double S=0.5,dt=0.1;
+    double S=0.5,dt=0.0;
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     TensorNetworks::iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder,1e-13);
+//    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
 
     expH->Report(cout);
     expH->CanonicalForm(TensorNetworks::DLeft); //Do we need to sweep both ways?
@@ -495,8 +491,8 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL9)
 //    EXPECT_NEAR(E2,E2right,1e-13);
 //    EXPECT_NEAR(E2,E2comp ,1e-13);
 }
-
 */
+
 #ifndef DEBUG
 
 TEST_F(MPOTests,TestTimingE2_S5D4)

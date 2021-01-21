@@ -263,6 +263,24 @@ void SiteOperatorImp::Report(std::ostream& os) const
     ;
 }
 
+bool SiteOperatorImp::isOrthonormal(Direction lr,const MatrixRT& Q) const
+{
+    bool ret=false;
+    double d=itsd;
+    switch (lr)
+    {
+    case DLeft:
+        ret=IsUnit(Transpose(Q)*Q/d,1e-13);
+        break;
+    case DRight:
+        ret=IsUnit(Q*Transpose(Q)/d,1e-13);
+        break;
+    default:
+        assert(false);
+    }
+    return ret;
+}
+
 char SiteOperatorImp::GetNormStatus(double eps) const
 {
     char ret='W'; //Not normalized
@@ -270,7 +288,7 @@ char SiteOperatorImp::GetNormStatus(double eps) const
         MatrixRT QL=ReshapeV(DLeft);
         if (QL.GetNumRows()==0)
             ret='l';
-        else if (IsUnit(Transpose(QL)*QL,eps))
+        else if (isOrthonormal(DLeft,QL))
             ret='L';
     }
     if (ret!='l')
@@ -278,7 +296,7 @@ char SiteOperatorImp::GetNormStatus(double eps) const
         MatrixRT QR=ReshapeV(DRight);
         if (QR.GetNumCols()==0)
             ret='r';
-        else if (IsUnit(QR*Transpose(QR),eps))
+        else if (isOrthonormal(DRight,QR))
         {
             if (ret=='L')
                 ret='I';
