@@ -16,28 +16,7 @@ Hamiltonian_1D_NN_Heisenberg_Upper::Hamiltonian_1D_NN_Heisenberg_Upper(int L, do
     , itshz(hz)
 {
     assert(fabs(itsJxy)+fabs(Jz)>0.0);
-
-//    Vector<int> w1_first_1x5(5);
-//    Fill(w1_first_1x5,1);
-//    Vector<int> w2_last_1x5(1);
-//    w2_last_1x5(1)=5;
-
-    Vector<int> w1_first_5x5(Dw);
-    Fill(w1_first_5x5,1);
-    w1_first_5x5(1)=1;
-    Vector<int> w2_last_5x5(Dw);
-    Fill(w2_last_5x5,Dw);
-    w2_last_5x5(5)=Dw;
-
-//    Vector<int> w1_first_5x1(1);
-//    w1_first_5x1(1)=1;
-//    Vector<int> w2_last_5x1(5);
-//    Fill(w2_last_5x1,5);
-
-
-
-    itsDw=Dw12(Dw,Dw,w1_first_5x5,w2_last_5x5);
-
+    itsDw=Dw12(Dw,Dw);
     InitializeSites();
 }
 

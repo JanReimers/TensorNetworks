@@ -15,28 +15,7 @@ Hamiltonian_1D_NN_TransverseIsing::Hamiltonian_1D_NN_TransverseIsing(int L, doub
     , itshx(hx)
 {
     assert(fabs(itsJ)+fabs(itshx)>0.0);
-
-//    Vector<int> w1_first_1xDw(Dw);
-//    Fill(w1_first_1xDw,1);
-//    Vector<int> w2_last_1xDw(1);
-//    w2_last_1xDw(1)=Dw;
-
-    Vector<int> w1_first_DwxDw(Dw);
-    Fill(w1_first_DwxDw,Dw);
-    w1_first_DwxDw(1)=1;
-    Vector<int> w2_last_DwxDw(Dw);
-    Fill(w2_last_DwxDw,1);
-    w2_last_DwxDw(Dw)=Dw;
-
-//    Vector<int> w1_first_Dwx1(1);
-//    w1_first_Dwx1(1)=1;
-//    Vector<int> w2_last_Dwx1(Dw);
-//    Fill(w2_last_Dwx1,1);
-
-
-
-    itsDw=Dw12(Dw,Dw,w1_first_DwxDw,w2_last_DwxDw);
-
+    itsDw=Dw12(Dw,Dw);
     InitializeSites();
 }
 

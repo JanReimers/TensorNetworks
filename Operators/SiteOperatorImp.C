@@ -10,15 +10,12 @@ namespace TensorNetworks
 //
 SiteOperatorImp::SiteOperatorImp(int d)
     : itsd(d)
-    , itsDw(1,1,Vector<int>(1),Vector<int>(1))
+    , itsDw(1,1)
     , itsTruncationError(0.0)
     , isShapeDirty(true) //Init_lr will turn this off
     , isData_Dirty(true) //Init_lr will turn this off
     , itsWs(d,d)
 {
-    itsDw.w1_first(1)=1;
-    itsDw.w2_last (1)=1;
-
     MatrixRT I0(1,1),I1(1,1);
     I0(1,1)=0.0;
     I1(1,1)=1.0;
@@ -34,14 +31,12 @@ SiteOperatorImp::SiteOperatorImp(int d)
 
 SiteOperatorImp::SiteOperatorImp(int d, double S, SpinOperator so) //Construct spin operator
     : itsd(d)
-    , itsDw(1,1,Vector<int>(1),Vector<int>(1))
+    , itsDw(1,1)
     , itsTruncationError(0.0)
     , isShapeDirty(true) //Init_lr will turn this off
     , isData_Dirty(true) //Init_lr will turn this off
     , itsWs(d,d)
 {
-    itsDw.w1_first(1)=1;
-    itsDw.w2_last (1)=1;
     SpinCalculator sc(S);
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)
@@ -85,12 +80,7 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const Di
     int Dw=s.GetNumRows();
     if (lr==DLeft)
     {
-        // Build up w limits
-        Vector<int> first(Dw);
-        Vector<int> last (1);
-        Fill(first,1);
-        Fill(last,Dw);
-        itsDw=Dw12(1,Dw,first,last);
+        itsDw=Dw12(1,Dw);
         int i1=1; //Linear index for (m,n) = 1+m+p*n
         //  Fill W^(m,n)_w matrices
         for (int m=0; m<itsd; m++)
@@ -106,12 +96,7 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const Di
     }
     else if (lr==DRight)
     {
-        // Build up w limits
-        Vector<int> first(1);
-        Vector<int> last (Dw);
-        Fill(first,1);
-        Fill(last,Dw);
-        itsDw=Dw12(Dw,1,first,last);
+        itsDw=Dw12(Dw,1);
         int i2=1; //Linear index for (m,n) = 1+m+p*n
         //  Fill W^(m,n)_w matrices
         for (int m=0; m<itsd; m++)
@@ -144,12 +129,7 @@ SiteOperatorImp::SiteOperatorImp(int d, const TensorT& W)
 {
     int Dw=itsWs(1,1).GetNumRows();
     assert(itsWs(1,1).GetNumCols()==Dw);
-// Build up w limits
-    Vector<int> first(Dw);
-    Vector<int> last (Dw);
-    Fill(first,1);
-    Fill(last,Dw);
-    itsDw=Dw12(Dw,Dw,first,last);
+    itsDw=Dw12(Dw,Dw);
 }
 
 
@@ -192,28 +172,28 @@ void SiteOperatorImp::SetiW(int m, int n, const MatrixRT& W)
 
 void SiteOperatorImp::SetLimits()
 {
-    itsDw.w1_first.SetLimits(itsDw.Dw2);
-    itsDw.w2_last .SetLimits(itsDw.Dw1);
-    Fill(itsDw.w1_first,1);
-    Fill(itsDw.w2_last ,itsDw.Dw2);
-//    Fill(itsDw12.w1_first,itsDw12.Dw1);
-//    Fill(itsDw12.w2_last ,1);
-//    for (int m=0; m<itsd; m++)
-//        for (int n=0; n<itsd; n++)
-//        {
-//            const MatrixRT& W=GetW(m,n);
-//            for (int w1=1; w1<=itsDw12.Dw1; w1++)
-//                for (int w2=1; w2<=itsDw12.Dw2; w2++)
-//                    if (W(w1,w2)!=0.0)
-//                    {
-//                        if (itsDw12.w1_first(w2)>w1) itsDw12.w1_first(w2)=w1;
-//                        if (itsDw12.w2_last (w1)<w2) itsDw12.w2_last (w1)=w2;
-//
-//                    }
+//    itsDw.w1_first.SetLimits(itsDw.Dw2);
+//    itsDw.w2_last .SetLimits(itsDw.Dw1);
+//    Fill(itsDw.w1_first,1);
+//    Fill(itsDw.w2_last ,itsDw.Dw2);
+    Fill(itsDw.w1_first,itsDw.Dw1);
+    Fill(itsDw.w2_last ,1);
+    for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
+        {
+            const MatrixRT& W=GetW(m,n);
+            for (int w1=1; w1<=itsDw.Dw1; w1++)
+                for (int w2=1; w2<=itsDw.Dw2; w2++)
+                    if (W(w1,w2)!=0.0)
+                    {
+                        if (itsDw.w1_first(w2)>w1) itsDw.w1_first(w2)=w1;
+                        if (itsDw.w2_last (w1)<w2) itsDw.w2_last (w1)=w2;
+
+                    }
 //            cout << "W(" << m << "," << n << ")=" << W << endl;
 //            cout << "w1_first=" << itsDw12.w1_first << endl;
 //            cout << "w2_last =" << itsDw12.w2_last  << endl;
-//        }
+        }
 
 }
 

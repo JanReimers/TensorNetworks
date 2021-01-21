@@ -275,7 +275,7 @@ TEST_F(MPOTests,TestH2CompressL2)
     EXPECT_EQ(H2->GetMaxDw(),25);
     H2->CompressStd(0,1e-13);
     H2->Report(cout);
-    H2->Dump(cout);
+//    H2->Dump(cout);
     double E22=itsMPS->GetExpectation(H2);
     EXPECT_NEAR(E21,E22,1e-13);
     EXPECT_EQ(H2->GetMaxDw(),10);

@@ -63,6 +63,15 @@ void SiteOperatorBulk::Init_lr()
 void SiteOperatorBulk::CheckDws() const
 {
     SiteOperatorImp::CheckDws();
+#ifdef DEBUG
+    for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
+        {
+            const MatrixRT& W=GetW(m,n);
+            assert(W.GetNumRows()==itsDw.Dw1);
+            assert(W.GetNumCols()==itsDw.Dw2);
+        }
+#endif
 }
 
 void SiteOperatorBulk::SetLimits()
