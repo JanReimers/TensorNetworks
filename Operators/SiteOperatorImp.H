@@ -80,6 +80,8 @@ class SiteOperatorImp : public virtual SiteOperator
         void     Reshape  (Direction lr,const MatrixRT& UV);
         void     ReshapeV (Direction lr,const MatrixRT& Q);
         void     ReshapeV1(Direction lr,const MatrixRT& Q);
+
+        void     AccumulateTruncationError(double err);
     protected:
 
         int      itsd; //2*S+1

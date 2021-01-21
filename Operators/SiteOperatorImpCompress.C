@@ -131,7 +131,7 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
             else
             {
                 auto [U,s,VT]=SVDsolver.SolveAll(M,1e-14); //Solves M=U * s * VT
-                itsTruncationError=comp->Compress(U,s,VT);
+                AccumulateTruncationError(comp->Compress(U,s,VT));
                 cout << std::fixed << std::setprecision(2) << "s=" << s.GetDiagonal() << endl;
                 Xs=s.GetDiagonal().size();
                 MatrixRT sV=s*VT;
@@ -187,7 +187,7 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
             else
             {
                 auto [U,s,VT]=SVDsolver.SolveAll(M,1e-14); //Solves M=U * s * VT
-                itsTruncationError=comp->Compress(U,s,VT);
+                AccumulateTruncationError(comp->Compress(U,s,VT));
                 cout << std::fixed << std::setprecision(2) << "s=" << s.GetDiagonal() << endl;
                 Xs=s.GetDiagonal().size();
                 MatrixRT Us=U*s;
@@ -243,7 +243,7 @@ void SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
             break;
     }
 
-    itsTruncationError=comp->Compress(U,sm,VT);
+    AccumulateTruncationError(comp->Compress(U,sm,VT));
 //    cout << "s_avg, sm=" << s_avg << " " << sm.GetDiagonal() << endl;
     MatrixRT UV;// This get transferred through the bond to a neighbouring site.
     switch (lr)

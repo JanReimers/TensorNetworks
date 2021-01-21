@@ -197,6 +197,10 @@ void SiteOperatorImp::SetLimits()
 
 }
 
+void  SiteOperatorImp::AccumulateTruncationError(double err)
+{
+    itsTruncationError=sqrt(itsTruncationError*itsTruncationError+err*err);
+}
 
 
 void SiteOperatorImp::Combine(const SiteOperator* O2,double factor)
