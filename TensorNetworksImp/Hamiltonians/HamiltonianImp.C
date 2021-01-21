@@ -51,11 +51,9 @@ double HamiltonianImp::I(int m, int n) const
     return ret;
 }
 
-Dw12 HamiltonianImp::GetDw12(Position lbr) const
+Dw12 HamiltonianImp::GetDw12() const
 {
-    assert(lbr>=0);
-    assert(lbr<3);
-    return itsDw12s[lbr];
+    return itsDw;
 }
 
 

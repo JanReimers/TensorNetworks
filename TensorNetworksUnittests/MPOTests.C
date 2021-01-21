@@ -52,7 +52,7 @@ public:
     Vector3CT CalcHeffRight(int isite,bool cache=false) const {return GetMPSImp()->CalcHeffRight(itsH,isite,cache);}
     void LoadHeffCaches() {GetMPSImp()->LoadHeffCaches(itsH);}
 
-    MatrixRT GetW1(TensorNetworks::Position lrb , int m, int n) {return itsOperatorClient->GetW(lrb,m,n);}
+    MatrixRT GetW1(int m, int n) {return itsOperatorClient->GetW(m,n);}
     MatrixRT GetW(int isite, int m, int n) {return itsH->GetSiteOperator(isite)->GetW(m,n);}
 
           TensorNetworks::MPSImp* GetMPSImp()       {return dynamic_cast<      TensorNetworks::MPSImp*>(itsMPS);}
@@ -74,48 +74,6 @@ TEST_F(MPOTests,MakeHamiltonian)
     Setup(10,0.5,2);
 }
 
-
-TEST_F(MPOTests,HamiltonianGetLeftW00)
-{
-    Setup(10,0.5,2);
-    EXPECT_EQ(ToString(GetW1(TensorNetworks::PLeft,0,0)),"(1:1),(1:5) \n[ -0 0 0 -0.5 1 ]\n");
-}
-
-TEST_F(MPOTests,HamiltonianGetRightW00)
-{
-    Setup(10,0.5,2);
-    EXPECT_EQ(ToString(GetW1(TensorNetworks::PRight,0,0)),"(1:5),(1:1) \n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ -0.5 ]\n[ -0 ]\n");
-}
-TEST_F(MPOTests,HamiltonianGetLeftW10)
-{
-    Setup(10,0.5,2);
-    EXPECT_EQ(ToString(GetW1(TensorNetworks::PLeft,1,0)),"(1:1),(1:5) \n[ 0 0 0.5 0 0 ]\n");
-}
-TEST_F(MPOTests,HamiltonianGetRightW10)
-{
-    Setup(10,0.5,2);
-    EXPECT_EQ(ToString(GetW1(TensorNetworks::PRight,1,0)),"(1:5),(1:1) \n[ 0 ]\n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ 0 ]\n");
-}
-TEST_F(MPOTests,HamiltonianGetLeftW01)
-{
-    Setup(10,0.5,2);
-    EXPECT_EQ(ToString(GetW1(TensorNetworks::PLeft,0,1)),"(1:1),(1:5) \n[ 0 0.5 0 0 0 ]\n");
-}
-TEST_F(MPOTests,HamiltonianGetRightW01)
-{
-    Setup(10,0.5,2);
-    EXPECT_EQ(ToString(GetW1(TensorNetworks::PRight,0,1)),"(1:5),(1:1) \n[ 0 ]\n[ 0 ]\n[ 1 ]\n[ 0 ]\n[ 0 ]\n");
-}
-TEST_F(MPOTests,HamiltonianGetLeftW11)
-{
-    Setup(10,0.5,2);
-    EXPECT_EQ(ToString(GetW1(TensorNetworks::PLeft,1,1)),"(1:1),(1:5) \n[ 0 0 0 0.5 1 ]\n");
-}
-TEST_F(MPOTests,HamiltonianGetRightW11)
-{
-    Setup(10,0.5,2);
-    EXPECT_EQ(ToString(GetW1(TensorNetworks::PRight,1,1)),"(1:5),(1:1) \n[ 1 ]\n[ 0 ]\n[ 0 ]\n[ 0.5 ]\n[ 0 ]\n");
-}
 
 TEST_F(MPOTests,CheckThatWsGotLoaded)
 {

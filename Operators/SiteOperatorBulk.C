@@ -7,13 +7,13 @@ namespace TensorNetworks
 //  Build with Dw=1 identity operators
 //
 SiteOperatorBulk::SiteOperatorBulk(int d)
-    : SiteOperatorImp(d,PBulk)
+    : SiteOperatorImp(d)
 {
     Init_lr();
 }
 
 SiteOperatorBulk::SiteOperatorBulk(int d, double S, SpinOperator so) //Construct spin operator
-    : SiteOperatorImp(d,PBulk,S,so)
+    : SiteOperatorImp(d,S,so)
 {
     Init_lr();
 }
@@ -21,7 +21,7 @@ SiteOperatorBulk::SiteOperatorBulk(int d, double S, SpinOperator so) //Construct
 //  Build from a W rep object
 //
 SiteOperatorBulk::SiteOperatorBulk(int d, const OperatorClient* H)
-    : SiteOperatorImp(d,PBulk,H)
+    : SiteOperatorImp(d,H)
 {
     Init_lr();
 }
@@ -31,7 +31,7 @@ SiteOperatorBulk::SiteOperatorBulk(int d, const OperatorClient* H)
 // Build from a trotter decomp.
 //
 SiteOperatorBulk::SiteOperatorBulk(int d, Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s)
-    : SiteOperatorImp(d,PBulk,lr,U,s)
+    : SiteOperatorImp(d,lr,U,s)
 {
     Init_lr();
 }
@@ -39,7 +39,7 @@ SiteOperatorBulk::SiteOperatorBulk(int d, Direction lr,const MatrixRT& U, const 
 // Construct with W operator
 //
 SiteOperatorBulk::SiteOperatorBulk(int d, const TensorT& W)
-    : SiteOperatorImp(d,PBulk,W)
+    : SiteOperatorImp(d,W)
 {
     Init_lr();
 }

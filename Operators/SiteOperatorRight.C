@@ -7,7 +7,7 @@ namespace TensorNetworks
 //  Build with Dw=1 identity operators
 //
 SiteOperatorRight::SiteOperatorRight(int d)
-    : SiteOperatorImp(d,PRight)
+    : SiteOperatorImp(d)
     , itsDw(1,1)
     , itsWrs(d,d)
 {
@@ -15,7 +15,7 @@ SiteOperatorRight::SiteOperatorRight(int d)
 }
 
 SiteOperatorRight::SiteOperatorRight(int d, double S, SpinOperator so) //Construct spin operator
-    : SiteOperatorImp(d,PRight,S,so)
+    : SiteOperatorImp(d,S,so)
     , itsDw(1,1,Vector<int>(1),Vector<int>(1))
     , itsWrs(d,d)
 {
@@ -25,8 +25,8 @@ SiteOperatorRight::SiteOperatorRight(int d, double S, SpinOperator so) //Constru
 //  Build from a W rep object
 //
 SiteOperatorRight::SiteOperatorRight(int d, const OperatorClient* H)
-    : SiteOperatorImp(d,PRight,H)
-    , itsDw(H->GetDw12(PRight))
+    : SiteOperatorImp(d,H)
+    , itsDw(1,1)
     , itsWrs(d,d)
 {
     Init_lr();
@@ -37,7 +37,7 @@ SiteOperatorRight::SiteOperatorRight(int d, const OperatorClient* H)
 // Build from a trotter decomp.
 //
 SiteOperatorRight::SiteOperatorRight(int d, Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s)
-    : SiteOperatorImp(d,PRight,lr,U,s)
+    : SiteOperatorImp(d,lr,U,s)
     , itsDw()
     , itsWrs(d,d)
 {
@@ -47,7 +47,7 @@ SiteOperatorRight::SiteOperatorRight(int d, Direction lr,const MatrixRT& U, cons
 // Construct with W operator
 //
 SiteOperatorRight::SiteOperatorRight(int d, const TensorT& W)
-    : SiteOperatorImp(d,PRight,W)
+    : SiteOperatorImp(d,W)
     , itsDw()
     , itsWrs(W)
 {

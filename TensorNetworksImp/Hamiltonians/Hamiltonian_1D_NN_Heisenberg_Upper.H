@@ -23,8 +23,8 @@ class Hamiltonian_1D_NN_Heisenberg_Upper
         //
         //  OperatorClient interface
         //
-        virtual MatrixRT GetW   (Position,int m, int n) const;
-        virtual Dw12     GetDw12(Position lbr) const {return HamiltonianImp::GetDw12(lbr);}
+        virtual MatrixRT GetW   (int m, int n) const;
+        virtual Dw12     GetDw12() const {return HamiltonianImp::GetDw12();}
 
         double GetH(int ma,int na,int mb,int nb,const SpinCalculator& sc) const
         {

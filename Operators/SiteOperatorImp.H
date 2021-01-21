@@ -20,8 +20,8 @@ protected:
     OperatorClient() {}
     virtual ~OperatorClient() {}
 public:
-    virtual MatrixRT GetW   (Position,int m, int n) const=0;
-    virtual Dw12     GetDw12(Position) const=0;
+    virtual MatrixRT GetW   (int m, int n) const=0;
+    virtual Dw12     GetDw12() const=0;
     friend class ::MPOTests;
 };
 
@@ -29,11 +29,11 @@ class SiteOperatorImp : public virtual SiteOperator
 {
     protected:
         typedef Matrix<MatrixRT> TensorT;
-        SiteOperatorImp(int d, Position  lbr); //Construct with identity operator
-        SiteOperatorImp(int d, Position  lbr, double S, SpinOperator so); //Construct with identity operator
-        SiteOperatorImp(int d, Position  lbr, const OperatorClient* O);
-        SiteOperatorImp(int d, Position  lbr, Direction lr , const MatrixRT& U, const DiagonalMatrixRT& expEvs);
-        SiteOperatorImp(int d, Position  lbr, const TensorT& W); //Construct with W operator
+        SiteOperatorImp(int d); //Construct with identity operator
+        SiteOperatorImp(int d, double S, SpinOperator so); //Construct with identity operator
+        SiteOperatorImp(int d, const OperatorClient* O);
+        SiteOperatorImp(int d, Direction lr , const MatrixRT& U, const DiagonalMatrixRT& expEvs);
+        SiteOperatorImp(int d, const TensorT& W); //Construct with W operator
     public:
         virtual ~SiteOperatorImp();
         void SetNeighbours(SiteOperator* left, SiteOperator* right);

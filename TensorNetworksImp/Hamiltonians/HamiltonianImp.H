@@ -41,17 +41,18 @@ protected:
 //
 //  OperatorClient interface
 //
-    virtual Dw12     GetDw12(Position lbr) const;
-    virtual MatrixRT GetW   (Position,int m, int n) const=0;
+    virtual Dw12     GetDw12() const;
+    virtual MatrixRT GetW   (int m, int n) const=0;
     virtual double GetH(int ma,int na,int mb,int nb,const SpinCalculator& sc) const=0;
 
 
     void   InitializeSites(); //Derived constructor must call this
     double I    (int m, int n) const;
 
-    double itsS; //
-    Dw12 itsDw12s[3]; //Dw2[w1] for left bulk and right
+    double itsS;
+    Dw12 itsDw;
 };
-}
+
+} //namespace
 
 #endif // HAMILTONIANIMP_H

@@ -8,7 +8,7 @@ namespace TensorNetworks
 //
 //  Build with Dw=1 identity operators
 //
-SiteOperatorImp::SiteOperatorImp(int d, Position  lbr)
+SiteOperatorImp::SiteOperatorImp(int d)
     : itsd(d)
     , itsDw(1,1,Vector<int>(1),Vector<int>(1))
     , itsTruncationError(0.0)
@@ -32,7 +32,7 @@ SiteOperatorImp::SiteOperatorImp(int d, Position  lbr)
         }
 }
 
-SiteOperatorImp::SiteOperatorImp(int d, Position  lbr, double S, SpinOperator so) //Construct spin operator
+SiteOperatorImp::SiteOperatorImp(int d, double S, SpinOperator so) //Construct spin operator
     : itsd(d)
     , itsDw(1,1,Vector<int>(1),Vector<int>(1))
     , itsTruncationError(0.0)
@@ -54,9 +54,9 @@ SiteOperatorImp::SiteOperatorImp(int d, Position  lbr, double S, SpinOperator so
 //
 //  Build from a W rep object
 //
-SiteOperatorImp::SiteOperatorImp(int d, Position lbr, const OperatorClient* H)
+SiteOperatorImp::SiteOperatorImp(int d, const OperatorClient* H)
     : itsd(d)
-    , itsDw(H->GetDw12(PBulk))
+    , itsDw(H->GetDw12())
     , itsTruncationError(0.0)
     , isShapeDirty(true) //Init_lr will turn this off
     , isData_Dirty(true) //Init_lr will turn this off
@@ -65,7 +65,7 @@ SiteOperatorImp::SiteOperatorImp(int d, Position lbr, const OperatorClient* H)
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)
         {
-            itsWs(m+1,n+1)=H->GetW(PBulk,m,n);
+            itsWs(m+1,n+1)=H->GetW(m,n);
             assert(itsWs(m+1,n+1).GetNumRows()==itsDw.Dw1);
             assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
         }
@@ -74,7 +74,7 @@ SiteOperatorImp::SiteOperatorImp(int d, Position lbr, const OperatorClient* H)
 //
 // Build from a trotter decomp.
 //
-SiteOperatorImp::SiteOperatorImp(int d, Position  lbr, Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s)
+SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s)
     : itsd(d)
     , itsDw()
     , itsTruncationError(0.0)
@@ -134,7 +134,7 @@ SiteOperatorImp::SiteOperatorImp(int d, Position  lbr, Direction lr,const Matrix
 //
 // Construct with W operator
 //
-SiteOperatorImp::SiteOperatorImp(int d, Position  lbr, const TensorT& W)
+SiteOperatorImp::SiteOperatorImp(int d, const TensorT& W)
     : itsd(d)
     , itsDw()
     , itsTruncationError(0.0)

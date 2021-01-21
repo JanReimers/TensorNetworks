@@ -31,6 +31,7 @@ Next steps:
                         -Update Dw limits
                         -Update l*W or W*r cache
                     8) Can we tidy up all the Reshape functions?
+                    Done 9) Hamiltonians no longer need to serve edge Ws
             -Getting exponentially large SVs.
                 Std compression does the same thing, but scaling by s_avg fixes it.
                 Should we scale by s_avg for Parker compression?
