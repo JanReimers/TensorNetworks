@@ -435,7 +435,7 @@ TEST_F(VariationalGroundStateTests,TestTransverIsingL9S1D2Hx1)
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
 
     double E1=itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(E1/(L-1),-0.598239208,1e-7);
+    EXPECT_NEAR(E1/(L-1),-0.594125875,1e-7);
     EXPECT_LT(nSweep,maxIter);
 
     TensorNetworks::MPO* H2=itsH->CreateH2Operator();
@@ -460,7 +460,7 @@ TEST_F(VariationalGroundStateTests,TestTransverIsingL9S1D8Hx1)
     int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
 
     double E1=itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(E1/(L-1),-0.598243716,1e-7);
+    EXPECT_NEAR(E1/(L-1),-0.5941321968,1e-7);
     EXPECT_LT(nSweep,maxIter);
 
     TensorNetworks::MPO* H2=itsH->CreateH2Operator();
