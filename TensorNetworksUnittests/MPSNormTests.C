@@ -16,7 +16,7 @@ public:
     , eps(1.0e-10)
     {
         StreamableObject::SetToPretty();
-        Setup(10,1,2);
+        Setup(10,0.5,2);
         std::cout.precision(5);
         cout << std::fixed;
     }
@@ -68,18 +68,37 @@ TEST_F(MPSNormTests,RightNormalMatriciesProductStateL100S3D2)
 }
 
 
-TEST_F(MPSNormTests,LeftNormalMatriciesRandomStateL10S3D2)
+TEST_F(MPSNormTests,LeftNormalMatriciesRandomStateL10S12D2)
 {
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DLeft);
     EXPECT_EQ(itsMPS->GetNormStatus(),"AAAAAAAAAA");
 }
 
-TEST_F(MPSNormTests,RightNormalMatriciesRandomStateL100S3D2)
+TEST_F(MPSNormTests,RightNormalMatriciesRandomStateL10S12D2)
 {
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
     EXPECT_EQ(itsMPS->GetNormStatus(),"BBBBBBBBBB");
+}
+TEST_F(MPSNormTests,LRNormalMatriciesRandomStateL10S12D2)
+{
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::DLeft);
+    EXPECT_EQ(itsMPS->GetNormStatus(),"AAAAAAAAAA");
+    itsMPS->Normalize(TensorNetworks::DRight);
+    EXPECT_EQ(itsMPS->GetNormStatus(),"BBBBBBBBBB");
+    itsMPS->Report(cout);
+}
+TEST_F(MPSNormTests,LRNormalMatriciesRandomStateL10S12D8)
+{
+    Setup(10,0.5,8);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::DLeft);
+    EXPECT_EQ(itsMPS->GetNormStatus(),"AAAAAAAAAA");
+    itsMPS->Normalize(TensorNetworks::DRight);
+    EXPECT_EQ(itsMPS->GetNormStatus(),"BBBBBBBBBB");
+    itsMPS->Report(cout);
 }
 
 TEST_F(MPSNormTests,LeftNormalMatriciesRandomStateL10S3D3)
@@ -206,7 +225,6 @@ TEST_F(MPSNormTests,QRNormalL10S12D8)
     EXPECT_EQ(itsMPS->GetNormStatus(),"AAAAAAAAAA");
     itsMPS->NormalizeQR(TensorNetworks::DRight);
     EXPECT_EQ(itsMPS->GetNormStatus(),"BBBBBBBBBB");
-//    itsMPS->Report(cout);
 }
 
 TEST_F(MPSNormTests,QRNormalL10S32D2)
