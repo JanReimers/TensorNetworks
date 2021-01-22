@@ -39,7 +39,7 @@ class Bond
     private:
         friend class iTEBDStateImp;
         void SetSingularValues(const DiagonalMatrixRT& s, double compessionError);
-        void ClearSingularValues(int D);
+        void ClearSingularValues(Direction lr,const MatrixCT& R);
         void UpdateBondEntropy();
         static double GetNorm(const DiagonalMatrixRT&);
         //

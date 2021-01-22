@@ -105,8 +105,20 @@ void Bond::SetSingularValues(const DiagonalMatrixRT& s,double compressionError)
     UpdateBondEntropy();
 }
 
-void Bond::ClearSingularValues(int D)
+void Bond::ClearSingularValues(Direction lr,const MatrixCT& R)
 {
+    int D=0;
+    switch (lr)
+    {
+    case DLeft:
+        D=R.GetNumRows();
+        break;
+    case DRight:
+        D=R.GetNumCols();
+        break;
+    default:
+        assert(false);
+    }
     if (D!=itsD)
     { //Pad with zeros so we can get a delta l.
         itsSingularValues.SetLimits(D,D);
@@ -157,7 +169,7 @@ void Bond::SVDTransfer(Direction lr,double compressionError,const DiagonalMatrix
 
 void Bond::TransferQR(Direction lr,const MatrixCT& R)
 {
-    ClearSingularValues(R.GetNumRows());
+    ClearSingularValues(lr,R);
     assert(GetSite(lr));
     // We have to forward the un-normalized Svs, otherwise R/L normalization breaks.
     GetSite(lr)->TransferQR(lr,R);
