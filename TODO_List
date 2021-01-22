@@ -1,5 +1,4 @@
 
-Done: -MPSImp GetCanonicalD1 overflows.  Needs to go bye bye.
 Next steps:
     -Try wave function optimization for improve iTEBD GS energies.  Get them closer to mp-toolkit results?
     -Try coding up iTEBD using iTensor library
@@ -13,26 +12,6 @@ Next steps:
             Done for iH and iH^2
         -Test 25x25 uncompressed H2 operator in recursive expectation routine.
             Fails: We get a unsolvable system of eqs when there are unit ops on the diagonal.
-        -Code up  MPO compression as per Parker
-            Done: -Clean DLeft code
-            Done: -Mirror for DRight
-            -Support l*W*W*W...*W*r formalism, which will allow us to compress W[1] and W[L]
-                -This may also make MPOs and iMPOS almost identical
-                -Plan:
-                    Done: 1) Always store full W, even at edges
-                    Done: 2) GetW(m,n) will return l*W or W*r at edges
-                    Done: 3) GetiW(m,n) return full W in bulk and at edges.
-                    Done: 4) Fix l*W and W*r caching
-                        User virtual dispatch for GetW?
-                    Done: 5) Var GS energies for transverse Ising with field on changed.
-                    Done: 6) Fix up SetLimits for Dw
-                    Done: 7) Make a SetW function for writing to W. It needs to
-                        -SetW (obviously)
-                        -Update Dw limits
-                        -Update l*W or W*r cache
-                    8) Can we tidy up all the Reshape functions?
-                    Done 9) Hamiltonians no longer need to serve edge Ws
-            Done: -Getting exponentially large SVs.
             -Try and make and (H-E)^2 operator
             -Compress exp(-t*H) operator
                 -exp(-t*H) doesn't have unit ops in the same places
@@ -40,10 +19,10 @@ Next steps:
                 -We get a rectangular V(mnw1,w2) with more rows than columns.
                     Lapack QL won't handle this'
             Done: -MPOs Store accumulated truncation error for each site.
-            -MPS Store accumulated truncation error for each site.
 
 
-        Done: -Code up iMPO compression as per Parker.
+        Done: -Code up MPO compression as per Parker.
+        -Code up iMPO compression as per Parker.
         -<E2> is not working, MPO get compressed to 1x4 - 4x1.  We need to learn how contract
             a Dw x Dw - Dw x Dw open MPO with eigen vectors to get <E2>.
             -We now have iH2, but after naive compression it is not even lower triangular.
@@ -85,11 +64,6 @@ Next steps:
     -Can we generalize GetExpectation to MPOs with arbitrary L?
     -Calculate fidelity
 
-    Done: -Figure out hanging TEBD tests.  fourth order exp(-tH) builds are slow.
-    Done: -TEBD and variational GS: converge on delta lambdas?
-        -or TEBD lambda gets modified many time in one iteration. As a consequence
-         Bond.C cannot easily save delta_lambda for the whole iteration, just part of the iteration.
-        -We could extract all the lambdas into a separate blob and diff against the blob at the end of the iteration
     -Handle Debug and Release modes for PyTensorNetworks.so
     -Figure out how to handle std::ostream when using SIP to interface with python.
 
@@ -114,6 +88,7 @@ Next steps:
 
     -Still getting noise about norm errors in Utests.
 
+-MPS Store accumulated truncation error for each site.
 -Refactor:
     Replace dVectorT with something that
         1) automatically tracks nab,na and nb consistently
@@ -122,8 +97,6 @@ Next steps:
 -Refactor: MPO_SpatialTrotter takes Hlocal, should work from H or expH.  Right now it duplicates code
     for calculating expH.
 -Move all oml instancing to oml side.
-Done: -Logging: only LogInfoV does indenting
-    Done: Also fix warnings
 -Save wave functions to disk.
 -Investigate sweep directions for normalization
 -Improve level two logging for variational ground states
@@ -165,6 +138,34 @@ Backburner:
         -Might need to identify parameters with strings "Jxy"
 
 ----------------------------------------------------------------------------------------------------------
+        -Code up  MPO compression as per Parker
+            Done: -Clean DLeft code
+            Done: -Mirror for DRight
+            -Support l*W*W*W...*W*r formalism, which will allow us to compress W[1] and W[L]
+                -This may also make MPOs and iMPOS almost identical
+                -Plan:
+                    Done: 1) Always store full W, even at edges
+                    Done: 2) GetW(m,n) will return l*W or W*r at edges
+                    Done: 3) GetiW(m,n) return full W in bulk and at edges.
+                    Done: 4) Fix l*W and W*r caching
+                        User virtual dispatch for GetW?
+                    Done: 5) Var GS energies for transverse Ising with field on changed.
+                    Done: 6) Fix up SetLimits for Dw
+                    Done: 7) Make a SetW function for writing to W. It needs to
+                        -SetW (obviously)
+                        -Update Dw limits
+                        -Update l*W or W*r cache
+                    Done: 8) Can we tidy up all the Reshape functions?
+                    Done: 9) Hamiltonians no longer need to serve edge Ws
+            Done: -Getting exponentially large SVs.
+    Done: -Figure out hanging TEBD tests.  fourth order exp(-tH) builds are slow.
+    Done: -TEBD and variational GS: converge on delta lambdas?
+        -or TEBD lambda gets modified many time in one iteration. As a consequence
+         Bond.C cannot easily save delta_lambda for the whole iteration, just part of the iteration.
+        -We could extract all the lambdas into a separate blob and diff against the blob at the end of the iteration
+Done: -Logging: only LogInfoV does indenting
+    Done: Also fix warnings
+Done: -MPSImp GetCanonicalD1 overflows.  Needs to go bye bye.
     Done: Make abstract interfaces for SVD and eigen
     Done: Do left and right Evs for non sym
     Done: Add Lapack non sym routines

@@ -285,7 +285,7 @@ char SiteOperatorImp::GetNormStatus(double eps) const
 {
     char ret='W'; //Not normalized
     {
-        MatrixRT QL=ReshapeV(DLeft);
+        MatrixRT QL=Reshape(DLeft,1);
         if (QL.GetNumRows()==0)
             ret='l';
         else if (isOrthonormal(DLeft,QL))
@@ -293,7 +293,7 @@ char SiteOperatorImp::GetNormStatus(double eps) const
     }
     if (ret!='l')
     {
-        MatrixRT QR=ReshapeV(DRight);
+        MatrixRT QR=Reshape(DRight,1);
         if (QR.GetNumCols()==0)
             ret='r';
         else if (isOrthonormal(DRight,QR))
