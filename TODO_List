@@ -1,5 +1,5 @@
 
--MPSImp GetCanonicalD1 overflows.  Needs to go bye bye.
+Done: -MPSImp GetCanonicalD1 overflows.  Needs to go bye bye.
 Next steps:
     -Try wave function optimization for improve iTEBD GS energies.  Get them closer to mp-toolkit results?
     -Try coding up iTEBD using iTensor library
@@ -26,7 +26,7 @@ Next steps:
                         User virtual dispatch for GetW?
                     Done: 5) Var GS energies for transverse Ising with field on changed.
                     Done: 6) Fix up SetLimits for Dw
-                    Done 7) Make a SetW function for writing to W. It needs to
+                    Done: 7) Make a SetW function for writing to W. It needs to
                         -SetW (obviously)
                         -Update Dw limits
                         -Update l*W or W*r cache
@@ -43,7 +43,7 @@ Next steps:
             -MPS Store accumulated truncation error for each site.
 
 
-        -Code up iMPO compression as per Parker.
+        Done: -Code up iMPO compression as per Parker.
         -<E2> is not working, MPO get compressed to 1x4 - 4x1.  We need to learn how contract
             a Dw x Dw - Dw x Dw open MPO with eigen vectors to get <E2>.
             -We now have iH2, but after naive compression it is not even lower triangular.

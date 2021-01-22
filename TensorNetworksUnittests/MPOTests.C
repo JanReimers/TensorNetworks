@@ -449,9 +449,9 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L9)
     EXPECT_EQ(H2->GetMaxDw(),10);
 }
 
-TEST_F(MPOTests,TestParkerSVDCompressH2L40)
+TEST_F(MPOTests,TestParkerSVDCompressH2L256)
 {
-    int L=40,D=2;
+    int L=256,D=2;
     double S=0.5;
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
