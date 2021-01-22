@@ -74,16 +74,5 @@ void SiteOperatorBulk::CheckDws() const
 #endif
 }
 
-void SiteOperatorBulk::SetLimits()
-{
-    itsDw.w1_first.SetLimits(itsDw.Dw2);
-    itsDw.w2_last .SetLimits(itsDw.Dw1);
-    Fill(itsDw.w1_first,1);
-    Fill(itsDw.w2_last ,itsDw.Dw2);
-
-}
-
-
-
 
 } //namespace

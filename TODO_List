@@ -15,7 +15,7 @@ Next steps:
             -Try and make and (H-E)^2 operator
             -Compress exp(-t*H) operator
                 -exp(-t*H) doesn't have unit ops in the same places
-                -exp(-t*H) is upper or lower triangular.
+                -exp(-t*H) is not upper or nor lower triangular.
                 -We get a rectangular V(mnw1,w2) with more rows than columns.
                     Lapack QL won't handle this'
             Done: -MPOs Store accumulated truncation error for each site.

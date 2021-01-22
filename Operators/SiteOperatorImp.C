@@ -172,23 +172,28 @@ void SiteOperatorImp::SetiW(int m, int n, const MatrixRT& W)
 
 void SiteOperatorImp::SetLimits()
 {
-//    itsDw.w1_first.SetLimits(itsDw.Dw2);
-//    itsDw.w2_last .SetLimits(itsDw.Dw1);
-//    Fill(itsDw.w1_first,1);
-//    Fill(itsDw.w2_last ,itsDw.Dw2);
-    Fill(itsDw.w1_first,itsDw.Dw1);
-    Fill(itsDw.w2_last ,1);
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
+    SetLimits(itsDw,itsWs);
+}
+
+void SiteOperatorImp::SetLimits(Dw12& Dw,TensorT& Ws)
+{
+    int d=Ws.GetNumRows();
+    Dw.w1_first.SetLimits(Dw.Dw2);
+    Dw.w2_last .SetLimits(Dw.Dw1);
+//    Fill(Dw.w1_first,1);
+//    Fill(DW.w2_last ,Dw.Dw2);
+    Fill(Dw.w1_first,Dw.Dw1);
+    Fill(Dw.w2_last ,1);
+    for (int m=0; m<d; m++)
+        for (int n=0; n<d; n++)
         {
-            const MatrixRT& W=GetW(m,n);
-            for (int w1=1; w1<=itsDw.Dw1; w1++)
-                for (int w2=1; w2<=itsDw.Dw2; w2++)
+            const MatrixRT& W=Ws(m+1,n+1);
+            for (int w1=1; w1<=Dw.Dw1; w1++)
+                for (int w2=1; w2<=Dw.Dw2; w2++)
                     if (W(w1,w2)!=0.0)
                     {
-                        if (itsDw.w1_first(w2)>w1) itsDw.w1_first(w2)=w1;
-                        if (itsDw.w2_last (w1)<w2) itsDw.w2_last (w1)=w2;
-
+                        if (Dw.w1_first(w2)>w1) Dw.w1_first(w2)=w1;
+                        if (Dw.w2_last (w1)<w2) Dw.w2_last (w1)=w2;
                     }
 //            cout << "W(" << m << "," << n << ")=" << W << endl;
 //            cout << "w1_first=" << itsDw12.w1_first << endl;
@@ -205,9 +210,6 @@ void  SiteOperatorImp::AccumulateTruncationError(double err)
 
 void SiteOperatorImp::Combine(const SiteOperator* O2,double factor)
 {
-    //const SiteOperatorImp* O2=dynamic_cast<const SiteOperatorImp*>(_O2);
-    //assert(O2);
-
     const SiteOperatorImp* O2i(dynamic_cast<const SiteOperatorImp*>(O2));
     assert(O2i);
     Dw12 O2Dw=O2i->itsDw;

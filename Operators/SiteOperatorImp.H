@@ -65,6 +65,7 @@ class SiteOperatorImp : public virtual SiteOperator
         virtual void Init_lr()=0;
         virtual void CheckDws() const;
         virtual void SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
+        static  void SetLimits(Dw12& Dw,TensorT& Ws); //Fix up itsDw12 by inspecting zeros in Wmn
     private:
         friend class MPOTesting;
         friend class iMPOImp;

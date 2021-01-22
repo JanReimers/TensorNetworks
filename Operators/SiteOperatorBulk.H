@@ -29,10 +29,7 @@ class SiteOperatorBulk
         }
 
         virtual void Init_lr();
-        virtual void SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
         virtual void CheckDws() const;
-
-
 };
 
 }
