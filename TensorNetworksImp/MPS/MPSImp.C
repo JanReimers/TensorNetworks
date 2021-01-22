@@ -66,18 +66,6 @@ MPSImp::MPSImp(int L, double S,Direction lr,double normEps)
     //InitSitesAndBonds is called from the derived class
 }
 
-int MPSImp::GetCanonicalD1(int a, int DMax)
-{
-    int iexp = a<=itsL/2 ? a-1 : itsL-a+1;
-    return Min(static_cast<int>(pow(itsd,iexp)),DMax);
-}
-
-int MPSImp::GetCanonicalD2(int a, int DMax)
-{
-    int iexp = a<=itsL/2 ? a : itsL-a;
-    return Min(static_cast<int>(pow(itsd,iexp)),DMax);
-}
-
 void MPSImp::InitSitesAndBonds(int D,double epsSV)
 {
     //
@@ -90,13 +78,10 @@ void MPSImp::InitSitesAndBonds(int D,double epsSV)
     //  Create Sites
     //
     itsSites.push_back(0);  //Dummy space holder. We want this array to be 1 based.
-    itsSites.push_back(new MPSSite(PLeft,NULL,itsBonds[1],itsd,
-                       GetCanonicalD1(1,D),GetCanonicalD2(1,D)));
+    itsSites.push_back(new MPSSite(PLeft,NULL,itsBonds[1],itsd,1,D));
     for (int i=2; i<=itsL-1; i++)
-        itsSites.push_back(new MPSSite(PBulk,itsBonds[i-1],itsBonds[i],itsd,
-                           GetCanonicalD1(i,D),GetCanonicalD2(i,D)));
-    itsSites.push_back(new MPSSite(PRight,itsBonds[itsL-1],NULL,itsd,
-                       GetCanonicalD1(itsL,D),GetCanonicalD2(itsL,D)));
+        itsSites.push_back(new MPSSite(PBulk,itsBonds[i-1],itsBonds[i],itsd,D,D));
+    itsSites.push_back(new MPSSite(PRight,itsBonds[itsL-1],NULL,itsd,D,1));
     //
     //  Tell each bond about its left and right sites.
     //

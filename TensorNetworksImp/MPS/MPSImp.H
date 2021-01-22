@@ -135,8 +135,6 @@ private:
         friend class ::MPSTests;
 
         void InitSitesAndBonds(int D,double epsSV);
-        int GetCanonicalD1(int a, int DMax);
-        int GetCanonicalD2(int a, int DMax);
 
 //--------------------------------------------------------------------------------------
 //
