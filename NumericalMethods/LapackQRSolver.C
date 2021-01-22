@@ -116,10 +116,6 @@ template <> void xunglq<dcmplx> (int* M,int* N,int*	K,dcmplx* Q,int* LDA,dcmplx*
 template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveThinQR(const MatrixT& Ain)
 {
     int M=Ain.GetNumRows(),N=Ain.GetNumCols(),mn=Min(M,N);
-
-    //
-    //  Diced how much work space lapack needs
-    //
     int info=0,lwork=-1;
     Vector<T> tau(mn),work(1);
     Matrix<T> Q(Ain);
@@ -165,10 +161,6 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
 {
     int M=Ain.GetNumRows(),N=Ain.GetNumCols(),mn=Min(M,N);
     assert(M>=N); //M<N not supported by Lapack dorgql_or zungql_
-
-    //
-    //  Diced how much work space lapack needs
-    //
     int info=0,lwork=-1;
     Vector<T> tau(mn),work(1);
     Matrix<T> Q(Ain);
@@ -215,9 +207,6 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
 {
     int M=Ain.GetNumRows(),N=Ain.GetNumCols(),mn=Min(M,N);
     assert(N>=M); //M>N not supported by Lapack dorgrq_or zungrq_
-    //
-    //  Diced how much work space lapack needs
-    //
     int info=0,lwork=-1;
     Vector<T> tau(mn),work(1);
     Matrix<T> Q(Ain);
@@ -260,10 +249,6 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
 template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveThinLQ(const MatrixT& Ain)
 {
     int M=Ain.GetNumRows(),N=Ain.GetNumCols(),mn=Min(M,N);
-    assert(N>=M); //M>N not supported by Lapack dorglq_or zunglq_
-    //
-    //  Diced how much work space lapack needs
-    //
     int info=0,lwork=-1;
     Vector<T> tau(mn),work(1);
     Matrix<T> Q(Ain);
@@ -294,12 +279,13 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
     //
     lwork=-1;
     info=0;
-    xunglq<T>(&M,&N,&M,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    xunglq<T>(&mn,&N,&mn,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
     assert(info==0);
     lwork=static_cast<int>(real(work(1)));
     work.SetLimits(lwork);
-    xunglq<T>(&M,&N,&M,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    xunglq<T>(&mn,&N,&mn,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
     assert(info==0);
+    if (mn<M) Q.SetLimits(mn,N,true);
     return std::make_tuple(std::move(L),std::move(Q)); //Return [L,Q]
 }
 
