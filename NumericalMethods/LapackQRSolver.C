@@ -160,7 +160,6 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
 template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveThinQL(const MatrixT& Ain)
 {
     int M=Ain.GetNumRows(),N=Ain.GetNumCols(),mn=Min(M,N);
-    assert(M>=N); //M<N not supported by Lapack dorgql_or zungql_
     int info=0,lwork=-1;
     Vector<T> tau(mn),work(1);
     Matrix<T> Q(Ain);
@@ -182,24 +181,32 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
     Matrix<T> L(mn,N);
     for (int i=1;i<=mn;i++)
     {
-        for (int j=1;j<=i;j++)
-            L(i,j)=Q(i+M-N,j);
-        for (int j=i+1;j<=N;j++)
+        for (int j=1;j<=i+N-mn;j++)
+            L(i,j)=Q(i+M-mn,j);
+        for (int j=i+1+N-mn;j<=N;j++)
             L(i,j)=0.0;
-
     }
     //
-    //  unpack Q
+    //  unpack Q  if M<N then the reflectors on the right side of Q, so we need
+    //  a shifted Q to xungql
     //
     lwork=-1;
     info=0;
-    xungql<T>(&M,&N,&N,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    xungql<T>(&M,&mn,&mn,&Q(1,1+N-mn),&M,&tau(1),&work(1),&lwork,&info);
     assert(info==0);
     lwork=static_cast<int>(real(work(1)));
     work.SetLimits(lwork);
-    xungql<T>(&M,&N,&N,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    xungql<T>(&M,&mn,&mn,&Q(1,1+N-mn),&M,&tau(1),&work(1),&lwork,&info);
     assert(info==0);
-    if (mn<N) Q.SetLimits(M,mn,true);
+
+    if (mn<N)
+    { //Now we need shift the orth vectors from the right side of Q over the left side, before
+      // shrinking Q..
+        for (int i=1;i<=M;i++)
+            for (int j=1;j<=mn;j++)
+                Q(i,j)=Q(i,j+N-mn);
+        Q.SetLimits(M,mn,true);
+    }
     return std::make_tuple(std::move(Q),std::move(L)); //return [Q,R]
 }
 

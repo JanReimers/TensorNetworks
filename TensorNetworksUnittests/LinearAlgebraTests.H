@@ -626,7 +626,6 @@ public:
             ValidateRQ(R,Q);
         }
 
-        if (M>=N)
         {
             auto [Q,L]=itsSolver->SolveThinQL(A);
             ValidateQR(Q,L);
