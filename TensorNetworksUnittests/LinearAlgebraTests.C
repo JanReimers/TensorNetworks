@@ -294,8 +294,8 @@ TEST_F(LinearAlgebraTests,LapackQRSolverReal)
 TEST_F(LinearAlgebraTests,LapackQRSolverComplex)
 {
     QRTester<dcmplx>(new LapackQRSolver<dcmplx>(),Nqr  ,Nqr  ).RunTests();
-    QRTester<dcmplx>(new LapackQRSolver<dcmplx>(),Nqr  ,Nqr/2).RunTests();
     QRTester<dcmplx>(new LapackQRSolver<dcmplx>(),Nqr/2,Nqr  ).RunTests();
+    QRTester<dcmplx>(new LapackQRSolver<dcmplx>(),Nqr  ,Nqr/2).RunTests();
 }
 
 

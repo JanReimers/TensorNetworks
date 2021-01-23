@@ -187,33 +187,36 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
             L(i,j)=0.0;
     }
     //
-    //  unpack Q  if M<N then the reflectors on the right side of Q, so we need
-    //  a shifted Q to xungql
+    // Now we need shift the orth vectors from the right side of Q over the left side, before
+    // shrinking Q and extracting the reflectors.
     //
-    lwork=-1;
-    info=0;
-    xungql<T>(&M,&mn,&mn,&Q(1,1+N-mn),&M,&tau(1),&work(1),&lwork,&info);
-    assert(info==0);
-    lwork=static_cast<int>(real(work(1)));
-    work.SetLimits(lwork);
-    xungql<T>(&M,&mn,&mn,&Q(1,1+N-mn),&M,&tau(1),&work(1),&lwork,&info);
-    assert(info==0);
-
     if (mn<N)
-    { //Now we need shift the orth vectors from the right side of Q over the left side, before
-      // shrinking Q..
+    { //
+      //
         for (int i=1;i<=M;i++)
             for (int j=1;j<=mn;j++)
                 Q(i,j)=Q(i,j+N-mn);
         Q.SetLimits(M,mn,true);
     }
+    //
+    //  unpack Q  if M<N then the reflectors on the right side of Q, so we need
+    //  a shifted Q to xungql
+    //
+    lwork=-1;
+    info=0;
+    xungql<T>(&M,&mn,&mn,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    assert(info==0);
+    lwork=static_cast<int>(real(work(1)));
+    work.SetLimits(lwork);
+    xungql<T>(&M,&mn,&mn,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    assert(info==0);
+
     return std::make_tuple(std::move(Q),std::move(L)); //return [Q,R]
 }
 
 template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveThinRQ(const MatrixT& Ain)
 {
     int M=Ain.GetNumRows(),N=Ain.GetNumCols(),mn=Min(M,N);
-    assert(N>=M); //M>N not supported by Lapack dorgrq_or zungrq_
     int info=0,lwork=-1;
     Vector<T> tau(mn),work(1);
     Matrix<T> Q(Ain);
@@ -232,24 +235,36 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
     //  Grab R before xungqr clobbers it.
     //
     Matrix<T> R(M,mn);
-    for (int i=1;i<=M;i++)
+    for (int j=1;j<=mn;j++)
     {
-        for (int j=1;j<i;j++)
+        for (int i=1;i<=j+M-mn;i++)
+            R(i,j)=Q(i,j+N-mn);
+        for (int i=j+1+M-mn;i<=M;i++)
             R(i,j)=0.0;
-        for (int j=i;j<=mn;j++)
-            R(i,j)=Q(i,N-M+j);
+    }
+    //
+    // If M>N we need shift the orth vectors from the bottom of Q up to top before
+    // unpacking the reflectors.
+    //
+    if (mn<M)
+    {
+        for (int j=1;j<=N;j++)
+            for (int i=1;i<=mn;i++)
+                Q(i,j)=Q(i+M-mn,j);
+        Q.SetLimits(mn,N,true);
     }
     //
     //  unpack Q
     //
     lwork=-1;
     info=0;
-    xungrq<T>(&M,&N,&M,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    xungrq<T>(&mn,&N,&mn,&Q(1,1),&mn,&tau(1),&work(1),&lwork,&info);
     assert(info==0);
     lwork=static_cast<int>(real(work(1)));
     work.SetLimits(lwork);
-    xungrq<T>(&M,&N,&M,&Q(1,1),&M,&tau(1),&work(1),&lwork,&info);
+    xungrq<T>(&mn,&N,&mn,&Q(1,1),&mn,&tau(1),&work(1),&lwork,&info);
     assert(info==0);
+
     return std::make_tuple(std::move(R),std::move(Q)); //Return [R,Q]
 }
 

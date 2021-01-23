@@ -620,7 +620,6 @@ public:
             auto [Q,R]=itsSolver->SolveThinQR(A);
             ValidateQR(Q,R);
         }
-        if (N>=M)
         {
             auto [R,Q]=itsSolver->SolveThinRQ(A);
             ValidateRQ(R,Q);
