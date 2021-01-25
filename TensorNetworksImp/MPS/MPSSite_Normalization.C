@@ -111,7 +111,7 @@ void MPSSite::Rescale(double norm)
 {
     for (int n=0; n<itsd; n++) itsMs[n]/=norm;
 }
-double   MPSSite::FrobeniusNorm() const
+double   MPSSite::GetFrobeniusNorm() const
 {
     double fnorm=0;
     for (int n=0; n<itsd; n++)

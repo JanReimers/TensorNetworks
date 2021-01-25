@@ -682,6 +682,7 @@ Matrix4CT  MPSSite::GetTransferMatrix(Direction lr) const
 
 void  MPSSite::ApplyInPlace(const SiteOperator* so)
 {
+    assert(so->GetFrobeniusNorm()>0.0);
     dVectorT newAs;
     Contract(newAs,so);
 
@@ -693,6 +694,7 @@ void  MPSSite::ApplyInPlace(const SiteOperator* so)
 
 void  MPSSite::Apply(const SiteOperator* so, MPSSite* psiPrime)
 {
+    assert(so->GetFrobeniusNorm()>0.0);
     Contract(psiPrime->itsMs,so);
 
     const Dw12& Dws=so->GetDw12();

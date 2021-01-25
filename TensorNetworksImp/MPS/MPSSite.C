@@ -216,8 +216,9 @@ void MPSSite::Report(std::ostream& os) const
 {
     os << std::setw(4)          << itsD1
        << std::setw(4)          << itsD2
-       << std::setw(5)          << GetNormStatus(1e-12)
+//       << std::setw(5)          << GetNormStatus(1e-12)
        << std::setw(8)          << itsNumUpdates
+       << std::fixed      << std::setprecision(4) << std::setw(8) << GetFrobeniusNorm()
        << std::fixed      << std::setprecision(8) << std::setw(13) << itsEmin
        << std::fixed      << std::setprecision(5) << std::setw(10) << itsGapE
        << std::scientific << std::setprecision(1) << std::setw(10) << itsIterDE

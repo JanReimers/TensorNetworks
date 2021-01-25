@@ -114,7 +114,7 @@ private:
     MatrixCT  ReshapeBeforeSVD(Direction lr);
     void      ReshapeAfter_SVD(Direction lr,const MatrixCT& UV);
     void      Rescale(double norm);
-    double    FrobeniusNorm() const;
+    double    GetFrobeniusNorm() const;
     Matrix4CT GetTransferMatrix(Direction lr) const;
     void      Update      (const VectorCT& newAs);
     void      iNormalize(Direction lr); //Use transfer matrix eigenvalue to rescale.
