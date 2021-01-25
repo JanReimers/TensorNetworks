@@ -324,7 +324,6 @@ TEST_F(MPOTests,TestL2MPOTrotter2)
 //    expH->CanonicalForm(TensorNetworks::DLeft);
 //    expH->CanonicalForm(TensorNetworks::DRight);
     expH->CompressStd(0,1e-4);
-//    expH->Report(cout);
     for (int is=2;is<=L-1;is++)
     {
         TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
@@ -368,19 +367,19 @@ TEST_F(MPOTests,TestL2iMPOTrotter2)
         EXPECT_EQ(Dw.Dw2,4);
     }
 }
-TEST_F(MPOTests,TestL2iMPOTrotter4)
-{
-    int L=2,D=2;
-    double S=0.5,dt=0.1,epsMPO=1e-4;
-    Setup(L,S,D);
-    TensorNetworks::iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder,epsMPO);
-    for (int is=1;is<=L;is++)
-    {
-        TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
-        EXPECT_EQ(Dw.Dw1,4);
-        EXPECT_EQ(Dw.Dw2,4);
-    }
-}
+//TEST_F(MPOTests,TestL2iMPOTrotter4)
+//{
+//    int L=2,D=2;
+//    double S=0.5,dt=0.1,epsMPO=1e-4;
+//    Setup(L,S,D);
+//    TensorNetworks::iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder,epsMPO);
+//    for (int is=1;is<=L;is++)
+//    {
+//        TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
+//        EXPECT_EQ(Dw.Dw1,4);
+//        EXPECT_EQ(Dw.Dw2,4);
+//    }
+//}
 
 TEST_F(MPOTests,TestParkerCanonicalL9)
 {
@@ -418,7 +417,7 @@ TEST_F(MPOTests,TestParkerSVDCompressHL9)
     EXPECT_EQ(itsH->GetNormStatus(),"WRRRRRRRR");
     double Eright=itsMPS->GetExpectation(itsH);
     itsH->CompressParker(0,1e-13);
-    EXPECT_EQ(itsH->GetNormStatus(),"LLLLLLLLW");
+    EXPECT_EQ(itsH->GetNormStatus(),"WRRRRRRRR");
     double Ecomp=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_NEAR(E,Ecomp ,1e-13);
@@ -444,7 +443,7 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L9)
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     double E2right=itsMPS->GetExpectation(H2);
     H2->CompressParker(0,1e-13);
-    EXPECT_EQ(H2->GetNormStatus(),"LLLLLLLLW");
+    EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     double E2comp=itsMPS->GetExpectation(H2);
     EXPECT_NEAR(E2,E2right,1e-13);
     EXPECT_NEAR(E2,E2comp ,1e-13);
@@ -510,25 +509,25 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
     TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
 //    TensorNetworks::MPO* expH=itsH->CreateUnitOperator();
 //    TensorNetworks::MPO* expH=new TensorNetworks::MPO_SpatialTrotter(dt,TensorNetworks::Even,L,S,H12);
-    expH->Report(cout);
+//    expH->Report(cout);
 //    expH->Dump(cout);
 
     TensorNetworks::MPS* psi1=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi1),1.0,1e-13);
 
-    itsMPS->Report(cout);
+//    itsMPS->Report(cout);
     EXPECT_NEAR(itsMPS->GetOverlap(psi1),1.0,1e-13);
     expH->CanonicalForm(TensorNetworks::DLeft); //Do we need to sweep both ways?
     expH->Report(cout);
     TensorNetworks::MPS* psi2=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi2),1.0,1e-13);
     expH->CanonicalForm(TensorNetworks::DRight);
-    expH->Report(cout);
+//    expH->Report(cout);
     TensorNetworks::MPS* psi3=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi3),1.0,1e-13);
 
     expH->CompressParker(0,1e-13);
-    expH->Report(cout);
+//    expH->Report(cout);
     EXPECT_EQ(expH->GetMaxDw(),2);
 //    double E2comp=itsMPS->GetExpectation(H2);
 //    EXPECT_NEAR(E2,E2right,1e-13);

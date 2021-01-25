@@ -1,4 +1,5 @@
 
+-MPOs show lower/upper triangular in Report
 Next steps:
     -Try wave function optimization for improve iTEBD GS energies.  Get them closer to mp-toolkit results?
     -Try coding up iTEBD using iTensor library
@@ -16,8 +17,7 @@ Next steps:
             -Compress exp(-t*H) operator
                 -exp(-t*H) doesn't have unit ops in the same places
                 -exp(-t*H) is not upper or nor lower triangular.
-                -We get a rectangular V(mnw1,w2) with more rows than columns.
-                    Lapack QL won't handle this'
+                Fixed: -We get a rectangular V(mnw1,w2) with more rows than columns.  Lapack QL won't handle this.
             Done: -MPOs Store accumulated truncation error for each site.
 
 

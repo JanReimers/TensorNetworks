@@ -115,6 +115,8 @@ double MPO::CompressParker(const SVCompressorR* compressor)
     int L=GetL();
     for (int ia=1;ia<L;ia++)
         GetSiteOperator(ia)->CompressParker(DLeft ,compressor);
+    for (int ia=L;ia>1;ia--)
+        GetSiteOperator(ia)->CompressParker(DRight ,compressor);
     return 0.0;
 }
 

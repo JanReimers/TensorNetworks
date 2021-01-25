@@ -153,7 +153,7 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
             W->Combine(&Wodd);
             W->Combine(&Weven);
             W->Combine(&Wodd);
-//            W->Compress(0,1e-12);
+ //            W->Compress(0,1e-12);
             break;
         }
         case FourthOrder :
