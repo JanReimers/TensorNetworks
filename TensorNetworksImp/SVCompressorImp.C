@@ -54,7 +54,7 @@ template <class T> double SVCompressorImp<T>::Compress(MatrixT& U, DiagonalMatri
     if (D<N)
     {
         double S2BeforeTruncation=s.GetDiagonal()*s.GetDiagonal();
-        assert(S2BeforeTruncation>0.0);
+        //assert(S2BeforeTruncation>0.0);
         //
         //  Trim tensors
         //
@@ -63,8 +63,9 @@ template <class T> double SVCompressorImp<T>::Compress(MatrixT& U, DiagonalMatri
         Vdagger.SetLimits(D,Vdagger.GetNumCols(),true);
 
         double S2AfterTruncation=s.GetDiagonal()*s.GetDiagonal();
-        assert(S2AfterTruncation>0.0);
-        double rescaleS=S2BeforeTruncation/S2AfterTruncation;
+        double rescaleS=1.0;
+        if (S2AfterTruncation>0.0)
+            rescaleS=S2BeforeTruncation/S2AfterTruncation;
         s*=rescaleS;
 //        cout << "SVCompressorImptruncation D,N,intS2=" << D << " " << N << " " << integratedS2 << " " << s.GetLimits() << endl;
     }

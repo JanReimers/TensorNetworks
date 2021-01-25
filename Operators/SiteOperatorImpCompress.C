@@ -56,19 +56,23 @@ MatrixRT MakeBlockMatrix(const MatrixRT& M,int D,int offset)
 
 std::tuple<MatrixRT,MatrixRT> ExtractM(Direction lr,const MatrixRT& Lp)
 {
-    int X=Lp.GetNumRows()-1;
-    assert(X==Lp.GetNumCols()-1);
-    MatrixRT M(X,X),Lprime;
+//    cout << "Lp=" << Lp << endl;
+    int X1=Lp.GetNumRows()-1;
+    int X2=Lp.GetNumCols()-1;
+    MatrixRT M(X1,X2),Lprime;
     switch(lr)
     {
     case DLeft:
-        M=Lp.SubMatrix(MatLimits(1,X,1,X));
-        Lprime=  MakeBlockMatrix(Lp,X+2,X+2,1);
-        for (int i=2;i<=X+1;i++)
+        M=Lp.SubMatrix(MatLimits(1,X1,1,X2));
+        Lprime=  MakeBlockMatrix(Lp,X1+2,X2+2,1);
+//        cout << "Lprime=" << Lprime << endl;
+        for (int i=2;i<=X1+1;i++)
         { //Clear out the M part of Lp
             Lprime(i,i)=1.0;
-            for (int j=i+1;j<=X+1;j++)
-                Lprime(i,j)=Lprime(j,i)=0.0;
+            for (int j=1;j<=i-1;j++)
+                Lprime(i,j)=0.0;
+            for (int j=i+1;j<=X2+1;j++)
+                Lprime(i,j)=0.0;
         }
         break;
     case DRight:
@@ -76,17 +80,71 @@ std::tuple<MatrixRT,MatrixRT> ExtractM(Direction lr,const MatrixRT& Lp)
             for (index_t j:M.cols())
                 M(i,j)=Lp(i+1,j+1);
 
-        Lprime=  MakeBlockMatrix(Lp,X+2,X+2,0);
-        for (int i=2;i<=X+1;i++)
+        Lprime=  MakeBlockMatrix(Lp,X1+2,X2+2,0);
+        for (int i=2;i<=X1+1;i++)
         { //Clear out the M part of Lp
             Lprime(i,i)=1.0;
-            for (int j=i+1;j<=X+1;j++)
-                Lprime(i,j)=Lprime(j,i)=0.0;
+            for (int j=1;j<=i-1;j++)
+                Lprime(i,j)=0.0;
+            for (int j=i+1;j<=X2+1;j++)
+                Lprime(i,j)=0.0;
         }
         break;
     }
 
     return std::make_tuple(M,Lprime);
+}
+
+MatrixRT ExtractLprime(Direction lr,const MatrixRT& Lp)
+{
+//    cout << "Lp=" << Lp << endl;
+    int X1=Lp.GetNumRows()-1;
+    int X2=Lp.GetNumCols()-1;
+    MatrixRT Lprime(X2+2,X2+2);
+    Unit(Lprime);
+
+    switch(lr)
+    {
+    case DLeft:
+        for (int j=2;j<=X2;j++)
+            Lprime(X2+2,j)=Lp(X1+1,j); //Copy the tvector part of Lp
+        break;
+    case DRight:
+        Lprime=  MakeBlockMatrix(Lp,X1+2,X2+2,0);
+        for (int i=2;i<=X1+1;i++)
+        { //Clear out the M part of Lp
+            Lprime(i,i)=1.0;
+            for (int j=1;j<=i-1;j++)
+                Lprime(i,j)=0.0;
+            for (int j=i+1;j<=X2+1;j++)
+                Lprime(i,j)=0.0;
+        }
+        break;
+    }
+
+    return Lprime;
+}
+
+MatrixRT ExtractM1(Direction lr,const MatrixRT& Lp)
+{
+//    cout << "Lp=" << Lp << endl;
+    int X1=Lp.GetNumRows()-1;
+    int X2=Lp.GetNumCols()-1;
+    MatrixRT M(X1,X2);
+    switch(lr)
+    {
+    case DLeft:
+        M=Lp.SubMatrix(MatLimits(1,X1,1,X2));
+        break;
+    case DRight:
+        for (index_t i:M.rows())
+            for (index_t j:M.cols())
+                M(i,j)=Lp(i+1,j+1);
+
+        break;
+    }
+
+    return M;
 }
 
 
@@ -99,11 +157,15 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
     int X1=Dw1-2,X2=Dw2-2,Xs=X2; //Chi and Chi_prime
 
     MatrixRT  V=Reshape(lr,1);
+//    cout << "X1,X2,V=" << X1 << " " << X2 << " " << V.GetLimits() << endl;
+    assert(V.GetNumRows()==itsd*itsd*(X1+1));
+    assert(V.GetNumCols()==X2+1);
 
     switch (lr)
     {
         case DLeft:
         {
+            if (V.GetNumRows()==0) return; //This will happen at the edges of an MPO
             assert(V.GetNumRows()==itsd*itsd*(X1+1)); // Treate these like enforced comments on the
             assert(V.GetNumCols()==X2+1);             // dimensions of each matrix.
             auto [Qp,Lp]=QRsolver.SolveThinQL(V); //Solves V=Q*L
@@ -113,46 +175,58 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
             if (QLerr>1e-13)
                Logger->LogWarnV(1,"SiteOperatorImp::CompressParker QL error=%.1e ",QLerr);
 
+            int Xq = (V.GetNumRows()>=V.GetNumCols()) ? X2 : itsd*itsd*(X1+1)-1;
             assert(Qp.GetNumRows()==itsd*itsd*(X1+1));
-            assert(Qp.GetNumCols()==X2+1);
-            assert(Lp.GetNumRows()==X2+1);
+            assert(Qp.GetNumCols()==Xq+1);
+            assert(Lp.GetNumRows()==Xq+1);
             assert(Lp.GetNumCols()==X2+1);
             assert(isOrthonormal(lr,Qp));
 
             MatrixRT Lpp;
-            auto [M,Lprime]=ExtractM(lr,Lp);
-            if (IsDiagonal(M,1e-14))
+            MatrixRT M=ExtractM1(lr,Lp);
+//            auto [M1,Lprime]=ExtractM(lr,Lp);
+//            if (IsDiagonal(M,1e-14))
+//            {
+//                cout << std::fixed << std::setprecision(2) << "DLeft M=" << M.GetDiagonal() << endl;
+//                assert(Min(fabs(M.GetDiagonal()))>1e-13); //If this trigger we need to compress
+//                Reshape(lr,1,Qp);  //W is now Q
+//                Lpp=MakeBlockMatrix(Lp,X2+2,1);
+//            }
+//            else
             {
-//                cout << std::fixed << std::setprecision(2) << "M=" << M.GetDiagonal() << endl;
-                assert(Min(fabs(M.GetDiagonal()))>1e-13); //If this trigger we need to compress
-                Reshape(lr,1,Qp);  //W is now Q
-                Lpp=MakeBlockMatrix(Lp,X2+2,1);
-            }
-            else
-            {
+//                cout << "M=" << M << endl;
                 auto [U,s,VT]=SVDsolver.SolveAll(M,1e-14); //Solves M=U * s * VT
                 AccumulateTruncationError(comp->Compress(U,s,VT));
-//                cout << std::fixed << std::setprecision(8) << "s=" << s.GetDiagonal() << endl;
+                cout << std::scientific << std::setprecision(8) << "s=" << s.GetDiagonal() << endl;
                 Xs=s.GetDiagonal().size();
                 MatrixRT sV=s*VT;
+//                cout << "sV=" << sV << endl;
                 assert(sV.GetNumRows()==Xs);
                 assert(sV.GetNumCols()==X2);
-                assert( U.GetNumRows()==X2);
+                assert( U.GetNumRows()==Xq);
                 assert( U.GetNumCols()==Xs);
                 assert(IsUnit(Transpose(U)*U,1e-13));
-
                 // Add lower right row and column
-                MatrixRT  Up=MakeBlockMatrix( U,X2+1,Xs+1,0);
+                MatrixRT  Up=MakeBlockMatrix( U,Xq+1,Xs+1,0);
                 MatrixRT sVp=MakeBlockMatrix(sV,Xs+1,X2+1,0);
                 assert(IsUnit(Transpose(Up)*Up,1e-13));
                 // Add upper left row and column
                 MatrixRT sVpp=MakeBlockMatrix(sVp,Xs+2,X2+2,1);
+                MatrixRT Lprime=ExtractLprime(lr,Lp);
 
+//                cout << "Lp    =" << Lp.GetLimits() << endl;
+//                cout << "sV    =" << sV.GetLimits() << endl;
+//                cout << "sVp   =" << sVp.GetLimits() << endl;
+//                cout << "sVpp  =" << sVpp.GetLimits() << endl;
+//                cout << std::setprecision(2) << "Lprime=" << Lprime << endl;
                 Lpp=sVpp*Lprime; //This get passed on to the next site over.
                 Qp*=Up;
                 assert(isOrthonormal(lr,Qp));
                 Reshape(lr,1,Qp);  //W is now Qp
-                assert(GetNormStatus(1e-13)=='L');
+#ifdef DEBUG
+                char ns=GetNormStatus(1e-13);
+                assert(ns=='L' || ns=='I');
+#endif
             }
 
             if (itsRightNeighbour) itsRightNeighbour->QLTransfer(lr,Lpp);
@@ -160,6 +234,7 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
         }
         case DRight:
         {
+            if (V.GetNumCols()==0) return; //This will happen at the edges of an MPO
             assert(V.GetNumCols()==itsd*itsd*(X2+1)); // Treate these like enforced comments on the
             assert(V.GetNumRows()==X1+1);             // dimensions of each matrix.
             auto [Lp,Qp]=QRsolver.SolveThinLQ(V); //Solves V=Q*L
@@ -181,7 +256,7 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 //            cout << "Lprime=" << Lprime << endl;
             if (IsDiagonal(M,1e-14))
             {
-//                cout << std::fixed << std::setprecision(2) << "M=" << M.GetDiagonal() << endl;
+                cout << std::fixed << std::setprecision(2) << "DRight M=" << M.GetDiagonal() << endl;
                 assert(Min(fabs(M.GetDiagonal()))>1e-13); //If this trigger we need to compress
                 Reshape(lr,1,Qp);  //W is now Q
                 Lpp=MakeBlockMatrix(Lp,X1+2,0);
@@ -277,21 +352,24 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
     {
         case DLeft:
         {
+//           cout << "V=" << V.GetLimits() << Max(fabs(V)) << endl;
+            if (V.size()==0) return; //This will happen at the edges of an MPO
             auto [Q,L]=solver.SolveThinQL(V); //Solves V=Q*L
             L*=1.0/sqrt(itsd);
             Q*=sqrt(itsd);
             Reshape(lr,1,Q);  //A is now U
-            MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,1);
+            MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,L.GetNumCols()+1,1);
             if (itsRightNeighbour) itsRightNeighbour->QLTransfer(lr,Lplus);
             break;
         }
         case DRight:
         {
+            if (V.size()==0) return; //This will happen at the edges of an MPO
             auto [L,Q]=solver.SolveThinLQ(V); //Solves V=L*Q
             L*=1.0/sqrt(itsd);
             Q*=sqrt(itsd);
             Reshape(lr,1,Q);  //A is now U
-            MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,0);
+            MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,L.GetNumCols()+1,0);
             if (itsLeft_Neighbour) itsLeft_Neighbour->QLTransfer(lr,Lplus);
             break;
         }
