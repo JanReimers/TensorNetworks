@@ -18,13 +18,15 @@ class MPO
         virtual ~MPO() {};
         virtual void ConvertToiMPO(int UnitCell)=0; //Strip away edge sites with w=1.
 
-        virtual int   GetL() const=0;
-        virtual int   GetMaxDw() const;
-        virtual void  Report(std::ostream&) const; //Show Dws
-        virtual void  Dump  (std::ostream&) const; //Show matrices
-        virtual std::string GetNormStatus () const;
         virtual const SiteOperator* GetSiteOperator(int isite) const;
         virtual       SiteOperator* GetSiteOperator(int isite)      =0;
+
+        virtual int         GetL() const=0;
+        virtual int         GetMaxDw() const;
+        virtual void        Report(std::ostream&) const; //Show Dws
+        virtual void        Dump  (std::ostream&) const; //Show matrices
+        virtual std::string GetNormStatus () const;
+
 
         virtual void   Combine(const MPO* O2);
         virtual void   Combine(const MPO* O2,double factor);
