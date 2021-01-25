@@ -28,6 +28,7 @@ class SiteOperatorRight
             return itsWrs(m+1,n+1);
         }
 
+        virtual double GetFrobeniusNorm() const {return SiteOperatorImp::GetFrobeniusNorm();};
         virtual void Init_lr();
         virtual void CheckDws() const;
         virtual void SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn

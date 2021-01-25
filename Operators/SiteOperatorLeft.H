@@ -28,6 +28,8 @@ class SiteOperatorLeft
             return itslWs(m+1,n+1);
         }
 
+        virtual double GetFrobeniusNorm() const {return SiteOperatorImp::GetFrobeniusNorm();};
+
         virtual void Init_lr();
         virtual void SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
         virtual void CheckDws() const;
@@ -35,6 +37,7 @@ class SiteOperatorLeft
     private:
 
         Dw12     itsDw;
+        int      itsUnitIndex; //Where to put the 1 in l
         MatrixRT itsl; //l in l*W*W*...*W*W*r
         TensorT  itslWs;
 };

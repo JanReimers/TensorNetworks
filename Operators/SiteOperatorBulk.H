@@ -28,6 +28,7 @@ class SiteOperatorBulk
             return itsWs(m+1,n+1);
         }
 
+        virtual double GetFrobeniusNorm() const {return SiteOperatorImp::GetFrobeniusNorm();};
         virtual void Init_lr();
         virtual void CheckDws() const;
 };

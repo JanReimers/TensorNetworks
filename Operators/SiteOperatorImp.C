@@ -260,9 +260,29 @@ void SiteOperatorImp::Report(std::ostream& os) const
     << std::setw(3) << itsDw.Dw1 << " "
     << std::setw(3) << itsDw.Dw2 << " "
     << std::scientific << std::setprecision(1) << itsTruncationError
+    << std::fixed << " " << GetFrobeniusNorm()
+    << std::fixed << " " << GetiFrobeniusNorm()
     << " " << GetNormStatus(1e-13)
 //    << " " << itsDw12.w1_first << " " << itsDw12.w2_last
     ;
+}
+
+double SiteOperatorImp::GetFrobeniusNorm() const
+{
+    double fn=0.0;
+    for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
+            fn+=FrobeniusNorm(GetW(n,m));
+    return fn;
+}
+
+double SiteOperatorImp::GetiFrobeniusNorm() const
+{
+    double fn=0.0;
+    for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
+            fn+=FrobeniusNorm(GetiW(n,m));
+    return fn;
 }
 
 bool SiteOperatorImp::isOrthonormal(Direction lr,const MatrixRT& Q) const

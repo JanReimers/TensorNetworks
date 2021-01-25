@@ -2,6 +2,8 @@
 #include "TensorNetworksImp/Typedefs.H"
 #include "Containers/Matrix4.H"
 #include "Operators/SiteOperatorBulk.H"
+#include "Operators/SiteOperatorLeft.H"
+#include "Operators/SiteOperatorRight.H"
 #include "NumericalMethods/LapackSVDSolver.H"
 #include "TensorNetworks/CheckSpin.H"
 #include "oml/diagonalmatrix.h"
@@ -55,23 +57,46 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, double S, 
     {
     case Even :  // LRLRLR  or LRLRLRI
         {
-            for (int ia=1;ia<L;ia+=2)
+            for (int ia=1;ia<L;ia++)
             {
-                Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
-                Insert(new SiteOperatorBulk(d,DRight,VT,sm));
+                if (ia==1)
+                    Insert(new SiteOperatorLeft(d,DLeft ,U ,sm));
+                else
+                    Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
+
+                ia++;
+
+                if (ia==L)
+                {
+                    if (L%2)
+                        Insert(new SiteOperatorBulk(d)); //if L is odd add one I op at the end
+                    else
+                        Insert(new SiteOperatorRight(d,DRight,VT,sm));
+                }
+                else
+                    Insert(new SiteOperatorBulk(d,DRight,VT,sm));
             }
-            if (L%2) Insert(new SiteOperatorBulk(d)); //if L is odd add one I op at the end
             break;
         }
-    case Odd : // ILRLRI or ILRLRLR
+    case Odd : // RLRLRL or RLRLRLRI
         {
-            Insert(new SiteOperatorBulk(d)); //if L is odd add one I op at the start
-            for (int ia=2;ia<=L-1;ia+=2)
+            for (int ia=1;ia<=L-1;ia++)
             {
-                Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
-                Insert(new SiteOperatorBulk(d,DRight,VT,sm));
+                if (ia==1)
+                    Insert(new SiteOperatorLeft(d,DRight,VT,sm));
+                else
+                    Insert(new SiteOperatorBulk(d,DRight,VT,sm));
+                ia++;
+                if (ia==L)
+                {
+                    if (L%2)
+                        Insert(new SiteOperatorRight(d)); //if L is odd add one I op at the end
+                    else
+                        Insert(new SiteOperatorRight(d,DLeft ,U ,sm));
+                }
+                if (ia<=L-1)
+                    Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
             }
-            if (!(L%2)) Insert(new SiteOperatorBulk(d)); //if L is odd add one I op at the end
             break;
         }
     default :

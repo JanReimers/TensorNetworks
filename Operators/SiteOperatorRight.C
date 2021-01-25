@@ -16,7 +16,7 @@ SiteOperatorRight::SiteOperatorRight(int d)
 
 SiteOperatorRight::SiteOperatorRight(int d, double S, SpinOperator so) //Construct spin operator
     : SiteOperatorImp(d,S,so)
-    , itsDw(1,1,Vector<int>(1),Vector<int>(1))
+    , itsDw(1,1)
     , itsWrs(d,d)
 {
     Init_lr();
@@ -38,7 +38,7 @@ SiteOperatorRight::SiteOperatorRight(int d, const OperatorClient* H)
 //
 SiteOperatorRight::SiteOperatorRight(int d, Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s)
     : SiteOperatorImp(d,lr,U,s)
-    , itsDw()
+    , itsDw(1,1)
     , itsWrs(d,d)
 {
     Init_lr();
@@ -48,7 +48,7 @@ SiteOperatorRight::SiteOperatorRight(int d, Direction lr,const MatrixRT& U, cons
 //
 SiteOperatorRight::SiteOperatorRight(int d, const TensorT& W)
     : SiteOperatorImp(d,W)
-    , itsDw()
+    , itsDw(1,1)
     , itsWrs(W)
 {
     Init_lr();

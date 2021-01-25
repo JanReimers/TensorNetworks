@@ -61,7 +61,8 @@ class SiteOperatorImp : public virtual SiteOperator
 
         virtual void Report(std::ostream&) const;
         virtual char GetNormStatus(double eps) const;
-
+        virtual double GetFrobeniusNorm() const;
+        virtual double GetiFrobeniusNorm() const;
         virtual void Init_lr()=0;
         virtual void CheckDws() const;
         virtual void SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn

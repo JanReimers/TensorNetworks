@@ -18,6 +18,7 @@ public:
 
     virtual int         Getd   () const=0;
     virtual const Dw12& GetDw12() const=0;
+    virtual double      GetFrobeniusNorm() const=0;
     //
     //  Generate MPO matrices.  m,n are quantum numbers for <m|Oa|n>
     //

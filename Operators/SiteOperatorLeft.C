@@ -9,6 +9,7 @@ namespace TensorNetworks
 SiteOperatorLeft::SiteOperatorLeft(int d)
     : SiteOperatorImp(d)
     , itsDw(1,1)
+    , itsUnitIndex(SiteOperatorImp::itsDw.Dw1)
     , itslWs(d,d)
 {
     Init_lr();
@@ -17,6 +18,7 @@ SiteOperatorLeft::SiteOperatorLeft(int d)
 SiteOperatorLeft::SiteOperatorLeft(int d, double S, SpinOperator so) //Construct spin operator
     : SiteOperatorImp(d,S,so)
     , itsDw(1,1,Vector<int>(1),Vector<int>(1))
+    , itsUnitIndex(SiteOperatorImp::itsDw.Dw1)
     , itslWs(d,d)
 {
     Init_lr();
@@ -29,6 +31,7 @@ SiteOperatorLeft::SiteOperatorLeft(int d, double S, SpinOperator so) //Construct
 SiteOperatorLeft::SiteOperatorLeft(int d, const OperatorClient* H)
     : SiteOperatorImp(d,H)
     , itsDw(1,1)
+    , itsUnitIndex(SiteOperatorImp::itsDw.Dw1)
     , itslWs(d,d)
 {
     Init_lr();
@@ -40,7 +43,8 @@ SiteOperatorLeft::SiteOperatorLeft(int d, const OperatorClient* H)
 //
 SiteOperatorLeft::SiteOperatorLeft(int d, Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s)
     : SiteOperatorImp(d,lr,U,s)
-    , itsDw()
+    , itsDw(1,1)
+    , itsUnitIndex(1)
     , itslWs(d,d)
 {
     Init_lr();
@@ -50,7 +54,8 @@ SiteOperatorLeft::SiteOperatorLeft(int d, Direction lr,const MatrixRT& U, const 
 //
 SiteOperatorLeft::SiteOperatorLeft(int d, const TensorT& W)
     : SiteOperatorImp(d,W)
-    , itsDw()
+    , itsDw(1,1)
+    , itsUnitIndex(SiteOperatorImp::itsDw.Dw1)
     , itslWs(W)
 {
     Init_lr();
@@ -70,7 +75,8 @@ void SiteOperatorLeft::Init_lr()
     {
         itsl.SetLimits(1,SiteOperatorImp::itsDw.Dw1);
         Fill(itsl,0.0);
-        itsl(1,SiteOperatorImp::itsDw.Dw1)=1.0;
+//        itsl(1,SiteOperatorImp::itsDw.Dw1)=1.0;
+        itsl(1,itsUnitIndex)=1.0;
         isShapeDirty=false;
     }
     if (isData_Dirty)
