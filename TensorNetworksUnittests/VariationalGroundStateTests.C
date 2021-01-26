@@ -416,7 +416,7 @@ TEST_F(VariationalGroundStateTests,TestTransverIsingL9S1D2Hx0)
     TensorNetworks::MPO* H2=itsH->CreateH2Operator();
     double E2=itsMPS->GetExpectation(H2);
     EXPECT_EQ(H2->GetMaxDw(),6); //if hx=0 it compresses a lot
-    EXPECT_NEAR(E2,E1*E1,1e-14);
+    EXPECT_NEAR(E2,E1*E1,2e-14);
 }
 
 
