@@ -57,45 +57,55 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, double S, 
     {
     case Even :  // LRLRLR  or LRLRLRI
         {
-            for (int ia=1;ia<L;ia++)
-            {
-                if (ia==1)
-                    Insert(new SiteOperatorLeft(d,DLeft ,U ,sm));
-                else
+            if (L%2)
+            { //Odd # of sites
+               Insert(new SiteOperatorLeft(d));
+               for (int ia=2;ia<=L;ia++)
+               {
                     Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
-
-                ia++;
-
-                if (ia==L)
-                {
-                    if (L%2)
-                        Insert(new SiteOperatorBulk(d)); //if L is odd add one I op at the end
+                    ia++;
+                    if (ia!=L)
+                        Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
                     else
-                        Insert(new SiteOperatorRight(d,DRight,VT,sm));
-                }
-                else
-                    Insert(new SiteOperatorBulk(d,DRight,VT,sm));
+                        Insert(new SiteOperatorRight(d,DRight ,VT,sm));
+               }
+            }
+            else
+            { //Even # of sites
+               Insert(new SiteOperatorLeft(d));
+               for (int ia=2;ia<L;ia+=2)
+               {
+                    Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
+                    Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
+               }
+               Insert(new SiteOperatorRight(d));
             }
             break;
         }
     case Odd : // RLRLRL or RLRLRLRI
         {
-            for (int ia=1;ia<=L-1;ia++)
-            {
-                if (ia==1)
-                    Insert(new SiteOperatorLeft(d,DRight,VT,sm));
-                else
-                    Insert(new SiteOperatorBulk(d,DRight,VT,sm));
-                ia++;
-                if (ia==L)
-                {
-                    if (L%2)
-                        Insert(new SiteOperatorRight(d)); //if L is odd add one I op at the end
+            if (L%2)
+            { //Odd # of sites
+               Insert(new SiteOperatorLeft(d,DLeft ,U ,sm));
+               for (int ia=2;ia<L;ia++)
+               {
+                    Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
+                    ia++;
+                    if (ia==L)
+                        Insert(new SiteOperatorRight(d));
                     else
-                        Insert(new SiteOperatorRight(d,DLeft ,U ,sm));
-                }
-                if (ia<=L-1)
+                        Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
+               }
+            }
+            else
+            { //Even # of sites
+                Insert(new SiteOperatorLeft(d,DLeft ,U ,sm));
+                for (int ia=2;ia<L;ia+=2)
+                {
+                    Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
                     Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
+                }
+                Insert(new SiteOperatorRight(d,DRight ,VT,sm));
             }
             break;
         }
