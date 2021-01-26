@@ -73,7 +73,53 @@ TEST_F(ImaginaryTimeTests,TestApplyIdentity)
 }
 
 
-TEST_F(ImaginaryTimeTests,TestMPPOCombine)
+TEST_F(ImaginaryTimeTests,TestMPPOCombineL8)
+{
+    int D=2,L=8;
+    double S=0.5,dt=0.05000;
+    Setup(L,S,D);
+
+    TensorNetworks::Matrix4RT H12=itsH->BuildLocalMatrix(); //Full H matrix for two sites 1&2
+
+    // Create some Trotter 2nd order operators
+    TensorNetworks::MPO_SpatialTrotter W_Odd (dt/2.0,TensorNetworks::Odd ,L,S,H12);
+    TensorNetworks::MPO_SpatialTrotter W_Even(dt    ,TensorNetworks::Even,L,S,H12);
+    //
+    //  Now combine three trotters into one
+    //
+    TensorNetworks::MPO* W=itsH->CreateUnitOperator();
+    W->Combine(&W_Odd);
+    W->Combine(&W_Even);
+    W->Combine(&W_Odd);
+    //
+    //  Make a random normalized wave function
+    //
+    itsMPS->Normalize(TensorNetworks::DRight);
+    //
+    //  Psi2 = W*Psi1
+    //
+    TensorNetworks::MPS* Psi2=itsMPS->Apply(W);
+    //
+    //  Psi1 = W_Odd * W_Even * W_Odd * Psi1
+    //
+    itsMPS->ApplyInPlace(&W_Odd);
+    itsMPS->ApplyInPlace(&W_Even);
+    itsMPS->ApplyInPlace(&W_Odd);
+    //
+    //  At this point if the Combine function is working Psi1==Psi2
+    //
+    double O11=itsMPS->GetOverlap(itsMPS);
+    double O12=itsMPS->GetOverlap(Psi2);
+    double O21=Psi2->GetOverlap(itsMPS);
+    double O22=Psi2->GetOverlap(Psi2);
+    EXPECT_NEAR(O12/O11,1.0,1e-14);
+    EXPECT_NEAR(O21/O11,1.0,1e-14);
+    EXPECT_NEAR(O22/O11,1.0,1e-14);
+
+    delete Psi2;
+    delete W;
+}
+TEST_F(ImaginaryTimeTests,TestMPPOCombineL9)
 {
     int D=2,L=9;
     double S=0.5,dt=0.05000;
@@ -119,6 +165,7 @@ TEST_F(ImaginaryTimeTests,TestMPPOCombine)
     delete Psi2;
     delete W;
 }
+
 TEST_F(ImaginaryTimeTests,TestIterationSchedule)
 {
     TensorNetworks::Epsilons eps(1e-12);
@@ -272,6 +319,7 @@ TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotterL2)
 
     itsMPS->Normalize(TensorNetworks::DLeft);
     itsMPS->Normalize(TensorNetworks::DRight);
+    TensorNetworks::MPO* temp=itsH->CreateH2Operator();
 
     TensorNetworks::Epsilons eps(1e-12);
     eps.itsMPOCompressEpsilon=1e-5;
@@ -298,6 +346,7 @@ TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotterL2)
     EXPECT_NEAR(E1/(L-1),-0.75,1e-6);
 
     TensorNetworks::MPO* H2=itsH->CreateH2Operator();
+    H2->Report(cout);
     double E2=itsMPS->GetExpectation(H2);
     EXPECT_NEAR(E2,E1*E1,1e-6);
 }
