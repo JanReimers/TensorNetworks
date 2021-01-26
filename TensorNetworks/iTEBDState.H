@@ -36,9 +36,9 @@ public:
     virtual double ApplyOrtho(const Matrix4RT& expH,SVCompressorC*)=0;
     virtual double ApplyOrtho(const Matrix4RT& expH,SVCompressorC*,double eps,int maxIter)=0;
 
-    virtual void   Apply     (const MPO* expH,SVCompressorC*)=0;
-    virtual double ApplyOrtho(const MPO* expH,SVCompressorC*)=0;
-    virtual double ApplyOrtho(const MPO* expH,SVCompressorC*,double eps,int maxIter)=0;
+    virtual void   Apply     (const iMPO* expH,SVCompressorC*)=0;
+    virtual double ApplyOrtho(const iMPO* expH,SVCompressorC*)=0;
+    virtual double ApplyOrtho(const iMPO* expH,SVCompressorC*,double eps,int maxIter)=0;
 //--------------------------------------------------------------------------------------
 //
 //  Normalization, Conoization and orthogonalization.
@@ -52,8 +52,8 @@ public:
 //  Hlocal and expH have different index ordering (for good reason) so they need
 //  different implementations.
 //
-    virtual double GetExpectation (const  MPO* o) const=0;
-    virtual double GetExpectation (const iMPO* o) const=0; //Recursive for triangular MPOs
+    virtual double GetExpectationDw1(const  MPO* o) const=0;
+    virtual double GetExpectation   (const iMPO* o) const=0; //Recursive for triangular MPOs
     virtual double GetExpectationmmnn (const Matrix4RT& Hlocal) const=0;
     virtual double GetExpectationmnmn (const Matrix4RT& expH  ) const=0;
 //--------------------------------------------------------------------------------------

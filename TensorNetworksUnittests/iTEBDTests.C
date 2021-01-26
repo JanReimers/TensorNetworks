@@ -45,19 +45,20 @@ public:
         itsCompressor=itsFactory->MakeMPSCompressor(D,epsSVD);
     }
 
+    using iMPO=TensorNetworks::iMPO;
     using MPO=TensorNetworks::MPO;
-
-    double CalculateE(int L, double S)
-    {
-        MPO* SpSmo=new TensorNetworks::MPO_TwoSite(L,S ,1,2, TensorNetworks::Sp,TensorNetworks::Sm);
-        MPO* SmSpo=new TensorNetworks::MPO_TwoSite(L,S ,1,2, TensorNetworks::Sm,TensorNetworks::Sp);
-        MPO* SzSzo=new TensorNetworks::MPO_TwoSite(L,S ,1,2, TensorNetworks::Sz,TensorNetworks::Sz);
-        double E=0.5*(itsState->GetExpectation(SpSmo)+itsState->GetExpectation(SmSpo))+itsState->GetExpectation(SzSzo);
-        delete SpSmo;
-        delete SmSpo;
-        delete SzSzo;
-        return E;
-    }
+//
+//    double CalculateE(int L, double S)
+//    {
+//        MPO* SpSmo=new TensorNetworks::MPO_TwoSite(L,S ,1,2, TensorNetworks::Sp,TensorNetworks::Sm);
+//        MPO* SmSpo=new TensorNetworks::MPO_TwoSite(L,S ,1,2, TensorNetworks::Sm,TensorNetworks::Sp);
+//        MPO* SzSzo=new TensorNetworks::MPO_TwoSite(L,S ,1,2, TensorNetworks::Sz,TensorNetworks::Sz);
+//        double E=0.5*(itsState->GetExpectation(SpSmo)+itsState->GetExpectation(SmSpo))+itsState->GetExpectation(SzSzo);
+//        delete SpSmo;
+//        delete SmSpo;
+//        delete SzSzo;
+//        return E;
+//    }
 //    MPO* MakeEnergyMPO(int L, double S)
 //    {
 //        MPO* SpSmo=new TensorNetworks::MPO_TwoSite(L,S ,1,2, TensorNetworks::Sp,TensorNetworks::Sm);
@@ -251,9 +252,8 @@ TEST_F(iTEBDTests,TestExpectationIdentity)
     Setup(UnitCell,S,D,epsSVD,TensorNetworks::Gates);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
-
     MPO* IdentityOp=itsH->CreateUnitOperator();
-    double expectation=itsState->GetExpectation(IdentityOp);
+    double expectation=itsState->GetExpectationDw1(IdentityOp);
     EXPECT_NEAR(expectation,1.0,D*1E-13);
     delete IdentityOp;
 }
@@ -284,7 +284,7 @@ TEST_F(iTEBDTests,TestReCenterExpectationIdentity1)
     itsState->Canonicalize(TensorNetworks::DLeft);
 
     MPO* IdentityOp=itsH->CreateUnitOperator();
-    double expectation=itsState->GetExpectation(IdentityOp);
+    double expectation=itsState->GetExpectationDw1(IdentityOp);
     EXPECT_NEAR(expectation,1.0,D*1E-13);
     delete IdentityOp;
 }
@@ -299,7 +299,7 @@ TEST_F(iTEBDTests,TestReCenterExpectationIdentity2)
     itsState->Orthogonalize(itsCompressor);
     itsState->ReCenter(2);
     MPO* IdentityOp=itsH->CreateUnitOperator();
-    double expectation=itsState->GetExpectation(IdentityOp);
+    double expectation=itsState->GetExpectationDw1(IdentityOp);
     EXPECT_NEAR(expectation,1.0,D*1E-13);
     delete IdentityOp;
 }
@@ -323,13 +323,13 @@ TEST_F(iTEBDTests,TestExpectationIdentityRangeSD)
             Matrix4RT IdentityOp=TensorNetworks::Hamiltonian::ExponentH(dt,Hlocal); //dt=0 gives unit oprator
             MPO* IdentityMPO=itsH->CreateUnitOperator();
             EXPECT_NEAR(itsState->GetExpectationmnmn(IdentityOp ),1.0,eps);
-            EXPECT_NEAR(itsState->GetExpectation    (IdentityMPO),1.0,eps);
+            EXPECT_NEAR(itsState->GetExpectationDw1 (IdentityMPO),1.0,eps);
             itsState->Orthogonalize(itsCompressor);
             EXPECT_NEAR(itsState->GetExpectationmnmn(IdentityOp ),1.0,eps);
-            EXPECT_NEAR(itsState->GetExpectation    (IdentityMPO),1.0,eps);
+            EXPECT_NEAR(itsState->GetExpectationDw1 (IdentityMPO),1.0,eps);
             itsState->ReCenter(2);
             EXPECT_NEAR(itsState->GetExpectationmnmn(IdentityOp ),1.0,eps);
-            EXPECT_NEAR(itsState->GetExpectation    (IdentityMPO),1.0,eps);
+            EXPECT_NEAR(itsState->GetExpectationDw1 (IdentityMPO),1.0,eps);
         }
 
 }
@@ -349,12 +349,11 @@ TEST_F(iTEBDTests,TestApplyIdentity)
 TEST_F(iTEBDTests,TestApplyMPOIdentity)
 {
     int UnitCell=2,D=2;
-    double S=0.5,epsSVD=0.0,dt=0.0;
+    double S=0.5,epsSVD=0.0,epsMPO=1e-13,dt=0.0;
     Setup(UnitCell,S,D,epsSVD,TensorNetworks::Gates);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
-    MPO* IdentityOp=itsH->CreateOperator(dt,TensorNetworks::FirstOrder);
-    IdentityOp->Report(cout);
+    iMPO* IdentityOp=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
     itsState->ApplyOrtho(IdentityOp,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
     delete IdentityOp;
@@ -384,7 +383,7 @@ TEST_F(iTEBDTests,TestApplyIdentityRangeSD)
 #ifdef DEBUG
     Dmax=4;
 #endif // DEBUG
-    double epsSVD=0.0,dt=0.0;
+    double epsSVD=0.0,epsMPO=1e-13,dt=0.0;
     for (int D=1;D<=Dmax;D*=2)
         for (double S=0.5;S<=2.5;S+=0.5)
         {
@@ -401,21 +400,21 @@ TEST_F(iTEBDTests,TestApplyIdentityRangeSD)
             EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
 
             itsState->ReCenter(1);
-            MPO* IMPO=itsH->CreateOperator(dt,TensorNetworks::FirstOrder);
+            iMPO* IMPO=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
             itsState->ApplyOrtho(IMPO,itsCompressor);
             itsState->ReCenter(2);
             itsState->ApplyOrtho(IMPO,itsCompressor);
             EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
             delete IMPO;
 
-            IMPO=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
+            IMPO=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder,epsMPO);
             itsState->ApplyOrtho(IMPO,itsCompressor);
             itsState->ReCenter(2);
             itsState->ApplyOrtho(IMPO,itsCompressor);
             EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
             delete IMPO;
 
-            IMPO=itsH->CreateOperator(dt,TensorNetworks::FourthOrder);
+            IMPO=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder,epsMPO);
             itsState->ApplyOrtho(IMPO,itsCompressor);
             itsState->ReCenter(2);
             itsState->ApplyOrtho(IMPO,itsCompressor);
@@ -427,7 +426,7 @@ TEST_F(iTEBDTests,TestApplyIdentityRangeSD)
 TEST_F(iTEBDTests,TestApplyExpH)
 {
     int UnitCell=2,D=2;
-    double S=0.5,epsSVD=0.0,dt=0.2;
+    double S=0.5,epsSVD=0.0,epsMPO=1e-13,dt=0.2;
     Setup(UnitCell,S,D,epsSVD,TensorNetworks::Gates);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
@@ -440,17 +439,17 @@ TEST_F(iTEBDTests,TestApplyExpH)
     itsState->ApplyOrtho(IdentityOp,itsCompressor,1e-13,100);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
 
-    MPO* IMPO=itsH->CreateOperator(dt,TensorNetworks::FirstOrder);
+    iMPO* IMPO=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
     itsState->ApplyOrtho(IMPO,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
     delete IMPO;
 
-    IMPO=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
+    IMPO=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder,epsMPO);
     itsState->ApplyOrtho(IMPO,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
     delete IMPO;
 
-    IMPO=itsH->CreateOperator(dt,TensorNetworks::FourthOrder);
+    IMPO=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder,epsMPO);
     itsState->ApplyOrtho(IMPO,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
     delete IMPO;
@@ -465,7 +464,7 @@ TEST_F(iTEBDTests,TestApplyOrthoiMPOExpH)
     itsState->Canonicalize(TensorNetworks::DLeft);
     itsState->Orthogonalize(itsCompressor);
 
-    MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
+    iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
     expH->Report(cout);
     itsState->ApplyOrtho(expH,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
@@ -491,7 +490,7 @@ TEST_F(iTEBDTests,TestApplyiMPOExpH)
     itsState->Canonicalize(TensorNetworks::DLeft);
     itsState->Orthogonalize(itsCompressor);
 
-    MPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
+    iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
     itsState->Apply(expH,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
     delete expH;
@@ -541,13 +540,13 @@ TEST_F(iTEBDTests,TestApplyExpH3)
 TEST_F(iTEBDTests,TestApplyMPOExpH3)
 {
     int UnitCell=2,D=2;
-    double S=0.5,epsSVD=0.0,dt=0.5;
+    double S=0.5,epsSVD=0.0,epsMPO=1e-13,dt=0.5;
     Setup(UnitCell,S,D,epsSVD,TensorNetworks::Gates);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
     itsState->Orthogonalize(itsCompressor);
 
-    MPO* expH=itsH->CreateOperator(dt,TensorNetworks::FirstOrder);
+    iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
     itsState->ApplyOrtho(expH,itsCompressor);
     itsState->ReCenter(2);
     itsState->ApplyOrtho(expH,itsCompressor);
@@ -555,7 +554,7 @@ TEST_F(iTEBDTests,TestApplyMPOExpH3)
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
     delete expH;
 
-    expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
+    expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder,epsMPO);
     itsState->ApplyOrtho(expH,itsCompressor);
     itsState->ReCenter(2);
     itsState->ApplyOrtho(expH,itsCompressor);
@@ -563,7 +562,7 @@ TEST_F(iTEBDTests,TestApplyMPOExpH3)
     EXPECT_EQ(itsState->GetNormStatus(),"GG");
     delete expH;
 
-    expH=itsH->CreateOperator(dt,TensorNetworks::FourthOrder);
+    expH=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder,epsMPO);
     itsState->ApplyOrtho(expH,itsCompressor);
     itsState->ReCenter(2);
     itsState->ApplyOrtho(expH,itsCompressor);
@@ -578,7 +577,7 @@ TEST_F(iTEBDTests,TestApplyExpHRangeSD)
 #ifdef DEBUG
     Dmax=4;
 #endif // DEBUG
-    double epsSVD=0.0,dt=0.0;
+    double epsSVD=0.0,epsMPO=1e-13,dt=0.0;
     for (int D=1;D<=Dmax;D*=2)
         for (double S=0.5;S<=2.5;S+=0.5)
         {
@@ -597,7 +596,7 @@ TEST_F(iTEBDTests,TestApplyExpHRangeSD)
                 EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
             }
             {
-                MPO* expH=itsH->CreateOperator(dt,TensorNetworks::FourthOrder);
+                iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FourthOrder,epsMPO);
                 itsState->ApplyOrtho(expH,itsCompressor);
                 itsState->ReCenter(2);
                 itsState->ApplyOrtho(expH,itsCompressor);
@@ -616,8 +615,8 @@ TEST_F(iTEBDTests,TestNeelEnergyS12)
     EXPECT_EQ(itsState->GetNormStatus(),"II");
     Matrix4RT Hlocal=itsH->BuildLocalMatrix();
     EXPECT_NEAR(itsState->GetExpectationmmnn(Hlocal),-0.25,1e-14);
-    EXPECT_NEAR(itsState->GetExpectation(itsH  ),-0.25,1e-14);
-    EXPECT_NEAR(CalculateE(UnitCell,S),-0.25,1e-14);
+    EXPECT_NEAR(itsState->GetExpectationDw1(itsH  ),-0.25,1e-14);
+//    EXPECT_NEAR(CalculateE(UnitCell,S),-0.25,1e-14);
 }
 
 TEST_F(iTEBDTests,TestNeelEnergyS1)
@@ -629,8 +628,8 @@ TEST_F(iTEBDTests,TestNeelEnergyS1)
     EXPECT_EQ(itsState->GetNormStatus(),"II");
     Matrix4RT Hlocal=itsH->BuildLocalMatrix();
     EXPECT_NEAR(itsState->GetExpectationmmnn(Hlocal),-1.,1e-14);
-    EXPECT_NEAR(itsState->GetExpectation(itsH  ),-1.,1e-14);
-    EXPECT_NEAR(CalculateE(UnitCell,S),-1.,1e-14);
+    EXPECT_NEAR(itsState->GetExpectationDw1(itsH  ),-1.,1e-14);
+//    EXPECT_NEAR(CalculateE(UnitCell,S),-1.,1e-14);
 }
 
 

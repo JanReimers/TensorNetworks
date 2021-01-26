@@ -18,7 +18,7 @@ iTEBDGates::~iTEBDGates()
 }
 
 
-void iTEBDGates::InitGates (const Hamiltonian* H,double dt,TrotterOrder to)
+void iTEBDGates::InitGates (const Hamiltonian* H,double dt,TrotterOrder to,double eps)
 {
     itsGates.clear();
     Matrix4RT Hlocal=H->BuildLocalMatrix();

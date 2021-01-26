@@ -83,7 +83,7 @@ MatrixCT iTEBDStateImp::ContractTheta(int ma, int mb,ThetaType tt) const
     return theta;
 }
 
-MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const MPO* o,ThetaType tt) const
+MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const iMPO* o,ThetaType tt) const
 {
     //
     //  Make sure everything is square
@@ -195,7 +195,7 @@ MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const MPO* o,ThetaType tt) const
     return Thetap;
 }
 
-MPSSite::dVectorT  iTEBDStateImp::ContractThetaDw(const MPO* o) const
+MPSSite::dVectorT  iTEBDStateImp::ContractThetaDw(const iMPO* o) const
 {
     //
     //  Make sure everything is square
@@ -445,6 +445,7 @@ double iTEBDStateImp::GetExpectation (const iMPO* o) const
     double E1;
     ReCenter(1);
     {
+        cout << "Oerr=" << GetOrthonormalityErrors() << endl;
         assert(GetOrthonormalityErrors()<1e-11);
 
         dVectorT A=lambdaB()*ContractAlB();
@@ -600,7 +601,7 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
                     assert(m==n); //should be only unit ops on the diagonal
                     assert(Wmn(w1,w1)==1.0);
                     diagonals.push_back(w1);
-                    std::cerr << "diagonal W["<< m << "," << n << "](" << w1 << "," << w1 << ")=" << Wmn(w1,w1) << std::endl;
+//                    std::cerr << "diagonal W["<< m << "," << n << "](" << w1 << "," << w1 << ")=" << Wmn(w1,w1) << std::endl;
                 }
                 for (int w2=w1+1;w2<=Dw;w2++)
                 if (Wmn(w2,w1)!=0.0)
@@ -623,7 +624,7 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
             Fill(C,dcmplx(0.0));
 //            C(1,1)=C(2,2);
 //            C(2,2)=C(1,1);
-            cout << std::fixed << "C[" << w1 << "]=" << C << endl;
+//            cout << std::fixed << "C[" << w1 << "]=" << C << endl;
             dcmplx c=Sum(C.GetDiagonal())/static_cast<double>(D);
             MatrixCT I(D,D);
             Unit(I);
@@ -633,7 +634,7 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
             {
                 T=-GetTransferMatrix1(A).Flatten();
                 for (int i=1;i<=D;i++) T(i,i)+=1.0;
-                cout << std::fixed << "1-T=" << T << endl;
+//                cout << std::fixed << "1-T=" << T << endl;
             }
 //            FillRandom(T);
             LapackSVDSolver<dcmplx> solver;
@@ -663,10 +664,10 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
 //            cout << "Ef=" << std::fixed << Ef << endl;
 //            cout << "T*Ef=" << std::fixed << T*Ef << endl;
             VectorCT err1=T*Ef-Cf;
-            cout << "err1=" << std::fixed << err1 << endl;
-            cout << std::scientific << Max(fabs(err1)) << endl;
+//            cout << "err1=" << std::fixed << err1 << endl;
+//            cout << std::scientific << Max(fabs(err1)) << endl;
             E[w1]=UnFlatten(Ef,D,D);
-            cout << std::fixed << "E[" << w1 << "]=" << E[w1] << endl;
+//            cout << std::fixed << "E[" << w1 << "]=" << E[w1] << endl;
             //
             //  Check solution
             //
@@ -679,7 +680,7 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
                     for (int m=0; m<d; m++)
                         Echeck(i2,j2)+=conj(A[m](i1,i2))*E[w1](i1,j1)*A[m](j1,j2);
              MatrixCT err=E[w1]-Echeck-C;
-             cout << "err=" << std::fixed << err << endl;
+//             cout << "err=" << std::fixed << err << endl;
              cout << std::scientific << Max(fabs(err)) << endl;
 
         }
@@ -709,7 +710,7 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
     }
 
 //  E[1] should now be the same as C in the paper.
-    cout << "E[" << 1 << "]=" << E[1] << endl;
+//    cout << "E[" << 1 << "]=" << E[1] << endl;
 
 //
 //  Take the trace of E1
@@ -727,16 +728,16 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
 }
 
 
-double iTEBDStateImp::GetExpectation (const MPO* o) const
+double iTEBDStateImp::GetExpectationDw1 (const MPO* o) const
 {
     int oldCenter=s1.leftSiteNumber;
-    double e1=GetExpectation(o,1);
-    double e2=GetExpectation(o,2);
+    double e1=GetExpectationDw1(o,1);
+    double e2=GetExpectationDw1(o,2);
     ReCenter(oldCenter);
     return 0.5*(e1+e2);
 }
 
-double iTEBDStateImp::GetExpectation (const MPO* o,int center) const
+double iTEBDStateImp::GetExpectationDw1 (const MPO* o,int center) const
 {
     assert(o->GetL()==2);
     ReCenter(center);

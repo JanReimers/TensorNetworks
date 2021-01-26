@@ -4,6 +4,7 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "Operators/SiteOperatorImp.H"
 #include "Operators/MPOImp.H"
+#include "Operators/iMPOImp.H"
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 
@@ -16,6 +17,7 @@ class HamiltonianImp
     : public virtual Hamiltonian
     , public virtual OperatorClient
     , private MPOImp
+    , private iMPOImp
 {
 public:
     HamiltonianImp(int L, double S);

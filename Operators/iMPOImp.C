@@ -5,6 +5,7 @@
 #include "TensorNetworks/Dw12.H"
 #include "oml/vector.h"
 #include "oml/matrix.h"
+#include "TensorNetworks/CheckSpin.H"
 //#include "oml/src/vector.cpp"
 
 using std::cout;
@@ -13,23 +14,69 @@ using std::endl;
 namespace TensorNetworks
 {
 
-iMPOImp::iMPOImp(int L, double S,MPOImp::LoadWith loadWith)
-    : MPOImp(L,S,loadWith)
+iMPOImp::iMPOImp(int L, double S,LoadWith loadWith)
+    : itsL(L)
+    , itsS(S)
+    , areSitesLinked(false)
+    , itsSites()
 {
-    LinkSites();
+    assert(isValidSpin(S));
+    int d=2*S+1;
+    assert(itsL>1);
+    assert(d>1);
+    switch (loadWith)
+    {
+    case Identity:
+    {
+        //
+        //  Load up the sites with unit operators
+        //  TODO tidy up loop and unit test.
+        //
+        for (int ia=1; ia<=itsL; ia++)
+            Insert(new SiteOperatorBulk(d));
+
+        LinkSites();
+        break;
+    }
+    case LoadLater:
+    {
+        break;
+    }
+    }
+
 }
 
 iMPOImp::iMPOImp(int L, double S,const TensorT& W)
-    : MPOImp(L,S,W)
+    : itsL(L)
+    , itsS(S)
+    , areSitesLinked(false)
+    , itsSites()
 {
+    assert(isValidSpin(S));
+    int d=2*S+1;
+    assert(itsL>=1);
+    assert(d>1);
+    //
+    //  Load up the sites with copies of the W operator
+    //
+
+    for (int ia=1; ia<=itsL; ia++)
+    {
+        Insert(new SiteOperatorBulk(d,W));
+    }
     LinkSites();
 }
 
 iMPOImp::iMPOImp(int L, double S,const OperatorClient* W)
-    : MPOImp(L,S,MPOImp::LoadLater)
+    : itsL(L)
+    , itsS(S)
+    , areSitesLinked(false)
+    , itsSites()
 {
-    int d=2*GetS()+1;
-    //
+    assert(isValidSpin(S));
+    int d=2*S+1;
+    assert(itsL>=1);
+    assert(d>1);    //
     //  Load up the sites with copies of the W operator
     //  For and iMPO the sites at the edge of the unit cell are considered Bulk
     //
@@ -75,6 +122,15 @@ void iMPOImp::LinkSites()
     areSitesLinked=true;
 }
 
+void iMPOImp::Insert(SiteOperator* so)
+{
+    assert(so);
+    assert(static_cast<int>(itsSites.size())<=itsL);
+    assert(!areSitesLinked);
+    if (itsSites.size()==0) itsSites.push_back(0); //Dummy at index 0 so we start counting at index 1
+    itsSites.push_back(so);
+}
+
 //
 // Contract horizontally to make iMPO for the whole unit cell.
 //
@@ -89,7 +145,7 @@ iMPO* iMPOImp::MakeUnitcelliMPO(int unitcell) const
     assert(L%unitcell==0);  //Make sure unit cell and L are compatible.
     int newL=L/unitcell;
     assert(newL*unitcell==L); //THis should be the same as the L%unitcell==0 test above.
-    int d=GetSiteOperator(1)->Getd();
+    int d=iMPO::GetSiteOperator(1)->Getd();
 
     //
     //  Work out the dimension of the unit cell Hilbert space.
@@ -97,7 +153,7 @@ iMPO* iMPOImp::MakeUnitcelliMPO(int unitcell) const
     int newd=1;
     for (int ia=1;ia<=unitcell;ia++)
     {
-        assert(GetSiteOperator(ia)->Getd()==d); //Assume all site have the same d
+        assert(iMPO::GetSiteOperator(ia)->Getd()==d); //Assume all site have the same d
         newd*=d;
     }
     double newS=(newd-1)/2.0;
@@ -112,9 +168,9 @@ iMPO* iMPOImp::MakeUnitcelliMPO(int unitcell) const
             const Vector<int>& ms=m.GetQuantumNumbers();
             const Vector<int>& ns=n.GetQuantumNumbers();
 
-            MatrixRT W=GetSiteOperator(1)->GetW(ms(unitcell),ns(unitcell));
+            MatrixRT W=iMPO::GetSiteOperator(1)->GetW(ms(unitcell),ns(unitcell));
             for (int ia=2;ia<=unitcell;ia++)
-                W*=GetSiteOperator(ia)->GetW(ms(unitcell-ia+1),ns(unitcell-ia+1));
+                W*=iMPO::GetSiteOperator(ia)->GetW(ms(unitcell-ia+1),ns(unitcell-ia+1));
             int mab=m.GetLinearIndex(); //one based
             int nab=n.GetLinearIndex();
 //            cout << "mab, ms=" << mab << " " << ms << endl;
@@ -124,31 +180,6 @@ iMPO* iMPOImp::MakeUnitcelliMPO(int unitcell) const
     return new iMPOImp(newL,newS,Wcell);
 
 }
-
-
-
-double iMPOImp::Compress(const SVCompressorR* compressor)
-{
-    int L=GetL();
-    Vector<int> oldDws(L),newDws(L);
-//    double truncationError=0.0;
-    for (int ia=1;ia<=L;ia++)
-    {
-        oldDws(ia)=GetSiteOperator(ia)->GetDw12().Dw2;
-        GetSiteOperator(ia)->CompressStd(DLeft ,compressor);
-    }
-    oldDws(L)=0;
-    for (int ia=L;ia>=1;ia--)
-    {
-        GetSiteOperator(ia)->CompressStd(DRight,compressor);
-        newDws(ia)=GetSiteOperator(ia)->GetDw12().Dw1;
-    }
-    newDws(1)=0;
-    double percent=100-(100.0*Sum(newDws))/static_cast<double>(Sum(oldDws));
-    cout << "% compression=" << std::fixed << std::setprecision(2) << percent << endl;
-    return percent;
-}
-
 
 } //namespace
 

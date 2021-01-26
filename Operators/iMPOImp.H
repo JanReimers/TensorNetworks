@@ -2,36 +2,48 @@
 #define iMPOImp_H
 
 #include "TensorNetworks/iMPO.H"
-#include "Operators/MPOImp.H"
+#include "Containers/ptr_vector.h"
 
 namespace TensorNetworks
 {
 
 class iMPOImp : public virtual iMPO
-    , private MPOImp
 {
-    public:
-        iMPOImp(int L, double S,MPOImp::LoadWith);
+        typedef Matrix<MatrixRT> TensorT;
+   public:
+        enum LoadWith {Identity,LoadLater};
+        iMPOImp(int L, double S,iMPOImp::LoadWith);
         iMPOImp(int L, double S,const TensorT& W);
         iMPOImp(int L, double S,const OperatorClient* W);
 
         virtual ~iMPOImp();
 
-        virtual iMPO* MakeUnitcelliMPO(int unitcell) const; //Contract horizontally to make iMPO for the whole unit cell.
-
-        virtual int   GetL() const {return MPOImp::GetL();}
-        virtual const SiteOperator* GetSiteOperator(int isite) const
-        {
-            return MPO::GetSiteOperator(isite);
-        }
+        virtual int   GetL() const {return itsL;}
+//        virtual const SiteOperator* GetSiteOperator(int isite) const
+//        {
+//            return iMPO::GetSiteOperator(isite);
+//        }
         virtual SiteOperator* GetSiteOperator(int isite)
         {
-            return MPOImp::GetSiteOperator(isite);
+            assert(isite>0);
+            assert(isite<=itsL);
+            assert(areSitesLinked);
+            return itsSites[isite];
         }
 
-        virtual double Compress(const SVCompressorR*);
+        iMPO* MakeUnitcelliMPO(int unitcell) const;
+//        virtual double Compress(const SVCompressorR*);
+protected:
+        void Insert(SiteOperator*);
+        virtual void LinkSites();
+
     private:
-         virtual void LinkSites();
+        typedef optr_vector<SiteOperator*> SitesType;
+
+        int itsL;
+        double itsS;
+        bool areSitesLinked;
+        SitesType itsSites;
 
 };
 

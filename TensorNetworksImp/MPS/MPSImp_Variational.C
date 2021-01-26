@@ -91,7 +91,8 @@ void MPSImp::Refine(Direction lr,const Hamiltonian *h,const Epsilons& eps,int is
     }
     UpdateEnergyData(isite);
     NormalizeSite(lr,isite);
-    itsSites[isite]->UpdateCache(h->GetSiteOperator(isite),
+    const MPO* hmpo=h;
+    itsSites[isite]->UpdateCache(hmpo->GetSiteOperator(isite),
                                  GetHeffCache(DLeft,isite-1),
                                  GetHeffCache(DRight,isite+1));
 
@@ -112,7 +113,8 @@ Matrix6CT MPSImp::GetHeffIterate   (const Hamiltonian* h,int isite) const
     CheckSiteNumber(isite);
     Vector3CT Lcache=GetHeffCache(DLeft,isite-1);
     Vector3CT Rcache=GetHeffCache(DRight,isite+1);
-    return itsSites[isite]->GetHeff(h->GetSiteOperator(isite),Lcache,Rcache);
+    const MPO* hmpo=h;
+    return itsSites[isite]->GetHeff(hmpo->GetSiteOperator(isite),Lcache,Rcache);
 }
 
 void MPSImp::LoadHeffCaches(const Hamiltonian* h)

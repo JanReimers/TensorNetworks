@@ -3,12 +3,15 @@
 
 #include "TensorNetworks/Namespace.H"
 #include "TensorNetworks/MPO.H"
+#include "TensorNetworks/iMPO.H"
 
 
 namespace TensorNetworks
 {
 
-class Hamiltonian : public virtual MPO
+class Hamiltonian
+    : public virtual MPO
+    , public virtual iMPO
 {
     public:
         Hamiltonian() {}

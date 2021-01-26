@@ -18,11 +18,11 @@ iTEBDMPOs::~iTEBDMPOs()
 }
 
 
-void iTEBDMPOs::InitGates (const Hamiltonian* H,double dt,TrotterOrder to)
+void iTEBDMPOs::InitGates (const Hamiltonian* H,double dt,TrotterOrder to, double eps)
 {
     itsGates.clear();
-    itsGates.push_back(H->CreateOperator(dt,to));
-    itsGates.push_back(H->CreateOperator(dt,to));
+    itsGates.push_back(H->CreateiMPO(dt,to,eps));
+    itsGates.push_back(H->CreateiMPO(dt,to,eps));
 }
 
 void iTEBDMPOs::Apply(SVCompressorC* comp, int center)

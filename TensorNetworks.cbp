@@ -158,6 +158,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/iMPOImp.H" />
+		<Unit filename="Operators/iMPO_SpatialTrotter.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/iMPO_SpatialTrotter.H" />
 		<Unit filename="TODO_List" />
 		<Unit filename="TensorNetworks/CheckSpin.C">
 			<Option compilerVar="CC" />
@@ -202,6 +206,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworks/VNEntropy.H" />
+		<Unit filename="TensorNetworks/iMPO.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="TensorNetworks/iMPO.H" />
 		<Unit filename="TensorNetworks/iTEBDState.H" />
 		<Unit filename="TensorNetworksImp/FactoryImp.C">

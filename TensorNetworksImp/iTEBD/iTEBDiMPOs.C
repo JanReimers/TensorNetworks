@@ -18,10 +18,10 @@ iTEBDiMPOs::~iTEBDiMPOs()
 }
 
 
-void iTEBDiMPOs::InitGates (const Hamiltonian* H,double dt,TrotterOrder to)
+void iTEBDiMPOs::InitGates (const Hamiltonian* H,double dt,TrotterOrder to,double eps)
 {
     itsGates.clear();
-    itsGates.push_back(H->CreateiMPO(dt,to,1e-13));
+    itsGates.push_back(H->CreateiMPO(dt,to,eps));
 }
 
 void iTEBDiMPOs::Apply(SVCompressorC* comp, int center)

@@ -1,38 +1,23 @@
 
+-Clean up Hamiltonian interface
+-iMPOs, all sites should be bulk.  How to achieve this
+    Done: -Stop deriving iMPOimp from MPOImp
+    Done: -Stop deriving iMPO from MPO
+        Are interfaces even distinct?
+            Combine(MPO*) and Combine(iMPO*) will be different
+            Only iMPO has MakeUnitcelliMPO
+        Done: But we need distinct types
+            can they share common base
+-MPO use enum to choose Std or Parker compression
+-MPO clean up compress return values.
+-MPOImp::MPOImp(int L, double S, const TensorT& W) does all Bulk, correct?!?!?
 -MPO Use TensorProduct in combine
+-Trotter MPO and iMPO have a lot of duplicated code for calculating exp(-t*H) and factoring it.
 -MPOs show lower/upper triangular in Report
--MPO ops
-    1) SetLimits: Fix up Dw ranges
-    2) Resize l/r vectors
-    3) TensorProduct l/r vector during combine
-    4) Update l*W and r*W caches
-    5)
-    Construction:
-        1) Set Dw1 Dw2
-        2) Shape Ws
-        3) Load Ws
-        4) Shape l/r
-        5) Load l/r (where is the 1?)
-        6) Left::Update Load lWs/Wrs
-        7) SetLimits
-            for Ws
-            for lWs/Wrs
-    Op Combine
-        1) Set Dw1/Dw2
-        2) Imp::Combine: Do TensorProduct W1 (x) W2
-        4) Left::Combine Do l=l1(x)l2 or r=r1(x)r2
-        5) Left::Update Load lWs/Wrs
-        7) SetLimits
-            for Ws
-            for lWs/Wrs
-    Op Canoncial/SVD
-        1) Do Canon/SVD modifies and reshapes Ws
-        2) Shape l/r Where does the 1 go?
-        3) Left::Update Load lWs/Wrs
-        4) SetLimits
-            for Ws
-            for lWs/Wrs
-
+-MPOs show Left/Bulk/Right in Report
+-Create iMPOs directly, get rid of the convert method.
+        Done for iH and iH^2
+-Add asserts to confirm zeros in Lp matrices are indeed zero.
 
 Next steps:
     -Try wave function optimization for improve iTEBD GS energies.  Get them closer to mp-toolkit results?
@@ -43,8 +28,6 @@ Next steps:
         -Study Parker
             Local Matrix Product Operators: Canonical Form, Compression, & Control Theory
             Efficient simulation of moire materials using the density matrix renormalization group appendix
-        -Create iMPOs directly, get rid of the convert method.
-            Done for iH and iH^2
         -Test 25x25 uncompressed H2 operator in recursive expectation routine.
             Fails: We get a unsolvable system of eqs when there are unit ops on the diagonal.
             -Try and make and (H-E)^2 operator

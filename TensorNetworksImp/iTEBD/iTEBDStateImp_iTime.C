@@ -28,7 +28,7 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const IterationS
     Canonicalize(TensorNetworks::DLeft);
     Logger->LogInfoV(0,"Initiate iTime GS iterations, D=%4d, Norm status=%s",GetMaxD(),GetNormStatus().c_str());
     Logger->LogInfo(1,"     dt    epsE      D  Dmax   Dw niter   E        Ortho error dE  DlambdaA DlambdaB");
-    MPO* H2=H->CreateH2Operator();
+    iMPO* H2=H->CreateiH2Operator();
 
     double E1=0;
     for (is.begin(); !is.end(); is++)
@@ -41,12 +41,12 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const IterationS
     return E2;
 }
 
-double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,const IterationScheduleLine& isl)
+double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const iMPO* H2,const IterationScheduleLine& isl)
 {
     assert(isl.itsDmax>0 || isl.itsEps.itsMPSCompressEpsilon>0);
     double dt=isl.itsdt;
 
-    InitGates(H,dt,isl.itsTrotterOrder);
+    InitGates(H,dt,isl.itsTrotterOrder,isl.itsEps.itsMPOCompressEpsilon);
 
     int Dmax=GetMaxD();
     double epsCompress=1e-16;
@@ -56,7 +56,7 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
     assert(epsOrth>0.0);
     OrthogonalizeI(mps_compressor,epsOrth,nOrthIter);
     ReCenter(1);
-    double E1=GetExpectation(H)/(itsL-1);
+    double E1=GetExpectationDw1(H)/(itsL-1);
     double dE=0.0;
 
     for (int D=Dmax;D<=isl.itsDmax;D+=isl.itsDeltaD)
@@ -90,10 +90,10 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const MPO* H2,co
         oerr1=OrthogonalizeI(mps_compressor,epsOrth,nOrthIter);
 //        ReCenter(2);
 //        oerr2=OrthogonalizeI(mps_compressor,epsOrth,nOrthIter);
-        double Enew=GetExpectation(H);
+        double Enew=GetExpectationDw1(H);
         dE=Enew-E1;
         E1=Enew;
-        double E2=GetExpectation(H2);
+        double E2=1.0;//GetExpectation(H2);
         E2= E2-E1*E1;
        Logger->LogInfoV(1,"%.3f %.2e %4d %4d %4d %4d %.9f %.1e  %.1e  %.1e  %.1e",
                         isl.itsdt,isl.itsEps.itsDelatEnergy1Epsilon,D,
@@ -137,26 +137,26 @@ void iTEBDStateImp::Apply(const MultigateType& expH,SVCompressorC* comp,int cent
 //
 //  Apply multiple mpo gates and compress at the end
 //
-void iTEBDStateImp::Apply(const MultiMPOType& expH,SVCompressorC* comp,int center)
-{
-    SVCompressorC* eps_compressor =Factory::GetFactory()->MakeMPSCompressor(0,1e-13);
-    int Ngate=expH.size();
-    assert(Ngate>0);
-    int isite=center;
-    int igate=1; //We need to know when the second last gate occurs.
-    for (auto& gate:expH)
-    {
-        ReCenter(isite++);
-        dVectorT gamma=ContractTheta(&gate,lAlBl);
-        if (igate++<=Ngate-2)
-            Unpack(gamma,eps_compressor); //only eps compression before the last two gates.
-        else
-            Unpack(gamma,comp); //Compression after the last two gates. Each compression truncates a different bond.
-    }
-}
+//void iTEBDStateImp::Apply(const MultiMPOType& expH,SVCompressorC* comp,int center)
+//{
+//    SVCompressorC* eps_compressor =Factory::GetFactory()->MakeMPSCompressor(0,1e-13);
+//    int Ngate=expH.size();
+//    assert(Ngate>0);
+//    int isite=center;
+//    int igate=1; //We need to know when the second last gate occurs.
+//    for (auto& gate:expH)
+//    {
+//        ReCenter(isite++);
+//        dVectorT gamma=ContractTheta(&gate,lAlBl);
+//        if (igate++<=Ngate-2)
+//            Unpack(gamma,eps_compressor); //only eps compression before the last two gates.
+//        else
+//            Unpack(gamma,comp); //Compression after the last two gates. Each compression truncates a different bond.
+//    }
+//}
+//
 
-
-DiagonalMatrixRT Extend(const DiagonalMatrixRT& lambda,const MPO* o)
+DiagonalMatrixRT Extend(const DiagonalMatrixRT& lambda,const iMPO* o)
 {
     // Extract Dw from the MPO
     assert(o->GetL()==2);
@@ -191,7 +191,7 @@ double iTEBDStateImp::ApplyOrtho(const Matrix4RT& expH,SVCompressorC* comp,doubl
     return UnpackOrthonormal(gamma,comp);
 }
 
-double iTEBDStateImp::ApplyOrtho(const MPO* expH,SVCompressorC* comp,double eps,int maxIter)
+double iTEBDStateImp::ApplyOrtho(const iMPO* expH,SVCompressorC* comp,double eps,int maxIter)
 {
     assert(comp);
     dVectorT          gamma=ContractTheta(expH,AlB);
@@ -222,7 +222,7 @@ double iTEBDStateImp::Apply(const Matrix4RT& expH,SVCompressorC* comp,bool ortho
 }
 
 
-double iTEBDStateImp::Apply(const MPO* expH,SVCompressorC* comp,bool orthogonalize)
+double iTEBDStateImp::Apply(const iMPO* expH,SVCompressorC* comp,bool orthogonalize)
 {
     assert(comp);
     DiagonalMatrixRT lambda=Extend(lambdaB(),expH);

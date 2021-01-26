@@ -1,7 +1,8 @@
 #ifndef iMPO_H
 #define iMPO_H
 
-#include "TensorNetworks/MPO.H"
+#include "TensorNetworks/Namespace.H"
+#include <iosfwd>
 
 namespace TensorNetworks
 {
@@ -10,7 +11,7 @@ namespace TensorNetworks
 //  Most of the this interface can be implemented using a few abstract functions
 //  from the Operator class.
 //
-class iMPO : public virtual MPO
+class iMPO
 {
     public:
         iMPO() {};
@@ -18,12 +19,20 @@ class iMPO : public virtual MPO
 
         virtual iMPO* MakeUnitcelliMPO(int unitcell) const=0; //Contract horizontally to make iMPO for the whole unit cell.
 
-        virtual int   GetL() const=0;
-        virtual const SiteOperator* GetSiteOperator(int isite) const
-        {
-            return MPO::GetSiteOperator(isite);
-        }
+        virtual const SiteOperator* GetSiteOperator(int isite) const;
         virtual       SiteOperator* GetSiteOperator(int isite)=0;
+
+        virtual int   GetL() const=0;
+        virtual int         GetMaxDw() const;
+        virtual void        Report(std::ostream&) const; //Show Dws
+        virtual void        Dump  (std::ostream&) const; //Show matrices
+        virtual std::string GetNormStatus () const;
+        virtual void   Combine(const iMPO* O2);
+        virtual double CompressStd   (int Dmax, double epsSV);
+        virtual double CompressStd   (const SVCompressorR*);
+        virtual double CompressParker(int Dmax, double epsSV);
+        virtual double CompressParker(const SVCompressorR*);
+        virtual void   CanonicalForm(Direction LR);
 };
 
 }

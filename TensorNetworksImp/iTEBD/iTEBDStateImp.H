@@ -25,7 +25,7 @@ public:
     typedef std::tuple<MatrixCT,MatrixCT> MMType;
     typedef std::tuple<MatrixCT,double  > MdType;
     typedef std::vector<Matrix4RT>        MultigateType; // sequence of Trotter gates
-    typedef  ptr_vector< MPO*>            MultiMPOType; // sequence of Trotter gates as MPOs
+//    typedef  ptr_vector< MPO*>            MultiMPOType; // sequence of Trotter gates as MPOs
     typedef  ptr_vector<iMPO*>            Multi_iMPOType; // sequence of Trotter gates as MPOs
 public:
     iTEBDStateImp(int L,double S, int D,double normEps,double epsSV);
@@ -46,22 +46,22 @@ public:
 // Find ground state.  Return <E^2>-<E>^2
 //
     virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&);
-    virtual void   InitGates (const Hamiltonian*,double dt,TrotterOrder)=0;
+    virtual void   InitGates (const Hamiltonian*,double dt,TrotterOrder,double eps)=0;
     virtual void   Apply     (SVCompressorC*, int center)=0;
 
     virtual void   Apply     (const Matrix4RT&      expH,SVCompressorC* comp) {       Apply(expH,comp,false);}
     virtual void   Apply     (const MultigateType & expH,SVCompressorC* comp,int center);
-    virtual void   Apply     (const MultiMPOType  & expH,SVCompressorC* comp,int center);
+//    virtual void   Apply     (const MultiMPOType  & expH,SVCompressorC* comp,int center);
     virtual void   Apply     (const Multi_iMPOType& expH,SVCompressorC* comp,int center);
     virtual double ApplyOrtho(const Matrix4RT&      expH,SVCompressorC* comp) {return Apply(expH,comp,true );}
     virtual double ApplyOrtho(const Matrix4RT&      expH,SVCompressorC*,double eps,int maxIter);
 
-    virtual void   Apply     (const MPO* expH,SVCompressorC* comp) {       Apply(expH,comp,false);}
-    virtual double ApplyOrtho(const MPO* expH,SVCompressorC* comp) {return Apply(expH,comp,true );}
-    virtual double ApplyOrtho(const MPO* expH,SVCompressorC*,double eps,int maxIter);
+    virtual void   Apply     (const iMPO* expH,SVCompressorC* comp) {       Apply(expH,comp,false);}
+    virtual double ApplyOrtho(const iMPO* expH,SVCompressorC* comp) {return Apply(expH,comp,true );}
+    virtual double ApplyOrtho(const iMPO* expH,SVCompressorC*,double eps,int maxIter);
 
     double    Apply     (const Matrix4RT& expH,SVCompressorC*,bool orthogonalize);
-    double    Apply     (const MPO*       expH,SVCompressorC*,bool orthogonalize);
+    double    Apply     (const iMPO*      expH,SVCompressorC*,bool orthogonalize);
 //--------------------------------------------------------------------------------------
 //
 //  Normalization members with and without SVD compression
@@ -72,11 +72,12 @@ public:
     virtual double Orthogonalize (SVCompressorC*);
     virtual double OrthogonalizeI(SVCompressorC*,double eps,int maxIter);
 
-    virtual double GetExpectation (const  MPO* o) const;
-    virtual double GetExpectation (const iMPO* o) const; //Recursive for triangular MPOs
+    virtual double GetExpectationDw1(const  MPO* o) const;
+    virtual double GetExpectation   (const iMPO* o) const; //Recursive for triangular MPOs
     virtual double GetExpectationmmnn (const Matrix4RT& Hlocal) const;
     virtual double GetExpectationmnmn (const Matrix4RT& expH) const;
-    double    GetExpectation    (const MPO*       o     ,int center) const;
+    double    GetExpectationDw1 (const  MPO*      o     ,int center) const;
+    double    GetExpectation    (const iMPO*      o     ,int center) const;
     double    GetExpectationmmnn(const Matrix4RT& Hlocal,int center) const;
 
     virtual void Report(std::ostream&) const;
@@ -85,7 +86,7 @@ public:
 protected:
 
     int       GetModSite(int isite) const;
-    double    FindiTimeGroundState(const Hamiltonian*,const MPO* H2, const IterationScheduleLine&);
+    double    FindiTimeGroundState(const Hamiltonian*,const iMPO* H2, const IterationScheduleLine&);
 
 
     virtual   double GetOrthonormalityErrors() const;
@@ -97,8 +98,8 @@ protected:
     MatrixCT  ContractTheta(int ma, int mb,ThetaType tt) const;
     dVectorT  ContractAlB() const;
     dVectorT  ContractTheta(const Matrix4RT& expH,ThetaType) const;
-    dVectorT  ContractTheta(const MPO*       expH,ThetaType) const;
-    dVectorT  ContractThetaDw(const MPO*     expH) const;
+    dVectorT  ContractTheta(const iMPO*       expH,ThetaType) const;
+    dVectorT  ContractThetaDw(const iMPO*     expH) const;
 
     void     CalculateLambdaB (const dVectorT& thetaBA,SVCompressorC*);
     double   UnpackOrthonormal(const dVectorT& gammap,SVCompressorC*);
