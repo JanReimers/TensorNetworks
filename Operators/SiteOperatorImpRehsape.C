@@ -94,7 +94,7 @@ void  SiteOperatorImp::Reshape(Direction lr,int off,const MatrixRT& Q)
         break;
     }
     }
-    Init_lr();
+    Update();
 }
 
 
