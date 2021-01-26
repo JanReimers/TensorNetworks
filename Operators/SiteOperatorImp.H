@@ -9,6 +9,32 @@
 
 class MPOTests;
 
+template <class T> Matrix<T> TensorProduct(const Matrix<T>& a, const Matrix<T>& b)
+{
+    int nr=a.GetNumRows()*b.GetNumRows();
+    int nc=a.GetNumCols()*b.GetNumCols();
+    Matrix<T> r(nr,nc);
+    //
+    //  These loops need to run in the same order as SiteOperatorImp::Combine
+    //
+    int i=1;
+    for (index_t ia:a.rows())
+    for (index_t ib:b.rows())
+    {
+        int j=1;
+        for (index_t ja:a.cols())
+        for (index_t jb:b.cols())
+        {
+            r(i,j)=a(ia,ja)*b(ib,jb);
+            j++;
+        }
+        i++;
+    }
+    return r;
+}
+
+
+
 namespace TensorNetworks
 {
 //
@@ -63,7 +89,7 @@ class SiteOperatorImp : public virtual SiteOperator
         virtual char GetNormStatus(double eps) const;
         virtual double GetFrobeniusNorm() const;
         virtual double GetiFrobeniusNorm() const;
-        virtual void Init_lr()=0;
+        virtual void Update()=0;
         virtual void CheckDws() const;
         virtual void SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
         static  void SetLimits(Dw12& Dw,TensorT& Ws); //Fix up itsDw12 by inspecting zeros in Wmn

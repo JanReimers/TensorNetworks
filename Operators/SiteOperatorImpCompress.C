@@ -404,7 +404,7 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
     }
 
     }
-    Init_lr();
+    Update();
 }
 
 void SiteOperatorImp::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV)
@@ -463,7 +463,7 @@ void SiteOperatorImp::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const M
     }
 
     }
-    Init_lr();
+    Update();
 }
 
 

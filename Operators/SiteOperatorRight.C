@@ -11,7 +11,8 @@ SiteOperatorRight::SiteOperatorRight(int d)
     , itsDw(1,1)
     , itsWrs(d,d)
 {
-    Init_lr();
+    Init_lr(1);
+    Update();
 }
 
 SiteOperatorRight::SiteOperatorRight(int d, double S, SpinOperator so) //Construct spin operator
@@ -19,7 +20,8 @@ SiteOperatorRight::SiteOperatorRight(int d, double S, SpinOperator so) //Constru
     , itsDw(1,1)
     , itsWrs(d,d)
 {
-    Init_lr();
+    Init_lr(1);
+    Update();
 }
 //
 //  Build from a W rep object
@@ -29,7 +31,8 @@ SiteOperatorRight::SiteOperatorRight(int d, const OperatorClient* H)
     , itsDw(1,1)
     , itsWrs(d,d)
 {
-    Init_lr();
+    Init_lr(1);
+    Update();
 }
 
 
@@ -41,7 +44,8 @@ SiteOperatorRight::SiteOperatorRight(int d, Direction lr,const MatrixRT& U, cons
     , itsDw(1,1)
     , itsWrs(d,d)
 {
-    Init_lr();
+    Init_lr(1);
+    Update();
 }
 //
 // Construct with W operator
@@ -51,7 +55,8 @@ SiteOperatorRight::SiteOperatorRight(int d, const TensorT& W)
     , itsDw(1,1)
     , itsWrs(W)
 {
-    Init_lr();
+    Init_lr(1);
+    Update();
 }
 
 
@@ -60,27 +65,45 @@ SiteOperatorRight::~SiteOperatorRight()
     //dtor
 }
 
-void SiteOperatorRight::Init_lr()
+void SiteOperatorRight::Init_lr(int oneIndex)
 {
     assert( itsDw.Dw2==1);
-    if (isShapeDirty)
+    itsDw.Dw1=SiteOperatorImp::itsDw.Dw1;
+    itsr.SetLimits(SiteOperatorImp::itsDw.Dw2,1);
+    Fill(itsr,0.0);
+    itsr(oneIndex,1)=1.0;
+}
+
+void SiteOperatorRight::Update()
+{
+    assert( itsDw.Dw2==1);
+    assert(itsr.GetNumCols()==1);
+    itsDw.Dw1=SiteOperatorImp::itsDw.Dw1;
+    if (itsr.GetNumRows()!=SiteOperatorImp::itsDw.Dw2)
     {
-        itsDw.Dw1=SiteOperatorImp::itsDw.Dw1;
-        itsr.SetLimits(SiteOperatorImp::itsDw.Dw2,1);
+        bool OneOne=itsr(1,1)==1.0; //The 1 is in the first element.
+        if (itsr.size()==1) //THis is hard part
+            OneOne=false;
+
+        itsr.SetLimits(1,SiteOperatorImp::itsDw.Dw2);
         Fill(itsr,0.0);
-        itsr(1,1)=1.0;
-        isShapeDirty=false;
+        if (OneOne)
+            itsr(1,1)=1.0; //[100...00]
+        else
+            itsr(SiteOperatorImp::itsDw.Dw2,1)=1.0; //[000...001]
     }
+    isShapeDirty=false;
     if (isData_Dirty)
     {
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
                 itsWrs(m+1,n+1)=itsWs(m+1,n+1)*itsr;
         SetLimits();
-        isData_Dirty=true;
+        isData_Dirty=false;
     }
     CheckDws();
 }
+
 
 void SiteOperatorRight::CheckDws() const
 {
@@ -103,6 +126,16 @@ void SiteOperatorRight::SetLimits()
     SiteOperatorImp::SetLimits();
 }
 
+void SiteOperatorRight::Combine(const SiteOperator* O2,double factor)
+{
+    const SiteOperatorRight* o2=dynamic_cast<const SiteOperatorRight*>(O2);
+    assert(o2);
+//    std::cout << "itsr=" << itsr << std::endl;
+//    std::cout << "o2 itsr=" << o2->itsr << std::endl;
+    itsr=TensorProduct(itsr,o2->itsr);
+//    std::cout << "itsr=" << itsr << " " << this << std::endl;
+    SiteOperatorImp::Combine(O2,factor);
+}
 
 
 

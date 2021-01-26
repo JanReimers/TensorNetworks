@@ -1,5 +1,39 @@
 
+-MPO Use TensorProduct in combine
 -MPOs show lower/upper triangular in Report
+-MPO ops
+    1) SetLimits: Fix up Dw ranges
+    2) Resize l/r vectors
+    3) TensorProduct l/r vector during combine
+    4) Update l*W and r*W caches
+    5)
+    Construction:
+        1) Set Dw1 Dw2
+        2) Shape Ws
+        3) Load Ws
+        4) Shape l/r
+        5) Load l/r (where is the 1?)
+        6) Left::Update Load lWs/Wrs
+        7) SetLimits
+            for Ws
+            for lWs/Wrs
+    Op Combine
+        1) Set Dw1/Dw2
+        2) Imp::Combine: Do TensorProduct W1 (x) W2
+        4) Left::Combine Do l=l1(x)l2 or r=r1(x)r2
+        5) Left::Update Load lWs/Wrs
+        7) SetLimits
+            for Ws
+            for lWs/Wrs
+    Op Canoncial/SVD
+        1) Do Canon/SVD modifies and reshapes Ws
+        2) Shape l/r Where does the 1 go?
+        3) Left::Update Load lWs/Wrs
+        4) SetLimits
+            for Ws
+            for lWs/Wrs
+
+
 Next steps:
     -Try wave function optimization for improve iTEBD GS energies.  Get them closer to mp-toolkit results?
     -Try coding up iTEBD using iTensor library

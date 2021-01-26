@@ -242,12 +242,11 @@ void SiteOperatorImp::Combine(const SiteOperator* O2,double factor)
             }
             newWs(m+1,o+1)=factor*Wmo;
         }
-    itsWs=newWs;
+    itsWs=newWs;  //Use SetiW instead
 
     itsDw=Dw;
-    isShapeDirty=true;
     isData_Dirty=true;
-    Init_lr();
+    Update();
 }
 
 
