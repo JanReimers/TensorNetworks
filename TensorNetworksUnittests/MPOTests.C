@@ -500,35 +500,36 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
 TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
 {
     int L=8,D=2;
-    double S=0.5,dt=0.0;
+    double S=0.5,dt=1.0;
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DLeft);
     TensorNetworks::Matrix4RT H12=itsH->BuildLocalMatrix();
     //    TensorNetworks::iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder,1e-13);
-    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
+//  TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
 //    TensorNetworks::MPO* expH=itsH->CreateUnitOperator();
-//    TensorNetworks::MPO* expH=new TensorNetworks::MPO_SpatialTrotter(dt,TensorNetworks::Even,L,S,H12);
-//    expH->Report(cout);
+    TensorNetworks::MPO* expH=new TensorNetworks::MPO_SpatialTrotter(dt,TensorNetworks::Odd,L,S,H12);
+    expH->Report(cout);
 //    expH->Dump(cout);
 
+    EXPECT_NEAR(itsMPS->GetOverlap(itsMPS),1.0,1e-13);
     TensorNetworks::MPS* psi1=itsMPS->Apply(expH);
-    EXPECT_NEAR(psi1->GetOverlap(psi1),1.0,1e-13);
-
+    double o1=psi1->GetOverlap(psi1);
 //    itsMPS->Report(cout);
-    EXPECT_NEAR(itsMPS->GetOverlap(psi1),1.0,1e-13);
     expH->CanonicalForm(TensorNetworks::DLeft); //Do we need to sweep both ways?
-    expH->Report(cout);
     TensorNetworks::MPS* psi2=itsMPS->Apply(expH);
-    EXPECT_NEAR(psi1->GetOverlap(psi2),1.0,1e-13);
+    EXPECT_NEAR(psi1->GetOverlap(psi2),o1,1e-13);
     expH->CanonicalForm(TensorNetworks::DRight);
 //    expH->Report(cout);
     TensorNetworks::MPS* psi3=itsMPS->Apply(expH);
-    EXPECT_NEAR(psi1->GetOverlap(psi3),1.0,1e-13);
+    EXPECT_NEAR(psi1->GetOverlap(psi3),o1,1e-13);
 
     expH->CompressParker(0,1e-13);
-//    expH->Report(cout);
-    EXPECT_EQ(expH->GetMaxDw(),2);
+    expH->Report(cout);
+    TensorNetworks::MPS* psi4=itsMPS->Apply(expH);
+    EXPECT_NEAR(psi1->GetOverlap(psi4),o1,1e-13);
+
+    EXPECT_EQ(expH->GetMaxDw(),4);
 //    double E2comp=itsMPS->GetExpectation(H2);
 //    EXPECT_NEAR(E2,E2right,1e-13);
 //    EXPECT_NEAR(E2,E2comp ,1e-13);
