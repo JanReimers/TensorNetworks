@@ -159,7 +159,7 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
     {
         case DLeft:
         {
-            if (V.GetNumRows()==0) return; //This will happen at the edges of an MPO
+            if (V.size()==0) return; //This will happen at the edges of an MPO
             assert(V.GetNumRows()==itsd*itsd*(X1+1)); // Treate these like enforced comments on the
             assert(V.GetNumCols()==X2+1);             // dimensions of each matrix.
             auto [Qp,Lp]=QRsolver.SolveThinQL(V); //Solves V=Q*L
