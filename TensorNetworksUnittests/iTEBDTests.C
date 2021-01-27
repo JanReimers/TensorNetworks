@@ -740,7 +740,7 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12_Gates_FourthOrder)
     EXPECT_GT(E,-0.4431471805599453094172);
 }
 
-TEST_F(iTEBDTests,FindiTimeGSD4S12_MPOs_FirstOrder)
+/*TEST_F(iTEBDTests,FindiTimeGSD4S12_MPOs_FirstOrder)
 {
     int UnitCell=2,D=8,maxIter=10000;
     double S=0.5,epsSVD=0.0;
@@ -858,7 +858,7 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12_iMPOs_SecondOrder)
 #endif
     EXPECT_GT(E,-0.4431471805599453094172);
 }
-
+*/
 
 TEST_F(iTEBDTests,FindiTimeGSD32S12)
 {
