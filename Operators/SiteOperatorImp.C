@@ -257,13 +257,41 @@ void SiteOperatorImp::Report(std::ostream& os) const
     << std::setw(3) << Dw.Dw1 << " "
     << std::setw(3) << Dw.Dw2 << " "
     << std::setw(3) << itsDw.Dw1 << " "
-    << std::setw(3) << itsDw.Dw2 << " "
+    << std::setw(3) << itsDw.Dw2 << "   "
     << std::scientific << std::setprecision(1) << itsTruncationError
-    << std::fixed << " " << GetFrobeniusNorm()
-    << std::fixed << " " << GetiFrobeniusNorm()
-    << " " << GetNormStatus(1e-13)
+    << " " << std::fixed << std::setprecision(1) << std::setw(5) << GetFrobeniusNorm()
+    << " " << std::fixed << std::setprecision(1) << std::setw(5) << GetiFrobeniusNorm()
+    << " " << std::setw(4) << GetNormStatus(1e-13)
+    << " " << std::setw(4) << GetUpperLower(1e-13)
+    << " " << std::setw(4) << GetLRB() //Left, Bulk, Right
 //    << " " << itsDw12.w1_first << " " << itsDw12.w2_last
     ;
+}
+
+char SiteOperatorImp::GetUpperLower(double eps) const
+{
+    char ret=' ';
+    for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
+        {
+            if (IsUpperTriangular(GetiW(n,m),eps))
+            {
+                if (ret==' ')
+                    ret='U';
+                else if (ret=='L')
+                    ret='M'; //Mix
+            }
+            else if (IsLowerTriangular(GetiW(n,m),eps))
+            {
+                if (ret==' ')
+                    ret='L';
+                else if (ret=='U')
+                    ret='M'; //Mix
+            }
+            else
+                ret='F'; // Full
+        }
+    return ret;
 }
 
 double SiteOperatorImp::GetFrobeniusNorm() const

@@ -13,8 +13,8 @@
 -MPOImp::MPOImp(int L, double S, const TensorT& W) does all Bulk, correct?!?!?
 -MPO Use TensorProduct in combine
 -Trotter MPO and iMPO have a lot of duplicated code for calculating exp(-t*H) and factoring it.
--MPOs show lower/upper triangular in Report
--MPOs show Left/Bulk/Right in Report
+Done: -MPOs show lower/upper triangular in Report
+Done: -MPOs show Left/Bulk/Right in Report
 -Create iMPOs directly, get rid of the convert method.
         Done for iH and iH^2
 -Add asserts to confirm zeros in Lp matrices are indeed zero.

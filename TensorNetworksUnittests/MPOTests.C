@@ -419,14 +419,18 @@ TEST_F(MPOTests,TestParkerSVDCompressHL9)
     itsMPS->InitializeWith(TensorNetworks::Random);
 
     TensorNetworks::iMPO* H=itsH;
+    H->Report(cout);
     EXPECT_EQ(H->GetNormStatus(),"WWWWWWWWW");
     double E=itsMPS->GetExpectation(itsH);
     H->CanonicalForm(TensorNetworks::DLeft); //Do we need to sweep both ways? Yes!!!!
     EXPECT_EQ(H->GetNormStatus(),"LLLLLLLLW");
+    H->Report(cout);
     H->CanonicalForm(TensorNetworks::DRight);
     EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR");
     double Eright=itsMPS->GetExpectation(itsH);
+    H->Report(cout);
     H->CompressParker(0,1e-13);
+    H->Report(cout);
     EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR");
     double Ecomp=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E,Eright,1e-13);
@@ -443,15 +447,18 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L9)
     TensorNetworks::MPO* H2=itsH->CreateUnitOperator();
     H2->Combine(itsH);
     H2->Combine(itsH);
+    H2->Report(cout);
 
     EXPECT_EQ(H2->GetNormStatus(),"WWWWWWWWW");
     double E2=itsMPS->GetExpectation(H2);
     H2->CanonicalForm(TensorNetworks::DLeft); //Do we need to sweep both ways?
     EXPECT_EQ(H2->GetNormStatus(),"LLLLLLLLW");
     H2->CanonicalForm(TensorNetworks::DRight);
+    H2->Report(cout);
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     double E2right=itsMPS->GetExpectation(H2);
     H2->CompressParker(0,1e-13);
+    H2->Report(cout);
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     double E2comp=itsMPS->GetExpectation(H2);
     EXPECT_NEAR(E2,E2right,1e-13);
@@ -473,6 +480,7 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L256)
     H2->CanonicalForm(TensorNetworks::DRight);
     double E2right=itsMPS->GetExpectation(H2);
     H2->CompressParker(0,1e-13);
+//    H2->Report(cout);
     double E2comp=itsMPS->GetExpectation(H2);
     EXPECT_NEAR(E2,E2right,1e-13);
     EXPECT_NEAR(E2,E2comp ,1e-13);

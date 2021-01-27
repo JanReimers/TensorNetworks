@@ -30,6 +30,7 @@ class SiteOperatorLeft
 
         virtual void Combine(const SiteOperator* O2,double factor);
         virtual double GetFrobeniusNorm() const {return SiteOperatorImp::GetFrobeniusNorm();};
+        virtual char   GetLRB() const {return 'L';}
 
         virtual void Init_lr(int oneIndex);
         virtual void Update();

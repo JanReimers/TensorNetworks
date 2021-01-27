@@ -25,9 +25,12 @@ void iMPO::Report(std::ostream& os) const
 {
     int L=GetL();
     os << "infinite Matrix Product Operator for " << L << " sites." << std::endl;
+    os << " Site    Dw      iDw      SVD      F-norm    Norm  U/L  LRB" << std::endl;
+    os << "  #     1   2   1   2   Tr err    fin   inf  stat          " << std::endl;
+    os << "-----------------------------------------------------------" << std::endl;
     for (int ia=1;ia<=L;ia++)
     {
-        os << "   Site " << ia << ": ";
+        os << std::setw(4) << ia << ": ";
         GetSiteOperator(ia)->Report(os);
         os << std::endl;
     }
@@ -36,7 +39,7 @@ void iMPO::Report(std::ostream& os) const
 void  iMPO::Dump(std::ostream& os) const
 {
     int L=GetL();
-    os << "Matrix Product Operator for " << L << " sites." << std::endl;
+    os << "Infinite Matrix Product Operator for " << L << " sites." << std::endl;
     for (int ia=1;ia<=L;ia++)
     {
         os << "   Site " << ia << ": " << std::fixed << std::setprecision(3);

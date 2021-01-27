@@ -29,6 +29,7 @@ class SiteOperatorBulk
         }
 
         virtual double GetFrobeniusNorm() const {return SiteOperatorImp::GetFrobeniusNorm();};
+        virtual char   GetLRB() const {return 'B';}
         virtual void Update();
         virtual void CheckDws() const;
 };
