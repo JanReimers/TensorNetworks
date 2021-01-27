@@ -445,7 +445,7 @@ double iTEBDStateImp::GetExpectation (const iMPO* o) const
     double E1;
     ReCenter(1);
     {
-        cout << "Oerr=" << GetOrthonormalityErrors() << endl;
+//        cout << "Oerr=" << GetOrthonormalityErrors() << endl;
         assert(GetOrthonormalityErrors()<1e-11);
 
         dVectorT A=lambdaB()*ContractAlB();
@@ -538,7 +538,7 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
     assert(D==A[0].GetNumCols());
 
     const SiteOperator* so=o->GetSiteOperator(1);
-    so->Report(cout); cout << endl;
+//    so->Report(cout); cout << endl;
     int Dw=so->GetDw12().Dw1;
     assert(Dw==so->GetDw12().Dw2);
 #ifdef DEBUG
@@ -681,7 +681,7 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
                         Echeck(i2,j2)+=conj(A[m](i1,i2))*E[w1](i1,j1)*A[m](j1,j2);
              MatrixCT err=E[w1]-Echeck-C;
 //             cout << "err=" << std::fixed << err << endl;
-             cout << std::scientific << Max(fabs(err)) << endl;
+//             cout << std::scientific << Max(fabs(err)) << endl;
 
         }
     }
