@@ -24,7 +24,6 @@ protected:
         MPOImp(int L, double S,LoadWith);
         MPOImp(int L, double S,const TensorT& W);
         virtual ~MPOImp();
-        virtual void ConvertToiMPO(int UnitCell); //Strip away edge sites with w=1.
 
         virtual int    GetL() const {return itsL;}
         virtual double GetS() const {return itsS;}

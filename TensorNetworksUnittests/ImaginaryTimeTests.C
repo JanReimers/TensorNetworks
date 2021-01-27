@@ -319,7 +319,6 @@ TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotterL2)
 
     itsMPS->Normalize(TensorNetworks::DLeft);
     itsMPS->Normalize(TensorNetworks::DRight);
-    TensorNetworks::MPO* temp=itsH->CreateH2Operator();
 
     TensorNetworks::Epsilons eps(1e-12);
     eps.itsMPOCompressEpsilon=1e-5;

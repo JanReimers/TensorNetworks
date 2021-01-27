@@ -369,13 +369,13 @@ TEST_F(MPOTests,TestL2iMPOTrotter2)
     double S=0.5,dt=0.1,epsMPO=6e-3;
     Setup(L,S,D);
     TensorNetworks::iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder,epsMPO);
-//    expH->Report(cout);
-//    for (int is=1;is<=L;is++)
-//    {
-//        TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
-//        EXPECT_EQ(Dw.Dw1,4);
-//        EXPECT_EQ(Dw.Dw2,4);
-//    }
+    expH->Report(cout);
+    for (int is=1;is<=L;is++)
+    {
+        TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
+        EXPECT_EQ(Dw.Dw1,4);
+        EXPECT_EQ(Dw.Dw2,4);
+    }
 }
 //TEST_F(MPOTests,TestL2iMPOTrotter4)
 //{

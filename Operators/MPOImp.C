@@ -70,38 +70,6 @@ MPOImp::~MPOImp()
     //dtor
 }
 
-void MPOImp::ConvertToiMPO(int UnitCell)
-{
-    assert((itsL-UnitCell)%2==0); //(itsL-UnitCell) needs to be even.
-    int n=(itsL-UnitCell)/2; //Strip away this many sites from each end.
-    //
-    //  This ends up being a #$*#(*$^# mess because ptr_vector doesn't support revers iterators.
-    //
-    for (int in=1; in<=n; in++)
-    {
-        auto is=itsSites.begin();
-        is++; // skip dummy site a index [0]
-        itsSites.erase(is);
-    }
-    for (int in=1; in<=n; in++)
-    {
-        auto is=itsSites.begin();
-        for (int i=0; i<=UnitCell; i++,is++);
-        itsSites.erase(is);
-    }
-    itsL=UnitCell;
-    //
-    //  Link first and last sites.
-    //
-    SiteOperatorImp* s=dynamic_cast<SiteOperatorImp*>(itsSites[1]);
-    assert(s);
-    s->SetNeighbours(itsSites[itsL  ],itsSites[2]);
-    s=dynamic_cast<SiteOperatorImp*>(itsSites[itsL]);
-    assert(s);
-    s->SetNeighbours(itsSites[itsL-1],itsSites[1]);
-
-}
-
 void MPOImp::Insert(SiteOperator* so)
 {
     assert(so);

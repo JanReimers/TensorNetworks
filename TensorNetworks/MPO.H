@@ -16,7 +16,6 @@ class MPO
     public:
         MPO() {};
         virtual ~MPO() {};
-        virtual void ConvertToiMPO(int UnitCell)=0; //Strip away edge sites with w=1.
 
         virtual const SiteOperator* GetSiteOperator(int isite) const;
         virtual       SiteOperator* GetSiteOperator(int isite)      =0;
