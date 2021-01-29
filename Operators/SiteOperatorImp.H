@@ -65,8 +65,7 @@ class SiteOperatorImp : public virtual SiteOperator
         //
         //  SVD compress and normalize to reduce Dw
         //
-        virtual void CompressStd   (Direction,const SVCompressorR*);
-        virtual void CompressParker(Direction,const SVCompressorR*);
+        virtual void Compress(CompressType,Direction,const SVCompressorR*);
         //
         //  As per Parker et. al.
         //
@@ -87,6 +86,8 @@ class SiteOperatorImp : public virtual SiteOperator
         friend class iMPOImp;
         void SetiW(int m, int n, const MatrixRT& W);
 
+        void CompressStd   (Direction,const SVCompressorR*);
+        void CompressParker(Direction,const SVCompressorR*);
         void SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV);
         void  QLTransfer(Direction lr,const MatrixRT& L);
 

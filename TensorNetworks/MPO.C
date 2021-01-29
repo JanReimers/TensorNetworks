@@ -74,60 +74,28 @@ void MPO::Product(const MPO* O2)
         GetSiteOperator(ia)->Product(O2->GetSiteOperator(ia));
 }
 
-double MPO::CompressStd(int Dmax, double epsSV)
+double MPO::Compress(CompressType ct,int Dmax, double epsSV)
 {
     Factory* f=Factory::GetFactory();
     SVCompressorR* comp=f->MakeMPOCompressor(Dmax,epsSV);
-    double compressionError=CompressStd(comp);
+    double compressionError=Compress(ct,comp);
     delete comp;
     delete f;
     return compressionError;
 }
 
-double MPO::CompressParker(int Dmax, double epsSV)
-{
-    Factory* f=Factory::GetFactory();
-    SVCompressorR* comp=f->MakeMPOCompressor(Dmax,epsSV);
-    double compressionError=CompressParker(comp);
-    delete comp;
-    delete f;
-    return compressionError;
-}
-
-
-double MPO::CompressStd(const SVCompressorR* compressor)
-{
-    int L=GetL();
-    Vector<int> oldDws(L),newDws(L);
-    for (int ia=1;ia<L;ia++)
-    {
-        oldDws(ia)=GetSiteOperator(ia)->GetDw12().Dw2;
-        GetSiteOperator(ia)->CompressStd(DLeft ,compressor);
-    }
-    oldDws(L)=0;
-    for (int ia=L;ia>1;ia--)
-    {
-        GetSiteOperator(ia)->CompressStd(DRight,compressor);
-        newDws(ia)=GetSiteOperator(ia)->GetDw12().Dw1;
-    }
-//    newDws(1)=0;
-//    double percent=100-(100.0*Sum(newDws))/static_cast<double>(Sum(oldDws));
-////    std::cout << "% compression=" << std::fixed << std::setprecision(2) << percent << std::endl;
-    return 0.0;
-}
-double MPO::CompressParker(const SVCompressorR* compressor)
+double MPO::Compress(CompressType ct, const SVCompressorR* compressor)
 {
     int L=GetL();
     for (int ia=1;ia<L;ia++)
-        GetSiteOperator(ia)->CompressParker(DLeft ,compressor);
+        GetSiteOperator(ia)->Compress(ct,DLeft ,compressor);
     for (int ia=L;ia>1;ia--)
-        GetSiteOperator(ia)->CompressParker(DRight ,compressor);
+        GetSiteOperator(ia)->Compress(ct,DRight ,compressor);
     return 0.0;
 }
 
 void MPO::CanonicalForm(Direction lr)
 {
-//    GetSiteOperator(3)->CanonicalForm(lr);
     int L=GetL();
     switch (lr)
     {

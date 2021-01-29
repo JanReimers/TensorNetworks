@@ -10,7 +10,7 @@ MPO* Hamiltonian::CreateH2Operator  () const
     MPO* H2=CreateUnitOperator();
     H2->Product(this);
     H2->Product(this);
-    H2->CompressStd(0,1e-13);
+    H2->Compress(TensorNetworks::Std,0,1e-13);
     return H2;
 }
 Matrix4RT Hamiltonian::GetExponentH(double dt) const

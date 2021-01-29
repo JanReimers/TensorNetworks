@@ -82,7 +82,7 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) 
             iMPO_SpatialTrotter Weven(dt,Even,L,S,this);
             W->Product(&Weven);
             W->Product(&Wodd);
-            W->CompressStd(0,epsMPO);
+            W->Compress(TensorNetworks::Std,0,epsMPO);
             break;
         }
         case SecondOrder :
@@ -97,7 +97,7 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) 
 //            W->Report(cout);
             W->Product(&Wodd);
 //            W->Report(cout);
-            W->CompressStd(0,epsMPO);
+            W->Compress(TensorNetworks::Std,0,epsMPO);
             break;
         }
         case FourthOrder :
@@ -121,7 +121,7 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) 
                 U.Product(&Weven);
                 U.Product(&Wodd);
                 W->Product(&U);
-                W->CompressStd(0,epsMPO);
+                W->Compress(TensorNetworks::Std,0,epsMPO);
                 assert(W->GetMaxDw()<=4096);
             }
             break;

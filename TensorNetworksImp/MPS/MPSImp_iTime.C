@@ -41,7 +41,7 @@ double MPSImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule
     SVCompressorC* mps_compressor =Factory::GetFactory()->MakeMPSCompressor(isl.itsDmax,isl.itsEps.itsMPSCompressEpsilon);
     SVCompressorR* mpo_compressor =Factory::GetFactory()->MakeMPOCompressor(0          ,isl.itsEps.itsMPOCompressEpsilon);
     MPO* W =H->CreateOperator(isl.itsdt,isl.itsTrotterOrder);
-    W->CompressStd(mpo_compressor);
+    W->Compress(TensorNetworks::Std,mpo_compressor);
 //    W->Report(cout);
 //    Logger->LogInfoV(1,"   Begin iterations, dt=%.3f,  Dw=%4d, GetMaxD=%4d, isl.Dmax=%4d, epsMPO=%.1e, epsMPS=%.1e ",isl.itsdt,W->GetMaxDw(),GetMaxD(),isl.itsDmax,isl.itsEps.itsMPOCompressEpsilon,isl.itsEps.itsMPSCompressEpsilon);
     Logger->LogInfo(2,"iter oiter      E          dE    dlambda    D1   D2");

@@ -188,7 +188,7 @@ TEST_F(ImaginaryTimeTests,MPOCompressSeconderOrderTrotter_dt0)
 
     TensorNetworks::MPS* Psi2=itsMPS->Apply(W);
     EXPECT_NEAR(itsMPS->GetOverlap(Psi2),1.0,eps);
-    W->CompressStd(0,epsSVD);
+    W->Compress(TensorNetworks::Std,0,epsSVD);
     TensorNetworks::MPS* Psi3=itsMPS->Apply(W);
     EXPECT_NEAR(itsMPS->GetOverlap(Psi3),1.0,1e-7);
     EXPECT_NEAR(Psi2->GetOverlap(Psi3),1.0,1e-7);

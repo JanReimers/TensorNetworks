@@ -11,6 +11,20 @@ namespace TensorNetworks
 using std::cout;
 using std::endl;
 
+void SiteOperatorImp::Compress(CompressType ct,Direction lr,const SVCompressorR* comp)
+{
+    switch (ct)
+    {
+    case Std:
+        CompressStd(lr,comp);
+        break;
+    case Parker:
+        CompressParker(lr,comp);
+        break;
+    default:
+        assert(false);
+    }
+}
 
 MatrixRT MakeBlockMatrix(const MatrixRT& M,int Dr,int Dc,int offset)
 {

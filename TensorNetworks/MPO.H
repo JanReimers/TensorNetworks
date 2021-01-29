@@ -34,10 +34,8 @@ public:
     //  High level MPO operations
     //
     virtual void   Product(const MPO* O2);
-    virtual double CompressStd   (int Dmax, double epsSV);
-    virtual double CompressStd   (const SVCompressorR*);
-    virtual double CompressParker(int Dmax, double epsSV);
-    virtual double CompressParker(const SVCompressorR*);
+    virtual double Compress(CompressType,int Dmax, double epsSV);
+    virtual double Compress(CompressType,const SVCompressorR*);
     virtual void   CanonicalForm(Direction LR);
 };
 

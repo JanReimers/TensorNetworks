@@ -1,11 +1,5 @@
 
--Speed up unit tests
-    -iTEBDTests.TestApplyIdentityRangeSD
-    -iTEBDTests.TestApplyIdentityRangeSD
-    -iTEBDTests.TestApplyExpHRangeSD
-    -iTEBDTests.FindiTimeGSD4S12_Gates_FourthOrder
-    -iTEBDTests.FindiTimeGSD32S12
-    - VariationalGroundStateTests.TestSweepL9S1D8_growD
+Done: -Speed up unit tests
 -Log level 0 should have no output
 -Can we move MakeUnitcelliMPO in iMPO.C base class?
 Done: -Do we really need iMPO::Combine ? Than answer seems to be NO!
@@ -16,7 +10,8 @@ Done: -SiteOperatorImp use delegate constructors
 Done: -MPO/iMPO Get rid of factor in Combine. Rename Combine to Product.
 -MPO Add (rather than combine) MPOs to do:
             S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
--MPO use enum to choose Std or Parker compression
+Done: -MPO use enum to choose Std or Parker compression
+-pass Std/Parker to Trotter constructors as a parameter.
 -MPO clean up compress return values.
 -MPO Use TensorProduct in combine
 -Trotter MPO and iMPO have a lot of duplicated code for calculating exp(-t*H) and factoring it.

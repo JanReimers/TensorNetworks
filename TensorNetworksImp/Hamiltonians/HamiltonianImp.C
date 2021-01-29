@@ -100,11 +100,11 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
                 //U.Compress(0,1e-12); //Does not seem to help
                 U.Product(&Wodd);
                 //U.Report(cout);
-                U.CompressStd(0,1e-12); //Useful for large S
+                U.Compress(TensorNetworks::Std,0,1e-12); //Useful for large S
                 //U.Report(cout);
                 W->Product(&U);
                 //W->Report(cout);
-                W->CompressStd(0,1e-12);
+                W->Compress(TensorNetworks::Std,0,1e-12);
                 //W->Report(cout);
                 assert(W->GetMaxDw()<=4096);
             }
