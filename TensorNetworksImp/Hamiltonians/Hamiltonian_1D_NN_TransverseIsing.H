@@ -12,27 +12,21 @@ namespace TensorNetworks
 class Hamiltonian_1D_NN_TransverseIsing
     : public virtual OperatorClient
 {
-    public:
-        Hamiltonian_1D_NN_TransverseIsing(double S, double J, double hx);
-        virtual ~Hamiltonian_1D_NN_TransverseIsing();
+public:
+    Hamiltonian_1D_NN_TransverseIsing(double S, double J, double hx);
+    virtual ~Hamiltonian_1D_NN_TransverseIsing();
+    //
+    //  OperatorClient interface
+    //
+    virtual double   GetS   () const {return itsS;}
+    virtual Dw12     GetDw12() const {return Dw12(Dw,Dw);}
+    virtual MatrixRT GetW   (int m, int n) const;
+    virtual double   GetH   (int ma,int na,int mb,int nb) const;
 
-    private:
-        //
-        //  OperatorClient interface
-        //
-        virtual double   GetS   () const {return itsS;}
-        virtual MatrixRT GetW   (int m, int n) const;
-        virtual Dw12     GetDw12() const {return Dw12(Dw,Dw);}
-
-        virtual  double GetH(int ma,int na,int mb,int nb,const SpinCalculator& sc) const
-        {
-            return +itsJ*sc.GetSz(ma,na)*sc.GetSz(mb,nb)
-            +itshx*(sc.GetSx(ma,na)+sc.GetSx(mb,nb)); //Should we only include one site here?
-        }
-
-        static const int Dw=3;
-//        int    itsL  MPOImp has L
-        double itsS,itsJ,itshx; //NN coupling constants and external field
+private:
+    static const int Dw=3;
+    double itsS,itsJ,itshx; //NN coupling constants and external field
+    SpinCalculator itsSC;
 };
 }
 

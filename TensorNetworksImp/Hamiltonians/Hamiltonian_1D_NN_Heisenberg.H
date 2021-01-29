@@ -12,22 +12,21 @@ namespace TensorNetworks
 class Hamiltonian_1D_NN_Heisenberg
     : public virtual OperatorClient
 {
-    public:
-        Hamiltonian_1D_NN_Heisenberg(double S, double Jxy,double Jz, double hz);
-        virtual ~Hamiltonian_1D_NN_Heisenberg();
-        //
-        //  OperatorClient interface
-        //
-        virtual double   GetS   () const {return itsS;}
-        virtual MatrixRT GetW   (int m, int n) const;
-        virtual Dw12     GetDw12() const {return Dw12(Dw,Dw);}
-//        virtual double   GetH(int ma,int na,int mb,int nb,const SpinCalculator& sc) const;
-    virtual double   GetH   (int ma,int na,int mb,int nb,const SpinCalculator& sc) const;
+public:
+    Hamiltonian_1D_NN_Heisenberg(double S, double Jxy,double Jz, double hz);
+    virtual ~Hamiltonian_1D_NN_Heisenberg();
+    //
+    //  OperatorClient interface
+    //
+    virtual double   GetS   () const {return itsS;}
+    virtual Dw12     GetDw12() const {return Dw12(Dw,Dw);}
+    virtual MatrixRT GetW   (int m, int n) const;
+    virtual double   GetH   (int ma,int na,int mb,int nb) const;
 
-    private:
-        static const int Dw=5;
-//        int    itsL  MPOImp has L
-        double itsS,itsJxy,itsJz,itshz; //NN coupling constants and external field
+private:
+    static const int Dw=5;
+    double itsS,itsJxy,itsJz,itshz; //NN coupling constants and external field
+    SpinCalculator itsSC;
 };
 }
 

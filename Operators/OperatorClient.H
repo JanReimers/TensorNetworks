@@ -16,12 +16,14 @@ public:
     OperatorClient() {}
     virtual ~OperatorClient() {}
 
-    virtual double   GetS   () const=0;
-    virtual Dw12     GetDw12() const=0;
-    virtual MatrixRT GetW   (int m, int n) const=0;
-    virtual double   GetH   (int ma,int na,int mb,int nb,const SpinCalculator& sc) const=0;
+    virtual double    GetS   () const=0;
+    virtual Dw12      GetDw12() const=0;
+    virtual Matrix4RT GetH12 () const  ; //Two site interaction matrix
+    virtual double    GetH   (int ma,int na,int mb,int nb) const=0;
+    virtual MatrixRT  GetW   (int m, int n) const=0;
 };
 
+// Unit operator k-delta function
 inline double I(int m, int n)
 {
     assert(m>=0);
@@ -30,7 +32,6 @@ inline double I(int m, int n)
     if (n==m) ret=1.0;
     return ret;
 }
-
 
 }
 #endif // OPERATORCLIENT_H

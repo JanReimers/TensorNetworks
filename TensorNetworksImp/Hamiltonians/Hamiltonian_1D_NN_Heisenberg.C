@@ -14,6 +14,7 @@ Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(double S, double Jxy,
     , itsJxy(Jxy)
     , itsJz (Jz)
     , itshz (hz)
+    , itsSC (S)
 {
     assert(fabs(itsJxy)+fabs(Jz)>0.0);
 }
@@ -31,26 +32,26 @@ Hamiltonian_1D_NN_Heisenberg::~Hamiltonian_1D_NN_Heisenberg()
 //
 MatrixRT Hamiltonian_1D_NN_Heisenberg::GetW (int m, int n) const
 {
-    SpinCalculator sc(itsS);
     MatrixRT W(Dw,Dw);
     Fill(W,0.0);
     W(1,1)=I(m,n);
-    W(2,1)=sc.GetSp(m,n);
-    W(3,1)=sc.GetSm(m,n);
-    W(4,1)=sc.GetSz(m,n);
-    W(5,1)=itshz*sc.GetSz(m,n);
-    W(5,2)=itsJxy/2.0*sc.GetSm(m,n);
-    W(5,3)=itsJxy/2.0*sc.GetSp(m,n);
-    W(5,4)=itsJz     *sc.GetSz(m,n); //The get return 2*Sz to avoid half integers
+    W(2,1)=itsSC.GetSp(m,n);
+    W(3,1)=itsSC.GetSm(m,n);
+    W(4,1)=itsSC.GetSz(m,n);
+    W(5,1)=itshz*itsSC.GetSz(m,n);
+    W(5,2)=itsJxy/2.0*itsSC.GetSm(m,n);
+    W(5,3)=itsJxy/2.0*itsSC.GetSp(m,n);
+    W(5,4)=itsJz     *itsSC.GetSz(m,n); //The get return 2*Sz to avoid half integers
     W(5,5)=I(m,n);
     return W;
 }
 
-double Hamiltonian_1D_NN_Heisenberg::GetH(int ma,int na,int mb,int nb,const SpinCalculator& sc) const
+
+double Hamiltonian_1D_NN_Heisenberg::GetH(int ma,int na,int mb,int nb) const
 {
-    return 0.5*itsJxy*(sc.GetSp(ma,na)*sc.GetSm(mb,nb)+sc.GetSm(ma,na)*sc.GetSp(mb,nb))
-    +itsJz*sc.GetSz(ma,na)*sc.GetSz(mb,nb)
-    +itshz*(sc.GetSz(ma,na)+sc.GetSz(mb,nb)); //Should we only include one stie here?
+    return 0.5*itsJxy*(itsSC.GetSp(ma,na)*itsSC.GetSm(mb,nb)+itsSC.GetSm(ma,na)*itsSC.GetSp(mb,nb))
+    +itsJz*itsSC.GetSz(ma,na)*itsSC.GetSz(mb,nb)
+    +itshz*(itsSC.GetSz(ma,na)+itsSC.GetSz(mb,nb)); //Should we only include one stie here?
 }
 
 

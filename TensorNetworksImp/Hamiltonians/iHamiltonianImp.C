@@ -1,7 +1,6 @@
 #include "TensorNetworksImp/Hamiltonians/iHamiltonianImp.H"
 #include "Operators/OperatorClient.H"
 #include "Operators/SiteOperatorBulk.H"
-#include "TensorNetworksImp/SpinCalculator.H"
 #include "TensorNetworks/CheckSpin.H"
 #include <iostream>
 
@@ -19,13 +18,7 @@ iHamiltonianImp::iHamiltonianImp(int L, const OperatorClient* W)
         iMPOImp::Insert(new SiteOperatorBulk(d,W));
     iMPOImp::LinkSites();
 
-    itsH12=Matrix4RT(d,d,d,d,0);
-    SpinCalculator sc(W->GetS());
-    for (int n1=0;n1<d;n1++)
-        for (int n2=0;n2<d;n2++)
-            for (int m1=0;m1<d;m1++)
-                for (int m2=0;m2<d;m2++)
-                    itsH12(m1,m2,n1,n2)=W->GetH(m1,n1,m2,n2,sc);
+    itsH12=W->GetH12();
 }
 
 iHamiltonianImp::~iHamiltonianImp()
