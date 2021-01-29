@@ -1,7 +1,7 @@
 
 -Can we move MakeUnitcelliMPO in iMPO.C base class?
 Done: -Do we really need iMPO::Combine ? Than answer seems to be NO!
--SiteOperatorImp use delegate constructors
+Done: -SiteOperatorImp use delegate constructors
 -MPO/iMPO areSitesLinked only used in asserts, can we lose them?
 -iTEBDState::FindiTimeGroundState takes a Hamiltonian instead of an iHamiltonian
     simply because we are not very good taking expectation values of iMPOs yet

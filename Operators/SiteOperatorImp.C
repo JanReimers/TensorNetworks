@@ -31,12 +31,7 @@ SiteOperatorImp::SiteOperatorImp(int d)
 }
 
 SiteOperatorImp::SiteOperatorImp(int d, double S, SpinOperator so) //Construct spin operator
-    : itsd(d)
-    , itsDw(1,1)
-    , itsTruncationError(0.0)
-    , isShapeDirty(true) //Init_lr will turn this off
-    , isData_Dirty(true) //Init_lr will turn this off
-    , itsWs(d,d)
+    : SiteOperatorImp(d)
 {
     SpinCalculator sc(S);
     for (int m=0; m<itsd; m++)
@@ -51,13 +46,9 @@ SiteOperatorImp::SiteOperatorImp(int d, double S, SpinOperator so) //Construct s
 //  Build from a W rep object
 //
 SiteOperatorImp::SiteOperatorImp(int d, const OperatorClient* H)
-    : itsd(d)
-    , itsDw(H->GetDw12())
-    , itsTruncationError(0.0)
-    , isShapeDirty(true) //Init_lr will turn this off
-    , isData_Dirty(true) //Init_lr will turn this off
-    , itsWs(d,d)
+    : SiteOperatorImp(d)
 {
+    itsDw=H->GetDw12();
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)
         {
@@ -71,12 +62,7 @@ SiteOperatorImp::SiteOperatorImp(int d, const OperatorClient* H)
 // Build from a trotter decomp.
 //
 SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s)
-    : itsd(d)
-    , itsDw()
-    , itsTruncationError(0.0)
-    , isShapeDirty(true) //Init_lr will turn this off
-    , isData_Dirty(true) //Init_lr will turn this off
-    , itsWs(d,d)
+    : SiteOperatorImp(d)
 {
     int Dw=s.GetNumRows();
     if (lr==DLeft)
@@ -121,13 +107,9 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const Di
 // Construct with W operator
 //
 SiteOperatorImp::SiteOperatorImp(int d, const TensorT& W)
-    : itsd(d)
-    , itsDw()
-    , itsTruncationError(0.0)
-    , isShapeDirty(true) //Init_lr will turn this off
-    , isData_Dirty(true) //Init_lr will turn this off
-    , itsWs(W)
+    : SiteOperatorImp(d)
 {
+    itsWs=W;
     int Dw=itsWs(1,1).GetNumRows();
     assert(itsWs(1,1).GetNumCols()==Dw);
     itsDw=Dw12(Dw,Dw);

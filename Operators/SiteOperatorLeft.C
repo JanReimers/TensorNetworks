@@ -17,7 +17,7 @@ SiteOperatorLeft::SiteOperatorLeft(int d)
 
 SiteOperatorLeft::SiteOperatorLeft(int d, double S, SpinOperator so) //Construct spin operator
     : SiteOperatorImp(d,S,so)
-    , itsDw(1,1,Vector<int>(1),Vector<int>(1))
+    , itsDw(1,1)
     , itslWs(d,d)
 {
     Init_lr(SiteOperatorImp::itsDw.Dw1);
