@@ -105,6 +105,8 @@ TEST_F(VariationalGroundStateTests,TestSweepL9S1D2)
     EXPECT_LT(nSweep,maxIter);
 }
 
+#ifndef DEBUG
+
 TEST_F(VariationalGroundStateTests,TestSweepL9S1D8_growD)
 {
     int L=9,Dstart=2,D=8,maxIter=100;
@@ -125,7 +127,6 @@ TEST_F(VariationalGroundStateTests,TestSweepL9S1D8_growD)
     EXPECT_LT(nSweep,maxIter);
 }
 
-#ifndef DEBUG
 TEST_F(VariationalGroundStateTests,TestSweepL9S1D8)
 {
     int L=9,D=8,maxIter=100;

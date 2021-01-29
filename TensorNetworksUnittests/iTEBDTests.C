@@ -383,12 +383,14 @@ TEST_F(iTEBDTests,TestApplyiMPOIdentity)
 TEST_F(iTEBDTests,TestApplyIdentityRangeSD)
 {
    int UnitCell=2,Dmax=16;
+   double Smax=2.5;
 #ifdef DEBUG
-    Dmax=4;
+    Dmax=8;
+    Smax=1.5;
 #endif // DEBUG
     double epsSVD=0.0,epsMPO=1e-13,dt=0.0;
     for (int D=1;D<=Dmax;D*=2)
-        for (double S=0.5;S<=2.5;S+=0.5)
+        for (double S=0.5;S<=Smax;S+=0.5)
         {
             Setup(UnitCell,S,D,epsSVD,TensorNetworks::Gates);
  //           cout << "S,D=" << S << " " << D << endl;
@@ -466,7 +468,7 @@ TEST_F(iTEBDTests,TestApplyOrthoiMPOExpH)
     itsState->Orthogonalize(itsCompressor);
 
     iMPO* expH=itsiH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
-    expH->Report(cout);
+//    expH->Report(cout);
     itsState->ApplyOrtho(expH,itsCompressor);
     EXPECT_EQ(itsState->GetNormStatus(),"lr");
     delete expH;
@@ -572,13 +574,15 @@ TEST_F(iTEBDTests,TestApplyMPOExpH3)
 
 TEST_F(iTEBDTests,TestApplyExpHRangeSD)
 {
-       int UnitCell=2,Dmax=16;
+   int UnitCell=2,Dmax=16;
+   double Smax=2.5;
 #ifdef DEBUG
-    Dmax=4;
+    Dmax=8;
+    Smax=1.0;
 #endif // DEBUG
     double epsSVD=0.0,epsMPO=1e-13,dt=0.0;
     for (int D=1;D<=Dmax;D*=2)
-        for (double S=0.5;S<=2.5;S+=0.5)
+        for (double S=0.5;S<=Smax;S+=0.5)
         {
             Setup(UnitCell,S,D,epsSVD,TensorNetworks::Gates);
 //            cout << "S,D=" << S << " " << D << endl;
@@ -679,7 +683,7 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12_Gates_FirstOrder)
     itsState->InitializeWith(TensorNetworks::Random);
     TensorNetworks::IterationSchedule is=MakeSchedule(maxIter,D,TensorNetworks::FirstOrder);
     itsState->FindiTimeGroundState(itsH,itsiH,is);
-    itsState->Report(cout);
+//    itsState->Report(cout);
     double E=itsState->GetExpectation(itsiH);
 #ifdef DEBUG
     EXPECT_LT(E,-0.44105);   //D=4 we only seem to get this far right now.
@@ -703,7 +707,7 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12_Gates_SecondOrder)
     itsState->InitializeWith(TensorNetworks::Random);
     TensorNetworks::IterationSchedule is=MakeSchedule(maxIter,D,TensorNetworks::SecondOrder);
     itsState->FindiTimeGroundState(itsH,itsiH,is);
-    itsState->Report(cout);
+//    itsState->Report(cout);
     double E=itsState->GetExpectation(itsiH);
 #ifdef DEBUG
     EXPECT_LT(E,-0.44105);   //D=4 we only seem to get this far right now.
@@ -719,17 +723,18 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12_Gates_FourthOrder)
     int UnitCell=2,D=8,maxIter=400;
     double S=0.5,epsSVD=0.0;
 #ifdef DEBUG
-    D=4;
+    D=2;
     maxIter=200;
 #endif // DEBUG
     Setup(UnitCell,S,2,epsSVD,TensorNetworks::Gates);
     itsState->InitializeWith(TensorNetworks::Random);
     TensorNetworks::IterationSchedule is=MakeSchedule(maxIter,D,TensorNetworks::FourthOrder);
     itsState->FindiTimeGroundState(itsH,itsiH,is);
-    itsState->Report(cout);
+//    itsState->Report(cout);
     double E=itsState->GetExpectation(itsiH);
 #ifdef DEBUG
-    EXPECT_LT(E,-0.44105);   //D=4 we only seem to get this far right now.
+    EXPECT_LT(E,-0.427905);   //D=2 we only seem to get this far right now.
+//    EXPECT_LT(E,-0.44105);   //D=4 we only seem to get this far right now.
 //    EXPECT_LT(E,-0.442607); //D=4 From mps-tools.  This looks more like a D=8 result?!?
 #else
     EXPECT_LT(E,-0.442845); //Fourth order does not as well in the sixth digit.
@@ -858,6 +863,7 @@ TEST_F(iTEBDTests,FindiTimeGSD4S12_iMPOs_SecondOrder)
 }
 */
 
+#ifndef DEBUG
 TEST_F(iTEBDTests,FindiTimeGSD32S12)
 {
     int UnitCell=2,Dstart=8,Dmax=32,deltaD=8,maxIter=1000;
@@ -884,7 +890,7 @@ TEST_F(iTEBDTests,FindiTimeGSD32S12)
     EXPECT_GT(E,-0.4431471805599453094172);
 }
 
-
+#endif
 
 #include "Operators/iMPOImp.H"
 TEST_F(iTEBDTests,TestiMPOExpectation)

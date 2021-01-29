@@ -88,7 +88,7 @@ TEST_F(MPSNormTests,LRNormalMatriciesRandomStateL10S12D2)
     EXPECT_EQ(itsMPS->GetNormStatus(),"AAAAAAAAAA");
     itsMPS->Normalize(TensorNetworks::DRight);
     EXPECT_EQ(itsMPS->GetNormStatus(),"BBBBBBBBBB");
-    itsMPS->Report(cout);
+//    itsMPS->Report(cout);
 }
 TEST_F(MPSNormTests,LRNormalMatriciesRandomStateL10S12D8)
 {
@@ -98,7 +98,7 @@ TEST_F(MPSNormTests,LRNormalMatriciesRandomStateL10S12D8)
     EXPECT_EQ(itsMPS->GetNormStatus(),"AAAAAAAAAA");
     itsMPS->Normalize(TensorNetworks::DRight);
     EXPECT_EQ(itsMPS->GetNormStatus(),"BBBBBBBBBB");
-    itsMPS->Report(cout);
+//    itsMPS->Report(cout);
 }
 
 TEST_F(MPSNormTests,LeftNormalMatriciesRandomStateL10S3D3)

@@ -1,4 +1,12 @@
 
+-Speed up unit tests
+    -iTEBDTests.TestApplyIdentityRangeSD
+    -iTEBDTests.TestApplyIdentityRangeSD
+    -iTEBDTests.TestApplyExpHRangeSD
+    -iTEBDTests.FindiTimeGSD4S12_Gates_FourthOrder
+    -iTEBDTests.FindiTimeGSD32S12
+    - VariationalGroundStateTests.TestSweepL9S1D8_growD
+-Log level 0 should have no output
 -Can we move MakeUnitcelliMPO in iMPO.C base class?
 Done: -Do we really need iMPO::Combine ? Than answer seems to be NO!
 Done: -SiteOperatorImp use delegate constructors

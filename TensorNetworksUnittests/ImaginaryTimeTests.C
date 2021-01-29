@@ -341,7 +341,7 @@ TEST_F(ImaginaryTimeTests,TestITimeFirstOrderTrotterL2)
     EXPECT_NEAR(E1/(L-1),-0.75,1e-6);
 
     TensorNetworks::MPO* H2=itsH->CreateH2Operator();
-    H2->Report(cout);
+//    H2->Report(cout);
     double E2=itsMPS->GetExpectation(H2);
     EXPECT_NEAR(E2,E1*E1,1e-6);
 }
