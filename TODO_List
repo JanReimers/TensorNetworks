@@ -5,6 +5,8 @@
 -iTEBDState::FindiTimeGroundState takes a Hamiltonian instead of an iHamiltonian
     simply because we are not very good taking expectation values of iMPOs yet
 -Get rid of MPOcompressor
+-MPOImp do we really need LoadWith enums?
+-Ham/iHam move itsH12 calc into OperatorClient
 -Refactor: Lots of duplicated code for MPO/iMPOP Ham/iHam.
 -iMPOs, all sites should be bulk.  How to achieve this
     Done: -Stop deriving iMPOimp from MPOImp

@@ -3,13 +3,10 @@
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/SVCompressor.H"
-#include "oml/vector.h"
 #include "oml/matrix.h"
-#include <cassert>
 
 namespace TensorNetworks
 {
-
 
 const SiteOperator* MPO::GetSiteOperator(int isite) const
 {
@@ -57,6 +54,16 @@ void  MPO::Dump(std::ostream& os) const
         os << std::endl;
     }
 }
+
+std::string MPO::GetNormStatus () const
+{
+     int L=GetL();
+     std::string status(L,' ');
+     for (int ia=1;ia<=L;ia++)
+           status[ia-1]=GetSiteOperator(ia)->GetNormStatus(1e-13);
+     return status;
+}
+
 
 
 void MPO::Combine(const MPO* O2)
@@ -140,15 +147,6 @@ void MPO::CanonicalForm(Direction lr)
                 GetSiteOperator(ia)->CanonicalForm(lr);
             break;
     }
-}
-
-std::string MPO::GetNormStatus () const
-{
-     int L=GetL();
-     std::string status(L,' ');
-     for (int ia=1;ia<=L;ia++)
-           status[ia-1]=GetSiteOperator(ia)->GetNormStatus(1e-13);
-     return status;
 }
 
 

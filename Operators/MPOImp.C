@@ -1,9 +1,7 @@
 #include "Operators/MPOImp.H"
-#include "Operators/SiteOperatorImp.H"
 #include "Operators/SiteOperatorLeft.H"
 #include "Operators/SiteOperatorBulk.H"
 #include "Operators/SiteOperatorRight.H"
-#include "TensorNetworksImp/SVMPOCompressor.H"
 #include "TensorNetworks/CheckSpin.H"
 
 namespace TensorNetworks
@@ -77,8 +75,6 @@ void MPOImp::Insert(SiteOperator* so)
     assert(!areSitesLinked);
     if (itsSites.size()==0) itsSites.push_back(0); //Dummy at index 0 so we start counting at index 1
     itsSites.push_back(so);
-//  This is too clever by half, derived constructor should call LinkSites.
-//    if (static_cast<int>(itsSites.size())==itsL+1) LinkSites(); //Dummy at index 0 so we start counting at index 1
 }
 
 //

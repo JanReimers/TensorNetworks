@@ -1,7 +1,7 @@
 #include "TensorNetworksImp/Hamiltonians/iHamiltonianImp.H"
 #include "Operators/OperatorClient.H"
 #include "Operators/SiteOperatorBulk.H"
-#include "Operators/iMPOImp.H"
+#include "TensorNetworksImp/SpinCalculator.H"
 #include "TensorNetworks/CheckSpin.H"
 #include <iostream>
 

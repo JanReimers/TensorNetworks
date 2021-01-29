@@ -2,11 +2,7 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworksImp/StateIterator.H"
 #include "Operators/SiteOperatorBulk.H"
-#include "TensorNetworks/Dw12.H"
-#include "oml/vector.h"
-#include "oml/matrix.h"
 #include "TensorNetworks/CheckSpin.H"
-//#include "oml/src/vector.cpp"
 
 using std::cout;
 using std::endl;

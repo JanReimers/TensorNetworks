@@ -2,15 +2,13 @@
 #define iHAMILTONIANIMP_H
 
 #include "TensorNetworks/iHamiltonian.H"
-#include "Operators/SiteOperatorImp.H"
 #include "Operators/iMPOImp.H"
-#include "TensorNetworks/Dw12.H"
-#include "TensorNetworksImp/SpinCalculator.H"
+#include "Containers/Matrix4.H"
 
 namespace TensorNetworks
 {
 //
-//  Common imp for all Hamiltonians
+//  Implement iHamiltonian construction with all Bulk operators (no Left/Right) at the edges.
 //
 class iHamiltonianImp
     : public virtual iHamiltonian
@@ -20,28 +18,19 @@ public:
     iHamiltonianImp(int L, const OperatorClient* W);
     virtual ~iHamiltonianImp();
     //
-    //  MPO interface
+    //  iHamiltonian interface
     //
-//    virtual const SiteOperator* GetSiteOperator(int isite) const {return MPOImp::GetSiteOperator(isite);}
-//    virtual       SiteOperator* GetSiteOperator(int isite)       {return MPOImp::GetSiteOperator(isite);}
-
-    //
-    //  Hamiltonian interface
-    //
-    virtual int GetL () const {return iMPOImp::GetL();}
-    virtual int Getd () const {return iMPOImp::Getd();}
+    virtual int GetL    () const {return iMPOImp::GetL    ();}
+    virtual int Getd    () const {return iMPOImp::Getd    ();}
     virtual int GetMaxDw() const {return iMPOImp::GetMaxDw();}
 
     virtual iTEBDState* CreateiTEBDState   (int D,iTEBDType,double normEps,double epsSV) const;
     virtual iMPO*       CreateiUnitOperator() const;
     virtual iMPO*       CreateiMPO         (double dt, TrotterOrder, double epsMPO) const;
-    virtual Matrix4RT  GetLocalMatrix(         ) const {return itsH12;}
+    virtual Matrix4RT   GetLocalMatrix     () const {return itsH12;}
 
-protected:
-
-//    double itsS;
+private:
     Matrix4RT itsH12;
-    Dw12 itsDw;
 };
 
 } //namespace

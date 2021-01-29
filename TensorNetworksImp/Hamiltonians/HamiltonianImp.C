@@ -3,6 +3,7 @@
 #include "Operators/SiteOperatorLeft.H"
 #include "Operators/SiteOperatorBulk.H"
 #include "Operators/SiteOperatorRight.H"
+#include "TensorNetworksImp/SpinCalculator.H"
 #include "TensorNetworks/CheckSpin.H"
 #include <iostream>
 
@@ -57,18 +58,20 @@ namespace TensorNetworks
 //
 MPS* HamiltonianImp::CreateMPS(int D,double normEps, double epsSV) const
 {
-    return new MPSImp(GetL(),itsS,D,normEps,epsSV);
+    return new MPSImp(GetL(),GetS(),D,normEps,epsSV);
 }
 
 
 MPO* HamiltonianImp::CreateUnitOperator() const
 {
-    return new MPOImp(GetL(),itsS,MPOImp::Identity);
+    return new MPOImp(GetL(),GetS(),MPOImp::Identity);
 }
 
 MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
 {
     MPO* W=CreateUnitOperator();
+    int    L=GetL();
+    double S=GetS();
     switch (order)
     {
         case None :
@@ -78,16 +81,16 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
         }
         case FirstOrder :
         {
-            MPO_SpatialTrotter Wodd (dt,Odd ,GetL(),itsS,itsH12);
-            MPO_SpatialTrotter Weven(dt,Even,GetL(),itsS,itsH12);
+            MPO_SpatialTrotter Wodd (dt,Odd ,L,S,itsH12);
+            MPO_SpatialTrotter Weven(dt,Even,L,S,itsH12);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             break;
         }
         case SecondOrder :
         {
-            MPO_SpatialTrotter Wodd (dt/2.0,Odd ,GetL(),itsS,itsH12);
-            MPO_SpatialTrotter Weven(dt    ,Even,GetL(),itsS,itsH12);
+            MPO_SpatialTrotter Wodd (dt/2.0,Odd ,L,S,itsH12);
+            MPO_SpatialTrotter Weven(dt    ,Even,L,S,itsH12);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             W->Combine(&Wodd);
@@ -107,9 +110,9 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
             ts(5)=ts(1);
             for (int it=1;it<=5;it++)
             {
-                MPOImp U(GetL(),itsS,MPOImp::Identity);
-                MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,GetL(),itsS,itsH12);
-                MPO_SpatialTrotter Weven(ts(it)    ,Even,GetL(),itsS,itsH12);
+                MPOImp U(L,S,MPOImp::Identity);
+                MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,L,S,itsH12);
+                MPO_SpatialTrotter Weven(ts(it)    ,Even,L,S,itsH12);
                 U.Combine(&Wodd);
                 U.Combine(&Weven);
                 //U.Compress(0,1e-12); //Does not seem to help
@@ -133,7 +136,7 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
 
 FullState* HamiltonianImp::CreateFullState () const
  {
-    return new FullStateImp<double>(GetL(),itsS);
+    return new FullStateImp<double>(GetL(),GetS());
  }
 
 

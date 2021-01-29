@@ -2,15 +2,14 @@
 #define HAMILTONIANIMP_H
 
 #include "TensorNetworks/Hamiltonian.H"
-#include "Operators/SiteOperatorImp.H"
 #include "Operators/MPOImp.H"
-#include "TensorNetworks/Dw12.H"
-#include "TensorNetworksImp/SpinCalculator.H"
+#include "Containers/Matrix4.H"
 
 namespace TensorNetworks
 {
 //
-//  Common imp for all Hamiltonians
+//  Implement Hamiltonian construction which involves deciding what type of operators
+//  (Left/Bulk/Right) live on each site.
 //
 class HamiltonianImp
     : public virtual Hamiltonian
@@ -20,17 +19,11 @@ public:
     HamiltonianImp(int L, const OperatorClient* W);
     virtual ~HamiltonianImp();
     //
-    //  MPO interface
-    //
-//    virtual const SiteOperator* GetSiteOperator(int isite) const {return MPOImp::GetSiteOperator(isite);}
-//    virtual       SiteOperator* GetSiteOperator(int isite)       {return MPOImp::GetSiteOperator(isite);}
-
-    //
     //  Hamiltonian interface
     //
-    virtual int GetL () const {return MPOImp::GetL();}
-    virtual int Getd () const {return 2*itsS+1;}
-//    virtual int GetMaxDw() const {return MPOImp::GetMaxDw();}
+    virtual int GetL    () const {return MPOImp::GetL    ();}
+    virtual int Getd    () const {return MPOImp::Getd    ();}
+    virtual int GetMaxDw() const {return MPOImp::GetMaxDw();}
 
     virtual MPS*       CreateMPS          (int D          ,double normEps,double epsSV) const;
     virtual MPO*       CreateUnitOperator () const;
@@ -38,9 +31,7 @@ public:
     virtual FullState* CreateFullState    () const;
     virtual Matrix4RT  GetLocalMatrix(         ) const {return itsH12;}
 
-protected:
-//    double itsS;
-    Dw12 itsDw;
+private:
     Matrix4RT itsH12;
 };
 
