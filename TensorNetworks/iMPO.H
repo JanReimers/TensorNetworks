@@ -18,7 +18,6 @@ public:
     virtual ~iMPO() {};
 
     virtual iMPO* MakeUnitcelliMPO(int unitcell) const=0; //Contract horizontally to make iMPO for the whole unit cell.
-    virtual void  Product(const iMPO* O2);
 };
 
 }
