@@ -17,7 +17,7 @@ class MPO
         MPO() {};
         virtual ~MPO() {};
 
-        virtual const SiteOperator* GetSiteOperator(int isite) const;
+        virtual const SiteOperator* GetSiteOperator(int isite) const=0;
         virtual       SiteOperator* GetSiteOperator(int isite)      =0;
 
         virtual int         GetL() const=0;

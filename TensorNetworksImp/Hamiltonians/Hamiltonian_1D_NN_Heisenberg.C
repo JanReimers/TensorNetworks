@@ -9,15 +9,13 @@ using std::endl;
 namespace TensorNetworks
 {
 
-Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(int L, double S, double Jxy,double Jz, double hz)
-    : HamiltonianImp(L,S)
+Hamiltonian_1D_NN_Heisenberg::Hamiltonian_1D_NN_Heisenberg(double S, double Jxy,double Jz, double hz)
+    : itsS  (S)
     , itsJxy(Jxy)
-    , itsJz(Jz)
-    , itshz(hz)
+    , itsJz (Jz)
+    , itshz (hz)
 {
     assert(fabs(itsJxy)+fabs(Jz)>0.0);
-    itsDw=Dw12(5,5);
-    InitializeSites();
 }
 
 Hamiltonian_1D_NN_Heisenberg::~Hamiltonian_1D_NN_Heisenberg()
@@ -47,5 +45,13 @@ MatrixRT Hamiltonian_1D_NN_Heisenberg::GetW (int m, int n) const
     W(5,5)=I(m,n);
     return W;
 }
+
+double Hamiltonian_1D_NN_Heisenberg::GetH(int ma,int na,int mb,int nb,const SpinCalculator& sc) const
+{
+    return 0.5*itsJxy*(sc.GetSp(ma,na)*sc.GetSm(mb,nb)+sc.GetSm(ma,na)*sc.GetSp(mb,nb))
+    +itsJz*sc.GetSz(ma,na)*sc.GetSz(mb,nb)
+    +itshz*(sc.GetSz(ma,na)+sc.GetSz(mb,nb)); //Should we only include one stie here?
+}
+
 
 } //namespace

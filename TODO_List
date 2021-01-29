@@ -1,5 +1,11 @@
 
 -Clean up Hamiltonian interface
+-Separate out OperatorClient into its own header
+-Don't pass SPinCalculator in GetH
+-iTEBDState::FindiTimeGroundState takes a Hamiltonian instead of an iHamiltonian
+    simply because we are not very good taking expectation values of iMPOs yet
+-Get rid of MPOcompressor
+-Refactor: Lots of duplicated code for MPO/iMPOP Ham/iHam.
 -iMPOs, all sites should be bulk.  How to achieve this
     Done: -Stop deriving iMPOimp from MPOImp
     Done: -Stop deriving iMPO from MPO
@@ -8,6 +14,11 @@
             Only iMPO has MakeUnitcelliMPO
         Done: But we need distinct types
             can they share common base
+-Refactor, share some imp between MPO and iMPO
+    THis is complicated by Hamiltonian deriving from both MPO and iMPO
+-MPO Get rid of factor in Combine. Rename Combine to Product.
+-MPO Add (rather than combine) MPOs to do:
+            S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
 -MPO use enum to choose Std or Parker compression
 -MPO clean up compress return values.
 -MPOImp::MPOImp(int L, double S, const TensorT& W) does all Bulk, correct?!?!?
@@ -43,8 +54,6 @@ Next steps:
         -<E2> is not working, MPO get compressed to 1x4 - 4x1.  We need to learn how contract
             a Dw x Dw - Dw x Dw open MPO with eigen vectors to get <E2>.
             -We now have iH2, but after naive compression it is not even lower triangular.
-        -We need to be able to add (rather than combine) MPOs to do:
-            S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
         -iMPO-iTEBD starts anti-converging for small dt.  Also lambdas are wrong.
             -Try unit operator, see if there is something obviously wrong.
             -Replace dVectorT idea may fix it.

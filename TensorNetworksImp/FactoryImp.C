@@ -1,4 +1,6 @@
 #include "TensorNetworksImp/FactoryImp.H"
+#include "TensorNetworksImp/Hamiltonians/HamiltonianImp.H"
+#include "TensorNetworksImp/Hamiltonians/iHamiltonianImp.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg_Upper.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_TransverseIsing.H"
@@ -18,19 +20,43 @@ Factory* Factory::GetFactory()
 Hamiltonian* FactoryImp::
 Make1D_NN_HeisenbergHamiltonian(int L, double S, double Jxy, double Jz, double hz)
 {
-    return new Hamiltonian_1D_NN_Heisenberg(L,S,Jxy,Jz,hz);
+    Hamiltonian_1D_NN_Heisenberg H(S,Jxy,Jz,hz);
+    return new HamiltonianImp(L,&H);
 }
 
 Hamiltonian* FactoryImp::
 Make1D_NN_HeisenbergHamiltonian_Upper(int L, double S, double Jxy, double Jz, double hz)
 {
-    return new Hamiltonian_1D_NN_Heisenberg_Upper(L,S,Jxy,Jz,hz);
+    Hamiltonian_1D_NN_Heisenberg_Upper H(S,Jxy,Jz,hz);
+    return new HamiltonianImp(L,&H);
 }
 
 Hamiltonian*   FactoryImp::
 Make1D_NN_TransverseIsingHamiltonian(int L, double S, double J, double hx)
 {
-    return new Hamiltonian_1D_NN_TransverseIsing(L,S,J,hx);
+    Hamiltonian_1D_NN_TransverseIsing H(S,J,hx);
+    return new HamiltonianImp(L,&H);
+}
+
+iHamiltonian* FactoryImp::
+Make1D_NN_HeisenbergiHamiltonian(int L, double S, double Jxy, double Jz, double hz)
+{
+    Hamiltonian_1D_NN_Heisenberg H(S,Jxy,Jz,hz);
+    return new iHamiltonianImp(L,&H);
+}
+
+iHamiltonian* FactoryImp::
+Make1D_NN_HeisenbergiHamiltonian_Upper(int L, double S, double Jxy, double Jz, double hz)
+{
+    Hamiltonian_1D_NN_Heisenberg_Upper H(S,Jxy,Jz,hz);
+    return new iHamiltonianImp(L,&H);
+}
+
+iHamiltonian*   FactoryImp::
+Make1D_NN_TransverseIsingiHamiltonian(int L, double S, double J, double hx)
+{
+    Hamiltonian_1D_NN_TransverseIsing H(S,J,hx);
+    return new iHamiltonianImp(L,&H);
 }
 
 SVCompressorR* FactoryImp::MakeMPOCompressor(int Dmax, double epsSV)

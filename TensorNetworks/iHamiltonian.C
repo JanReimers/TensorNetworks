@@ -1,20 +1,20 @@
-#include "TensorNetworks/Hamiltonian.H"
+#include "TensorNetworks/iHamiltonian.H"
 #include "Containers/Matrix4.H"
 #include "oml/numeric.h"
 
 namespace TensorNetworks
 {
 
-MPO* Hamiltonian::CreateH2Operator  () const
+iMPO* iHamiltonian::CreateiH2Operator  () const
 {
-    MPO* H2=CreateUnitOperator();
-    H2->Combine(this);
-    H2->Combine(this);
-    H2->CompressStd(0,1e-13);
-    return H2;
+    iMPO* iH2=CreateiUnitOperator();
+    iH2->Combine(this);
+    iH2->Combine(this);
+//    iH2->Compress(0,1e-13);
+    return iH2;
 }
 
-Matrix4RT Hamiltonian::GetExponentH(double dt) const
+Matrix4RT iHamiltonian::GetExponentH(double dt) const
 {
     MatrixRT U12=GetLocalMatrix().Flatten();
     int N=U12.GetNumRows();

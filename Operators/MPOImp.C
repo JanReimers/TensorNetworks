@@ -110,5 +110,19 @@ void MPOImp::LinkSites()
     areSitesLinked=true;
 }
 
+const SiteOperator* MPOImp::GetSiteOperator(int isite) const
+{
+    const MPO* mpo(this);
+    return const_cast<MPO*>(mpo)->GetSiteOperator(isite);
+}
+
+SiteOperator* MPOImp::GetSiteOperator(int isite)
+{
+    assert(isite>0);
+    assert(isite<=itsL);
+    assert(areSitesLinked);
+    return itsSites[isite];
+}
+
 
 } //namespace

@@ -1,5 +1,5 @@
 #include "TensorNetworksImp/iTEBD/iTEBDGates.H"
-#include "TensorNetworks/Hamiltonian.H"
+#include "TensorNetworks/iHamiltonian.H"
 
 
 
@@ -18,20 +18,19 @@ iTEBDGates::~iTEBDGates()
 }
 
 
-void iTEBDGates::InitGates (const Hamiltonian* H,double dt,TrotterOrder to,double eps)
+void iTEBDGates::InitGates (const iHamiltonian* H,double dt,TrotterOrder to,double eps)
 {
     itsGates.clear();
-    Matrix4RT Hlocal=H->BuildLocalMatrix();
     switch (to)
     {
     case FirstOrder :
-        itsGates.push_back(Hamiltonian::ExponentH(dt,Hlocal));
-        itsGates.push_back(Hamiltonian::ExponentH(dt,Hlocal));
+        itsGates.push_back(H->GetExponentH(dt));
+        itsGates.push_back(H->GetExponentH(dt));
         break;
     case SecondOrder :
-        itsGates.push_back(Hamiltonian::ExponentH(dt/2.0,Hlocal));
-        itsGates.push_back(Hamiltonian::ExponentH(dt    ,Hlocal));
-        itsGates.push_back(Hamiltonian::ExponentH(dt/2.0,Hlocal));
+        itsGates.push_back(H->GetExponentH(dt/2.0));
+        itsGates.push_back(H->GetExponentH(dt));
+        itsGates.push_back(H->GetExponentH(dt/2.0));
         break;
     case FourthOrder :
         {
@@ -43,9 +42,9 @@ void iTEBDGates::InitGates (const Hamiltonian* H,double dt,TrotterOrder to,doubl
             ts(5)=ts(1);
             for (int it=1;it<=5;it++)
             {
-                itsGates.push_back(Hamiltonian::ExponentH(ts(it)/2.0,Hlocal));
-                itsGates.push_back(Hamiltonian::ExponentH(ts(it)    ,Hlocal));
-                itsGates.push_back(Hamiltonian::ExponentH(ts(it)/2.0,Hlocal));
+                itsGates.push_back(H->GetExponentH(ts(it)/2.0));
+                itsGates.push_back(H->GetExponentH(ts(it)    ));
+                itsGates.push_back(H->GetExponentH(ts(it)/2.0));
             }
             break;
         }

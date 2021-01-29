@@ -1,4 +1,4 @@
-#include "TensorNetworks/MPO.H"
+#include "Operators/MPO_Common.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworks/Factory.H"
@@ -11,23 +11,19 @@ namespace TensorNetworks
 {
 
 
-const SiteOperator* MPO::GetSiteOperator(int isite) const
-{
-    return const_cast<MPO*>(this)->GetSiteOperator(isite);
-}
 
-int MPO::GetMaxDw() const
-{
-    int L=GetL();
-    int Dw=0;
-    for (int ia=1;ia<L;ia++)
-    {
-        Dw=Max(Dw,GetSiteOperator(ia)->GetDw12().Dw2);
-    }
-    return Dw;
-}
-
-void MPO::Report(std::ostream& os) const
+//int MPO_Common::GetMaxDw() const
+//{
+//    int L=GetL();
+//    int Dw=0;
+//    for (int ia=1;ia<L;ia++)
+//    {
+//        Dw=Max(Dw,GetSiteOperator(ia)->GetDw12().Dw2);
+//    }
+//    return Dw;
+//}
+/*
+void MPO_Common::Report(std::ostream& os) const
 {
     int L=GetL();
     os << "Matrix Product Operator for " << L << " sites." << std::endl;
@@ -42,7 +38,7 @@ void MPO::Report(std::ostream& os) const
     }
 }
 
-void  MPO::Dump(std::ostream& os) const
+void  MPO_Common::Dump(std::ostream& os) const
 {
     int L=GetL();
     os << "Matrix Product Operator for " << L << " sites." << std::endl;
@@ -57,14 +53,18 @@ void  MPO::Dump(std::ostream& os) const
         os << std::endl;
     }
 }
+const SiteOperator* MPO_Common::GetSiteOperator(int isite) const
+{
+    return const_cast<MPO*>(this)->GetSiteOperator(isite);
+}
 
 
-void MPO::Combine(const MPO* O2)
+void MPO_Common::Combine(const MPO* O2)
 {
     Combine(O2,1.0);
 }
 
-void MPO::Combine(const MPO* O2,double factor)
+void MPO_Common::Combine(const MPO* O2,double factor)
 {
     int L=GetL();
     assert(L==O2->GetL());
@@ -74,7 +74,7 @@ void MPO::Combine(const MPO* O2,double factor)
     }
 }
 
-double MPO::CompressStd(int Dmax, double epsSV)
+double MPO_Common::CompressStd(int Dmax, double epsSV)
 {
     Factory* f=Factory::GetFactory();
     SVCompressorR* comp=f->MakeMPOCompressor(Dmax,epsSV);
@@ -84,7 +84,7 @@ double MPO::CompressStd(int Dmax, double epsSV)
     return compressionError;
 }
 
-double MPO::CompressParker(int Dmax, double epsSV)
+double MPO_Common::CompressParker(int Dmax, double epsSV)
 {
     Factory* f=Factory::GetFactory();
     SVCompressorR* comp=f->MakeMPOCompressor(Dmax,epsSV);
@@ -95,7 +95,7 @@ double MPO::CompressParker(int Dmax, double epsSV)
 }
 
 
-double MPO::CompressStd(const SVCompressorR* compressor)
+double MPO_Common::CompressStd(const SVCompressorR* compressor)
 {
     int L=GetL();
     Vector<int> oldDws(L),newDws(L);
@@ -115,7 +115,7 @@ double MPO::CompressStd(const SVCompressorR* compressor)
 ////    std::cout << "% compression=" << std::fixed << std::setprecision(2) << percent << std::endl;
     return 0.0;
 }
-double MPO::CompressParker(const SVCompressorR* compressor)
+double MPO_Common::CompressParker(const SVCompressorR* compressor)
 {
     int L=GetL();
     for (int ia=1;ia<L;ia++)
@@ -125,7 +125,7 @@ double MPO::CompressParker(const SVCompressorR* compressor)
     return 0.0;
 }
 
-void MPO::CanonicalForm(Direction lr)
+void MPO_Common::CanonicalForm(Direction lr)
 {
 //    GetSiteOperator(3)->CanonicalForm(lr);
     int L=GetL();
@@ -142,7 +142,7 @@ void MPO::CanonicalForm(Direction lr)
     }
 }
 
-std::string MPO::GetNormStatus () const
+std::string MPO_Common::GetNormStatus () const
 {
      int L=GetL();
      std::string status(L,' ');
@@ -151,5 +151,5 @@ std::string MPO::GetNormStatus () const
      return status;
 }
 
-
-}
+*/
+} //namespace

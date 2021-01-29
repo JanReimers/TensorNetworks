@@ -1,5 +1,5 @@
 #include "TensorNetworksImp/iTEBD/iTEBDMPOs.H"
-#include "TensorNetworks/Hamiltonian.H"
+#include "TensorNetworks/iHamiltonian.H"
 
 
 
@@ -18,7 +18,7 @@ iTEBDMPOs::~iTEBDMPOs()
 }
 
 
-void iTEBDMPOs::InitGates (const Hamiltonian* H,double dt,TrotterOrder to, double eps)
+void iTEBDMPOs::InitGates (const iHamiltonian* H,double dt,TrotterOrder to, double eps)
 {
     itsGates.clear();
     itsGates.push_back(H->CreateiMPO(dt,to,eps));

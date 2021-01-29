@@ -120,6 +120,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/MPOImp.H" />
+		<Unit filename="Operators/MPO_Common.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/MPO_Common.H" />
 		<Unit filename="Operators/MPO_OneSite.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -132,6 +136,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/MPO_TwoSite.H" />
+		<Unit filename="Operators/OperatorClient.H" />
 		<Unit filename="Operators/SiteOperatorBulk.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -206,6 +211,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworks/VNEntropy.H" />
+		<Unit filename="TensorNetworks/iHamiltonian.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworks/iHamiltonian.H" />
 		<Unit filename="TensorNetworks/iMPO.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -235,6 +244,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_TransverseIsing.H" />
+		<Unit filename="TensorNetworksImp/Hamiltonians/iHamiltonianImp.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/Hamiltonians/iHamiltonianImp.H" />
 		<Unit filename="TensorNetworksImp/MPS/Bond.C">
 			<Option compilerVar="CC" />
 		</Unit>

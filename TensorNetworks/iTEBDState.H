@@ -27,7 +27,7 @@ public:
 //
 // Find ground state.  Return <E^2>-<E>^2
 //
-    virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&)=0;
+    virtual double FindiTimeGroundState      (const Hamiltonian* H,const iHamiltonian* iH,const IterationSchedule&)=0;
 //--------------------------------------------------------------------------------------
 //
 //  iTime evolution

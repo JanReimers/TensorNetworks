@@ -43,7 +43,7 @@ public:
     TensorNetworks::MatrixRT GetH(double S)
     {
         SetupH(2,S);
-        return itsH->BuildLocalMatrix().Flatten();
+        return itsH->GetLocalMatrix().Flatten();
     }
 
 
@@ -68,7 +68,7 @@ TEST_F(ExactDiagTests,TestStateIterator)
 TEST_F(ExactDiagTests,TestHabS12)
 {
     SetupH(10,0.5);
-    MatrixRT Hab=itsH->BuildLocalMatrix().Flatten();
+    MatrixRT Hab=itsH->GetLocalMatrix().Flatten();
     //cout << "Hab=" << Hab << endl;
     EXPECT_EQ(ToString(Hab),"(1:4),(1:4) \n[ 0.25 0 0 0 ]\n[ 0 -0.25 0.5 0 ]\n[ 0 0.5 -0.25 0 ]\n[ 0 0 0 0.25 ]\n");
 }
@@ -77,14 +77,14 @@ TEST_F(ExactDiagTests,TestHabS12)
 TEST_F(ExactDiagTests,TestHabS1)
 {
     SetupH(10,1.0);
-    MatrixRT Hab=itsH->BuildLocalMatrix().Flatten();
+    MatrixRT Hab=itsH->GetLocalMatrix().Flatten();
     EXPECT_EQ(ToString(Hab),"(1:9),(1:9) \n[ 1 0 0 0 0 0 0 0 0 ]\n[ 0 0 0 1 0 0 0 0 0 ]\n[ 0 0 -1 0 1 0 0 0 0 ]\n[ 0 1 0 0 0 0 0 0 0 ]\n[ 0 0 1 0 0 0 1 0 0 ]\n[ 0 0 0 0 0 0 0 1 0 ]\n[ 0 0 0 0 1 0 -1 0 0 ]\n[ 0 0 0 0 0 1 0 0 0 ]\n[ 0 0 0 0 0 0 0 0 1 ]\n");
 }
 
 TEST_F(ExactDiagTests,TestHabS32)
 {
     SetupH(10,1.5);
-    TensorNetworks::MatrixRT Hab=itsH->BuildLocalMatrix().Flatten();
+    TensorNetworks::MatrixRT Hab=itsH->GetLocalMatrix().Flatten();
     EXPECT_EQ(ToString(Hab),"(1:16),(1:16) \n[ 2.25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ]\n[ 0 0.75 0 0 1.5 0 0 0 0 0 0 0 0 0 0 0 ]\n[ 0 0 -0.75 0 0 1.73205 0 0 0 0 0 0 0 0 0 0 ]\n[ 0 0 0 -2.25 0 0 1.5 0 0 0 0 0 0 0 0 0 ]\n[ 0 1.5 0 0 0.75 0 0 0 0 0 0 0 0 0 0 0 ]\n[ 0 0 1.73205 0 0 0.25 0 0 1.73205 0 0 0 0 0 0 0 ]\n[ 0 0 0 1.5 0 0 -0.25 0 0 2 0 0 0 0 0 0 ]\n[ 0 0 0 0 0 0 0 -0.75 0 0 1.73205 0 0 0 0 0 ]\n[ 0 0 0 0 0 1.73205 0 0 -0.75 0 0 0 0 0 0 0 ]\n[ 0 0 0 0 0 0 2 0 0 -0.25 0 0 1.5 0 0 0 ]\n[ 0 0 0 0 0 0 0 1.73205 0 0 0.25 0 0 1.73205 0 0 ]\n[ 0 0 0 0 0 0 0 0 0 0 0 0.75 0 0 1.5 0 ]\n[ 0 0 0 0 0 0 0 0 0 1.5 0 0 -2.25 0 0 0 ]\n[ 0 0 0 0 0 0 0 0 0 0 1.73205 0 0 -0.75 0 0 ]\n[ 0 0 0 0 0 0 0 0 0 0 0 1.5 0 0 0.75 0 ]\n[ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2.25 ]\n");
 }
 

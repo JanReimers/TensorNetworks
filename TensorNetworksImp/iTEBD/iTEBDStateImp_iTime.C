@@ -1,5 +1,6 @@
 #include "TensorNetworksImp/iTEBD/iTEBDStateImp.H"
 #include "TensorNetworks/Hamiltonian.H"
+#include "TensorNetworks/iHamiltonian.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/iMPO.H"
 #include "TensorNetworks/SiteOperator.H"
@@ -22,17 +23,17 @@ namespace TensorNetworks
 {
 
 
-double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const IterationSchedule& is)
+double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const iHamiltonian* iH,const IterationSchedule& is)
 {
     assert(Logger); //Make sure we have global logger.
     Canonicalize(TensorNetworks::DLeft);
     Logger->LogInfoV(0,"Initiate iTime GS iterations, D=%4d, Norm status=%s",GetMaxD(),GetNormStatus().c_str());
     Logger->LogInfo(1,"     dt    epsE      D  Dmax   Dw niter   E        Ortho error dE  DlambdaA DlambdaB");
-    iMPO* H2=H->CreateiH2Operator();
+    iMPO* H2=iH->CreateiH2Operator();
 
     double E1=0;
     for (is.begin(); !is.end(); is++)
-        E1=FindiTimeGroundState(H,H2,*is);
+        E1=FindiTimeGroundState(H,iH,H2,*is);
 
     double E2=GetExpectation(H2)/(itsL-1)/(itsL-1);
     E2= E2-E1*E1;
@@ -41,12 +42,12 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const IterationS
     return E2;
 }
 
-double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const iMPO* H2,const IterationScheduleLine& isl)
+double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const iHamiltonian* iH,const iMPO* H2,const IterationScheduleLine& isl)
 {
     assert(isl.itsDmax>0 || isl.itsEps.itsMPSCompressEpsilon>0);
     double dt=isl.itsdt;
 
-    InitGates(H,dt,isl.itsTrotterOrder,isl.itsEps.itsMPOCompressEpsilon);
+    InitGates(iH,dt,isl.itsTrotterOrder,isl.itsEps.itsMPOCompressEpsilon);
 
     int Dmax=GetMaxD();
     double epsCompress=1e-16;

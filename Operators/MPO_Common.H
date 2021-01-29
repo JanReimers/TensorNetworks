@@ -1,32 +1,30 @@
-#ifndef iMPO_H
-#define iMPO_H
+#ifndef MPOCOMMON_H
+#define MPOCOMMON_H
 
-#include "TensorNetworks/MPO.H"
+#include "TensorNetworks/iMPO.H"
 
 namespace TensorNetworks
 {
 //
-//  MPO is an operator but it also has the combine and compress capabilities.
-//  Most of the this interface can be implemented using a few abstract functions
-//  from the Operator class.
+// Implement some MPO and iMPO functions that have the same implementation for both cases.
 //
-class iMPO : public virtual MPO
+class MPO_Common
+: public virtual iMPO
 {
     public:
-        iMPO() {};
-        virtual ~iMPO() {};
-
-        virtual iMPO* MakeUnitcelliMPO(int unitcell) const=0; //Contract horizontally to make iMPO for the whole unit cell.
+        MPO_Common() {};
+        virtual ~MPO_Common() {};
 
 //        virtual const SiteOperator* GetSiteOperator(int isite) const=0;
 //        virtual       SiteOperator* GetSiteOperator(int isite)      =0;
-
-//        virtual int   GetL() const=0;
-//        virtual int         GetMaxDw() const=0;
+//
+//        virtual int         GetL() const=0;
+//        virtual int         GetMaxDw() const;
 //        virtual void        Report(std::ostream&) const; //Show Dws
 //        virtual void        Dump  (std::ostream&) const; //Show matrices
 //        virtual std::string GetNormStatus () const;
-        virtual void   Combine(const iMPO* O2);
+//
+//
 //        virtual double CompressStd   (int Dmax, double epsSV);
 //        virtual double CompressStd   (const SVCompressorR*);
 //        virtual double CompressParker(int Dmax, double epsSV);
@@ -36,4 +34,4 @@ class iMPO : public virtual MPO
 
 }
 
-#endif // iMPO_H
+#endif // MPOCOMMON_H

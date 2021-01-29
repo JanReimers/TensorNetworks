@@ -79,7 +79,7 @@ TEST_F(ImaginaryTimeTests,TestMPPOCombineL8)
     double S=0.5,dt=0.05000;
     Setup(L,S,D);
 
-    TensorNetworks::Matrix4RT H12=itsH->BuildLocalMatrix(); //Full H matrix for two sites 1&2
+    TensorNetworks::Matrix4RT H12=itsH->GetLocalMatrix(); //Full H matrix for two sites 1&2
 
     // Create some Trotter 2nd order operators
     TensorNetworks::MPO_SpatialTrotter W_Odd (dt/2.0,TensorNetworks::Odd ,L,S,H12);
@@ -125,7 +125,7 @@ TEST_F(ImaginaryTimeTests,TestMPPOCombineL9)
     double S=0.5,dt=0.05000;
     Setup(L,S,D);
 
-    TensorNetworks::Matrix4RT H12=itsH->BuildLocalMatrix(); //Full H matrix for two sites 1&2
+    TensorNetworks::Matrix4RT H12=itsH->GetLocalMatrix(); //Full H matrix for two sites 1&2
 
     // Create some Trotter 2nd order operators
     TensorNetworks::MPO_SpatialTrotter W_Odd (dt/2.0,TensorNetworks::Odd ,L,S,H12);

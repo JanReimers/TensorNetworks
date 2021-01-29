@@ -158,7 +158,7 @@ template <class T> double FullStateImp<T>::
 {
     Normalize(itsAmplitudes);
     double E=0;
-    itsHlocal=H.BuildLocalMatrix();
+    itsHlocal=H.GetLocalMatrix();
     assert(itsHlocal.Flatten().GetNumRows()==itsd*itsd);
     assert(itsHlocal.Flatten().GetNumCols()==itsd*itsd);
 
@@ -183,7 +183,7 @@ template <class T> double FullStateImp<T>::
 
 template <class T> double FullStateImp<T>::FindGroundState(const Hamiltonian& H,double epsE)
 {
-    itsHlocal=H.BuildLocalMatrix();
+    itsHlocal=H.GetLocalMatrix();
     assert(itsHlocal.Flatten().GetNumRows()==itsd*itsd);
     assert(itsHlocal.Flatten().GetNumCols()==itsd*itsd);
     double E=0;

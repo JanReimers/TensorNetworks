@@ -2,6 +2,7 @@
 #define MPOImp_H
 
 #include "TensorNetworks/MPO.H"
+//#include "Operators/MPO_Common.H"
 #include "Containers/ptr_vector.h"
 
 namespace TensorNetworks
@@ -14,7 +15,9 @@ namespace TensorNetworks
 //  All operator are initialized as unit operators with Dw=1.
 //  Non trivial MPOs are then created using the Combine function in MPO.H
 //
-class MPOImp : public virtual MPO
+class MPOImp
+    : public virtual MPO
+//    , private MPO_Common
 {
 protected:
     typedef Matrix<MatrixRT> TensorT;
@@ -27,13 +30,8 @@ protected:
 
         virtual int    GetL() const {return itsL;}
         virtual double GetS() const {return itsS;}
-        virtual SiteOperator* GetSiteOperator(int isite)
-        {
-            assert(isite>0);
-            assert(isite<=itsL);
-            assert(areSitesLinked);
-            return itsSites[isite];
-        }
+        virtual const SiteOperator* GetSiteOperator(int isite) const;
+        virtual       SiteOperator* GetSiteOperator(int isite);
 
     protected:
         virtual void LinkSites();

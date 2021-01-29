@@ -1,4 +1,5 @@
 #include "Operators/SiteOperatorImp.H"
+#include "Operators/OperatorClient.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 #include "oml/diagonalmatrix.h"
 

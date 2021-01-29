@@ -4,7 +4,6 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "Operators/SiteOperatorImp.H"
 #include "Operators/MPOImp.H"
-#include "Operators/iMPOImp.H"
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 
@@ -15,44 +14,34 @@ namespace TensorNetworks
 //
 class HamiltonianImp
     : public virtual Hamiltonian
-    , public virtual OperatorClient
     , private MPOImp
-    , private iMPOImp
 {
 public:
-    HamiltonianImp(int L, double S);
+    HamiltonianImp(int L, const OperatorClient* W);
     virtual ~HamiltonianImp();
+    //
+    //  MPO interface
+    //
+//    virtual const SiteOperator* GetSiteOperator(int isite) const {return MPOImp::GetSiteOperator(isite);}
+//    virtual       SiteOperator* GetSiteOperator(int isite)       {return MPOImp::GetSiteOperator(isite);}
+
     //
     //  Hamiltonian interface
     //
     virtual int GetL () const {return MPOImp::GetL();}
     virtual int Getd () const {return 2*itsS+1;}
-    virtual int GetMaxDw() const {return MPOImp::GetMaxDw();}
+//    virtual int GetMaxDw() const {return MPOImp::GetMaxDw();}
 
-    virtual MPS*        CreateMPS          (int D          ,double normEps,double epsSV) const;
-    virtual iTEBDState* CreateiTEBDState   (int D,iTEBDType,double normEps,double epsSV) const;
-    virtual  MPO*       CreateUnitOperator () const;
-    virtual iMPO*       CreateiUnitOperator() const;
-    virtual  MPO*       CreateOperator     (double dt, TrotterOrder) const;
-    virtual iMPO*       CreateiMPO         (double dt, TrotterOrder, double epsMPO) const;
-    virtual iMPO*       CreateiMPO         () const; //iMPO rep of Hamiltonian
-    virtual Matrix4RT   BuildLocalMatrix   () const;
-    virtual FullState*  CreateFullState    () const;
+    virtual MPS*       CreateMPS          (int D          ,double normEps,double epsSV) const;
+    virtual MPO*       CreateUnitOperator () const;
+    virtual MPO*       CreateOperator     (double dt, TrotterOrder) const;
+    virtual FullState* CreateFullState    () const;
+    virtual Matrix4RT  GetLocalMatrix(         ) const {return itsH12;}
 
 protected:
-//
-//  OperatorClient interface
-//
-    virtual Dw12     GetDw12() const;
-    virtual MatrixRT GetW   (int m, int n) const=0;
-    virtual double GetH(int ma,int na,int mb,int nb,const SpinCalculator& sc) const=0;
-
-
-    void   InitializeSites(); //Derived constructor must call this
-    double I    (int m, int n) const;
-
-    double itsS;
+//    double itsS;
     Dw12 itsDw;
+    Matrix4RT itsH12;
 };
 
 } //namespace

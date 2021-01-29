@@ -1,8 +1,8 @@
 #include "TensorNetworksImp/Hamiltonians/HamiltonianImp.H"
+#include "Operators/OperatorClient.H"
 #include "Operators/SiteOperatorLeft.H"
 #include "Operators/SiteOperatorBulk.H"
 #include "Operators/SiteOperatorRight.H"
-#include "Operators/iMPOImp.H"
 #include "TensorNetworks/CheckSpin.H"
 #include <iostream>
 
@@ -12,81 +12,37 @@ using std::endl;
 namespace TensorNetworks
 {
 
-HamiltonianImp::HamiltonianImp(int L, double S)
-    :  MPOImp(L,S, MPOImp::LoadLater)
-    , iMPOImp(L,S,iMPOImp::LoadLater)
-    , itsS(S)
-{
-    assert(isValidSpin(S));
-
-
-}
-
-//
-//  Load up site operators with special ops at the edges
-//
-//  The SiteOperatorImp makes a virtual callback to GetW(Position,int m, int n)
-//  So the derived constructor must call this method
-//
-void HamiltonianImp::InitializeSites()
+HamiltonianImp::HamiltonianImp(int L, const OperatorClient* W)
+    : MPOImp(L,W->GetS(), MPOImp::LoadLater)
 {
     int d=Getd();
-    MPOImp::Insert(new SiteOperatorLeft(d,this));
+    MPOImp::Insert(new SiteOperatorLeft(d,W));
     for (int ia=2;ia<=GetL()-1;ia++)
-        MPOImp::Insert(new SiteOperatorBulk(d,this));
-    MPOImp::Insert(new SiteOperatorRight(d,this));
+        MPOImp::Insert(new SiteOperatorBulk(d,W));
+    MPOImp::Insert(new SiteOperatorRight(d,W));
     MPOImp::LinkSites();
 
-    for (int ia=1;ia<=GetL();ia++)
-        iMPOImp::Insert(new SiteOperatorBulk(d,this));
-    iMPOImp::LinkSites();
+    itsH12=Matrix4RT(d,d,d,d,0);
+    SpinCalculator sc(W->GetS());
+    for (int n1=0;n1<d;n1++)
+        for (int n2=0;n2<d;n2++)
+            for (int m1=0;m1<d;m1++)
+                for (int m2=0;m2<d;m2++)
+                    itsH12(m1,m2,n1,n2)=W->GetH(m1,n1,m2,n2,sc);
 }
+
 
 HamiltonianImp::~HamiltonianImp()
 {
 //     cout << "HamiltonianImp destructor." << endl;
 }
 
-double HamiltonianImp::I(int m, int n) const
-{
-    assert(m>=0);
-    assert(n>=0);
-    double ret=0.0;
-    if (n==m) ret=1.0;
-    return ret;
-}
 
-Dw12 HamiltonianImp::GetDw12() const
-{
-    return itsDw;
-}
-
-
-//
-//  Build the a local (2 site for NN interactions) Hamiltonian Matrix
-//
-Matrix4RT HamiltonianImp::BuildLocalMatrix() const
-{
-    SpinCalculator sc(itsS);
-    int d=Getd();
-    Matrix4RT H12(d,d,d,d,0);
-    for (int n1=0;n1<d;n1++)
-        for (int n2=0;n2<d;n2++)
-            for (int m1=0;m1<d;m1++)
-                for (int m2=0;m2<d;m2++)
-                    H12(m1,m2,n1,n2)=GetH(m1,n1,m2,n2,sc);
-
-    return H12;
-}
 } //namespace
 
-#include "TensorNetworksImp/iTEBD/iTEBDGates.H"
-#include "TensorNetworksImp/iTEBD/iTEBDMPOs.H"
-#include "TensorNetworksImp/iTEBD/iTEBDiMPOs.H"
 #include "TensorNetworksImp/FullStateImp.H"
 #include "TensorNetworksImp/MPS/MPSImp.H"
 #include "Operators/MPO_SpatialTrotter.H"
-#include "Operators/iMPO_SpatialTrotter.H"
 
 namespace TensorNetworks
 {
@@ -104,39 +60,15 @@ MPS* HamiltonianImp::CreateMPS(int D,double normEps, double epsSV) const
     return new MPSImp(GetL(),itsS,D,normEps,epsSV);
 }
 
-iTEBDState* HamiltonianImp::CreateiTEBDState(int D,iTEBDType type,double normEps, double epsSV) const
-{
-    iTEBDState* ret=nullptr;
-    switch (type)
-    {
-    case Gates :
-        ret=new iTEBDGates(GetL(),itsS,D,normEps,epsSV);
-        break;
-    case MPOs :
-        ret=new iTEBDMPOs(GetL(),itsS,D,normEps,epsSV);
-        break;
-    case iMPOs :
-        ret=new iTEBDiMPOs(GetL(),itsS,D,normEps,epsSV);
-        break;
-    }
-    return ret;
-}
-
 
 MPO* HamiltonianImp::CreateUnitOperator() const
 {
     return new MPOImp(GetL(),itsS,MPOImp::Identity);
 }
 
-iMPO* HamiltonianImp::CreateiUnitOperator() const
-{
-    return new iMPOImp(GetL(),itsS,iMPOImp::Identity);
-}
-
 MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
 {
     MPO* W=CreateUnitOperator();
-    Matrix4RT H12=BuildLocalMatrix(); //Full H matrix for two sites 1&2
     switch (order)
     {
         case None :
@@ -146,16 +78,16 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
         }
         case FirstOrder :
         {
-            MPO_SpatialTrotter Wodd (dt,Odd ,GetL(),itsS,H12);
-            MPO_SpatialTrotter Weven(dt,Even,GetL(),itsS,H12);
+            MPO_SpatialTrotter Wodd (dt,Odd ,GetL(),itsS,itsH12);
+            MPO_SpatialTrotter Weven(dt,Even,GetL(),itsS,itsH12);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             break;
         }
         case SecondOrder :
         {
-            MPO_SpatialTrotter Wodd (dt/2.0,Odd ,GetL(),itsS,H12);
-            MPO_SpatialTrotter Weven(dt    ,Even,GetL(),itsS,H12);
+            MPO_SpatialTrotter Wodd (dt/2.0,Odd ,GetL(),itsS,itsH12);
+            MPO_SpatialTrotter Weven(dt    ,Even,GetL(),itsS,itsH12);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             W->Combine(&Wodd);
@@ -176,8 +108,8 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
             for (int it=1;it<=5;it++)
             {
                 MPOImp U(GetL(),itsS,MPOImp::Identity);
-                MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,GetL(),itsS,H12);
-                MPO_SpatialTrotter Weven(ts(it)    ,Even,GetL(),itsS,H12);
+                MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,GetL(),itsS,itsH12);
+                MPO_SpatialTrotter Weven(ts(it)    ,Even,GetL(),itsS,itsH12);
                 U.Combine(&Wodd);
                 U.Combine(&Weven);
                 //U.Compress(0,1e-12); //Does not seem to help
@@ -198,78 +130,6 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
     return W;
 }
 
-iMPO* HamiltonianImp::CreateiMPO() const
-{
-    iMPO* W=new iMPOImp(GetL(),itsS,this);
-    return W;
-}
-
-iMPO* HamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) const
-{
-    iMPO* W(nullptr);
-    int L=GetL();
-    Matrix4RT H12=BuildLocalMatrix(); //Full H matrix for two sites 1&2
-    switch (order)
-    {
-        case None :
-        {
-            assert(false);
-            break;
-        }
-        case FirstOrder :
-        {
-            W=new iMPOImp(L,itsS,iMPOImp::Identity);
-            iMPO_SpatialTrotter Wodd (dt,Odd ,L,itsS,H12);
-            iMPO_SpatialTrotter Weven(dt,Even,L,itsS,H12);
-            W->Combine(&Weven);
-            W->Combine(&Wodd);
-            W->CompressStd(0,epsMPO);
-            break;
-        }
-        case SecondOrder :
-        {
-            iMPO_SpatialTrotter Weven(dt    ,Even,L,itsS,H12);
-            iMPO_SpatialTrotter Wodd (dt/2.0,Odd ,L,itsS,H12);
-            W=new iMPOImp(L,itsS,iMPOImp::Identity);
-//            W->Report(cout);
-            W->Combine(&Wodd);
-//            W->Report(cout);
-            W->Combine(&Weven);
-//            W->Report(cout);
-            W->Combine(&Wodd);
-//            W->Report(cout);
-            W->CompressStd(0,epsMPO);
-            break;
-        }
-        case FourthOrder :
-        {
-            W=new iMPOImp(L,itsS,iMPOImp::Identity);
-            //
-            //  At this order we must compress as we go or we risk consuming all memory
-            //
-            VectorRT ts(5);
-            ts(1)=dt/(4-pow(4.0,1.0/3.0));
-            ts(2)=ts(1);
-            ts(3)=dt-2*ts(1)-2*ts(2);
-            ts(4)=ts(2);
-            ts(5)=ts(1);
-            for (int it=1;it<=5;it++)
-            {
-                iMPOImp U(L,itsS,iMPOImp::Identity);
-                iMPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,L,itsS,H12);
-                iMPO_SpatialTrotter Weven(ts(it)    ,Even,L,itsS,H12);
-                U.Combine(&Wodd);
-                U.Combine(&Weven);
-                U.Combine(&Wodd);
-                W->Combine(&U);
-                W->CompressStd(0,epsMPO);
-                assert(W->GetMaxDw()<=4096);
-            }
-            break;
-        }
-    } //End switch
-    return W;
-}
 
 FullState* HamiltonianImp::CreateFullState () const
  {

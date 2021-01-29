@@ -131,6 +131,20 @@ void iMPOImp::Insert(SiteOperator* so)
     itsSites.push_back(so);
 }
 
+const SiteOperator* iMPOImp::GetSiteOperator(int isite) const
+{
+    const iMPO* impo(this);
+    return const_cast<iMPO*>(impo)->GetSiteOperator(isite);
+}
+
+SiteOperator* iMPOImp::GetSiteOperator(int isite)
+{
+    assert(isite>0);
+    assert(isite<=itsL);
+    assert(areSitesLinked);
+    return itsSites[isite];
+}
+
 //
 // Contract horizontally to make iMPO for the whole unit cell.
 //

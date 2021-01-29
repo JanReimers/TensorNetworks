@@ -1,7 +1,8 @@
 #ifndef HAMILTONIAN_1D_NN_HEISENBERG_UPPER_H
 #define HAMILTONIAN_1D_NN_HEISENBERG_UPPER_H
 
-#include "TensorNetworksImp/Hamiltonians/HamiltonianImp.H"
+#include "Operators/OperatorClient.H"
+#include "TensorNetworksImp/SpinCalculator.H"
 
 namespace TensorNetworks
 {
@@ -9,24 +10,21 @@ namespace TensorNetworks
 //  H=Sum(a=1..L,J*Sa*Sa+1) where Sa spin S operator on site a
 //
 class Hamiltonian_1D_NN_Heisenberg_Upper
-    : public virtual Hamiltonian
-    , public virtual OperatorClient
-    , private HamiltonianImp
+    : public virtual OperatorClient
 {
     public:
-        Hamiltonian_1D_NN_Heisenberg_Upper(int L, double S, double Jxy,double Jz, double hz);
+        Hamiltonian_1D_NN_Heisenberg_Upper(double S, double Jxy,double Jz, double hz);
         virtual ~Hamiltonian_1D_NN_Heisenberg_Upper();
-
-        virtual const OperatorClient* GetClient() const {return this;} //dynamic cast was unreliable
 
     private:
         //
         //  OperatorClient interface
         //
+        virtual double   GetS   () const {return itsS;}
         virtual MatrixRT GetW   (int m, int n) const;
-        virtual Dw12     GetDw12() const {return HamiltonianImp::GetDw12();}
+        virtual Dw12     GetDw12() const {return Dw12(Dw,Dw);}
 
-        double GetH(int ma,int na,int mb,int nb,const SpinCalculator& sc) const
+        virtual double GetH(int ma,int na,int mb,int nb,const SpinCalculator& sc) const
         {
             return 0.5*itsJxy*(sc.GetSp(ma,na)*sc.GetSm(mb,nb)+sc.GetSm(ma,na)*sc.GetSp(mb,nb))
             +itsJz*sc.GetSz(ma,na)*sc.GetSz(mb,nb)
@@ -35,7 +33,7 @@ class Hamiltonian_1D_NN_Heisenberg_Upper
 
         static const int Dw=5;
 //        int    itsL  MPOImp has L
-        double itsJxy,itsJz,itshz; //NN coupling constants and external field
+        double itsS,itsJxy,itsJz,itshz; //NN coupling constants and external field
 };
 }
 

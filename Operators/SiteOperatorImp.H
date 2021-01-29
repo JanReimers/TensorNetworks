@@ -37,19 +37,6 @@ template <class T> Matrix<T> TensorProduct(const Matrix<T>& a, const Matrix<T>& 
 
 namespace TensorNetworks
 {
-//
-//  Derive from this in order to load up your site MPO/W matrices
-//
-class OperatorClient
-{
-protected:
-    OperatorClient() {}
-    virtual ~OperatorClient() {}
-public:
-    virtual MatrixRT GetW   (int m, int n) const=0;
-    virtual Dw12     GetDw12() const=0;
-    friend class ::MPOTests;
-};
 
 class SiteOperatorImp : public virtual SiteOperator
 {

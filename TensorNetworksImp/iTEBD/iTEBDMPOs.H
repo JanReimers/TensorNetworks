@@ -15,7 +15,7 @@ class iTEBDMPOs
         iTEBDMPOs(int L,double S, int D,double normEps,double epsSV);
         virtual ~iTEBDMPOs();
 
-        virtual void   InitGates (const Hamiltonian*,double dt,TrotterOrder, double eps);
+        virtual void   InitGates (const iHamiltonian*,double dt,TrotterOrder, double eps);
         virtual void   Apply     (SVCompressorC*, int center);
 
     private:

@@ -1,8 +1,10 @@
 #include "Tests.H"
 #include "TensorNetworksImp/MPS/MPSImp.H"
+#include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.H"
 #include "Operators/MPO_SpatialTrotter.H"
 #include "Containers/Matrix4.H"
 #include "TensorNetworks/Hamiltonian.H"
+#include "TensorNetworks/iHamiltonian.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/iMPO.H"
@@ -25,6 +27,7 @@ public:
         : eps(1.0e-13)
         , itsFactory(TensorNetworks::Factory::GetFactory())
         , itsH(0)
+        , itsiH(0)
         , itsOperatorClient(0)
         , itsMPS(0)
     {
@@ -34,17 +37,21 @@ public:
     ~MPOTests()
     {
         delete itsFactory;
-        if (itsH) delete itsH;
-//        delete itsOperatorClient; NO! part of itsH.
+        if (itsH  ) delete itsH;
+        if (itsiH ) delete itsiH;
         if (itsMPS) delete itsMPS;
+        if (itsOperatorClient) delete itsOperatorClient;
     }
 
     void Setup(int L, double S, int D)
     {
-        if (itsH) delete itsH;
+        if (itsH  ) delete itsH;
+        if (itsiH ) delete itsiH;
         if (itsMPS) delete itsMPS;
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsOperatorClient=itsH->GetClient();
+        if (itsOperatorClient) delete itsOperatorClient;
+        itsH =itsFactory->Make1D_NN_HeisenbergHamiltonian( L,S,1.0,1.0,0.0);
+        itsiH=itsFactory->Make1D_NN_HeisenbergiHamiltonian(L,S,1.0,1.0,0.0);
+        itsOperatorClient=new TensorNetworks::Hamiltonian_1D_NN_Heisenberg(S,1.0,1.0,0.0);
         assert(itsOperatorClient);
         itsMPS=itsH->CreateMPS(D);
     }
@@ -62,7 +69,7 @@ public:
     }
     MatrixRT GetiW(int isite, int m, int n)
     {
-        const TensorNetworks::iMPO* hmpo=itsH;
+        const TensorNetworks::iMPO* hmpo=itsiH;
         return hmpo->GetSiteOperator(isite)->GetW(m,n);
     }
 
@@ -71,7 +78,8 @@ public:
 
     double eps;
            TensorNetworks::Factory*        itsFactory;
-           TensorNetworks::Hamiltonian*    itsH;
+           TensorNetworks:: Hamiltonian*   itsH;
+           TensorNetworks::iHamiltonian*   itsiH;
     const  TensorNetworks::OperatorClient* itsOperatorClient;
            TensorNetworks::MPS*            itsMPS;
 };
@@ -347,7 +355,7 @@ TEST_F(MPOTests,TestL2iMPOTrotter1)
     int L=2,D=2;
     double S=0.5,dt=0.00001,epsMPO=1e-14;
     Setup(L,S,D);
-    TensorNetworks::iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
+    TensorNetworks::iMPO* expH=itsiH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
 //    expH->Report(cout);
     for (int is=1;is<=L;is++)
     {
@@ -368,7 +376,7 @@ TEST_F(MPOTests,TestL2iMPOTrotter2)
     int L=2,D=2;
     double S=0.5,dt=0.1,epsMPO=6e-3;
     Setup(L,S,D);
-    TensorNetworks::iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder,epsMPO);
+    TensorNetworks::iMPO* expH=itsiH->CreateiMPO(dt,TensorNetworks::SecondOrder,epsMPO);
     expH->Report(cout);
     for (int is=1;is<=L;is++)
     {
@@ -397,7 +405,7 @@ TEST_F(MPOTests,TestParkerCanonicalL9)
     double S=0.5;
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
-    TensorNetworks::iMPO* H=itsH;
+    TensorNetworks::iMPO* H=itsiH;
     EXPECT_EQ(H->GetNormStatus(),"WWWWWWWWW");
     double E=itsMPS->GetExpectation(itsH);
     H->CanonicalForm(TensorNetworks::DLeft);
@@ -418,7 +426,7 @@ TEST_F(MPOTests,TestParkerSVDCompressHL9)
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
 
-    TensorNetworks::iMPO* H=itsH;
+    TensorNetworks::iMPO* H=itsiH;
     H->Report(cout);
     EXPECT_EQ(H->GetNormStatus(),"WWWWWWWWW");
     double E=itsMPS->GetExpectation(itsH);
@@ -523,7 +531,7 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DLeft);
-    TensorNetworks::Matrix4RT H12=itsH->BuildLocalMatrix();
+    TensorNetworks::Matrix4RT H12=itsH->GetLocalMatrix();
     //    TensorNetworks::iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder,1e-13);
 //  TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
 //    TensorNetworks::MPO* expH=itsH->CreateUnitOperator();

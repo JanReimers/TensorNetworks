@@ -9,15 +9,13 @@ using std::endl;
 namespace TensorNetworks
 {
 
-Hamiltonian_1D_NN_Heisenberg_Upper::Hamiltonian_1D_NN_Heisenberg_Upper(int L, double S, double Jxy,double Jz, double hz)
-    : HamiltonianImp(L,S)
+Hamiltonian_1D_NN_Heisenberg_Upper::Hamiltonian_1D_NN_Heisenberg_Upper(double S, double Jxy,double Jz, double hz)
+    : itsS  (S)
     , itsJxy(Jxy)
-    , itsJz(Jz)
-    , itshz(hz)
+    , itsJz (Jz)
+    , itshz (hz)
 {
     assert(fabs(itsJxy)+fabs(Jz)>0.0);
-    itsDw=Dw12(Dw,Dw);
-    InitializeSites();
 }
 
 Hamiltonian_1D_NN_Heisenberg_Upper::~Hamiltonian_1D_NN_Heisenberg_Upper()

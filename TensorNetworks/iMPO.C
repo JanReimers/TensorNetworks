@@ -10,6 +10,7 @@
 namespace TensorNetworks
 {
 
+/*
 int iMPO::GetMaxDw() const
 {
     int L=GetL();
@@ -20,8 +21,9 @@ int iMPO::GetMaxDw() const
     }
     return Dw;
 }
+*/
 
-void iMPO::Report(std::ostream& os) const
+/*void iMPO::Report(std::ostream& os) const
 {
     int L=GetL();
     os << "infinite Matrix Product Operator for " << L << " sites." << std::endl;
@@ -52,11 +54,7 @@ void  iMPO::Dump(std::ostream& os) const
     }
 }
 
-const SiteOperator* iMPO::GetSiteOperator(int isite) const
-{
-    return const_cast<iMPO*>(this)->GetSiteOperator(isite);
-}
-
+*/
 
 void iMPO::Combine(const iMPO* O2)
 {
@@ -67,7 +65,7 @@ void iMPO::Combine(const iMPO* O2)
         GetSiteOperator(ia)->Combine(O2->GetSiteOperator(ia),1.0);
     }
 }
-
+/*
 double iMPO::CompressStd(int Dmax, double epsSV)
 {
     Factory* f=Factory::GetFactory();
@@ -135,6 +133,6 @@ std::string iMPO::GetNormStatus () const
            status[ia-1]=GetSiteOperator(ia)->GetNormStatus(1e-13);
      return status;
 }
-
+*/
 
 }

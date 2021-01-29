@@ -7,14 +7,18 @@
 namespace TensorNetworks
 {
     class MPS;
+    class MPO;
     class FullState;
-    class iTEBDState;
 
     class Hamiltonian;
-    class MPO;
+
+    class iTEBDState;
+    class iHamiltonian;
     class iMPO;
+
     class SiteOperator;
     class Dw12;
+    class SpinCalculator;
     class OperatorClient;
 
     template <class T> class SVCompressor;
@@ -27,7 +31,5 @@ namespace TensorNetworks
 
     class TNSLogger;
 }
-
-template<class X> class rc_ptr;
 
 #endif // NAMESPACE_H_INCLUDED

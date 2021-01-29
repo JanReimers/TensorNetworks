@@ -45,8 +45,8 @@ public:
 //
 // Find ground state.  Return <E^2>-<E>^2
 //
-    virtual double FindiTimeGroundState      (const Hamiltonian* H,const IterationSchedule&);
-    virtual void   InitGates (const Hamiltonian*,double dt,TrotterOrder,double eps)=0;
+    virtual double FindiTimeGroundState      (const Hamiltonian* H,const iHamiltonian* iH,const IterationSchedule&);
+    virtual void   InitGates (const iHamiltonian*,double dt,TrotterOrder,double eps)=0;
     virtual void   Apply     (SVCompressorC*, int center)=0;
 
     virtual void   Apply     (const Matrix4RT&      expH,SVCompressorC* comp) {       Apply(expH,comp,false);}
@@ -86,7 +86,7 @@ public:
 protected:
 
     int       GetModSite(int isite) const;
-    double    FindiTimeGroundState(const Hamiltonian*,const iMPO* H2, const IterationScheduleLine&);
+    double    FindiTimeGroundState(const Hamiltonian* H,const iHamiltonian* iH,const iMPO* H2, const IterationScheduleLine&);
 
 
     virtual   double GetOrthonormalityErrors() const;

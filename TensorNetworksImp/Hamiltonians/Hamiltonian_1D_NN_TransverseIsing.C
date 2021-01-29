@@ -9,14 +9,12 @@ using std::endl;
 namespace TensorNetworks
 {
 
-Hamiltonian_1D_NN_TransverseIsing::Hamiltonian_1D_NN_TransverseIsing(int L, double S, double J, double hx)
-    : HamiltonianImp(L,S)
+Hamiltonian_1D_NN_TransverseIsing::Hamiltonian_1D_NN_TransverseIsing(double S, double J, double hx)
+    : itsS (S)
     , itsJ (J)
     , itshx(hx)
 {
     assert(fabs(itsJ)+fabs(itshx)>0.0);
-    itsDw=Dw12(Dw,Dw);
-    InitializeSites();
 }
 
 Hamiltonian_1D_NN_TransverseIsing::~Hamiltonian_1D_NN_TransverseIsing()
