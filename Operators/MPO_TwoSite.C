@@ -9,7 +9,7 @@ namespace TensorNetworks
 
 
 MPO_TwoSite::MPO_TwoSite(int L, double S ,int isite1,int isite2, SpinOperator so1, SpinOperator so2)
-    : MPOImp(L,S,MPOImp::LoadLater)
+    : MPOImp(L,S)
 {
     assert(isValidSpin(S));
     int d=2*S+1;

@@ -10,6 +10,9 @@ namespace TensorNetworks
 //
 //  Implement Hamiltonian construction which involves deciding what type of operators
 //  (Left/Bulk/Right) live on each site.
+//  This class has been wittled down to the point there all it does now is:
+//      1) Cache H12 matrix
+//      2) Act as factory for wave functions and other MPOs.
 //
 class HamiltonianImp
     : public virtual Hamiltonian
@@ -18,9 +21,7 @@ class HamiltonianImp
 public:
     HamiltonianImp(int L, const OperatorClient* W);
     virtual ~HamiltonianImp();
-    //
-    //  Hamiltonian interface
-    //
+
     virtual int GetL    () const {return MPOImp::GetL    ();}
     virtual int Getd    () const {return MPOImp::Getd    ();}
     virtual int GetMaxDw() const {return MPOImp::GetMaxDw();}

@@ -8,7 +8,9 @@
 namespace TensorNetworks
 {
 //
-//  Implement iHamiltonian construction with all Bulk operators (no Left/Right) at the edges.
+//  This class has been wittled down to the point there all it does now is:
+//      1) Cache H12 matrix
+//      2) Act as factory for wave functions and other MPOs.
 //
 class iHamiltonianImp
     : public virtual iHamiltonian
@@ -17,9 +19,7 @@ class iHamiltonianImp
 public:
     iHamiltonianImp(int L, const OperatorClient* W);
     virtual ~iHamiltonianImp();
-    //
-    //  iHamiltonian interface
-    //
+
     virtual int GetL    () const {return iMPOImp::GetL    ();}
     virtual int Getd    () const {return iMPOImp::Getd    ();}
     virtual int GetMaxDw() const {return iMPOImp::GetMaxDw();}

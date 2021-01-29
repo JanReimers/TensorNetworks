@@ -2,64 +2,64 @@
 #include "Operators/SiteOperatorLeft.H"
 #include "Operators/SiteOperatorBulk.H"
 #include "Operators/SiteOperatorRight.H"
+#include "Operators/OperatorClient.H"
 #include "TensorNetworks/CheckSpin.H"
 
 namespace TensorNetworks
 {
+//
+//  Root constructor.  All other constructors should delegate to this one.
+//
+MPOImp::MPOImp(int L, double S)
+    : itsL(L)
+    , itsS(S)
+    , areSitesLinked(false)
+    , itsSites()
+{
+    assert(isValidSpin(S));
+    assert(itsL>1);
+    assert(Getd()>1);
+}
 
 MPOImp::MPOImp(int L, double S,LoadWith loadWith)
-    : itsL(L)
-    , itsS(S)
-    , areSitesLinked(false)
-    , itsSites()
+    : MPOImp(L,S)
 {
-    assert(isValidSpin(S));
-    int d=2*S+1;
-    assert(itsL>1);
-    assert(d>1);
+    int d=Getd();
+    assert(loadWith==Identity);
 
-    switch (loadWith)
-    {
-    case Identity:
-    {
-        //
-        //  Load up the sites with unit operators
-        //  TODO tidy up loop and unit test.
-        //
-        Insert(new SiteOperatorLeft(d));
-        for (int ia=2; ia<=itsL-1; ia++)
-            Insert(new SiteOperatorBulk(d));
-        Insert(new SiteOperatorRight(d));
-        LinkSites();
-        break;
-    }
-    case LoadLater:
-    {
-        break;
-    }
-    }
+    Insert(new SiteOperatorLeft(d));
+    for (int ia=2; ia<=itsL-1; ia++)
+        Insert(new SiteOperatorBulk(d));
+    Insert(new SiteOperatorRight(d));
+    LinkSites();
 
 }
 
-MPOImp::MPOImp(int L, double S, const TensorT& W)
-    : itsL(L)
-    , itsS(S)
-    , areSitesLinked(false)
-    , itsSites()
+MPOImp::MPOImp(int L, const OperatorClient* W)
+    : MPOImp(L,W->GetS())
 {
-    assert(isValidSpin(S));
-    int d=2*S+1;
-    assert(itsL>=1);
-    assert(d>1);
-    //
-    //  Load up the sites with copies of the W operator
-    //
-
-    for (int ia=1; ia<=itsL; ia++)
-    {
+    int d=Getd();
+    Insert(new SiteOperatorLeft(d,W));
+    for (int ia=2;ia<=GetL()-1;ia++)
         Insert(new SiteOperatorBulk(d,W));
-    }
+    Insert(new SiteOperatorRight(d,W));
+    LinkSites();
+
 }
+
+
+//MPOImp::MPOImp(int L, double S, const TensorT& W)
+//    : MPOImp(L,S)
+//{
+//    //
+//    //  Load up the sites with copies of the W operator
+//    //
+//    int d=Getd();
+//    for (int ia=1; ia<=itsL; ia++)
+//    {
+//        Insert(new SiteOperatorBulk(d,W));
+//    }
+//}
 
 
 

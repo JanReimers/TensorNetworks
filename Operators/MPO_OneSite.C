@@ -8,7 +8,7 @@ namespace TensorNetworks
 {
 
 MPO_OneSite::MPO_OneSite(int L, double S ,int isite, SpinOperator o)
-    : MPOImp(L,S,MPOImp::LoadLater)
+    : MPOImp(L,S)
 {
     assert(isValidSpin(S));
     int d=2*S+1;

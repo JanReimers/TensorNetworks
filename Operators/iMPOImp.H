@@ -12,10 +12,11 @@ class iMPOImp
 {
     typedef Matrix<MatrixRT> TensorT;
 public:
-    enum LoadWith {Identity,LoadLater};
+    enum LoadWith {Identity};
+    iMPOImp(int L, double S);
     iMPOImp(int L, double S,iMPOImp::LoadWith);
     iMPOImp(int L, double S,const TensorT& W);
-    iMPOImp(int L, double S,const OperatorClient* W);
+    iMPOImp(int L, const OperatorClient* W);
     virtual ~iMPOImp();
 
     virtual int    GetL() const {return itsL;}

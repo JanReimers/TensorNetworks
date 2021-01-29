@@ -18,7 +18,7 @@ namespace TensorNetworks
 //   Whem flatted to H(m,n) where m=(m1,m2) n=(n1,n2) it is hermitian and diagonalizable.
 //
 MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, double S, const Hamiltonian* H)
-    : MPOImp(L,S,MPOImp::LoadLater)
+    : MPOImp(L,S)
 {
     assert(isValidSpin(S));
     int d=2*S+1;

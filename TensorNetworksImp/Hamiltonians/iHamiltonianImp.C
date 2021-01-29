@@ -1,7 +1,5 @@
 #include "TensorNetworksImp/Hamiltonians/iHamiltonianImp.H"
 #include "Operators/OperatorClient.H"
-#include "Operators/SiteOperatorBulk.H"
-#include "TensorNetworks/CheckSpin.H"
 #include <iostream>
 
 using std::cout;
@@ -11,13 +9,8 @@ namespace TensorNetworks
 {
 
 iHamiltonianImp::iHamiltonianImp(int L, const OperatorClient* W)
-    :  iMPOImp(L,W->GetS(),iMPOImp::LoadLater)
+    :  iMPOImp(L,W)
 {
-    int d=Getd();
-    for (int ia=1;ia<=GetL();ia++)
-        iMPOImp::Insert(new SiteOperatorBulk(d,W));
-    iMPOImp::LinkSites();
-
     itsH12=W->GetH12();
 }
 

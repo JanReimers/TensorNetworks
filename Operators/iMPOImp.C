@@ -2,6 +2,7 @@
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworksImp/StateIterator.H"
 #include "Operators/SiteOperatorBulk.H"
+#include "Operators/OperatorClient.H"
 #include "TensorNetworks/CheckSpin.H"
 
 using std::cout;
@@ -9,76 +10,53 @@ using std::endl;
 
 namespace TensorNetworks
 {
-
-iMPOImp::iMPOImp(int L, double S,LoadWith loadWith)
+//
+//  Root constructor.  All other constructors should delegate to this one.
+//
+iMPOImp::iMPOImp(int L, double S)
     : itsL(L)
     , itsS(S)
     , areSitesLinked(false)
     , itsSites()
 {
     assert(isValidSpin(S));
-    int d=2*S+1;
-    assert(itsL>1);
-    assert(d>1);
-    switch (loadWith)
-    {
-    case Identity:
-    {
-        //
-        //  Load up the sites with unit operators
-        //  TODO tidy up loop and unit test.
-        //
-        for (int ia=1; ia<=itsL; ia++)
-            Insert(new SiteOperatorBulk(d));
-
-        LinkSites();
-        break;
-    }
-    case LoadLater:
-    {
-        break;
-    }
-    }
-
+    assert(itsL>0);
+    assert(Getd()>1);
 }
 
-iMPOImp::iMPOImp(int L, double S,const TensorT& W)
-    : itsL(L)
-    , itsS(S)
-    , areSitesLinked(false)
-    , itsSites()
-{
-    assert(isValidSpin(S));
-    int d=2*S+1;
-    assert(itsL>=1);
-    assert(d>1);
-    //
-    //  Load up the sites with copies of the W operator
-    //
 
+//
+//  Load up the sites with unit operators
+//
+iMPOImp::iMPOImp(int L, double S,LoadWith loadWith)
+    : iMPOImp(L,S)
+{
+    assert(loadWith==Identity);
     for (int ia=1; ia<=itsL; ia++)
-    {
-        Insert(new SiteOperatorBulk(d,W));
-    }
+        Insert(new SiteOperatorBulk(Getd()));
+
     LinkSites();
 }
 
-iMPOImp::iMPOImp(int L, double S,const OperatorClient* W)
-    : itsL(L)
-    , itsS(S)
-    , areSitesLinked(false)
-    , itsSites()
+//
+//  Load up the sites with copies of the W operator
+//
+iMPOImp::iMPOImp(int L, double S,const TensorT& W)
+    : iMPOImp(L,S)
 {
-    assert(isValidSpin(S));
-    int d=2*S+1;
-    assert(itsL>=1);
-    assert(d>1);    //
-    //  Load up the sites with copies of the W operator
-    //  For and iMPO the sites at the edge of the unit cell are considered Bulk
-    //
     for (int ia=1; ia<=itsL; ia++)
-        Insert(new SiteOperatorBulk(d,W));
-
+        Insert(new SiteOperatorBulk(Getd(),W));
+    LinkSites();
+}
+//
+//  Load up the sites with copies of the W operator
+//  For and iMPO the sites at the edge of the unit cell are considered Bulk
+//
+iMPOImp::iMPOImp(int L, const OperatorClient* W)
+    : iMPOImp(L,W->GetS())
+{
+    for (int ia=1; ia<=itsL; ia++)
+        Insert(new SiteOperatorBulk(Getd(),W));
     LinkSites();
 }
 

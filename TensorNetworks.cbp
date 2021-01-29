@@ -136,6 +136,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/MPO_TwoSite.H" />
+		<Unit filename="Operators/OperatorClient.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="Operators/OperatorClient.H" />
 		<Unit filename="Operators/SiteOperatorBulk.C">
 			<Option compilerVar="CC" />
@@ -297,10 +300,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/SVCompressorImp.H" />
-		<Unit filename="TensorNetworksImp/SVMPOCompressor.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworksImp/SVMPOCompressor.H" />
 		<Unit filename="TensorNetworksImp/SpinCalculator.C">
 			<Option compilerVar="CC" />
 		</Unit>
