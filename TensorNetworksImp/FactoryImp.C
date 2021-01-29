@@ -5,7 +5,6 @@
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg_Upper.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_TransverseIsing.H"
 #include "TensorNetworksImp/SVCompressorImp.H"
-#include "TensorNetworksImp/SVMPOCompressor.H"
 #include "TensorNetworksImp/SPDLogger.H"
 
 namespace TensorNetworks
