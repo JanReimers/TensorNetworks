@@ -26,7 +26,7 @@ public:
     //
     //  Contract MPOs together
     //
-    virtual void Combine(const SiteOperator* O2,double factor)=0;
+    virtual void Product(const SiteOperator* O2)=0;
     //
     //  SVD compress and normalize to reduce Dw
     //

@@ -228,10 +228,10 @@ TEST_F(MPOTests,TestMPOCombineForH2)
     itsMPS->Normalize(TensorNetworks::DRight);
     int Dw=itsH->GetMaxDw();
     TensorNetworks::MPO* H1=itsH->CreateUnitOperator();
-    H1->Combine(itsH);
+    H1->Product(itsH);
     TensorNetworks::MPO* H2=itsH->CreateUnitOperator();
-    H2->Combine(itsH);
-    H2->Combine(itsH);
+    H2->Product(itsH);
+    H2->Product(itsH);
     EXPECT_EQ(H1->GetMaxDw(),Dw);
     EXPECT_EQ(H2->GetMaxDw(),Dw*Dw);
     delete H1;
@@ -245,10 +245,10 @@ TEST_F(MPOTests,TestMPOCompressForH2)
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
     TensorNetworks::MPO* H1=itsH->CreateUnitOperator();
-    H1->Combine(itsH);
+    H1->Product(itsH);
     TensorNetworks::MPO* H2=itsH->CreateUnitOperator();
-    H2->Combine(itsH);
-    H2->Combine(itsH);
+    H2->Product(itsH);
+    H2->Product(itsH);
     H2->CanonicalForm(TensorNetworks::DLeft);
     H2->CanonicalForm(TensorNetworks::DRight);
     H2->CompressStd(0,1e-13);
@@ -288,8 +288,8 @@ TEST_F(MPOTests,TestH2CompressL2)
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
     TensorNetworks::MPO* H2=itsH->CreateUnitOperator();
-    H2->Combine(itsH);
-    H2->Combine(itsH);
+    H2->Product(itsH);
+    H2->Product(itsH);
 //    H2->Report(cout);
     double E21=itsMPS->GetExpectation(H2);
     EXPECT_EQ(H2->GetMaxDw(),25);
@@ -319,10 +319,10 @@ TEST_F(MPOTests,TestMPOCompressForE2)
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DRight);
     TensorNetworks::MPO* H1=itsH->CreateUnitOperator();
-    H1->Combine(itsH);
+    H1->Product(itsH);
     TensorNetworks::MPO* H2=itsH->CreateUnitOperator();
-    H2->Combine(itsH);
-    H2->Combine(itsH);
+    H2->Product(itsH);
+    H2->Product(itsH);
     double E2a=itsMPS->GetExpectation(H2);
     H2->CanonicalForm(TensorNetworks::DLeft);
     H2->CanonicalForm(TensorNetworks::DRight);
@@ -453,8 +453,8 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L9)
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     TensorNetworks::MPO* H2=itsH->CreateUnitOperator();
-    H2->Combine(itsH);
-    H2->Combine(itsH);
+    H2->Product(itsH);
+    H2->Product(itsH);
     H2->Report(cout);
 
     EXPECT_EQ(H2->GetNormStatus(),"WWWWWWWWW");
@@ -481,8 +481,8 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L256)
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     TensorNetworks::MPO* H2=itsH->CreateUnitOperator();
-    H2->Combine(itsH);
-    H2->Combine(itsH);
+    H2->Product(itsH);
+    H2->Product(itsH);
 
     double E2=itsMPS->GetExpectation(H2);
     H2->CanonicalForm(TensorNetworks::DRight);

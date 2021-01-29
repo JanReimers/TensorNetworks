@@ -80,8 +80,8 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) 
             W=new iMPOImp(L,S,iMPOImp::Identity);
             iMPO_SpatialTrotter Wodd (dt,Odd ,L,S,this);
             iMPO_SpatialTrotter Weven(dt,Even,L,S,this);
-            W->Combine(&Weven);
-            W->Combine(&Wodd);
+            W->Product(&Weven);
+            W->Product(&Wodd);
             W->CompressStd(0,epsMPO);
             break;
         }
@@ -91,11 +91,11 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) 
             iMPO_SpatialTrotter Wodd (dt/2.0,Odd ,L,S,this);
             W=new iMPOImp(L,S,iMPOImp::Identity);
 //            W->Report(cout);
-            W->Combine(&Wodd);
+            W->Product(&Wodd);
 //            W->Report(cout);
-            W->Combine(&Weven);
+            W->Product(&Weven);
 //            W->Report(cout);
-            W->Combine(&Wodd);
+            W->Product(&Wodd);
 //            W->Report(cout);
             W->CompressStd(0,epsMPO);
             break;
@@ -117,10 +117,10 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) 
                 iMPOImp U(L,S,iMPOImp::Identity);
                 iMPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,L,S,this);
                 iMPO_SpatialTrotter Weven(ts(it)    ,Even,L,S,this);
-                U.Combine(&Wodd);
-                U.Combine(&Weven);
-                U.Combine(&Wodd);
-                W->Combine(&U);
+                U.Product(&Wodd);
+                U.Product(&Weven);
+                U.Product(&Wodd);
+                W->Product(&U);
                 W->CompressStd(0,epsMPO);
                 assert(W->GetMaxDw()<=4096);
             }

@@ -12,7 +12,7 @@ namespace TensorNetworks
 //    1) store a string MPOs, each with left and right neighbour links.
 //    2) serve up the site operators W(m,n) by site number
 //  All operator are initialized as unit operators with Dw=1.
-//  Non trivial MPOs are then created using the Combine function in MPO.H
+//  Non trivial MPOs are then created using the Product function in MPO.H
 //
 class MPOImp
     : public virtual MPO

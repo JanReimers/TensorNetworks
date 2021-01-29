@@ -66,19 +66,12 @@ std::string MPO::GetNormStatus () const
 
 
 
-void MPO::Combine(const MPO* O2)
-{
-    Combine(O2,1.0);
-}
-
-void MPO::Combine(const MPO* O2,double factor)
+void MPO::Product(const MPO* O2)
 {
     int L=GetL();
     assert(L==O2->GetL());
     for (int ia=1;ia<=L;ia++)
-    {
-        GetSiteOperator(ia)->Combine(O2->GetSiteOperator(ia),factor);
-    }
+        GetSiteOperator(ia)->Product(O2->GetSiteOperator(ia));
 }
 
 double MPO::CompressStd(int Dmax, double epsSV)

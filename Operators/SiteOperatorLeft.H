@@ -28,7 +28,7 @@ class SiteOperatorLeft
             return itslWs(m+1,n+1);
         }
 
-        virtual void Combine(const SiteOperator* O2,double factor);
+        virtual void Product(const SiteOperator* O2);
         virtual double GetFrobeniusNorm() const {return SiteOperatorImp::GetFrobeniusNorm();};
         virtual char   GetLRB() const {return 'L';}
 

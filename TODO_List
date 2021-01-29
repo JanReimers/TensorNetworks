@@ -1,38 +1,18 @@
 
+-Do we really need iMPO::Combine ?
+-SiteOperatorImp use delegate constructors
 -MPO/iMPO areSitesLinked only used in asserts, can we lose them?
-Done: -Clean up Hamiltonian interface
-Done: -Separate out OperatorClient into its own header
-Done: -Don't pass SPinCalculator in GetH
 -iTEBDState::FindiTimeGroundState takes a Hamiltonian instead of an iHamiltonian
     simply because we are not very good taking expectation values of iMPOs yet
-Done: -Get rid of MPOcompressor
-Fixed: -MPOImp do we really need LoadWith enums?
-Done: -Ham/iHam move itsH12 calc into OperatorClient
-Done: -Refactor: Lots of duplicated code for MPO/iMPOP Ham/iHam.
--iMPOs, all sites should be bulk.  How to achieve this
-    Done: -Stop deriving iMPOimp from MPOImp
-    Done: -Stop deriving iMPO from MPO
-        Done: Are interfaces even distinct?
-            Combine(MPO*) and Combine(iMPO*) will be different
-            Only iMPO has MakeUnitcelliMPO
-        Done: But we need distinct types
-            can they share common base
--Done: Refactor, share some imp between MPO and iMPO
-    THis is complicated by Hamiltonian deriving from both MPO and iMPO
--MPO Get rid of factor in Combine. Rename Combine to Product.
+Done: -MPO/iMPO Get rid of factor in Combine. Rename Combine to Product.
 -MPO Add (rather than combine) MPOs to do:
             S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
 -MPO use enum to choose Std or Parker compression
 -MPO clean up compress return values.
--Done: Not used!! MPOImp::MPOImp(int L, double S, const TensorT& W) does all Bulk, correct?!?!?
 -MPO Use TensorProduct in combine
 -Trotter MPO and iMPO have a lot of duplicated code for calculating exp(-t*H) and factoring it.
     Done: -ExpH
     -Factor U*s*V = expH
-Done: -MPOs show lower/upper triangular in Report
-Done: -MPOs show Left/Bulk/Right in Report
-Done: -Create iMPOs directly, get rid of the convert method.
-        Done for iH and iH^2
 -Add asserts to confirm zeros in Lp matrices are indeed zero.
 
 Next steps:
@@ -125,8 +105,6 @@ Next steps:
         1) automatically tracks nab,na and nb consistently
         2) handles N sites per unit cell
         3) handle MPOs with two sets of indices
-Done: -Refactor: MPO_SpatialTrotter takes Hlocal, should work from H or expH.  Right now it duplicates code
-    for calculating expH.
 -Move all oml instancing to oml side.
 -Save wave functions to disk.
 -Investigate sweep directions for normalization
@@ -169,6 +147,30 @@ Backburner:
         -Might need to identify parameters with strings "Jxy"
 
 ----------------------------------------------------------------------------------------------------------
+Done: -Refactor: MPO_SpatialTrotter takes Hlocal, should work from H or expH.  Right now it duplicates code
+    for calculating expH.
+Done: -Not used!! MPOImp::MPOImp(int L, double S, const TensorT& W) does all Bulk, correct?!?!?
+Done: -Clean up Hamiltonian interface
+Done: -Separate out OperatorClient into its own header
+Done: -Don't pass SPinCalculator in GetH
+Done: -Get rid of MPOcompressor
+Fixed: -MPOImp do we really need LoadWith enums?
+Done: -Ham/iHam move itsH12 calc into OperatorClient
+Done: -Refactor: Lots of duplicated code for MPO/iMPOP Ham/iHam.
+-iMPOs, all sites should be bulk.  How to achieve this
+    Done: -Stop deriving iMPOimp from MPOImp
+    Done: -Stop deriving iMPO from MPO
+        Done: Are interfaces even distinct?
+            Combine(MPO*) and Combine(iMPO*) will be different
+            Only iMPO has MakeUnitcelliMPO
+        Done: But we need distinct types
+            can they share common base
+-Done: Refactor, share some imp between MPO and iMPO
+    THis is complicated by Hamiltonian deriving from both MPO and iMPO
+Done: -MPOs show lower/upper triangular in Report
+Done: -MPOs show Left/Bulk/Right in Report
+Done: -Create iMPOs directly, get rid of the convert method.
+        Done for iH and iH^2
         -Code up  MPO compression as per Parker
             Done: -Clean DLeft code
             Done: -Mirror for DRight

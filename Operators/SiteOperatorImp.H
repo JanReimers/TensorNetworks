@@ -15,7 +15,7 @@ template <class T> Matrix<T> TensorProduct(const Matrix<T>& a, const Matrix<T>& 
     int nc=a.GetNumCols()*b.GetNumCols();
     Matrix<T> r(nr,nc);
     //
-    //  These loops need to run in the same order as SiteOperatorImp::Combine
+    //  These loops need to run in the same order as SiteOperatorImp::Product
     //
     int i=1;
     for (index_t ia:a.rows())
@@ -61,7 +61,7 @@ class SiteOperatorImp : public virtual SiteOperator
         //
         //  Contract MPOs together
         //
-        virtual void Combine(const SiteOperator* O2,double factor);
+        virtual void Product(const SiteOperator* O2);
         //
         //  SVD compress and normalize to reduce Dw
         //

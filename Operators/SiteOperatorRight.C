@@ -126,7 +126,7 @@ void SiteOperatorRight::SetLimits()
     SiteOperatorImp::SetLimits();
 }
 
-void SiteOperatorRight::Combine(const SiteOperator* O2,double factor)
+void SiteOperatorRight::Product(const SiteOperator* O2)
 {
     const SiteOperatorRight* o2=dynamic_cast<const SiteOperatorRight*>(O2);
     assert(o2);
@@ -134,7 +134,7 @@ void SiteOperatorRight::Combine(const SiteOperator* O2,double factor)
 //    std::cout << "o2 itsr=" << o2->itsr << std::endl;
     itsr=TensorProduct(itsr,o2->itsr);
 //    std::cout << "itsr=" << itsr << " " << this << std::endl;
-    SiteOperatorImp::Combine(O2,factor);
+    SiteOperatorImp::Product(O2);
 }
 
 

@@ -209,7 +209,7 @@ void  SiteOperatorImp::AccumulateTruncationError(double err)
 }
 
 
-void SiteOperatorImp::Combine(const SiteOperator* O2,double factor)
+void SiteOperatorImp::Product(const SiteOperator* O2)
 {
     const SiteOperatorImp* O2i(dynamic_cast<const SiteOperatorImp*>(O2));
     assert(O2i);
@@ -241,7 +241,7 @@ void SiteOperatorImp::Combine(const SiteOperator* O2,double factor)
                                 Wmo(w1,w2)+=W1(w11,w21)*W2(w12,w22);
                     }
             }
-            newWs(m+1,o+1)=factor*Wmo;
+            newWs(m+1,o+1)=Wmo;
         }
     itsWs=newWs;  //Use SetiW instead
 

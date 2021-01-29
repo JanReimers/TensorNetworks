@@ -65,17 +65,17 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
         {
             MPO_SpatialTrotter Wodd (dt,Odd ,L,S,this);
             MPO_SpatialTrotter Weven(dt,Even,L,S,this);
-            W->Combine(&Wodd);
-            W->Combine(&Weven);
+            W->Product(&Wodd);
+            W->Product(&Weven);
             break;
         }
         case SecondOrder :
         {
             MPO_SpatialTrotter Wodd (dt/2.0,Odd ,L,S,this);
             MPO_SpatialTrotter Weven(dt    ,Even,L,S,this);
-            W->Combine(&Wodd);
-            W->Combine(&Weven);
-            W->Combine(&Wodd);
+            W->Product(&Wodd);
+            W->Product(&Weven);
+            W->Product(&Wodd);
  //            W->Compress(0,1e-12);
             break;
         }
@@ -95,14 +95,14 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
                 MPOImp U(L,S,MPOImp::Identity);
                 MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,L,S,this);
                 MPO_SpatialTrotter Weven(ts(it)    ,Even,L,S,this);
-                U.Combine(&Wodd);
-                U.Combine(&Weven);
+                U.Product(&Wodd);
+                U.Product(&Weven);
                 //U.Compress(0,1e-12); //Does not seem to help
-                U.Combine(&Wodd);
+                U.Product(&Wodd);
                 //U.Report(cout);
                 U.CompressStd(0,1e-12); //Useful for large S
                 //U.Report(cout);
-                W->Combine(&U);
+                W->Product(&U);
                 //W->Report(cout);
                 W->CompressStd(0,1e-12);
                 //W->Report(cout);

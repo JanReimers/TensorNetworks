@@ -8,8 +8,8 @@ namespace TensorNetworks
 MPO* Hamiltonian::CreateH2Operator  () const
 {
     MPO* H2=CreateUnitOperator();
-    H2->Combine(this);
-    H2->Combine(this);
+    H2->Product(this);
+    H2->Product(this);
     H2->CompressStd(0,1e-13);
     return H2;
 }

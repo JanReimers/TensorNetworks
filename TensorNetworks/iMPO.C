@@ -5,13 +5,13 @@
 namespace TensorNetworks
 {
 
-void iMPO::Combine(const iMPO* O2)
+void iMPO::Product(const iMPO* O2)
 {
     int L=GetL();
     assert(L==O2->GetL());
     for (int ia=1;ia<=L;ia++)
     {
-        GetSiteOperator(ia)->Combine(O2->GetSiteOperator(ia),1.0);
+        GetSiteOperator(ia)->Product(O2->GetSiteOperator(ia));
     }
 }
 

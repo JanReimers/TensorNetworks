@@ -86,9 +86,9 @@ TEST_F(ImaginaryTimeTests,TestMPPOCombineL8)
     //  Now combine three trotters into one
     //
     TensorNetworks::MPO* W=itsH->CreateUnitOperator();
-    W->Combine(&W_Odd);
-    W->Combine(&W_Even);
-    W->Combine(&W_Odd);
+    W->Product(&W_Odd);
+    W->Product(&W_Even);
+    W->Product(&W_Odd);
     //
     //  Make a random normalized wave function
     //
@@ -130,9 +130,9 @@ TEST_F(ImaginaryTimeTests,TestMPPOCombineL9)
     //  Now combine three trotters into one
     //
     TensorNetworks::MPO* W=itsH->CreateUnitOperator();
-    W->Combine(&W_Odd);
-    W->Combine(&W_Even);
-    W->Combine(&W_Odd);
+    W->Product(&W_Odd);
+    W->Product(&W_Even);
+    W->Product(&W_Odd);
     //
     //  Make a random normalized wave function
     //

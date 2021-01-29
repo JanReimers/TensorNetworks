@@ -33,8 +33,7 @@ public:
     //
     //  High level MPO operations
     //
-    virtual void   Combine(const MPO* O2);
-    virtual void   Combine(const MPO* O2,double factor);
+    virtual void   Product(const MPO* O2);
     virtual double CompressStd   (int Dmax, double epsSV);
     virtual double CompressStd   (const SVCompressorR*);
     virtual double CompressParker(int Dmax, double epsSV);

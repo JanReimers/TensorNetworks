@@ -9,8 +9,8 @@ namespace TensorNetworks
 iMPO* iHamiltonian::CreateiH2Operator  () const
 {
     iMPO* iH2=CreateiUnitOperator();
-    iH2->Combine(this);
-    iH2->Combine(this);
+    iH2->Product(this);
+    iH2->Product(this);
 //    iH2->Compress(0,1e-13);
     return iH2;
 }
