@@ -120,10 +120,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/MPOImp.H" />
-		<Unit filename="Operators/MPO_Common.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Operators/MPO_Common.H" />
 		<Unit filename="Operators/MPO_OneSite.C">
 			<Option compilerVar="CC" />
 		</Unit>
