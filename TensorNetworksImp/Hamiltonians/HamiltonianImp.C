@@ -74,16 +74,16 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
         }
         case FirstOrder :
         {
-            MPO_SpatialTrotter Wodd (dt,Odd ,L,S,itsH12);
-            MPO_SpatialTrotter Weven(dt,Even,L,S,itsH12);
+            MPO_SpatialTrotter Wodd (dt,Odd ,L,S,this);
+            MPO_SpatialTrotter Weven(dt,Even,L,S,this);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             break;
         }
         case SecondOrder :
         {
-            MPO_SpatialTrotter Wodd (dt/2.0,Odd ,L,S,itsH12);
-            MPO_SpatialTrotter Weven(dt    ,Even,L,S,itsH12);
+            MPO_SpatialTrotter Wodd (dt/2.0,Odd ,L,S,this);
+            MPO_SpatialTrotter Weven(dt    ,Even,L,S,this);
             W->Combine(&Wodd);
             W->Combine(&Weven);
             W->Combine(&Wodd);
@@ -104,8 +104,8 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
             for (int it=1;it<=5;it++)
             {
                 MPOImp U(L,S,MPOImp::Identity);
-                MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,L,S,itsH12);
-                MPO_SpatialTrotter Weven(ts(it)    ,Even,L,S,itsH12);
+                MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,L,S,this);
+                MPO_SpatialTrotter Weven(ts(it)    ,Even,L,S,this);
                 U.Combine(&Wodd);
                 U.Combine(&Weven);
                 //U.Compress(0,1e-12); //Does not seem to help

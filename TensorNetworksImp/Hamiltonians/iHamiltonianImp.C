@@ -75,7 +75,6 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) 
     iMPO*  W(nullptr);
     int    L=GetL();
     double S=GetS();
-    Matrix4RT H12=GetLocalMatrix(); //Full H matrix for two sites 1&2
     switch (order)
     {
         case None :
@@ -86,8 +85,8 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) 
         case FirstOrder :
         {
             W=new iMPOImp(L,S,iMPOImp::Identity);
-            iMPO_SpatialTrotter Wodd (dt,Odd ,L,S,H12);
-            iMPO_SpatialTrotter Weven(dt,Even,L,S,H12);
+            iMPO_SpatialTrotter Wodd (dt,Odd ,L,S,this);
+            iMPO_SpatialTrotter Weven(dt,Even,L,S,this);
             W->Combine(&Weven);
             W->Combine(&Wodd);
             W->CompressStd(0,epsMPO);
@@ -95,8 +94,8 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) 
         }
         case SecondOrder :
         {
-            iMPO_SpatialTrotter Weven(dt    ,Even,L,S,H12);
-            iMPO_SpatialTrotter Wodd (dt/2.0,Odd ,L,S,H12);
+            iMPO_SpatialTrotter Weven(dt    ,Even,L,S,this);
+            iMPO_SpatialTrotter Wodd (dt/2.0,Odd ,L,S,this);
             W=new iMPOImp(L,S,iMPOImp::Identity);
 //            W->Report(cout);
             W->Combine(&Wodd);
@@ -123,8 +122,8 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) 
             for (int it=1;it<=5;it++)
             {
                 iMPOImp U(L,S,iMPOImp::Identity);
-                iMPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,L,S,H12);
-                iMPO_SpatialTrotter Weven(ts(it)    ,Even,L,S,H12);
+                iMPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,L,S,this);
+                iMPO_SpatialTrotter Weven(ts(it)    ,Even,L,S,this);
                 U.Combine(&Wodd);
                 U.Combine(&Weven);
                 U.Combine(&Wodd);

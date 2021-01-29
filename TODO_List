@@ -1,22 +1,22 @@
 
--Clean up Hamiltonian interface
--Separate out OperatorClient into its own header
--Don't pass SPinCalculator in GetH
+Done: -Clean up Hamiltonian interface
+Done: -Separate out OperatorClient into its own header
+Done: -Don't pass SPinCalculator in GetH
 -iTEBDState::FindiTimeGroundState takes a Hamiltonian instead of an iHamiltonian
     simply because we are not very good taking expectation values of iMPOs yet
 -Get rid of MPOcompressor
 -MPOImp do we really need LoadWith enums?
--Ham/iHam move itsH12 calc into OperatorClient
--Refactor: Lots of duplicated code for MPO/iMPOP Ham/iHam.
+Done: -Ham/iHam move itsH12 calc into OperatorClient
+Done: -Refactor: Lots of duplicated code for MPO/iMPOP Ham/iHam.
 -iMPOs, all sites should be bulk.  How to achieve this
     Done: -Stop deriving iMPOimp from MPOImp
     Done: -Stop deriving iMPO from MPO
-        Are interfaces even distinct?
+        Done: Are interfaces even distinct?
             Combine(MPO*) and Combine(iMPO*) will be different
             Only iMPO has MakeUnitcelliMPO
         Done: But we need distinct types
             can they share common base
--Refactor, share some imp between MPO and iMPO
+-Done: Refactor, share some imp between MPO and iMPO
     THis is complicated by Hamiltonian deriving from both MPO and iMPO
 -MPO Get rid of factor in Combine. Rename Combine to Product.
 -MPO Add (rather than combine) MPOs to do:
@@ -26,6 +26,8 @@
 -MPOImp::MPOImp(int L, double S, const TensorT& W) does all Bulk, correct?!?!?
 -MPO Use TensorProduct in combine
 -Trotter MPO and iMPO have a lot of duplicated code for calculating exp(-t*H) and factoring it.
+    Done: -ExpH
+    -Factor U*s*V = expH
 Done: -MPOs show lower/upper triangular in Report
 Done: -MPOs show Left/Bulk/Right in Report
 Done: -Create iMPOs directly, get rid of the convert method.
@@ -122,7 +124,7 @@ Next steps:
         1) automatically tracks nab,na and nb consistently
         2) handles N sites per unit cell
         3) handle MPOs with two sets of indices
--Refactor: MPO_SpatialTrotter takes Hlocal, should work from H or expH.  Right now it duplicates code
+Done: -Refactor: MPO_SpatialTrotter takes Hlocal, should work from H or expH.  Right now it duplicates code
     for calculating expH.
 -Move all oml instancing to oml side.
 -Save wave functions to disk.

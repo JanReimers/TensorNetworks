@@ -531,11 +531,11 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DLeft);
-    TensorNetworks::Matrix4RT H12=itsH->GetLocalMatrix();
+//    TensorNetworks::Matrix4RT H12=itsH->GetLocalMatrix();
     //    TensorNetworks::iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder,1e-13);
 //  TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
 //    TensorNetworks::MPO* expH=itsH->CreateUnitOperator();
-    TensorNetworks::MPO* expH=new TensorNetworks::MPO_SpatialTrotter(dt,TensorNetworks::Odd,L,S,H12);
+    TensorNetworks::MPO* expH=new TensorNetworks::MPO_SpatialTrotter(dt,TensorNetworks::Odd,L,S,itsH);
     expH->Report(cout);
 //    expH->Dump(cout);
 

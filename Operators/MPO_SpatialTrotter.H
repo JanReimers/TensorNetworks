@@ -20,8 +20,8 @@ class MPO_SpatialTrotter
     , private MPOImp
 {
     public:
-        MPO_SpatialTrotter(double dt, Trotter type,int L, double S, const Matrix4RT& Hlocal);
-        MPO_SpatialTrotter(double dt, Trotter type,int L, int d   , const Matrix4RT& Hlocal) = delete;
+        MPO_SpatialTrotter(double dt, Trotter type,int L, double S, const Hamiltonian*);
+        MPO_SpatialTrotter(double dt, Trotter type,int L, int d   , const Hamiltonian*) = delete;
         virtual ~MPO_SpatialTrotter();
 };
 

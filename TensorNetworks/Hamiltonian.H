@@ -35,6 +35,8 @@ class Hamiltonian : public virtual MPO
     //    Get a 2 site local matrix of order p^2 x p^2
     virtual Matrix4RT GetLocalMatrix(         ) const=0;
     virtual Matrix4RT GetExponentH  (double dt) const;
+
+    static  Matrix4RT GetExponentH  (double dt,const Matrix4RT& H12);
 };
 
 } //namespace

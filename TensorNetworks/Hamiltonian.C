@@ -13,10 +13,14 @@ MPO* Hamiltonian::CreateH2Operator  () const
     H2->CompressStd(0,1e-13);
     return H2;
 }
-
 Matrix4RT Hamiltonian::GetExponentH(double dt) const
 {
-    MatrixRT U12=GetLocalMatrix().Flatten();
+    return GetExponentH(dt,GetLocalMatrix());
+}
+
+Matrix4RT Hamiltonian::GetExponentH(double dt,const Matrix4RT& H12)
+{
+    MatrixRT U12=H12.Flatten();
     int N=U12.GetNumRows();
     assert(N==U12.GetNumCols());
     int d=sqrt(N);

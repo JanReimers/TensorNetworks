@@ -1,4 +1,5 @@
 #include "MPO_SpatialTrotter.H"
+#include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworksImp/Typedefs.H"
 #include "Containers/Matrix4.H"
 #include "Operators/SiteOperatorBulk.H"
@@ -16,7 +17,7 @@ namespace TensorNetworks
 //  THe local two site Hamiltonian H12 should be stored as H12(m1,m2,n1,n2);
 //   Whem flatted to H(m,n) where m=(m1,m2) n=(n1,n2) it is hermitian and diagonalizable.
 //
-MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, double S, const Matrix4RT& H12)
+MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, double S, const Hamiltonian* H)
     : MPOImp(L,S,MPOImp::LoadLater)
 {
     assert(isValidSpin(S));
@@ -24,26 +25,9 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, double S, 
     assert(L>1);
     assert(d>1);
     assert(type==Odd || type==Even);
-    //
-    //  Diagonalize H12 in order to caluclate exp(-t*H)
-    //
-    //cout << "H12=" << H12 << endl;
-    MatrixRT U12=H12.Flatten();
-    VectorRT evs=Diagonalize(U12);
-    assert(evs.size()==d*d);
-    VectorRT expEvs=exp(-dt*evs);
-    Matrix4RT expH(d,d,d,d,0);
-    Fill(expH.Flatten(),0.0);
-    int i1=1,N=U12.GetNumRows();
-    for (int m1=0; m1<d; m1++)
-        for (int m2=0; m2<d; m2++,i1++)
-        {
-            int i2=1;
-            for (int n1=0; n1<d; n1++)
-                for (int n2=0; n2<d; n2++,i2++)
-                    for (int k=1; k<=N; k++)
-                        expH(m1,n1,m2,n2)+=U12(i1,k)*expEvs(k)*U12(i2,k);
-        }
+
+    Matrix4RT expH=H->GetExponentH(dt);
+    int N=expH.Flatten().GetNumRows();
 //
 // Now SVD to factor exp(-dt*H)
 //
