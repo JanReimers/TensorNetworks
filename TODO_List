@@ -4,7 +4,7 @@ Done: -Separate out OperatorClient into its own header
 Done: -Don't pass SPinCalculator in GetH
 -iTEBDState::FindiTimeGroundState takes a Hamiltonian instead of an iHamiltonian
     simply because we are not very good taking expectation values of iMPOs yet
--Get rid of MPOcompressor
+Done: -Get rid of MPOcompressor
 -MPOImp do we really need LoadWith enums?
 Done: -Ham/iHam move itsH12 calc into OperatorClient
 Done: -Refactor: Lots of duplicated code for MPO/iMPOP Ham/iHam.
