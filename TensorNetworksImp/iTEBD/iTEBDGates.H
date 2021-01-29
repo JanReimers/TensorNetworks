@@ -15,7 +15,7 @@ class iTEBDGates
         iTEBDGates(int L,double S, int D,double normEps,double epsSV);
         virtual ~iTEBDGates();
 
-        virtual void   InitGates (const iHamiltonian*,double dt,TrotterOrder,double eps);
+        virtual void   InitGates (const iHamiltonian*,double dt,TrotterOrder,CompressType,double eps);
         virtual void   Apply     (SVCompressorC*, int center);
 
     private:

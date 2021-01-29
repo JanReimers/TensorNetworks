@@ -336,9 +336,9 @@ TEST_F(MPOTests,TestMPOCompressForE2)
 TEST_F(MPOTests,TestL2MPOTrotter2)
 {
     int L=4,D=2;
-    double S=0.5,dt=0.1;
+    double S=0.5,dt=0.1,epsMPO=1e-4;
     Setup(L,S,D);
-    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
+    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::Std,epsMPO);
 //    expH->CanonicalForm(TensorNetworks::DLeft);
 //    expH->CanonicalForm(TensorNetworks::DRight);
     expH->Compress(TensorNetworks::Std,0,1e-4);
@@ -355,7 +355,7 @@ TEST_F(MPOTests,TestL2iMPOTrotter1)
     int L=2,D=2;
     double S=0.5,dt=0.00001,epsMPO=1e-14;
     Setup(L,S,D);
-    TensorNetworks::iMPO* expH=itsiH->CreateiMPO(dt,TensorNetworks::FirstOrder,epsMPO);
+    TensorNetworks::iMPO* expH=itsiH->CreateiMPO(dt,TensorNetworks::FirstOrder,TensorNetworks::Std,epsMPO);
 //    expH->Report(cout);
     for (int is=1;is<=L;is++)
     {
@@ -376,7 +376,7 @@ TEST_F(MPOTests,TestL2iMPOTrotter2)
     int L=2,D=2;
     double S=0.5,dt=0.1,epsMPO=6e-3;
     Setup(L,S,D);
-    TensorNetworks::iMPO* expH=itsiH->CreateiMPO(dt,TensorNetworks::SecondOrder,epsMPO);
+    TensorNetworks::iMPO* expH=itsiH->CreateiMPO(dt,TensorNetworks::SecondOrder,TensorNetworks::Std,epsMPO);
 //    expH->Report(cout);
     for (int is=1;is<=L;is++)
     {
@@ -506,11 +506,11 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L256)
 TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
 {
     int L=8,D=2;
-    double S=0.5,dt=0.0;
+    double S=0.5,dt=0.0,epsMPO=1e-4;
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DLeft);
-    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
+    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::Std,epsMPO);
 
     TensorNetworks::MPS* psi1=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi1),1.0,1e-13);

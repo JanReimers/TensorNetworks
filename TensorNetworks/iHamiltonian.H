@@ -30,7 +30,7 @@ public:
     virtual iMPO* CreateiUnitOperator() const=0;
     virtual iMPO* CreateiH2Operator() const; //iMPO rep of Hamiltonian^2 for <E^2> calculations
     //  Create and exp(-dt*H) time evolution operator of a certain order in tau.
-    virtual iMPO* CreateiMPO(double dt, TrotterOrder, double epsMPO) const=0;
+    virtual iMPO* CreateiMPO(double dt, TrotterOrder, CompressType,double epsMPO) const=0;
     //    Get a 2 site local matrix of order p^2 x p^2
     virtual Matrix4RT GetLocalMatrix(         ) const=0;
     virtual Matrix4RT GetExponentH  (double dt) const;

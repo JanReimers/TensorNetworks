@@ -177,14 +177,14 @@ TEST_F(ImaginaryTimeTests,TestIterationSchedule)
 TEST_F(ImaginaryTimeTests,MPOCompressSeconderOrderTrotter_dt0)
 {
     int D=8,L=9;
-    double dt=0.0,epsSVD=1e-12;                                                                                                                                                                                                        ;
+    double dt=0.0,epsSVD=1e-12,epsMPO=1e-4;                                                                                                                                                                                                        ;
     Setup(L,0.5,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DLeft );
     itsMPS->Normalize(TensorNetworks::DRight);
 
     //Since dt=0 W should be unit operator.
-    TensorNetworks::MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder);
+    TensorNetworks::MPO* W=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::Std,epsMPO);
 
     TensorNetworks::MPS* Psi2=itsMPS->Apply(W);
     EXPECT_NEAR(itsMPS->GetOverlap(Psi2),1.0,eps);
@@ -300,10 +300,10 @@ TEST_F(ImaginaryTimeTests,MPOCompressSeconderOrderTrotter_dt05_FixedDw)
 TEST_F(ImaginaryTimeTests,MPOCompressFourthOrderTrotter)
 {
     int D=8,L=9;
-    double dt=0.1;
+    double dt=0.1,epsMPO=1e-13;
     Setup(L,0.5,D);
 
-    TensorNetworks::MPO* W=itsH->CreateOperator(dt,TensorNetworks::FourthOrder);
+    TensorNetworks::MPO* W=itsH->CreateOperator(dt,TensorNetworks::FourthOrder,TensorNetworks::Std,epsMPO);
     EXPECT_EQ(W->GetMaxDw(),16);
 
 }

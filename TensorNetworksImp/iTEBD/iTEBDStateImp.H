@@ -46,7 +46,7 @@ public:
 // Find ground state.  Return <E^2>-<E>^2
 //
     virtual double FindiTimeGroundState      (const Hamiltonian* H,const iHamiltonian* iH,const IterationSchedule&);
-    virtual void   InitGates (const iHamiltonian*,double dt,TrotterOrder,double eps)=0;
+    virtual void   InitGates (const iHamiltonian*,double dt,TrotterOrder,CompressType,double eps)=0;
     virtual void   Apply     (SVCompressorC*, int center)=0;
 
     virtual void   Apply     (const Matrix4RT&      expH,SVCompressorC* comp) {       Apply(expH,comp,false);}

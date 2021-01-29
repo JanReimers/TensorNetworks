@@ -38,7 +38,7 @@ namespace TensorNetworks
 //  Create states.  Why are these here?  Because the Hamiltonian is the
 //  only thing that knows L,S,Dw
 //
-iTEBDState* iHamiltonianImp::CreateiTEBDState(int D,iTEBDType type,double normEps, double epsSV) const
+iTEBDState* iHamiltonianImp::CreateiTEBDState(int D,iTEBDType type,double normEps,double epsSV) const
 {
     iTEBDState* ret=nullptr;
     switch (type)
@@ -63,7 +63,7 @@ iMPO* iHamiltonianImp::CreateiUnitOperator() const
 }
 
 
-iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) const
+iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order,CompressType ct,double epsMPO) const
 {
     iMPO*  W(nullptr);
     int    L=GetL();
@@ -82,7 +82,7 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) 
             iMPO_SpatialTrotter Weven(dt,Even,L,S,this);
             W->Product(&Weven);
             W->Product(&Wodd);
-            W->Compress(TensorNetworks::Std,0,epsMPO);
+            W->Compress(ct,0,epsMPO);
             break;
         }
         case SecondOrder :
@@ -97,7 +97,7 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) 
 //            W->Report(cout);
             W->Product(&Wodd);
 //            W->Report(cout);
-            W->Compress(TensorNetworks::Std,0,epsMPO);
+            W->Compress(ct,0,epsMPO);
             break;
         }
         case FourthOrder :
@@ -121,7 +121,7 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order, double epsMPO) 
                 U.Product(&Weven);
                 U.Product(&Wodd);
                 W->Product(&U);
-                W->Compress(TensorNetworks::Std,0,epsMPO);
+                W->Compress(ct,0,epsMPO);
                 assert(W->GetMaxDw()<=4096);
             }
             break;

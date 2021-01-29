@@ -49,7 +49,7 @@ MPO* HamiltonianImp::CreateUnitOperator() const
     return new MPOImp(GetL(),GetS(),MPOImp::Identity);
 }
 
-MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
+MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order,CompressType ct,double epsMPO) const
 {
     MPO* W=CreateUnitOperator();
     int    L=GetL();
@@ -76,7 +76,7 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
             W->Product(&Wodd);
             W->Product(&Weven);
             W->Product(&Wodd);
- //            W->Compress(0,1e-12);
+            W->Compress(ct,0,epsMPO);
             break;
         }
         case FourthOrder :
@@ -100,11 +100,11 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order) const
                 //U.Compress(0,1e-12); //Does not seem to help
                 U.Product(&Wodd);
                 //U.Report(cout);
-                U.Compress(TensorNetworks::Std,0,1e-12); //Useful for large S
+                U.Compress(ct,0,epsMPO); //Useful for large S
                 //U.Report(cout);
                 W->Product(&U);
                 //W->Report(cout);
-                W->Compress(TensorNetworks::Std,0,1e-12);
+                W->Compress(ct,0,epsMPO);
                 //W->Report(cout);
                 assert(W->GetMaxDw()<=4096);
             }

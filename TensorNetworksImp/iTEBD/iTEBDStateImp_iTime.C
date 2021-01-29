@@ -47,7 +47,7 @@ double iTEBDStateImp::FindiTimeGroundState(const Hamiltonian* H,const iHamiltoni
     assert(isl.itsDmax>0 || isl.itsEps.itsMPSCompressEpsilon>0);
     double dt=isl.itsdt;
 
-    InitGates(iH,dt,isl.itsTrotterOrder,isl.itsEps.itsMPOCompressEpsilon);
+    InitGates(iH,dt,isl.itsTrotterOrder,Std,isl.itsEps.itsMPOCompressEpsilon);
 
     int Dmax=GetMaxD();
     double epsCompress=1e-16;

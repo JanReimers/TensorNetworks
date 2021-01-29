@@ -18,7 +18,7 @@ iTEBDGates::~iTEBDGates()
 }
 
 
-void iTEBDGates::InitGates (const iHamiltonian* H,double dt,TrotterOrder to,double eps)
+void iTEBDGates::InitGates (const iHamiltonian* H,double dt,TrotterOrder to,CompressType ct,double eps)
 {
     itsGates.clear();
     switch (to)

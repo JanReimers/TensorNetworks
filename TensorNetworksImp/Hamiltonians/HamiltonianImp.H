@@ -28,7 +28,7 @@ public:
 
     virtual MPS*       CreateMPS          (int D          ,double normEps,double epsSV) const;
     virtual MPO*       CreateUnitOperator () const;
-    virtual MPO*       CreateOperator     (double dt, TrotterOrder) const;
+    virtual MPO*       CreateOperator     (double dt, TrotterOrder,CompressType,double epsMPO) const;
     virtual FullState* CreateFullState    () const;
     virtual Matrix4RT  GetLocalMatrix(         ) const {return itsH12;}
 

@@ -26,7 +26,7 @@ public:
 
     virtual iTEBDState* CreateiTEBDState   (int D,iTEBDType,double normEps,double epsSV) const;
     virtual iMPO*       CreateiUnitOperator() const;
-    virtual iMPO*       CreateiMPO         (double dt, TrotterOrder, double epsMPO) const;
+    virtual iMPO*       CreateiMPO         (double dt, TrotterOrder,CompressType,double epsMPO) const;
     virtual Matrix4RT   GetLocalMatrix     () const {return itsH12;}
 
 private:
