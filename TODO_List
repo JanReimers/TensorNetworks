@@ -3,6 +3,7 @@
 -MPO track SV spectrum or at least the Min(Sv).
     -These need to live on bonds between sites.
     -Ideally Dw would also live on the bonds
+-iMPO Trotter has Dw=1 at the edges ?!?
 Done: -MPO canonical form requires sweeping both ways.  Make that the default.
 Done: -Speed up unit tests
 -Log level 0 should have no output
@@ -24,6 +25,7 @@ Done: -MPO clean up compress return values.
     Done: -ExpH
     -Factor U*s*V = expH
 -Add asserts to confirm zeros in Lp matrices are indeed zero.
+-Simplify MPO compression code
 
 Next steps:
     -Try wave function optimization for improve iTEBD GS energies.  Get them closer to mp-toolkit results?

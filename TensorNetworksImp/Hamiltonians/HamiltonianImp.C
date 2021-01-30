@@ -56,7 +56,7 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order,CompressType c
     double S=GetS();
     switch (order)
     {
-        case None :
+        case TNone :
         {
             assert(false);
             break;

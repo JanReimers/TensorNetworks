@@ -8,9 +8,9 @@ namespace TensorNetworks
     enum State        {Product,Random,Neel};
     enum SpinOperator {Sx,Sy,Sz,Sp,Sm};
     enum Trotter      {Odd,Even,TrotterX,TrotterY,TrotterZ};
-    enum TrotterOrder {None,FirstOrder,SecondOrder,FourthOrder};
+    enum TrotterOrder {TNone,FirstOrder,SecondOrder,FourthOrder};
     enum iTEBDType    {Gates,MPOs,iMPOs};
-    enum CompressType {Std,Parker};
+    enum CompressType {CNone,Std,Parker};
 };
 
 #endif // ENUMS_H

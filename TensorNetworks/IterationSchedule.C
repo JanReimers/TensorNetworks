@@ -12,7 +12,7 @@ IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax, const Epsilon
     , itsDmax(Dmax)
     , itsDeltaD(1)
     , itsdt(0.0)  //not used for variational
-    , itsTrotterOrder(None) //not used for variational
+    , itsTrotterOrder(TNone) //not used for variational
     , itsEps(eps)
 {
     assert(itsMaxGSSweepIterations>0);
@@ -25,7 +25,7 @@ IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,int DD, const 
     , itsDmax(Dmax)
     , itsDeltaD(DD)
     , itsdt(0.0)  //not used for variational
-    , itsTrotterOrder(None) //not used for variational
+    , itsTrotterOrder(TNone) //not used for variational
     , itsEps(eps)
 {
     assert(itsMaxGSSweepIterations>0);
@@ -69,7 +69,7 @@ IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,double dt,Trot
 {
     assert(itsMaxGSSweepIterations>0);
     assert(itsdt>0);
-    assert(o!=None);
+    assert(o!=TNone);
 }
 
 IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,int deltaD,double dt,TrotterOrder o,const Epsilons& eps)
@@ -82,7 +82,7 @@ IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,int deltaD,dou
     , itsEps(eps)
 {
     assert(itsMaxGSSweepIterations>0);
-    assert(o!=None);
+    assert(o!=TNone);
 }
 
 IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,int deltaD,int maxOptIter,double dt,TrotterOrder o,const Epsilons& eps)
@@ -96,7 +96,7 @@ IterationScheduleLine::IterationScheduleLine(int maxiter,int Dmax,int deltaD,int
 {
     assert(itsMaxGSSweepIterations>0);
     assert(itsdt>=0);
-    assert(o!=None);
+    assert(o!=TNone);
 }
 
 

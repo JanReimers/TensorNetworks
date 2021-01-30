@@ -22,6 +22,8 @@ double SiteOperatorImp::Compress(CompressType ct,Direction lr,const SVCompressor
     case Parker:
         terror=CompressParker(lr,comp);
         break;
+    case CNone:
+        break;
     default:
         assert(false);
     }

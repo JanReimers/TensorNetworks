@@ -528,16 +528,16 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
 TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
 {
     int L=8,D=2;
-    double S=0.5,dt=1.0,epsMPO=1e-4;
+    double S=0.5,dt=1.0,epsMPO=1e-13;
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DLeft);
 //    TensorNetworks::Matrix4RT H12=itsH->GetLocalMatrix();
-    //    TensorNetworks::iMPO* expH=itsH->CreateiMPO(dt,TensorNetworks::SecondOrder,1e-13);
-  TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::Std,epsMPO);
+//    TensorNetworks::iMPO* expH=itsiH->CreateiMPO(dt,TensorNetworks::SecondOrder,TensorNetworks::CNone,epsMPO);
+    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::CNone,epsMPO);
 //    TensorNetworks::MPO* expH=itsH->CreateUnitOperator();
 //    TensorNetworks::MPO* expH=new TensorNetworks::MPO_SpatialTrotter(dt,TensorNetworks::Odd,L,S,itsH);
-//    expH->Report(cout);
+    expH->Report(cout);
 //    expH->Dump(cout);
 
     EXPECT_NEAR(itsMPS->GetOverlap(itsMPS),1.0,1e-13);
@@ -545,19 +545,17 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
     double o1=psi1->GetOverlap(psi1);
 //    itsMPS->Report(cout);
     expH->CanonicalForm(); //Sweep both ways
+    expH->Report(cout);
     TensorNetworks::MPS* psi3=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi3),o1,1e-13);
 
     double truncError=expH->Compress(TensorNetworks::Parker,0,1e-13);
-//    expH->Report(cout);
+    expH->Report(cout);
     TensorNetworks::MPS* psi4=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi4),o1,1e-13);
 
     EXPECT_EQ(expH->GetMaxDw(),4);
     EXPECT_LT(truncError,epsMPO);
-//    double E2comp=itsMPS->GetExpectation(H2);
-//    EXPECT_NEAR(E2,E2right,1e-13);
-//    EXPECT_NEAR(E2,E2comp ,1e-13);
 }
 
 #ifndef DEBUG

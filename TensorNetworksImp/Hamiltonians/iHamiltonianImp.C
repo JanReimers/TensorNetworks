@@ -70,7 +70,7 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order,CompressType ct,
     double S=GetS();
     switch (order)
     {
-        case None :
+        case TNone :
         {
             assert(false);
             break;
