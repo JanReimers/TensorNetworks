@@ -340,16 +340,16 @@ TEST_F(MPOTests,TestL2MPOTrotter2)
     int L=4,D=2;
     double S=0.5,dt=0.1,epsMPO=1e-4;
     Setup(L,S,D);
-    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::Std,epsMPO);
-    expH->CanonicalForm();
-    double truncError=expH->Compress(TensorNetworks::Std,0,1e-4);
+    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::CNone,epsMPO);
+//    expH->CanonicalForm(); this changes the Dws
+    double truncError=expH->Compress(TensorNetworks::Std,0,epsMPO);
     for (int is=2;is<=L-1;is++)
     {
         TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
         EXPECT_EQ(Dw.Dw1,4);
         EXPECT_EQ(Dw.Dw2,4);
     }
-    EXPECT_LT(truncError,1e-4);
+    EXPECT_LT(truncError,epsMPO*50);
 }
 
 TEST_F(MPOTests,TestL2iMPOTrotter1)
@@ -364,13 +364,6 @@ TEST_F(MPOTests,TestL2iMPOTrotter1)
         TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
         EXPECT_EQ(Dw.Dw1,4);
         EXPECT_EQ(Dw.Dw2,4);
-
-//        int d=2*S+1;
-//        TensorNetworks::SiteOperator* so=expH->GetSiteOperator(is);
-//        cout << std::fixed << endl;
-//        for (int m=0;m<d;m++)
-//            for (int n=0;n<d;n++)
-//                cout << "W(" << m << "," << n << ")=" << so->GetW(m,n) << endl;
     }
 }
 TEST_F(MPOTests,TestL2iMPOTrotter2)
@@ -504,27 +497,58 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L256)
 TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
 {
     int L=8,D=2;
-    double S=0.5,dt=0.0,epsMPO=1e-4;
+    double S=0.5,dt=0.0,epsMPO=1e-13;
     Setup(L,S,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DLeft);
-    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::Std,epsMPO);
+    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::CNone,epsMPO);
+//    TensorNetworks::iMPO* expH=itsiH->CreateiMPO(dt,TensorNetworks::SecondOrder,TensorNetworks::CNone,epsMPO);
+//    expH->Report(cout);
 
     TensorNetworks::MPS* psi1=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi1),1.0,1e-13);
 
     EXPECT_NEAR(itsMPS->GetOverlap(psi1),1.0,1e-13);
     expH->CanonicalForm(); //Do we need to sweep both ways?
+//    expH->Report(cout);
     TensorNetworks::MPS* psi3=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi3),1.0,1e-13);
 
 //    expH->Report(cout);
-    double truncError=expH->Compress(TensorNetworks::Parker,0,1e-13);
+    double truncError=expH->Compress(TensorNetworks::Parker,0,epsMPO);
 //    expH->Report(cout);
     TensorNetworks::MPS* psi4=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi4),1.0,1e-13);
     EXPECT_EQ(expH->GetMaxDw(),2);
-    EXPECT_EQ(truncError,0.0); //Unit operator should have no compression error
+    EXPECT_LT(truncError,epsMPO); //Unit operator should have no compression error
+}
+TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
+{
+    int L=9,D=2;
+    double S=0.5,dt=0.0,epsMPO=1e-13;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::DLeft);
+    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::CNone,epsMPO);
+//    TensorNetworks::iMPO* expH=itsiH->CreateiMPO(dt,TensorNetworks::SecondOrder,TensorNetworks::CNone,epsMPO);
+//    expH->Report(cout);
+
+    TensorNetworks::MPS* psi1=itsMPS->Apply(expH);
+    EXPECT_NEAR(psi1->GetOverlap(psi1),1.0,1e-13);
+
+    EXPECT_NEAR(itsMPS->GetOverlap(psi1),1.0,1e-13);
+    expH->CanonicalForm(); //Do we need to sweep both ways?
+//    expH->Report(cout);
+    TensorNetworks::MPS* psi3=itsMPS->Apply(expH);
+    EXPECT_NEAR(psi1->GetOverlap(psi3),1.0,1e-13);
+
+//    expH->Report(cout);
+    double truncError=expH->Compress(TensorNetworks::Parker,0,epsMPO);
+//    expH->Report(cout);
+    TensorNetworks::MPS* psi4=itsMPS->Apply(expH);
+    EXPECT_NEAR(psi1->GetOverlap(psi4),1.0,1e-13);
+    EXPECT_EQ(expH->GetMaxDw(),13);
+    EXPECT_LT(truncError,epsMPO); //Unit operator should have no compression error
 }
 
 TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
@@ -551,7 +575,7 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
     TensorNetworks::MPS* psi3=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi3),o1,1e-13);
 
-    double truncError=expH->Compress(TensorNetworks::Parker,0,1e-13);
+    double truncError=expH->Compress(TensorNetworks::Std,0,epsMPO);
     expH->Report(cout);
     TensorNetworks::MPS* psi4=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi4),o1,1e-13);
