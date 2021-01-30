@@ -210,19 +210,7 @@ void SiteOperatorImp::Product(const SiteOperator* O2)
             MatrixRT Wmo(Dw.Dw1,Dw.Dw2);
             Fill(Wmo,0.0);
             for (int n=0; n<itsd; n++)
-            {
-                const MatrixRT& W1=GetiW(m,n);
-                const MatrixRT& W2=O2i->GetiW(n,o);
-                int w1=1;
-                for (int w11=1; w11<=itsDw.Dw1; w11++)
-                    for (int w12=1; w12<=   O2Dw.Dw1; w12++,w1++)
-                    {
-                        int w2=1;
-                        for (int w21=1; w21<=itsDw.Dw2; w21++)
-                            for (int w22=1; w22<=   O2Dw.Dw2; w22++,w2++)
-                                Wmo(w1,w2)+=W1(w11,w21)*W2(w12,w22);
-                    }
-            }
+                Wmo+=TensorProduct(GetiW(m,n),O2i->GetiW(n,o));
             newWs(m+1,o+1)=Wmo;
         }
     itsWs=newWs;  //Use SetiW instead
