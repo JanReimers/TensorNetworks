@@ -89,6 +89,8 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order,CompressType ct,
         {
             iMPO_SpatialTrotter Weven(dt    ,Even,L,S,this);
             iMPO_SpatialTrotter Wodd (dt/2.0,Odd ,L,S,this);
+//            Wodd .Report(cout);
+//            Weven.Report(cout);
             W=new iMPOImp(L,S,iMPOImp::Identity);
 //            W->Report(cout);
             W->Product(&Wodd);

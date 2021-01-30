@@ -1,9 +1,12 @@
 
--Support None for compression types.
+-expH MPO get scrambled when reducing to Canonical form.
+    Get further scrambled after Parker-compress, std-compress is fine
+    test is TestParkerSVDCompressExpHL8t1
+Done: -Support None for compression types.sdf
 -MPO track SV spectrum or at least the Min(Sv).
     -These need to live on bonds between sites.
     -Ideally Dw would also live on the bonds
--iMPO Trotter has Dw=1 at the edges ?!?
+Done: -iMPO Trotter has Dw=1 at the edges ?!?
 Done: -MPO canonical form requires sweeping both ways.  Make that the default.
 Done: -Speed up unit tests
 -Log level 0 should have no output
@@ -20,7 +23,7 @@ Done: -MPO/iMPO Get rid of factor in Combine. Rename Combine to Product.
 Done: -MPO use enum to choose Std or Parker compression
 Done: -pass Std/Parker to Trotter constructors as a parameter.
 Done: -MPO clean up compress return values.
--MPO Use TensorProduct in combine
+Done: -MPO Use TensorProduct in Product
 -Trotter MPO and iMPO have a lot of duplicated code for calculating exp(-t*H) and factoring it.
     Done: -ExpH
     -Factor U*s*V = expH

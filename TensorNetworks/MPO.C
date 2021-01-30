@@ -90,11 +90,13 @@ double MPO::Compress(CompressType ct, const SVCompressorR* compressor)
     int L=GetL();
     for (int ia=1;ia<L;ia++)
     {
+//        std::cout << "Site " << ia << ": ";
         double err=GetSiteOperator(ia)->Compress(ct,DLeft ,compressor);
         terror+=err*err;
     }
     for (int ia=L;ia>1;ia--)
     {
+//        std::cout << "Site " << ia << ": ";
         double err=GetSiteOperator(ia)->Compress(ct,DRight ,compressor);
         terror+=err*err;
     }

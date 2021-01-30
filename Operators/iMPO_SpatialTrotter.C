@@ -54,13 +54,11 @@ iMPO_SpatialTrotter::iMPO_SpatialTrotter(double dt, Trotter type,int L, double S
             }
             else
             { //Even # of sites
-               Insert(new SiteOperatorBulk(d));
-               for (int ia=2;ia<L;ia+=2)
+               for (int ia=1;ia<=L;ia+=2)
                {
-                    Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
                     Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
+                    Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
                }
-               Insert(new SiteOperatorBulk(d));
             }
             break;
         }

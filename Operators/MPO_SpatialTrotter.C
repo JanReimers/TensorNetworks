@@ -6,6 +6,7 @@
 #include "Operators/SiteOperatorLeft.H"
 #include "Operators/SiteOperatorRight.H"
 #include "NumericalMethods/LapackSVDSolver.H"
+#include "TensorNetworks/TNSLogger.H"
 #include "TensorNetworks/CheckSpin.H"
 #include "oml/diagonalmatrix.h"
 #include "oml/numeric.h"
@@ -43,53 +44,55 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,int L, double S, 
         {
             if (L%2)
             { //Odd # of sites
-               Insert(new SiteOperatorLeft(d));
-               for (int ia=2;ia<=L;ia++)
-               {
-                    Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
+                Logger->LogWarn(0,"MPO_SpatialTrotter with odd number of lattice sites will not compress effectively");
+                Insert(new SiteOperatorLeft(d,DLeft ,U,sm));
+                for (int ia=2;ia<=L;ia++)
+                {
+                    Insert(new SiteOperatorBulk(d,DRight ,VT ,sm));
                     ia++;
                     if (ia!=L)
-                        Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
+                        Insert(new SiteOperatorBulk(d,DLeft ,U,sm));
                     else
-                        Insert(new SiteOperatorRight(d,DRight ,VT,sm));
-               }
+                        Insert(new SiteOperatorRight(d));
+                }
             }
             else
             { //Even # of sites
-               Insert(new SiteOperatorLeft(d));
-               for (int ia=2;ia<L;ia+=2)
-               {
+                Insert(new SiteOperatorLeft(d,DLeft,U,sm));
+                for (int ia=2;ia<L;ia+=2)
+                {
+                    Insert(new SiteOperatorBulk(d,DRight,VT,sm));
                     Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
-                    Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
-               }
-               Insert(new SiteOperatorRight(d));
+                }
+                Insert(new SiteOperatorRight(d,DRight ,VT ,sm));
             }
             break;
         }
-    case Odd : // RLRLRL or RLRLRLRI
+    case Odd : // RLRLRL or ILRLRLR
         {
             if (L%2)
             { //Odd # of sites
-               Insert(new SiteOperatorLeft(d,DLeft ,U ,sm));
+               Logger->LogWarn(0,"MPO_SpatialTrotter with odd number of lattice sites will not compress effectively");
+               Insert(new SiteOperatorLeft(d));
                for (int ia=2;ia<L;ia++)
                {
-                    Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
+                    Insert(new SiteOperatorBulk(d,DLeft ,U,sm));
                     ia++;
                     if (ia==L)
-                        Insert(new SiteOperatorRight(d));
+                        Insert(new SiteOperatorRight(d,DRight ,VT ,sm));
                     else
-                        Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
+                        Insert(new SiteOperatorBulk(d,DRight ,VT ,sm));
                }
             }
             else
             { //Even # of sites
-                Insert(new SiteOperatorLeft(d,DLeft ,U ,sm));
+                Insert(new SiteOperatorLeft(d,DRight ,VT,sm));
                 for (int ia=2;ia<L;ia+=2)
                 {
-                    Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
                     Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
+                    Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
                 }
-                Insert(new SiteOperatorRight(d,DRight ,VT,sm));
+                Insert(new SiteOperatorRight(d,DLeft ,U ,sm));
             }
             break;
         }

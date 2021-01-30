@@ -72,47 +72,6 @@ MatrixRT MakeBlockMatrix(const MatrixRT& M,int D,int offset)
     return ret;
 }
 
-//std::tuple<MatrixRT,MatrixRT> ExtractM(Direction lr,const MatrixRT& Lp)
-//{
-////    cout << "Lp=" << Lp << endl;
-//    int X1=Lp.GetNumRows()-1;
-//    int X2=Lp.GetNumCols()-1;
-//    MatrixRT M(X1,X2),Lprime;
-//    switch(lr)
-//    {
-//    case DLeft:
-//        M=Lp.SubMatrix(MatLimits(1,X1,1,X2));
-//        Lprime=  MakeBlockMatrix(Lp,X1+2,X2+2,1);
-////        cout << "Lprime=" << Lprime << endl;
-//        for (int i=2;i<=X1+1;i++)
-//        { //Clear out the M part of Lp
-//            Lprime(i,i)=1.0;
-//            for (int j=1;j<=i-1;j++)
-//                Lprime(i,j)=0.0;
-//            for (int j=i+1;j<=X2+1;j++)
-//                Lprime(i,j)=0.0;
-//        }
-//        break;
-//    case DRight:
-//        for (index_t i:M.rows())
-//            for (index_t j:M.cols())
-//                M(i,j)=Lp(i+1,j+1);
-//
-//        Lprime=  MakeBlockMatrix(Lp,X1+2,X2+2,0);
-//        for (int i=2;i<=X1+1;i++)
-//        { //Clear out the M part of Lp
-//            Lprime(i,i)=1.0;
-//            for (int j=1;j<=i-1;j++)
-//                Lprime(i,j)=0.0;
-//            for (int j=i+1;j<=X2+1;j++)
-//                Lprime(i,j)=0.0;
-//        }
-//        break;
-//    }
-//
-//    return std::make_tuple(M,Lprime);
-//}
-
 MatrixRT ExtractLprime(Direction lr,const MatrixRT& Lp)
 {
 //    cout << "Lp=" << Lp << endl;
@@ -200,7 +159,7 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
            {
                 auto [U,s,VT]=SVDsolver.SolveAll(M,1e-14); //Solves M=U * s * VT
                 AccumulateTruncationError(comp->Compress(U,s,VT));
-//                cout << std::scientific << std::setprecision(8) << "s=" << s.GetDiagonal() << endl;
+//                cout << std::scientific << std::setprecision(8) << "DLeft s=" << s.GetDiagonal() << endl;
                 Xs=s.GetDiagonal().size();
                 MatrixRT sV=s*VT;
                 assert(sV.GetNumRows()==Xs);
@@ -254,7 +213,7 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
             {
                 auto [U,s,VT]=SVDsolver.SolveAll(M,1e-14); //Solves M=U * s * VT
                 AccumulateTruncationError(comp->Compress(U,s,VT));
-//                cout << std::fixed << std::setprecision(2) << "s=" << s.GetDiagonal() << endl;
+//                cout << std::fixed << std::setprecision(2) << "DRight s=" << s.GetDiagonal() << endl;
                 Xs=s.GetDiagonal().size();
                 MatrixRT Us=U*s;
                 assert(Us.GetNumRows()==X1);

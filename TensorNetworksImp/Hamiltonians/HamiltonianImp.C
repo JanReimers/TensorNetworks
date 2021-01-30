@@ -73,6 +73,8 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order,CompressType c
         {
             MPO_SpatialTrotter Wodd (dt/2.0,Odd ,L,S,this);
             MPO_SpatialTrotter Weven(dt    ,Even,L,S,this);
+//            Wodd .Report(cout);
+//            Weven.Report(cout);
             W->Product(&Wodd);
             W->Product(&Weven);
             W->Product(&Wodd);
