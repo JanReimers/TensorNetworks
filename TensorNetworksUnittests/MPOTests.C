@@ -472,7 +472,8 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L9)
 //    H2->Report(cout);
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     double E2comp=itsMPS->GetExpectation(H2);
-    EXPECT_NEAR(E2,E2right,1e-13);
+    cout << E2 << " " << E2right << " " << E2comp << endl;
+   EXPECT_NEAR(E2,E2right,1e-13);
     EXPECT_NEAR(E2,E2comp ,1e-13);
     EXPECT_EQ(H2->GetMaxDw(),10);
 }
@@ -491,6 +492,7 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L256)
     H2->Product(itsH);
     H2->Product(itsH);
     double E2=itsMPS->GetExpectation(H2);
+    H2->CanonicalForm(TensorNetworks::DLeft); //Do we need to sweep both ways? YES!!!! Try commenting out this line
     H2->CanonicalForm(TensorNetworks::DRight);
     double E2right=itsMPS->GetExpectation(H2);
     H2->Compress(TensorNetworks::Parker,0,1e-13);

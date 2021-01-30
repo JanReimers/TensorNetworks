@@ -1,4 +1,5 @@
 
+-MPO canonical form requires sweeping both ways.  Make that the default.
 Done: -Speed up unit tests
 -Log level 0 should have no output
 Done: -Can we move MakeUnitcelliMPO in iMPO.C base class?
