@@ -28,9 +28,9 @@ public:
     //
     virtual void Product(const SiteOperator* O2)=0;
     //
-    //  SVD compress and normalize to reduce Dw
+    //  SVD compress and normalize to reduce Dw Returns accumulated SVD truncation error.
     //
-    virtual void Compress(CompressType,Direction,const SVCompressorR*)=0;
+    virtual double Compress(CompressType,Direction,const SVCompressorR*)=0;
     //
     //  as per: Parker, D. E.; Cao, X. & Zaletel, M. P.
     //          Local Matrix Product Operators: Canonical Form, Compression, and Control Theory

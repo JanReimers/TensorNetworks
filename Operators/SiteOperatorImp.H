@@ -61,15 +61,15 @@ class SiteOperatorImp : public virtual SiteOperator
         //
         //  Contract MPOs together
         //
-        virtual void Product(const SiteOperator* O2);
+        virtual void   Product(const SiteOperator* O2);
         //
-        //  SVD compress and normalize to reduce Dw
+        //  SVD compress and normalize to reduce Dw. Returns accumulated SVD truncation error
         //
-        virtual void Compress(CompressType,Direction,const SVCompressorR*);
+        virtual double Compress(CompressType,Direction,const SVCompressorR*);
         //
         //  As per Parker et. al.
         //
-        virtual void CanonicalForm(Direction LR);
+        virtual void   CanonicalForm(Direction LR);
 
         virtual void   Report(std::ostream&) const;
         virtual char   GetNormStatus(double eps) const;
@@ -86,10 +86,10 @@ class SiteOperatorImp : public virtual SiteOperator
         friend class iMPOImp;
         void SetiW(int m, int n, const MatrixRT& W);
 
-        void CompressStd   (Direction,const SVCompressorR*);
-        void CompressParker(Direction,const SVCompressorR*);
-        void SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV);
-        void  QLTransfer(Direction lr,const MatrixRT& L);
+        double CompressStd   (Direction,const SVCompressorR*);
+        double CompressParker(Direction,const SVCompressorR*);
+        void   SVDTransfer   (Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV);
+        void   QLTransfer    (Direction lr,const MatrixRT& L);
 
         MatrixRT Reshape(Direction lr,int offset) const;
         void     Reshape(Direction lr,int offset,const MatrixRT& Q);

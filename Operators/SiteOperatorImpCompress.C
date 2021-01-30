@@ -11,19 +11,21 @@ namespace TensorNetworks
 using std::cout;
 using std::endl;
 
-void SiteOperatorImp::Compress(CompressType ct,Direction lr,const SVCompressorR* comp)
+double SiteOperatorImp::Compress(CompressType ct,Direction lr,const SVCompressorR* comp)
 {
+    double terror=0.0;
     switch (ct)
     {
     case Std:
-        CompressStd(lr,comp);
+        terror=CompressStd(lr,comp);
         break;
     case Parker:
-        CompressParker(lr,comp);
+        terror=CompressParker(lr,comp);
         break;
     default:
         assert(false);
     }
+    return terror;
 }
 
 MatrixRT MakeBlockMatrix(const MatrixRT& M,int Dr,int Dc,int offset)
@@ -158,7 +160,7 @@ MatrixRT ExtractM1(Direction lr,const MatrixRT& Lp)
 }
 
 
-void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
+double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 {
     assert(comp);
     LapackQRSolver <double>  QRsolver;
@@ -173,7 +175,7 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
     {
         case DLeft:
         {
-            if (V.size()==0) return; //This will happen at the edges of an MPO
+            if (V.size()==0) return 0.0; //This will happen at the edges of an MPO
             assert(V.GetNumRows()==itsd*itsd*(X1+1)); // Treate these like enforced comments on the
             assert(V.GetNumCols()==X2+1);             // dimensions of each matrix.
             auto [Qp,Lp]=QRsolver.SolveThinQL(V); //Solves V=Q*L
@@ -192,7 +194,7 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 
             MatrixRT Lpp;
             MatrixRT M=ExtractM1(lr,Lp);
-            if (M.size()==0) return; //THis will happen if we have already compressed down to a unit matrix.
+            if (M.size()==0) return 0.0; //THis will happen if we have already compressed down to a unit matrix.
            {
                 auto [U,s,VT]=SVDsolver.SolveAll(M,1e-14); //Solves M=U * s * VT
                 AccumulateTruncationError(comp->Compress(U,s,VT));
@@ -227,7 +229,7 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
         }
         case DRight:
         {
-            if (V.size()==0) return; //This will happen at the edges of an MPO
+            if (V.size()==0) return 0.0; //This will happen at the edges of an MPO
             assert(V.GetNumCols()==itsd*itsd*(X2+1)); // Treate these like enforced comments on the
             assert(V.GetNumRows()==X1+1);             // dimensions of each matrix.
             auto [Lp,Qp]=QRsolver.SolveThinLQ(V); //Solves V=Q*L
@@ -246,7 +248,7 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 
             MatrixRT Lpp;
             MatrixRT M=ExtractM1(lr,Lp);
-            if (M.size()==0) return; //THis will happen if we have already compressed down to a unit matrix.
+            if (M.size()==0) return 0.0; //THis will happen if we have already compressed down to a unit matrix.
             {
                 auto [U,s,VT]=SVDsolver.SolveAll(M,1e-14); //Solves M=U * s * VT
                 AccumulateTruncationError(comp->Compress(U,s,VT));
@@ -281,10 +283,11 @@ void SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
         }
 
     }
+    return itsTruncationError;
 }
 
 
-void SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
+double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
 {
     assert(comp);
     MatrixRT  A=Reshape(lr,0);
@@ -328,6 +331,7 @@ void SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
             break;
         }
     }
+    return itsTruncationError;
 }
 
 

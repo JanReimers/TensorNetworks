@@ -86,12 +86,19 @@ double MPO::Compress(CompressType ct,int Dmax, double epsSV)
 
 double MPO::Compress(CompressType ct, const SVCompressorR* compressor)
 {
+    double terror=0.0;
     int L=GetL();
     for (int ia=1;ia<L;ia++)
-        GetSiteOperator(ia)->Compress(ct,DLeft ,compressor);
+    {
+        double err=GetSiteOperator(ia)->Compress(ct,DLeft ,compressor);
+        terror+=err*err;
+    }
     for (int ia=L;ia>1;ia--)
-        GetSiteOperator(ia)->Compress(ct,DRight ,compressor);
-    return 0.0;
+    {
+        double err=GetSiteOperator(ia)->Compress(ct,DRight ,compressor);
+        terror+=err*err;
+    }
+    return sqrt(terror)/(L-1); //Truncation error per site.
 }
 
 void MPO::CanonicalForm()
