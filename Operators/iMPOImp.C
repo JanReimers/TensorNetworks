@@ -16,7 +16,6 @@ namespace TensorNetworks
 iMPOImp::iMPOImp(int L, double S)
     : itsL(L)
     , itsS(S)
-    , areSitesLinked(false)
     , itsSites()
 {
     assert(isValidSpin(S));
@@ -93,14 +92,12 @@ void iMPOImp::LinkSites()
     {
         s->SetNeighbours(s,s);
     }
-    areSitesLinked=true;
 }
 
 void iMPOImp::Insert(SiteOperator* so)
 {
     assert(so);
     assert(static_cast<int>(itsSites.size())<=itsL);
-    assert(!areSitesLinked);
     if (itsSites.size()==0) itsSites.push_back(0); //Dummy at index 0 so we start counting at index 1
     itsSites.push_back(so);
 }
@@ -115,7 +112,6 @@ SiteOperator* iMPOImp::GetSiteOperator(int isite)
 {
     assert(isite>0);
     assert(isite<=itsL);
-    assert(areSitesLinked);
     return itsSites[isite];
 }
 

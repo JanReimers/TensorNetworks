@@ -1,17 +1,18 @@
 
 Done: -Speed up unit tests
 -Log level 0 should have no output
--Can we move MakeUnitcelliMPO in iMPO.C base class?
+Done: -Can we move MakeUnitcelliMPO in iMPO.C base class?
+    No: The last line constructs and iMPOImp
 Done: -Do we really need iMPO::Combine ? Than answer seems to be NO!
 Done: -SiteOperatorImp use delegate constructors
--MPO/iMPO areSitesLinked only used in asserts, can we lose them?
--iTEBDState::FindiTimeGroundState takes a Hamiltonian instead of an iHamiltonian
+Done: -MPO/iMPO areSitesLinked only used in asserts, can we lose them?
+-iTEBDState::FindiTimeGroundState takes a Hamiltonian AND an iHamiltonian (yuck!)
     simply because we are not very good taking expectation values of iMPOs yet
 Done: -MPO/iMPO Get rid of factor in Combine. Rename Combine to Product.
 -MPO Add (rather than combine) MPOs to do:
             S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
 Done: -MPO use enum to choose Std or Parker compression
--pass Std/Parker to Trotter constructors as a parameter.
+Done: -pass Std/Parker to Trotter constructors as a parameter.
 -MPO clean up compress return values.
 -MPO Use TensorProduct in combine
 -Trotter MPO and iMPO have a lot of duplicated code for calculating exp(-t*H) and factoring it.

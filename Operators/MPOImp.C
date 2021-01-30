@@ -13,7 +13,6 @@ namespace TensorNetworks
 MPOImp::MPOImp(int L, double S)
     : itsL(L)
     , itsS(S)
-    , areSitesLinked(false)
     , itsSites()
 {
     assert(isValidSpin(S));
@@ -72,7 +71,6 @@ void MPOImp::Insert(SiteOperator* so)
 {
     assert(so);
     assert(static_cast<int>(itsSites.size())<=itsL);
-    assert(!areSitesLinked);
     if (itsSites.size()==0) itsSites.push_back(0); //Dummy at index 0 so we start counting at index 1
     itsSites.push_back(so);
 }
@@ -103,7 +101,6 @@ void MPOImp::LinkSites()
     {
         s->SetNeighbours(0,0);
     }
-    areSitesLinked=true;
 }
 
 const SiteOperator* MPOImp::GetSiteOperator(int isite) const
@@ -116,7 +113,6 @@ SiteOperator* MPOImp::GetSiteOperator(int isite)
 {
     assert(isite>0);
     assert(isite<=itsL);
-    assert(areSitesLinked);
     return itsSites[isite];
 }
 

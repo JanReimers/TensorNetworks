@@ -45,7 +45,6 @@ private:
 
     int       itsL;
     double    itsS;
-    bool      areSitesLinked;
     SitesType itsSites;
 };
 
