@@ -36,7 +36,7 @@ public:
     virtual void   Product(const MPO* O2);
     virtual double Compress(CompressType,int Dmax, double epsSV);
     virtual double Compress(CompressType,const SVCompressorR*);
-    virtual void   CanonicalForm(Direction LR);
+    virtual void   CanonicalForm(); //Sweep left and then right
 };
 
 }

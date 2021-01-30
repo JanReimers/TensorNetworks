@@ -94,20 +94,13 @@ double MPO::Compress(CompressType ct, const SVCompressorR* compressor)
     return 0.0;
 }
 
-void MPO::CanonicalForm(Direction lr)
+void MPO::CanonicalForm()
 {
     int L=GetL();
-    switch (lr)
-    {
-        case DLeft:
-            for (int ia=1;ia<L;ia++)
-                GetSiteOperator(ia)->CanonicalForm(lr);
-            break;
-        case DRight:
-            for (int ia=L;ia>1;ia--)
-                GetSiteOperator(ia)->CanonicalForm(lr);
-            break;
-    }
+    for (int ia=1;ia<L;ia++)
+        GetSiteOperator(ia)->CanonicalForm(DLeft);
+    for (int ia=L;ia>1;ia--)
+        GetSiteOperator(ia)->CanonicalForm(DRight);
 }
 
 

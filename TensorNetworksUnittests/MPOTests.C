@@ -249,8 +249,7 @@ TEST_F(MPOTests,TestMPOCompressForH2)
     TensorNetworks::MPO* H2=itsH->CreateUnitOperator();
     H2->Product(itsH);
     H2->Product(itsH);
-    H2->CanonicalForm(TensorNetworks::DLeft);
-    H2->CanonicalForm(TensorNetworks::DRight);
+    H2->CanonicalForm();
     H2->Compress(TensorNetworks::Std,0,1e-13);
 //    H2->Report(cout);
     EXPECT_EQ(H2->GetMaxDw(),10);
@@ -324,8 +323,7 @@ TEST_F(MPOTests,TestMPOCompressForE2)
     H2->Product(itsH);
     H2->Product(itsH);
     double E2a=itsMPS->GetExpectation(H2);
-    H2->CanonicalForm(TensorNetworks::DLeft);
-    H2->CanonicalForm(TensorNetworks::DRight);
+    H2->CanonicalForm();
     H2->Compress(TensorNetworks::Std,0,1e-13);
     EXPECT_EQ(H2->GetMaxDw(),10);
     double E2b=itsMPS->GetExpectation(H2);
@@ -409,13 +407,9 @@ TEST_F(MPOTests,TestParkerCanonicalL9)
     TensorNetworks::iMPO* H=itsiH;
     EXPECT_EQ(H->GetNormStatus(),"WWWWWWWWW");
     double E=itsMPS->GetExpectation(itsH);
-    H->CanonicalForm(TensorNetworks::DLeft);
-    EXPECT_EQ(H->GetNormStatus(),"LLLLLLLLW");
-    double Eleft=itsMPS->GetExpectation(itsH);
-    H->CanonicalForm(TensorNetworks::DRight);
+    H->CanonicalForm();
     EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR"); //The last site ends up being both right and left normalized
     double Eright=itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(E,Eleft ,1e-13);
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_EQ(H->GetMaxDw(),5);
 }
@@ -432,10 +426,7 @@ TEST_F(MPOTests,TestParkerSVDCompressHL9)
 //    H->Report(cout);
     EXPECT_EQ(H->GetNormStatus(),"WWWWWWWWW");
     double E=itsMPS->GetExpectation(itsH);
-    H->CanonicalForm(TensorNetworks::DLeft); //Do we need to sweep both ways? Yes!!!!
-    EXPECT_EQ(H->GetNormStatus(),"LLLLLLLLW");
-//    H->Report(cout);
-    H->CanonicalForm(TensorNetworks::DRight);
+    H->CanonicalForm(); //Do we need to sweep both ways? Yes!!!!
     EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR");
     double Eright=itsMPS->GetExpectation(itsH);
 //    H->Report(cout);
@@ -462,10 +453,7 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L9)
 
     EXPECT_EQ(H2->GetNormStatus(),"WWWWWWWWW");
     double E2=itsMPS->GetExpectation(H2);
-    H2->CanonicalForm(TensorNetworks::DLeft); //Do we need to sweep both ways?
-    EXPECT_EQ(H2->GetNormStatus(),"LLLLLLLLW");
-    H2->CanonicalForm(TensorNetworks::DRight);
-//    H2->Report(cout);
+    H2->CanonicalForm(); //Do we need to sweep both ways?
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     double E2right=itsMPS->GetExpectation(H2);
     H2->Compress(TensorNetworks::Parker,0,1e-13);
@@ -473,7 +461,7 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L9)
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     double E2comp=itsMPS->GetExpectation(H2);
     cout << E2 << " " << E2right << " " << E2comp << endl;
-   EXPECT_NEAR(E2,E2right,1e-13);
+    EXPECT_NEAR(E2,E2right,1e-13);
     EXPECT_NEAR(E2,E2comp ,1e-13);
     EXPECT_EQ(H2->GetMaxDw(),10);
 }
@@ -492,8 +480,7 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L256)
     H2->Product(itsH);
     H2->Product(itsH);
     double E2=itsMPS->GetExpectation(H2);
-    H2->CanonicalForm(TensorNetworks::DLeft); //Do we need to sweep both ways? YES!!!! Try commenting out this line
-    H2->CanonicalForm(TensorNetworks::DRight);
+    H2->CanonicalForm(); //Sweep both ways
     double E2right=itsMPS->GetExpectation(H2);
     H2->Compress(TensorNetworks::Parker,0,1e-13);
 //    H2->Report(cout);
@@ -518,10 +505,7 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
     EXPECT_NEAR(psi1->GetOverlap(psi1),1.0,1e-13);
 
     EXPECT_NEAR(itsMPS->GetOverlap(psi1),1.0,1e-13);
-    expH->CanonicalForm(TensorNetworks::DLeft); //Do we need to sweep both ways?
-    TensorNetworks::MPS* psi2=itsMPS->Apply(expH);
-    EXPECT_NEAR(psi1->GetOverlap(psi2),1.0,1e-13);
-    expH->CanonicalForm(TensorNetworks::DRight);
+    expH->CanonicalForm(); //Do we need to sweep both ways?
     TensorNetworks::MPS* psi3=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi3),1.0,1e-13);
 
@@ -552,11 +536,7 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
     TensorNetworks::MPS* psi1=itsMPS->Apply(expH);
     double o1=psi1->GetOverlap(psi1);
 //    itsMPS->Report(cout);
-    expH->CanonicalForm(TensorNetworks::DLeft); //Do we need to sweep both ways?
-    TensorNetworks::MPS* psi2=itsMPS->Apply(expH);
-    EXPECT_NEAR(psi1->GetOverlap(psi2),o1,1e-13);
-    expH->CanonicalForm(TensorNetworks::DRight);
-//    expH->Report(cout);
+    expH->CanonicalForm(); //Sweep both ways
     TensorNetworks::MPS* psi3=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi3),o1,1e-13);
 
