@@ -475,8 +475,10 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L9)
 TEST_F(MPOTests,TestParkerSVDCompressH2L256)
 {
     int L=256,D=2;
+    double epsE=2e-10;
 #ifdef DEBUG
     L=32;
+    epsE=4e-13;
 #endif // DEBUG
     double S=0.5;
     Setup(L,S,D);
@@ -492,8 +494,8 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L256)
 //    H2->Report(cout);
     double E2comp=itsMPS->GetExpectation(H2);
     cout << E2 << " " << E2right << " " << E2comp << endl;
-    EXPECT_NEAR(E2,E2right,4e-13);
-    EXPECT_NEAR(E2,E2comp ,4e-13);
+    EXPECT_NEAR(E2,E2right,epsE);
+    EXPECT_NEAR(E2,E2comp ,epsE);
     EXPECT_EQ(H2->GetMaxDw(),10);
     EXPECT_LT(truncError,1e-13);
 }
