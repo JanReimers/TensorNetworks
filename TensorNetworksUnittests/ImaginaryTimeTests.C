@@ -300,7 +300,7 @@ TEST_F(ImaginaryTimeTests,MPOCompressSeconderOrderTrotter_dt05_FixedDw)
 TEST_F(ImaginaryTimeTests,MPOCompressFourthOrderTrotter)
 {
     int D=8,L=9;
-    double dt=0.1,epsMPO=1e-13;
+    double dt=0.1,epsMPO=1e-4;
     Setup(L,0.5,D);
 
     TensorNetworks::MPO* W=itsH->CreateOperator(dt,TensorNetworks::FourthOrder,TensorNetworks::Std,epsMPO);
