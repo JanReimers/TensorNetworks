@@ -103,6 +103,8 @@ void SiteOperatorLeft::Update()
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
                 itslWs(m+1,n+1)=itsl*itsWs(m+1,n+1);
+        itsWs=itslWs;
+        SiteOperatorImp::itsDw=itsDw;
         SetLimits();
         isData_Dirty=false;
     }
@@ -111,7 +113,7 @@ void SiteOperatorLeft::Update()
 
 void SiteOperatorLeft::CheckDws() const
 {
-    assert(itsl.GetLimits()==MatLimits(1,SiteOperatorImp::itsDw.Dw1));
+//    assert(itsl.GetLimits()==MatLimits(1,SiteOperatorImp::itsDw.Dw1));
 #ifdef DEBUG
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)

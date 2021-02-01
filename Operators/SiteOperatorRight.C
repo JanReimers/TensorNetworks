@@ -98,6 +98,8 @@ void SiteOperatorRight::Update()
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
                 itsWrs(m+1,n+1)=itsWs(m+1,n+1)*itsr;
+        itsWs=itsWrs;
+        SiteOperatorImp::itsDw=itsDw;
         SetLimits();
         isData_Dirty=false;
     }
@@ -107,7 +109,7 @@ void SiteOperatorRight::Update()
 
 void SiteOperatorRight::CheckDws() const
 {
-    assert(itsr.GetLimits()==MatLimits(SiteOperatorImp::itsDw.Dw2,1));
+//    assert(itsr.GetLimits()==MatLimits(SiteOperatorImp::itsDw.Dw2,1));
 #ifdef DEBUG
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)
