@@ -6170,7 +6170,7 @@ literal "false"
 \end_layout
 
 \begin_layout Subsubsection
-Lattice edges
+Lattice edges (upper triangular)
 \end_layout
 
 \begin_layout Standard
@@ -6190,7 +6190,7 @@ literal "false"
 
 \end_inset
 
-where for an upper triangulr MPO
+where for an upper triangular MPO
 \begin_inset Formula 
 \[
 \boldsymbol{l}=\begin{bmatrix}1 & 0 & 0 & 0 & 0\end{bmatrix}
@@ -6247,6 +6247,62 @@ so at the left we get
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+In general we have
+\begin_inset Formula 
+\[
+\boldsymbol{l}\hat{W}=\begin{bmatrix}1 & \boldsymbol{0} & 0\end{bmatrix}\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}} & \hat{d}\\
+0 & \hat{\boldsymbol{A}} & \hat{\boldsymbol{b}}\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}} & \hat{d}\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{V}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}\end{bmatrix}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\hat{W}\boldsymbol{r}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}} & \hat{d}\\
+0 & \hat{\boldsymbol{A}} & \hat{\boldsymbol{b}}\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}\begin{bmatrix}0\\
+\boldsymbol{0}\\
+1
+\end{bmatrix}=\begin{bmatrix}\hat{d}\\
+\hat{\boldsymbol{b}}\\
+\hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{V}=\begin{bmatrix}\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Lattice edges (lower triangular)
+\end_layout
+
+\begin_layout Standard
 For a lower triangular MPO we need
 \begin_inset Formula 
 \[
@@ -6296,7 +6352,55 @@ giving
 
 \end_inset
 
- 
+Or in general 
+\begin_inset Formula 
+\[
+\boldsymbol{l}\hat{W}=\begin{bmatrix}0 & \boldsymbol{0} & 1\end{bmatrix}\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{c}} & \hat{\boldsymbol{A}} & 0\\
+\hat{d} & \hat{\boldsymbol{b}} & \hat{𝕀}
+\end{bmatrix}=\begin{bmatrix}\hat{d} & \hat{\boldsymbol{b}} & \hat{𝕀}\end{bmatrix}
+\]
+
+\end_inset
+
+with
+\begin_inset Formula 
+\[
+\hat{V}=\begin{bmatrix}\hat{\boldsymbol{b}} & \hat{𝕀}\end{bmatrix}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\hat{W}\boldsymbol{r}=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{c}} & \hat{\boldsymbol{A}} & 0\\
+\hat{d} & \hat{\boldsymbol{b}} & \hat{𝕀}
+\end{bmatrix}\begin{bmatrix}1\\
+\boldsymbol{0}\\
+0
+\end{bmatrix}=\begin{bmatrix}\hat{𝕀}\\
+\hat{\boldsymbol{c}}\\
+\hat{d}
+\end{bmatrix}
+\]
+
+\end_inset
+
+and again
+\begin_inset Formula 
+\[
+\hat{V}=\begin{bmatrix}\end{bmatrix}
+\]
+
+\end_inset
+
+is empty.
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \begin_layout Subsection
