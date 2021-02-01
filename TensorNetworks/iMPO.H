@@ -18,6 +18,9 @@ public:
     virtual ~iMPO() {};
 
     virtual iMPO* MakeUnitcelliMPO(int unitcell) const=0; //Contract horizontally to make iMPO for the whole unit cell.
+    virtual double Compress(CompressType ct,int Dmax, double epsSV) {return MPO::Compress(ct,Dmax,epsSV);}
+    virtual double Compress(CompressType ct,const SVCompressorR*);
+    virtual void   CanonicalForm(); //Sweep left and then right
 };
 
 }
