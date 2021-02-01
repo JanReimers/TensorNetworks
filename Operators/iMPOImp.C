@@ -167,10 +167,4 @@ iMPO* iMPOImp::MakeUnitcelliMPO(int unitcell) const
 
 } //namespace
 
-//---------------------------------------------------------------------------------
-//
-//  Make template instance.  For some reason we can's share the instance created in SiteOperatorImp.C
-//
-#define TYPE Matrix<double>
-#include "oml/src/matrix.cpp"
 

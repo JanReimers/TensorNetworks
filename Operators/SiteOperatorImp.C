@@ -329,12 +329,4 @@ char SiteOperatorImp::GetNormStatus(double eps) const
 
 
 } //namespace
-//---------------------------------------------------------------------------------
-//
-//  Make template instance
-//
-#define TYPE Matrix<double>
-#include "oml/src/matrix.cpp"
-#undef TYPE
-#define TYPE int
-#include "oml/src/vector.cpp"
+

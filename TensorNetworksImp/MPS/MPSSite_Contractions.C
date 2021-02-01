@@ -704,5 +704,4 @@ void  MPSSite::Apply(const SiteOperator* so, MPSSite* psiPrime)
 
 } //namespace
 
-#define TYPE int
-#include "oml/src/vector.cpp"
+
