@@ -303,6 +303,8 @@ bool SiteOperatorImp::isOrthonormal(Direction lr,const MatrixRT& Q) const
 
 char SiteOperatorImp::GetNormStatus(double eps) const
 {
+//    cout << "Dw1*Dw2=" << itsDw.Dw1*itsDw.Dw2 << endl;
+    if (itsDw.Dw1*itsDw.Dw2>4096) return '?';
     char ret='W'; //Not normalized
     {
         MatrixRT QL=Reshape(DLeft,1);
