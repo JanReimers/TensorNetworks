@@ -162,7 +162,7 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
            {
                 auto [U,s,VT]=SVDsolver.SolveAll(M,1e-14); //Solves M=U * s * VT
                 AccumulateTruncationError(comp->Compress(U,s,VT));
-                cout << std::fixed << std::setprecision(2) << "DLeft s=" << s.GetDiagonal() << endl;
+//                cout << std::fixed << std::setprecision(2) << "DLeft s=" << s.GetDiagonal() << endl;
                 Xs=s.GetDiagonal().size();
                 MatrixRT sV=s*VT;
                 assert(sV.GetNumRows()==Xs);
@@ -215,7 +215,7 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
             {
                 auto [U,s,VT]=SVDsolver.SolveAll(M,1e-14); //Solves M=U * s * VT
                 AccumulateTruncationError(comp->Compress(U,s,VT));
-                cout << std::fixed << std::setprecision(2) << "DRight s=" << s.GetDiagonal() << endl;
+//                cout << std::fixed << std::setprecision(2) << "DRight s=" << s.GetDiagonal() << endl;
                 Xs=s.GetDiagonal().size();
                 MatrixRT Us=U*s;
                 assert(Us.GetNumRows()==X1);
@@ -340,6 +340,7 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
             assert(Max(fabs(Q-V))<1e-15);
             MatrixRT Qplus=Reshape(lr,0);
             MatrixRT LQ=Lplus*Qplus;
+            cout << "Worig-LQ=" << Worig-LQ << endl;
             assert(Max(fabs(Worig-LQ ))<1e-13);
 #endif
             break;
