@@ -127,7 +127,7 @@ void SiteOperatorImp::CheckDws() const
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)
         {
-            const MatrixRT& W=GetiW(m,n);
+            const MatrixRT& W=GetW(m,n);
             assert(W.GetNumRows()==itsDw.Dw1);
             assert(W.GetNumCols()==itsDw.Dw2);
         }
@@ -145,7 +145,8 @@ void SiteOperatorImp::SetNeighbours(SiteOperator* left, SiteOperator* right)
 
 void SiteOperatorImp::SetiW(int m, int n, const MatrixRT& W)
 {
-    assert(W.GetNumRows()==itsDw.Dw1);
+    if (W.GetNumRows()!=itsDw.Dw1)
+        assert(W.GetNumRows()==itsDw.Dw1);
     assert(W.GetNumCols()==itsDw.Dw2);
     if (itsWs(m+1,n+1).GetLimits()!=W.GetLimits())
         isShapeDirty=true;
@@ -179,8 +180,8 @@ void SiteOperatorImp::SetLimits(Dw12& Dw,TensorT& Ws)
                         if (Dw.w2_last (w1)<w2) Dw.w2_last (w1)=w2;
                     }
 //            cout << "W(" << m << "," << n << ")=" << W << endl;
-//            cout << "w1_first=" << itsDw12.w1_first << endl;
-//            cout << "w2_last =" << itsDw12.w2_last  << endl;
+//            cout << "w1_first=" << Dw.w1_first << endl;
+//            cout << "w2_last =" << Dw.w2_last  << endl;
         }
 
 }
@@ -210,7 +211,7 @@ void SiteOperatorImp::Product(const SiteOperator* O2)
             MatrixRT Wmo(Dw.Dw1,Dw.Dw2);
             Fill(Wmo,0.0);
             for (int n=0; n<itsd; n++)
-                Wmo+=TensorProduct(GetiW(m,n),O2i->GetiW(n,o));
+                Wmo+=TensorProduct(GetW(m,n),O2i->GetW(n,o));
             newWs(m+1,o+1)=Wmo;
         }
     itsWs=newWs;  //Use SetiW instead
@@ -245,14 +246,14 @@ char SiteOperatorImp::GetUpperLower(double eps) const
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)
         {
-            if (IsUpperTriangular(GetiW(n,m),eps))
+            if (IsUpperTriangular(GetW(n,m),eps))
             {
                 if (ret==' ')
                     ret='U';
                 else if (ret=='L')
                     ret='M'; //Mix
             }
-            else if (IsLowerTriangular(GetiW(n,m),eps))
+            else if (IsLowerTriangular(GetW(n,m),eps))
             {
                 if (ret==' ')
                     ret='L';
@@ -279,7 +280,7 @@ double SiteOperatorImp::GetiFrobeniusNorm() const
     double fn=0.0;
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)
-            fn+=FrobeniusNorm(GetiW(n,m));
+            fn+=FrobeniusNorm(GetW(n,m));
     return fn;
 }
 
@@ -307,7 +308,7 @@ char SiteOperatorImp::GetNormStatus(double eps) const
     if (itsDw.Dw1*itsDw.Dw2>4096) return '?';
     char ret='W'; //Not normalized
     {
-        MatrixRT QL=Reshape(DLeft,1);
+        MatrixRT QL=ReshapeV(DLeft);
         if (QL.GetNumRows()==0)
             ret='l';
         else if (isOrthonormal(DLeft,QL))
@@ -315,7 +316,7 @@ char SiteOperatorImp::GetNormStatus(double eps) const
     }
     if (ret!='l')
     {
-        MatrixRT QR=Reshape(DRight,1);
+        MatrixRT QR=ReshapeV(DRight);
         if (QR.GetNumCols()==0)
             ret='r';
         else if (isOrthonormal(DRight,QR))

@@ -127,16 +127,19 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
     LapackQRSolver <double>  QRsolver;
     LapackSVDSolver<double> SVDsolver;
     int Dw1=itsDw.Dw1,Dw2=itsDw.Dw2;
-    int X1=Dw1-2,X2=Dw2-2,Xs=X2; //Chi and Chi_prime
+    int X1=Dw1-2,X2=Dw2-2; //Chi and Chi_prime
+    if (X1<0) X1=0;
+    if (X2<0) X2=0;
+    int Xs=X2;
 
-    MatrixRT  V=Reshape(lr,1);
+    MatrixRT  V=ReshapeV(lr);
+    assert(V.size()!=0);
 //    cout << "X1,X2,V=" << X1 << " " << X2 << " " << V.GetLimits() << endl;
 
     switch (lr)
     {
         case DLeft:
         {
-            if (V.size()==0) return 0.0; //This will happen at the edges of an MPO
             assert(V.GetNumRows()==itsd*itsd*(X1+1)); // Treate these like enforced comments on the
             assert(V.GetNumCols()==X2+1);             // dimensions of each matrix.
             auto [Qp,Lp]=QRsolver.SolveThinQL(V); //Solves V=Q*L
@@ -159,7 +162,7 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
            {
                 auto [U,s,VT]=SVDsolver.SolveAll(M,1e-14); //Solves M=U * s * VT
                 AccumulateTruncationError(comp->Compress(U,s,VT));
-//                cout << std::scientific << std::setprecision(8) << "DLeft s=" << s.GetDiagonal() << endl;
+                cout << std::fixed << std::setprecision(2) << "DLeft s=" << s.GetDiagonal() << endl;
                 Xs=s.GetDiagonal().size();
                 MatrixRT sV=s*VT;
                 assert(sV.GetNumRows()==Xs);
@@ -178,7 +181,7 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
                 Lpp=sVpp*Lprime; //This get passed on to the next site over.
                 Qp*=Up;
                 assert(isOrthonormal(lr,Qp));
-                Reshape(lr,1,Qp);  //W is now Qp
+                ReshapeV(lr,Qp);  //W is now Qp
 #ifdef DEBUG
                 char ns=GetNormStatus(1e-13);
                 assert(ns=='L' || ns=='I');
@@ -190,7 +193,6 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
         }
         case DRight:
         {
-            if (V.size()==0) return 0.0; //This will happen at the edges of an MPO
             assert(V.GetNumCols()==itsd*itsd*(X2+1)); // Treate these like enforced comments on the
             assert(V.GetNumRows()==X1+1);             // dimensions of each matrix.
             auto [Lp,Qp]=QRsolver.SolveThinLQ(V); //Solves V=Q*L
@@ -213,7 +215,7 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
             {
                 auto [U,s,VT]=SVDsolver.SolveAll(M,1e-14); //Solves M=U * s * VT
                 AccumulateTruncationError(comp->Compress(U,s,VT));
-//                cout << std::fixed << std::setprecision(2) << "DRight s=" << s.GetDiagonal() << endl;
+                cout << std::fixed << std::setprecision(2) << "DRight s=" << s.GetDiagonal() << endl;
                 Xs=s.GetDiagonal().size();
                 MatrixRT Us=U*s;
                 assert(Us.GetNumRows()==X1);
@@ -232,7 +234,7 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
                 Lpp=Lprime*Uspp; //This get passed on to the next site over.
                 Qp=MatrixRT(VTp*Qp);
                 assert(isOrthonormal(lr,Qp));
-                Reshape(lr,1,Qp);  //W is now Qp
+                ReshapeV(lr,Qp);  //W is now Qp
 #ifdef DEBUG
                 char ns=GetNormStatus(1e-13);
                 assert(ns=='R' || ns=='I');
@@ -299,32 +301,47 @@ double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
 
 void SiteOperatorImp::CanonicalForm(Direction lr)
 {
-
-    MatrixRT  V=Reshape(lr,1);
+#ifdef DEBUG
+    MatrixRT Worig=Reshape(lr,0);
+#endif
+    MatrixRT  V=ReshapeV(lr);
+    assert(V.size()>0);
     LapackQRSolver<double> solver;
     switch (lr)
     {
         case DLeft:
         {
-//           cout << "V=" << V.GetLimits() << Max(fabs(V)) << endl;
-            if (V.size()==0) return; //This will happen at the edges of an MPO
             auto [Q,L]=solver.SolveThinQL(V); //Solves V=Q*L
             L*=1.0/sqrt(itsd);
             Q*=sqrt(itsd);
-            Reshape(lr,1,Q);  //A is now U
+            ReshapeV(lr,Q);  //A is now U
             MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,L.GetNumCols()+1,1);
             if (itsRightNeighbour) itsRightNeighbour->QLTransfer(lr,Lplus);
+#ifdef DEBUG
+            V=ReshapeV(lr);
+            assert(V.GetLimits()==Q.GetLimits());
+            assert(Max(fabs(Q-V))<1e-15);
+            MatrixRT Qplus=Reshape(lr,0);
+            MatrixRT QL=Qplus*Lplus;
+#endif
             break;
         }
         case DRight:
         {
-            if (V.size()==0) return; //This will happen at the edges of an MPO
             auto [L,Q]=solver.SolveThinLQ(V); //Solves V=L*Q
             L*=1.0/sqrt(itsd);
             Q*=sqrt(itsd);
-            Reshape(lr,1,Q);  //A is now U
+            ReshapeV(lr,Q);  //A is now U
             MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,L.GetNumCols()+1,0);
             if (itsLeft_Neighbour) itsLeft_Neighbour->QLTransfer(lr,Lplus);
+#ifdef DEBUG
+            V=ReshapeV(lr);
+            assert(V.GetLimits()==Q.GetLimits());
+            assert(Max(fabs(Q-V))<1e-15);
+            MatrixRT Qplus=Reshape(lr,0);
+            MatrixRT LQ=Lplus*Qplus;
+            assert(Max(fabs(Worig-LQ ))<1e-13);
+#endif
             break;
         }
 
@@ -342,7 +359,7 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
         int N1=L.GetNumCols(); //N1=0 on the first site.
         if (N1>0 && N1!=itsDw.Dw2)
         {
-            if (GetiW(0,0).GetNumCols()!=L.GetNumRows())
+            if (GetW(0,0).GetNumCols()!=L.GetNumRows())
                 NewBondDimensions(itsDw.Dw1,N1,true);
             else
                 itsDw.Dw2=N1; //The contraction below will automatically reshape the Ws.
@@ -350,7 +367,7 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
             {
-                MatrixRT W=GetiW(m,n);
+                MatrixRT W=GetW(m,n);
                 assert(W.GetNumCols()==L.GetNumRows());
                 MatrixRT temp=W*L;
                 W=temp; //Shallow copy
@@ -364,7 +381,7 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
         int N1=L.GetNumRows(); //N1=0 on the first site.
         if (N1>0 && N1!=itsDw.Dw1)
         {
-            if (GetiW(0,0).GetNumRows()!=L.GetNumCols())
+            if (GetW(0,0).GetNumRows()!=L.GetNumCols())
                 NewBondDimensions(N1,itsDw.Dw2,true);
             else
                 itsDw.Dw1=N1; //The contraction below will automatically reshape the As.
@@ -372,7 +389,7 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
             {
-                MatrixRT W=GetiW(m,n);
+                MatrixRT W=GetW(m,n);
                 assert(L.GetNumCols()==W.GetNumRows());
                 MatrixRT temp=L*W;
                 W=temp; //Shallow copy
@@ -396,7 +413,7 @@ void SiteOperatorImp::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const M
         int N1=s.GetNumRows(); //N1=0 on the first site.
         if (N1>0 && N1!=itsDw.Dw2)
         {
-            if (GetiW(0,0).GetNumCols()!=UV.GetNumRows())
+            if (GetW(0,0).GetNumCols()!=UV.GetNumRows())
                 NewBondDimensions(itsDw.Dw1,N1,true);
             else
                 itsDw.Dw2=N1; //The contraction below will automatically reshape the As.
@@ -404,7 +421,7 @@ void SiteOperatorImp::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const M
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
             {
-                MatrixRT W=GetiW(m,n);
+                MatrixRT W=GetW(m,n);
                 assert(W.GetNumCols()==UV.GetNumRows());
                 MatrixRT temp=W*UV*s;
                 W.SetLimits(0,0);
@@ -420,7 +437,7 @@ void SiteOperatorImp::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const M
         int N1=s.GetNumRows(); //N1=0 on the first site.
         if (N1>0 && N1!=itsDw.Dw1)
         {
-            if (GetiW(0,0).GetNumRows()!=UV.GetNumCols())
+            if (GetW(0,0).GetNumRows()!=UV.GetNumCols())
                 NewBondDimensions(N1,itsDw.Dw2,true);
             else
                 itsDw.Dw1=N1; //The contraction below will automatically reshape the As.
@@ -429,7 +446,7 @@ void SiteOperatorImp::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const M
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
             {
-                MatrixRT W=GetiW(m,n);
+                MatrixRT W=GetW(m,n);
                 assert(UV.GetNumCols()==W.GetNumRows());
                 MatrixRT temp=s*UV*W;
                 W.SetLimits(0,0);

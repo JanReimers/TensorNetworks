@@ -251,8 +251,8 @@ TEST_F(MPOTests,TestMPOCompressForH2)
     H2->Product(itsH);
     H2->CanonicalForm();
     double truncError=H2->Compress(TensorNetworks::Std,0,1e-13);
-//    H2->Report(cout);
-    EXPECT_EQ(H2->GetMaxDw(),10);
+    H2->Report(cout);
+    EXPECT_EQ(H2->GetMaxDw(),9);
     EXPECT_LT(truncError,1e-13);
     delete H1;
     delete H2;
@@ -263,7 +263,7 @@ TEST_F(MPOTests,TestHamiltonianCreateH2)
     int L=10;
     Setup(L,0.5,1);
     TensorNetworks::MPO* H2=itsH->CreateH2Operator();
-    EXPECT_EQ(H2->GetMaxDw(),10);
+    EXPECT_EQ(H2->GetMaxDw(),9);
     delete H2;
 }
 
@@ -278,8 +278,8 @@ TEST_F(MPOTests,TestHamiltonianCompressL2)
     double truncError=Hmpo->Compress(TensorNetworks::Std,0,1e-13);
     double E2=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E1,E2,1e-13);
-    EXPECT_EQ(itsH->GetMaxDw(),5);
-    EXPECT_EQ(truncError,0.0); //No compression
+    EXPECT_EQ(itsH->GetMaxDw(),3);
+    EXPECT_LT(truncError,1e-13);
 }
 
 TEST_F(MPOTests,TestH2CompressL2)
@@ -299,7 +299,7 @@ TEST_F(MPOTests,TestH2CompressL2)
 //    H2->Dump(cout);
     double E22=itsMPS->GetExpectation(H2);
     EXPECT_NEAR(E21,E22,1e-13);
-    EXPECT_EQ(H2->GetMaxDw(),10);
+    EXPECT_EQ(H2->GetMaxDw(),4);
     EXPECT_LT(truncError,1e-13);
 }
 
@@ -309,7 +309,7 @@ TEST_F(MPOTests,TestHamiltonianCreateH2L2)
     int L=2;
     Setup(L,0.5,1);
     TensorNetworks::MPO* H2=itsH->CreateH2Operator();
-    EXPECT_EQ(H2->GetMaxDw(),10);
+    EXPECT_EQ(H2->GetMaxDw(),4);
 //    EXPECT_EQ(H2->GetMaxDw(),9); was expecting 9 but SVD for L=2 only gives Dw=4 = d*d
     delete H2;
 }
@@ -328,7 +328,7 @@ TEST_F(MPOTests,TestMPOCompressForE2)
     double E2a=itsMPS->GetExpectation(H2);
     H2->CanonicalForm();
     double truncError=H2->Compress(TensorNetworks::Std,0,1e-13);
-    EXPECT_EQ(H2->GetMaxDw(),10);
+    EXPECT_EQ(H2->GetMaxDw(),9);
     double E2b=itsMPS->GetExpectation(H2);
     EXPECT_NEAR(E2a,E2b,1e-13);
     EXPECT_LT(truncError,1e-13);
@@ -394,7 +394,25 @@ TEST_F(MPOTests,TestL2iMPOTrotter2)
 //    }
 //}
 
-TEST_F(MPOTests,TestParkerCanonicalL9)
+TEST_F(MPOTests,TestParkerCanonicalL9H)
+{
+    int L=9,D=2;
+    double S=0.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::DLeft);
+    TensorNetworks::MPO* H=itsH;
+    EXPECT_EQ(H->GetNormStatus(),"lWWWWWWWr");
+    double E=itsMPS->GetExpectation(itsH);
+    H->CanonicalForm();
+    H->Report(cout);
+    EXPECT_EQ(H->GetNormStatus(),"lRRRRRRIr"); //The last site ends up being both right and left normalized
+    double Eright=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E,Eright,1e-13);
+    EXPECT_EQ(H->GetMaxDw(),5);
+}
+
+TEST_F(MPOTests,TestParkerCanonicalL9iH)
 {
     int L=9,D=2;
     double S=0.5;
@@ -405,7 +423,7 @@ TEST_F(MPOTests,TestParkerCanonicalL9)
     EXPECT_EQ(H->GetNormStatus(),"WWWWWWWWW");
     double E=itsMPS->GetExpectation(itsH);
     H->CanonicalForm();
-    EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR"); //The last site ends up being both right and left normalized
+    EXPECT_EQ(H->GetNormStatus(),"RRRRRRRRR"); //The last site ends up being both right and left normalized
     double Eright=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_EQ(H->GetMaxDw(),5);
@@ -424,12 +442,12 @@ TEST_F(MPOTests,TestParkerSVDCompressHL9)
     EXPECT_EQ(H->GetNormStatus(),"WWWWWWWWW");
     double E=itsMPS->GetExpectation(itsH);
     H->CanonicalForm(); //Do we need to sweep both ways? Yes!!!!
-    EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR");
+    EXPECT_EQ(H->GetNormStatus(),"RRRRRRRRR");
     double Eright=itsMPS->GetExpectation(itsH);
 //    H->Report(cout);
     double truncError=H->Compress(TensorNetworks::Parker,0,1e-13);
 //    H->Report(cout);
-    EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR");
+    EXPECT_EQ(H->GetNormStatus(),"RRRRRRRRR");
     double Ecomp=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_NEAR(E,Ecomp ,1e-13);
@@ -447,21 +465,23 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L9)
     TensorNetworks::MPO* H2=itsH->CreateUnitOperator();
     H2->Product(itsH);
     H2->Product(itsH);
-//    H2->Report(cout);
+    H2->Report(cout);
 
     EXPECT_EQ(H2->GetNormStatus(),"WWWWWWWWW");
     double E2=itsMPS->GetExpectation(H2);
     H2->CanonicalForm(); //Do we need to sweep both ways?
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
+    H2->Report(cout);
+//    H2->Dump(cout);
     double E2right=itsMPS->GetExpectation(H2);
     double truncError=H2->Compress(TensorNetworks::Parker,0,1e-13);
-//    H2->Report(cout);
+    H2->Report(cout);
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     double E2comp=itsMPS->GetExpectation(H2);
-    cout << E2 << " " << E2right << " " << E2comp << endl;
+    cout << std::setprecision(8) << E2 << " " << E2right << " " << E2comp << endl;
     EXPECT_NEAR(E2,E2right,1e-13);
     EXPECT_NEAR(E2,E2comp ,1e-13);
-    EXPECT_EQ(H2->GetMaxDw(),10);
+    EXPECT_EQ(H2->GetMaxDw(),9);
     EXPECT_LT(truncError,1e-13);
 }
 
@@ -551,6 +571,7 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
     EXPECT_LT(truncError,epsMPO); //Unit operator should have no compression error
 }
 
+/*
 TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
 {
     int L=8,D=2;
@@ -583,7 +604,7 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
     EXPECT_EQ(expH->GetMaxDw(),4);
     EXPECT_LT(truncError,epsMPO);
 }
-
+*/
 #ifndef DEBUG
 
 TEST_F(MPOTests,TestTimingE2_S5D4)

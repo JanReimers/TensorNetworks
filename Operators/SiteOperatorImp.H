@@ -54,10 +54,11 @@ class SiteOperatorImp : public virtual SiteOperator
         virtual int             Getd   () const {return itsd;}
         virtual const Dw12&     GetDw12() const=0;
         virtual const MatrixRT& GetW(int m, int n) const =0;
-        virtual const MatrixRT& GetiW(int m, int n) const
-        {
-            return itsWs(m+1,n+1);
-        }
+        virtual       MatrixRT  GetV(Direction,int m, int n) const =0;
+//        virtual const MatrixRT& GetiW(int m, int n) const
+//        {
+//            return itsWs(m+1,n+1);
+//        }
         //
         //  Contract MPOs together
         //
@@ -85,6 +86,7 @@ class SiteOperatorImp : public virtual SiteOperator
         friend class MPOTesting;
         friend class iMPOImp;
         void SetiW(int m, int n, const MatrixRT& W);
+        virtual void SetV (Direction,int m, int n, const MatrixRT& V)=0;
 
         double CompressStd   (Direction,const SVCompressorR*);
         double CompressParker(Direction,const SVCompressorR*);
@@ -93,6 +95,8 @@ class SiteOperatorImp : public virtual SiteOperator
 
         MatrixRT Reshape(Direction lr,int offset) const;
         void     Reshape(Direction lr,int offset,const MatrixRT& Q);
+        MatrixRT ReshapeV(Direction lr) const;
+        void     ReshapeV(Direction lr,const MatrixRT& Q);
         void     NewBondDimensions(int D1, int D2, bool saveData=false);
 
         bool     isOrthonormal(Direction lr,const MatrixRT& Q) const;

@@ -74,5 +74,46 @@ void SiteOperatorBulk::CheckDws() const
 #endif
 }
 
+MatrixRT SiteOperatorBulk::GetV(Direction lr,int m, int n) const
+{
+    MatrixRT V(itsDw.Dw1-1,itsDw.Dw2-1);
+    const MatrixRT& W=GetW(m,n);
+    switch (lr)
+    {
+    case DLeft:
+        for (int w1=2;w1<=itsDw.Dw1;w1++)
+            for (int w2=2;w2<=itsDw.Dw2;w2++)
+                V(w1-1,w2-1)=W(w1,w2);
+        break;
+    case DRight:
+        for (int w1=1;w1<=itsDw.Dw1-1;w1++)
+            for (int w2=1;w2<=itsDw.Dw2-1;w2++)
+                V(w1,w2)=W(w1,w2);
+        break;
+    }
+    return V;
+}
+
+void SiteOperatorBulk::SetV (Direction lr,int m, int n, const MatrixRT& V)
+{
+    MatrixRT& W=itsWs(m+1,n+1);
+    assert(W.GetNumRows()==V.GetNumRows()+1);
+    assert(W.GetNumCols()==V.GetNumCols()+1);
+    switch (lr)
+    {
+    case DLeft:
+        for (int w1=2;w1<=itsDw.Dw1;w1++)
+            for (int w2=2;w2<=itsDw.Dw2;w2++)
+                W(w1,w2)=V(w1-1,w2-1);
+        break;
+    case DRight:
+        for (int w1=1;w1<=itsDw.Dw1-1;w1++)
+            for (int w2=1;w2<=itsDw.Dw2-1;w2++)
+                W(w1,w2)=V(w1,w2);
+        break;
+    }
+    isData_Dirty=true;
+}
+
 
 } //namespace

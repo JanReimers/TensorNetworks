@@ -5222,7 +5222,7 @@ They define a
 \emph on
 regular
 \emph default
- MPO as having the form
+ upper triangular MPO as having the form
 \begin_inset Formula 
 \begin{equation}
 \hat{W}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}} & \hat{d}\\
@@ -5257,7 +5257,7 @@ where
  This MPO is said to be in left canonical form if it's upper left block
 \begin_inset Formula 
 \begin{equation}
-\hat{V}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}\\
+\hat{V}_{L}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}\\
 0 & \hat{\boldsymbol{A}}
 \end{bmatrix}\label{eq:WupperLeft}
 \end{equation}
@@ -5276,7 +5276,17 @@ The right canonical form is the
 \emph on
 mirror
 \emph default
- of this.
+ of this with
+\begin_inset Formula 
+\[
+\hat{V}_{R}=\begin{bmatrix}\hat{\boldsymbol{A}} & \hat{\boldsymbol{b}}\\
+0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+.
  If the MPO is in left canonical form the eq.
  
 \begin_inset CommandInset ref
@@ -5483,16 +5493,26 @@ where
 
  is lower triangular.
  This time we define 
-\begin_inset Formula $\hat{V}$
+\begin_inset Formula $\hat{V}_{L}$
 \end_inset
 
  as the bottom right corner
 \begin_inset Formula 
 \begin{equation}
-\hat{V}=\begin{bmatrix}\hat{\boldsymbol{A}} & 0\\
+\hat{V}_{L}=\begin{bmatrix}\hat{\boldsymbol{A}} & 0\\
 \hat{\boldsymbol{b}} & \hat{𝕀}
 \end{bmatrix}\label{eq:WlowerLeft}
 \end{equation}
+
+\end_inset
+
+and for right canonical we have
+\begin_inset Formula 
+\[
+\hat{V}_{R}=\begin{bmatrix}\hat{𝕀} & 0\\
+\hat{\boldsymbol{c}} & \hat{\boldsymbol{A}}
+\end{bmatrix}
+\]
 
 \end_inset
 
@@ -5544,13 +5564,25 @@ In the paper they have
 
 .
  In practice I see 
-\begin_inset Formula $x=-\sqrt{d}$
+\begin_inset Formula $x=\pm\sqrt{d}$
 \end_inset
 
 .
- It turns out that after doing canonical sweeps in both directions, one
- will get 
-\begin_inset Formula $x=1$
+ This is just because most canned QR routines (including) Lapack want 
+\begin_inset Formula $Q$
+\end_inset
+
+ to be orthonormal, but we want
+\begin_inset Formula $Q^{T}Q=d𝕀$
+\end_inset
+
+.
+ SO we just need to rescale 
+\begin_inset Formula $Q\rightarrow\sqrt{d}$
+\end_inset
+
+and 
+\begin_inset Formula $L\rightarrow\frac{1}{\sqrt{d}}L$
 \end_inset
 
 .
@@ -5586,7 +5618,7 @@ QL\left(\hat{W}\right)=\hat{Q}L=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
 
 \begin_inset Formula 
 \[
-=\boldsymbol{l}\hat{Q}^{1}L^{1}\hat{W}^{2}\hat{W}^{2}\cdots
+QL\left(\boldsymbol{l}\hat{W}^{1}\right)\hat{W}^{2}\hat{W}^{2}\cdots
 \]
 
 \end_inset
@@ -5594,7 +5626,7 @@ QL\left(\hat{W}\right)=\hat{Q}L=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
 
 \begin_inset Formula 
 \[
-=\boldsymbol{l}\hat{Q}^{1}\left(L^{1}\hat{W}^{2}\right)\hat{W}^{2}\cdots
+=\hat{Q}^{1}L^{1}\hat{W}^{2}\hat{W}^{2}\cdots
 \]
 
 \end_inset
@@ -5602,7 +5634,7 @@ QL\left(\hat{W}\right)=\hat{Q}L=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
 
 \begin_inset Formula 
 \[
-=\boldsymbol{l}\hat{Q}^{1}\left(\hat{W}^{2\prime}\right)\hat{W}^{2}\cdots
+=\hat{Q}^{1}\left(L^{1}\hat{W}^{2}\right)\hat{W}^{2}\cdots
 \]
 
 \end_inset
@@ -5610,7 +5642,15 @@ QL\left(\hat{W}\right)=\hat{Q}L=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
 
 \begin_inset Formula 
 \[
-=\boldsymbol{l}\hat{Q}^{1}\hat{Q}^{2}L^{2}\hat{W}^{2}\cdots
+=\hat{Q}^{1}\left(\hat{W}^{2\prime}\right)\hat{W}^{2}\cdots
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\hat{Q}^{1}\hat{Q}^{2}L^{2}\hat{W}^{2}\cdots
 \]
 
 \end_inset
@@ -5622,9 +5662,9 @@ QL\left(\hat{W}\right)=\hat{Q}L=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
 The mirror of this is
 \begin_inset Formula 
 \[
-LQ\left(W\right)=\begin{bmatrix}1 & 0 & 0\\
+LQ\left(W\right)=\begin{bmatrix}x & 0 & 0\\
 t & \mathsf{L} & 0\\
-0 & 0 & x
+0 & 0 & 1
 \end{bmatrix}\begin{bmatrix}\hat{𝕀} & 0 & 0\\
 \hat{\boldsymbol{c}}^{\prime} & \hat{\boldsymbol{A}}^{\prime} & 0\\
 \hat{d} & \hat{\boldsymbol{b}} & \hat{𝕀}
@@ -5671,13 +5711,13 @@ We start with a right canonical MPO
 \end_inset
 
 and QL the first 
-\begin_inset Formula $\hat{W}_{R}$
+\begin_inset Formula $\boldsymbol{l}\hat{W}_{R}$
 \end_inset
 
 
 \begin_inset Formula 
 \[
-\hat{W}_{R}=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\boldsymbol{l}\hat{W}_{R}=\begin{bmatrix}\hat{𝕀} & 0 & 0\\
 \hat{\boldsymbol{c}} & \hat{\boldsymbol{A}}^{\prime} & 0\\
 \hat{d} & \hat{\boldsymbol{b}}^{\prime} & \hat{𝕀}
 \end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
@@ -6265,7 +6305,17 @@ In general we have
 
 \begin_inset Formula 
 \[
-\hat{V}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}\end{bmatrix}
+\hat{V}_{L}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{V}_{R}=\begin{bmatrix}\hat{\boldsymbol{b}}\\
+\hat{𝕀}
+\end{bmatrix}
 \]
 
 \end_inset
@@ -6290,7 +6340,9 @@ and
 
 \begin_inset Formula 
 \[
-\hat{V}=\begin{bmatrix}\end{bmatrix}
+\hat{V}=\begin{bmatrix}\hat{\boldsymbol{b}}\\
+\hat{𝕀}
+\end{bmatrix}
 \]
 
 \end_inset
@@ -6391,16 +6443,14 @@ and
 and again
 \begin_inset Formula 
 \[
-\hat{V}=\begin{bmatrix}\end{bmatrix}
+\hat{V}=\begin{bmatrix}\hat{𝕀}\\
+\hat{\boldsymbol{c}}
+\end{bmatrix}
 \]
 
 \end_inset
 
 is empty.
-\end_layout
-
-\begin_layout Standard
-
 \end_layout
 
 \begin_layout Subsection

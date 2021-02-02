@@ -25,8 +25,10 @@ class SiteOperatorRight
         }
         virtual const MatrixRT& GetW(int m, int n) const
         {
-            return itsWrs(m+1,n+1);
+            return itsWs(m+1,n+1);
         }
+        virtual MatrixRT GetV(Direction,int m, int n) const;
+        virtual void SetV (Direction,int m, int n, const MatrixRT& V);
 
         virtual void Product(const SiteOperator* O2);
         virtual double GetFrobeniusNorm() const {return SiteOperatorImp::GetFrobeniusNorm();};
@@ -38,7 +40,7 @@ class SiteOperatorRight
 
     private:
 
-        Dw12     itsDw;
+//        Dw12     itsDw;
         MatrixRT itsr; //r in l*W*W*...*W*W*r
         TensorT  itsWrs;
 };

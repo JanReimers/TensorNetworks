@@ -27,6 +27,8 @@ class SiteOperatorBulk
         {
             return itsWs(m+1,n+1);
         }
+        virtual MatrixRT GetV(Direction,int m, int n) const;
+        virtual void SetV (Direction,int m, int n, const MatrixRT& V);
 
         virtual double GetFrobeniusNorm() const {return SiteOperatorImp::GetFrobeniusNorm();};
         virtual char   GetLRB() const {return 'B';}
