@@ -127,8 +127,7 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
     assert(comp);
     LapackQRSolver <double>  QRsolver;
     LapackSVDSolver<double> SVDsolver;
-    int Dw1=itsDw.Dw1,Dw2=itsDw.Dw2;
-    int X1=Dw1-2,X2=Dw2-2; //Chi and Chi_prime
+    int X1=itsDw.Dw1-2,X2=itsDw.Dw2-2; //Chi and Chi_prime
     if (X1<0) X1=0;
     if (X2<0) X2=0;
     int Xs=X2;
@@ -360,6 +359,55 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
     }
     SetLimits();
 }
+
+void SiteOperatorImp::iCanonicalForm(Direction lr)
+{
+    assert(itsDw.Dw1==itsDw.Dw2); //Make sure we are square
+    LapackQRSolver <double>  QRsolver;
+
+    int X=itsDw.Dw1-2; //Chi
+//    if (X1<0) X1=0;
+//    if (X2<0) X2=0;
+    MatrixRT Lp(X+1,X+1);
+    Unit(Lp);
+    MatrixRT Id(X+1,X+1);
+    Unit(Id);
+    //Id*=itsd;
+
+    double eta=8.111111;
+
+    do
+    {
+        MatrixRT  V=ReshapeV(lr);
+        auto [Q,L]=QRsolver.SolveThinQL(V); //Solves V=Q*L
+        double sgn=L(X+1,X+1);
+        L*=1.0/sgn;
+        Q*=sgn;
+
+        ReshapeV(lr,Q);
+        cout << std::fixed << std::setprecision(8) << "Min(Diag(L)=" << Min(L.GetDiagonal()) << endl;
+        MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,L.GetNumCols()+1,1);
+        //
+        //  Do W->L*W
+        //
+        for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
+        {
+            MatrixRT W=GetW(m,n);
+            SetW(m,n,Lplus*W);
+        }
+
+        Lp=L*Lp;
+        eta=Max(fabs(L-Id));
+        cout << "eta=" << eta << endl;
+
+    } while (eta>1e-13);
+    cout << std::fixed << std::setprecision(2) << "Lp=" << Lp << endl;
+
+
+}
+
+
 //
 //  Do W = W*L, but L is (Dw-1)x(Dw-1) is smaller than W
 //

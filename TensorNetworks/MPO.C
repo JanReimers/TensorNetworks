@@ -17,7 +17,7 @@ int MPO::GetMaxDw() const
 {
     int L=GetL();
     int Dw=0;
-    for (int ia=1;ia<L;ia++)
+    for (int ia=1;ia<=L;ia++)
     {
         Dw=Max(Dw,GetSiteOperator(ia)->GetDw12().Dw2);
     }
@@ -28,8 +28,8 @@ void MPO::Report(std::ostream& os) const
 {
     int L=GetL();
     os << "Matrix Product Operator for " << L << " sites." << std::endl;
-    os << " Site    Dw      iDw      SVD      F-norm    Norm  U/L  LRB" << std::endl;
-    os << "  #     1   2   1   2   Tr err    fin   inf  stat          " << std::endl;
+    os << " Site    Dw       SVD   F-norm    Norm  U/L  LRB" << std::endl;
+    os << "  #     1   2   Tr err    fin     stat          " << std::endl;
     os << "-----------------------------------------------------------" << std::endl;
     for (int ia=1;ia<=L;ia++)
     {

@@ -65,7 +65,8 @@ class SiteOperatorImp : public virtual SiteOperator
         //
         //  As per Parker et. al.
         //
-        virtual void   CanonicalForm(Direction LR);
+        virtual void    CanonicalForm(Direction LR);
+        virtual void   iCanonicalForm(Direction LR); //Infinite lattice iMPO version
 
         virtual void   Report(std::ostream&) const;
         virtual char   GetNormStatus(double eps) const;

@@ -49,11 +49,14 @@ public:
         if (itsiH ) delete itsiH;
         if (itsMPS) delete itsMPS;
         if (itsOperatorClient) delete itsOperatorClient;
-        itsH =itsFactory->Make1D_NN_HeisenbergHamiltonian( L,S,1.0,1.0,0.0);
+        if (L>1)
+        {
+            itsH =itsFactory->Make1D_NN_HeisenbergHamiltonian( L,S,1.0,1.0,0.0);
+            itsMPS=itsH->CreateMPS(D);
+        }
         itsiH=itsFactory->Make1D_NN_HeisenbergiHamiltonian(L,S,1.0,1.0,0.0);
         itsOperatorClient=new TensorNetworks::Hamiltonian_1D_NN_Heisenberg(S,1.0,1.0,0.0);
         assert(itsOperatorClient);
-        itsMPS=itsH->CreateMPS(D);
     }
     double ENeel(double S) const;
     Matrix6CT GetHeffIterate(int isite) const {return GetMPSImp()->GetHeffIterate(itsH,isite);}
@@ -408,21 +411,24 @@ TEST_F(MPOTests,TestParkerCanonicalL9H)
     EXPECT_EQ(H->GetMaxDw(),5);
 }
 
+
 TEST_F(MPOTests,TestParkerCanonicalL9iH)
 {
-    int L=9,D=2;
+    int L=1,D=2;
     double S=0.5;
     Setup(L,S,D);
-    itsMPS->InitializeWith(TensorNetworks::Random);
-    itsMPS->Normalize(TensorNetworks::DLeft);
-    TensorNetworks::iMPO* H=itsiH;
-    EXPECT_EQ(H->GetNormStatus(),"WWWWWWWWW");
-    double E=itsMPS->GetExpectation(itsH);
-    H->CanonicalForm();
-    EXPECT_EQ(H->GetNormStatus(),"RRRRRRRRR"); //The last site ends up being both right and left normalized
-    double Eright=itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(E,Eright,1e-13);
-    EXPECT_EQ(H->GetMaxDw(),5);
+    TensorNetworks::MPO* iH2=itsiH->CreateiUnitOperator();
+    iH2->Product(itsiH);
+//    iH2->Product(itsiH);
+
+    EXPECT_EQ(iH2->GetNormStatus(),"W");
+//    double E=itsMPS->GetExpectation(itsH);
+    iH2->CanonicalForm();
+    EXPECT_EQ(iH2->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
+    iH2->Report(cout);
+//    double Eright=itsMPS->GetExpectation(itsH);
+//    EXPECT_NEAR(E,Eright,1e-13);
+    EXPECT_EQ(iH2->GetMaxDw(),5);
 }
 
 TEST_F(MPOTests,TestParkerSVDCompressHL9)
@@ -433,14 +439,14 @@ TEST_F(MPOTests,TestParkerSVDCompressHL9)
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DLeft);
 
-    TensorNetworks::iMPO* H=itsiH;
+    TensorNetworks::MPO* H=itsH;
     EXPECT_EQ(H->GetNormStatus(),"WWWWWWWWW");
     double E=itsMPS->GetExpectation(itsH);
     H->CanonicalForm(); //Do we need to sweep both ways? Yes!!!!
-    EXPECT_EQ(H->GetNormStatus(),"RRRRRRRRR");
+    EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR");
     double Eright=itsMPS->GetExpectation(itsH);
     double truncError=H->Compress(TensorNetworks::Parker,0,1e-13);
-    EXPECT_EQ(H->GetNormStatus(),"RRRRRRRRR");
+    EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR");
     double Ecomp=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_NEAR(E,Ecomp ,1e-13);

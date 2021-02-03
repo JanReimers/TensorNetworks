@@ -16,7 +16,7 @@ MPOImp::MPOImp(int L, double S)
     , itsSites()
 {
     assert(isValidSpin(S));
-    assert(itsL>1);
+    assert(itsL>1); //One won't work because of the Left/Right boundary sites
     assert(Getd()>1);
 }
 

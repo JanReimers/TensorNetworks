@@ -36,7 +36,8 @@ public:
     //          Local Matrix Product Operators: Canonical Form, Compression, and Control Theory
     //          Phys. Rev. B 102, 035147 (2020), 2019
     //
-    virtual void CanonicalForm(Direction LR)=0;
+    virtual void  CanonicalForm(Direction LR)=0; //Finite lattice MPO version
+    virtual void iCanonicalForm(Direction LR)=0; //Infinite lattice iMPO version
 
     virtual void Report(std::ostream&) const=0;
     virtual char GetNormStatus(double eps) const=0;
