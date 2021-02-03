@@ -13,8 +13,6 @@ SiteOperatorImp::SiteOperatorImp(int d)
     : itsd(d)
     , itsDw(1,1)
     , itsTruncationError(0.0)
-    , isShapeDirty(true) //Init_lr will turn this off
-    , isData_Dirty(true) //Init_lr will turn this off
     , itsWs(d,d)
 {
     MatrixRT I0(1,1),I1(1,1);
@@ -143,41 +141,32 @@ void SiteOperatorImp::SetNeighbours(SiteOperator* left, SiteOperator* right)
     assert(!right || itsRightNeighbour);
 }
 
-void SiteOperatorImp::SetiW(int m, int n, const MatrixRT& W)
+void SiteOperatorImp::SetW(int m, int n, const MatrixRT& W)
 {
     if (W.GetNumRows()!=itsDw.Dw1)
         assert(W.GetNumRows()==itsDw.Dw1);
     assert(W.GetNumCols()==itsDw.Dw2);
-    if (itsWs(m+1,n+1).GetLimits()!=W.GetLimits())
-        isShapeDirty=true;
     itsWs(m+1,n+1)=W;
-    isData_Dirty=true;
 }
 
 void SiteOperatorImp::SetLimits()
 {
-    SetLimits(itsDw,itsWs);
-}
-
-void SiteOperatorImp::SetLimits(Dw12& Dw,TensorT& Ws)
-{
-    int d=Ws.GetNumRows();
-    Dw.w1_first.SetLimits(Dw.Dw2);
-    Dw.w2_last .SetLimits(Dw.Dw1);
+    itsDw.w1_first.SetLimits(itsDw.Dw2);
+    itsDw.w2_last .SetLimits(itsDw.Dw1);
 //    Fill(Dw.w1_first,1);
 //    Fill(DW.w2_last ,Dw.Dw2);
-    Fill(Dw.w1_first,Dw.Dw1);
-    Fill(Dw.w2_last ,1);
-    for (int m=0; m<d; m++)
-        for (int n=0; n<d; n++)
+    Fill(itsDw.w1_first,itsDw.Dw1);
+    Fill(itsDw.w2_last ,1);
+    for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
         {
-            const MatrixRT& W=Ws(m+1,n+1);
-            for (int w1=1; w1<=Dw.Dw1; w1++)
-                for (int w2=1; w2<=Dw.Dw2; w2++)
+            const MatrixRT& W=itsWs(m+1,n+1);
+            for (int w1=1; w1<=itsDw.Dw1; w1++)
+                for (int w2=1; w2<=itsDw.Dw2; w2++)
                     if (W(w1,w2)!=0.0)
                     {
-                        if (Dw.w1_first(w2)>w1) Dw.w1_first(w2)=w1;
-                        if (Dw.w2_last (w1)<w2) Dw.w2_last (w1)=w2;
+                        if (itsDw.w1_first(w2)>w1) itsDw.w1_first(w2)=w1;
+                        if (itsDw.w2_last (w1)<w2) itsDw.w2_last (w1)=w2;
                     }
 //            cout << "W(" << m << "," << n << ")=" << W << endl;
 //            cout << "w1_first=" << Dw.w1_first << endl;
@@ -217,22 +206,16 @@ void SiteOperatorImp::Product(const SiteOperator* O2)
     itsWs=newWs;  //Use SetiW instead
 
     itsDw=Dw;
-    isData_Dirty=true;
-    Update();
 }
 
 
 void SiteOperatorImp::Report(std::ostream& os) const
 {
-    Dw12 Dw=GetDw12();
     os
-    << std::setw(3) << Dw.Dw1 << " "
-    << std::setw(3) << Dw.Dw2 << " "
     << std::setw(3) << itsDw.Dw1 << " "
     << std::setw(3) << itsDw.Dw2 << "   "
     << std::scientific << std::setprecision(1) << itsTruncationError
     << " " << std::fixed << std::setprecision(1) << std::setw(5) << GetFrobeniusNorm()
-    << " " << std::fixed << std::setprecision(1) << std::setw(5) << GetiFrobeniusNorm()
     << " " << std::setw(4) << GetNormStatus(1e-13)
     << " " << std::setw(4) << GetUpperLower(1e-13)
     << " " << std::setw(4) << GetLRB() //Left, Bulk, Right
@@ -267,15 +250,6 @@ char SiteOperatorImp::GetUpperLower(double eps) const
 }
 
 double SiteOperatorImp::GetFrobeniusNorm() const
-{
-    double fn=0.0;
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
-            fn+=FrobeniusNorm(GetW(n,m));
-    return fn;
-}
-
-double SiteOperatorImp::GetiFrobeniusNorm() const
 {
     double fn=0.0;
     for (int m=0; m<itsd; m++)

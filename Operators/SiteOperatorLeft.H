@@ -3,7 +3,6 @@
 
 #include "Operators/SiteOperatorImp.H"
 
-
 namespace TensorNetworks
 {
 
@@ -19,31 +18,13 @@ class SiteOperatorLeft
         SiteOperatorLeft(int d, const TensorT& W); //Construct with W operator
         virtual ~SiteOperatorLeft();
 
-        virtual const Dw12&     GetDw12() const
-        {
-            return itsDw;
-        }
-        virtual const MatrixRT& GetW(int m, int n) const
-        {
-            return itsWs(m+1,n+1);
-        }
         virtual MatrixRT GetV(Direction,int m, int n) const;
-        virtual void SetV (Direction,int m, int n, const MatrixRT& V);
+        virtual void     SetV(Direction,int m, int n, const MatrixRT& V);
 
-        virtual void Product(const SiteOperator* O2);
-        virtual double GetFrobeniusNorm() const {return SiteOperatorImp::GetFrobeniusNorm();};
-        virtual char   GetLRB() const {return 'L';}
-
-        virtual void Init_lr(int oneIndex);
-        virtual void Update();
-        virtual void SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
+        virtual char GetLRB() const {return 'L';}
         virtual void CheckDws() const;
-
-    private:
-
-//        Dw12     itsDw;
-        MatrixRT itsl; //l in l*W*W*...*W*W*r
-        TensorT  itslWs;
+private:
+        virtual void Init_lr(int oneIndex);
 };
 
 }

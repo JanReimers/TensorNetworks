@@ -19,20 +19,10 @@ class SiteOperatorBulk
         SiteOperatorBulk(int d, const TensorT& W); //Construct with W operator
         virtual ~SiteOperatorBulk();
 
-        virtual const Dw12&     GetDw12() const
-        {
-            return itsDw;
-        }
-        virtual const MatrixRT& GetW(int m, int n) const
-        {
-            return itsWs(m+1,n+1);
-        }
         virtual MatrixRT GetV(Direction,int m, int n) const;
-        virtual void SetV (Direction,int m, int n, const MatrixRT& V);
+        virtual void     SetV(Direction,int m, int n, const MatrixRT& V);
 
-        virtual double GetFrobeniusNorm() const {return SiteOperatorImp::GetFrobeniusNorm();};
-        virtual char   GetLRB() const {return 'B';}
-        virtual void Update();
+        virtual char GetLRB  () const {return 'B';}
         virtual void CheckDws() const;
 };
 

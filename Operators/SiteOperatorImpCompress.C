@@ -27,6 +27,7 @@ double SiteOperatorImp::Compress(CompressType ct,Direction lr,const SVCompressor
     default:
         assert(false);
     }
+    SetLimits();
     return terror;
 }
 
@@ -253,7 +254,7 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
 {
     assert(comp);
-    MatrixRT  A=Reshape(lr,0);
+    MatrixRT  A=ReshapeW(lr);
 //    cout << "A=" << A << endl;
     LapackSVDSolver<double> solver;
     auto [U,sm,VT]=solver.SolveAll(A,1e-14); //Solves A=U * s * VT
@@ -282,14 +283,14 @@ double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
         case DRight:
         {
             UV=U;
-            Reshape(lr,0,VT);  //A is now Vdagger
+            ReshapeW(lr,VT);  //A is now Vdagger
             if (itsLeft_Neighbour) itsLeft_Neighbour->SVDTransfer(lr,sm,UV);
             break;
         }
         case DLeft:
         {
             UV=VT; //Set Vdagger
-            Reshape(lr,0,U);  //A is now U
+            ReshapeW(lr,U);  //A is now U
             if (itsRightNeighbour) itsRightNeighbour->SVDTransfer(lr,sm,UV);
             break;
         }
@@ -302,7 +303,7 @@ double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
 void SiteOperatorImp::CanonicalForm(Direction lr)
 {
 #ifdef DEBUG
-    MatrixRT Worig=Reshape(lr,0);
+    MatrixRT Worig=ReshapeW(lr);
 //    cout << "Worig=" << Worig << endl;
 #endif
     MatrixRT  V=ReshapeV(lr);
@@ -325,7 +326,7 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
             V=ReshapeV(lr);
             assert(V.GetLimits()==Q.GetLimits());
             assert(Max(fabs(Q-V))<1e-15);
-            MatrixRT Qplus=Reshape(lr,0);
+            MatrixRT Qplus=ReshapeW(lr);
             MatrixRT QL=Qplus*Lplus;
 //            cout << "Lplus=" << Lplus << endl;
 //            cout << "Qplus=" << Qplus << endl;
@@ -348,7 +349,7 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
             V=ReshapeV(lr);
             assert(V.GetLimits()==Q.GetLimits());
             assert(Max(fabs(Q-V))<1e-15);
-            MatrixRT Qplus=Reshape(lr,0);
+            MatrixRT Qplus=ReshapeW(lr);
             MatrixRT LQ=Lplus*Qplus;
 //            cout << "Worig-LQ=" << Worig-LQ << endl;
             assert(Max(fabs(Worig-LQ ))<1e-13);
@@ -357,6 +358,7 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
         }
 
     }
+    SetLimits();
 }
 //
 //  Do W = W*L, but L is (Dw-1)x(Dw-1) is smaller than W
@@ -380,10 +382,8 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
             {
                 MatrixRT W=GetW(m,n);
                 assert(W.GetNumCols()==L.GetNumRows());
-                MatrixRT temp=W*L;
-                W=temp; //Shallow copy
-                SetiW(m,n,W);
-                assert(W.GetNumCols()==itsDw.Dw2); //Verify shape is correct;
+                SetW(m,n,W*L);
+                assert(GetW(m,n).GetNumCols()==itsDw.Dw2); //Verify shape is correct;
             }
         break;
     }
@@ -402,16 +402,14 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
             {
                 MatrixRT W=GetW(m,n);
                 assert(L.GetNumCols()==W.GetNumRows());
-                MatrixRT temp=L*W;
-                W=temp; //Shallow copy
-                assert(W.GetNumRows()==itsDw.Dw1); //Verify shape is correct;
-                SetiW(m,n,W);
+                SetW(m,n,L*W);
+                assert(GetW(m,n).GetNumRows()==itsDw.Dw1); //Verify shape is correct;
             }
         break;
     }
 
     }
-    Update();
+    SetLimits();
 }
 
 void SiteOperatorImp::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV)
@@ -439,7 +437,7 @@ void SiteOperatorImp::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const M
                 W=temp; //Shallow copy
 //                cout << "SVD transfer W(" << m << "," << n << ")=" << W << endl;
                 assert(W.GetNumCols()==itsDw.Dw2); //Verify shape is correct;
-                SetiW(m,n,W);
+                SetW(m,n,W);
             }
         break;
     }
@@ -464,13 +462,13 @@ void SiteOperatorImp::SVDTransfer(Direction lr,const DiagonalMatrixRT& s,const M
                 W=temp; //Shallow copy
 //                cout << "SVD transfer W(" << m << "," << n << ")=" << W << endl;
                 assert(W.GetNumRows()==itsDw.Dw1); //Verify shape is correct;
-                SetiW(m,n,W);
+                SetW(m,n,W);
             }
         break;
     }
 
     }
-    Update();
+    SetLimits();
 }
 
 

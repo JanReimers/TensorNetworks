@@ -9,35 +9,35 @@ namespace TensorNetworks
 //  has the intrinsic portion of W.
 //  In simple terms we just leave out the {first/last} row and column
 //
-MatrixRT SiteOperatorImp::Reshape(Direction lr,int off) const
+MatrixRT SiteOperatorImp::ReshapeW(Direction lr) const
 {
     MatrixRT A;
     switch (lr)
     {
     case DLeft:
     { //Leave out **first** row and column of W
-        A.SetLimits(itsd*itsd*(itsDw.Dw1-off),itsDw.Dw2-off);
+        A.SetLimits(itsd*itsd*(itsDw.Dw1),itsDw.Dw2);
         int w=1;
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
             {
                 const MatrixRT& W=GetW(m,n);
-                for (int w1=1+off; w1<=itsDw.Dw1; w1++,w++)
-                    for (int w2=1+off; w2<=itsDw.Dw2; w2++)
-                        A(w,w2-off)=W(w1,w2);
+                for (int w1=1; w1<=itsDw.Dw1; w1++,w++)
+                    for (int w2=1; w2<=itsDw.Dw2; w2++)
+                        A(w,w2)=W(w1,w2);
             }
         break;
     }
     case DRight:
     { //Leave out **last** row and column of W
-        A.SetLimits(itsDw.Dw1-off,itsd*itsd*(itsDw.Dw2-off));
+        A.SetLimits(itsDw.Dw1,itsd*itsd*(itsDw.Dw2));
         int w=1;
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
             {
                 const MatrixRT& W=GetW(m,n);
-                for (int w2=1; w2<=itsDw.Dw2-off; w2++,w++)
-                    for (int w1=1; w1<=itsDw.Dw1-off; w1++)
+                for (int w2=1; w2<=itsDw.Dw2; w2++,w++)
+                    for (int w1=1; w1<=itsDw.Dw1; w1++)
                         A(w1,w)=W(w1,w2);
             }
         break;
@@ -136,12 +136,11 @@ void  SiteOperatorImp::ReshapeV(Direction lr,const MatrixRT& Q)
         break;
     }
     }
-    Update();
 }
 
 
 
-void  SiteOperatorImp::Reshape(Direction lr,int off,const MatrixRT& Q)
+void  SiteOperatorImp::ReshapeW(Direction lr,const MatrixRT& Q)
 {
     switch (lr)
     {
@@ -150,18 +149,18 @@ void  SiteOperatorImp::Reshape(Direction lr,int off,const MatrixRT& Q)
         //  If L has less columns than the Ws then we need to reshape the whole site.
         //  Typically this will happen at the edges of the lattice.
         //
-        if (Q.GetNumCols()+off<itsDw.Dw2)
-            NewBondDimensions(itsDw.Dw1,Q.GetNumCols()+off,true);//we must save the old since Q only holds part of W
+        if (Q.GetNumCols()<itsDw.Dw2)
+            NewBondDimensions(itsDw.Dw1,Q.GetNumCols(),true);//we must save the old since Q only holds part of W
         //Leave out **first** row and column of W
         int w=1;
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
             {
                 MatrixRT W=GetW(m,n);
-                for (int w1=1+off; w1<=itsDw.Dw1; w1++,w++)
-                    for (int w2=1+off; w2<=itsDw.Dw2; w2++)
-                        W(w1,w2)=Q(w,w2-off);
-                SetiW(m,n,W);
+                for (int w1=1; w1<=itsDw.Dw1; w1++,w++)
+                    for (int w2=1; w2<=itsDw.Dw2; w2++)
+                        W(w1,w2)=Q(w,w2);
+                SetW(m,n,W);
             }
 //        for (int m=0; m<itsd; m++)
 //            for (int n=0; n<itsd; n++,w++)
@@ -173,23 +172,22 @@ void  SiteOperatorImp::Reshape(Direction lr,int off,const MatrixRT& Q)
         //  If Vdagger has less rows than the Ws then we need to reshape the whole site.
         //  Typically this will happen at the edges of the lattice.
         //
-        if (Q.GetNumRows()+off<itsDw.Dw1)
-            NewBondDimensions(Q.GetNumRows()+off,itsDw.Dw2,true);//we must save the old since Q only holds part of W
+        if (Q.GetNumRows()<itsDw.Dw1)
+            NewBondDimensions(Q.GetNumRows(),itsDw.Dw2,true);//we must save the old since Q only holds part of W
         //Leave out **last** row and column of W
         int w=1;
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++)
             {
                 MatrixRT W=GetW(m,n);
-                for (int w2=1; w2<=itsDw.Dw2-off; w2++,w++)
-                    for (int w1=1; w1<=itsDw.Dw1-off; w1++)
+                for (int w2=1; w2<=itsDw.Dw2; w2++,w++)
+                    for (int w1=1; w1<=itsDw.Dw1; w1++)
                         W(w1,w2)=Q(w1,w);
-                SetiW(m,n,W);
+                SetW(m,n,W);
             }
         break;
     }
     }
-    Update();
 }
 
 //
@@ -214,7 +212,6 @@ void SiteOperatorImp::NewBondDimensions(int D1, int D2, bool saveData)
     itsDw.Dw1=D1;
     itsDw.Dw2=D2;
 
-    isShapeDirty=true;
 }
 
 

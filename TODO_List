@@ -1,21 +1,7 @@
 
--At left edge we should get V=[b,I] not [0].  Fix ReshapeV accordingly
-    We need a few cases
-        Canonical:
-            Left:   GetV(m,n)=[b_mn,I_mn]
-            Bulk:   GetV(m,n)= [Amn,0]
-                            [b_mn,I_mn]
-            Right:  GetV(m,n)= [] empty
-        Compress
-            Left:   GetW(m,n)=[dmn,b_mn,I_mn]
-            Bulk:   GetW(m,n)= Whole thing
-            Right:  GetW(m,n)= [I_mn]
-                               [c_mn]
-                               [d_mn]
-
-
--Std compression should work on GetW not GetiW
--ImaginaryTimeTests,TestITimeFourthOrderTrotterL2 locks up
+Done: -At left edge we should get V=[b,I] not [0].  Fix ReshapeV accordingly
+Done: -Std compression should work on GetW not GetiW
+Done: -ImaginaryTimeTests,TestITimeFourthOrderTrotterL2 locks up
     Edges Dws get too big.
 -expH MPO get scrambled when reducing to Canonical form.
     Get further scrambled after Parker-compress, std-compress is fine
@@ -34,7 +20,7 @@
     -Factor U*s*V = expH
 -Add asserts to confirm zeros in Lp matrices are indeed zero.
 -Simplify MPO compression code
--Move all oml instancing to oml side.
+Done: -Move all oml instancing to oml side.
 -Implement Parker algorithm #3, iMPO left canonical form
 -Implement Parker algorithm #4, iMPO left canonical form for triangular W
 -Implement Parker algorithm #5, iMPO compression

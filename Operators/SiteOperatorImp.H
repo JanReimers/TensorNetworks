@@ -52,13 +52,8 @@ class SiteOperatorImp : public virtual SiteOperator
         void SetNeighbours(SiteOperator* left, SiteOperator* right);
 
         virtual int             Getd   () const {return itsd;}
-        virtual const Dw12&     GetDw12() const=0;
-        virtual const MatrixRT& GetW(int m, int n) const =0;
-        virtual       MatrixRT  GetV(Direction,int m, int n) const =0;
-//        virtual const MatrixRT& GetiW(int m, int n) const
-//        {
-//            return itsWs(m+1,n+1);
-//        }
+        virtual const Dw12&     GetDw12() const {return itsDw;}
+        virtual const MatrixRT& GetW(int m, int n) const {return itsWs(m+1,n+1);}
         //
         //  Contract MPOs together
         //
@@ -75,27 +70,26 @@ class SiteOperatorImp : public virtual SiteOperator
         virtual void   Report(std::ostream&) const;
         virtual char   GetNormStatus(double eps) const;
         virtual double GetFrobeniusNorm() const;
-        virtual double GetiFrobeniusNorm() const;
         virtual char   GetUpperLower(double eps) const;
-        virtual void   Update()=0;
         virtual char   GetLRB() const=0;
         virtual void   CheckDws() const;
         virtual void   SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
-        static  void   SetLimits(Dw12& Dw,TensorT& Ws); //Fix up itsDw12 by inspecting zeros in Wmn
     private:
         friend class MPOTesting;
         friend class iMPOImp;
-        void SetiW(int m, int n, const MatrixRT& W);
-        virtual void SetV (Direction,int m, int n, const MatrixRT& V)=0;
+
+        virtual MatrixRT GetV(Direction,int m, int n) const =0;
+        virtual void     SetV(Direction,int m, int n, const MatrixRT& V)=0;
+                void     SetW(          int m, int n, const MatrixRT& W);
 
         double CompressStd   (Direction,const SVCompressorR*);
         double CompressParker(Direction,const SVCompressorR*);
         void   SVDTransfer   (Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV);
         void   QLTransfer    (Direction lr,const MatrixRT& L);
 
-        MatrixRT Reshape(Direction lr,int offset) const;
-        void     Reshape(Direction lr,int offset,const MatrixRT& Q);
+        MatrixRT ReshapeW(Direction lr) const;
         MatrixRT ReshapeV(Direction lr) const;
+        void     ReshapeW(Direction lr,const MatrixRT& Q);
         void     ReshapeV(Direction lr,const MatrixRT& Q);
         void     NewBondDimensions(int D1, int D2, bool saveData=false);
 
@@ -106,9 +100,6 @@ class SiteOperatorImp : public virtual SiteOperator
         int      itsd; //2*S+1
         Dw12     itsDw;
         double   itsTruncationError;
-        bool     isShapeDirty; //Matrices got reshaped
-        bool     isData_Dirty; //Matrices got new data
-
         TensorT  itsWs;
         SiteOperatorImp* itsLeft_Neighbour;
         SiteOperatorImp* itsRightNeighbour;

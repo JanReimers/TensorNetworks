@@ -9,13 +9,13 @@ namespace TensorNetworks
 SiteOperatorBulk::SiteOperatorBulk(int d)
     : SiteOperatorImp(d)
 {
-    Update();
+    SetLimits();
 }
 
 SiteOperatorBulk::SiteOperatorBulk(int d, double S, SpinOperator so) //Construct spin operator
     : SiteOperatorImp(d,S,so)
 {
-    Update();
+    SetLimits();
 }
 //
 //  Build from a W rep object
@@ -23,7 +23,7 @@ SiteOperatorBulk::SiteOperatorBulk(int d, double S, SpinOperator so) //Construct
 SiteOperatorBulk::SiteOperatorBulk(int d, const OperatorClient* H)
     : SiteOperatorImp(d,H)
 {
-    Update();
+    SetLimits();
 }
 //
 // Build from a trotter decomp.
@@ -31,7 +31,7 @@ SiteOperatorBulk::SiteOperatorBulk(int d, const OperatorClient* H)
 SiteOperatorBulk::SiteOperatorBulk(int d, Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s)
     : SiteOperatorImp(d,lr,U,s)
 {
-    Update();
+    SetLimits();
 }
 //
 // Construct with W operator
@@ -39,7 +39,7 @@ SiteOperatorBulk::SiteOperatorBulk(int d, Direction lr,const MatrixRT& U, const 
 SiteOperatorBulk::SiteOperatorBulk(int d, const TensorT& W)
     : SiteOperatorImp(d,W)
 {
-    Update();
+    SetLimits();
 }
 
 
@@ -47,18 +47,6 @@ SiteOperatorBulk::~SiteOperatorBulk()
 {
     //dtor
 }
-
-void SiteOperatorBulk::Update()
-{
-    isShapeDirty=false;
-    if (isData_Dirty)
-    {
-        SetLimits();
-        isData_Dirty=false;
-    }
-    CheckDws();
-}
-
 
 void SiteOperatorBulk::CheckDws() const
 {
@@ -112,7 +100,6 @@ void SiteOperatorBulk::SetV (Direction lr,int m, int n, const MatrixRT& V)
                 W(w1,w2)=V(w1,w2);
         break;
     }
-    isData_Dirty=true;
 }
 
 

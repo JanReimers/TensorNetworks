@@ -19,30 +19,13 @@ class SiteOperatorRight
         SiteOperatorRight(int d, const TensorT& W); //Construct with W operator
         virtual ~SiteOperatorRight();
 
-        virtual const Dw12&     GetDw12() const
-        {
-            return itsDw;
-        }
-        virtual const MatrixRT& GetW(int m, int n) const
-        {
-            return itsWs(m+1,n+1);
-        }
         virtual MatrixRT GetV(Direction,int m, int n) const;
-        virtual void SetV (Direction,int m, int n, const MatrixRT& V);
+        virtual void     SetV(Direction,int m, int n, const MatrixRT& V);
 
-        virtual void Product(const SiteOperator* O2);
-        virtual double GetFrobeniusNorm() const {return SiteOperatorImp::GetFrobeniusNorm();};
-        virtual char   GetLRB() const {return 'R';}
-        virtual void Init_lr(int oneIndex);
-        virtual void Update();
+        virtual char GetLRB() const {return 'R';}
         virtual void CheckDws() const;
-        virtual void SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
-
-    private:
-
-//        Dw12     itsDw;
-        MatrixRT itsr; //r in l*W*W*...*W*W*r
-        TensorT  itsWrs;
+private:
+        virtual void Init_lr(int oneIndex);
 };
 
 }
