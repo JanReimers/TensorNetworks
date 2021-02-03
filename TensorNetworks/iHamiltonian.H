@@ -19,7 +19,8 @@ public:
     iHamiltonian() {}
     virtual ~iHamiltonian() {}
 
-    virtual int Getd    () const=0; //Dimension of the one site Hilbert space
+    virtual int    Getd() const=0; //Dimension of the one site Hilbert space
+    virtual double GetS() const=0; //Spin of the one site Hilbert space
     //
     // Wave function zone:
     //    Creates an iTEBD state with the correct unit cell size and spin space.

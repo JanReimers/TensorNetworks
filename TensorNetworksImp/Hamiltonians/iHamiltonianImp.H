@@ -20,9 +20,10 @@ public:
     iHamiltonianImp(int L, const OperatorClient* W);
     virtual ~iHamiltonianImp();
 
-    virtual int GetL    () const {return iMPOImp::GetL    ();}
-    virtual int Getd    () const {return iMPOImp::Getd    ();}
-    virtual int GetMaxDw() const {return iMPOImp::GetMaxDw();}
+    virtual int    GetL    () const {return iMPOImp::GetL    ();}
+    virtual double GetS    () const {return iMPOImp::GetS    ();}
+    virtual int    Getd    () const {return iMPOImp::Getd    ();}
+    virtual int    GetMaxDw() const {return iMPOImp::GetMaxDw();}
 
     virtual iTEBDState* CreateiTEBDState   (int D,iTEBDType,double normEps,double epsSV) const;
     virtual iMPO*       CreateiUnitOperator() const;

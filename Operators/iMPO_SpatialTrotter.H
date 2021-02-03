@@ -20,8 +20,7 @@ class iMPO_SpatialTrotter
     , private iMPOImp
 {
     public:
-        iMPO_SpatialTrotter(double dt, Trotter type,int L, double S, const iHamiltonian*);
-        iMPO_SpatialTrotter(double dt, Trotter type,int L, int d   , const iHamiltonian*) = delete;
+        iMPO_SpatialTrotter(double dt, Trotter type, const iHamiltonian*);
         virtual ~iMPO_SpatialTrotter();
 };
 

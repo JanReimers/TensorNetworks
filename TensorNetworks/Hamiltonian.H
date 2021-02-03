@@ -17,8 +17,9 @@ class Hamiltonian : public virtual MPO
     public:
     Hamiltonian() {}
     virtual ~Hamiltonian() {}
-    //virtual int GetL    () const=0; //# of lattice sites
-    virtual int Getd    () const=0; //Dimension of the one site Hilbert space
+
+    virtual int    Getd() const=0; //Dimension of the one site Hilbert space
+    virtual double GetS() const=0; //Spin of the one site Hilbert space
     //
     // Wave function zone:
     //    Creates an MPS state with the correct lattice size and spin space.

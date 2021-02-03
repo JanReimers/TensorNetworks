@@ -52,8 +52,6 @@ MPO* HamiltonianImp::CreateUnitOperator() const
 MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order,CompressType ct,double epsMPO) const
 {
     MPO* W=CreateUnitOperator();
-    int    L=GetL();
-    double S=GetS();
     switch (order)
     {
         case TNone :
@@ -63,16 +61,16 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order,CompressType c
         }
         case FirstOrder :
         {
-            MPO_SpatialTrotter Wodd (dt,Odd ,L,S,this);
-            MPO_SpatialTrotter Weven(dt,Even,L,S,this);
+            MPO_SpatialTrotter Wodd (dt,Odd ,this);
+            MPO_SpatialTrotter Weven(dt,Even,this);
             W->Product(&Wodd);
             W->Product(&Weven);
             break;
         }
         case SecondOrder :
         {
-            MPO_SpatialTrotter Wodd (dt/2.0,Odd ,L,S,this);
-            MPO_SpatialTrotter Weven(dt    ,Even,L,S,this);
+            MPO_SpatialTrotter Wodd (dt/2.0,Odd ,this);
+            MPO_SpatialTrotter Weven(dt    ,Even,this);
 //            Wodd .Report(cout);
 //            Weven.Report(cout);
             W->Product(&Wodd);
@@ -94,9 +92,9 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order,CompressType c
             ts(5)=ts(1);
             for (int it=1;it<=5;it++)
             {
-                MPOImp U(L,S,MPOImp::Identity);
-                MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,L,S,this);
-                MPO_SpatialTrotter Weven(ts(it)    ,Even,L,S,this);
+                MPOImp U(GetL(),GetS(),MPOImp::Identity);
+                MPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,this);
+                MPO_SpatialTrotter Weven(ts(it)    ,Even,this);
                 U.Product(&Wodd);
                 U.Product(&Weven);
                 //U.Compress(0,1e-12); //Does not seem to help

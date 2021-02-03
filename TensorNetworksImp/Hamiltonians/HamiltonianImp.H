@@ -22,9 +22,10 @@ public:
     HamiltonianImp(int L, const OperatorClient* W);
     virtual ~HamiltonianImp();
 
-    virtual int GetL    () const {return MPOImp::GetL    ();}
-    virtual int Getd    () const {return MPOImp::Getd    ();}
-    virtual int GetMaxDw() const {return MPOImp::GetMaxDw();}
+    virtual int    GetL    () const {return MPOImp::GetL    ();}
+    virtual double GetS    () const {return MPOImp::GetS    ();}
+    virtual int    Getd    () const {return MPOImp::Getd    ();}
+    virtual int    GetMaxDw() const {return MPOImp::GetMaxDw();}
 
     virtual MPS*       CreateMPS          (int D          ,double normEps,double epsSV) const;
     virtual MPO*       CreateUnitOperator () const;

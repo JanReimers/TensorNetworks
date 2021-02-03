@@ -14,7 +14,7 @@ Done: -ImaginaryTimeTests,TestITimeFourthOrderTrotterL2 locks up
     simply because we are not very good taking expectation values of iMPOs yet
 -MPO Add (rather than combine) MPOs to do:
             S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
--MPO_SpatialTrotter(dt,TensorNetworks::Even,L,S,itsH), H knows L & S don't need them as arguments
+-Done: MPO_SpatialTrotter(dt,TensorNetworks::Even,L,S,itsH), H knows L & S don't need them as arguments
 -Trotter MPO and iMPO have a lot of duplicated code for calculating exp(-t*H) and factoring it.
     Done: -ExpH
     -Factor U*s*V = expH

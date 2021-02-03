@@ -15,13 +15,11 @@ namespace TensorNetworks
 //  THe local two site Hamiltonian H12 should be stored as H12(m1,m2,n1,n2);
 //   Whem flatted to H(m,n) where m=(m1,m2) n=(n1,n2) it is hermitian and diagonalizable.
 //
-iMPO_SpatialTrotter::iMPO_SpatialTrotter(double dt, Trotter type,int L, double S, const iHamiltonian* H)
-    : iMPOImp(L,S)
+iMPO_SpatialTrotter::iMPO_SpatialTrotter(double dt, Trotter type, const iHamiltonian* H)
+    : iMPOImp(H->GetL(),H->GetS())
 {
-    assert(isValidSpin(S));
-    int d=2*S+1;
-    assert(L>1);
-    assert(d>1);
+    int d=Getd();
+    int L=GetL();
     assert(type==Odd || type==Even);
 
     Matrix4RT expH=H->GetExponentH(dt);

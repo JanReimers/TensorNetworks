@@ -80,8 +80,8 @@ TEST_F(ImaginaryTimeTests,TestMPPOCombineL8)
     Setup(L,S,D);
 
     // Create some Trotter 2nd order operators
-    TensorNetworks::MPO_SpatialTrotter W_Odd (dt/2.0,TensorNetworks::Odd ,L,S,itsH);
-    TensorNetworks::MPO_SpatialTrotter W_Even(dt    ,TensorNetworks::Even,L,S,itsH);
+    TensorNetworks::MPO_SpatialTrotter W_Odd (dt/2.0,TensorNetworks::Odd ,itsH);
+    TensorNetworks::MPO_SpatialTrotter W_Even(dt    ,TensorNetworks::Even,itsH);
     //
     //  Now combine three trotters into one
     //
@@ -124,8 +124,8 @@ TEST_F(ImaginaryTimeTests,TestMPPOCombineL9)
     Setup(L,S,D);
 
     // Create some Trotter 2nd order operators
-    TensorNetworks::MPO_SpatialTrotter W_Odd (dt/2.0,TensorNetworks::Odd ,L,S,itsH);
-    TensorNetworks::MPO_SpatialTrotter W_Even(dt    ,TensorNetworks::Even,L,S,itsH);
+    TensorNetworks::MPO_SpatialTrotter W_Odd (dt/2.0,TensorNetworks::Odd ,itsH);
+    TensorNetworks::MPO_SpatialTrotter W_Even(dt    ,TensorNetworks::Even,itsH);
     //
     //  Now combine three trotters into one
     //
