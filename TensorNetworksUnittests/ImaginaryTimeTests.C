@@ -176,7 +176,7 @@ TEST_F(ImaginaryTimeTests,TestIterationSchedule)
 
 TEST_F(ImaginaryTimeTests,MPOCompressSeconderOrderTrotter_dt0)
 {
-    int D=8,L=9;
+    int D=8,L=8;
     double dt=0.0,epsSVD=1e-12,epsMPO=1e-4;                                                                                                                                                                                                        ;
     Setup(L,0.5,D);
     itsMPS->InitializeWith(TensorNetworks::Random);
@@ -299,8 +299,8 @@ TEST_F(ImaginaryTimeTests,MPOCompressSeconderOrderTrotter_dt05_FixedDw)
 #endif
 TEST_F(ImaginaryTimeTests,MPOCompressFourthOrderTrotter)
 {
-    int D=8,L=9;
-    double dt=0.1,epsMPO=1e-4;
+    int D=8,L=8;
+    double dt=0.1,epsMPO=1e-12;
     Setup(L,0.5,D);
 
     TensorNetworks::MPO* W=itsH->CreateOperator(dt,TensorNetworks::FourthOrder,TensorNetworks::Std,epsMPO);
@@ -380,6 +380,7 @@ TEST_F(ImaginaryTimeTests,TestITimeSecondOrderTrotterL2)
     EXPECT_NEAR(E2,E1*E1,1e-9);
     delete Psi1;
 }
+
 TEST_F(ImaginaryTimeTests,TestITimeFourthOrderTrotterL2)
 {
     int D=2,L=2;

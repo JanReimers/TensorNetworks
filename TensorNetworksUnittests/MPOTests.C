@@ -546,7 +546,7 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
     EXPECT_NEAR(psi1->GetOverlap(psi1),1.0,1e-13);
 
     EXPECT_NEAR(itsMPS->GetOverlap(psi1),1.0,1e-13);
-    expH->CanonicalForm(); //Do we need to sweep both ways?
+    expH->CanonicalForm();
 //    expH->Report(cout);
     TensorNetworks::MPS* psi3=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi3),1.0,1e-13);
@@ -558,7 +558,7 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
     EXPECT_LT(truncError,epsMPO); //Unit operator should have no compression error
 }
 
-
+/*
 TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
 {
     int L=8,D=2;
@@ -568,9 +568,9 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
     itsMPS->Normalize(TensorNetworks::DLeft);
 //    TensorNetworks::Matrix4RT H12=itsH->GetLocalMatrix();
 //    TensorNetworks::iMPO* expH=itsiH->CreateiMPO(dt,TensorNetworks::SecondOrder,TensorNetworks::CNone,epsMPO);
-    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::CNone,epsMPO);
+    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::FirstOrder,TensorNetworks::CNone,epsMPO);
 //    TensorNetworks::MPO* expH=itsH->CreateUnitOperator();
-//    TensorNetworks::MPO* expH=new TensorNetworks::MPO_SpatialTrotter(dt,TensorNetworks::Odd,L,S,itsH);
+//  TensorNetworks::MPO* expH=new TensorNetworks::MPO_SpatialTrotter(dt,TensorNetworks::Even,L,S,itsH);
     expH->Report(cout);
 //    expH->Dump(cout);
 
@@ -580,17 +580,18 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
 //    itsMPS->Report(cout);
     expH->CanonicalForm(); //Sweep both ways
     expH->Report(cout);
-    TensorNetworks::MPS* psi3=itsMPS->Apply(expH);
-    EXPECT_NEAR(psi1->GetOverlap(psi3),o1,1e-13);
+    TensorNetworks::MPS* psi2=itsMPS->Apply(expH);
+    EXPECT_NEAR(psi1->GetOverlap(psi2),o1,1e-13);
 
-    double truncError=expH->Compress(TensorNetworks::Std,0,epsMPO);
-    expH->Report(cout);
-    TensorNetworks::MPS* psi4=itsMPS->Apply(expH);
-    EXPECT_NEAR(psi1->GetOverlap(psi4),o1,1e-13);
+//    double truncError=expH->Compress(TensorNetworks::Std,0,epsMPO);
+//    expH->Report(cout);
+//    TensorNetworks::MPS* psi4=itsMPS->Apply(expH);
+//    EXPECT_NEAR(psi1->GetOverlap(psi4),o1,1e-13);
 
-    EXPECT_EQ(expH->GetMaxDw(),4);
-    EXPECT_LT(truncError,epsMPO);
+//    EXPECT_EQ(expH->GetMaxDw(),4);
+//    EXPECT_LT(truncError,epsMPO);
 }
+*/
 
 #ifndef DEBUG
 

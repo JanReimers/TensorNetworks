@@ -303,9 +303,11 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
 {
 #ifdef DEBUG
     MatrixRT Worig=Reshape(lr,0);
+//    cout << "Worig=" << Worig << endl;
 #endif
     MatrixRT  V=ReshapeV(lr);
-    assert(V.size()>0);
+    if(V.size()==0) return; //We only this for unit operators with Dw1==Dw2==1;
+//    cout << "V=" << V << endl;
     LapackQRSolver<double> solver;
     switch (lr)
     {
@@ -314,16 +316,24 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
             auto [Q,L]=solver.SolveThinQL(V); //Solves V=Q*L
             L*=1.0/sqrt(itsd);
             Q*=sqrt(itsd);
+//            cout << "L=" << L << endl;
+//            cout << "Q=" << Q << endl;
+//            cout << "Qt*Q=" << Transpose(Q)*Q << endl;
             ReshapeV(lr,Q);  //A is now U
             MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,L.GetNumCols()+1,1);
-            if (itsRightNeighbour) itsRightNeighbour->QLTransfer(lr,Lplus);
 #ifdef DEBUG
             V=ReshapeV(lr);
             assert(V.GetLimits()==Q.GetLimits());
             assert(Max(fabs(Q-V))<1e-15);
             MatrixRT Qplus=Reshape(lr,0);
             MatrixRT QL=Qplus*Lplus;
+//            cout << "Lplus=" << Lplus << endl;
+//            cout << "Qplus=" << Qplus << endl;
+//            cout << "QL=" << QL << endl;
+//            cout << "Worig-QL=" << Worig-QL << endl;
+            assert(Max(fabs(Worig-QL ))<1e-8);
 #endif
+            if (itsRightNeighbour) itsRightNeighbour->QLTransfer(lr,Lplus);
             break;
         }
         case DRight:
@@ -340,7 +350,7 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
             assert(Max(fabs(Q-V))<1e-15);
             MatrixRT Qplus=Reshape(lr,0);
             MatrixRT LQ=Lplus*Qplus;
-            cout << "Worig-LQ=" << Worig-LQ << endl;
+//            cout << "Worig-LQ=" << Worig-LQ << endl;
             assert(Max(fabs(Worig-LQ ))<1e-13);
 #endif
             break;

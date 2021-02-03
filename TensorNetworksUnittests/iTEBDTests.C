@@ -382,8 +382,8 @@ TEST_F(iTEBDTests,TestApplyiMPOIdentity)
 
 TEST_F(iTEBDTests,TestApplyIdentityRangeSD)
 {
-   int UnitCell=2,Dmax=16;
-   double Smax=2.5;
+   int UnitCell=2,Dmax=4;
+   double Smax=2.0;
 #ifdef DEBUG
     Dmax=8;
     Smax=1.5;
@@ -430,7 +430,7 @@ TEST_F(iTEBDTests,TestApplyIdentityRangeSD)
 TEST_F(iTEBDTests,TestApplyExpH)
 {
     int UnitCell=2,D=2;
-    double S=0.5,epsSVD=0.0,epsMPO=1e-13,dt=0.2;
+    double S=0.5,epsSVD=0.0,epsMPO=1e-4,dt=0.2;
     Setup(UnitCell,S,D,epsSVD,TensorNetworks::Gates);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
@@ -461,7 +461,7 @@ TEST_F(iTEBDTests,TestApplyExpH)
 TEST_F(iTEBDTests,TestApplyOrthoiMPOExpH)
 {
     int UnitCell=2,D=2;
-    double S=0.5,epsSVD=0.0,epsMPO=1e-14,dt=0.2;
+    double S=0.5,epsSVD=0.0,epsMPO=1e-4,dt=0.2;
     Setup(UnitCell,S,D,epsSVD,TensorNetworks::Gates);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
@@ -487,7 +487,7 @@ TEST_F(iTEBDTests,TestApplyOrthoiMPOExpH)
 TEST_F(iTEBDTests,TestApplyiMPOExpH)
 {
     int UnitCell=2,D=2;
-    double S=0.5,epsSVD=0.0,epsMPO=1e-14,dt=0.2;
+    double S=0.5,epsSVD=0.0,epsMPO=1e-4,dt=0.2;
     Setup(UnitCell,S,D,epsSVD,TensorNetworks::Gates);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
@@ -541,7 +541,7 @@ TEST_F(iTEBDTests,TestApplyExpH3)
 TEST_F(iTEBDTests,TestApplyMPOExpH3)
 {
     int UnitCell=2,D=2;
-    double S=0.5,epsSVD=0.0,epsMPO=1e-13,dt=0.5;
+    double S=0.5,epsSVD=0.0,epsMPO=1e-2,dt=0.5;
     Setup(UnitCell,S,D,epsSVD,TensorNetworks::Gates);
     itsState->InitializeWith(TensorNetworks::Random);
     itsState->Canonicalize(TensorNetworks::DLeft);
@@ -575,12 +575,12 @@ TEST_F(iTEBDTests,TestApplyMPOExpH3)
 TEST_F(iTEBDTests,TestApplyExpHRangeSD)
 {
    int UnitCell=2,Dmax=16;
-   double Smax=2.5;
+   double Smax=1.5;
 #ifdef DEBUG
     Dmax=8;
     Smax=1.0;
 #endif // DEBUG
-    double epsSVD=0.0,epsMPO=1e-13,dt=0.0;
+    double epsSVD=0.0,epsMPO=1e-4,dt=0.0;
     for (int D=1;D<=Dmax;D*=2)
         for (double S=0.5;S<=Smax;S+=0.5)
         {
@@ -652,7 +652,7 @@ TEST_F(iTEBDTests,TestRandomEnergyRangeSD)
             itsState->Orthogonalize(itsCompressor);
             EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
             Matrix4RT Hlocal=itsiH->GetLocalMatrix();
-            EXPECT_NEAR(itsState->GetExpectationmmnn(Hlocal),itsState->GetExpectation(itsiH  ),2e-14);
+            EXPECT_NEAR(itsState->GetExpectationmmnn(Hlocal),itsState->GetExpectation(itsiH  ),3e-14);
 //            EXPECT_NEAR(CalculateE(UnitCell,S),itsState->GetExpectation(itsiH  ),1e-14);
         }
 }
