@@ -360,6 +360,30 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
     SetLimits();
 }
 
+//
+//  Hunt for the zero pivots in L and remove those rows from L and columns from Q
+//
+bool Shrink(MatrixRT& L, MatrixRT& Q,double eps)
+{
+    VectorRT diag=L.GetDiagonal();
+    std::vector<index_t> remove;
+    for (index_t i:diag.indices())
+    {
+        if (fabs(diag(i))<eps) //fast feasibility study
+        {
+            double s=Sum(fabs(L.GetRow(i))); //Now check the whole row
+            if (s<eps) remove.push_back(i);
+        }
+    }
+    for (auto i=remove.rbegin();i!=remove.rend();i++)
+    {
+        assert(Sum(fabs(L.GetRow(*i)))<eps); //Make sure we got the correct row
+        L.RemoveRow   (*i);
+        Q.RemoveColumn(*i);
+    }
+    return remove.size()>0;
+}
+
 void SiteOperatorImp::iCanonicalForm(Direction lr)
 {
     assert(itsDw.Dw1==itsDw.Dw2); //Make sure we are square
@@ -375,17 +399,27 @@ void SiteOperatorImp::iCanonicalForm(Direction lr)
     //Id*=itsd;
 
     double eta=8.111111;
-
+    int niter=1;
     do
     {
         MatrixRT  V=ReshapeV(lr);
         auto [Q,L]=QRsolver.SolveThinQL(V); //Solves V=Q*L
+        X=itsDw.Dw1-2; //Chi
+        assert(L.GetNumRows()==X+1);
+        assert(L.GetNumCols()==X+1);
         double sgn=L(X+1,X+1);
         L*=1.0/sgn;
         Q*=sgn;
 
+//        cout << std::scientific << std::setprecision(8) << "Min(Diag(L)=" << Min(L.GetDiagonal()) << endl;
+        if (Shrink(L,Q,1e-13))
+        {
+            cout << "L*Q-V=" << Max(fabs(Q*L-V)) << endl;
+            assert(Max(fabs(Q*L-V))<1e-13);
+        }
         ReshapeV(lr,Q);
-        cout << std::fixed << std::setprecision(8) << "Min(Diag(L)=" << Min(L.GetDiagonal()) << endl;
+        // Get out here so we leave the Ws left normalized.
+        if (niter++>100) break;
         MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,L.GetNumCols()+1,1);
         //
         //  Do W->L*W
@@ -394,15 +428,24 @@ void SiteOperatorImp::iCanonicalForm(Direction lr)
         for (int n=0; n<itsd; n++)
         {
             MatrixRT W=GetW(m,n);
-            SetW(m,n,Lplus*W);
+            itsWs(m+1,n+1)=Lplus*W;
         }
+        itsDw.Dw1=Lplus.GetNumRows();
 
-        Lp=L*Lp;
-        eta=Max(fabs(L-Id));
-        cout << "eta=" << eta << endl;
+        MatrixRT LLp=L*Lp;
+        Lp=LLp;
+        eta=8.111;
+        if (L.GetNumRows()==L.GetNumCols())
+        {
+            Id.SetLimits(L.GetLimits(),true);
+            eta=Max(fabs(L-Id));
+        }
+//        cout << "eta=" << eta << "  sgn=" << sgn << endl;
+//        cout << "L-Id=" << L-Id << endl;
 
     } while (eta>1e-13);
     cout << std::fixed << std::setprecision(2) << "Lp=" << Lp << endl;
+//    cout << std::fixed << std::setprecision(2) << "LpT*Lp=" << Transpose(Lp)*Lp << endl;
 
 
 }

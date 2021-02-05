@@ -1,6 +1,7 @@
 #include "Tests.H"
 #include "TensorNetworksImp/MPS/MPSImp.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.H"
+#include "TensorNetworks/iTEBDState.H"
 #include "Operators/MPO_SpatialTrotter.H"
 #include "Containers/Matrix4.H"
 #include "TensorNetworks/Hamiltonian.H"
@@ -30,6 +31,7 @@ public:
         , itsiH(0)
         , itsOperatorClient(0)
         , itsMPS(0)
+        , itsiMPS(0)
     {
         assert(itsFactory);
         StreamableObject::SetToPretty();
@@ -37,9 +39,10 @@ public:
     ~MPOTests()
     {
         delete itsFactory;
-        if (itsH  ) delete itsH;
-        if (itsiH ) delete itsiH;
-        if (itsMPS) delete itsMPS;
+        if (itsH  )  delete itsH;
+        if (itsiH )  delete itsiH;
+        if (itsMPS)  delete itsMPS;
+        if (itsiMPS) delete itsiMPS;
         if (itsOperatorClient) delete itsOperatorClient;
     }
 
@@ -48,13 +51,15 @@ public:
         if (itsH  ) delete itsH;
         if (itsiH ) delete itsiH;
         if (itsMPS) delete itsMPS;
+        if (itsiMPS) delete itsiMPS;
         if (itsOperatorClient) delete itsOperatorClient;
         if (L>1)
         {
             itsH =itsFactory->Make1D_NN_HeisenbergHamiltonian( L,S,1.0,1.0,0.0);
             itsMPS=itsH->CreateMPS(D);
         }
-        itsiH=itsFactory->Make1D_NN_HeisenbergiHamiltonian(L,S,1.0,1.0,0.0);
+        itsiH  =itsFactory->Make1D_NN_HeisenbergiHamiltonian(L,S,1.0,1.0,0.0);
+        itsiMPS=itsiH->CreateiTEBDState(2,D,TensorNetworks::Gates,D*D*1e-10,1e-13);
         itsOperatorClient=new TensorNetworks::Hamiltonian_1D_NN_Heisenberg(S,1.0,1.0,0.0);
         assert(itsOperatorClient);
     }
@@ -85,6 +90,7 @@ public:
            TensorNetworks::iHamiltonian*   itsiH;
     const  TensorNetworks::OperatorClient* itsOperatorClient;
            TensorNetworks::MPS*            itsMPS;
+           TensorNetworks::iTEBDState*     itsiMPS;
 };
 
 
@@ -412,23 +418,46 @@ TEST_F(MPOTests,TestParkerCanonicalL9H)
 }
 
 
-TEST_F(MPOTests,TestParkerCanonicalL9iH)
+TEST_F(MPOTests,TestParkerCanonicalL1iH)
 {
     int L=1,D=2;
     double S=0.5;
     Setup(L,S,D);
-    TensorNetworks::MPO* iH2=itsiH->CreateiUnitOperator();
+    itsiMPS->InitializeWith(TensorNetworks::Random);
+    itsiMPS->Canonicalize(TensorNetworks::DLeft);
+    itsiMPS->Orthogonalize(0,1e-13);
+
+
+    EXPECT_EQ(itsiH->GetNormStatus(),"W");
+    double E=itsiMPS->GetExpectation(itsiH);
+    itsiH->CanonicalForm();
+    EXPECT_EQ(itsiH->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
+    itsiH->Report(cout);
+    double Eright=itsiMPS->GetExpectation(itsiH);
+    EXPECT_NEAR(E,Eright,1e-13);
+    EXPECT_EQ(itsiH->GetMaxDw(),5);
+}
+TEST_F(MPOTests,TestParkerCanonicalL1iH2)
+{
+    int L=1,D=2;
+    double S=0.5;
+    Setup(L,S,D);
+    itsiMPS->InitializeWith(TensorNetworks::Random);
+    itsiMPS->Canonicalize(TensorNetworks::DLeft);
+    itsiMPS->Orthogonalize(0,1e-13);
+
+    TensorNetworks::iMPO* iH2=itsiH->CreateiUnitOperator();
     iH2->Product(itsiH);
-//    iH2->Product(itsiH);
+    iH2->Product(itsiH);
 
     EXPECT_EQ(iH2->GetNormStatus(),"W");
-//    double E=itsMPS->GetExpectation(itsH);
+    double E=itsiMPS->GetExpectation(iH2);
     iH2->CanonicalForm();
     EXPECT_EQ(iH2->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
     iH2->Report(cout);
-//    double Eright=itsMPS->GetExpectation(itsH);
-//    EXPECT_NEAR(E,Eright,1e-13);
-    EXPECT_EQ(iH2->GetMaxDw(),5);
+    double Eright=itsiMPS->GetExpectation(iH2);
+    EXPECT_NEAR(E,Eright,2e-3); //Very lax right now because CanonicalForm is not fully converging
+    EXPECT_EQ(iH2->GetMaxDw(),15);
 }
 
 TEST_F(MPOTests,TestParkerSVDCompressHL9)
