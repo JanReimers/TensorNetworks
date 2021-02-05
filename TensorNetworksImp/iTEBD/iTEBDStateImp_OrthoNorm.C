@@ -98,6 +98,15 @@ double iTEBDStateImp::GetOrthonormalityErrors(const dVectorT& gamma, const Diago
     return Max(right_orth_error,left__orth_error);
 }
 
+double iTEBDStateImp::Orthogonalize (int Dmax, double epsSV)
+{
+    Factory* f=Factory::GetFactory();
+    SVCompressorC* comp=f->MakeMPSCompressor(Dmax,epsSV);
+    double compressionError=Orthogonalize(comp);
+    delete comp;
+    delete f;
+    return compressionError;
+}
 
 double iTEBDStateImp::OrthogonalizeI(SVCompressorC* comp, double eps, int niter)
 {

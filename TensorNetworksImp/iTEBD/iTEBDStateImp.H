@@ -70,6 +70,7 @@ public:
     virtual void Normalize(Direction LR);
 
     virtual double Orthogonalize (SVCompressorC*);
+    virtual double Orthogonalize (int D, double epsSV);
     virtual double OrthogonalizeI(SVCompressorC*,double eps,int maxIter);
 
     virtual double GetExpectationDw1(const  MPO* o) const;

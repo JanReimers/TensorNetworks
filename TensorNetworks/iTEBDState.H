@@ -45,6 +45,7 @@ public:
 //
     virtual void   Canonicalize (Direction)=0;  //Vidals L-G-L-G-L canonical form
     virtual void   Normalize    (Direction)=0; //Use largest eigen value of transfer matrix
+    virtual double Orthogonalize(int D, double epsSV)=0;
     virtual double Orthogonalize(SVCompressorC*)=0;
 //--------------------------------------------------------------------------------------
 //
