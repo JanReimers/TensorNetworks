@@ -8,6 +8,7 @@
 #include "NumericalMethods/LapackEigenSolver.H"
 #include "NumericalMethods/ArpackEigenSolver.H"
 #include "NumericalMethods/LapackQRSolver.H"
+#include "NumericalMethods/LapackLinearSolver.H"
 #include "Containers/SparseMatrix.H"
 #include "oml/numeric.h"
 #include "oml/cnumeric.h"
@@ -27,13 +28,15 @@ public:
     : itsEps()
     , eps(1.0e-13)
 #ifdef DEBUG
-    , Nsvd  (30)
-    , Neigen(30)
-    , Nqr   (30)
+    , Nsvd   (30)
+    , Neigen (30)
+    , Nqr    (30)
+    , Nlinear(30)
 #else
-    , Nsvd  (100)
-    , Neigen(100)
-    , Nqr   (200)
+    , Nsvd   (100)
+    , Neigen (100)
+    , Nqr    (200)
+    , Nlinear(200)
 #endif
     , svdDensity(0.2)
     , eigenDensity(0.1)
@@ -66,7 +69,7 @@ public:
 
     TensorNetworks::Epsilons  itsEps;
     double eps;
-    int Nsvd,Neigen,Nqr;
+    int Nsvd,Neigen,Nqr,Nlinear;
     double svdDensity;
     double eigenDensity;
 
@@ -296,6 +299,15 @@ TEST_F(LinearAlgebraTests,LapackQRSolverComplex)
     QRTester<dcmplx>(new LapackQRSolver<dcmplx>(),Nqr  ,Nqr  ).RunTests();
     QRTester<dcmplx>(new LapackQRSolver<dcmplx>(),Nqr/2,Nqr  ).RunTests();
     QRTester<dcmplx>(new LapackQRSolver<dcmplx>(),Nqr  ,Nqr/2).RunTests();
+}
+
+TEST_F(LinearAlgebraTests,LapackLinearSolverReal)
+{
+    LinearTester<double>(new LapackLinearSolver<double>(),Nlinear).RunTests();
+}
+TEST_F(LinearAlgebraTests,LapackLinearSolverComplex)
+{
+    LinearTester<dcmplx>(new LapackLinearSolver<dcmplx>(),Nlinear).RunTests();
 }
 
 

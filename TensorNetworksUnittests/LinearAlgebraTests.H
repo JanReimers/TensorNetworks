@@ -7,6 +7,7 @@
 #include "NumericalMethods/SparseEigenSolver.H"
 #include "NumericalMethods/LapackEigenSolver.H"
 #include "NumericalMethods/QRSolver.H"
+#include "NumericalMethods/LinearSolver.H"
 #include "oml/random.h"
 #include "oml/matrix.h"
 #include "oml/diagonalmatrix.h"
@@ -18,17 +19,6 @@ using std::cout;
 using std::endl;
 
 typedef std::complex<double> dcmplx;
-
-template <typename T> Matrix<double> MyAbs(const Matrix<T> &);
-template <> Matrix<double> MyAbs(const Matrix<double> &m)
-{
-    return fabs(m);
-};
-
-template <> Matrix<double> MyAbs(const Matrix<dcmplx> &m)
-{
-    return fabs(m);
-};
 
 //
 //  Randomly put zeros into a dense matrix until a request density is achieved
@@ -488,7 +478,7 @@ public:
         Base::Validate(U,s,VT); //Check U,V orthonormality
         Matrix<T> A1=U*s*VT;
         Matrix<T> dA=A-A1;
-        EXPECT_NEAR(Max(MyAbs(dA)),0.0,2*sqrt(N*M)*eps);
+        EXPECT_NEAR(Max(fabs(dA)),0.0,2*sqrt(N*M)*eps);
     }
 
     SVDSolver<T>* itsSolver;
@@ -536,7 +526,7 @@ public:
         Base::Validate(U,s,VT); //Check U,V orthonormality
         Matrix<T> A1=U*s*VT;
         Matrix<T> dA=A-A1;
-        EXPECT_NEAR(Max(MyAbs(dA)),0.0,2*sqrt(N*M)*eps);
+        EXPECT_NEAR(Max(fabs(dA)),0.0,2*sqrt(N*M)*eps);
     }
 //
 // SparseSVDSolverClient interface
@@ -649,7 +639,7 @@ public:
         }
         Matrix<T> A1=Q*R;
         Matrix<T> dA=A-A1;
-        EXPECT_NEAR(Max(MyAbs(dA)),0.0,2*sqrt(N*M)*eps);
+        EXPECT_NEAR(Max(fabs(dA)),0.0,2*sqrt(N*M)*eps);
     }
     virtual void ValidateRQ(const Matrix<T>& R, const Matrix<T>& Q)
     {
@@ -665,11 +655,81 @@ public:
         }
         Matrix<T> A1=R*Q;
         Matrix<T> dA=A-A1;
-        EXPECT_NEAR(Max(MyAbs(dA)),0.0,2*sqrt(N*M)*eps);
+        EXPECT_NEAR(Max(fabs(dA)),0.0,2*sqrt(N*M)*eps);
     }
 
     QRSolver<T>* itsSolver;
     Matrix  <T>  A;
 };
+
+template <typename T> class LinearTester
+{
+public:
+    LinearTester(LinearSolver<T>* s, int n)
+        : itsSolver(s)
+        , N(n)
+        , eps(1e-14)
+        , A(n,n)
+        , b(n)
+    {}
+    ~LinearTester()
+    {
+        delete itsSolver;
+    }
+
+    virtual void RunTests()
+    {
+        A=MakeMatrix('U');
+        FillRandom(b);
+        {
+            Vector<T> x=itsSolver->SolveUpperTri(A,b);
+            Validate(x);
+        }
+        A=MakeMatrix('L');
+        {
+            Vector<T> x=itsSolver->SolveLowerTri(A,b);
+            Validate(x);
+        }
+    }
+    virtual void Validate(const Vector<T>& x)
+    {
+
+        Vector<T> b1=A*x;
+        Vector<T> db=b-b1;
+        EXPECT_NEAR(Max(fabs(db)),0.0,sqrt(N)*eps);
+    }
+
+    Matrix<T> MakeMatrix(char ul)
+    {
+        Matrix<T> ret(N,N);
+        FillRandom(ret);
+        if (ul=='L')
+        {
+            for (index_t i:ret.rows())
+                for (index_t j:ret.cols(i+1))
+                    ret(i,j)=T(0.0);
+        }
+        else if(ul=='U')
+        {
+            for (index_t j:ret.cols())
+                for (index_t i:ret.rows(j+1))
+                    ret(i,j)=T(0.0);
+        }
+        else
+            assert(false);
+
+        for (index_t i:ret.rows())
+            ret(i,i)=T(sqrt(sqrt(N))); //Ensure some numerical stability.
+
+        return ret;
+    }
+
+    LinearSolver<T>* itsSolver;
+    int       N;
+    double    eps;
+    Matrix<T> A;
+    Vector<T> b;
+};
+
 
 #endif // LINEARALGEBRATESTS_H_INCLUDED
