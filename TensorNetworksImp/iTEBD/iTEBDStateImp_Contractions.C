@@ -438,7 +438,7 @@ double iTEBDStateImp::GetExpectation (const iMPO* o) const
 {
     int L=GetL();
     assert(L==2);
-    assert(o->GetL()==L);
+//    assert(o->GetL()==L); need to be able to work with a one site iMPO
 //
 //  The first recursion relation for E^Dw is the just orthonormality condition
 //
@@ -598,10 +598,10 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
                 const MatrixRT& Wmn=so->GetW(m,n);
                 if (Wmn(w1,w1)!=0.0) //Make sure there is nothing on the diagonal.
                 {
+                    std::cerr << "diagonal W["<< m << "," << n << "](" << w1 << "," << w1 << ")=" << Wmn(w1,w1) << std::endl;
                     assert(m==n); //should be only unit ops on the diagonal
-                    assert(Wmn(w1,w1)==1.0);
+//                    assert(Wmn(w1,w1)==1.0);
                     diagonals.push_back(w1);
-//                    std::cerr << "diagonal W["<< m << "," << n << "](" << w1 << "," << w1 << ")=" << Wmn(w1,w1) << std::endl;
                 }
                 for (int w2=w1+1;w2<=Dw;w2++)
                 if (Wmn(w2,w1)!=0.0)
@@ -680,7 +680,7 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
                     for (int m=0; m<d; m++)
                         Echeck(i2,j2)+=conj(A[m](i1,i2))*E[w1](i1,j1)*A[m](j1,j2);
              MatrixCT err=E[w1]-Echeck-C;
-//             cout << "err=" << std::fixed << err << endl;
+             cout << "err=" << std::fixed << err << endl;
 //             cout << std::scientific << Max(fabs(err)) << endl;
 
         }
