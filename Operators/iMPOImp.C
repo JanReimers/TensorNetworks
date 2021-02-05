@@ -111,6 +111,8 @@ const SiteOperator* iMPOImp::GetSiteOperator(int isite) const
 SiteOperator* iMPOImp::GetSiteOperator(int isite)
 {
     assert(isite>0);
+    if(isite>itsL)
+        isite=(isite-1)%itsL+1; //Allow wrap around since this is a infinite lattice.
     assert(isite<=itsL);
     return itsSites[isite];
 }
@@ -124,11 +126,20 @@ iMPO* iMPOImp::MakeUnitcelliMPO(int unitcell) const
     assert(L>=1);
     //
     //  Usually unitcell==L, but maybe we can have 2 or more unit cells fit exaclty inside L.
+    //  We also need to support unitcell=N*L where N is an int.
     //
-    assert(unitcell<=L);
-    assert(L%unitcell==0);  //Make sure unit cell and L are compatible.
-    int newL=L/unitcell;
-    assert(newL*unitcell==L); //THis should be the same as the L%unitcell==0 test above.
+    int newL=L;
+    if (L>unitcell)
+    {
+        newL=L/unitcell;
+        assert(L%unitcell==0);  //Make sure unit cell and L are compatible.
+        assert(newL*unitcell==L); //THis should be the same as the L%unitcell==0 test above.
+    }
+    else if (L<unitcell)
+    {
+        assert(unitcell%L==0);  //Make sure unit cell and L are compatible.
+
+    }
     int d=iMPO::GetSiteOperator(1)->Getd();
 
     //
