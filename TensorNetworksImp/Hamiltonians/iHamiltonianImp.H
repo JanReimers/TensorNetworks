@@ -25,7 +25,8 @@ public:
     virtual int    Getd    () const {return iMPOImp::Getd    ();}
     virtual int    GetMaxDw() const {return iMPOImp::GetMaxDw();}
 
-    virtual iTEBDState* CreateiTEBDState   (int D,iTEBDType,double normEps,double epsSV) const;
+    virtual iTEBDState* CreateiTEBDState   (      int D,iTEBDType,double normEps,double epsSV) const;
+    virtual iTEBDState* CreateiTEBDState   (int L,int D,iTEBDType,double normEps,double epsSV) const;
     virtual iMPO*       CreateiUnitOperator() const;
     virtual iMPO*       CreateiMPO         (double dt, TrotterOrder,CompressType,double epsMPO) const;
     virtual Matrix4RT   GetLocalMatrix     () const {return itsH12;}

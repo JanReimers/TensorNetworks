@@ -40,17 +40,22 @@ namespace TensorNetworks
 //
 iTEBDState* iHamiltonianImp::CreateiTEBDState(int D,iTEBDType type,double normEps,double epsSV) const
 {
+    return CreateiTEBDState(GetL(),D,type,normEps,epsSV);
+}
+
+iTEBDState* iHamiltonianImp::CreateiTEBDState(int L,int D,iTEBDType type,double normEps,double epsSV) const
+{
     iTEBDState* ret=nullptr;
     switch (type)
     {
     case Gates :
-        ret=new iTEBDGates(GetL(),GetS(),D,normEps,epsSV);
+        ret=new iTEBDGates(L,GetS(),D,normEps,epsSV);
         break;
     case MPOs :
-        ret=new iTEBDMPOs (GetL(),GetS(),D,normEps,epsSV);
+        ret=new iTEBDMPOs (L,GetS(),D,normEps,epsSV);
         break;
     case iMPOs :
-        ret=new iTEBDiMPOs(GetL(),GetS(),D,normEps,epsSV);
+        ret=new iTEBDiMPOs(L,GetS(),D,normEps,epsSV);
         break;
     }
     return ret;

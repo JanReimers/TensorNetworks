@@ -23,8 +23,9 @@ public:
     virtual double GetS() const=0; //Spin of the one site Hilbert space
     //
     // Wave function zone:
-    //    Creates an iTEBD state with the correct unit cell size and spin space.
-    virtual iTEBDState* CreateiTEBDState(int D,iTEBDType,double normEps=1e-12,double epsSV=1e-12) const=0;
+    //    Creates an iTEBD state with the correct spin space. Second version allows different unit cell size
+    virtual iTEBDState* CreateiTEBDState(      int D,iTEBDType,double normEps=1e-12,double epsSV=1e-12) const=0;
+    virtual iTEBDState* CreateiTEBDState(int L,int D,iTEBDType,double normEps=1e-12,double epsSV=1e-12) const=0;
     //
     // Operator zone:
     //    Create full lattice of unit operators
