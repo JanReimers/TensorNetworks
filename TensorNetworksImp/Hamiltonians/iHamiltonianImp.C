@@ -72,6 +72,7 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order,CompressType ct,
 {
     iMPO*  W(nullptr);
     int    L=GetL();
+    if (L==1) L=2; //Trotter gates needs at least two sites.
     double S=GetS();
     switch (order)
     {
@@ -83,8 +84,9 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order,CompressType ct,
         case FirstOrder :
         {
             W=new iMPOImp(L,S,iMPOImp::Identity);
-            iMPO_SpatialTrotter Wodd (dt,Odd ,this);
-            iMPO_SpatialTrotter Weven(dt,Even,this);
+            iMPO_SpatialTrotter Wodd (dt,Odd ,this,L);
+            iMPO_SpatialTrotter Weven(dt,Even,this,L);
+
             W->Product(&Weven);
             W->Product(&Wodd);
             W->Compress(ct,0,epsMPO);
@@ -92,8 +94,8 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order,CompressType ct,
         }
         case SecondOrder :
         {
-            iMPO_SpatialTrotter Weven(dt    ,Even,this);
-            iMPO_SpatialTrotter Wodd (dt/2.0,Odd ,this);
+            iMPO_SpatialTrotter Weven(dt    ,Even,this,L);
+            iMPO_SpatialTrotter Wodd (dt/2.0,Odd ,this,L);
 //            Wodd .Report(cout);
 //            Weven.Report(cout);
             W=new iMPOImp(L,S,iMPOImp::Identity);
@@ -109,7 +111,7 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order,CompressType ct,
         }
         case FourthOrder :
         {
-            W=new iMPOImp(GetL(),GetS(),iMPOImp::Identity);
+            W=new iMPOImp(L,GetS(),iMPOImp::Identity);
             //
             //  At this order we must compress as we go or we risk consuming all memory
             //
@@ -122,8 +124,8 @@ iMPO* iHamiltonianImp::CreateiMPO(double dt, TrotterOrder order,CompressType ct,
             for (int it=1;it<=5;it++)
             {
                 iMPOImp U(L,S,iMPOImp::Identity);
-                iMPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,this);
-                iMPO_SpatialTrotter Weven(ts(it)    ,Even,this);
+                iMPO_SpatialTrotter Wodd (ts(it)/2.0,Odd ,this,L);
+                iMPO_SpatialTrotter Weven(ts(it)    ,Even,this,L);
                 U.Product(&Wodd);
                 U.Product(&Weven);
                 U.Product(&Wodd);

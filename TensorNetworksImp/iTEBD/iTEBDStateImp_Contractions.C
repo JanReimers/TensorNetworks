@@ -739,7 +739,7 @@ double iTEBDStateImp::GetExpectationDw1 (const MPO* o) const
 
 double iTEBDStateImp::GetExpectationDw1 (const MPO* o,int center) const
 {
-    assert(o->GetL()==2);
+    assert(o->GetL()<=2);
     ReCenter(center);
     int D=s1.siteA->GetD1();
     assert(D==s1.siteA->GetD2());

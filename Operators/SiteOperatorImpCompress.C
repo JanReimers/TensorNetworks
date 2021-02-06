@@ -392,11 +392,10 @@ void SiteOperatorImp::iCanonicalForm(Direction lr)
     int X=itsDw.Dw1-2; //Chi
 //    if (X1<0) X1=0;
 //    if (X2<0) X2=0;
-    MatrixRT Lp(X+1,X+1);
+    MatrixRT Lp(X+1,X+1),LpOld(X+1,X+1);
     Unit(Lp);
     MatrixRT Id(X+1,X+1);
     Unit(Id);
-    //Id*=itsd;
 
     double eta=8.111111;
     int niter=1;
@@ -417,10 +416,18 @@ void SiteOperatorImp::iCanonicalForm(Direction lr)
             cout << "L*Q-V=" << Max(fabs(Q*L-V)) << endl;
             assert(Max(fabs(Q*L-V))<1e-13);
         }
+         eta=8.111;
+        if (L.GetNumRows()==L.GetNumCols())
+        {
+            Id.SetLimits(L.GetLimits(),true);
+            eta=Max(fabs(L-Id));
+        }
+        cout << "eta=" << eta << "  sgn=" << sgn << endl;
+        MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,L.GetNumCols()+1,1);
+
         ReshapeV(lr,Q);
         // Get out here so we leave the Ws left normalized.
         if (niter++>100) break;
-        MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,L.GetNumCols()+1,1);
         //
         //  Do W->L*W
         //
@@ -431,16 +438,9 @@ void SiteOperatorImp::iCanonicalForm(Direction lr)
             itsWs(m+1,n+1)=Lplus*W;
         }
         itsDw.Dw1=Lplus.GetNumRows();
-
         MatrixRT LLp=L*Lp;
         Lp=LLp;
-        eta=8.111;
-        if (L.GetNumRows()==L.GetNumCols())
-        {
-            Id.SetLimits(L.GetLimits(),true);
-            eta=Max(fabs(L-Id));
-        }
-//        cout << "eta=" << eta << "  sgn=" << sgn << endl;
+
 //        cout << "L-Id=" << L-Id << endl;
 
     } while (eta>1e-13);

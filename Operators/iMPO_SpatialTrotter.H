@@ -21,6 +21,7 @@ class iMPO_SpatialTrotter
 {
     public:
         iMPO_SpatialTrotter(double dt, Trotter type, const iHamiltonian*);
+        iMPO_SpatialTrotter(double dt, Trotter type, const iHamiltonian*,int L);
         virtual ~iMPO_SpatialTrotter();
 };
 

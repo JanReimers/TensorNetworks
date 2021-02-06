@@ -45,8 +45,8 @@ public:
         if (itsState)      delete itsState;
         if (itsCompressor) delete itsCompressor;
         itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
-        itsiH=itsFactory->Make1D_NN_HeisenbergiHamiltonian(L,S,1.0,1.0,0.0);
-        itsState=itsiH->CreateiTEBDState(D,itype,D*D*epsNorm,epsSVD);
+        itsiH=itsFactory->Make1D_NN_HeisenbergiHamiltonian(1,S,1.0,1.0,0.0);
+        itsState=itsiH->CreateiTEBDState(L,D,itype,D*D*epsNorm,epsSVD);
         itsCompressor=itsFactory->MakeMPSCompressor(D,epsSVD);
     }
 
@@ -912,8 +912,9 @@ TEST_F(iTEBDTests,TestiMPOExpectation)
 //  Recursive contraction of H^2 does not work because we get unsolvable, singular equations
 //  when diagonal Wmn(i,i) operators are present.
 //    TensorNetworks::iMPO* iH2=itsiH->CreateiH2Operator();
+//    iH2->CanonicalForm();
 //    iH2->Report(cout);
 //    double Er2=itsState->GetExpectation(iH2); //Fail because shape of W is no longer lower triangular
-//    cout << "E, Er, Er2, <E^2>-<E>^2=" << E << " " << Er << " " << Er2 << " " << Er2-Er*Er <<  endl;
+//    cout << std::setprecision(8) << "E, Er, Er2, <E^2>-<E>^2=" << E << " " << Er << " " << Er2 << " " << Er2-Er*Er <<  endl;
 }
 
