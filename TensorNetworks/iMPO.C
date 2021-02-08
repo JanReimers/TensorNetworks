@@ -25,9 +25,9 @@ double iMPO::Compress(CompressType ct, const SVCompressorR* compressor)
 
 void iMPO::CanonicalForm()
 {
-    int L=GetL();
-        GetSiteOperator(1)->iCanonicalForm(DLeft);
-
+//    GetSiteOperator(1)->iCanonicalFormQRIter(DLeft);
+    GetSiteOperator(1)->iCanonicalFormTriangular(DLeft);
+//    int L=GetL();
 //    for (int ia=1;ia<=L;ia++)
 //        GetSiteOperator(ia)->iCanonicalForm(DLeft);
 //    for (int ia=L;ia>=1;ia--)

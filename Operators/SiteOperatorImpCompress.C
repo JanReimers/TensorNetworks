@@ -3,6 +3,7 @@
 #include "TensorNetworks/TNSLogger.H"
 #include "NumericalMethods/LapackSVDSolver.H"
 #include "NumericalMethods/LapackQRSolver.H"
+#include "NumericalMethods/LapackLinearSolver.H"
 #include "oml/diagonalmatrix.h"
 
 namespace TensorNetworks
@@ -297,7 +298,37 @@ double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
     return itsTruncationError;
 }
 
+MatrixRT SiteOperatorImp::ContractDel(Direction lr) const
+{
+    int X1=itsDw.Dw1-2;
+    int X2=itsDw.Dw2-2;
+    MatrixRT del(X2+1,X2+1);
+    switch (lr)
+    {
+    case DLeft:
+        for (int b=1; b<=X2+1; b++)
+        for (int c=1; c<=X2+1; c++)
+        {
+            double t=0.0;
+            for (int a=1; a<=X1+1; a++)
+                t+=Contract(a,b,a,c);
+            del(b,c)=t;
+        }
+        break;
+    case DRight:
+        for (int b=0; b<=X1; b++)
+        for (int c=0; c<=X1; c++)
+        {
+            double t=0.0;
+            for (int a=0; a<=X2; a++)
+                t+=Contract(b,a,c,a);
+            del(b+1,c+1)=t;
+        }
+        break;
+    }
 
+    return del;
+}
 
 void SiteOperatorImp::CanonicalForm(Direction lr)
 {
@@ -321,6 +352,7 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
 //            cout << "Qt*Q=" << Transpose(Q)*Q << endl;
             ReshapeV(lr,Q);  //A is now U
             MatrixRT Lplus=MakeBlockMatrix(L,L.GetNumRows()+1,L.GetNumCols()+1,1);
+            if (itsRightNeighbour) itsRightNeighbour->QLTransfer(lr,Lplus);
 #ifdef DEBUG
             V=ReshapeV(lr);
             assert(V.GetLimits()==Q.GetLimits());
@@ -332,8 +364,17 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
 //            cout << "QL=" << QL << endl;
 //            cout << "Worig-QL=" << Worig-QL << endl;
             assert(Max(fabs(Worig-QL ))<1e-8);
+            if (itsDw.Dw1>1 && itsDw.Dw2>1)
+            {
+                MatrixRT del=ContractDel(lr);
+                if(!IsUnit(del,1e-13))
+                {
+                    cout << std::fixed << std::setprecision(0) << "del=" << del << endl;
+                    assert(false);
+                }
+            }
+
 #endif
-            if (itsRightNeighbour) itsRightNeighbour->QLTransfer(lr,Lplus);
             break;
         }
         case DRight:
@@ -352,12 +393,23 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
             MatrixRT LQ=Lplus*Qplus;
 //            cout << "Worig-LQ=" << Worig-LQ << endl;
             assert(Max(fabs(Worig-LQ ))<1e-13);
+
+            if (itsDw.Dw1>1 && itsDw.Dw2>1)
+            {
+                MatrixRT del=ContractDel(lr);
+                if(!IsUnit(del,1e-13))
+                {
+                    cout << std::fixed << std::setprecision(0) << "del=" << del << endl;
+                    assert(false);
+                }
+            }
 #endif
             break;
         }
 
     }
     SetLimits();
+
 }
 
 //
@@ -384,7 +436,151 @@ bool Shrink(MatrixRT& L, MatrixRT& Q,double eps)
     return remove.size()>0;
 }
 
-void SiteOperatorImp::iCanonicalForm(Direction lr)
+//
+//  <Wdagger(w11,w12),W(w21,w22)>.  The ws are zero based.
+//
+double SiteOperatorImp::ContractT(int w11, int w12, int w21, int w22) const
+{
+    return Contract(w12,w11,w22,w21);
+}
+
+double SiteOperatorImp::Contract(int w11, int w12, int w21, int w22) const
+{
+    double r1=0.0;
+//    cout << " m  n   " << " Wt(" << w11+1 << "," << w12+1 << ") " << " W(" << w21+1 << "," << w22+1 << ")" << endl;
+    for (int m=0; m<itsd; m++)
+    for (int n=0; n<itsd; n++)
+    {
+        const MatrixRT& W=GetW(m,n); //Work on lower triangular version for now.
+        r1+=W(w11+1,w12+1)*W(w21+1,w22+1);
+//        cout << m << " " << n << " " << W(w11+1,w12+1) << " " << W(w21+1,w22+1) << " " << r1 << endl ;
+    }
+    return r1/itsd; //Divide by Tr[I]
+}
+
+MatrixRT SiteOperatorImp::BuildK(int M) const
+{
+    MatrixRT K(M,M),I(M,M);
+    Unit(I);
+    for (int b=0;b<=M-1;b++)
+    for (int a=0;a<=M-1;a++)
+    {
+        K(b+1,a+1)=I(b+1,a+1)-Contract(b,a,M,M);
+    }
+    return K;
+}
+VectorRT SiteOperatorImp::Buildc(int M) const
+{
+    VectorRT c(M);
+    Fill(c,0.0);
+    for (int b=0;b<=M-1;b++)
+    for (int a=0;a<=M-1;a++)
+    {
+        c(b+1)+=Contract(M,b,M,a);
+    }
+    return c;
+}
+
+void SiteOperatorImp::GaugeTransform(const MatrixRT& R, const MatrixRT& Rinv)
+{
+    assert(R.GetLimits()==Rinv.GetLimits());
+    assert(IsUnit(R*Rinv,1e-13));
+    for (int m=0; m<itsd; m++)
+    for (int n=0; n<itsd; n++)
+    {
+        const MatrixRT& W=Transpose(GetW(m,n));
+        MatrixRT RWR=R*W*Rinv;
+        SetW(m,n,Transpose(RWR));
+    }
+}
+
+double SiteOperatorImp::Contract_sM(int M) const
+{
+    double dM=ContractT(M,M,M,M);
+    assert(dM<1.0);
+    assert(dM>=0.0);
+    double sM=0.0;
+    for (int a=0;a<=M;a++)
+        sM+=ContractT(a,M,a,M);
+    cout << "sM,dM = " << sM << " " << dM << endl;
+    assert(sM>=0.0);
+    sM/=(1-dM);
+    assert(sM>=0.0);
+    return sqrt(sM);
+
+}
+double SiteOperatorImp::Contract_sM1(int M) const
+{
+    int X=itsDw.Dw1-2;
+    double sM=0.0;
+    for (int a=1;a<=X+1;a++)
+        sM+=ContractT(M,a,M,a);
+    return sqrt(sM);
+
+}
+void SiteOperatorImp::iCanonicalFormTriangular(Direction lr)
+{
+    assert(itsDw.Dw1==itsDw.Dw2); //Make sure we are square
+    int X=itsDw.Dw1-2; //Chi
+    MatrixRT RT(X+2,X+2); //Accumulated gauge transform
+    LinearSolver<double>* solver=new LapackLinearSolver<double>();;
+    for (int M=1;M<=X;M++)
+    {
+//        cout << "Init del=" << ContractDel(DLeft) << endl;
+        MatrixRT K=BuildK(M);
+        VectorRT c=Buildc(M);
+        cout << "M=" << M << endl;
+        cout << "K=" << K << endl;
+        cout << "c=" << c << endl;
+        VectorRT r=solver->SolveLowerTri(K,c);
+        cout << "r=" << r << endl;
+        MatrixRT R(X+2,X+2),Rinv(X+2,X+2);
+        Unit(R);
+        for (int b=0;b<=M-1;b++)
+            R(b+1,M+1)=r(b+1);
+//        cout << "R=" << R << endl;
+        Unit(Rinv);
+        for (int b=0;b<=M-1;b++)
+            Rinv(b+1,M+1)=-r(b+1);
+//        cout << "Rinv=" << Rinv << endl;
+//        cout << "R*Rinv=" << R*Rinv << endl;
+
+        GaugeTransform(R,Rinv);
+//        cout << "After gauge del=" << ContractDel(DLeft) << endl;
+        RT=R*RT;
+//        {
+//            MatrixRT QL=ReshapeV(DLeft);
+//            cout << "Before norm QT*Q=" << Transpose(QL)*QL << endl;
+//        }
+        double sM=Contract_sM1(M);
+        assert(fabs(sM)>1e-14);
+ //       cout << "sM^2=" << sM*sM << endl;
+        if (fabs(sM)>1e-14)
+        {
+            Unit(R);
+            Unit(Rinv);
+            R   (M+1,M+1)=1.0/sM;
+            Rinv(M+1,M+1)=sM;
+            GaugeTransform(R,Rinv);
+            RT=R*RT;
+        }
+        else
+        {
+            assert(false);
+            //Need code to remove rows and columns
+        }
+//        cout << "After norm del=" << ContractDel(DLeft) << endl;
+        {
+            MatrixRT QL=ReshapeV(DLeft);
+            cout << "After norm QT*Q=" << Transpose(QL)*QL << endl;
+        }
+
+    }
+    delete solver;
+}
+
+
+void SiteOperatorImp::iCanonicalFormQRIter(Direction lr)
 {
     assert(itsDw.Dw1==itsDw.Dw2); //Make sure we are square
     LapackQRSolver <double>  QRsolver;

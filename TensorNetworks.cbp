@@ -93,6 +93,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="NumericalMethods/LapackEigenSolver.H" />
+		<Unit filename="NumericalMethods/LapackLinearSolver.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="NumericalMethods/LapackLinearSolver.H" />
 		<Unit filename="NumericalMethods/LapackQRSolver.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -101,6 +105,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="NumericalMethods/LapackSVDSolver.H" />
+		<Unit filename="NumericalMethods/LinearSolver.H" />
 		<Unit filename="NumericalMethods/PrimeEigenSolver.C">
 			<Option compilerVar="CC" />
 		</Unit>

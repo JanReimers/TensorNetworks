@@ -66,7 +66,8 @@ class SiteOperatorImp : public virtual SiteOperator
         //  As per Parker et. al.
         //
         virtual void    CanonicalForm(Direction LR);
-        virtual void   iCanonicalForm(Direction LR); //Infinite lattice iMPO version
+        virtual void   iCanonicalFormQRIter(Direction LR); //Infinite lattice iMPO version
+        virtual void   iCanonicalFormTriangular(Direction LR); //Infinite lattice iMPO version
 
         virtual void   Report(std::ostream&) const;
         virtual char   GetNormStatus(double eps) const;
@@ -96,6 +97,15 @@ class SiteOperatorImp : public virtual SiteOperator
 
         bool     isOrthonormal(Direction lr,const MatrixRT& Q) const;
         void     AccumulateTruncationError(double err);
+
+        MatrixRT BuildK(int M) const;
+        VectorRT Buildc(int M) const;
+        double   Contract (int w11, int w12, int w21, int w22) const;
+        double   ContractT(int w11, int w12, int w21, int w22) const;
+        void     GaugeTransform(const MatrixRT& R, const MatrixRT& Rinv);
+        double   Contract_sM(int M) const;
+        double   Contract_sM1(int M) const;
+        MatrixRT ContractDel(Direction lr) const;
     protected:
 
         int      itsd; //2*S+1
