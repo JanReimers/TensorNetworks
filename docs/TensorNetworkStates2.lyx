@@ -5380,7 +5380,86 @@ where
 \end_inset
 
  is upper triangular.
- They now define block respectiong QR decomposition of 
+ And 
+\begin_inset Formula $Q$
+\end_inset
+
+ is orthongonal
+\begin_inset Formula 
+\[
+Q^{\dagger}Q=d𝕀
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+\sum_{a=1}^{\chi+1}\sum_{mn}Q_{b,\left(mna\right)}Q_{\left(mna\right),c}=d\delta_{bc}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\sum_{a=1}^{\chi+1}\sum_{mn}\hat{Q}_{ba}^{mn}\hat{Q}_{ac}^{mn}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{a=1}^{\chi+1}\sum_{mn}\hat{Q}_{ab}^{\dagger mn}\hat{Q}_{ac}^{mn}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{a=1}^{\chi+1}_{a}Tr\left[\hat{Q}_{ab}^{\dagger}\hat{Q}_{ac}\right]=\delta_{bc}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{\sum_{a=1}^{\chi+1}_{a}Tr\left[\hat{Q}_{ab}^{\dagger}\hat{Q}_{ac}\right]}{d}=\delta_{bc}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{\sum_{a=1}^{\chi+1}_{a}Tr\left[\hat{Q}_{ab}^{\dagger}\hat{Q}_{ac}\right]}{Tr\left[𝕀\right]}=\delta_{bc}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{\sum_{a=1}^{\chi+1}Tr\left[\hat{W}_{ab}^{\dagger}\hat{W}_{ac}\right]}{Tr\left[𝕀\right]}=\delta_{bc}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{a=1}^{\chi+1}\left\langle \hat{W}_{ab}^{\dagger},\hat{W}_{ac}\right\rangle =\delta_{bc}
+\]
+
+\end_inset
+
+They now define block respectiong QR decomposition of 
 \begin_inset Formula $\hat{W}$
 \end_inset
 
@@ -5586,7 +5665,66 @@ and
 \end_inset
 
 .
- The block respectiong QL decomposition of 
+ 
+\end_layout
+
+\begin_layout Standard
+Orthogonality of 
+\begin_inset Formula $Q^{\dagger}Q=d\mathbb{I}$
+\end_inset
+
+ now looks like
+\begin_inset Formula 
+\[
+\sum_{a=1}^{\chi+1}\sum_{mn}Q_{b,\left(mna\right)}Q_{\left(mna\right),c}=d\delta_{bc}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\sum_{a=1}^{\chi+1}\sum_{mn}\hat{Q}_{ba}^{mn}\hat{Q}_{ac}^{mn}=d\delta_{bc}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{\sum_{a=2}^{\chi+2}Tr\left[\hat{W}_{ab}^{\dagger}\hat{W}_{ac}\right]}{Tr\left[𝕀\right]}=\delta_{bc}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{a=2}^{\chi+2}\left\langle \hat{W}_{ab}^{\dagger},\hat{W}_{ac}\right\rangle =\delta_{bc}
+\]
+
+\end_inset
+
+Notive how the range for 
+\begin_inset Formula $a$
+\end_inset
+
+ changes when we switch from 
+\begin_inset Formula $Q$
+\end_inset
+
+ to 
+\begin_inset Formula $W$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The block respectiong QL decomposition of 
 \begin_inset Formula $\hat{W}$
 \end_inset
 
@@ -6450,9 +6588,412 @@ and again
 
 \end_inset
 
-is empty.
+
 \end_layout
 
+\begin_layout Standard
+The reshaped 
+\begin_inset Formula $V$
+\end_inset
+
+looks like
+\begin_inset Formula 
+\[
+V=\begin{bmatrix}𝕀_{00} & 𝕀_{01} & 𝕀_{10} & 𝕀_{11}\\
+\boldsymbol{c}_{00} & \boldsymbol{c}_{01} & \boldsymbol{c}_{10} & \boldsymbol{c}_{11}
+\end{bmatrix}
+\]
+
+\end_inset
+
+The LQ factorization looks like
+\begin_inset Formula 
+\[
+\hat{V}=L\hat{Q}=\begin{bmatrix}1 & 0\\
+t & \mathsf{L}
+\end{bmatrix}\begin{bmatrix}\hat{𝕀}\\
+\hat{\boldsymbol{c}}^{\prime}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{W}\boldsymbol{r}=LQ\left(W\right)=\begin{bmatrix}1 & 0 & 0\\
+t & \mathsf{L} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}\hat{𝕀}\\
+\hat{\boldsymbol{c}}^{\prime}\\
+\hat{d}
+\end{bmatrix}=\begin{bmatrix}\hat{𝕀}\\
+t\hat{𝕀}+\mathsf{L}\hat{\boldsymbol{c}}^{\prime}\\
+\hat{d}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+iMPO canonical form
+\end_layout
+
+\begin_layout Standard
+Algorithm 3 Iterated QR is fairly straight forward, and converges instantly
+ for a 
+\begin_inset Formula $D_{w}=5$
+\end_inset
+
+ Heisenberg Hamiltonian.
+ However convergence for 
+\begin_inset Formula $H^{2}$
+\end_inset
+
+ is agonizingly slow.
+ And alternative the upper (ot lower) triangular matrices is algorithm 4
+ which runs as shown below.
+ But first we need to unpack things like
+\begin_inset Formula 
+\[
+\left\langle \hat{W}_{ab}^{\dagger},\hat{W}_{cd}\right\rangle =\frac{Tr\left[\hat{W}_{ab}^{\dagger}\hat{W}_{cd}\right]}{Tr\left[\hat{𝕀}\right]}=\frac{\sum_{mn}\hat{W}_{ab}\left(m,n\right)\hat{W}_{cd}\left(m,n\right)}{\sum_{mn}\hat{𝕀}\left(m,n\right)}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\frac{\sum_{mn}\hat{W}_{ab}\left(m,n\right)\hat{W}_{cd}\left(m,n\right)}{\sum_{mn}\delta_{mn}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\frac{\sum_{mn}\hat{W}_{ab}\left(m,n\right)\hat{W}_{cd}\left(m,n\right)}{\sum_{m}1}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\frac{1}{d}\sum_{mn}\hat{W}_{ab}\left(m,n\right)\hat{W}_{cd}\left(m,n\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This algo will be diffult to code up because in the paper all matrices are
+ zero based, but my code is all 1 based.
+ The inductive argument is that we have a upper triangular operator valued
+ MPO matrix
+\begin_inset Formula 
+\[
+\hat{W_{0}}=\begin{bmatrix}\hat{𝕀} & \Downarrow & \Downarrow & \Downarrow & \cdots\\
+0 & \hat{\boldsymbol{w}}_{1} & \Downarrow & \Downarrow & \cdots\\
+0 & 0 & \hat{\boldsymbol{w}}_{2} & \Downarrow & \cdots\\
+0 & 0 & 0 & \hat{\boldsymbol{w}}_{3} & \cdots\\
+\vdots & \vdots & \vdots & \vdots & \ddots
+\end{bmatrix}
+\]
+
+\end_inset
+
+where the lower case 
+\begin_inset Formula $\hat{\boldsymbol{w}}_{a}$
+\end_inset
+
+ 's are operator valued column vectors that we wish to orthogonalize starting
+ with 
+\begin_inset Formula $a=0$
+\end_inset
+
+ and 
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{w}}_{0}=\begin{bmatrix}\hat{𝕀}\\
+0\\
+0\\
+0\\
+0
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{w}}_{1}=\begin{bmatrix}\hat{W}_{01}\\
+\hat{W}_{11}\\
+0\\
+0\\
+0
+\end{bmatrix}
+\]
+
+\end_inset
+
+etc.
+ We will encounter dot products like
+\begin_inset Formula 
+\[
+\left\langle \hat{\boldsymbol{w}}_{a},\hat{\boldsymbol{w}}_{b}\right\rangle =\left\langle \begin{bmatrix}\hat{W}_{0a}^{\dagger} & \hat{W}_{1a}^{\dagger} & \cdots & \hat{W}_{\chi+1,a}^{\dagger}\end{bmatrix}\begin{bmatrix}\hat{W}_{0b}\\
+\hat{W}_{1b}\\
+\vdots\\
+\hat{W}_{\chi+1,b}
+\end{bmatrix}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{k}\left\langle \hat{W}_{ka}^{\dagger},\hat{W}_{kb}\right\rangle 
+\]
+
+\end_inset
+
+The gauge transform to orthogonalize (we will normalize later) the 
+\begin_inset Formula $\hat{\boldsymbol{w}}_{1}$
+\end_inset
+
+ column looks like
+\begin_inset Formula 
+\[
+R_{1}=\begin{bmatrix}1 & r_{0} & 0 & 0 & \cdots\\
+0 & 1 & 0 & 0 & \cdots\\
+0 & 0 & 1 & 0 & \cdots\\
+0 & 0 & 0 & 1 & \cdots\\
+\vdots & \vdots & \vdots & \vdots & \ddots
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+R_{1}^{-1}=\begin{bmatrix}1 & -r_{0} & 0 & 0 & \cdots\\
+0 & 1 & 0 & 0 & \cdots\\
+0 & 0 & 1 & 0 & \cdots\\
+0 & 0 & 0 & 1 & \cdots\\
+\vdots & \vdots & \vdots & \vdots & \ddots
+\end{bmatrix}
+\]
+
+\end_inset
+
+now we must caluclate
+\begin_inset Formula 
+\[
+R_{1}\hat{W_{0}}R_{1}^{-1}=\begin{bmatrix}1 & r_{0} & 0 & 0 & \cdots\\
+0 & 1 & 0 & 0 & \cdots\\
+0 & 0 & 1 & 0 & \cdots\\
+0 & 0 & 0 & 1 & \cdots\\
+\vdots & \vdots & \vdots & \vdots & \ddots
+\end{bmatrix}\begin{bmatrix}\hat{𝕀} & \hat{W}_{01} & \Downarrow & \Downarrow & \cdots\\
+0 & \hat{W}_{11} & \Downarrow & \Downarrow & \cdots\\
+0 & 0 & \hat{w}_{2} & \Downarrow & \cdots\\
+0 & 0 & 0 & \hat{w}_{3} & \cdots\\
+\vdots & \vdots & \vdots & \vdots & \ddots
+\end{bmatrix}\begin{bmatrix}1 & -r_{0} & 0 & 0 & \cdots\\
+0 & 1 & 0 & 0 & \cdots\\
+0 & 0 & 1 & 0 & \cdots\\
+0 & 0 & 0 & 1 & \cdots\\
+\vdots & \vdots & \vdots & \vdots & \ddots
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\begin{bmatrix}1 & r_{0} & 0 & 0 & \cdots\\
+0 & 1 & 0 & 0 & \cdots\\
+0 & 0 & 1 & 0 & \cdots\\
+0 & 0 & 0 & 1 & \cdots\\
+\vdots & \vdots & \vdots & \vdots & \ddots
+\end{bmatrix}\begin{bmatrix}\hat{𝕀} & -r_{0}\hat{𝕀}+\hat{W}_{01} & \Downarrow & \Downarrow & \cdots\\
+0 & \hat{W}_{11} & \Downarrow & \Downarrow & \cdots\\
+0 & 0 & \hat{w}_{2} & \Downarrow & \cdots\\
+0 & 0 & 0 & \hat{w}_{3} & \cdots\\
+\vdots & \vdots & \vdots & \vdots & \ddots
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\begin{bmatrix}\hat{𝕀} & -r_{0}\hat{𝕀}+\hat{W}_{01}+r_{0}\hat{W}_{11} & \Downarrow & \Downarrow & \cdots\\
+0 & \hat{W}_{11} & \Downarrow & \Downarrow & \cdots\\
+0 & 0 & \hat{w}_{2}^{\prime} & \Downarrow & \cdots\\
+0 & 0 & 0 & \hat{w}_{3}^{\prime} & \cdots\\
+\vdots & \vdots & \vdots & \vdots & \ddots
+\end{bmatrix}
+\]
+
+\end_inset
+
+where the columns 
+\begin_inset Formula $2$
+\end_inset
+
+ and beyond have been modified by the last matrix multiplication.
+ We see that
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{w}}_{1}^{\prime}=\hat{\boldsymbol{w}}_{1}-r_{0}\hat{\boldsymbol{w}}_{0}+r_{o}\boldsymbol{e}_{0}\hat{W}_{11}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\[
+\boldsymbol{e}_{0}=\begin{bmatrix}1\\
+0\\
+0\\
+0\\
+0
+\end{bmatrix}
+\]
+
+\end_inset
+
+In order for column 1 to be orthogonal to column 0 we need
+\begin_inset Formula 
+\[
+0=\left\langle \hat{\boldsymbol{w}}_{0},\hat{\boldsymbol{w}}_{1}^{\prime}\right\rangle =\left\langle \hat{𝕀},-r_{0}\hat{𝕀}+\hat{W}_{01}+r_{0}\hat{W}_{11}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=-r_{0}\left\langle \hat{𝕀},\hat{𝕀}\right\rangle +\left\langle \hat{𝕀},\hat{W}_{01}\right\rangle +r_{0}\left\langle \hat{𝕀},\hat{W}_{11}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=-r_{0}\left\langle \hat{W}_{00},\hat{W}_{00}\right\rangle +\left\langle \hat{W}_{00},\hat{W}_{01}\right\rangle +r_{0}\left\langle \hat{W}_{00},\hat{W}_{11}\right\rangle 
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+0=\left\langle \hat{\boldsymbol{w}}_{0},\hat{\boldsymbol{w}}_{1}^{\prime}\right\rangle =\left\langle \hat{\boldsymbol{w}}_{0},\hat{\boldsymbol{w}}_{1}-r_{0}\hat{\boldsymbol{w}}_{0}+r_{o}\boldsymbol{e}_{0}\hat{W}_{11}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\left\langle \hat{\boldsymbol{w}}_{0},\hat{\boldsymbol{w}}_{1}\right\rangle -r_{0}\left\langle \hat{\boldsymbol{w}}_{0},\hat{\boldsymbol{w}}_{0}\right\rangle +r_{o}\left\langle \hat{\boldsymbol{w}}_{0},\boldsymbol{e}_{0}\hat{W}_{11}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\left\langle \hat{\boldsymbol{w}}_{0},\hat{\boldsymbol{w}}_{1}\right\rangle +\left\{ -\left\langle \hat{\boldsymbol{w}}_{0},\hat{\boldsymbol{w}}_{0}\right\rangle +\left\langle \hat{\boldsymbol{w}}_{0},\boldsymbol{e}_{0}\hat{W}_{11}\right\rangle \right\} r_{o}
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+\left\{ \left\langle \hat{\boldsymbol{w}}_{0},\hat{\boldsymbol{w}}_{0}\right\rangle -\left\langle \hat{\boldsymbol{w}}_{0},\boldsymbol{e}_{0}\hat{W}_{11}\right\rangle \right\} r_{o}=\left\langle \hat{\boldsymbol{w}}_{0},\hat{\boldsymbol{w}}_{1}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+K_{00}r_{o}=c_{0}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+c_{0}=\left\langle \hat{\boldsymbol{w}}_{0},\hat{\boldsymbol{w}}_{1}\right\rangle =\left\langle \hat{𝕀},\hat{W}_{01}\right\rangle +\left\langle \hat{𝕀},\hat{W}_{11}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\left\langle \hat{W}_{00},\hat{W}_{01}\right\rangle +\left\langle \hat{W}_{00},\hat{W}_{11}\right\rangle 
+\]
+
+\end_inset
+
+and 
+\begin_inset Formula $s$
+\end_inset
+
+ is determined by
+\begin_inset Formula 
+\[
+s_{M}^{2}\left(1-\left\langle \hat{W}_{MM},\hat{W}_{MM}\right\rangle \right)=\left\langle \hat{\boldsymbol{w}}_{M},\hat{\boldsymbol{w}}_{M}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{a=0}^{M}\left\langle \hat{W}_{aM},\hat{W}_{aM}\right\rangle 
+\]
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Enumerate
+Loop over 
+\begin_inset Formula $M=1..\chi$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+\begin_inset Formula $K_{ba}=\delta_{ba}-\left\langle \hat{W}_{ab}^{\dagger},\hat{W}_{MM}\right\rangle $
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Subsection
 Contracting iTEBD state with an iMPO
 \end_layout

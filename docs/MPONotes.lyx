@@ -1,0 +1,2647 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2cm
+\topmargin 2cm
+\rightmargin 2cm
+\bottommargin 2cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Notes on MPO canonical forms and compression
+\end_layout
+
+\begin_layout Section
+Background
+\end_layout
+
+\begin_layout Standard
+The recent paper Local Matrix Product Operators:Canonical Form, Compression,
+ and Control Theory
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Parker2019"
+literal "false"
+
+\end_inset
+
+ contains a number of important insights for the handling of finite and
+ infinite lattice MPOs.
+ Unlike matrix product states, MPOs contain a mixture of intensive and extensive
+ degrees of freedom.
+ A naive application of SVD compression to MPOs will result in some singular
+ vales diverging as the lattice size is increased, resulting in severe numerical
+ instabilities.
+\end_layout
+
+\begin_layout Standard
+Since my math skills are considerably less well developed that those of
+ the authors
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Parker2019"
+literal "false"
+
+\end_inset
+
+ is will try and intersperse the notes with concrete examples.
+ This will help me connect symbols in the paper with symbols I am more familiar
+ with.
+\end_layout
+
+\begin_layout Section
+Canoncial form for operators
+\end_layout
+
+\begin_layout Subsection
+Regular form
+\end_layout
+
+\begin_layout Standard
+We can split any Hamiltonian operator which is a sum of local terms into
+ left and right partitions about any bond
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Zaletel2015"
+literal "false"
+
+\end_inset
+
+ as follows
+\begin_inset Formula 
+\begin{equation}
+\hat{H}=\hat{H}_{L}\otimes𝕀_{R}+𝕀_{L}\otimes\hat{H}_{R}+\sum_{ab=1}^{\chi}\mathsf{M}_{ab}\hat{h}_{L}^{a}\otimes\hat{h}_{R}^{b}\label{eq:PartitionedHamiltonian}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\begin{bmatrix}\hat{𝕀}_{L} & \hat{\boldsymbol{h}}_{L} & \hat{H}_{L}\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{M} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}\hat{H}_{R}\\
+\hat{\boldsymbol{h}}_{R}\\
+\hat{𝕀}_{R}
+\end{bmatrix}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\hat{H}_{L/R}$
+\end_inset
+
+ are extensive Hamiltonians for the lattices to the left and right of the
+ central bond and the last term accounts for the local interaction across
+ the bond.
+ The local interactions are not restricted to just the two sites immediately
+ adjacent to the bond, they can include sites arbitrarily far away from
+ the central bond.
+ The only trick is to decide which interactions are included on a given
+ bond and not double count any of these interactions.
+ 
+\begin_inset Formula $\chi$
+\end_inset
+
+ plays the role of the bond dimension, similar to the bond dimension 
+\begin_inset Formula $D$
+\end_inset
+
+ for and MPS.
+ The scalar matrix 
+\begin_inset Formula $\mathsf{M}$
+\end_inset
+
+ contains the interaction strengths.
+ This representation is referred as the 
+\emph on
+regular form
+\emph default
+.
+\end_layout
+
+\begin_layout Paragraph
+Example 1
+\end_layout
+
+\begin_layout Standard
+In the language a standard Heisenberg 
+\begin_inset Formula $XYZ$
+\end_inset
+
+ nearest neighbour spin model 
+\begin_inset Formula 
+\[
+\hat{H}_{xyz}=\sum_{i}\hat{H}_{i}=\sum_{i}\left(J_{x}\hat{S}_{i}^{x}\hat{S}_{i+1}^{x}+J_{y}\hat{S}_{i}^{y}\hat{S}_{i+1}^{y}+J_{z}\hat{S}_{i}^{z}\hat{S}_{i+1}^{z}\right)
+\]
+
+\end_inset
+
+split at bond 
+\begin_inset Formula $n$
+\end_inset
+
+ would have
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{h}}_{L}=\begin{bmatrix}\hat{S}_{n}^{x} & \hat{S}_{n}^{y} & \hat{S}_{n}^{z}\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{h}}_{R}=\begin{bmatrix}\hat{S}_{n+1}^{x} & \hat{S}_{n+1}^{y} & \hat{S}_{n+1}^{z}\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathsf{M}=\begin{bmatrix}J_{x} & 0 & 0\\
+0 & J_{y} & 0\\
+0 & 0 & J_{z}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{H}_{L}=\sum_{i=1}^{n-1}\hat{H}_{i}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{H}_{R}=\sum_{i=n+1}^{L}\hat{H}_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Left and right canonical forms
+\end_layout
+
+\begin_layout Standard
+Just as MPSs and iMPSs have left and right canonical forms, we can also
+ make a corresponding definition for operators (and subsequently for MPOs
+ and iMPOs).
+ The local operators in eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:PartitionedHamiltonian"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ are said to be in left canonical form if
+\begin_inset Formula 
+\begin{equation}
+\left\langle \hat{h}_{L}^{a},\hat{h}_{L}^{b}\right\rangle =\delta^{ab}\label{eq:LeftCanonical}
+\end{equation}
+
+\end_inset
+
+and right canonical if
+\begin_inset Formula 
+\begin{equation}
+\left\langle \hat{h}_{R}^{a},\hat{h}_{R}^{b}\right\rangle =\delta^{ab}.\label{eq:RightCanonical}
+\end{equation}
+
+\end_inset
+
+The important distinction with MPS canonical forms is that extensive parts
+ of the Hamiltonian 
+\begin_inset Formula $\hat{H}_{L/R}$
+\end_inset
+
+ are excluded from definition canonical form.
+\end_layout
+
+\begin_layout Standard
+This notation requires some unpacking.
+ The operator overlap is defined as follows
+\begin_inset Formula 
+\begin{equation}
+\left\langle \hat{A},\hat{B}\right\rangle =\frac{Tr\left[\hat{A}^{\dagger}\hat{B}\right]}{Tr\left[\hat{𝕀}\right]}=\frac{1}{d}\sum_{mn=1}^{d}\hat{A}^{\dagger mn}\hat{B}^{mn}\label{eq:OpOverlap}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $d$
+\end_inset
+
+ is the dimension of the local Hilbert space at each site.
+\end_layout
+
+\begin_layout Subsection
+Almost Schmidt decomposition
+\end_layout
+
+\begin_layout Standard
+The local portion of eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:PartitionedHamiltonian"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ can be SVDd
+\begin_inset Formula 
+\[
+\hat{h}_{i}=\hat{\boldsymbol{h}}_{L}\mathsf{M}\hat{\boldsymbol{h}}_{R}=\hat{\boldsymbol{h}}_{L}\mathsf{UsV^{\dagger}}\hat{\boldsymbol{h}}_{R}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+=\hat{\boldsymbol{h}}_{L}^{\prime}\mathsf{s}\hat{\boldsymbol{h}}_{R}^{\prime}=\sum_{a=1}^{\chi}s_{a}\hat{h}_{L}^{\prime a}\otimes\hat{h}_{R}^{\prime a}\label{eq:AlmostSchmidt}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{h}}_{L}^{\prime}=\hat{\boldsymbol{h}}_{L}\mathsf{U},\quad\hat{\boldsymbol{h}}_{R}^{\prime}=\mathsf{V^{\dagger}}\hat{\boldsymbol{h}}_{R}
+\]
+
+\end_inset
+
+At this point standard compression methods apply, we can restrict the sum
+ in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:AlmostSchmidt"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ which amounts to removing the corresponding columns and rows of 
+\begin_inset Formula $\mathsf{U}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathsf{V^{\dagger}}$
+\end_inset
+
+ .
+ Also because of the orthonormality properties of 
+\begin_inset Formula $\mathsf{U}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathsf{V^{\dagger}}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathsf{U}^{\dagger}\mathsf{U}=\mathsf{V}\mathsf{V^{\dagger}}=𝕀
+\]
+
+\end_inset
+
+we get the canonical form conditions 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:LeftCanonical"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for 
+\begin_inset Formula $\hat{\boldsymbol{h}}_{L}^{\prime}$
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:RightCanonical"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for 
+\begin_inset Formula $\hat{\boldsymbol{h}}_{R}^{\prime}.$
+\end_inset
+
+ The next step is to translate these ideas into the MPO representation.
+\end_layout
+
+\begin_layout Section
+Canonical form for finite MPOs
+\end_layout
+
+\begin_layout Subsection
+Upper triangular left canonical form
+\end_layout
+
+\begin_layout Standard
+By definition a 
+\emph on
+regular
+\emph default
+ upper triangular MPO has the form
+\begin_inset Formula 
+\begin{equation}
+\hat{W}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}} & \hat{d}\\
+0 & \hat{\boldsymbol{A}} & \hat{\boldsymbol{b}}\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}\label{eq:WRegular}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\hat{\boldsymbol{c}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\boldsymbol{b}}$
+\end_inset
+
+ are operator valued vectors of length 
+\begin_inset Formula $\chi$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\boldsymbol{A}}$
+\end_inset
+
+ is an upper triangular operator valued 
+\begin_inset Formula $\chi\times\chi$
+\end_inset
+
+ matrix.
+ This MPO is said to be in left canonical form if it's upper left block
+\begin_inset Formula 
+\begin{equation}
+\hat{V}_{L}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}\\
+0 & \hat{\boldsymbol{A}}
+\end{bmatrix}\label{eq:WupperLeft}
+\end{equation}
+
+\end_inset
+
+has orthogonal columns (two daggers cancel)
+\begin_inset Formula 
+\begin{equation}
+\sum_{a=0}^{\chi}\left\langle \hat{W}_{ab}^{\dagger},\hat{W}_{ac}\right\rangle =\frac{\sum_{a=0}^{\chi}Tr\left[\hat{W}_{ab}\hat{W}_{ac}\right]}{Tr\left[\hat{𝕀}\right]}=\delta_{bc}\label{eq:OrthoColumns}
+\end{equation}
+
+\end_inset
+
+In order to translate this to right canonical form for upper triangular
+ MPOs we need to define the so called mirror operations.
+\end_layout
+
+\begin_layout Subsection
+Mirroring
+\end_layout
+
+\begin_layout Standard
+A Hamiltonian MPO for a finite lattice can be written as
+\begin_inset Formula 
+\[
+\hat{H}=\boldsymbol{𝑙}\hat{W}^{\left(1\right)}\hat{W}^{\left(2\right)}\hat{W}^{\left(3\right)}\cdots\hat{W}^{\left(L-1\right)}\hat{W}^{\left(L\right)}\boldsymbol{𝑟}
+\]
+
+\end_inset
+
+where for an upper triangular MPO
+\begin_inset Formula 
+\[
+\boldsymbol{𝑙}=\begin{bmatrix}1 & \boldsymbol{0} & 0\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boldsymbol{𝑟}=\begin{bmatrix}0\\
+\boldsymbol{0}\\
+1
+\end{bmatrix}
+\]
+
+\end_inset
+
+A MPO is mirrored by 
+\end_layout
+
+\begin_layout Enumerate
+Transposing each matrix 
+\begin_inset Formula $\hat{W}^{(i)}$
+\end_inset
+
+ .
+ This means we transpose in the auxiliary indices 
+\begin_inset Formula $\left\{ w\right\} $
+\end_inset
+
+ and not the physical indices 
+\begin_inset Formula $\left\{ m,n\right\} $
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+exchanging 
+\begin_inset Formula $\boldsymbol{𝑙}^{\dagger}\longleftrightarrow\boldsymbol{𝑟}$
+\end_inset
+
+, 
+\end_layout
+
+\begin_layout Enumerate
+Reversing all auxiliary indices 
+\begin_inset Formula $0\longleftrightarrow\chi+1$
+\end_inset
+
+, 
+\begin_inset Formula $1,2,3\cdots\chi\longleftrightarrow\chi,\cdots,3,2,1$
+\end_inset
+
+, 
+\end_layout
+
+\begin_layout Enumerate
+Reversing the physical positions.
+ i.e.
+ lattices sites 
+\begin_inset Formula $1,2,\cdots,L\longleftrightarrow L,\cdots,2,1$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Subsection
+All mirror combinations
+\end_layout
+
+\begin_layout Standard
+Since many publications and computer codes are set up for lower triangular
+ MPOs, upper triangular representations are by no means a standard or convention.
+ As a result it is useful to write out all combinations for clarity.
+ Starting with the full 
+\begin_inset Formula $W$
+\end_inset
+
+ matrices table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:Regular-reps"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ shows the regular representations for upper and lower triangular 
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+ matrices and the various sub blocks.
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Upper
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lower
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topspace="default" bottomspace="default" interlinespace="default">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}_{U} & \hat{d}_{U}\\
+0 & \hat{\boldsymbol{A}}_{U} & \hat{\boldsymbol{b}}_{U}\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{b}}_{L} & \hat{\boldsymbol{A}}_{L} & 0\\
+\hat{d}_{L} & \hat{\boldsymbol{c}}_{L} & \hat{𝕀}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{\boldsymbol{c}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}\hat{W}_{01} & \hat{W}_{02} & \cdots & \hat{W}_{0,\chi-1} & \hat{W}_{0\chi}\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}\hat{W}_{0\chi} & \hat{W}_{0,\chi-1} & \cdots & \hat{W}_{02} & \hat{W}_{01}\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{d}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{W}_{0,\chi+1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{W}_{0,\chi+1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{\boldsymbol{b}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}\hat{W}_{10}\\
+\hat{W}_{20}\\
+\vdots\\
+\hat{W}_{\chi-1,0}\\
+\hat{W}_{\chi0}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}\hat{W}_{\chi0}\\
+\hat{W}_{\chi-1,0}\\
+\vdots\\
+\hat{W}_{20}\\
+\hat{W}_{10}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{\boldsymbol{A}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}\hat{W}_{11} & \hat{W}_{12} & \cdots & \hat{W}_{1\chi}\\
+\hat{W}_{21} & \hat{W}_{22} & \cdots & \hat{W}_{2\chi}\\
+\vdots & \vdots & \ddots & \vdots\\
+\hat{W}_{\chi1} & \hat{W}_{\chi2} & \cdots & \hat{W}_{\chi\chi}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}\hat{W}_{\chi\chi} & \hat{W}_{\chi,\chi-1} & \cdots & \hat{W}_{\chi1}\\
+\hat{W}_{\chi-1,\chi} & \hat{W}_{\chi-1,\chi-1} & \cdots & \hat{W}_{\chi-1,1}\\
+\vdots & \vdots & \ddots & \vdots\\
+\hat{W}_{1\chi} & \hat{W}_{1,\chi-1} & \cdots & \hat{W}_{11}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Regular-reps"
+
+\end_inset
+
+Regular representations for upper a lower triangular MPOs
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+There are also four cases for the intensive 
+\begin_inset Formula $\hat{V}$
+\end_inset
+
+ blocks shown in table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:V-blocks"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and corresponding orthonormality, or canonical for definitions are in table
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:Orthogonality-conditions"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Notice that summation ranges change depending on weather 
+\begin_inset Formula $\hat{V}$
+\end_inset
+
+ is an upper left block or a lower right block.
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+V-Blocks
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Upper
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lower
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topspace="default" bottomspace="default" interlinespace="default">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Left
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{V}_{L}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}_{U}\\
+0 & \hat{\boldsymbol{A}}_{U}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{V}_{L}=\begin{bmatrix}\hat{\boldsymbol{A}}_{L} & 0\\
+\hat{\boldsymbol{c}}_{L} & \hat{𝕀}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topspace="default" bottomspace="default" interlinespace="default">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Right
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{V}_{R}=\begin{bmatrix}\hat{\boldsymbol{A}}_{U} & \hat{\boldsymbol{b}}_{U}\\
+0 & \hat{𝕀}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{V}_{R}=\begin{bmatrix}\hat{𝕀} & 0\\
+\hat{\boldsymbol{b}}_{L} & \hat{\boldsymbol{A}}_{L}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:V-blocks"
+
+\end_inset
+
+V-blocks for all combinations of Upper/Lower triangular MPOs and Left/Right
+ canonical forms.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="5cm">
+<column alignment="center" valignment="top" width="5cm">
+<column alignment="center" valignment="top" width="5cm">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Definition of Canonical
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Upper
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lower
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topspace="default" bottomspace="default" interlinespace="default">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Left
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Orth.
+ Columns:
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sum_{a=0}^{\chi}\left\langle \hat{W}_{ab},\hat{W}_{ac}\right\rangle =\delta_{bc}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Orth.
+ Columns:
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sum_{a=1}^{\chi+1}\left\langle \hat{W}_{ab},\hat{W}_{ac}\right\rangle =\delta_{bc}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topspace="default" bottomspace="default" interlinespace="default">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Right
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Orth.
+ Rows:
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sum_{a=1}^{\chi+1}\left\langle \hat{W}_{ba},\hat{W}_{ca}\right\rangle =\delta_{bc}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Orth.
+ Rows:
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sum_{a=0}^{\chi}\left\langle \hat{W}_{ba},\hat{W}_{ca}\right\rangle =\delta_{bc}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Orthogonality-conditions"
+
+\end_inset
+
+Orthogonality conditions for all combinations of Upper/Lower triangular
+ MPOs and Left/Right canonical forms.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+In order preserve the regular forms any gauge transformations must also
+ be block triangular as shown in table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:Block-structure"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="center" valignment="top" width="0pt">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Upper
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lower
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topspace="default" bottomspace="default" interlinespace="default">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gauge Transform
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{W}^{\prime}U=U\hat{W}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{W}^{\prime}L=L\hat{W}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topspace="default" bottomspace="default" interlinespace="default">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gauge matrix block structure
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $U=\begin{bmatrix}1 & t & r\\
+0 & \mathsf{U} & s\\
+0 & 0 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $L=\begin{bmatrix}1 & 0 & 0\\
+t & \mathsf{L} & 0\\
+r & s & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Block-structure"
+
+\end_inset
+
+Block structure of gauge transformations
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Subsection
+Block Respecting QR decomposition
+\end_layout
+
+\begin_layout Standard
+In order to calculate the canonical form for any MPO in regular form we
+ need to
+\end_layout
+
+\begin_layout Enumerate
+extract the correct V-block for our MPO using table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:V-blocks"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Enumerate
+convert from the operator valued matrix, to a scalar matrix, 
+\begin_inset Formula 
+\[
+\hat{V}_{ab}\rightarrow V_{ab}^{mn}\rightarrow\begin{cases}
+V_{\left(mna\right)b} & Left\\
+V_{a\left(mnb\right)} & Right
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Perform a QR (QL,RQ,LQ) decomposition on the scalar 
+\begin_inset Formula $V$
+\end_inset
+
+ matrix
+\end_layout
+
+\begin_layout Enumerate
+Reshape assign 
+\begin_inset Formula $Q$
+\end_inset
+
+ into the MPO 
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+: 
+\begin_inset Formula $Q\rightarrow Q_{ab}^{mn}\rightarrow\hat{Q}_{ab}\rightarrow\hat{V}_{ab}\rightarrow\hat{W}_{ab}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Transfer the 
+\begin_inset Formula $R$
+\end_inset
+
+ or 
+\begin_inset Formula $L$
+\end_inset
+
+ block on to the next site.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="left" valignment="top" width="8cm">
+<column alignment="left" valignment="top" width="8cm">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Upper
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lower
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Left
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Enumerate
+Extract
+\begin_inset Formula $\hat{V}^{(i)}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}_{U}\\
+0 & \hat{\boldsymbol{A}}_{U}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Reshape 
+\begin_inset Formula $\hat{V}_{ab}\rightarrow V_{ab}^{mn}\rightarrow V_{\left(mna\right)b}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+QR decomp.
+\begin_inset Formula $V_{\left(mna\right)b}=\sum_{k=0}^{\chi}Q_{\left(mna\right)k}R_{kb}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Reshape
+\begin_inset Formula $Q_{\left(mna\right)k}\rightarrow\hat{Q}_{ak}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Transfer
+\begin_inset Formula $\hat{W}^{\left(i+1\right)}\rightarrow R\hat{W}^{\left(i+1\right)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Enumerate
+Extract
+\begin_inset Formula $\hat{V}^{(i)}=\begin{bmatrix}\hat{\boldsymbol{A}}_{L} & 0\\
+\hat{\boldsymbol{c}}_{L} & \hat{𝕀}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Reshape 
+\begin_inset Formula $\hat{V}_{ab}\rightarrow V_{ab}^{mn}\rightarrow V_{\left(mna\right)b}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+QL decomp.
+\begin_inset Formula $V_{\left(mna\right)b}=\sum_{k=1}^{\chi+1}Q_{\left(mna\right)k}L_{kb}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Reshape
+\begin_inset Formula $Q_{\left(mna\right)k}\rightarrow\hat{Q}_{ak}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Transfer
+\begin_inset Formula $\hat{W}^{\left(i+1\right)}\rightarrow L\hat{W}^{\left(i+1\right)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Right
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Enumerate
+Extract
+\begin_inset Formula $\hat{V}^{(i)}=\begin{bmatrix}\hat{\boldsymbol{A}}_{U} & \hat{\boldsymbol{b}}_{U}\\
+0 & \hat{𝕀}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Reshape 
+\begin_inset Formula $\hat{V}_{ab}\rightarrow V_{ab}^{mn}\rightarrow V_{a\left(mnb\right)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+RQ decomp.
+\begin_inset Formula $V_{a\left(mnb\right)}=\sum_{k=1}^{\chi+1}R_{ak}Q_{k\left(mnb\right)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Reshape
+\begin_inset Formula $Q_{k\left(mnb\right)}\rightarrow\hat{Q}_{kb}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Transfer
+\begin_inset Formula $\hat{W}^{\left(i-1\right)}\rightarrow\hat{W}^{\left(i-1\right)}R$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Enumerate
+Extract
+\begin_inset Formula $\hat{V}^{(i)}=\begin{bmatrix}\hat{𝕀} & 0\\
+\hat{\boldsymbol{b}}_{L} & \hat{\boldsymbol{A}}_{L}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Reshape 
+\begin_inset Formula $\hat{V}_{ab}\rightarrow V_{ab}^{mn}\rightarrow V_{a\left(mnb\right)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+LQ decomp.
+\begin_inset Formula $V_{a\left(mnb\right)}=\sum_{k=0}^{\chi}L_{ak}Q_{k\left(mnb\right)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Reshape
+\begin_inset Formula $Q_{k\left(mnb\right)}\rightarrow\hat{Q}_{kb}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Transfer
+\begin_inset Formula $\hat{W}^{\left(i-1\right)}\rightarrow\hat{W}^{\left(i-1\right)}L$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:CanFormAlgorithms"
+
+\end_inset
+
+Left/Right canonical form algorithms for site 
+\begin_inset Formula $i$
+\end_inset
+
+ for upper/lower regular forms.
+ 
+\begin_inset Formula $R$
+\end_inset
+
+matrices are upper triangular and 
+\begin_inset Formula $L$
+\end_inset
+
+matrices are lower triangular.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In step 3 the 
+\begin_inset Formula $R/L$
+\end_inset
+
+matrices are of dimension 
+\begin_inset Formula $\left(\chi+1\right)\times\left(\chi+1\right)$
+\end_inset
+
+.
+ For step 5 these must be reshaped to dimension 
+\begin_inset Formula $\left(\chi+2\right)\times\left(\chi+2\right)$
+\end_inset
+
+ as follows
+\begin_inset Formula 
+\[
+R=\begin{bmatrix}1 & t\\
+0 & \mathsf{R}
+\end{bmatrix}\rightarrow\begin{cases}
+\begin{bmatrix}1 & t & 0\\
+0 & \mathsf{R} & 0\\
+0 & 0 & 1
+\end{bmatrix} & Left\\
+\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{R} & t\\
+0 & 0 & 1
+\end{bmatrix} & Right
+\end{cases},\qquad L=\begin{bmatrix}1 & 0\\
+t & \mathsf{L}
+\end{bmatrix}\rightarrow\begin{cases}
+\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{L} & 0\\
+0 & t & 1
+\end{bmatrix} & Left\\
+\begin{bmatrix}1 & 0 & 0\\
+t & \mathsf{L} & 0\\
+0 & 0 & 1
+\end{bmatrix} & Right
+\end{cases}
+\]
+
+\end_inset
+
+The Lapack library provides all four combinations of QR, RQ, QL and LQ decomposi
+tion.
+ The 
+\begin_inset Formula $Q$
+\end_inset
+
+ matrices output from Lapack are orthonormal 
+\begin_inset Formula $Q^{\dagger}Q=𝕀$
+\end_inset
+
+, but in order to satisfy eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:OrthoColumns"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ (or it's mirror) we need 
+\begin_inset Formula $Q^{\dagger}Q=d𝕀$
+\end_inset
+
+.
+ We must fix this by re-scaling 
+\begin_inset Formula $Q$
+\end_inset
+
+ and 
+\begin_inset Formula $R/L$
+\end_inset
+
+ as follows
+\begin_inset Formula 
+\[
+Q\rightarrow\sqrt{d}Q,\quad R\rightarrow\frac{1}{\sqrt{d}}R,\quad L\rightarrow\frac{1}{\sqrt{d}}L.
+\]
+
+\end_inset
+
+This still leaves a random factor of 
+\begin_inset Formula $-1$
+\end_inset
+
+ between 
+\begin_inset Formula $Q$
+\end_inset
+
+ and 
+\begin_inset Formula $R/L$
+\end_inset
+
+.
+ This can also be eliminated by using for example 
+\begin_inset Formula $R_{\chi\chi}=\pm\sqrt{d}$
+\end_inset
+
+ as the scaling factor.
+\end_layout
+
+\begin_layout Section
+Compression of finite MPOs
+\end_layout
+
+\begin_layout Standard
+SVD compression acts on the scalar matrix in the QR (QL,RQ,LQ) decomposition
+ during an orthogonalization (canonization) operation.
+ For a left compression operation the lattice is brought into right canonical
+ form as described in table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:CanFormAlgorithms"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Then moving left to right, for an upper triangular MPO we do the QR decompositi
+on, and then further decompose the 
+\begin_inset Formula $R$
+\end_inset
+
+ matrix as follows
+\begin_inset Formula 
+\[
+R=\begin{bmatrix}1 & t & 0\\
+0 & \mathsf{R} & 0\\
+0 & 0 & 1
+\end{bmatrix}=MR^{\prime}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{R} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & t & 0\\
+0 & \mathsf{𝕀} & 0\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+and do an SVD decomposition on the dimension 
+\begin_inset Formula $\chi\times\chi$
+\end_inset
+
+ sub block 
+\begin_inset Formula $\mathsf{R}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+M=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{R} & 0\\
+0 & 0 & 1
+\end{bmatrix}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{UsV^{\dagger}} & 0\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+which can now be compressed 
+\begin_inset Formula $\mathsf{UsV^{\dagger}}\sim\mathsf{\tilde{U}\tilde{s}\tilde{V}^{\dagger}}$
+\end_inset
+
+ giving
+\begin_inset Formula 
+\[
+M\sim\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{U}\tilde{s}\tilde{V}^{\dagger}} & 0\\
+0 & 0 & 1
+\end{bmatrix}=\begin{bmatrix}1 & 0 & 0\\
+0 & \tilde{\mathsf{U}} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{s}\tilde{V}^{\dagger}} & 0\\
+0 & 0 & 1
+\end{bmatrix}=UV.
+\]
+
+\end_inset
+
+Putting it all together we get
+\begin_inset Formula 
+\[
+\hat{V}=\hat{Q}R=\hat{Q}MR^{\prime}\sim\hat{Q}UVR^{\prime}
+\]
+
+\end_inset
+
+At this point we update the 
+\begin_inset Formula $\hat{V}$
+\end_inset
+
+ block
+\begin_inset Formula 
+\[
+\hat{Q}U\rightarrow\hat{V}
+\]
+
+\end_inset
+
+and the neighbouring site
+\begin_inset Formula 
+\[
+\hat{W}^{\left(i+1\right)}\rightarrow VR^{\prime}\hat{W}^{\left(i+1\right)}
+\]
+
+\end_inset
+
+It is worth noting that the matrix 
+\begin_inset Formula $R^{\prime}$
+\end_inset
+
+ only purpose to the carry the 
+\begin_inset Formula $t$
+\end_inset
+
+ block over the next site.
+ Since both 
+\begin_inset Formula $\hat{Q}$
+\end_inset
+
+ and 
+\begin_inset Formula $U$
+\end_inset
+
+ are left orthogonal, so is their product and therefore the update V-block.
+ Whether or not result V-block is still upper triangular is a bit murky
+ because the SVD algorithm in Lapack has some freedom in laying out 
+\begin_inset Formula $\mathsf{U}$
+\end_inset
+
+ when there are degenerate singular values.
+ An upper triangular is always possible it is not guaranteed.
+ This means that it may be necessary to find a row swapping gauge transform
+ that preserve the upper triangular structure.
+\end_layout
+
+\begin_layout Standard
+The details for lower triangular and left sweeps are presented in table
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:MPO-compression"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="11" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="2cm">
+<column alignment="center" valignment="top" width="2cm">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Canonical form
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Operation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Upper
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lower
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Left
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+QR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{V}=\hat{Q}R$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{V}=\hat{Q}L$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Decompose R/L
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}1 & t & 0\\
+0 & \mathsf{R} & 0\\
+0 & 0 & 1
+\end{bmatrix}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{R} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & t & 0\\
+0 & \mathsf{𝕀} & 0\\
+0 & 0 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{L} & 0\\
+0 & t & 1
+\end{bmatrix}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{L} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{𝕀} & 0\\
+0 & t & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $U/V$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $U=\begin{bmatrix}1 & 0 & 0\\
+0 & \tilde{\mathsf{U}} & 0\\
+0 & 0 & 1
+\end{bmatrix},\;V=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{s}\tilde{V}^{\dagger}} & 0\\
+0 & 0 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $U=\begin{bmatrix}1 & 0 & 0\\
+0 & \tilde{\mathsf{U}} & 0\\
+0 & 0 & 1
+\end{bmatrix},\;V=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{s}\tilde{V}^{\dagger}} & 0\\
+0 & 0 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Final V-block
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{Q}U\rightarrow\hat{V}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{Q}U\rightarrow\hat{V}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Transfer
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{W}^{\left(i+1\right)}\rightarrow VR^{\prime}\hat{W}^{\left(i+1\right)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{W}^{\left(i+1\right)}\rightarrow VL^{\prime}\hat{W}^{\left(i+1\right)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Right
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+QR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{V}=R\hat{Q}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{V}=L\hat{Q}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{R} & t\\
+0 & 0 & 1
+\end{bmatrix}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{R} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{𝕀} & t\\
+0 & 0 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}1 & 0 & 0\\
+t & \mathsf{L} & 0\\
+0 & 0 & 1
+\end{bmatrix}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{L} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+t & \mathsf{𝕀} & 0\\
+0 & 0 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $U/V$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $U=\begin{bmatrix}1 & 0 & 0\\
+0 & \tilde{\mathsf{U}\tilde{s}} & 0\\
+0 & 0 & 1
+\end{bmatrix},\;V=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{V}^{\dagger}} & 0\\
+0 & 0 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $U=\begin{bmatrix}1 & 0 & 0\\
+0 & \tilde{\mathsf{U}\tilde{s}} & 0\\
+0 & 0 & 1
+\end{bmatrix},\;V=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{V}^{\dagger}} & 0\\
+0 & 0 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Final V-block
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $V\hat{Q}\rightarrow\hat{V}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $V\hat{Q}\rightarrow\hat{V}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Transfer
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{W}^{\left(i-1\right)}\rightarrow\hat{W}^{\left(i-1\right)}R^{\prime}U$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{W}^{\left(i-1\right)}\rightarrow\hat{W}^{\left(i-1\right)}L^{\prime}U$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:MPO-compression"
+
+\end_inset
+
+MPO compression for all combinations of upper/lower triangular and left
+ and right orthogonality.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Canonical form for iMPOs
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintCited"
+bibfiles "MPS1"
+options "plain"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\end_body
+\end_document
