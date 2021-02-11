@@ -118,7 +118,7 @@ literal "false"
 
 \end_inset
 
- is will try and intersperse the notes with concrete examples.
+ I will try and intersperse the notes with concrete examples.
  This will help me connect symbols in the paper with symbols I am more familiar
  with.
 \end_layout
@@ -374,7 +374,7 @@ noprefix "false"
 
 \end_inset
 
- which amounts to removing the corresponding columns and rows of 
+, which amounts to removing the corresponding columns and rows of 
 \begin_inset Formula $\mathsf{U}$
 \end_inset
 
@@ -585,13 +585,13 @@ All mirror combinations
 
 \begin_layout Standard
 Since many publications and computer codes are set up for lower triangular
- MPOs, upper triangular representations are by no means a standard or convention.
- As a result it is useful to write out all combinations for clarity.
+ MPOs, it is useful to write out all upper/lower, left/right combinations
+ for clarity.
  Starting with the full 
-\begin_inset Formula $W$
+\begin_inset Formula $\hat{W}$
 \end_inset
 
- matrices table 
+ matrices, table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Regular-reps"
@@ -903,8 +903,8 @@ noprefix "false"
 
 \end_inset
 
- and corresponding orthonormality, or canonical for definitions are in table
- 
+ and corresponding orthonormality, or canonical form definitions are in
+ table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Orthogonality-conditions"
@@ -1237,7 +1237,7 @@ Orthogonality conditions for all combinations of Upper/Lower triangular
 
 \end_inset
 
-In order preserve the regular forms any gauge transformations must also
+In order preserve the regular forms, any gauge transformations must also
  be block triangular as shown in table 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -1304,7 +1304,7 @@ Gauge Transform
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\hat{W}^{\prime}U=U\hat{W}$
+\begin_inset Formula $\hat{W}^{\prime}G_{U}=G_{U}\hat{W}$
 \end_inset
 
 
@@ -1316,7 +1316,7 @@ Gauge Transform
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\hat{W}^{\prime}L=L\hat{W}$
+\begin_inset Formula $\hat{W}^{\prime}G_{L}=G_{L}\hat{W}$
 \end_inset
 
 
@@ -1339,7 +1339,7 @@ Gauge matrix block structure
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $U=\begin{bmatrix}1 & t & r\\
+\begin_inset Formula $G_{U}=\begin{bmatrix}1 & t & r\\
 0 & \mathsf{U} & s\\
 0 & 0 & 1
 \end{bmatrix}$
@@ -1354,7 +1354,7 @@ Gauge matrix block structure
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $L=\begin{bmatrix}1 & 0 & 0\\
+\begin_inset Formula $G_{L}=\begin{bmatrix}1 & 0 & 0\\
 t & \mathsf{L} & 0\\
 r & s & 1
 \end{bmatrix}$
@@ -1531,7 +1531,7 @@ Left
 \begin_inset Text
 
 \begin_layout Enumerate
-Extract
+Extract 
 \begin_inset Formula $\hat{V}^{(i)}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}_{U}\\
 0 & \hat{\boldsymbol{A}}_{U}
 \end{bmatrix}$
@@ -1550,6 +1550,7 @@ Reshape
 
 \begin_layout Enumerate
 QR decomp.
+ 
 \begin_inset Formula $V_{\left(mna\right)b}=\sum_{k=0}^{\chi}Q_{\left(mna\right)k}R_{kb}$
 \end_inset
 
@@ -1557,7 +1558,7 @@ QR decomp.
 \end_layout
 
 \begin_layout Enumerate
-Reshape
+Reshape 
 \begin_inset Formula $Q_{\left(mna\right)k}\rightarrow\hat{Q}_{ak}$
 \end_inset
 
@@ -1565,7 +1566,7 @@ Reshape
 \end_layout
 
 \begin_layout Enumerate
-Transfer
+Transfer 
 \begin_inset Formula $\hat{W}^{\left(i+1\right)}\rightarrow R\hat{W}^{\left(i+1\right)}$
 \end_inset
 
@@ -1578,7 +1579,7 @@ Transfer
 \begin_inset Text
 
 \begin_layout Enumerate
-Extract
+Extract 
 \begin_inset Formula $\hat{V}^{(i)}=\begin{bmatrix}\hat{\boldsymbol{A}}_{L} & 0\\
 \hat{\boldsymbol{c}}_{L} & \hat{𝕀}
 \end{bmatrix}$
@@ -1597,6 +1598,7 @@ Reshape
 
 \begin_layout Enumerate
 QL decomp.
+ 
 \begin_inset Formula $V_{\left(mna\right)b}=\sum_{k=1}^{\chi+1}Q_{\left(mna\right)k}L_{kb}$
 \end_inset
 
@@ -1604,7 +1606,7 @@ QL decomp.
 \end_layout
 
 \begin_layout Enumerate
-Reshape
+Reshape 
 \begin_inset Formula $Q_{\left(mna\right)k}\rightarrow\hat{Q}_{ak}$
 \end_inset
 
@@ -1612,7 +1614,7 @@ Reshape
 \end_layout
 
 \begin_layout Enumerate
-Transfer
+Transfer 
 \begin_inset Formula $\hat{W}^{\left(i+1\right)}\rightarrow L\hat{W}^{\left(i+1\right)}$
 \end_inset
 
@@ -1636,7 +1638,7 @@ Right
 \begin_inset Text
 
 \begin_layout Enumerate
-Extract
+Extract 
 \begin_inset Formula $\hat{V}^{(i)}=\begin{bmatrix}\hat{\boldsymbol{A}}_{U} & \hat{\boldsymbol{b}}_{U}\\
 0 & \hat{𝕀}
 \end{bmatrix}$
@@ -1655,6 +1657,7 @@ Reshape
 
 \begin_layout Enumerate
 RQ decomp.
+ 
 \begin_inset Formula $V_{a\left(mnb\right)}=\sum_{k=1}^{\chi+1}R_{ak}Q_{k\left(mnb\right)}$
 \end_inset
 
@@ -1662,7 +1665,7 @@ RQ decomp.
 \end_layout
 
 \begin_layout Enumerate
-Reshape
+Reshape 
 \begin_inset Formula $Q_{k\left(mnb\right)}\rightarrow\hat{Q}_{kb}$
 \end_inset
 
@@ -1670,7 +1673,7 @@ Reshape
 \end_layout
 
 \begin_layout Enumerate
-Transfer
+Transfer 
 \begin_inset Formula $\hat{W}^{\left(i-1\right)}\rightarrow\hat{W}^{\left(i-1\right)}R$
 \end_inset
 
@@ -1683,7 +1686,7 @@ Transfer
 \begin_inset Text
 
 \begin_layout Enumerate
-Extract
+Extract 
 \begin_inset Formula $\hat{V}^{(i)}=\begin{bmatrix}\hat{𝕀} & 0\\
 \hat{\boldsymbol{b}}_{L} & \hat{\boldsymbol{A}}_{L}
 \end{bmatrix}$
@@ -1702,6 +1705,7 @@ Reshape
 
 \begin_layout Enumerate
 LQ decomp.
+ 
 \begin_inset Formula $V_{a\left(mnb\right)}=\sum_{k=0}^{\chi}L_{ak}Q_{k\left(mnb\right)}$
 \end_inset
 
@@ -1709,7 +1713,7 @@ LQ decomp.
 \end_layout
 
 \begin_layout Enumerate
-Reshape
+Reshape 
 \begin_inset Formula $Q_{k\left(mnb\right)}\rightarrow\hat{Q}_{kb}$
 \end_inset
 
@@ -1717,7 +1721,7 @@ Reshape
 \end_layout
 
 \begin_layout Enumerate
-Transfer
+Transfer 
 \begin_inset Formula $\hat{W}^{\left(i-1\right)}\rightarrow\hat{W}^{\left(i-1\right)}L$
 \end_inset
 
@@ -1750,11 +1754,11 @@ Left/Right canonical form algorithms for site
 \begin_inset Formula $R$
 \end_inset
 
-matrices are upper triangular and 
+ matrices are upper triangular and 
 \begin_inset Formula $L$
 \end_inset
 
-matrices are lower triangular.
+ matrices are lower triangular.
 \end_layout
 
 \end_inset
@@ -1772,7 +1776,7 @@ In step 3 the
 \begin_inset Formula $R/L$
 \end_inset
 
-matrices are of dimension 
+ matrices are of dimension 
 \begin_inset Formula $\left(\chi+1\right)\times\left(\chi+1\right)$
 \end_inset
 
@@ -1892,8 +1896,8 @@ noprefix "false"
 \end_inset
 
 .
- Then moving left to right, for an upper triangular MPO we do the QR decompositi
-on, and then further decompose the 
+ Then moving left to right along the lattice, for an upper triangular MPO
+ we do the QR decomposition, and then further decompose the 
 \begin_inset Formula $R$
 \end_inset
 
@@ -1985,11 +1989,11 @@ and the neighbouring site
 
 \end_inset
 
-It is worth noting that the matrix 
+It is worth noting that the only purpose for matrix 
 \begin_inset Formula $R^{\prime}$
 \end_inset
 
- only purpose to the carry the 
+ is to the carry the 
 \begin_inset Formula $t$
 \end_inset
 
@@ -2003,15 +2007,21 @@ It is worth noting that the matrix
 \end_inset
 
  are left orthogonal, so is their product and therefore the update V-block.
- Whether or not result V-block is still upper triangular is a bit murky
+ Whether or not resulting V-block is still upper triangular is a bit murky
  because the SVD algorithm in Lapack has some freedom in laying out 
 \begin_inset Formula $\mathsf{U}$
 \end_inset
 
  when there are degenerate singular values.
- An upper triangular is always possible it is not guaranteed.
+ An upper triangular 
+\begin_inset Formula $\mathsf{U}$
+\end_inset
+
+ may always be possible it is not guaranteed as direct output from canned
+ routines.
  This means that it may be necessary to find a row swapping gauge transform
- that preserve the upper triangular structure.
+ that preserves the upper triangular structure and only swaps degenerate
+ singular values.
 \end_layout
 
 \begin_layout Standard
@@ -2627,6 +2637,1803 @@ MPO compression for all combinations of upper/lower triangular and left
 Canonical form for iMPOs
 \end_layout
 
+\begin_layout Standard
+There are three algorithms that can be applied to a one site iMPO, in order
+ to bring it into canonical form, Iterated QR, modified Gram-Schnidt for
+ triangular iMPOs and the most general algorithm is iterated QR with preconditio
+ning.
+ The defintion of a one site iMPO is very straightforward, it is just one
+ operator valued matrix, multiplied with itself infinitly many times:
+\begin_inset Formula 
+\[
+\hat{H}=\cdots\hat{W}\hat{W}\hat{W}\cdots
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Iterated QR
+\end_layout
+
+\begin_layout Standard
+For this algorithm we will use a subscript in 
+\begin_inset Formula $\hat{W}_{n}$
+\end_inset
+
+ to indicate the iteration number.
+ Iterations for upper triangular and left canonical form, start with a standard
+ block respecting QR decomposition
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $n=0$
+\end_inset
+
+, Set the accumulated gauge transform 
+\begin_inset Formula $G_{L}=𝕀$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\hat{QR}\left(\hat{W}_{n}\right)\rightarrow\hat{V}_{n}=\hat{Q}_{n}R_{n}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Rank revailing step to remove zero rows in 
+\begin_inset Formula $R_{n}$
+\end_inset
+
+ and the corresponding columns of 
+\begin_inset Formula $\hat{Q}_{n}$
+\end_inset
+
+.
+ 
+\begin_inset Formula $\hat{Q}_{n},R_{n}\rightarrow\hat{\tilde{Q}}_{n},\tilde{R}_{n}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\hat{W}_{n+1}=\tilde{R}_{n}\hat{\tilde{Q}}_{n}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $G_{L}=\tilde{R}_{n}G_{L}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+if 
+\begin_inset Formula $\tilde{R}_{n}$
+\end_inset
+
+ is not square(because to step 3), or 
+\begin_inset Formula $\left\Vert \tilde{R}_{n}-𝕀\right\Vert >\varepsilon$
+\end_inset
+
+, increment 
+\begin_inset Formula $n$
+\end_inset
+
+ and goto 2.
+\end_layout
+
+\begin_layout Standard
+As the iterations proceed 
+\begin_inset Formula $R_{n}$
+\end_inset
+
+ should get closer and closer to the unit matrix, at which point 
+\begin_inset Formula $\hat{W}_{n+1}=\hat{Q}_{n}$
+\end_inset
+
+ which is by definition orthogonal.
+ The full gauge transformation is accumulated in 
+\begin_inset Formula $G_{L}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The modified steps for other combinations of upp/lower left/right are shown
+ in table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:MPO-compression"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ As stated in the paper this algorithm is not gauranteed to converge.
+ In my experience the second iMPO I tested (after testing a simple Heisenberg
+ 
+\begin_inset Formula $\hat{H})$
+\end_inset
+
+ was 
+\begin_inset Formula $\hat{H}^{2}$
+\end_inset
+
+ which failed to converge, requiring thousands of iterations to get down
+ to 
+\begin_inset Formula $\left\Vert R_{n}-\mathbb{I}\right\Vert <10^{-6}$
+\end_inset
+
+.
+ I am seeking clarification from the authors if this is to be expected.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Step
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Upper
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lower
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="3" alignment="center" valignment="middle" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Left
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{QR}\left(\hat{W}_{n}\right)\rightarrow\hat{V}_{n}\rightarrow\hat{Q}_{n}R_{n}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{QL}\left(\hat{W}_{n}\right)\rightarrow\hat{V}_{n}\rightarrow\hat{Q}_{n}L_{n}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{W}_{n+1}=R_{n}\hat{Q}_{n}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{W}_{n+1}=L_{n}\hat{Q}_{n}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G=R_{n}G$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G=L_{n}G$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="3" alignment="center" valignment="middle" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Right
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{RQ}\left(\hat{W}_{n}\right)\rightarrow\hat{V}_{n}\rightarrow R_{n}\hat{Q}_{n}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{LQ}\left(\hat{W}_{n}\right)\rightarrow\hat{V}_{n}\rightarrow L_{n}\hat{Q}_{n}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{W}_{n+1}=\hat{Q}_{n}R_{n}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{W}_{n+1}=\hat{Q}_{n}L_{n}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G=GR_{n}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G=GL_{n}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Iterated-QR-steps"
+
+\end_inset
+
+Iterated QR steps for left/right and upper/lower canoncial forms for iMPOs
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Step four can be re-written as
+\begin_inset Formula 
+\[
+\hat{W}_{n+1}=R_{n}\hat{Q}_{n}=R_{n}\hat{W}_{n}R_{n}^{-1}=R_{n}R_{n-1}\hat{W}_{n-1}R_{n-1}^{-1}R_{n}^{-1}
+\]
+
+\end_inset
+
+and ultimately
+\begin_inset Formula 
+\[
+\hat{W}_{L}=G_{L}\hat{W}_{0}G_{L}^{-1}
+\]
+
+\end_inset
+
+or if 
+\begin_inset Formula $G$
+\end_inset
+
+ is not invertable then
+\begin_inset Formula 
+\[
+\hat{W}_{L}G_{L}=G_{L}\hat{W}_{0}
+\]
+
+\end_inset
+
+Similarly in the right hand case
+\begin_inset Formula 
+\[
+\hat{W}_{n+1}=\hat{Q}_{n}R_{n}=R_{n}^{-1}W_{n}R_{n}=R_{n}^{-1}R_{n-1}^{-1}W_{n-1}R_{n-1}R_{n}
+\]
+
+\end_inset
+
+showing
+\begin_inset Formula 
+\[
+\hat{W}_{R}=G_{R}^{-1}\hat{W}_{0}G_{R}
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+G_{R}\hat{W}_{R}=\hat{W}_{0}G_{R}
+\]
+
+\end_inset
+
+we can now see that
+\begin_inset Formula 
+\[
+G_{R}\hat{W}_{R}G_{R}^{-1}=\hat{W}_{0}=G_{L}^{-1}\hat{W}_{L}G_{L}
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+G_{L}G_{R}\hat{W}_{R}=\hat{W}_{L}G_{L}G_{R}
+\]
+
+\end_inset
+
+So our gauge transform between left and right canoncial forms is just 
+\begin_inset Formula $G=G_{L}G_{R}$
+\end_inset
+
+.
+ This will be the input for the SVD compression algorithm.
+\end_layout
+
+\begin_layout Subsection
+Preconditioned QR iteration
+\end_layout
+
+\begin_layout Standard
+The proconditioning starts with calculating the eigen matrix of the transfer
+ matrix of the sub-block 
+\begin_inset Formula $\hat{V}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+T_{V}=Tr\left[\hat{V}^{\dagger}\otimes\hat{V}\right]=\sum_{mn}V_{ab}^{\dagger mn}V_{cd}^{\dagger mn}
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+T_{V}\left(abcd\right)=\sum_{mn}V_{ab}^{\dagger mn}V_{cd}^{\dagger mn}
+\]
+
+\end_inset
+
+The left eigen matrix (which should have eigen value 1 if V is orthonormal)
+ of the transfer matrix is defined as
+\begin_inset Formula 
+\[
+\sum_{ab}X_{ab}T_{V}\left(abcd\right)=X_{cd}
+\]
+
+\end_inset
+
+and 
+\begin_inset Formula $X$
+\end_inset
+
+ has the form
+\begin_inset Formula 
+\[
+X=\begin{bmatrix}1 & x\\
+x^{\dagger} & \mathsf{X}
+\end{bmatrix}
+\]
+
+\end_inset
+
+This can be Cholsky factored
+\begin_inset Formula 
+\[
+\begin{bmatrix}1 & x\\
+x^{\dagger} & \mathsf{X}
+\end{bmatrix}=\begin{bmatrix}1 & 0\\
+x^{\dagger} & 𝕀
+\end{bmatrix}\begin{bmatrix}1 & 0\\
+0 & \mathsf{X-}x^{\dagger}\otimes x
+\end{bmatrix}\begin{bmatrix}1 & x\\
+0 & 𝕀
+\end{bmatrix}
+\]
+
+\end_inset
+
+We can now eigen decompose
+\begin_inset Formula 
+\[
+\mathsf{X-}x^{\dagger}\otimes x=\mathsf{U}^{\dagger}\lambda\mathsf{U}
+\]
+
+\end_inset
+
+so that
+\begin_inset Formula 
+\[
+X=\begin{bmatrix}1 & 0\\
+x^{\dagger} & 𝕀
+\end{bmatrix}\begin{bmatrix}1 & 0\\
+0 & \mathsf{U}^{\dagger}
+\end{bmatrix}\begin{bmatrix}1 & 0\\
+0 & \lambda
+\end{bmatrix}\begin{bmatrix}1 & 0\\
+0 & \mathsf{U}
+\end{bmatrix}\begin{bmatrix}1 & x\\
+0 & 𝕀
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\begin{bmatrix}1 & 0\\
+x^{\dagger} & \mathsf{U}^{\dagger}
+\end{bmatrix}\begin{bmatrix}1 & 0\\
+0 & \lambda
+\end{bmatrix}\begin{bmatrix}1 & x\\
+0 & \mathsf{U}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=G^{\dagger}X_{1}G
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+At this point we can compress by tossing all 
+\begin_inset Formula $\lambda_{i}<\varepsilon^{2}$
+\end_inset
+
+ (
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ is squared because eigen values scale like singular values squared).
+ This results in a good approximation to 
+\begin_inset Formula $X$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+X\approx\begin{bmatrix}1 & 0\\
+x^{\dagger} & \tilde{\mathsf{U}}^{\dagger}
+\end{bmatrix}\begin{bmatrix}1 & 0\\
+0 & \tilde{\lambda}
+\end{bmatrix}\begin{bmatrix}1 & x\\
+0 & \tilde{\mathsf{U}}
+\end{bmatrix}=\tilde{G}^{\dagger}\tilde{X}_{1}\tilde{G}
+\]
+
+\end_inset
+
+with this decomposition of the eigen matrix defined we specify the precondition
+ algorithm for the left canonical upper triagnular case:
+\end_layout
+
+\begin_layout Enumerate
+Solve 
+\begin_inset Formula $\sum_{ab}X_{ab}T_{V}\left(abcd\right)=X_{cd}$
+\end_inset
+
+ for 
+\begin_inset Formula $X$
+\end_inset
+
+ using a son-symmetric eigen solver.
+\end_layout
+
+\begin_layout Enumerate
+Diagonalize the symmetrix matrix 
+\begin_inset Formula $\mathsf{X-}x^{\dagger}\otimes x=\mathsf{U}^{\dagger}\lambda\mathsf{U}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Compress 
+\begin_inset Formula $\mathsf{U}^{\dagger}\lambda\mathsf{U}\approx\mathsf{\tilde{U}}^{\dagger}\tilde{\lambda}\tilde{\mathsf{U}}$
+\end_inset
+
+, 
+\begin_inset Formula $\chi\rightarrow\chi^{\prime}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Form the preconditioning gauge transform 
+\begin_inset Formula $G_{0}=\begin{bmatrix}1 & x & 0\\
+0 & \mathsf{\tilde{U}} & 0\\
+0 & 0 & 1
+\end{bmatrix},\quad G_{0}^{\prime}=\begin{bmatrix}1 & -x & 0\\
+0 & \mathsf{\tilde{U}}^{\dagger} & 0\\
+0 & 0 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Regauge 
+\begin_inset Formula $\hat{W}_{1}=G_{0}\hat{W}_{0}G_{0}^{\prime}$
+\end_inset
+
+.
+ This should shrink 
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+ from dimension 
+\begin_inset Formula $\chi+2\rightarrow\chi^{\prime}+2$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Enumerate
+Run QR iteration algorithm on 
+\begin_inset Formula $\hat{W}_{1}$
+\end_inset
+
+ yielding an accumulated guage transform 
+\begin_inset Formula $G_{1}$
+\end_inset
+
+ and the left canonical 
+\begin_inset Formula $\hat{W}_{L}$
+\end_inset
+
+.
+ THe full guage transform is now 
+\begin_inset Formula $G_{L}=G_{1}G_{0}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+There migth be a error in paper for 
+\begin_inset Formula $G_{0}^{\prime}$
+\end_inset
+
+, if it is intedned that 
+\begin_inset Formula $G_{0}^{\prime}=G_{0}^{-1}$
+\end_inset
+
+ then we would need
+\begin_inset Formula 
+\[
+G_{0}^{\prime}=\begin{bmatrix}1 & -x\mathsf{\tilde{U}}^{\dagger} & 0\\
+0 & \mathsf{\tilde{U}}^{\dagger} & 0\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="9" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Step
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Upper
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lower
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="3" alignment="center" valignment="middle" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Left
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Form of 
+\begin_inset Formula $X$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}1 & x\\
+x^{\dagger} & \mathsf{X}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}\mathsf{X} & x^{\dagger}\\
+x & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G_{0}=\begin{bmatrix}1 & x & 0\\
+0 & \mathsf{\tilde{U}} & 0\\
+0 & 0 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G_{0}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{U}} & 0\\
+0 & x & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G_{0}^{\prime}=\begin{bmatrix}1 & -x & 0\\
+0 & \mathsf{\tilde{U}}^{\dagger} & 0\\
+0 & 0 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G_{0}^{\prime}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{U}}^{\dagger} & 0\\
+0 & -x & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G_{L}=G_{1}G_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="3" alignment="center" valignment="middle" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Right
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}\mathsf{X} & x^{\dagger}\\
+x & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}1 & x\\
+x^{\dagger} & \mathsf{X}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G_{0}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{U}} & 0\\
+0 & x & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G_{0}=\begin{bmatrix}1 & x & 0\\
+0 & \mathsf{\tilde{U}} & 0\\
+0 & 0 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G_{0}^{\prime}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{U}}^{\dagger} & 0\\
+0 & -x & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G_{0}^{\prime}=\begin{bmatrix}1 & -x & 0\\
+0 & \mathsf{\tilde{U}}^{\dagger} & 0\\
+0 & 0 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G_{R}=G_{0}G_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Modified preconditioning steps for upper/lower iMPOs and left/right canonical
+ forms.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+afasdf
+\begin_inset Formula 
+\[
+\begin{bmatrix}\mathsf{X} & x^{\dagger}\\
+x & 1
+\end{bmatrix}=\begin{bmatrix}𝕀 & x^{\dagger}\\
+0 & 1
+\end{bmatrix}\begin{bmatrix}\mathsf{X-}x^{\dagger}\otimes x & 0\\
+0 & 1
+\end{bmatrix}\begin{bmatrix}𝕀 & 0\\
+x & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\begin{bmatrix}𝕀 & x^{\dagger}\\
+0 & 1
+\end{bmatrix}\begin{bmatrix}\mathsf{X}-x^{\dagger}\otimes x & 0\\
+x & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+=\begin{bmatrix}\mathsf{X} & x^{\dagger}\\
+x & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{bmatrix}\mathsf{X} & x^{\dagger}\\
+x & 1
+\end{bmatrix}=\begin{bmatrix}𝕀 & x^{\dagger}\\
+0 & 1
+\end{bmatrix}\begin{bmatrix}\mathsf{\tilde{U}}^{\dagger}\tilde{\lambda}\tilde{\mathsf{U}} & 0\\
+0 & 1
+\end{bmatrix}\begin{bmatrix}𝕀 & 0\\
+x & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\begin{bmatrix}\mathsf{\tilde{U}}^{\dagger} & x^{\dagger}\\
+0 & 1
+\end{bmatrix}\begin{bmatrix}\tilde{\lambda} & 0\\
+0 & 1
+\end{bmatrix}\begin{bmatrix}\tilde{\mathsf{U}} & 0\\
+x & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+SVD compession of iMPOs
+\end_layout
+
+\begin_layout Section
+Software considerations
+\end_layout
+
+\begin_layout Standard
+It is usef to think about what sorts of software abtractions we can use
+ to make all of this technology easier code and hopefully more reliable
+ (less bug prone).
+ One obvious idea is to have a some sort of operator valued matrix class.
+ Also how to deal with left/righ canonical forms and upper/lower triangular
+ MPOs.
+ The left right pair is mostly about operations rather state so is perhap
+ not ameinable to OOD and vitual dispatch.
+ However upper/lower is all about state so perhaps 
+\noun on
+SiteOperatorUpper
+\noun default
+ and 
+\noun on
+SiteOperatorLower
+\noun default
+ with virtual functions would make sense.
+ Here some ideas:
+\end_layout
+
+\begin_layout Subsubsection
+OperatorElement
+\end_layout
+
+\begin_layout Standard
+The operator valued matrix needs to be a matrix of something.
+ One klunky name would be 
+\noun on
+OperatorElement
+\noun default
+ .
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+class OperatorElement
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+	public:
+\end_layout
+
+\begin_layout Plain Layout
+
+		OperatorElement();
+\end_layout
+
+\begin_layout Plain Layout
+
+		OperatorElement(int d);
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+		double  operator()(int m, int n) const;
+\end_layout
+
+\begin_layout Plain Layout
+
+		double& operator()(int m, int n); //Write access?
+\end_layout
+
+\begin_layout Plain Layout
+
+	private:
+\end_layout
+
+\begin_layout Plain Layout
+
+		int itsd; //Dimension of local Hilbert space.
+\end_layout
+
+\begin_layout Plain Layout
+
+};
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+OperatorElement operator*(const OperatorElement& a, const OperatorElement&
+ b);
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+	c(m,n) = a(m,n)*b(m,n); 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Operator valued matrix
+\end_layout
+
+\begin_layout Standard
+This is a matrix of 
+\noun on
+OperatorElement
+\noun default
+s.
+ It would useful for the 
+\noun on
+MatrixO
+\noun default
+ to keep track of whether it is upper/lower triangular.
+ We can do this with an enum inside 
+\noun on
+MatrixO
+\noun default
+, or we can drive upper/lower version and virtual dispatch.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+class MatrixO : public Matrix<OperatorElement>
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+public:
+\end_layout
+
+\begin_layout Plain Layout
+
+	MatrixO(int Dw1, int Dw2, int d);
+\end_layout
+
+\begin_layout Plain Layout
+
+	//
+\end_layout
+
+\begin_layout Plain Layout
+
+	//  Mid level operators
+\end_layout
+
+\begin_layout Plain Layout
+
+	//
+\end_layout
+
+\begin_layout Plain Layout
+
+	virtual MatrixO  GetV(Direction) const;
+\end_layout
+
+\begin_layout Plain Layout
+
+	virtual void	 SetV(Direction,const MatrixO& V);
+\end_layout
+
+\begin_layout Plain Layout
+
+	MatrixRT         Flatten() const; // return W(m,w1),(n,w1)
+\end_layout
+
+\begin_layout Plain Layout
+
+	virtual [Q,R]    QX(Direction) const; // Do suitable QR/QL/RQ/LQ decomp
+\end_layout
+
+\begin_layout Plain Layout
+
+	virtual Matrix4T GetVTransferMatrix(Direction)  const;
+\end_layout
+
+\begin_layout Plain Layout
+
+	//
+\end_layout
+
+\begin_layout Plain Layout
+
+	//  High level one site operations.
+  Try an implment these algos at the this level using the mid
+\end_layout
+
+\begin_layout Plain Layout
+
+    //  operations in the derives U/L classes.
+\end_layout
+
+\begin_layout Plain Layout
+
+	//
+\end_layout
+
+\begin_layout Plain Layout
+
+	MatrixRT  CanonicalForm(Direction lr); // finite algo, Returns sV or Us
+ for transfer to the next site.
+\end_layout
+
+\begin_layout Plain Layout
+
+	MatrixRT iCaninicalForm(Direction lr); //infinte algo, Return gauge transform
+ G
+\end_layout
+
+\begin_layout Plain Layout
+
+	MatrixRT  Compress     (Direction lr); // finite algo, Returns sV or Us
+ for transfer to the next site.
+\end_layout
+
+\begin_layout Plain Layout
+
+	MatrixRT iCompress     (Direction lr); //infinte algo, Returns ?.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+private:
+\end_layout
+
+\begin_layout Plain Layout
+
+	TriUL itsUL; //enum for Upper/Lower/Full
+\end_layout
+
+\begin_layout Plain Layout
+
+};
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+class MatrixOL : public MatrixO
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+	MatrixOL(const OperatorClient*);
+\end_layout
+
+\begin_layout Plain Layout
+
+public:
+\end_layout
+
+\begin_layout Plain Layout
+
+	// Implement lower triangular version of each of these functions
+\end_layout
+
+\begin_layout Plain Layout
+
+	virtual MatrixO  GetV(Direction) const;
+\end_layout
+
+\begin_layout Plain Layout
+
+	virtual void	 SetV(Direction,const MatrixO& V);
+\end_layout
+
+\begin_layout Plain Layout
+
+	virtual [MatrixOL Q,MatrixRT R/L]    QX(Direction) const; // Do suitable
+ QR/QL/RQ/LQ decomp
+\end_layout
+
+\begin_layout Plain Layout
+
+	virtual Matrix4T GetVTransferMatrix(Direction) 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+MatrixOL operator*(const MatrixOL& a, const MatrixOL& b); // tensor product
+\end_layout
+
+\begin_layout Plain Layout
+
+MatrixOL operator*(double          s, const MatrixOL& b); // scalar product
+ s*b
+\end_layout
+
+\begin_layout Plain Layout
+
+MatrixOL operator+(const MatrixOL& a, const MatrixOL& b); // tensor sum
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Unit tests
+\end_layout
+
+\begin_layout Standard
+I should try and write unit tests first
+\end_layout
+
+\begin_layout Itemize
+
+\noun on
+OperatorElement
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Default constructor 
+\noun on
+OperatorElement()
+\end_layout
+
+\begin_layout Itemize
+constructor 
+\noun on
+OperatorElement(
+\noun default
+d
+\noun on
+)
+\end_layout
+
+\begin_layout Itemize
+operator(m,n)
+\end_layout
+
+\begin_layout Itemize
+
+\noun on
+OperatorElement*OperatorElement
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+MatrixOL
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Constructors
+\end_layout
+
+\begin_layout Itemize
+GetV/SetV
+\end_layout
+
+\begin_layout Itemize
+QX
+\end_layout
+
+\begin_layout Itemize
+Transfer
+\end_layout
+
+\begin_layout Itemize
+op*, op+
+\end_layout
+
+\end_deeper
 \begin_layout Section
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
