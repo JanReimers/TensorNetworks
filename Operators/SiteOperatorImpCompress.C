@@ -311,7 +311,7 @@ MatrixRT SiteOperatorImp::ContractDel(Direction lr) const
         {
             double t=0.0;
             for (int a=1; a<=X1+1; a++)
-                t+=Contract(a,b,a,c);
+                t+=Contract(a,b,a,c); // <Wab,Wac> dot product between columns b and c
             del(b,c)=t;
         }
         break;
@@ -321,7 +321,7 @@ MatrixRT SiteOperatorImp::ContractDel(Direction lr) const
         {
             double t=0.0;
             for (int a=0; a<=X2; a++)
-                t+=Contract(b,a,c,a);
+                t+=Contract(b,a,c,a); // <Wba,Wba> dot product between rows b and c
             del(b+1,c+1)=t;
         }
         break;
