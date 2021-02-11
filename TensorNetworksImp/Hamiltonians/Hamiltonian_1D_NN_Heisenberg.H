@@ -11,6 +11,7 @@ namespace TensorNetworks
 //
 class Hamiltonian_1D_NN_Heisenberg
     : public virtual OperatorClient
+    , public virtual OperatorClient1
 {
 public:
     Hamiltonian_1D_NN_Heisenberg(double S, double Jxy,double Jz, double hz);
@@ -22,6 +23,7 @@ public:
     virtual Dw12     GetDw12() const {return Dw12(Dw,Dw);}
     virtual MatrixRT GetW   (int m, int n) const;
     virtual double   GetH   (int ma,int na,int mb,int nb) const;
+    virtual MatrixOR GetMatrixO()  const;
 
 private:
     static const int Dw=5;

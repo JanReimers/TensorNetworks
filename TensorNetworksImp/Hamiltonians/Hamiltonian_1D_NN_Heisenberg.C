@@ -54,5 +54,19 @@ double Hamiltonian_1D_NN_Heisenberg::GetH(int ma,int na,int mb,int nb) const
     +itshz*(itsSC.GetSz(ma,na)+itsSC.GetSz(mb,nb)); //Should we only include one stie here?
 }
 
+MatrixOR  Hamiltonian_1D_NN_Heisenberg::GetMatrixO() const
+{
+    MatrixOR W(Dw,Dw,itsS);
+    W(0,0)=OperatorI (itsS);
+    W(1,0)=OperatorSp(itsS);
+    W(2,0)=OperatorSm(itsS);
+    W(3,0)=OperatorSz(itsS);
+    W(4,0)=itshz     *OperatorSz(itsS);
+    W(4,1)=itsJxy/2.0*OperatorSm(itsS);
+    W(4,2)=itsJxy/2.0*OperatorSp(itsS);
+    W(4,3)=itsJz     *OperatorSz(itsS);
+    W(4,4)=OperatorI (itsS);
+    return W;
+}
 
 } //namespace

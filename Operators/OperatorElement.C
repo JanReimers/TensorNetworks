@@ -1,4 +1,4 @@
-#include "OperatorElement.H"
+#include "Operators/OperatorElement.H"
 #include "TensorNetworksImp/SpinCalculator.H"
 
 namespace TensorNetworks
@@ -13,10 +13,31 @@ template <class T> OperatorElement<T>::OperatorElement(int d,double S)
     //ctor
 }
 
+template <class T> OperatorElement<T>::OperatorElement()
+: Matrix<T>()
+, itsS(0.0)
+, itsd(0)
+{
+}
+
 template <class T> OperatorElement<T>::~OperatorElement()
 {
     //dtor
 }
+
+ OperatorI::OperatorI(double S)
+ : OperatorElement(2*S+1,S)
+ {
+     for (int m=0;m<itsd;m++)
+     for (int n=0;n<itsd;n++)
+        (*this)(m,n)= (m==n) ? 1.0 : 0.0;
+ }
+
+OperatorZ::OperatorZ(double S)
+ : OperatorElement(2*S+1,S)
+ {
+     Fill(*this,0.0);
+ }
 
 
  OperatorSz::OperatorSz(double S)
@@ -64,5 +85,6 @@ OperatorSm::OperatorSm(double S)
         (*this)(m,n)=sc.GetSm(m,n);
  }
 
+ template class OperatorElement<double>;
 
  } //Tensor networks

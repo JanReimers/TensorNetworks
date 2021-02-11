@@ -11,12 +11,36 @@ using dcmplx=std::complex<double>;
 template <class T> class OperatorElement : public Matrix<T>
 {
 public:
+    OperatorElement();
     OperatorElement(int d,double S);
     virtual ~OperatorElement();
+
+    template <class A, Store M, Data D> const OperatorElement& operator=(const Indexable <T,A,M,D,MatrixShape>& m)
+    {
+        Matrix<T>::operator=(m);
+        return *this;
+    }
 
 protected:
     double itsS;
     int    itsd;
+};
+
+typedef OperatorElement<double> OperatorElementR;
+typedef OperatorElement<dcmplx> OperatorElementC;
+
+// Unit operator
+class OperatorI : public OperatorElement<double>
+{
+public:
+    OperatorI(double S);
+};
+
+// Zero operator
+class OperatorZ : public OperatorElement<double>
+{
+public:
+    OperatorZ(double S);
 };
 
 class OperatorSz : public OperatorElement<double>

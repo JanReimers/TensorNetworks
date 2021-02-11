@@ -2,6 +2,7 @@
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.H"
 #include "Operators/OperatorElement.H"
+#include "Operators/OperatorValuedMatrix.H"
 
 
 //#include "TensorNetworksImp/MPS/MPSImp.H"
@@ -48,8 +49,8 @@ public:
     }
 
     double eps;
-           TensorNetworks::Factory*        itsFactory;
-    const  TensorNetworks::OperatorClient* itsOperatorClient;
+           TensorNetworks::Factory*         itsFactory;
+    const  TensorNetworks::OperatorClient1* itsOperatorClient;
 };
 
 TEST_F(MPOTests1,MakeHamiltonian)
@@ -100,4 +101,27 @@ TEST_F(MPOTests1,OperatorElement1)
     }
 }
 
+TEST_F(MPOTests1,OperatorValuedMatrix1)
+{
+    double S=0.5;
+    Setup(S);
+    TensorNetworks::MatrixOR OvM(itsOperatorClient);
+    EXPECT_EQ(OvM(0,0),TensorNetworks::OperatorI (S));
+    EXPECT_EQ(OvM(1,0),TensorNetworks::OperatorSp(S));
+    EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorSm(S));
+    EXPECT_EQ(OvM(3,0),TensorNetworks::OperatorSz(S));
+
+    cout << "OvM=" << OvM << endl;
+}
+
+TEST_F(MPOTests1,OperatorValuedMatrix2)
+{
+    double S=1.0;
+    Setup(S);
+    TensorNetworks::MatrixOR OvM(itsOperatorClient);
+    EXPECT_EQ(OvM(0,0),TensorNetworks::OperatorI (S));
+    EXPECT_EQ(OvM(1,0),TensorNetworks::OperatorSp(S));
+    EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorSm(S));
+    EXPECT_EQ(OvM(3,0),TensorNetworks::OperatorSz(S));
+}
 
