@@ -12,8 +12,8 @@ int main(int argc, char **argv)
 //    testing::GTEST_FLAG(filter) = "LinearAlgebraTests.*";
 //    testing::GTEST_FLAG(filter) = "MPSTests*";
 //    testing::GTEST_FLAG(filter) = "MPSNormTests.*";
-//    testing::GTEST_FLAG(filter) = "MPOTests.*";
-//    testing::GTEST_FLAG(filter) = "MPOTests.TestParkerSVDCompressH2L9";
+    testing::GTEST_FLAG(filter) = "MPOTests1.*";
+//    testing::GTEST_FLAG(filter) = "MPOTests.TestParkerCanonicalL1iH";
 //    testing::GTEST_FLAG(filter) = "VariationalGroundStateTests.*";
 //    testing::GTEST_FLAG(filter) = "ImaginaryTimeTests.*";
 //   testing::GTEST_FLAG(filter) = "iTEBDTests.*";

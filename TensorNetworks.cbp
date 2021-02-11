@@ -19,6 +19,7 @@
 					<Add option="-g" />
 					<Add option="-DDEBUG" />
 					<Add directory="NumericalMethods" />
+					<Add directory="Operators" />
 				</Compiler>
 				<Linker>
 					<Add directory="../Debug" />
@@ -39,6 +40,7 @@
 					<Add option="-g" />
 					<Add option="-DNDEBUG" />
 					<Add directory="NumericalMethods" />
+					<Add directory="Operators" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />
@@ -141,6 +143,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/OperatorClient.H" />
+		<Unit filename="Operators/OperatorElement.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/OperatorElement.H" />
 		<Unit filename="Operators/SiteOperatorBulk.C">
 			<Option compilerVar="CC" />
 		</Unit>

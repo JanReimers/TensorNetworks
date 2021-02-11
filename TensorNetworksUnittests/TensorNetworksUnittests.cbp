@@ -102,6 +102,9 @@
 		<Unit filename="MPOTests.C">
 			<Option compilerVar="CPP" />
 		</Unit>
+		<Unit filename="MPOTests1.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="MPSNormTests.C">
 			<Option compilerVar="CPP" />
 		</Unit>
