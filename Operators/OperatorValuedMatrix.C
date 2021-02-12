@@ -8,6 +8,13 @@ template <class T> MatrixO<T>::MatrixO()
 , itsUL(Full)
 {}
 
+template <class T> MatrixO<T>::MatrixO(const Base& m)
+: Matrix<OperatorElement<T> >(m)
+, itsUL(Full)
+{
+    CheckUL();
+}
+
 template <class T> MatrixO<T>::MatrixO(const MatrixO& m)
 : Matrix<OperatorElement<T> >(m)
 , itsUL(Full)
@@ -59,10 +66,42 @@ template <class T> MatrixO<T>& MatrixO<T>::operator=(MatrixO<T>&& m)
 }
 
 
-//template <class T> MatrixO<T>* MatrixO<T>::GetV(Direction) const
-//{
-//    return new
-//}
+template <class T> MatrixO<T> MatrixO<T>::GetV(Direction lr) const
+{
+    MatrixO<T> V;
+    const MatLimits& l=this->GetLimits();
+    MatLimits lv;
+    switch (lr)
+    {
+    case DLeft:
+        switch(itsUL)
+        {
+            case Upper:
+                lv=MatLimits(l.Row.Low,l.Row.High-1,l.Col.Low,l.Col.High-1);
+            break;
+            case Lower:
+                lv=MatLimits(l.Row.Low+1,l.Row.High,l.Col.Low+1,l.Col.High);
+                break;
+            default:
+                assert(false);
+        }
+        break;
+    case DRight:
+        switch(itsUL)
+        {
+            case Upper:
+                lv=MatLimits(l.Row.Low+1,l.Row.High,l.Col.Low+1,l.Col.High);
+            break;
+            case Lower:
+                lv=MatLimits(l.Row.Low,l.Row.High-1,l.Col.Low,l.Col.High-1);
+                break;
+            default:
+                assert(false);
+        }
+        break;
+    }
+    return this->SubMatrix(lv);
+}
 
 
 template class MatrixO <double>;

@@ -18,6 +18,11 @@
 //#include "Containers/Matrix6.H"
 
 using dcmplx=TensorNetworks::dcmplx;
+using TensorNetworks::MatrixOR;
+using TensorNetworks::Lower;
+using TensorNetworks::Upper;
+using TensorNetworks::DLeft;
+using TensorNetworks::DRight;
 
 class MPOTests1 : public ::testing::Test
 {
@@ -105,7 +110,7 @@ TEST_F(MPOTests1,OperatorValuedMatrix1)
 {
     double S=0.5;
     Setup(S);
-    TensorNetworks::MatrixOR OvM(itsOperatorClient->GetMatrixO(TensorNetworks::Lower));
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
     EXPECT_EQ(OvM(0,0),TensorNetworks::OperatorI (S));
     EXPECT_EQ(OvM(1,0),TensorNetworks::OperatorSp(S));
     EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorSm(S));
@@ -113,7 +118,7 @@ TEST_F(MPOTests1,OperatorValuedMatrix1)
     EXPECT_EQ(OvM(0,1),TensorNetworks::OperatorZ (S));
     EXPECT_EQ(OvM(0,2),TensorNetworks::OperatorZ (S));
     EXPECT_EQ(OvM(0,3),TensorNetworks::OperatorZ (S));
-    EXPECT_EQ(OvM.GetUpperLower(),TensorNetworks::Lower);
+    EXPECT_EQ(OvM.GetUpperLower(),Lower);
 //    cout << "OvM=" << OvM << endl;
 }
 
@@ -121,7 +126,7 @@ TEST_F(MPOTests1,OperatorValuedMatrix2)
 {
     double S=1.0;
     Setup(S);
-    TensorNetworks::MatrixOR OvM(itsOperatorClient->GetMatrixO(TensorNetworks::Lower));
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
     EXPECT_EQ(OvM(0,0),TensorNetworks::OperatorI (S));
     EXPECT_EQ(OvM(1,0),TensorNetworks::OperatorSp(S));
     EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorSm(S));
@@ -129,14 +134,14 @@ TEST_F(MPOTests1,OperatorValuedMatrix2)
     EXPECT_EQ(OvM(0,1),TensorNetworks::OperatorZ (S));
     EXPECT_EQ(OvM(0,2),TensorNetworks::OperatorZ (S));
     EXPECT_EQ(OvM(0,3),TensorNetworks::OperatorZ (S));
-    EXPECT_EQ(OvM.GetUpperLower(),TensorNetworks::Lower);
+    EXPECT_EQ(OvM.GetUpperLower(),Lower);
 }
 
 TEST_F(MPOTests1,OperatorValuedMatrix3)
 {
     double S=0.5;
     Setup(S);
-    TensorNetworks::MatrixOR OvM(itsOperatorClient->GetMatrixO(TensorNetworks::Upper));
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
     EXPECT_EQ(OvM(0,0),TensorNetworks::OperatorI (S));
     EXPECT_EQ(OvM(0,1),TensorNetworks::OperatorSp(S));
     EXPECT_EQ(OvM(0,2),TensorNetworks::OperatorSm(S));
@@ -144,7 +149,7 @@ TEST_F(MPOTests1,OperatorValuedMatrix3)
     EXPECT_EQ(OvM(1,0),TensorNetworks::OperatorZ (S));
     EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorZ (S));
     EXPECT_EQ(OvM(3,0),TensorNetworks::OperatorZ (S));
-    EXPECT_EQ(OvM.GetUpperLower(),TensorNetworks::Upper);
+    EXPECT_EQ(OvM.GetUpperLower(),Upper);
 
 //    cout << "OvM=" << OvM << endl;
 }
@@ -153,7 +158,7 @@ TEST_F(MPOTests1,OperatorValuedMatrix4)
 {
     double S=1.0;
     Setup(S);
-    TensorNetworks::MatrixOR OvM(itsOperatorClient->GetMatrixO(TensorNetworks::Upper));
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
     EXPECT_EQ(OvM(0,0),TensorNetworks::OperatorI (S));
     EXPECT_EQ(OvM(0,1),TensorNetworks::OperatorSp(S));
     EXPECT_EQ(OvM(0,2),TensorNetworks::OperatorSm(S));
@@ -161,5 +166,44 @@ TEST_F(MPOTests1,OperatorValuedMatrix4)
     EXPECT_EQ(OvM(1,0),TensorNetworks::OperatorZ (S));
     EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorZ (S));
     EXPECT_EQ(OvM(3,0),TensorNetworks::OperatorZ (S));
-    EXPECT_EQ(OvM.GetUpperLower(),TensorNetworks::Upper);
+    EXPECT_EQ(OvM.GetUpperLower(),Upper);
+}
+
+
+TEST_F(MPOTests1,OperatorValuedMatrixGetVUpper)
+{
+    double S=0.5;
+    Setup(S);
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+    MatrixOR Vl=OvM.GetV(DLeft);
+    MatrixOR Vr=OvM.GetV(DRight);
+    EXPECT_EQ(OvM.GetNumRows(),Vl.GetNumRows()+1);
+    EXPECT_EQ(OvM.GetNumCols(),Vl.GetNumCols()+1);
+    EXPECT_EQ(OvM.GetNumRows(),Vr.GetNumRows()+1);
+    EXPECT_EQ(OvM.GetNumCols(),Vr.GetNumCols()+1);
+    for (index_t i:Vl.rows())
+    for (index_t j:Vl.cols())
+        EXPECT_EQ(OvM(i,j),Vl(i,j));
+    for (index_t i:Vr.rows())
+    for (index_t j:Vr.cols())
+        EXPECT_EQ(OvM(i,j),Vr(i,j));
+}
+
+TEST_F(MPOTests1,OperatorValuedMatrixGetVLower)
+{
+    double S=0.5;
+    Setup(S);
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+    MatrixOR Vl=OvM.GetV(DLeft);
+    MatrixOR Vr=OvM.GetV(DRight);
+    EXPECT_EQ(OvM.GetNumRows(),Vl.GetNumRows()+1);
+    EXPECT_EQ(OvM.GetNumCols(),Vl.GetNumCols()+1);
+    EXPECT_EQ(OvM.GetNumRows(),Vr.GetNumRows()+1);
+    EXPECT_EQ(OvM.GetNumCols(),Vr.GetNumCols()+1);
+    for (index_t i:Vl.rows())
+    for (index_t j:Vl.cols())
+        EXPECT_EQ(OvM(i,j),Vl(i,j));
+    for (index_t i:Vr.rows())
+    for (index_t j:Vr.cols())
+        EXPECT_EQ(OvM(i,j),Vr(i,j));
 }

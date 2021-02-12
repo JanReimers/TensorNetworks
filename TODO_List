@@ -6,7 +6,7 @@ Operator Valued Matrix:
         What if it is both upper and lower?
         Really 5 cases: Full, Upper, Lower, Diagonal, Zero
         Could be two more cases: StrictlyUpper, StrictlyLower (nothing on diagonal)
-    -Implement GetV for U/L*L/R
+    Done: -Implement GetV for U/L*L/R
     -Implement SetV for U/L*L/R
     -Implement Block respecting QR for U/L*L/R
 

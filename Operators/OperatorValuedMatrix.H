@@ -12,6 +12,7 @@ template <class T> class MatrixO : public Matrix<OperatorElement<T> >
     typedef Matrix<OperatorElement<T> > Base;
 public:
     MatrixO();
+    MatrixO(const Base   & m);
     MatrixO(const MatrixO& m);
     MatrixO(MatrixO&& m);
     MatrixO(int Dw1, int Dw2,double S);
@@ -23,7 +24,7 @@ public:
 
     TriType GetUpperLower() const {return itsUL;}
 
-    //virtual MatrixO GetV(Direction) const; //Make this abstract
+    MatrixO GetV(Direction) const;
 private:
 
     TriType itsUL; //Upper or lower triangular.
