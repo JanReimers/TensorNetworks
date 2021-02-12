@@ -147,6 +147,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/OperatorElement.H" />
+		<Unit filename="Operators/OperatorValuedMatrix.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/OperatorValuedMatrix.H" />
 		<Unit filename="Operators/SiteOperatorBulk.C">
 			<Option compilerVar="CC" />
 		</Unit>

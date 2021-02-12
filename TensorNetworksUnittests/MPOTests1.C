@@ -105,23 +105,61 @@ TEST_F(MPOTests1,OperatorValuedMatrix1)
 {
     double S=0.5;
     Setup(S);
-    TensorNetworks::MatrixOR OvM(itsOperatorClient);
+    TensorNetworks::MatrixOR OvM(itsOperatorClient->GetMatrixO(TensorNetworks::Lower));
     EXPECT_EQ(OvM(0,0),TensorNetworks::OperatorI (S));
     EXPECT_EQ(OvM(1,0),TensorNetworks::OperatorSp(S));
     EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorSm(S));
     EXPECT_EQ(OvM(3,0),TensorNetworks::OperatorSz(S));
-
-    cout << "OvM=" << OvM << endl;
+    EXPECT_EQ(OvM(0,1),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM(0,2),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM(0,3),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM.GetUpperLower(),TensorNetworks::Lower);
+//    cout << "OvM=" << OvM << endl;
 }
 
 TEST_F(MPOTests1,OperatorValuedMatrix2)
 {
     double S=1.0;
     Setup(S);
-    TensorNetworks::MatrixOR OvM(itsOperatorClient);
+    TensorNetworks::MatrixOR OvM(itsOperatorClient->GetMatrixO(TensorNetworks::Lower));
     EXPECT_EQ(OvM(0,0),TensorNetworks::OperatorI (S));
     EXPECT_EQ(OvM(1,0),TensorNetworks::OperatorSp(S));
     EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorSm(S));
     EXPECT_EQ(OvM(3,0),TensorNetworks::OperatorSz(S));
+    EXPECT_EQ(OvM(0,1),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM(0,2),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM(0,3),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM.GetUpperLower(),TensorNetworks::Lower);
 }
 
+TEST_F(MPOTests1,OperatorValuedMatrix3)
+{
+    double S=0.5;
+    Setup(S);
+    TensorNetworks::MatrixOR OvM(itsOperatorClient->GetMatrixO(TensorNetworks::Upper));
+    EXPECT_EQ(OvM(0,0),TensorNetworks::OperatorI (S));
+    EXPECT_EQ(OvM(0,1),TensorNetworks::OperatorSp(S));
+    EXPECT_EQ(OvM(0,2),TensorNetworks::OperatorSm(S));
+    EXPECT_EQ(OvM(0,3),TensorNetworks::OperatorSz(S));
+    EXPECT_EQ(OvM(1,0),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM(3,0),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM.GetUpperLower(),TensorNetworks::Upper);
+
+//    cout << "OvM=" << OvM << endl;
+}
+
+TEST_F(MPOTests1,OperatorValuedMatrix4)
+{
+    double S=1.0;
+    Setup(S);
+    TensorNetworks::MatrixOR OvM(itsOperatorClient->GetMatrixO(TensorNetworks::Upper));
+    EXPECT_EQ(OvM(0,0),TensorNetworks::OperatorI (S));
+    EXPECT_EQ(OvM(0,1),TensorNetworks::OperatorSp(S));
+    EXPECT_EQ(OvM(0,2),TensorNetworks::OperatorSm(S));
+    EXPECT_EQ(OvM(0,3),TensorNetworks::OperatorSz(S));
+    EXPECT_EQ(OvM(1,0),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM(3,0),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM.GetUpperLower(),TensorNetworks::Upper);
+}

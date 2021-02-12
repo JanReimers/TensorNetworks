@@ -9,14 +9,24 @@ namespace TensorNetworks
 
 template <class T> class MatrixO : public Matrix<OperatorElement<T> >
 {
-    public:
-        MatrixO(const OperatorClient1*);
-        MatrixO(int Dw1, int Dw2,double S);
-        virtual ~MatrixO();
+    typedef Matrix<OperatorElement<T> > Base;
+public:
+    MatrixO();
+    MatrixO(const MatrixO& m);
+    MatrixO(MatrixO&& m);
+    MatrixO(int Dw1, int Dw2,double S);
+    virtual ~MatrixO();
 
-    protected:
+    void CheckUL();
+    MatrixO& operator=(const MatrixO& m);
+    MatrixO& operator=(MatrixO&& m);
 
-    private:
+    TriType GetUpperLower() const {return itsUL;}
+
+    //virtual MatrixO GetV(Direction) const; //Make this abstract
+private:
+
+    TriType itsUL; //Upper or lower triangular.
 };
 
 typedef MatrixO<double> MatrixOR;

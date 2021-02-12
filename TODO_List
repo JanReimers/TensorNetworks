@@ -1,6 +1,17 @@
 
+Operator Valued Matrix:
+    -Make a pretty print
+    Done:-Track upper/lower as part of OvM class
+    -Advanced matrix shape tracking:
+        What if it is both upper and lower?
+        Really 5 cases: Full, Upper, Lower, Diagonal, Zero
+        Could be two more cases: StrictlyUpper, StrictlyLower (nothing on diagonal)
+    -Implement GetV for U/L*L/R
+    -Implement SetV for U/L*L/R
+    -Implement Block respecting QR for U/L*L/R
+
 Done: -oml implement Matrix<T>.RemoveColumn() and Matrix<T>.RemoveRow()
--iMPO can form, implement rank revealing QR
+Done: -iMPO can form, implement rank revealing QR
 Done: -At left edge we should get V=[b,I] not [0].  Fix ReshapeV accordingly
 Done: -Std compression should work on GetW not GetiW
 Done: -ImaginaryTimeTests,TestITimeFourthOrderTrotterL2 locks up

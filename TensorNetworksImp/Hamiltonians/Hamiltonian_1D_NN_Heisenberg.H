@@ -19,11 +19,11 @@ public:
     //
     //  OperatorClient interface
     //
-    virtual double   GetS   () const {return itsS;}
-    virtual Dw12     GetDw12() const {return Dw12(Dw,Dw);}
-    virtual MatrixRT GetW   (int m, int n) const;
-    virtual double   GetH   (int ma,int na,int mb,int nb) const;
-    virtual MatrixOR GetMatrixO()  const;
+    virtual double    GetS   () const {return itsS;}
+    virtual Dw12      GetDw12() const {return Dw12(Dw,Dw);}
+    virtual MatrixRT  GetW   (int m, int n) const;
+    virtual double    GetH   (int ma,int na,int mb,int nb) const;
+    virtual MatrixOR GetMatrixO(TriType ul)  const;
 
 private:
     static const int Dw=5;

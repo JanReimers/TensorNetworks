@@ -11,6 +11,7 @@ namespace TensorNetworks
     enum TrotterOrder {TNone,FirstOrder,SecondOrder,FourthOrder};
     enum iTEBDType    {Gates,MPOs,iMPOs};
     enum CompressType {CNone,Std,Parker};
+    enum TriType      {Full,Upper,Lower};
 };
 
 #endif // ENUMS_H
