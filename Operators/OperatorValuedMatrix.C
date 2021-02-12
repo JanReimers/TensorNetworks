@@ -5,11 +5,13 @@ namespace TensorNetworks
 
 template <class T> MatrixO<T>::MatrixO()
 : Matrix<OperatorElement<T> >()
+, itsd(0)
 , itsUL(Full)
 {}
 
 template <class T> MatrixO<T>::MatrixO(const Base& m)
 : Matrix<OperatorElement<T> >(m)
+, itsd(m(m.GetLimits().Row.Low,m.GetLimits().Col.Low).GetNumRows())
 , itsUL(Full)
 {
     CheckUL();
@@ -17,6 +19,7 @@ template <class T> MatrixO<T>::MatrixO(const Base& m)
 
 template <class T> MatrixO<T>::MatrixO(const MatrixO& m)
 : Matrix<OperatorElement<T> >(m)
+, itsd(m.itsd)
 , itsUL(Full)
 {
     CheckUL();
@@ -24,6 +27,7 @@ template <class T> MatrixO<T>::MatrixO(const MatrixO& m)
 
 template <class T> MatrixO<T>::MatrixO(MatrixO&& m)
 : Matrix<OperatorElement<T> >(m)
+, itsd(m.itsd)
 , itsUL(Full)
 {
     CheckUL();
@@ -32,6 +36,7 @@ template <class T> MatrixO<T>::MatrixO(MatrixO&& m)
 
 template <class T> MatrixO<T>::MatrixO(int Dw1, int Dw2,double S)
 : Matrix<OperatorElement<T> >(0,Dw1-1,0,Dw2-1)
+, itsd(2*S+1)
 , itsUL(Full)
 {
     OperatorElement<T> Z=OperatorZ(S);
@@ -110,6 +115,82 @@ template <class T> void MatrixO<T>::SetV(const MatrixO& V)
         (*this)(i,j)=V(i,j);
     CheckUL();
 }
+
+template <class T> Matrix<T> MatrixO<T>::Flatten(Direction lr) const
+{
+    int rl=this->GetLimits().Row.Low;
+    int cl=this->GetLimits().Col.Low;
+    Matrix<T> F;
+    switch (lr)
+    {
+    case DLeft:
+        {
+            int Dw1=itsd*itsd*this->GetNumRows();
+            F.SetLimits(VecLimits(rl,rl+Dw1-1),this->GetLimits().Col);
+            for (index_t j:this->cols())
+            {
+                int w=rl;
+                for (index_t i:this->rows())
+                    for (int m=0;m<itsd;m++)
+                    for (int n=0;n<itsd;n++)
+                        F(w++,j)=(*this)(i,j)(m,n);
+            }
+        }
+        break;
+    case DRight:
+        {
+            int Dw2=itsd*itsd*this->GetNumCols();
+            F.SetLimits(this->GetLimits().Row,VecLimits(cl,cl+Dw2-1));
+            for (index_t i:this->rows())
+            {
+                int w=cl;
+                for (index_t j:this->cols())
+                    for (int m=0;m<itsd;m++)
+                    for (int n=0;n<itsd;n++)
+                        F(i,w++)=(*this)(i,j)(m,n);
+            }
+        }
+        break;
+    }
+    return F;
+}
+
+
+template <class T> void MatrixO<T>::UnFlatten(const Matrix<T>& F)
+{
+    if (F.GetNumRows()==itsd*itsd*this->GetNumRows())
+    {
+        for (index_t j:this->cols())
+        {
+            int w=this->GetLimits().Row.Low;
+            for (index_t i:this->rows())
+                for (int m=0;m<itsd;m++)
+                for (int n=0;n<itsd;n++)
+                    (*this)(i,j)(m,n)=F(w++,j);
+        }
+
+    }
+    else if (F.GetNumCols()==itsd*itsd*this->GetNumCols())
+    {
+        for (index_t i:this->rows())
+        {
+            int w=this->GetLimits().Col.Low;
+            for (index_t j:this->cols())
+                for (int m=0;m<itsd;m++)
+                for (int n=0;n<itsd;n++)
+                    (*this)(i,j)(m,n)=F(i,w++);
+        }
+    }
+    else
+        assert(false);
+
+}
+//template <class T> MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr) const
+//{
+//    MatrixO V=GetV(lr);
+//    Matrix<T> Vf=V.Flatten(lr);
+//}
+
 
 template class MatrixO <double>;
 

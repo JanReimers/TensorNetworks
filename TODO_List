@@ -8,6 +8,7 @@ Operator Valued Matrix:
         Could be two more cases: StrictlyUpper, StrictlyLower (nothing on diagonal)
     Done: -Implement GetV for U/L*L/R
     Done: -Implement SetV for U/L*L/R
+    Done: -Implement Flatten(Direction) and UnFlatten
     -Implement Block respecting QR for U/L*L/R
 
 Done: -oml implement Matrix<T>.RemoveColumn() and Matrix<T>.RemoveRow()

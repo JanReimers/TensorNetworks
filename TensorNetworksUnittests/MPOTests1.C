@@ -235,3 +235,86 @@ TEST_F(MPOTests1,OperatorValuedMatrixSetVLower)
     Copy.SetV(Vr);
     EXPECT_EQ(OvM,Copy);
 }
+
+TEST_F(MPOTests1,OperatorValuedMatrixFlattenUpper)
+{
+    double S=0.5;
+    Setup(S);
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+    MatrixOR Copy(OvM);
+    Matrix<double> F=Copy.Flatten(DLeft);
+    Copy.UnFlatten(F);
+    EXPECT_EQ(OvM,Copy);
+    F=Copy.Flatten(DRight);
+    Copy.UnFlatten(F);
+    EXPECT_EQ(OvM,Copy);
+}
+
+TEST_F(MPOTests1,OperatorValuedMatrixFlattenLower)
+{
+    double S=0.5;
+    Setup(S);
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+    MatrixOR Copy(OvM);
+    Matrix<double> F=Copy.Flatten(DLeft);
+    Copy.UnFlatten(F);
+    EXPECT_EQ(OvM,Copy);
+    F=Copy.Flatten(DRight);
+    Copy.UnFlatten(F);
+    EXPECT_EQ(OvM,Copy);
+}
+
+TEST_F(MPOTests1,OperatorValuedMatrixFlattenVUpper)
+{
+    double S=0.5;
+    Setup(S);
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+    {
+        MatrixOR V=OvM.GetV(DLeft);
+        MatrixOR Copy(V);
+        Matrix<double> F=V.Flatten(DLeft);
+        Copy.UnFlatten(F);
+        EXPECT_EQ(V,Copy);
+        F=Copy.Flatten(DRight);
+        Copy.UnFlatten(F);
+        EXPECT_EQ(V,Copy);
+    }
+    {
+        MatrixOR V=OvM.GetV(DRight);
+        MatrixOR Copy(V);
+        Matrix<double> F=V.Flatten(DRight);
+        Copy.UnFlatten(F);
+        EXPECT_EQ(V,Copy);
+        F=Copy.Flatten(DRight);
+        Copy.UnFlatten(F);
+        EXPECT_EQ(V,Copy);
+    }
+}
+
+TEST_F(MPOTests1,OperatorValuedMatrixFlattenVLower)
+{
+    double S=0.5;
+    Setup(S);
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+    {
+        MatrixOR V=OvM.GetV(DLeft);
+        MatrixOR Copy(V);
+        Matrix<double> F=V.Flatten(DLeft);
+        Copy.UnFlatten(F);
+        EXPECT_EQ(V,Copy);
+        F=Copy.Flatten(DRight);
+        Copy.UnFlatten(F);
+        EXPECT_EQ(V,Copy);
+    }
+    {
+        MatrixOR V=OvM.GetV(DRight);
+        MatrixOR Copy(V);
+        Matrix<double> F=V.Flatten(DRight);
+        Copy.UnFlatten(F);
+        EXPECT_EQ(V,Copy);
+        F=Copy.Flatten(DRight);
+        Copy.UnFlatten(F);
+        EXPECT_EQ(V,Copy);
+    }
+}
+
