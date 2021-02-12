@@ -207,3 +207,31 @@ TEST_F(MPOTests1,OperatorValuedMatrixGetVLower)
     for (index_t j:Vr.cols())
         EXPECT_EQ(OvM(i,j),Vr(i,j));
 }
+
+TEST_F(MPOTests1,OperatorValuedMatrixSetVUpper)
+{
+    double S=0.5;
+    Setup(S);
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+    MatrixOR Copy(OvM);
+    MatrixOR Vl=OvM.GetV(DLeft);
+    Copy.SetV(Vl);
+    EXPECT_EQ(OvM,Copy);
+    MatrixOR Vr=OvM.GetV(DRight);
+    Copy.SetV(Vr);
+    EXPECT_EQ(OvM,Copy);
+}
+
+TEST_F(MPOTests1,OperatorValuedMatrixSetVLower)
+{
+    double S=0.5;
+    Setup(S);
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+    MatrixOR Copy(OvM);
+    MatrixOR Vl=OvM.GetV(DLeft);
+    Copy.SetV(Vl);
+    EXPECT_EQ(OvM,Copy);
+    MatrixOR Vr=OvM.GetV(DRight);
+    Copy.SetV(Vr);
+    EXPECT_EQ(OvM,Copy);
+}

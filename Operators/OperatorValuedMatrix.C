@@ -103,6 +103,13 @@ template <class T> MatrixO<T> MatrixO<T>::GetV(Direction lr) const
     return this->SubMatrix(lv);
 }
 
+template <class T> void MatrixO<T>::SetV(const MatrixO& V)
+{
+    for (index_t i:V.rows())
+    for (index_t j:V.cols())
+        (*this)(i,j)=V(i,j);
+    CheckUL();
+}
 
 template class MatrixO <double>;
 

@@ -25,6 +25,8 @@ public:
     TriType GetUpperLower() const {return itsUL;}
 
     MatrixO GetV(Direction) const;
+    void    SetV(const MatrixO& V); //Limits of V decide R/L*U/L
+
 private:
 
     TriType itsUL; //Upper or lower triangular.

@@ -7,7 +7,7 @@ Operator Valued Matrix:
         Really 5 cases: Full, Upper, Lower, Diagonal, Zero
         Could be two more cases: StrictlyUpper, StrictlyLower (nothing on diagonal)
     Done: -Implement GetV for U/L*L/R
-    -Implement SetV for U/L*L/R
+    Done: -Implement SetV for U/L*L/R
     -Implement Block respecting QR for U/L*L/R
 
 Done: -oml implement Matrix<T>.RemoveColumn() and Matrix<T>.RemoveRow()
