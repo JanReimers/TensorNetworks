@@ -3,6 +3,7 @@
 
 #include "oml/matrix.h"
 
+
 namespace TensorNetworks
 {
 
@@ -12,6 +13,7 @@ template <class T> class OperatorElement : public Matrix<T>
 {
 public:
     OperatorElement();
+    OperatorElement(int fil); //Required by mat mul routines
     OperatorElement(int d,double S);
     virtual ~OperatorElement();
 
@@ -75,5 +77,23 @@ public:
 
 
 } //Tensor networks
+
+//
+//  OperatorElement/scalar mixing is allowed in oml matrix ops.
+//
+template <class T> struct ReturnType<T ,TensorNetworks::OperatorElement<T>>
+{
+    typedef TensorNetworks::OperatorElement<T> RetType;
+};
+template <class T> struct ReturnType<TensorNetworks::OperatorElement<T>,T >
+{
+    typedef TensorNetworks::OperatorElement<T> RetType;
+};
+template <class T> struct ReturnType<TensorNetworks::OperatorElement<T>,TensorNetworks::OperatorElement<T> >
+{
+    typedef TensorNetworks::OperatorElement<T> RetType;
+};
+
+
 
 #endif // OPERATORELEMENT_H

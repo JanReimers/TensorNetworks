@@ -20,6 +20,13 @@ template <class T> OperatorElement<T>::OperatorElement()
 {
 }
 
+template <class T> OperatorElement<T>::OperatorElement(int)
+: Matrix<T>()
+, itsS(0.0)
+, itsd(0)
+{
+}
+
 template <class T> OperatorElement<T>::~OperatorElement()
 {
     //dtor
