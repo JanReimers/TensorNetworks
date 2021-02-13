@@ -75,6 +75,27 @@ template <class T> MatrixO<T>& MatrixO<T>::operator=(MatrixO<T>&& m)
     return *this;
 }
 
+template <class T> std::ostream& MatrixO<T>::PrettyPrint(std::ostream& os) const
+{
+    assert(itsd>1);
+    os << std::fixed << std::setprecision(1) << std::endl;
+    for (index_t i:this->rows())
+    {
+        for (int m=0;m<itsd;m++)
+        {
+            for (index_t j:this->cols())
+            {
+                os << "[ ";
+                for (int n=0;n<itsd;n++)
+                    os << std::setw(4) <<(*this)(i,j)(m,n) << " ";
+                os << "]  ";
+            }
+            os << std::endl;
+        }
+        os << std::endl;
+    }
+    return os;
+}
 
 template <class T> MatrixO<T> MatrixO<T>::GetV(Direction lr) const
 {

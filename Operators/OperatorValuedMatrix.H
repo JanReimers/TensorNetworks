@@ -45,6 +45,11 @@ public:
     void      SetV     (const MatrixO& V); //Limits of V decide R/L*U/L
     void      UnFlatten(const Matrix<T>& F); //Limits of V decide R/L*U/L
 
+    friend std::ostream& operator<<(std::ostream& os, const MatrixO& m)
+    {
+        return m.PrettyPrint(os);
+    }
+    std::ostream& PrettyPrint(std::ostream& os) const;
 private:
 
     int     itsd;
