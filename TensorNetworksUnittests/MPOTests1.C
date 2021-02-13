@@ -318,3 +318,57 @@ TEST_F(MPOTests1,OperatorValuedMatrixFlattenVLower)
     }
 }
 
+TEST_F(MPOTests1,OperatorValuedMatrixQRUpperLeft)
+{
+    double S=0.5;
+    Setup(S);
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+    MatrixOR V=OvM.GetV(DLeft);
+    auto [Q,R]=OvM.BlockQX(DLeft);
+    MatrixOR V1=Q*R;
+
+    EXPECT_NEAR(MaxDelta(V,V1),0.0,1e-13);
+    EXPECT_TRUE(IsUpperTriangular(R));
+    EXPECT_TRUE(IsUpperTriangular(Q));
+}
+TEST_F(MPOTests1,OperatorValuedMatrixQRUpperRight)
+{
+    double S=0.5;
+    Setup(S);
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+    MatrixOR V=OvM.GetV(DRight);
+    auto [Q,R]=OvM.BlockQX(DRight);
+    MatrixOR V1=R*Q;
+
+    EXPECT_NEAR(MaxDelta(V,V1),0.0,1e-13);
+    EXPECT_TRUE(IsUpperTriangular(R));
+    EXPECT_TRUE(IsUpperTriangular(Q));
+}
+
+TEST_F(MPOTests1,OperatorValuedMatrixQRLowerLeft)
+{
+    double S=0.5;
+    Setup(S);
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+    MatrixOR V=OvM.GetV(DLeft);
+    auto [Q,L]=OvM.BlockQX(DLeft);
+    MatrixOR V1=Q*L;
+
+    EXPECT_NEAR(MaxDelta(V,V1),0.0,1e-13);
+    EXPECT_TRUE(IsLowerTriangular(L));
+    EXPECT_TRUE(IsLowerTriangular(Q));
+}
+TEST_F(MPOTests1,OperatorValuedMatrixQRLowerRight)
+{
+    double S=0.5;
+    Setup(S);
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+    MatrixOR V=OvM.GetV(DRight);
+    auto [Q,L]=OvM.BlockQX(DRight);
+    MatrixOR V1=L*Q;
+
+    EXPECT_NEAR(MaxDelta(V,V1),0.0,1e-13);
+    EXPECT_TRUE(IsLowerTriangular(L));
+    EXPECT_TRUE(IsLowerTriangular(Q));
+}
+

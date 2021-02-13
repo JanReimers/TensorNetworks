@@ -9,7 +9,8 @@ namespace TensorNetworks
 
 template <class T> class MatrixO : public Matrix<OperatorElement<T> >
 {
-    typedef Matrix<OperatorElement<T> > Base;
+    typedef OperatorElement<T> EType;
+    typedef Matrix<EType> Base;
     typedef std::tuple<MatrixO,Matrix<T> > QXType;
 
 public:
@@ -23,6 +24,17 @@ public:
     void CheckUL();
     MatrixO& operator=(const MatrixO& m);
     MatrixO& operator=(MatrixO&& m);
+    template <class A, Store M, Data D> MatrixO(const Indexable <EType,A,M,D,MatrixShape>& m)
+    : Base(m)
+    {
+        CheckUL();
+    }
+    template <class A, Store M, Data D> const MatrixO& operator=(const Indexable <EType,A,M,D,MatrixShape>& m)
+    {
+        Base::operator=(m);
+        CheckUL();
+        return *this;
+    }
 
     TriType GetUpperLower() const {return itsUL;}
 
@@ -41,6 +53,16 @@ private:
 
 typedef MatrixO<double> MatrixOR;
 typedef MatrixO<dcmplx> MatrixOC;
+
+template <class T> double MaxDelta(const MatrixO<T>& a, const MatrixO<T>& b)
+{
+    assert(a.GetLimits()==b.GetLimits());
+    Matrix<T> ret(a.GetLimits());
+    for (index_t i:a.rows())
+        for (index_t j:a.cols())
+            ret(i,j)=Max(fabs(a(i,j)-b(i,j)));
+    return Max(fabs(ret));
+}
 
 } //namespace
 
