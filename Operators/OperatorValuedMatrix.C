@@ -75,6 +75,15 @@ template <class T> MatrixO<T>& MatrixO<T>::operator=(MatrixO<T>&& m)
     return *this;
 }
 
+template <class T> MatrixO<T>& MatrixO<T>::operator*=(const T& s)
+{
+    for (index_t i:this->rows())
+        for (index_t j:this->cols())
+            (*this)(i,j)*=s;
+    return *this;
+}
+
+
 template <class T> std::ostream& MatrixO<T>::PrettyPrint(std::ostream& os) const
 {
     assert(itsd>1);
@@ -220,6 +229,9 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
 
     Matrix<T> Vf=V.Flatten(lr);
     Matrix<T> RL;
+    double scale=1.0;
+    int Dw1=V.GetNumRows();
+    int Dw2=V.GetNumCols();
     switch (itsUL)
     {
     case Upper:
@@ -230,6 +242,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
             auto [Q,R1]=solver.SolveThinQR(Vf);
             V.UnFlatten(Q);
             RL=R1;
+            scale=RL(1,1);
         }
         break;
         case DRight:
@@ -237,6 +250,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
             auto [R,Q]=solver.SolveThinRQ(Vf);
             V.UnFlatten(Q);
             RL=R;
+            scale=RL(Dw1,Dw2);
         }
         break;
         }
@@ -249,6 +263,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
             auto [Q,L]=solver.SolveThinQL(Vf);
             V.UnFlatten(Q);
             RL=L;
+            scale=RL(Dw1,Dw2);
         }
         break;
         case DRight:
@@ -256,6 +271,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
             auto [L,Q]=solver.SolveThinLQ(Vf);
             V.UnFlatten(Q);
             RL=L;
+            scale=RL(1,1);
         }
         break;
         }
@@ -263,6 +279,9 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
     default:
         assert(false);
     }
+    assert(fabs(scale)-itsd<1e-15);
+    RL/=scale;
+    V*=scale;
     V .ReBase(Vlim);
     RL.ReBase(Vlim);
     return std::make_tuple(V,RL);

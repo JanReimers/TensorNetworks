@@ -1,23 +1,31 @@
 
 Operator Valued Matrix:
-    -Make a pretty print
-    Done:-Track upper/lower as part of OvM class
+    -OperatorElement: recognize known operators for pretty print.
+        -One way is to solve Op=a*I + b*Sx + c*Sy + d*Sz for abcd.  For d>2 this is not guaranteed to solve.
+        -is it as easy as a=Tr(O,I) ?
+    Done: -Rescale Q/R so QT*Q=d*I
+    -Calculate overlap <Wab*Wcd> for abcd=0..X+1  for R/L*U/L
+        -GetV(lr).Overlap = <Vab*Vcd>
+    -Shadow classes using MatrixO
+        SiteOperator/SiteOperatorImp
+        MPO/MPOImp
+        iMPO/iMPOImp
+        We need to build up interfaces bit by bit so we need shadow those as well.
+        Support GetW(m,n) for now so we can calculate contractions <psi|O|psi>
+        Later, implement Psi->GetOverlap(MatrixO) contractions.
+
     -Advanced matrix shape tracking:
         What if it is both upper and lower?
         Really 5 cases: Full, Upper, Lower, Diagonal, Zero
         Could be two more cases: StrictlyUpper, StrictlyLower (nothing on diagonal)
+    Done -Make a pretty print
+    Done:-Track upper/lower as part of OvM class
     Done: -Implement GetV for U/L*L/R
     Done: -Implement SetV for U/L*L/R
     Done: -Implement Flatten(Direction) and UnFlatten
     Done: -Implement Block respecting QR for U/L*L/R
 
-Done: -oml implement Matrix<T>.RemoveColumn() and Matrix<T>.RemoveRow()
-Done: -iMPO can form, implement rank revealing QR
-Done: -At left edge we should get V=[b,I] not [0].  Fix ReshapeV accordingly
-Done: -Std compression should work on GetW not GetiW
-Done: -ImaginaryTimeTests,TestITimeFourthOrderTrotterL2 locks up
-    Edges Dws get too big.
--Once rank revealing QL is robust, move into the QRSolver interface.
+
 -expH MPO get scrambled when reducing to Canonical form.
     Get further scrambled after Parker-compress, std-compress is fine
     test is TestParkerSVDCompressExpHL8t1
@@ -35,8 +43,7 @@ Done: -ImaginaryTimeTests,TestITimeFourthOrderTrotterL2 locks up
     -Factor U*s*V = expH
 -Add asserts to confirm zeros in Lp matrices are indeed zero.
 -Simplify iMPO compression code
-Done: -Move all oml instancing to oml side.
-Done: -Implement Parker algorithm #3, iMPO left canonical form
+-Once rank revealing QL is robust, move into the QRSolver interface.
 -Implement Parker algorithm #4, iMPO left canonical form for triangular W
 -Implement Parker algorithm #5, iMPO compression
 
@@ -174,6 +181,14 @@ Backburner:
         -Might need to identify parameters with strings "Jxy"
 
 ----------------------------------------------------------------------------------------------------------
+Done: -oml implement Matrix<T>.RemoveColumn() and Matrix<T>.RemoveRow()
+Done: -iMPO can form, implement rank revealing QR
+Done: -At left edge we should get V=[b,I] not [0].  Fix ReshapeV accordingly
+Done: -Std compression should work on GetW not GetiW
+Done: -ImaginaryTimeTests,TestITimeFourthOrderTrotterL2 locks up
+    Edges Dws get too big.
+Done: -Move all oml instancing to oml side.
+Done: -Implement Parker algorithm #3, iMPO left canonical form
 Done: -Support None for compression types.sdf
 Done: -iMPO Trotter has Dw=1 at the edges ?!?
 Done: -MPO canonical form requires sweeping both ways.  Make that the default.

@@ -35,6 +35,7 @@ public:
         CheckUL();
         return *this;
     }
+    MatrixO<T>& operator*=(const T& s);
 
     TriType GetUpperLower() const {return itsUL;}
 
@@ -44,6 +45,7 @@ public:
 
     void      SetV     (const MatrixO& V); //Limits of V decide R/L*U/L
     void      UnFlatten(const Matrix<T>& F); //Limits of V decide R/L*U/L
+
 
     friend std::ostream& operator<<(std::ostream& os, const MatrixO& m)
     {
@@ -68,6 +70,8 @@ template <class T> double MaxDelta(const MatrixO<T>& a, const MatrixO<T>& b)
             ret(i,j)=Max(fabs(a(i,j)-b(i,j)));
     return Max(fabs(ret));
 }
+
+
 
 } //namespace
 
