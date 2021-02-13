@@ -344,6 +344,8 @@ template <class T> typename ArpackEigenSolver<T>::UdType
 ArpackEigenSolver<T>::Solve(const MatrixT& A,double eps, int Nev)
 {
     // For complex Hermitian we are supposed to use the non-sym solver
+    assert(A.GetLimits().Row.Low==1);
+    assert(A.GetLimits().Col.Low==1);
     assert(A.GetNumRows()==A.GetNumCols());
     assert(Nev<A.GetNumRows());
     theDenseMatrix=&A;
@@ -355,6 +357,8 @@ ArpackEigenSolver<T>::Solve(const MatrixT& A,double eps, int Nev)
 template <> typename ArpackEigenSolver<double>::UdType
 ArpackEigenSolver<double>::Solve(const MatrixT& A,double eps, int Nev)
 {
+    assert(A.GetLimits().Row.Low==1);
+    assert(A.GetLimits().Col.Low==1);
     assert(A.GetNumRows()==A.GetNumCols());
     assert(Nev<A.GetNumRows());
     assert(IsSymmetric(A,eps));
@@ -374,6 +378,8 @@ template <class T> typename ArpackEigenSolver<T>::UdType
 ArpackEigenSolver<T>::Solve(const SparseMatrixT& A,double eps, int Nev)
 {
     // For complex Hermitian we are supposed to use the non-sym solver
+    assert(A.GetLimits().Row.Low==1);
+    assert(A.GetLimits().Col.Low==1);
     assert(A.GetNumRows()==A.GetNumCols());
     assert(Nev<A.GetNumRows());
     theSparseMatrix=&A;
@@ -385,6 +391,8 @@ ArpackEigenSolver<T>::Solve(const SparseMatrixT& A,double eps, int Nev)
 template <> typename ArpackEigenSolver<double>::UdType
 ArpackEigenSolver<double>::Solve(const SparseMatrixT& A,double eps, int Nev)
 {
+    assert(A.GetLimits().Row.Low==1);
+    assert(A.GetLimits().Col.Low==1);
     assert(A.GetNumRows()==A.GetNumCols());
     assert(Nev<A.GetNumRows());
     theSparseMatrix=&A;
@@ -395,6 +403,8 @@ ArpackEigenSolver<double>::Solve(const SparseMatrixT& A,double eps, int Nev)
 template <class T> typename ArpackEigenSolver<T>::UdTypeN
 ArpackEigenSolver<T>::SolveRightNonSym(const MatrixT& A,double eps, int Nev)
 {
+    assert(A.GetLimits().Row.Low==1);
+    assert(A.GetLimits().Col.Low==1);
     assert(A.GetNumRows()==A.GetNumCols());
     assert(Nev<A.GetNumRows());
     theDenseMatrix=&A;
@@ -412,6 +422,8 @@ template <class T> typename ArpackEigenSolver<T>::UdTypeN ArpackEigenSolver<T>::
 template <class T> typename ArpackEigenSolver<T>::UdTypeN
 ArpackEigenSolver<T>::SolveRightNonSym(const SparseMatrixT& A,double eps, int Nev)
 {
+    assert(A.GetLimits().Row.Low==1);
+    assert(A.GetLimits().Col.Low==1);
     assert(A.GetNumRows()==A.GetNumCols());
     assert(Nev<A.GetNumRows());
     theSparseMatrix=&A;

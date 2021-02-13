@@ -37,6 +37,8 @@ template <class T> typename LapackLinearSolver<T>::VectorT LapackLinearSolver<T>
 
 template <class T> typename LapackLinearSolver<T>::VectorT LapackLinearSolver<T>::SolveTri(const MatrixT& A,const VectorT& b,char UL)
 {
+    assert(A.GetLimits().Row.Low==1);
+    assert(A.GetLimits().Col.Low==1);
     int N=A.GetNumRows();
     assert(A.GetNumCols()==N);
     assert(b.size()==N);

@@ -45,6 +45,8 @@ LapackSVDSolver<T>::Solve(const MatrixT& A,double eps, int NumSingularValues)
     assert(eps<1.0);
     assert(NumSingularValues>0);
     assert(NumSingularValues<=Min(A.GetNumRows(),A.GetNumCols()));
+    assert(A.GetLimits().Row.Low==1);
+    assert(A.GetLimits().Col.Low==1);
     assert(!isnan(A));
     int M=A.GetNumRows(),N=A.GetNumCols(),mn=Min(M,N);
 

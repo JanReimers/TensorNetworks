@@ -33,6 +33,8 @@ template <class T> typename PrimeEigenSolver<T>::UdType
 PrimeEigenSolver<T>::Solve(const MatrixT& m,double eps, int NumEigenValues)
 {
     int N=m.GetNumRows();
+    assert(m.GetLimits().Row.Low==1);
+    assert(m.GetLimits().Col.Low==1);
     assert(N==m.GetNumCols());
     assert(NumEigenValues<=N);
     assert(IsHermitian(m,eps));
@@ -52,6 +54,8 @@ template <class T> typename PrimeEigenSolver<T>::UdType
 PrimeEigenSolver<T>::Solve(const SparseMatrixT& m,double eps, int NumEigenValues)
 {
     int N=m.GetNumRows();
+    assert(m.GetLimits().Row.Low==1);
+    assert(m.GetLimits().Col.Low==1);
     assert(N==m.GetNumCols());
     assert(NumEigenValues<=N);
     assert(IsHermitian(m,eps));
@@ -77,6 +81,8 @@ template <class T> typename PrimeEigenSolver<T>::UdTypeN
 PrimeEigenSolver<T>::SolveRightNonSym   (const MatrixT& m,double eps, int NumEigenValues)
 {
     int N=m.GetNumRows();
+    assert(m.GetLimits().Row.Low==1);
+    assert(m.GetLimits().Col.Low==1);
     assert(N==m.GetNumCols());
     assert(NumEigenValues<=N);
     //assert(IsNormal(m,eps));
@@ -96,6 +102,8 @@ template <class T> typename PrimeEigenSolver<T>::UdTypeN
 PrimeEigenSolver<T>::SolveRightNonSym(const SparseMatrixT& m,double eps, int NumEigenValues)
 {
     int N=m.GetNumRows();
+    assert(m.GetLimits().Row.Low==1);
+    assert(m.GetLimits().Col.Low==1);
     assert(N==m.GetNumCols());
     assert(NumEigenValues<=N);
 //    assert(IsHermitian(m,eps));

@@ -62,6 +62,8 @@ LapackEigenSolver<T>::SolveAll(const MatrixT& A,double eps)
 template <class T> typename LapackEigenSolver<T>::UdType
 LapackEigenSolver<T>::Solve(const MatrixT& A,double eps, int NumEigenValues)
 {
+    assert(A.GetLimits().Row.Low==1);
+    assert(A.GetLimits().Col.Low==1);
     int N=A.GetNumRows();
     assert(N==A.GetNumCols());
     assert(NumEigenValues<=N);
@@ -116,6 +118,8 @@ LapackEigenSolver<T>::SolveAllRightNonSym(const MatrixT& A,double eps)
 template <> typename LapackEigenSolver<double>::UdTypeN
 LapackEigenSolver<double>::SolveRightNonSym(const MatrixT& A,double eps, int NumEigenValues)
 {
+    assert(A.GetLimits().Row.Low==1);
+    assert(A.GetLimits().Col.Low==1);
     int N=A.GetNumRows();
     assert(N==A.GetNumCols());
     if (NumEigenValues<N)
@@ -173,6 +177,8 @@ LapackEigenSolver<double>::SolveRightNonSym(const MatrixT& A,double eps, int Num
 template <> typename LapackEigenSolver<dcmplx>::UdTypeN
 LapackEigenSolver<dcmplx>::SolveRightNonSym(const MatrixT& A,double eps, int NumEigenValues)
 {
+    assert(A.GetLimits().Row.Low==1);
+    assert(A.GetLimits().Col.Low==1);
     int N=A.GetNumRows();
     assert(N==A.GetNumCols());
     if (NumEigenValues<N)

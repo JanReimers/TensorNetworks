@@ -31,6 +31,8 @@ primme_svds_params MakeParameters(MatvecT MatVec,int M,int N,int NumSingularValu
 template <class T> typename PrimeSVDSolver<T>::UsVType
 PrimeSVDSolver<T>::Solve(const MatrixT& m,double eps, int NumSingularValues)
 {
+    assert(m.GetLimits().Row.Low==1);
+    assert(m.GetLimits().Col.Low==1);
     assert(NumSingularValues<=Min(m.GetNumRows(),m.GetNumCols()));
     theDenseMatrix=&m;
     primme_svds_params primme=MakeParameters(DenseMatvec<T>,m.GetNumRows(),m.GetNumCols(),NumSingularValues,itsNumGuesses,eps);
@@ -47,6 +49,8 @@ PrimeSVDSolver<T>::SolveAll(const MatrixT& A,double eps)
 template <class T> typename PrimeSVDSolver<T>::UsVType
 PrimeSVDSolver<T>::Solve(const SparseMatrixT& m,double eps, int NumSingularValues)
 {
+    assert(m.GetLimits().Row.Low==1);
+    assert(m.GetLimits().Col.Low==1);
     assert(NumSingularValues<=Min(m.GetNumRows(),m.GetNumCols()));
     theSparseMatrix=&m;
     primme_svds_params primme=MakeParameters(SparseMatvec<T>,m.GetNumRows(),m.GetNumCols(),NumSingularValues,itsNumGuesses,eps);

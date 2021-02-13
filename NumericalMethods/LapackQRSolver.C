@@ -115,6 +115,8 @@ template <> void xunglq<dcmplx> (int* M,int* N,int*	K,dcmplx* Q,int* LDA,dcmplx*
 
 template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveThinQR(const MatrixT& Ain)
 {
+    assert(Ain.GetLimits().Row.Low==1);
+    assert(Ain.GetLimits().Col.Low==1);
     int M=Ain.GetNumRows(),N=Ain.GetNumCols(),mn=Min(M,N);
     int info=0,lwork=-1;
     Vector<T> tau(mn),work(1);
@@ -159,6 +161,8 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
 
 template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveThinQL(const MatrixT& Ain)
 {
+    assert(Ain.GetLimits().Row.Low==1);
+    assert(Ain.GetLimits().Col.Low==1);
     int M=Ain.GetNumRows(),N=Ain.GetNumCols(),mn=Min(M,N);
     int info=0,lwork=-1;
     Vector<T> tau(mn),work(1);
@@ -216,6 +220,8 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
 
 template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveThinRQ(const MatrixT& Ain)
 {
+    assert(Ain.GetLimits().Row.Low==1);
+    assert(Ain.GetLimits().Col.Low==1);
     int M=Ain.GetNumRows(),N=Ain.GetNumCols(),mn=Min(M,N);
     int info=0,lwork=-1;
     Vector<T> tau(mn),work(1);
@@ -270,6 +276,8 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
 
 template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveThinLQ(const MatrixT& Ain)
 {
+    assert(Ain.GetLimits().Row.Low==1);
+    assert(Ain.GetLimits().Col.Low==1);
     int M=Ain.GetNumRows(),N=Ain.GetNumCols(),mn=Min(M,N);
     int info=0,lwork=-1;
     Vector<T> tau(mn),work(1);
