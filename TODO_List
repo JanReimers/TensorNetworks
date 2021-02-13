@@ -4,7 +4,7 @@ Operator Valued Matrix:
         -One way is to solve Op=a*I + b*Sx + c*Sy + d*Sz for abcd.  For d>2 this is not guaranteed to solve.
         -is it as easy as a=Tr(O,I) ?
     Done: -Rescale Q/R so QT*Q=d*I
-    -Calculate overlap <Wab*Wcd> for abcd=0..X+1  for R/L*U/L
+    Done: -Calculate overlap <Wab*Wcd> for abcd=0..X+1  for R/L*U/L
         -GetV(lr).Overlap = <Vab*Vcd>
     -Shadow classes using MatrixO
         SiteOperator/SiteOperatorImp

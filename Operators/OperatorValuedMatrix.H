@@ -37,7 +37,9 @@ public:
     }
     MatrixO<T>& operator*=(const T& s);
 
-    TriType GetUpperLower() const {return itsUL;}
+    TriType   GetUpperLower() const {return itsUL;}
+    T         GetTrace(int a, int b, int c, int d) const;
+    Matrix<T> GetOrthoMatrix(Direction) const;
 
     MatrixO   GetV     (Direction) const;
     Matrix<T> Flatten  (Direction) const;

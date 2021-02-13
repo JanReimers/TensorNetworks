@@ -106,6 +106,41 @@ template <class T> std::ostream& MatrixO<T>::PrettyPrint(std::ostream& os) const
     return os;
 }
 
+template <class T> T MatrixO<T>::GetTrace(int a, int b, int c, int d) const
+{
+    T ret(0.0);
+    for (int m=0;m<itsd;m++)
+    for (int n=0;n<itsd;n++)
+        ret+=conj((*this)(b,a))(m,n)*(*this)(c,d)(m,n);
+    return ret/itsd;
+}
+
+template <class T> Matrix<T> MatrixO<T>::GetOrthoMatrix(Direction lr) const
+{
+    Matrix<T> O;
+    switch (lr)
+    {
+    case DLeft:
+        O.SetLimits(this->GetColLimits(),this->GetColLimits());
+        Fill(O,T(0.0));
+        for (index_t b:this->cols())
+        for (index_t c:this->cols())
+            for (index_t a:this->rows())
+                O(b,c)+=GetTrace(b,a,a,c);
+        break;
+    case DRight:
+        O.SetLimits(this->GetRowLimits(),this->GetRowLimits());
+        Fill(O,T(0.0));
+        for (index_t b:this->rows())
+        for (index_t c:this->rows())
+            for (index_t a:this->cols())
+                O(b,c)+=GetTrace(a,b,c,a);
+        break;
+    }
+    return O;
+}
+
+
 template <class T> MatrixO<T> MatrixO<T>::GetV(Direction lr) const
 {
     MatrixO<T> V;
