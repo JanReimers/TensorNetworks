@@ -4,6 +4,7 @@
 #include "TensorNetworks/Namespace.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
+#include "Operators/OperatorValuedMatrix.H"
 #include "TensorNetworksImp/Typedefs.H"
 #include "oml/matrix.h"
 
@@ -80,6 +81,9 @@ class SiteOperatorImp : public virtual SiteOperator
         friend class MPOTesting;
         friend class iMPOImp;
 
+        void SyncWtoO();
+        void SyncOtoW();
+
         virtual MatrixRT GetV(Direction,int m, int n) const =0;
         virtual void     SetV(Direction,int m, int n, const MatrixRT& V)=0;
                 void     SetW(          int m, int n, const MatrixRT& W);
@@ -112,6 +116,7 @@ class SiteOperatorImp : public virtual SiteOperator
         Dw12     itsDw;
         double   itsTruncationError;
         TensorT  itsWs;
+        MatrixOR itsWOvM; //Operator values matrix version of W.
         SiteOperatorImp* itsLeft_Neighbour;
         SiteOperatorImp* itsRightNeighbour;
 };

@@ -1,5 +1,5 @@
 
-Operator Valued Matrix:
+Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
     -OperatorElement: recognize known operators for pretty print.
         -One way is to solve Op=a*I + b*Sx + c*Sy + d*Sz for abcd.  For d>2 this is not guaranteed to solve.
         -is it as easy as a=Tr(O,I) ?
@@ -13,6 +13,13 @@ Operator Valued Matrix:
         We need to build up interfaces bit by bit so we need shadow those as well.
         Support GetW(m,n) for now so we can calculate contractions <psi|O|psi>
         Later, implement Psi->GetOverlap(MatrixO) contractions.
+        Do we get a benefit from an abstract SiteOperator?  MatrixO *is* the site operator.
+            (this is the data centric approach)
+            if so then MPO->GetSiteOperator just returns MatrixO
+            It would be nice if ALL {m,n} sums occur inside MatrixO. Does MatrixO get very big?
+            Can we do the same MPS, Vector<Matrix<T>> M(i,j)(m) *is* the site
+            Should we just switch to iTensor right now?  Scary?
+
 
     -Advanced matrix shape tracking:
         What if it is both upper and lower?

@@ -10,6 +10,12 @@ template <class T> MatrixO<T>::MatrixO()
     , itsUL(Full)
 {}
 
+template <class T> MatrixO<T>::MatrixO(int d)
+    : Matrix<OperatorElement<T> >()
+    , itsd(d)
+    , itsUL(Full)
+{}
+
 template <class T> MatrixO<T>::MatrixO(const Base& m)
     : Matrix<OperatorElement<T> >(m)
     , itsd(m(m.GetLimits().Row.Low,m.GetLimits().Col.Low).GetNumRows())
@@ -48,6 +54,17 @@ template <class T> MatrixO<T>::MatrixO(int Dw1, int Dw2,double S)
 template <class T> MatrixO<T>::~MatrixO()
 {
     //dtor
+}
+
+template <class T> void MatrixO<T>::SetChi12(int X1,int X2)
+{
+    if (this->GetNumRows()!=X1+2 || this->GetNumCols()!=X2+2)
+    {
+        Base::SetLimits(0,X1+1,0,X2+1,true); //Save Data?
+        double S=0.5*(itsd-1.0);
+        OperatorElement<T> Z=OperatorZ(S);
+        Fill(*this,Z);
+    }
 }
 template <class T> void MatrixO<T>::CheckUL()
 {

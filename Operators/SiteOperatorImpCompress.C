@@ -302,10 +302,11 @@ MatrixRT SiteOperatorImp::ContractDel(Direction lr) const
 {
     int X1=itsDw.Dw1-2;
     int X2=itsDw.Dw2-2;
-    MatrixRT del(X2+1,X2+1);
+    MatrixRT del;
     switch (lr)
     {
     case DLeft:
+        del.SetLimits(X2+1,X2+1);
         for (int b=1; b<=X2+1; b++)
         for (int c=1; c<=X2+1; c++)
         {
@@ -316,6 +317,7 @@ MatrixRT SiteOperatorImp::ContractDel(Direction lr) const
         }
         break;
     case DRight:
+        del.SetLimits(X1+1,X1+1);
         for (int b=0; b<=X1; b++)
         for (int c=0; c<=X1; c++)
         {
@@ -529,11 +531,11 @@ void SiteOperatorImp::iCanonicalFormTriangular(Direction lr)
 //        cout << "Init del=" << ContractDel(DLeft) << endl;
         MatrixRT K=BuildK(M);
         VectorRT c=Buildc(M);
-        cout << "M=" << M << endl;
-        cout << "K=" << K << endl;
-        cout << "c=" << c << endl;
+//        cout << "M=" << M << endl;
+//        cout << "K=" << K << endl;
+//        cout << "c=" << c << endl;
         VectorRT r=solver->SolveLowerTri(K,c);
-        cout << "r=" << r << endl;
+//        cout << "r=" << r << endl;
         MatrixRT R(X+2,X+2),Rinv(X+2,X+2);
         Unit(R);
         for (int b=0;b<=M-1;b++)
@@ -570,10 +572,10 @@ void SiteOperatorImp::iCanonicalFormTriangular(Direction lr)
             //Need code to remove rows and columns
         }
 //        cout << "After norm del=" << ContractDel(DLeft) << endl;
-        {
-            MatrixRT QL=ReshapeV(DLeft);
-            cout << "After norm QT*Q=" << Transpose(QL)*QL << endl;
-        }
+//        {
+//            MatrixRT QL=ReshapeV(DLeft);
+//            cout << "After norm QT*Q=" << Transpose(QL)*QL << endl;
+//        }
 
     }
     delete solver;

@@ -211,7 +211,7 @@ void SiteOperatorImp::NewBondDimensions(int D1, int D2, bool saveData)
         }
     itsDw.Dw1=D1;
     itsDw.Dw2=D2;
-
+    SyncWtoO();
 }
 
 

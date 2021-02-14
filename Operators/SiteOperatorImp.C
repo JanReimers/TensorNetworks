@@ -14,6 +14,7 @@ SiteOperatorImp::SiteOperatorImp(int d)
     , itsDw(1,1)
     , itsTruncationError(0.0)
     , itsWs(d,d)
+    , itsWOvM(d)
 {
     MatrixRT I0(1,1),I1(1,1);
     I0(1,1)=0.0;
@@ -26,6 +27,7 @@ SiteOperatorImp::SiteOperatorImp(int d)
             assert(itsWs(m+1,n+1).GetNumRows()==itsDw.Dw1);
             assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
         }
+
 }
 
 SiteOperatorImp::SiteOperatorImp(int d, double S, SpinOperator so) //Construct spin operator
@@ -39,6 +41,7 @@ SiteOperatorImp::SiteOperatorImp(int d, double S, SpinOperator so) //Construct s
             assert(itsWs(m+1,n+1).GetNumRows()==itsDw.Dw1);
             assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
         }
+    SyncWtoO();
 }
 //
 //  Build from a W rep object
@@ -54,6 +57,7 @@ SiteOperatorImp::SiteOperatorImp(int d, const OperatorClient* H)
             assert(itsWs(m+1,n+1).GetNumRows()==itsDw.Dw1);
             assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
         }
+    SyncWtoO();
 }
 
 //
@@ -100,6 +104,7 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const Di
         // Must be been called with one of the spin decomposition types.
         assert(false);
     }
+    SyncWtoO();
 }
 //
 // Construct with W operator
@@ -111,6 +116,7 @@ SiteOperatorImp::SiteOperatorImp(int d, const TensorT& W)
     int Dw=itsWs(1,1).GetNumRows();
     assert(itsWs(1,1).GetNumCols()==Dw);
     itsDw=Dw12(Dw,Dw);
+    SyncWtoO();
 }
 
 
@@ -141,12 +147,44 @@ void SiteOperatorImp::SetNeighbours(SiteOperator* left, SiteOperator* right)
     assert(!right || itsRightNeighbour);
 }
 
+void SiteOperatorImp::SyncWtoO()
+{
+    itsWOvM.SetChi12(itsDw.Dw1-2,itsDw.Dw2-2);
+    for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
+        {
+            const MatrixRT& W=GetW(m,n);
+            for (index_t i:itsWOvM.rows())
+            for (index_t j:itsWOvM.cols())
+                itsWOvM(i,j)(m,n)=W(i+1,j+1);
+        }
+}
+
+void SiteOperatorImp::SyncOtoW()
+{
+    for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
+        {
+            MatrixRT W(itsDw.Dw1,itsDw.Dw2);
+            for (index_t i:itsWOvM.rows())
+            for (index_t j:itsWOvM.cols())
+                W(i+1,j+1)=itsWOvM(i,j)(m,n);
+            SetW(m,n,W);
+        }
+
+}
+
 void SiteOperatorImp::SetW(int m, int n, const MatrixRT& W)
 {
-    if (W.GetNumRows()!=itsDw.Dw1)
-        assert(W.GetNumRows()==itsDw.Dw1);
+    assert(W.GetNumRows()==itsDw.Dw1);
     assert(W.GetNumCols()==itsDw.Dw2);
     itsWs(m+1,n+1)=W;
+
+//    if (W.GetNumRows()!=itsWOvM.GetNumRows() || W.GetNumCols()==itsWOvM.GetNumCols())
+    itsWOvM.SetChi12(itsDw.Dw1-2,itsDw.Dw2-2);
+    for (index_t i:itsWOvM.rows())
+    for (index_t j:itsWOvM.cols())
+          itsWOvM(i,j)(m,n)=W(i+1,j+1);
 }
 
 void SiteOperatorImp::SetLimits()
