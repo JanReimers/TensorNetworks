@@ -82,21 +82,33 @@
 		</Linker>
 		<Unit filename="BenchmarkTests.C">
 			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="ExactDiagTests.C">
 			<Option compilerVar="CPP" />
+			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="ExpectationsTests.C">
 			<Option compilerVar="CPP" />
+			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="ITensorUnitTests.C">
 			<Option compilerVar="CPP" />
+			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="ImaginaryTimeTests.C">
 			<Option compilerVar="CPP" />
+			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="LinearAlgebraTests.C">
 			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="LinearAlgebraTests.H" />
 		<Unit filename="MPOTests.C">
@@ -107,16 +119,24 @@
 		</Unit>
 		<Unit filename="MPSNormTests.C">
 			<Option compilerVar="CPP" />
+			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="MPSTests.C">
 			<Option compilerVar="CPP" />
+			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="Tests.H" />
 		<Unit filename="VariationalGroundStateTests.C">
 			<Option compilerVar="CPP" />
+			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="iTEBDTests.C">
 			<Option compilerVar="CPP" />
+			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="main.C">
 			<Option compilerVar="CPP" />

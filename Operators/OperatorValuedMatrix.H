@@ -11,8 +11,8 @@ template <class T> class MatrixO : public Matrix<OperatorElement<T> >
 {
     typedef OperatorElement<T> EType;
     typedef Matrix<EType> Base;
-    typedef std::tuple<MatrixO,Matrix<T> > QXType;
-
+    typedef std::tuple<MatrixO  ,Matrix<T> > QXType;
+    typedef std::tuple<index_t  ,index_t   > IIType;
 public:
     MatrixO();
     MatrixO(int d);
@@ -23,6 +23,8 @@ public:
     virtual ~MatrixO();
 
     void SetChi12(int X1,int X2,bool preserve_data);
+    IIType GetChi12() const;
+
     void CheckUL();
     MatrixO& operator=(const MatrixO& m);
     MatrixO& operator=(MatrixO&& m);
@@ -46,6 +48,7 @@ public:
     MatrixO   GetV     (Direction) const;
     Matrix<T> Flatten  (Direction) const;
     QXType    BlockQX  (Direction) const;
+    QXType    BlockSVD (Direction,const SVCompressorR* comp) const;
 
     void      SetV     (const MatrixO& V); //Limits of V decide R/L*U/L
     void      UnFlatten(const Matrix<T>& F); //Limits of V decide R/L*U/L
@@ -57,6 +60,8 @@ public:
     }
     std::ostream& PrettyPrint(std::ostream& os) const;
 private:
+    Matrix<T> ExtractM(Matrix<T>& RL) const;
+    void      Grow(Matrix<T>& m,const MatLimits& lim) const;
 
     int     itsd;
     TriType itsUL; //Upper or lower triangular.

@@ -1,5 +1,8 @@
 #include "OperatorValuedMatrix.H"
 #include "NumericalMethods/LapackQRSolver.H"
+#include "NumericalMethods/LapackSVDSolver.H"
+#include "TensorNetworks/SVCompressor.H"
+#include "oml/diagonalmatrix.h"
 
 using std::cout;
 using std::endl;
@@ -59,6 +62,12 @@ template <class T> MatrixO<T>::~MatrixO()
     //dtor
 }
 
+template <class T> typename MatrixO<T>::IIType MatrixO<T>::GetChi12() const
+{
+    return std::make_tuple(this->GetNumRows()-2,this->GetNumCols()-2);
+}
+
+
 template <class T> void MatrixO<T>::SetChi12(int X1,int X2,bool preserve_data)
 {
     if (this->GetNumRows()!=X1+2 || this->GetNumCols()!=X2+2)
@@ -81,7 +90,7 @@ template <class T> void MatrixO<T>::CheckUL()
             itsUL=Lower;
         else if (IsUpperTriangular(*this))
         {
-            cout << "Upper=" << *this << endl;
+//            cout << "Upper=" << *this << endl;
             itsUL=Upper;
 
         }
@@ -118,7 +127,7 @@ template <class T> MatrixO<T>& MatrixO<T>::operator*=(const T& s)
 template <class T> std::ostream& MatrixO<T>::PrettyPrint(std::ostream& os) const
 {
     assert(itsd>1);
-    os << std::fixed << std::setprecision(1) << std::endl;
+    os << std::fixed << std::setprecision(1) << this->GetLimits() << std::endl;
     for (index_t i:this->rows())
     {
         for (int m=0;m<itsd;m++)
@@ -171,7 +180,11 @@ template <class T> Matrix<T> MatrixO<T>::GetOrthoMatrix(Direction lr) const
     return O;
 }
 
-
+//
+//  THis routine is rather tricky because are actually 12 permutations here
+//  Left/Right * Upper/Lower * Column/Rectangular/Row matrix.
+//  For the column and row cases the V-block still needs to have one column or row.
+//
 template <class T> MatrixO<T> MatrixO<T>::GetV(Direction lr) const
 {
     assert(itsUL!=Full); //Did we forget to call CheckUL() after loading the data?
@@ -366,6 +379,93 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
     V .ReBase(Vlim);
     RL.ReBase(Vlim);
     return std::make_tuple(V,RL);
+}
+
+//
+//  This is where the fixed limits (0....X+1) helps us.  We know exactly where M is.
+//  M is from (1..X1)x(1..X2) inside RL regardless of the limits RL.
+//  the M area of the RL matrix gets replaced by a unit matrix.
+//
+template <class T> Matrix<T> MatrixO<T>::ExtractM(Matrix<T>& RL) const
+{
+    auto [X1,X2]=GetChi12();
+    Matrix<T> M(X1,X2); //One based
+    for (int w1=1;w1<=X1;w1++)
+    for (int w2=1;w2<=X2;w2++)
+    {
+        M(w1,w2)=RL(w1,w2);
+        RL(w1,w2)= (w1==w2) ? 1 : 0;
+    }
+    return M;
+}
+
+//
+//  add unit rows and columns to m until m has the limits: lim
+//
+template <class T> void MatrixO<T>::Grow(Matrix<T>& m,const MatLimits& lim) const
+{
+    const VecLimits&  rl=lim.Row;
+    const VecLimits&  cl=lim.Col;
+    const VecLimits& mrl=m.GetLimits().Row;
+    const VecLimits& mcl=m.GetLimits().Col;
+    assert( rl.Low == cl.Low );
+    assert( rl.High== cl.High);
+    assert(mrl.Low ==mcl.Low );
+    assert(mrl.High==mcl.High);
+    assert( rl.Low <=mrl.Low );
+    assert( rl.High>=mrl.High);
+    m.SetLimits(lim,true); //Save the data.
+    for (int i= rl.Low;i<mrl.Low;i++)
+    {
+        m(i,i)=1.0;
+        for (int j=i+1;j<=cl.High;j++) m(i,j)=0.0;
+        for (int j=i+1;j<=rl.High;j++) m(j,i)=0.0;
+    }
+    for (int i=mrl.High+1;i<=rl.High;i++)
+    {
+        m(i,i)=1.0;
+        for (int j=cl.Low;j<=i-1;j++) m(i,j)=0.0;
+        for (int j=rl.Low;j<=i-1;j++) m(j,i)=0.0;
+    }
+
+}
+
+template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr,const SVCompressorR* comp) const
+{
+    auto [Q,RL]=BlockQX(lr);
+    assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
+    Matrix<T> M=ExtractM(RL);
+    LapackSVDSolver <double>  solver;
+    auto [U,s,VT]=solver.SolveAll(M,1e-14); //Solves M=U * s * VT
+    comp->Compress(U,s,VT);
+//    cout << "s=" << s << endl;
+
+    Grow(RL,this->GetLimits());
+    MatrixRT RLtrans; //THis gets transferred to the neighbouring site;
+    switch (lr)
+    {
+    case DLeft:
+        {
+            Matrix<T> sV=s*VT;
+            Grow(sV,this->GetLimits());
+            RLtrans=sV*RL;
+            Grow(U,Q.GetLimits());
+            Q=MatrixO(Q*U);
+            assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
+        }
+        break;
+    case DRight:
+        {
+            Matrix<T> Us=U*s;
+            Grow(Us,this->GetLimits());
+            RLtrans=RL*Us;
+            Grow(VT,Q.GetLimits());
+            Q=MatrixO(VT*Q);
+            assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
+        }
+        break;
+    }
+    return std::make_tuple(Q,RLtrans);
 }
 
 

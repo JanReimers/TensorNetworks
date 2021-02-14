@@ -25,6 +25,7 @@ using TensorNetworks::Upper;
 using TensorNetworks::Direction;
 using TensorNetworks::DLeft;
 using TensorNetworks::DRight;
+using TensorNetworks::SVCompressorR;
 
 class MPOTests1 : public ::testing::Test
 {
@@ -55,7 +56,8 @@ public:
         assert(itsOperatorClient);
     }
 
-    void TestQR(double S,Direction,TriType);
+    void TestQR (double S,Direction,TriType);
+    void TestSVD(double S,Direction,TriType);
     Direction Invert(Direction lr) const
     {
         if (lr==DLeft)
@@ -88,6 +90,34 @@ void MPOTests1::TestQR(double S,Direction lr,TriType ul)
     if (ul==Lower)
     {
         EXPECT_TRUE(IsLowerTriangular(R));
+        EXPECT_TRUE(IsLowerTriangular(Q));
+    }
+    EXPECT_TRUE(IsUnit(Q.GetOrthoMatrix(lr),eps));
+    EXPECT_FALSE(IsUnit(Q.GetOrthoMatrix(Invert(lr)),eps));
+}
+
+void MPOTests1::TestSVD(double S,Direction lr,TriType ul)
+{
+    Setup(S);
+    SVCompressorR* comp=itsFactory->MakeMPOCompressor(0,1e-14);
+
+    MatrixOR OvM(itsOperatorClient->GetMatrixO(ul));
+    MatrixOR V=OvM.GetV(lr);
+    auto [Q,R]=OvM.BlockSVD(lr,comp);
+    R.SetLimits(Q.GetLimits(),true); //Shrink R back to Q size so we can multiply.
+    MatrixOR V1;
+    if (lr==DLeft) V1=Q*R; else V1=R*Q;
+
+    EXPECT_NEAR(MaxDelta(V,V1),0.0,eps);
+
+    if (ul==Upper)
+    {
+//        EXPECT_TRUE(IsUpperTriangular(R)); Not guaranteed for SVD
+        EXPECT_TRUE(IsUpperTriangular(Q));
+    }
+    if (ul==Lower)
+    {
+//        EXPECT_TRUE(IsLowerTriangular(R)); Not guaranteed for SVD
         EXPECT_TRUE(IsLowerTriangular(Q));
     }
     EXPECT_TRUE(IsUnit(Q.GetOrthoMatrix(lr),eps));
@@ -362,5 +392,16 @@ TEST_F(MPOTests1,OperatorValuedMatrixQR)
         TestQR(S,DRight,Upper);
         TestQR(S,DLeft ,Lower);
         TestQR(S,DRight,Lower);
+    }
+}
+
+TEST_F(MPOTests1,OperatorValuedMatrixSVD)
+{
+    for (double S=0.5;S<=2.5;S+=0.5)
+    {
+        TestSVD(S,DLeft ,Upper);
+        TestSVD(S,DRight,Upper);
+        TestSVD(S,DLeft ,Lower);
+        TestSVD(S,DRight,Lower);
     }
 }
