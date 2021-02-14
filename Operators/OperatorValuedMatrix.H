@@ -22,7 +22,7 @@ public:
     MatrixO(MatrixO&& m);
     virtual ~MatrixO();
 
-    void SetChi12(int X1,int X2);
+    void SetChi12(int X1,int X2,bool preserve_data);
     void CheckUL();
     MatrixO& operator=(const MatrixO& m);
     MatrixO& operator=(MatrixO&& m);

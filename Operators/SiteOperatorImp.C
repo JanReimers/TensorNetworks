@@ -58,6 +58,7 @@ SiteOperatorImp::SiteOperatorImp(int d, const OperatorClient* H)
             assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
         }
     SyncWtoO();
+    CheckSync();
 }
 
 //
@@ -149,15 +150,16 @@ void SiteOperatorImp::SetNeighbours(SiteOperator* left, SiteOperator* right)
 
 void SiteOperatorImp::SyncWtoO()
 {
-    itsWOvM.SetChi12(itsDw.Dw1-2,itsDw.Dw2-2);
+    itsWOvM.SetChi12(itsDw.Dw1-2,itsDw.Dw2-2,false);
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)
         {
             const MatrixRT& W=GetW(m,n);
-            for (index_t i:itsWOvM.rows())
-            for (index_t j:itsWOvM.cols())
-                itsWOvM(i,j)(m,n)=W(i+1,j+1);
+            for (index_t w1:itsWOvM.rows())
+            for (index_t w2:itsWOvM.cols())
+                itsWOvM(w1,w2)(m,n)=W(w1+1,w2+1);
         }
+    itsWOvM.CheckUL();
 }
 
 void SiteOperatorImp::SyncOtoW()
@@ -166,12 +168,45 @@ void SiteOperatorImp::SyncOtoW()
         for (int n=0; n<itsd; n++)
         {
             MatrixRT W(itsDw.Dw1,itsDw.Dw2);
-            for (index_t i:itsWOvM.rows())
-            for (index_t j:itsWOvM.cols())
-                W(i+1,j+1)=itsWOvM(i,j)(m,n);
+            for (index_t w1:itsWOvM.rows())
+            for (index_t w2:itsWOvM.cols())
+                W(w1+1,w2+1)=itsWOvM(w1,w2)(m,n);
             SetW(m,n,W);
         }
 
+}
+
+void SiteOperatorImp::CheckSync()
+{
+    for (int m=0; m<itsd; m++)
+    for (int n=0; n<itsd; n++)
+    {
+        const MatrixRT& W=GetW(m,n);
+        for (index_t w1:itsWOvM.rows())
+        for (index_t w2:itsWOvM.cols())
+            if(itsWOvM(w1,w2)(m,n)!=W(w1+1,w2+1))
+            {
+                cout << "Ovw(" << w1 << "," << w2 << ")(" << m << "," << n << "),W = " << itsWOvM(w1,w2)(m,n) << " " << W(w1+1,w2+1) << endl;
+            }
+    }
+}
+
+SiteOperatorImp* SiteOperatorImp::GetNeighbour(Direction lr) const
+{
+    SiteOperatorImp* ret=0;
+    switch(lr)
+    {
+    case DLeft:
+        ret=itsRightNeighbour;
+        break;
+    case DRight:
+        ret=itsLeft_Neighbour;
+        break;
+    default:
+        assert(false);
+    }
+    assert(ret);
+    return ret;
 }
 
 void SiteOperatorImp::SetW(int m, int n, const MatrixRT& W)
@@ -180,8 +215,7 @@ void SiteOperatorImp::SetW(int m, int n, const MatrixRT& W)
     assert(W.GetNumCols()==itsDw.Dw2);
     itsWs(m+1,n+1)=W;
 
-//    if (W.GetNumRows()!=itsWOvM.GetNumRows() || W.GetNumCols()==itsWOvM.GetNumCols())
-    itsWOvM.SetChi12(itsDw.Dw1-2,itsDw.Dw2-2);
+    itsWOvM.SetChi12(itsDw.Dw1-2,itsDw.Dw2-2,false); //Don't bother preserving the data.
     for (index_t i:itsWOvM.rows())
     for (index_t j:itsWOvM.cols())
           itsWOvM(i,j)(m,n)=W(i+1,j+1);
@@ -244,6 +278,7 @@ void SiteOperatorImp::Product(const SiteOperator* O2)
     itsWs=newWs;  //Use SetiW instead
 
     itsDw=Dw;
+    SyncWtoO();
 }
 
 

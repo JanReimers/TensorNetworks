@@ -66,6 +66,7 @@ class SiteOperatorImp : public virtual SiteOperator
         //
         //  As per Parker et. al.
         //
+        virtual void    CanonicalFormOvM(Direction LR);
         virtual void    CanonicalForm(Direction LR);
         virtual void   iCanonicalFormQRIter(Direction LR); //Infinite lattice iMPO version
         virtual void   iCanonicalFormTriangular(Direction LR); //Infinite lattice iMPO version
@@ -77,16 +78,20 @@ class SiteOperatorImp : public virtual SiteOperator
         virtual char   GetLRB() const=0;
         virtual void   CheckDws() const;
         virtual void   SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
+    protected:
+        void SyncWtoO();
+        void SyncOtoW();
+        void CheckSync();
+
     private:
         friend class MPOTesting;
         friend class iMPOImp;
 
-        void SyncWtoO();
-        void SyncOtoW();
 
         virtual MatrixRT GetV(Direction,int m, int n) const =0;
         virtual void     SetV(Direction,int m, int n, const MatrixRT& V)=0;
                 void     SetW(          int m, int n, const MatrixRT& W);
+        SiteOperatorImp* GetNeighbour(Direction) const;
 
         double CompressStd   (Direction,const SVCompressorR*);
         double CompressParker(Direction,const SVCompressorR*);

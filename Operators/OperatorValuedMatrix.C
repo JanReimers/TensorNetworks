@@ -1,6 +1,9 @@
 #include "OperatorValuedMatrix.H"
 #include "NumericalMethods/LapackQRSolver.H"
 
+using std::cout;
+using std::endl;
+
 namespace TensorNetworks
 {
 
@@ -56,11 +59,11 @@ template <class T> MatrixO<T>::~MatrixO()
     //dtor
 }
 
-template <class T> void MatrixO<T>::SetChi12(int X1,int X2)
+template <class T> void MatrixO<T>::SetChi12(int X1,int X2,bool preserve_data)
 {
     if (this->GetNumRows()!=X1+2 || this->GetNumCols()!=X2+2)
     {
-        Base::SetLimits(0,X1+1,0,X2+1,true); //Save Data?
+        Base::SetLimits(0,X1+1,0,X2+1,preserve_data); //Save Data?
         double S=0.5*(itsd-1.0);
         OperatorElement<T> Z=OperatorZ(S);
         Fill(*this,Z);
@@ -68,12 +71,23 @@ template <class T> void MatrixO<T>::SetChi12(int X1,int X2)
 }
 template <class T> void MatrixO<T>::CheckUL()
 {
-    if (IsLowerTriangular(*this))
-        itsUL=Lower;
-    else if (IsUpperTriangular(*this))
-        itsUL=Upper;
+    if (this->GetNumRows()<2 || this->GetNumCols()<2)
+    {
+        itsUL=Lower; //Temporary kludge to get beyond the row/col matrix U/L ambiguity
+    }
     else
-        itsUL=Full;
+    {
+        if (IsLowerTriangular(*this))
+            itsUL=Lower;
+        else if (IsUpperTriangular(*this))
+        {
+            cout << "Upper=" << *this << endl;
+            itsUL=Upper;
+
+        }
+        else
+            itsUL=Full;
+    }
 
     MatLimits l=this->GetLimits();
     OperatorElement<T> e=(*this)(l.Row.Low,l.Col.Low);
@@ -160,8 +174,16 @@ template <class T> Matrix<T> MatrixO<T>::GetOrthoMatrix(Direction lr) const
 
 template <class T> MatrixO<T> MatrixO<T>::GetV(Direction lr) const
 {
-    MatrixO<T> V;
+    assert(itsUL!=Full); //Did we forget to call CheckUL() after loading the data?
     const MatLimits& l=this->GetLimits();
+    int rl=l.Row.Low +1; //shifted first row.
+    int rh=l.Row.High-1;
+    int cl=l.Col.Low +1;
+    int ch=l.Col.High-1;
+    if (rl>l.Row.High) rl=l.Row.High; //enforce at least one row
+    if (rh<l.Row.Low ) rh=l.Row.Low;  //enforce at least one row
+    if (cl>l.Col.High) cl=l.Col.High; //enforce at least one column
+    if (ch<l.Col.Low ) ch=l.Col.Low;  //enforce at least one column
     MatLimits lv;
     switch (lr)
     {
@@ -169,10 +191,10 @@ template <class T> MatrixO<T> MatrixO<T>::GetV(Direction lr) const
         switch(itsUL)
         {
         case Upper:
-            lv=MatLimits(l.Row.Low,l.Row.High-1,l.Col.Low,l.Col.High-1);
+            lv=MatLimits(l.Row.Low,rh,l.Col.Low,ch);
             break;
         case Lower:
-            lv=MatLimits(l.Row.Low+1,l.Row.High,l.Col.Low+1,l.Col.High);
+            lv=MatLimits(rl,l.Row.High,cl,l.Col.High);
             break;
         default:
             assert(false);
@@ -182,16 +204,18 @@ template <class T> MatrixO<T> MatrixO<T>::GetV(Direction lr) const
         switch(itsUL)
         {
         case Upper:
-            lv=MatLimits(l.Row.Low+1,l.Row.High,l.Col.Low+1,l.Col.High);
+            lv=MatLimits(rl,l.Row.High,cl,l.Col.High);
             break;
         case Lower:
-            lv=MatLimits(l.Row.Low,l.Row.High-1,l.Col.Low,l.Col.High-1);
+            lv=MatLimits(l.Row.Low,rh,l.Col.Low,ch);
             break;
         default:
             assert(false);
         }
         break;
     }
+    assert(lv.GetNumRows()>0);
+    assert(lv.GetNumCols()>0);
     return this->SubMatrix(lv);
 }
 
@@ -280,6 +304,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
     MatLimits Vlim=V.ReBase(1,1);
 
     Matrix<T> Vf=V.Flatten(lr);
+    assert(FrobeniusNorm(Vf)>0.0); //Make sure we didn't get all zeros
     Matrix<T> RL;
     double scale=1.0;
     int Dw1=V.GetNumRows();
@@ -302,7 +327,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
             auto [R,Q]=solver.SolveThinRQ(Vf);
             V.UnFlatten(Q);
             RL=R;
-            scale=RL(Dw1,Dw2);
+            scale=RL(Dw1,Dw1);
         }
         break;
         }
@@ -315,7 +340,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
             auto [Q,L]=solver.SolveThinQL(Vf);
             V.UnFlatten(Q);
             RL=L;
-            scale=RL(Dw1,Dw2);
+            scale=RL(Dw2,Dw2);
         }
         break;
         case DRight:
@@ -331,7 +356,11 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
     default:
         assert(false);
     }
-    assert(fabs(scale)-itsd<1e-15);
+    // Do some sanity checks before re-scaling.
+    assert(fabs(scale)>0.0);
+    assert(!isnan(RL));
+    assert(!isinf(RL));
+    assert(fabs(fabs(scale)-sqrt(itsd))<1e-15);
     RL/=scale;
     V*=scale;
     V .ReBase(Vlim);

@@ -63,6 +63,7 @@ void SiteOperatorRight::Init_lr(int oneIndex)
         }
      itsDw.Dw2=1;
      SetLimits();
+     SyncWtoO();
 }
 
 
