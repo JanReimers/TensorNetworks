@@ -472,7 +472,21 @@ TEST_F(MPOTests1,Grow3)
     Unit(A);
     MatLimits l(0,5,0,25);
     TensorNetworks::Grow(A,l);
-    EXPECT_TRUE(IsUnit(A));
+    for (index_t i:A.rows())
+    {
+        if (i==5)
+            EXPECT_EQ(A(i,25),1.0);
+        else
+            EXPECT_EQ(A(i,25),0.0);
+    }
+    for (index_t i:A.cols())
+    {
+        if (i==25)
+            EXPECT_EQ(A(5,i),1.0);
+        else
+            EXPECT_EQ(A(5,i),0.0);
+    }
+    EXPECT_FALSE(IsUnit(A));
 }
 TEST_F(MPOTests1,Grow4)
 {
@@ -480,7 +494,21 @@ TEST_F(MPOTests1,Grow4)
     Unit(A);
     MatLimits l(0,25,0,5);
     TensorNetworks::Grow(A,l);
-    EXPECT_TRUE(IsUnit(A));
+    for (index_t i:A.rows())
+    {
+        if (i==25)
+            EXPECT_EQ(A(i,5),1.0);
+        else
+            EXPECT_EQ(A(i,5),0.0);
+    }
+    for (index_t i:A.cols())
+    {
+        if (i==5)
+            EXPECT_EQ(A(25,i),1.0);
+        else
+            EXPECT_EQ(A(25,i),0.0);
+    }
+    EXPECT_FALSE(IsUnit(A));
 }
 
 TEST_F(MPOTests1,Grow5)
