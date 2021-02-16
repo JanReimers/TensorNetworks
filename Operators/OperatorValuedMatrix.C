@@ -105,21 +105,22 @@ template <class T> void MatrixO<T>::SetChi12(int X1,int X2,bool preserve_data)
 
 template <class T> void MatrixO<T>::CheckUL()
 {
+    double eps=1e-8;
     if (this->GetNumRows()<2 || this->GetNumCols()<2)
     {
         //itsUL=Lower; //Temporary kludge to get beyond the row/col matrix U/L ambiguity
     }
     else
     {
-        if (IsLowerTriangular(*this))
+        if (IsLowerTriangular(*this,eps))
             itsUL=Lower;
-        else if (IsUpperTriangular(*this))
+        else if (IsUpperTriangular(*this,eps))
         {
             itsUL=Upper;
         }
         else
         {
-//            cout << std::scientific << std::setprecision(1) << *this;
+//            cout << std::scientific << std::setprecision(1) << "Full matrix??=" << *this;
             itsUL=Full;
         }
     }
