@@ -71,6 +71,7 @@ class SiteOperatorImp : public virtual SiteOperator
 
         double CompressStd   (Direction,const SVCompressorR*);
         double CompressParker(Direction,const SVCompressorR*);
+        double CompressParkerOvM(Direction,const SVCompressorR*);
         void   SVDTransfer   (Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV);
         void   QLTransfer    (Direction lr,const MatrixRT& L);
 

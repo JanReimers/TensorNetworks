@@ -347,6 +347,18 @@ MatrixRT MakeBlockMatrix(Direction lr,const MatrixRT& LR)
     }
     return LRplus;
 }
+
+double SiteOperatorImp::CompressParkerOvM(Direction lr,const SVCompressorR* comp)
+{
+    CheckSync();
+    auto [Q,RL]=itsWOvM.BlockSVD(lr,comp); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
+    itsWOvM.SetV(lr,Q); //Could be move inside BlockQX
+    SyncOtoW(); //Get Q into the Ws.
+    GetNeighbour(lr)->QLTransfer(lr,RL);
+    return itsWOvM.GetTruncationError();
+}
+
+
 void SiteOperatorImp::CanonicalFormOvM(Direction lr)
 {
     CheckSync();
