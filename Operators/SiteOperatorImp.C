@@ -164,6 +164,22 @@ void SiteOperatorImp::SyncWtoO()
 
 void SiteOperatorImp::SyncOtoW()
 {
+    auto [X1,X2]=itsWOvM.GetChi12();
+    int D1=X1+2;
+    int D2=X2+2;
+    if (itsDw.Dw1!=D1 || itsDw.Dw2!=D2)
+    {
+        for (int m=0; m<itsd; m++)
+        for (int n=0; n<itsd; n++)
+        {
+            VectorRT lastRow=itsWs(m+1,n+1).GetRow(itsDw.Dw1);
+            itsWs(m+1,n+1).SetLimits(D1,D2,true);
+            itsWs(m+1,n+1).GetRow(D1)=lastRow.SubVector(D2);
+
+        }
+        itsDw.Dw1=D1;
+        itsDw.Dw2=D2;
+    }
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)
         {
