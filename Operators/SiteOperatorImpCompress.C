@@ -362,15 +362,12 @@ double SiteOperatorImp::CompressParkerOvM(Direction lr,const SVCompressorR* comp
 void SiteOperatorImp::CanonicalFormOvM(Direction lr)
 {
     CheckSync();
-//    int X1=itsDw.Dw1-2;
-//    int X2=itsDw.Dw2-2;
-//    MatrixOR V=itsWOvM.GetV(lr); //Extract the V-block
+    MatrixOR Wcopy=itsWOvM;
     auto [Q,RL]=itsWOvM.BlockQX(lr); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
-    itsWOvM.SetV(Q); //Could be move inside BlockQX
+    itsWOvM.SetV(lr,Q); //Could be move inside BlockQX
     SyncOtoW(); //Get Q into the Ws.
     RL.ReBase(1,1); //Remove later
-    MatrixRT RLplus=MakeBlockMatrix(lr,RL); //Could be move inside BlockQX
-    GetNeighbour(lr)->QLTransfer(lr,RLplus);
+    GetNeighbour(lr)->QLTransfer(lr,RL);
 }
 
 void SiteOperatorImp::CanonicalForm(Direction lr)
