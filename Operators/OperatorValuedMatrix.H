@@ -42,6 +42,7 @@ public:
     }
     MatrixO<T>& operator*=(const T& s);
 
+    double    GetTruncationError() const {return itsTruncationError;}
     TriType   GetUpperLower() const {return itsUL;}
     T         GetTrace(int a, int b, int c, int d) const;
     Matrix<T> GetOrthoMatrix(Direction) const;
@@ -64,6 +65,7 @@ private:
     Matrix<T> ExtractM(Matrix<T>& RL) const;
 
     int     itsd;
+    double  itsTruncationError; //Should live on the bond with the SVs.
     TriType itsUL; //Upper or lower triangular.
 };
 

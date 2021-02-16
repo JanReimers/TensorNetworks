@@ -13,18 +13,21 @@ namespace TensorNetworks
 template <class T> MatrixO<T>::MatrixO()
     : Matrix<OperatorElement<T> >()
     , itsd(0)
+    , itsTruncationError(0)
     , itsUL(Full)
 {}
 
 template <class T> MatrixO<T>::MatrixO(int d)
     : Matrix<OperatorElement<T> >()
     , itsd(d)
+    , itsTruncationError(0)
     , itsUL(Full)
 {}
 
 template <class T> MatrixO<T>::MatrixO(const Base& m)
     : Matrix<OperatorElement<T> >(m)
     , itsd(m(m.GetLimits().Row.Low,m.GetLimits().Col.Low).GetNumRows())
+    , itsTruncationError(0)
     , itsUL(Full)
 {
     CheckUL();
@@ -33,6 +36,7 @@ template <class T> MatrixO<T>::MatrixO(const Base& m)
 template <class T> MatrixO<T>::MatrixO(const MatrixO& m)
     : Matrix<OperatorElement<T> >(m)
     , itsd(m.itsd)
+    , itsTruncationError(0)
     , itsUL(Full)
 {
     CheckUL();
@@ -41,6 +45,7 @@ template <class T> MatrixO<T>::MatrixO(const MatrixO& m)
 template <class T> MatrixO<T>::MatrixO(MatrixO&& m)
     : Matrix<OperatorElement<T> >(m)
     , itsd(m.itsd)
+    , itsTruncationError(0)
     , itsUL(Full)
 {
     CheckUL();
@@ -50,6 +55,7 @@ template <class T> MatrixO<T>::MatrixO(MatrixO&& m)
 template <class T> MatrixO<T>::MatrixO(int Dw1, int Dw2,double S)
     : Matrix<OperatorElement<T> >(0,Dw1-1,0,Dw2-1)
     , itsd(2*S+1)
+    , itsTruncationError(0)
     , itsUL(Full)
 {
     OperatorElement<T> Z=OperatorZ(S);
