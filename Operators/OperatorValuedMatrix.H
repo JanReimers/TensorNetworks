@@ -50,7 +50,7 @@ public:
     MatrixO   GetV     (Direction) const;
     Matrix<T> Flatten  (Direction) const;
     QXType    BlockQX  (Direction) const;
-    QXType    BlockSVD (Direction,const SVCompressorR* comp) const;
+    QXType    BlockSVD (Direction,const SVCompressorR* comp) ;
 
     void      SetV     (Direction,const MatrixO& V);
     void      UnFlatten(const Matrix<T>& F); //Limits of V decide R/L*U/L

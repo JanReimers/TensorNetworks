@@ -528,14 +528,14 @@ void Grow(Matrix<double>& m,const MatLimits& lim)
 
 }
 
-template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr,const SVCompressorR* comp) const
+template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr,const SVCompressorR* comp)
 {
     auto [Q,RL]=BlockQX(lr);
     assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
     Matrix<T> M=ExtractM(RL);
     LapackSVDSolver <double>  solver;
     auto [U,s,VT]=solver.SolveAll(M,1e-14); //Solves M=U * s * VT
-    comp->Compress(U,s,VT);
+    itsTruncationError=comp->Compress(U,s,VT);
 //    cout << "s=" << s << endl;
 
     Grow(RL,this->GetLimits());
