@@ -28,6 +28,7 @@ protected:
     int    itsd;
 };
 
+
 typedef OperatorElement<double> OperatorElementR;
 typedef OperatorElement<dcmplx> OperatorElementC;
 
@@ -94,6 +95,11 @@ template <class T> struct ReturnType<TensorNetworks::OperatorElement<T>,TensorNe
     typedef TensorNetworks::OperatorElement<T> RetType;
 };
 
+template <class T> double fabs(const TensorNetworks::OperatorElement<T>& oe)
+{
+    const Matrix<T>& m(oe);
+    return Max(fabs(m));
+}
 
 
 #endif // OPERATORELEMENT_H
