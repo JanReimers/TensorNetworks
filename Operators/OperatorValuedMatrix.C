@@ -372,13 +372,20 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
     LapackQRSolver <double>  solver;
     MatrixO   V=GetV(lr);
     MatLimits Vlim=V.ReBase(1,1);
+//    cout << "V,Vlim=" << V.GetLimits() << " " << Vlim << endl;
 
     Matrix<T> Vf=V.Flatten(lr);
+//    cout << "Vf=" << Vf.GetLimits() << endl;
     assert(FrobeniusNorm(Vf)>0.0); //Make sure we didn't get all zeros
     Matrix<T> RL;
     double scale=1.0;
     int Dw1=V.GetNumRows();
     int Dw2=V.GetNumCols();
+    MatLimits RLlim;
+    VecLimits rlim=this->GetLimits().Row;
+    VecLimits clim=this->GetLimits().Col;
+    int RLlow;
+
     switch (itsUL)
     {
     case Upper:
@@ -386,19 +393,26 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
         {
         case DLeft:
         {
-            auto [Q,R1]=solver.SolveThinQR(Vf);
+            auto [Q,R]=solver.SolveThinQR(Vf);
+            assert(IsUpperTriangular(R));
             V.UnFlatten(Q);
-            RL=R1;
+            RL=R;
+//            cout << "RL=" << RL << endl;
             scale=RL(1,1);
+            RLlim=MatLimits(VecLimits(clim.Low,Q.GetColLimits().High),clim);
+            RLlow=Vlim.Col.Low;
         }
         break;
         case DRight:
         {
             auto [R,Q]=solver.SolveThinRQ(Vf);
+            assert(IsUpperTriangular(R));
             V.UnFlatten(Q);
             RL=R;
-            scale=RL(Dw1,Dw1);
-        }
+            scale=RL(Dw1,RL.GetNumCols());
+            RLlim=MatLimits(rlim,VecLimits(rlim.Low,Q.GetRowLimits().High));
+            RLlow=Vlim.Row.Low;
+       }
         break;
         }
         break;
@@ -408,17 +422,28 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
         case DLeft:
         {
             auto [Q,L]=solver.SolveThinQL(Vf);
+            assert(IsLowerTriangular(L));
+//            cout << "Q=" << Q << endl;
             V.UnFlatten(Q);
+ //           cout << "V=" << V << endl;
             RL=L;
-            scale=RL(Dw2,Dw2);
+//            cout << "RL=" << RL << endl;
+            scale=RL(RL.GetNumRows(),Dw2);
+//            cout << "scale=" << scale << endl;
+            RLlim=MatLimits(VecLimits(clim.Low,Q.GetColLimits().High),clim);
+            RLlow=Vlim.Col.Low;
         }
         break;
         case DRight:
         {
             auto [L,Q]=solver.SolveThinLQ(Vf);
+            assert(IsLowerTriangular(L));
             V.UnFlatten(Q);
             RL=L;
+//            cout << "RL=" << RL << endl;
             scale=RL(1,1);
+            RLlim=MatLimits(rlim,VecLimits(rlim.Low,Q.GetRowLimits().High));
+            RLlow=Vlim.Row.Low;
         }
         break;
         }
@@ -434,7 +459,13 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
     RL/=scale;
     V*=scale;
     V .ReBase(Vlim);
-    RL.ReBase(Vlim);
+    RL.ReBase(RLlow,RLlow);
+//    cout << "Rebase RL=" << RL << endl;
+//    cout << "RLlim=" << RLlim << endl;
+    Grow(RL,RLlim);
+//    cout << "V=" << V.GetLimits() << endl;
+//    cout << "Grow RL=" << RL << endl;
+
     return std::make_tuple(V,RL);
 }
 
