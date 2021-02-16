@@ -83,6 +83,19 @@ template <class T> double MaxDelta(const MatrixO<T>& a, const MatrixO<T>& b)
             ret(i,j)=Max(fabs(a(i,j)-b(i,j)));
     return Max(fabs(ret));
 }
+template <class T> MatrixO<T> operator-(const MatrixO<T>& a, const MatrixO<T>& b)
+{
+    assert(a.GetLimits()==b.GetLimits());
+    assert(a.Getd     ()==b.Getd     ());
+    MatrixO<T> ret(a.Getd(),a.GetLimits());
+    double S=0.5*(a.Getd()-1.0);
+    OperatorElement<T> Z=OperatorZ(S);
+    Fill(ret,Z);
+    for (index_t i:a.rows())
+        for (index_t j:a.cols())
+            ret(i,j)=a(i,j)-b(i,j);
+    return ret;
+}
 
 void Grow(Matrix<double>& m,const MatLimits& lim);
 
