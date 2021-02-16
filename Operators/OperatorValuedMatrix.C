@@ -24,6 +24,13 @@ template <class T> MatrixO<T>::MatrixO(int d)
     , itsUL(Full)
 {}
 
+template <class T> MatrixO<T>::MatrixO(int d, const MatLimits& lim)
+    : Matrix<OperatorElement<T> >(lim)
+    , itsd(d)
+    , itsTruncationError(0)
+    , itsUL(Full)
+{}
+
 template <class T> MatrixO<T>::MatrixO(const Base& m)
     : Matrix<OperatorElement<T> >(m)
     , itsd(m(m.GetLimits().Row.Low,m.GetLimits().Col.Low).GetNumRows())

@@ -16,6 +16,7 @@ template <class T> class MatrixO : public Matrix<OperatorElement<T> >
 public:
     MatrixO();
     MatrixO(int d);
+    MatrixO(int d, const MatLimits&);
     MatrixO(int Dw1, int Dw2,double S);
     MatrixO(const Base   & m);
     MatrixO(const MatrixO& m);
