@@ -480,10 +480,10 @@ TEST_F(MPOTests,TestParkerSVDCompressHL9)
     H->CanonicalForm(); //Do we need to sweep both ways? Yes!!!!
     EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR");
     double Eright=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E,Eright,1e-13);
     double truncError=H->Compress(TensorNetworks::Parker,0,1e-13);
     EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR");
     double Ecomp=itsMPS->GetExpectation(itsH);
-    EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_NEAR(E,Ecomp ,1e-13);
     EXPECT_EQ(itsH->GetMaxDw(),5);
     EXPECT_EQ(truncError,0.0); //H should be uncompressable
