@@ -10,30 +10,6 @@
 
 class MPOTests;
 
-template <class T> Matrix<T> TensorProduct(const Matrix<T>& a, const Matrix<T>& b)
-{
-    int nr=a.GetNumRows()*b.GetNumRows();
-    int nc=a.GetNumCols()*b.GetNumCols();
-    Matrix<T> r(nr,nc);
-    //
-    //  These loops need to run in the same order as SiteOperatorImp::Product
-    //
-    int i=1;
-    for (index_t ia:a.rows())
-    for (index_t ib:b.rows())
-    {
-        int j=1;
-        for (index_t ja:a.cols())
-        for (index_t jb:b.cols())
-        {
-            r(i,j)=a(ia,ja)*b(ib,jb);
-            j++;
-        }
-        i++;
-    }
-    return r;
-}
-
 
 
 namespace TensorNetworks

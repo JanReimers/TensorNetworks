@@ -91,6 +91,33 @@ inline VecLimits operator*(const VecLimits& a, const VecLimits& b)
     return VecLimits(a.Low,a.Low+size-1);
 }
 
+inline MatLimits operator*(const MatLimits& a, const MatLimits& b)
+{
+    return MatLimits(a.Row*b.Row,a.Col*b.Col);
+}
+
+template <class T> Matrix<T> TensorProduct(const Matrix<T>& a, const Matrix<T>& b)
+{
+    Matrix<T> r(a.GetLimits()*b.GetLimits());
+    //
+    //  These loops need to run in the same order as SiteOperatorImp::Product
+    //
+    int i=r.GetRowLimits().Low;
+    for (index_t ia:a.rows())
+    for (index_t ib:b.rows())
+    {
+        int j=r.GetColLimits().Low;
+        for (index_t ja:a.cols())
+        for (index_t jb:b.cols())
+        {
+            r(i,j)=a(ia,ja)*b(ib,jb);
+            j++;
+        }
+        i++;
+    }
+    return r;
+}
+
 
 
 } //namespace
