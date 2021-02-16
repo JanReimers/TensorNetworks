@@ -530,8 +530,9 @@ void Grow(Matrix<double>& m,const MatLimits& lim)
     {
         int i1=mrl.High+di;
         int i2=mcl.High+di;
-        for (int j=cl.Low;j<=i2;j++) m(i1,j)= (i1==j) ? 1.0 : 0.0; // Fill out bottom row
-        for (int j=rl.Low;j<=i1;j++) m(j,i2)= (j==i2) ? 1.0 : 0.0; // FIll out right column
+        for (int j=cl.Low;j<=i2;j++) m(i1,j)= 0.0; // Fill out bottom row
+        for (int j=rl.Low;j<=i1;j++) m(j,i2)= 0.0; // FIll out right column
+        m(i1,i2)=1.0;
     }
 
 }
