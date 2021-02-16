@@ -402,30 +402,40 @@ template <class T> Matrix<T> MatrixO<T>::ExtractM(Matrix<T>& RL) const
 //
 //  add unit rows and columns to m until m has the limits: lim
 //
-template <class T> void MatrixO<T>::Grow(Matrix<T>& m,const MatLimits& lim) const
+void Grow(Matrix<double>& m,const MatLimits& lim)
 {
     const VecLimits&  rl=lim.Row;
     const VecLimits&  cl=lim.Col;
     const VecLimits& mrl=m.GetLimits().Row;
     const VecLimits& mcl=m.GetLimits().Col;
     assert( rl.Low == cl.Low );
-    assert( rl.High== cl.High);
+//    assert( rl.High== cl.High);
     assert(mrl.Low ==mcl.Low );
-    assert(mrl.High==mcl.High);
+//    assert(mrl.High==mcl.High);
     assert( rl.Low <=mrl.Low );
     assert( rl.High>=mrl.High);
+    assert( cl.High>=mcl.High);
+    int delta_high=rl.High-mrl.High;
+    assert(cl.High-mcl.High==delta_high);
     m.SetLimits(lim,true); //Save the data.
+    //
+    //  Everything lines up in the top left corner so the code is reasonably simple here
+    //
     for (int i= rl.Low;i<mrl.Low;i++)
     {
         m(i,i)=1.0;
         for (int j=i+1;j<=cl.High;j++) m(i,j)=0.0;
         for (int j=i+1;j<=rl.High;j++) m(j,i)=0.0;
     }
-    for (int i=mrl.High+1;i<=rl.High;i++)
+    //
+    //  Since m is not necessarily square this is non trivial
+    //
+    for (int di=1;di<=delta_high;di++)
     {
-        m(i,i)=1.0;
-        for (int j=cl.Low;j<=i-1;j++) m(i,j)=0.0;
-        for (int j=rl.Low;j<=i-1;j++) m(j,i)=0.0;
+        int i1=mrl.High+di;
+        int i2=mcl.High+di;
+        for (int j=cl.Low;j<=i2;j++) m(i1,j)= (i1==j) ? 1.0 : 0.0; // Fill out bottom row
+        for (int j=rl.Low;j<=i1;j++) m(j,i2)= (j==i2) ? 1.0 : 0.0; // FIll out right column
     }
 
 }

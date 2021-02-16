@@ -62,7 +62,6 @@ public:
     std::ostream& PrettyPrint(std::ostream& os) const;
 private:
     Matrix<T> ExtractM(Matrix<T>& RL) const;
-    void      Grow(Matrix<T>& m,const MatLimits& lim) const;
 
     int     itsd;
     TriType itsUL; //Upper or lower triangular.
@@ -79,6 +78,15 @@ template <class T> double MaxDelta(const MatrixO<T>& a, const MatrixO<T>& b)
         for (index_t j:a.cols())
             ret(i,j)=Max(fabs(a(i,j)-b(i,j)));
     return Max(fabs(ret));
+}
+
+void Grow(Matrix<double>& m,const MatLimits& lim);
+
+inline VecLimits operator*(const VecLimits& a, const VecLimits& b)
+{
+    assert(a.Low==b.Low);
+    int size=a.size()*b.size();
+    return VecLimits(a.Low,a.Low+size-1);
 }
 
 
