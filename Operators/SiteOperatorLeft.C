@@ -67,6 +67,7 @@ void SiteOperatorLeft::Init_lr(int oneIndex)
      itsDw.Dw1=1;
      SetLimits();
      SyncWtoO();
+     itsWOvM.SetUpperLower(Lower);
 }
 
 void SiteOperatorLeft::CheckDws() const

@@ -23,6 +23,7 @@ public:
     virtual ~MatrixO();
 
     void SetChi12(int X1,int X2,bool preserve_data);
+    void SetUpperLower(TriType ul); //Row and column matrices have no way of knowing (I think?)
     IIType GetChi12() const;
 
     void CheckUL();
