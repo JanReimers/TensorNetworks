@@ -406,14 +406,14 @@ TEST_F(MPOTests,TestParkerCanonicalL9H)
     int L=9,D=2;
     double S=0.5;
     Setup(L,S,D);
-    itsH->Report(cout);
+//    itsH->Report(cout);
     itsMPS->InitializeWith(TensorNetworks::Random);
     itsMPS->Normalize(TensorNetworks::DLeft);
     TensorNetworks::MPO* H=itsH;
     EXPECT_EQ(H->GetNormStatus(),"WWWWWWWWW");
     double E=itsMPS->GetExpectation(itsH);
     itsH->CanonicalForm();
-    H->Report(cout);
+//    H->Report(cout);
     EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR"); //The last site ends up being both right and left normalized
     double Eright=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E,Eright,1e-13);
