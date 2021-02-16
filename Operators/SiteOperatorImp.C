@@ -227,8 +227,6 @@ SiteOperatorImp* SiteOperatorImp::GetNeighbour(Direction lr) const
 
 void SiteOperatorImp::SetW(int m, int n, const MatrixRT& W)
 {
-    assert(W.GetNumRows()==itsDw.Dw1);
-    assert(W.GetNumCols()==itsDw.Dw2);
     itsWs(m+1,n+1)=W;
 
     itsWOvM.SetChi12(itsDw.Dw1-2,itsDw.Dw2-2,false); //Don't bother preserving the data.
