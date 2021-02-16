@@ -143,14 +143,16 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
         {
             assert(V.GetNumRows()==itsd*itsd*(X1+1)); // Treate these like enforced comments on the
             assert(V.GetNumCols()==X2+1);             // dimensions of each matrix.
+            int Xq = (V.GetNumRows()>=V.GetNumCols()) ? X2 : itsd*itsd*(X1+1)-1;
             auto [Qp,Lp]=QRsolver.SolveThinQL(V); //Solves V=Q*L
-            Lp*=1.0/sqrt(itsd);
-            Qp*=sqrt(itsd);
+            double scale=Lp(Xq+1,X2+1);
+            assert(fabs(fabs(scale)-sqrt(itsd))<1e-15);
+            Lp*=1.0/scale;
+            Qp*=scale;
             double QLerr=Max(fabs(Qp*Lp-V));
             if (QLerr>1e-13)
                Logger->LogWarnV(1,"SiteOperatorImp::CompressParker QL error=%.1e ",QLerr);
 
-            int Xq = (V.GetNumRows()>=V.GetNumCols()) ? X2 : itsd*itsd*(X1+1)-1;
             assert(Qp.GetNumRows()==itsd*itsd*(X1+1));
             assert(Qp.GetNumCols()==Xq+1);
             assert(Lp.GetNumRows()==Xq+1);
@@ -197,8 +199,10 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
             assert(V.GetNumCols()==itsd*itsd*(X2+1)); // Treate these like enforced comments on the
             assert(V.GetNumRows()==X1+1);             // dimensions of each matrix.
             auto [Lp,Qp]=QRsolver.SolveThinLQ(V); //Solves V=Q*L
-            Lp*=1.0/sqrt(itsd);
-            Qp*=sqrt(itsd);
+            double scale=Lp(1,1);
+            assert(fabs(fabs(scale)-sqrt(itsd))<1e-15);
+            Lp*=1.0/scale;
+            Qp*=scale;
             double QLerr=Max(fabs(Lp*Qp-V));
             if (QLerr>1e-13)
                Logger->LogWarnV(1,"SiteOperatorImp::CompressParker QL error=%.1e ",QLerr);
