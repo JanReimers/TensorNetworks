@@ -380,10 +380,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
     LapackQRSolver <double>  solver;
     MatrixO   V=GetV(lr);
     MatLimits Vlim=V.ReBase(1,1);
-//    cout << "V,Vlim=" << V.GetLimits() << " " << Vlim << endl;
-
     Matrix<T> Vf=V.Flatten(lr);
-//    cout << "Vf=" << Vf.GetLimits() << endl;
     assert(FrobeniusNorm(Vf)>0.0); //Make sure we didn't get all zeros
     Matrix<T> RL;
     double scale=1.0;
@@ -405,7 +402,6 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
             assert(IsUpperTriangular(R));
             V.UnFlatten(Q);
             RL=R;
-//            cout << "RL=" << RL << endl;
             scale=RL(1,1);
             RLlim=MatLimits(VecLimits(clim.Low,Q.GetColLimits().High),clim);
             RLlow=Vlim.Col.Low;
@@ -431,13 +427,9 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
         {
             auto [Q,L]=solver.SolveThinQL(Vf);
             assert(IsLowerTriangular(L));
-//            cout << "Q=" << Q << endl;
             V.UnFlatten(Q);
- //           cout << "V=" << V << endl;
             RL=L;
-//            cout << "RL=" << RL << endl;
             scale=RL(RL.GetNumRows(),Dw2);
-//            cout << "scale=" << scale << endl;
             RLlim=MatLimits(VecLimits(clim.Low,Q.GetColLimits().High),clim);
             RLlow=Vlim.Col.Low;
         }
@@ -448,7 +440,6 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
             assert(IsLowerTriangular(L));
             V.UnFlatten(Q);
             RL=L;
-//            cout << "RL=" << RL << endl;
             scale=RL(1,1);
             RLlim=MatLimits(rlim,VecLimits(rlim.Low,Q.GetRowLimits().High));
             RLlow=Vlim.Row.Low;
@@ -468,12 +459,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
     V*=scale;
     V .ReBase(Vlim);
     RL.ReBase(RLlow,RLlow);
-//    cout << "Rebase RL=" << RL << endl;
-//    cout << "RLlim=" << RLlim << endl;
     Grow(RL,RLlim);
-//    cout << "V=" << V.GetLimits() << endl;
-//    cout << "Grow RL=" << RL << endl;
-
     return std::make_tuple(V,RL);
 }
 
