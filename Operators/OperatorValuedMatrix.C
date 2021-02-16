@@ -108,6 +108,13 @@ template <class T> void MatrixO<T>::CheckUL()
     OperatorElement<T> e=(*this)(l.Row.Low,l.Col.Low);
     itsd=e.GetNumRows();
 }
+template <class T> void MatrixO<T>::SetUpperLower(TriType ul)
+{
+    assert(this->GetNumRows()==1 || this->GetNumCols()==1);
+    assert(ul==Upper || ul==Lower);
+    itsUL=ul;
+}
+
 template <class T> MatrixO<T>& MatrixO<T>::operator=(const MatrixO<T>& m)
 {
     Base::operator=(m);
