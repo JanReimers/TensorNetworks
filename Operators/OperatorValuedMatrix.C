@@ -80,19 +80,13 @@ template <class T> typename MatrixO<T>::IIType MatrixO<T>::GetChi12() const
     return std::make_tuple(this->GetNumRows()-2,this->GetNumCols()-2);
 }
 
-
 template <class T> void MatrixO<T>::SetChi12(int X1,int X2,bool preserve_data)
 {
     if (this->GetNumRows()!=X1+2 || this->GetNumCols()!=X2+2)
     {
         auto [X1o,X2o]=GetChi12(); //Save old size
-//        for (index_t w1:this->rows())
-//        for (index_t w2:this->cols())
-//            cout << w1 << " " << w2 << " " << (*this)(w1,w2) << endl;
         Base::SetLimits(0,X1+1,0,X2+1,preserve_data); //Save Data?
-//        for (index_t w1:this->rows())
-//        for (index_t w2:this->cols())
-//            cout << w1 << " " << w2 << " " << (*this)(w1,w2) << endl;
+
         double S=0.5*(itsd-1.0);
         OperatorElement<T> Z=OperatorZ(S);
         if (preserve_data)
@@ -287,7 +281,14 @@ template <class T> void MatrixO<T>::SetV(Direction lr,const MatrixO& V)
         break;
     case DRight:
         if (nr-1<X1)
+        {
+            VectorOR lastRow=this->GetRow(X1+1);
+            assert(lastRow.size());
             SetChi12(nr-1,X2,true); //we must save the old since V only holds part of W
+//            cout << "X2,lastRow=" << X2 << " " << lastRow.GetLimits() << endl;
+            this->GetRow(nr)=lastRow.SubVector(0,X2+1);
+
+        }
         break;
     }
 

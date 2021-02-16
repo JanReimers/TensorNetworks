@@ -73,6 +73,7 @@ private:
 
 typedef MatrixO<double> MatrixOR;
 typedef MatrixO<dcmplx> MatrixOC;
+typedef Vector<OperatorElement<double>> VectorOR;
 
 template <class T> double MaxDelta(const MatrixO<T>& a, const MatrixO<T>& b)
 {
