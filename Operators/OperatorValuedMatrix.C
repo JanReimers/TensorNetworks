@@ -78,17 +78,35 @@ template <class T> void MatrixO<T>::SetChi12(int X1,int X2,bool preserve_data)
 {
     if (this->GetNumRows()!=X1+2 || this->GetNumCols()!=X2+2)
     {
+        auto [X1o,X2o]=GetChi12(); //Save old size
+//        for (index_t w1:this->rows())
+//        for (index_t w2:this->cols())
+//            cout << w1 << " " << w2 << " " << (*this)(w1,w2) << endl;
         Base::SetLimits(0,X1+1,0,X2+1,preserve_data); //Save Data?
+//        for (index_t w1:this->rows())
+//        for (index_t w2:this->cols())
+//            cout << w1 << " " << w2 << " " << (*this)(w1,w2) << endl;
         double S=0.5*(itsd-1.0);
         OperatorElement<T> Z=OperatorZ(S);
-        Fill(*this,Z);
+        if (preserve_data)
+        {
+            // Zero new rows and columns (if any)
+            for (int w1=X1o+2;w1<=X1+1;w1++)
+            for (int w2=X2o+2;w2<=X2+1;w2++)
+                (*this)(w1,w2)=Z;
+        }
+        else
+        {
+            Fill(*this,Z);
+        }
     }
 }
+
 template <class T> void MatrixO<T>::CheckUL()
 {
     if (this->GetNumRows()<2 || this->GetNumCols()<2)
     {
-        itsUL=Lower; //Temporary kludge to get beyond the row/col matrix U/L ambiguity
+        //itsUL=Lower; //Temporary kludge to get beyond the row/col matrix U/L ambiguity
     }
     else
     {
@@ -96,12 +114,13 @@ template <class T> void MatrixO<T>::CheckUL()
             itsUL=Lower;
         else if (IsUpperTriangular(*this))
         {
-//            cout << "Upper=" << *this << endl;
             itsUL=Upper;
-
         }
         else
+        {
+//            cout << std::scientific << std::setprecision(1) << *this;
             itsUL=Full;
+        }
     }
 
     MatLimits l=this->GetLimits();
@@ -245,8 +264,26 @@ template <class T> MatrixO<T> MatrixO<T>::GetV(Direction lr) const
     return this->SubMatrix(lv);
 }
 
-template <class T> void MatrixO<T>::SetV(const MatrixO& V)
+template <class T> void MatrixO<T>::SetV(Direction lr,const MatrixO& V)
 {
+    //  If L has less columns than the Ws then we need to reshape the whole site.
+    //  Typically this will happen at the edges of the lattice.
+    //
+    auto [X1,X2]=GetChi12();
+    int nc=V.GetNumCols();
+    int nr=V.GetNumRows();
+    switch (lr)
+    {
+    case DLeft:
+        if (nc-1<X2)
+            SetChi12(X1,nc-1,true); //we must save the old since V only holds part of W
+        break;
+    case DRight:
+        if (nr-1<X1)
+            SetChi12(nr-1,X2,true); //we must save the old since V only holds part of W
+        break;
+    }
+
     for (index_t i:V.rows())
         for (index_t j:V.cols())
             (*this)(i,j)=V(i,j);
@@ -295,8 +332,12 @@ template <class T> Matrix<T> MatrixO<T>::Flatten(Direction lr) const
 
 template <class T> void MatrixO<T>::UnFlatten(const Matrix<T>& F)
 {
-    if (F.GetNumRows()==itsd*itsd*this->GetNumRows())
+    int Nr=this->GetNumRows();
+    int Nc=this->GetNumCols();
+    if (F.GetNumRows()==itsd*itsd*Nr)
     {
+        if (F.GetNumCols()<Nc)
+            this->SetLimits(Nr,F.GetNumCols(),true);
         for (index_t j:this->cols())
         {
             int w=this->GetLimits().Row.Low;
@@ -309,6 +350,9 @@ template <class T> void MatrixO<T>::UnFlatten(const Matrix<T>& F)
     }
     else if (F.GetNumCols()==itsd*itsd*this->GetNumCols())
     {
+        if (F.GetNumRows()<Nr)
+            this->SetLimits(F.GetNumRows(),Nc,true);
+
         for (index_t i:this->rows())
         {
             int w=this->GetLimits().Col.Low;

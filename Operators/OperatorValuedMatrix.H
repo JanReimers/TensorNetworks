@@ -52,7 +52,7 @@ public:
     QXType    BlockQX  (Direction) const;
     QXType    BlockSVD (Direction,const SVCompressorR* comp) const;
 
-    void      SetV     (const MatrixO& V); //Limits of V decide R/L*U/L
+    void      SetV     (Direction,const MatrixO& V);
     void      UnFlatten(const Matrix<T>& F); //Limits of V decide R/L*U/L
 
 
