@@ -384,7 +384,119 @@ TEST_F(MPOTests1,OperatorValuedMatrixFlattenVLower)
     }
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixQR)
+TEST_F(MPOTests1,Grow1)
+{
+    MatrixRT A(1,4,1,24);
+    Unit(A);
+    MatLimits l(0,4,0,24);
+    TensorNetworks::Grow(A,l);
+    EXPECT_TRUE(IsUnit(A));
+}
+TEST_F(MPOTests1,Grow2)
+{
+    MatrixRT A(1,24,1,4);
+    Unit(A);
+    MatLimits l(0,24,0,4);
+    TensorNetworks::Grow(A,l);
+    EXPECT_TRUE(IsUnit(A));
+}
+TEST_F(MPOTests1,Grow3)
+{
+    MatrixRT A(0,4,0,24);
+    Unit(A);
+    MatLimits l(0,5,0,25);
+    TensorNetworks::Grow(A,l);
+    EXPECT_TRUE(IsUnit(A));
+}
+TEST_F(MPOTests1,Grow4)
+{
+    MatrixRT A(0,24,0,4);
+    Unit(A);
+    MatLimits l(0,25,0,5);
+    TensorNetworks::Grow(A,l);
+    EXPECT_TRUE(IsUnit(A));
+}
+
+TEST_F(MPOTests1,Grow5)
+{
+    MatrixRT A(0,4,0,4);
+    Unit(A);
+    MatLimits l(0,5,0,5);
+    TensorNetworks::Grow(A,l);
+    EXPECT_TRUE(IsUnit(A));
+}
+
+TEST_F(MPOTests1,Lower1)
+{
+    int M=4,N=24;
+    MatrixRT A(M,N);
+    Fill(A,1.0);
+    EXPECT_FALSE(IsLowerTriangular(A));
+    int delta=Max(1,N-M+1);
+    for (index_t i:A.rows())
+    for (index_t j:A.cols(i+delta))
+        A(i,j)=0;
+
+    EXPECT_TRUE(IsLowerTriangular(A));
+    EXPECT_TRUE(IsLowerTriangular(A,0.0));
+    EXPECT_FALSE(IsUpperTriangular(A));
+    EXPECT_FALSE(IsUpperTriangular(A,0.0));
+
+}
+TEST_F(MPOTests1,Lower2)
+{
+    int M=24,N=4;
+    MatrixRT A(M,N);
+    Fill(A,1.0);
+    EXPECT_FALSE(IsLowerTriangular(A));
+    int delta=Max(1,N-M+1);
+    for (index_t i:A.rows())
+    for (index_t j:A.cols(i+delta))
+        A(i,j)=0;
+
+    EXPECT_TRUE(IsLowerTriangular(A));
+    EXPECT_TRUE(IsLowerTriangular(A,0.0));
+    EXPECT_FALSE(IsUpperTriangular(A));
+    EXPECT_FALSE(IsUpperTriangular(A,0.0));
+
+}
+
+TEST_F(MPOTests1,Upper1)
+{
+    int M=4,N=24;
+    MatrixRT A(M,N);
+    Fill(A,1.0);
+    EXPECT_FALSE(IsLowerTriangular(A));
+    int delta=Max(1,M-N+1);
+    for (index_t j:A.cols())
+    for (index_t i:A.rows(j+delta))
+        A(i,j)=0;
+
+    EXPECT_TRUE(IsUpperTriangular(A));
+    EXPECT_TRUE(IsUpperTriangular(A,0.0));
+    EXPECT_FALSE(IsLowerTriangular(A));
+    EXPECT_FALSE(IsLowerTriangular(A,0.0));
+
+}
+
+TEST_F(MPOTests1,Upper2)
+{
+    int M=24,N=4;
+    MatrixRT A(M,N);
+    Fill(A,1.0);
+    EXPECT_FALSE(IsLowerTriangular(A));
+    int delta=Max(1,M-N+1);
+    for (index_t j:A.cols())
+    for (index_t i:A.rows(j+delta))
+        A(i,j)=0;
+
+    EXPECT_TRUE(IsUpperTriangular(A));
+    EXPECT_TRUE(IsUpperTriangular(A,0.0));
+    EXPECT_FALSE(IsLowerTriangular(A));
+    EXPECT_FALSE(IsLowerTriangular(A,0.0));
+
+}
+
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
