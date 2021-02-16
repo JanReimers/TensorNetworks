@@ -332,10 +332,12 @@ TEST_F(MPOTests,TestMPOCompressForE2)
     H2->Product(itsH);
     double E2a=itsMPS->GetExpectation(H2);
     H2->CanonicalForm();
+    double E2b=itsMPS->GetExpectation(H2);
     double truncError=H2->Compress(TensorNetworks::Std,0,1e-13);
     EXPECT_EQ(H2->GetMaxDw(),9);
-    double E2b=itsMPS->GetExpectation(H2);
+    double E2c=itsMPS->GetExpectation(H2);
     EXPECT_NEAR(E2a,E2b,1e-13);
+    EXPECT_NEAR(E2a,E2c,1e-13);
     EXPECT_LT(truncError,1e-13);
     delete H1;
     delete H2;
