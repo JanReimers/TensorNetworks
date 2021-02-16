@@ -451,10 +451,16 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
         assert(false);
     }
     // Do some sanity checks before re-scaling.
-    assert(fabs(scale)>0.0);
+    if (scale==0.0)
+        scale=1.0;
+    else
+    {
+        assert(fabs(scale)>0.0);
+        assert(fabs(fabs(scale)-sqrt(itsd))<1e-15);
+    }
+
     assert(!isnan(RL));
     assert(!isinf(RL));
-    assert(fabs(fabs(scale)-sqrt(itsd))<1e-15);
     RL/=scale;
     V*=scale;
     V .ReBase(Vlim);

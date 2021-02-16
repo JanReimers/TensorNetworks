@@ -146,7 +146,10 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
             int Xq = (V.GetNumRows()>=V.GetNumCols()) ? X2 : itsd*itsd*(X1+1)-1;
             auto [Qp,Lp]=QRsolver.SolveThinQL(V); //Solves V=Q*L
             double scale=Lp(Xq+1,X2+1);
-            assert(fabs(fabs(scale)-sqrt(itsd))<1e-15);
+            if (scale==0.0)
+                scale=1.0;
+            else if (fabs(fabs(scale-1.0))<1e-10)
+                scale*=sqrt(itsd);
             Lp*=1.0/scale;
             Qp*=scale;
             double QLerr=Max(fabs(Qp*Lp-V));
@@ -200,7 +203,10 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
             assert(V.GetNumRows()==X1+1);             // dimensions of each matrix.
             auto [Lp,Qp]=QRsolver.SolveThinLQ(V); //Solves V=Q*L
             double scale=Lp(1,1);
-            assert(fabs(fabs(scale)-sqrt(itsd))<1e-15);
+            if (scale==0.0)
+                scale=1.0;
+            else if (fabs(fabs(scale-1.0))<1e-10)
+                scale*=sqrt(itsd);
             Lp*=1.0/scale;
             Qp*=scale;
             double QLerr=Max(fabs(Lp*Qp-V));
