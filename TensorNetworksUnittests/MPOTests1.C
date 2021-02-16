@@ -4,19 +4,6 @@
 #include "Operators/OperatorElement.H"
 #include "Operators/OperatorValuedMatrix.H"
 
-
-//#include "TensorNetworksImp/MPS/MPSImp.H"
-//#include "TensorNetworks/iTEBDState.H"
-//#include "Operators/MPO_SpatialTrotter.H"
-//#include "Containers/Matrix4.H"
-//#include "TensorNetworks/Hamiltonian.H"
-//#include "TensorNetworks/iHamiltonian.H"
-//#include "TensorNetworks/SiteOperator.H"
-//#include "TensorNetworks/MPO.H"
-//#include "TensorNetworks/iMPO.H"
-//#include "Operators/SiteOperatorImp.H"
-//#include "Containers/Matrix6.H"
-
 using dcmplx=TensorNetworks::dcmplx;
 using TensorNetworks::MatrixOR;
 using TensorNetworks::TriType;
@@ -35,11 +22,6 @@ using TensorNetworks::PRight;
 class MPOTests1 : public ::testing::Test
 {
 public:
-//    typedef TensorNetworks::Matrix6CT Matrix6CT;
-//    typedef TensorNetworks::MatrixRT  MatrixRT;
-//    typedef TensorNetworks::MatrixCT  MatrixCT;
-//    typedef TensorNetworks::Vector3CT Vector3CT;
-//    typedef TensorNetworks::dcmplx     dcmplx;
     MPOTests1()
         : eps(2.0e-15)
         , itsFactory(TensorNetworks::Factory::GetFactory())
@@ -93,12 +75,11 @@ void MPOTests1::TestQR(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
         case Lower:
             l(0,X2+1)=1.0;
             break;
+        default:
+            assert(false);
         }
-//        cout << "OvM=" << OvM << endl;
-//        cout << "l=" << l << endl;
         OvM=MatrixOR(l*OvM);
         OvM.SetUpperLower(ul);
-//        cout << "OvM=" << OvM << endl;
     }
     if (lbr==PRight)
     {
@@ -112,36 +93,29 @@ void MPOTests1::TestQR(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
         case Lower:
             r(0,0)=1.0;
             break;
+        default:
+            assert(false);
         }
-//        cout << "OvM=" << OvM << endl;
-//        cout << "r=" << r << endl;
         OvM=MatrixOR(OvM*r);
         OvM.SetUpperLower(ul);
-//        cout << "OvM=" << OvM << endl;
     }
     MatrixOR V=OvM.GetV(lr);
-//    cout << "V=" << V.GetLimits() << endl;
     auto [Q,R]=OvM.BlockQX(lr);
     MatrixRT R1=R;
-//    cout << "Q=" << Q.GetLimits() << endl;
-//    cout << "R1=" << R1.GetLimits() << endl;
     if (lr==DLeft)
         R1.SetLimits(MatLimits(Q.GetColLimits(),V.GetColLimits()),true); //Shrink R back to Q size so we can multiply.
     else if (lr==DRight)
         R1.SetLimits(MatLimits(V.GetRowLimits(),Q.GetRowLimits()),true); //Shrink R back to Q size so we can multiply.
     else
         assert(false);
-//    cout << "R1=" << R1.GetLimits() << endl;
+
     MatrixOR V1;
     if (lr==DLeft)
         V1=Q*R1;
     else
         V1=R1*Q;
-//    cout << "V=" << V << endl;
-//    cout << "V1=" << V1 << endl;
     EXPECT_NEAR(MaxDelta(V,V1),0.0,d*eps);
 
-//    cout << "Q=" << Q << endl;
     if (ul==Upper)
     {
         EXPECT_TRUE(IsUpperTriangular(R,1e-13));
@@ -251,7 +225,6 @@ TEST_F(MPOTests1,OperatorValuedMatrix1)
     EXPECT_EQ(OvM(0,2),TensorNetworks::OperatorZ (S));
     EXPECT_EQ(OvM(0,3),TensorNetworks::OperatorZ (S));
     EXPECT_EQ(OvM.GetUpperLower(),Lower);
-//    cout << "OvM=" << OvM << endl;
 }
 
 TEST_F(MPOTests1,OperatorValuedMatrix2)
@@ -282,8 +255,6 @@ TEST_F(MPOTests1,OperatorValuedMatrix3)
     EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorZ (S));
     EXPECT_EQ(OvM(3,0),TensorNetworks::OperatorZ (S));
     EXPECT_EQ(OvM.GetUpperLower(),Upper);
-
-//    cout << "OvM=" << OvM << endl;
 }
 
 TEST_F(MPOTests1,OperatorValuedMatrix4)
