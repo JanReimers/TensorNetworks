@@ -102,7 +102,7 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const Di
     }
     else
     {
-        // Must be been called with one of the spin decomposition types.
+        // Must have been called with one of the spin decomposition types.
         assert(false);
     }
     SyncWtoO();
