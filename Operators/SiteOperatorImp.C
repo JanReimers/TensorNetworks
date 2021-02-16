@@ -187,9 +187,9 @@ void SiteOperatorImp::SyncOtoW()
             for (index_t w1:itsWOvM.rows())
             for (index_t w2:itsWOvM.cols())
                 W(w1+1,w2+1)=itsWOvM(w1,w2)(m,n);
-            SetW(m,n,W);
+            itsWs(m+1,n+1)=W; //Dont' call SetW here !!!
         }
-
+    SetLimits();
 }
 
 void SiteOperatorImp::CheckSync()
