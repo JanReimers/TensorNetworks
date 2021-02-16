@@ -521,7 +521,7 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L256)
     double epsE=2e-10;
 #ifdef DEBUG
     L=32;
-    epsE=4e-13;
+    epsE=5e-13;
 #endif // DEBUG
     double S=0.5;
     Setup(L,S,D);
