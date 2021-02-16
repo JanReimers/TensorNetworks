@@ -43,6 +43,7 @@ public:
     }
     MatrixO<T>& operator*=(const T& s);
 
+    int       Getd() const {return itsd;}
     double    GetTruncationError() const {return itsTruncationError;}
     TriType   GetUpperLower() const {return itsUL;}
     T         GetTrace(int a, int b, int c, int d) const;
