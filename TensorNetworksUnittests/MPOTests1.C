@@ -26,6 +26,11 @@ using TensorNetworks::Direction;
 using TensorNetworks::DLeft;
 using TensorNetworks::DRight;
 using TensorNetworks::SVCompressorR;
+using TensorNetworks::MatrixRT;
+using TensorNetworks::Position;
+using TensorNetworks::PBulk;
+using TensorNetworks::PLeft;
+using TensorNetworks::PRight;
 
 class MPOTests1 : public ::testing::Test
 {
@@ -36,7 +41,7 @@ public:
 //    typedef TensorNetworks::Vector3CT Vector3CT;
 //    typedef TensorNetworks::dcmplx     dcmplx;
     MPOTests1()
-        : eps(1.0e-15)
+        : eps(2.0e-15)
         , itsFactory(TensorNetworks::Factory::GetFactory())
         , itsOperatorClient(0)
     {
@@ -56,7 +61,7 @@ public:
         assert(itsOperatorClient);
     }
 
-    void TestQR (double S,Direction,TriType);
+    void TestQR (MatrixOR OvM,Direction,TriType,Position lbr);
     void TestSVD(double S,Direction,TriType);
     Direction Invert(Direction lr) const
     {
@@ -72,28 +77,89 @@ public:
     const  TensorNetworks::OperatorClient1* itsOperatorClient;
 };
 
-void MPOTests1::TestQR(double S,Direction lr,TriType ul)
+void MPOTests1::TestQR(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
 {
-    Setup(S);
-    MatrixOR OvM(itsOperatorClient->GetMatrixO(ul));
+    auto [X1,X2]=OvM.GetChi12();
+    int d=2*itsOperatorClient->GetS()+1;
+    if (lbr==PLeft)
+    {
+        MatrixRT l(0,0,0,X2+1);
+        Fill(l,0.0);
+        switch (ul)
+        {
+        case Upper:
+            l(0,0)=1.0;
+            break;
+        case Lower:
+            l(0,X2+1)=1.0;
+            break;
+        }
+//        cout << "OvM=" << OvM << endl;
+//        cout << "l=" << l << endl;
+        OvM=MatrixOR(l*OvM);
+        OvM.SetUpperLower(ul);
+//        cout << "OvM=" << OvM << endl;
+    }
+    if (lbr==PRight)
+    {
+        MatrixRT r(0,X1+1,0,0);
+        Fill(r,0.0);
+        switch (ul)
+        {
+        case Upper:
+            r(X1+1,0)=1.0;
+            break;
+        case Lower:
+            r(0,0)=1.0;
+            break;
+        }
+//        cout << "OvM=" << OvM << endl;
+//        cout << "r=" << r << endl;
+        OvM=MatrixOR(OvM*r);
+        OvM.SetUpperLower(ul);
+//        cout << "OvM=" << OvM << endl;
+    }
     MatrixOR V=OvM.GetV(lr);
+//    cout << "V=" << V.GetLimits() << endl;
     auto [Q,R]=OvM.BlockQX(lr);
+    MatrixRT R1=R;
+//    cout << "Q=" << Q.GetLimits() << endl;
+//    cout << "R1=" << R1.GetLimits() << endl;
+    if (lr==DLeft)
+        R1.SetLimits(MatLimits(Q.GetColLimits(),V.GetColLimits()),true); //Shrink R back to Q size so we can multiply.
+    else if (lr==DRight)
+        R1.SetLimits(MatLimits(V.GetRowLimits(),Q.GetRowLimits()),true); //Shrink R back to Q size so we can multiply.
+    else
+        assert(false);
+//    cout << "R1=" << R1.GetLimits() << endl;
     MatrixOR V1;
-    if (lr==DLeft) V1=Q*R; else V1=R*Q;
+    if (lr==DLeft)
+        V1=Q*R1;
+    else
+        V1=R1*Q;
+//    cout << "V=" << V << endl;
+//    cout << "V1=" << V1 << endl;
+    EXPECT_NEAR(MaxDelta(V,V1),0.0,d*eps);
 
-    EXPECT_NEAR(MaxDelta(V,V1),0.0,eps);
+//    cout << "Q=" << Q << endl;
     if (ul==Upper)
     {
-        EXPECT_TRUE(IsUpperTriangular(R));
-        EXPECT_TRUE(IsUpperTriangular(Q));
+        EXPECT_TRUE(IsUpperTriangular(R,1e-13));
+        if (Q.GetNumCols()>1)
+        {
+            EXPECT_TRUE(IsUpperTriangular(Q));
+        }
     }
     if (ul==Lower)
     {
         EXPECT_TRUE(IsLowerTriangular(R));
-        EXPECT_TRUE(IsLowerTriangular(Q));
+        if (Q.GetNumRows()>1)
+        {
+            EXPECT_TRUE(IsLowerTriangular(Q));
+        }
     }
-    EXPECT_TRUE(IsUnit(Q.GetOrthoMatrix(lr),eps));
-    EXPECT_FALSE(IsUnit(Q.GetOrthoMatrix(Invert(lr)),eps));
+    EXPECT_TRUE(IsUnit(Q.GetOrthoMatrix(lr),d*eps));
+    EXPECT_FALSE(IsUnit(Q.GetOrthoMatrix(Invert(lr)),d*eps));
 }
 
 void MPOTests1::TestSVD(double S,Direction lr,TriType ul)
@@ -281,10 +347,10 @@ TEST_F(MPOTests1,OperatorValuedMatrixSetVUpper)
     MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
     MatrixOR Copy(OvM);
     MatrixOR Vl=OvM.GetV(DLeft);
-    Copy.SetV(Vl);
+    Copy.SetV(DLeft,Vl);
     EXPECT_EQ(OvM,Copy);
     MatrixOR Vr=OvM.GetV(DRight);
-    Copy.SetV(Vr);
+    Copy.SetV(DRight,Vr);
     EXPECT_EQ(OvM,Copy);
 }
 
@@ -295,10 +361,10 @@ TEST_F(MPOTests1,OperatorValuedMatrixSetVLower)
     MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
     MatrixOR Copy(OvM);
     MatrixOR Vl=OvM.GetV(DLeft);
-    Copy.SetV(Vl);
+    Copy.SetV(DLeft,Vl);
     EXPECT_EQ(OvM,Copy);
     MatrixOR Vr=OvM.GetV(DRight);
-    Copy.SetV(Vr);
+    Copy.SetV(DRight,Vr);
     EXPECT_EQ(OvM,Copy);
 }
 
@@ -497,15 +563,113 @@ TEST_F(MPOTests1,Upper2)
 
 }
 
+TEST_F(MPOTests1,OperatorValuedMatrixQRBulk)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
-        TestQR(S,DLeft ,Upper);
-        TestQR(S,DRight,Upper);
-        TestQR(S,DLeft ,Lower);
-        TestQR(S,DRight,Lower);
+        Setup(S);
+        {
+            MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+            TestQR(OvM,DLeft ,Upper,PBulk);
+            TestQR(OvM,DRight,Upper,PBulk);
+        }
+        {
+            MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+            TestQR(OvM,DLeft ,Lower,PBulk);
+            TestQR(OvM,DRight,Lower,PBulk);
+        }
     }
 }
+
+TEST_F(MPOTests1,OperatorValuedMatrixQRBulkH2)
+{
+    for (double S=0.5;S<=2.5;S+=0.5)
+    {
+        Setup(S);
+        {
+            MatrixOR H(itsOperatorClient->GetMatrixO(Upper));
+            MatrixOR H2=TensorProduct(H,H);
+            TestQR(H2,DLeft ,Upper,PBulk);
+            TestQR(H2,DRight,Upper,PBulk);
+        }
+        {
+            MatrixOR H(itsOperatorClient->GetMatrixO(Lower));
+            MatrixOR H2=TensorProduct(H,H);
+            TestQR(H2,DLeft ,Lower,PBulk);
+            TestQR(H2,DRight,Lower,PBulk);
+        }
+    }
+}
+
+TEST_F(MPOTests1,OperatorValuedMatrixQRLeft)
+{
+    for (double S=0.5;S<=2.5;S+=0.5)
+    {
+        Setup(S);
+        {
+            MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+            TestQR(OvM,DLeft ,Upper,PLeft);
+        }
+        {
+            MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+            TestQR(OvM,DLeft ,Lower,PLeft);
+        }
+    }
+}
+
+TEST_F(MPOTests1,OperatorValuedMatrixQRLeftH2)
+{
+    for (double S=0.5;S<=2.5;S+=0.5)
+    {
+        Setup(S);
+        {
+            MatrixOR H(itsOperatorClient->GetMatrixO(Upper));
+            MatrixOR H2=TensorProduct(H,H);
+            TestQR(H2,DLeft ,Upper,PLeft);
+        }
+        {
+            MatrixOR H(itsOperatorClient->GetMatrixO(Lower));
+            MatrixOR H2=TensorProduct(H,H);
+            TestQR(H2,DLeft ,Lower,PLeft);
+        }
+    }
+}
+
+TEST_F(MPOTests1,OperatorValuedMatrixQRRight)
+{
+    for (double S=0.5;S<=2.5;S+=0.5)
+    {
+        Setup(S);
+        {
+            MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+            TestQR(OvM,DRight ,Upper,PRight);
+        }
+        {
+            MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+            TestQR(OvM,DRight ,Lower,PRight);
+        }
+    }
+
+}
+
+TEST_F(MPOTests1,OperatorValuedMatrixQRRightH2)
+{
+    for (double S=0.5;S<=2.5;S+=0.5)
+    {
+        Setup(S);
+        {
+            MatrixOR H(itsOperatorClient->GetMatrixO(Upper));
+            MatrixOR H2=TensorProduct(H,H);
+            TestQR(H2,DRight,Upper,PRight);
+        }
+        {
+            MatrixOR H(itsOperatorClient->GetMatrixO(Lower));
+            MatrixOR H2=TensorProduct(H,H);
+            TestQR(H2,DRight,Lower,PRight);
+        }
+    }
+}
+
 
 TEST_F(MPOTests1,OperatorValuedMatrixSVD)
 {
