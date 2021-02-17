@@ -477,7 +477,12 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
 //
 template <class T> Matrix<T> MatrixO<T>::ExtractM(Matrix<T>& RL) const
 {
-    auto [X1,X2]=GetChi12();
+    int X1=RL.GetNumRows()-2;
+    int X2=RL.GetNumCols()-2;
+    if (X1<0)
+        assert(X1>=0);
+    if (X2<0)
+        assert(X2>=0);
     Matrix<T> M(X1,X2); //One based
     for (int w1=1;w1<=X1;w1++)
     for (int w2=1;w2<=X2;w2++)
@@ -537,8 +542,6 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
     //
     auto [Q,RL]=BlockQX(lr);
     assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
-    int base=Q.GetRowLimits().Low; //base depends on the combination Left/Right*Upper/Lower
-    assert(base==0 || base==1);
     //
     //  Isolate the M matrix and SVD/compress it.
     //
@@ -552,12 +555,13 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
     //  Post processing:
     //      1) Get RLtrans ready for transfer to the neighbouring site
     //      2) Integrate U (or VT) into Q
-    Grow(RL,this->GetLimits());
     MatrixRT RLtrans; //THis gets transferred to the neighbouring site;
     switch (lr)
     {
     case DLeft:
         {
+            int base=Q.GetColLimits().Low; //base depends on the combination Left/Right*Upper/Lower
+            assert(base==0 || base==1);
             Matrix<T> sV=s*VT;
             Grow(sV,MatLimits(VecLimits(0,Xs+1),RL.GetRowLimits()));
             RLtrans=sV*RL;
@@ -568,6 +572,8 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
         break;
     case DRight:
         {
+            int base=Q.GetRowLimits().Low; //base depends on the combination Left/Right*Upper/Lower
+            assert(base==0 || base==1);
             Matrix<T> Us=U*s;
             Grow(Us,MatLimits(RL.GetColLimits(),VecLimits(0,Xs+1)));
             RLtrans=RL*Us;
