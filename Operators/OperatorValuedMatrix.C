@@ -532,14 +532,26 @@ void Grow(Matrix<double>& m,const MatLimits& lim)
 
 template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr,const SVCompressorR* comp)
 {
+    //
+    //  Block respecting QR/QL/RQ/LQ
+    //
     auto [Q,RL]=BlockQX(lr);
     assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
+    int base=Q.GetRowLimits().Low; //base depends on the combination Left/Right*Upper/Lower
+    assert(base==0 || base==1);
+    //
+    //  Isolate the M matrix and SVD/compress it.
+    //
     Matrix<T> M=ExtractM(RL);
     LapackSVDSolver <double>  solver;
     auto [U,s,VT]=solver.SolveAll(M,1e-14); //Solves M=U * s * VT
     itsTruncationError=comp->Compress(U,s,VT);
-//    cout << "s=" << s << endl;
-
+    int Xs=s.GetDiagonal().size();
+//    cout << "s=" << s.GetDiagonal() << endl;
+    //
+    //  Post processing:
+    //      1) Get RLtrans ready for transfer to the neighbouring site
+    //      2) Integrate U (or VT) into Q
     Grow(RL,this->GetLimits());
     MatrixRT RLtrans; //THis gets transferred to the neighbouring site;
     switch (lr)
@@ -547,9 +559,9 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
     case DLeft:
         {
             Matrix<T> sV=s*VT;
-            Grow(sV,this->GetLimits());
+            Grow(sV,MatLimits(VecLimits(0,Xs+1),RL.GetRowLimits()));
             RLtrans=sV*RL;
-            Grow(U,Q.GetLimits());
+            Grow(U,MatLimits(Q.GetColLimits(),VecLimits(base,Xs+base)));
             Q=MatrixO(Q*U);
             assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
         }
@@ -557,9 +569,9 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
     case DRight:
         {
             Matrix<T> Us=U*s;
-            Grow(Us,this->GetLimits());
+            Grow(Us,MatLimits(RL.GetColLimits(),VecLimits(0,Xs+1)));
             RLtrans=RL*Us;
-            Grow(VT,Q.GetLimits());
+            Grow(VT,MatLimits(VecLimits(base,Xs+base),Q.GetRowLimits()));
             Q=MatrixO(VT*Q);
             assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
         }

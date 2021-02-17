@@ -1,5 +1,14 @@
 
 Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
+    -SVD:
+        1)t identify degenerate blocks
+        2) Try swapping rows/cols on U/VT in each block to maintain upper/lower.
+        Have a look at lapack DGESVJ, it accepts Upper/Lower as input. Not clear if U/VT respect U/L
+    -Do SetV(Q) inside SVD routine
+    -Make a version of BlockQX that does SetV(Q) inside. SVD needs the current version return [Q,RL]
+    -Grow test it is should always be zero based? No!!  Zero or 1.
+    -Move tensor product to oml side.
+    -OperatorElement op=(T), allow assign 1 and 0.  THen try Fill(OvM,0.0)
     -OperatorElement: recognize known operators for pretty print.
         -One way is to solve Op=a*I + b*Sx + c*Sy + d*Sz for abcd.  For d>2 this is not guaranteed to solve.
         -is it as easy as a=Tr(O,I) ?
