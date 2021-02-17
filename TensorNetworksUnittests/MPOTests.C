@@ -543,7 +543,7 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L256)
     EXPECT_LT(truncError,1e-13);
 }
 
-
+/*
 TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
 {
     int L=8,D=2;
@@ -598,7 +598,7 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
     EXPECT_EQ(expH->GetMaxDw(),2);
     EXPECT_LT(truncError,epsMPO); //Unit operator should have no compression error
 }
-
+*/
 /*
 TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
 {

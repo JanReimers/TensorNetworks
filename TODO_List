@@ -1,9 +1,12 @@
 
 Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
+    -Can we simplify some code with Mul(Direction,a,b) mat mul function?
+    -Rename MPOTest1 to OpValMatrixTests.
     -SVD:
         1)t identify degenerate blocks
         2) Try swapping rows/cols on U/VT in each block to maintain upper/lower.
-        Have a look at lapack DGESVJ, it accepts Upper/Lower as input. Not clear if U/VT respect U/L
+        Have a look at Lapack DGESVJ, it accepts Upper/Lower as input. Not clear if U/VT respect U/L
+        THis is causing major problems.  Right now we can only SVD sweep one direction.
     -Do SetV(Q) inside SVD routine
     -Make a version of BlockQX that does SetV(Q) inside. SVD needs the current version return [Q,RL]
     -Grow test it is should always be zero based? No!!  Zero or 1.
@@ -12,7 +15,7 @@ Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
     -OperatorElement: recognize known operators for pretty print.
         -One way is to solve Op=a*I + b*Sx + c*Sy + d*Sz for abcd.  For d>2 this is not guaranteed to solve.
         -is it as easy as a=Tr(O,I) ?
-    Done: -Rescale Q/R so QT*Q=d*I
+    Done: -Re-scale Q/R so QT*Q=d*I
     Done: -Calculate overlap <Wab*Wcd> for abcd=0..X+1  for R/L*U/L
         -GetV(lr).Overlap = <Vab*Vcd>
     -Shadow classes using MatrixO
@@ -23,7 +26,7 @@ Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
         Support GetW(m,n) for now so we can calculate contractions <psi|O|psi>
         Later, implement Psi->GetOverlap(MatrixO) contractions.
         Do we get a benefit from an abstract SiteOperator?  MatrixO *is* the site operator.
-            (this is the data centric approach)
+            (this is the data-centric approach)
             if so then MPO->GetSiteOperator just returns MatrixO
             It would be nice if ALL {m,n} sums occur inside MatrixO. Does MatrixO get very big?
             Can we do the same MPS, Vector<Matrix<T>> M(i,j)(m) *is* the site
