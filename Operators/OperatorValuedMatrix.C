@@ -139,13 +139,17 @@ template <class T> void MatrixO<T>::SetUpperLower(TriType ul)
 template <class T> MatrixO<T>& MatrixO<T>::operator=(const MatrixO<T>& m)
 {
     Base::operator=(m);
-    CheckUL();
+    itsd=m.itsd;
+    itsTruncationError=m.itsTruncationError;
+    itsUL=m.itsUL;
     return *this;
 }
 template <class T> MatrixO<T>& MatrixO<T>::operator=(MatrixO<T>&& m)
 {
     Base::operator=(m);
-    CheckUL();
+    itsd=m.itsd;
+    itsTruncationError=m.itsTruncationError;
+    itsUL=m.itsUL;
     return *this;
 }
 
@@ -221,7 +225,6 @@ template <class T> Matrix<T> MatrixO<T>::GetOrthoMatrix(Direction lr) const
 //
 template <class T> MatrixO<T> MatrixO<T>::GetV(Direction lr) const
 {
-    assert(itsUL!=Full); //Did we forget to call CheckUL() after loading the data?
     const MatLimits& l=this->GetLimits();
     int rl=l.Row.Low +1; //shifted first row.
     int rh=l.Row.High-1;
@@ -296,7 +299,7 @@ template <class T> void MatrixO<T>::SetV(Direction lr,const MatrixO& V)
     for (index_t i:V.rows())
         for (index_t j:V.cols())
             (*this)(i,j)=V(i,j);
-    CheckUL();
+//    CheckUL();
 }
 
 template <class T> Matrix<T> MatrixO<T>::Flatten(Direction lr) const

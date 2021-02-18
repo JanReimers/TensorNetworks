@@ -1877,6 +1877,31 @@ This still leaves a random factor of
  as the scaling factor.
 \end_layout
 
+\begin_layout Subsection
+Honouring triangular structure
+\end_layout
+
+\begin_layout Standard
+By definition of the QR/QL algorithm the L/R matrices are lower/upper triangular.
+ On the other hand the scaler matrix
+\begin_inset Formula $Q_{(mna),b}$
+\end_inset
+
+ is by no means expected to be lower or upper triangular.
+ But after rehaping 
+\begin_inset Formula $Q_{\left(mna\right)k}\rightarrow\hat{Q}_{ak}$
+\end_inset
+
+ the operator values matrix does honour the lower/upper shape of the original
+ 
+\begin_inset Formula $\hat{V}_{ab}$
+\end_inset
+
+ operator.
+ As a result the canonical form sweeps will leave intact the upper/lower
+ form of and MPO.
+\end_layout
+
 \begin_layout Section
 Compression of finite MPOs
 \end_layout
@@ -2631,6 +2656,38 @@ MPO compression for all combinations of upper/lower triangular and left
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsection
+Honouring triangular structure
+\end_layout
+
+\begin_layout Standard
+As with the QR canonical form algorithm, we would like the triangular to
+ remain intact during SVD compression.
+ For the QR case since inner 
+\begin_inset Formula $\mathsf{R}$
+\end_inset
+
+ is upper triangular one can hope that 
+\begin_inset Formula $UsV^{\dagger}$
+\end_inset
+
+ are all also upper triangular but SVD does not gaurantee this.
+ In some cases one can swap columns of 
+\begin_inset Formula $U$
+\end_inset
+
+ and rows of 
+\begin_inset Formula $V$
+\end_inset
+
+ (with corresponding shuffling of 
+\begin_inset Formula $s$
+\end_inset
+
+) to achieve a triangular structure.
+ 
 \end_layout
 
 \begin_layout Section

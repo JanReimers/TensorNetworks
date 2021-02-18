@@ -411,10 +411,12 @@ TEST_F(MPOTests,TestParkerCanonicalL9H)
     itsMPS->Normalize(TensorNetworks::DLeft);
     TensorNetworks::MPO* H=itsH;
     EXPECT_EQ(H->GetNormStatus(),"WWWWWWWWW");
+    EXPECT_EQ(H->GetUpperLower()," LLLLLLL ");
     double E=itsMPS->GetExpectation(itsH);
     itsH->CanonicalForm();
 //    H->Report(cout);
     EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR"); //The last site ends up being both right and left normalized
+    EXPECT_EQ(H->GetUpperLower()," LLLLLLL ");
     double Eright=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_EQ(H->GetMaxDw(),5);
@@ -476,16 +478,16 @@ TEST_F(MPOTests,TestParkerSVDCompressHL9)
 
     TensorNetworks::MPO* H=itsH;
     EXPECT_EQ(H->GetNormStatus(),"WWWWWWWWW");
+    EXPECT_EQ(H->GetUpperLower()," LLLLLLL ");
     double E=itsMPS->GetExpectation(itsH);
-    H->Report(cout);
     H->CanonicalForm(); //Do we need to sweep both ways? Yes!!!!
-    H->Report(cout);
     EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR");
+    EXPECT_EQ(H->GetUpperLower()," LLLLLLL ");
     double Eright=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E,Eright,1e-13);
     double truncError=H->Compress(TensorNetworks::Parker,0,1e-13);
-    H->Report(cout);
     EXPECT_EQ(H->GetNormStatus(),"WRRRRRRRR");
+    EXPECT_EQ(H->GetUpperLower()," LLLLLLL "); //This one happens to work out maintain lower.
     double Ecomp=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E,Ecomp ,1e-13);
     EXPECT_EQ(itsH->GetMaxDw(),5);
@@ -509,13 +511,12 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L9)
     H2->CanonicalForm(); //Do we need to sweep both ways?
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     EXPECT_EQ(H2->GetUpperLower()," LLLLLLL ");
-    double E2right=itsMPS->GetExpectation(H2);
+    double E2can=itsMPS->GetExpectation(H2);
     double truncError=H2->Compress(TensorNetworks::Parker,0,1e-13);
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
-    EXPECT_EQ(H2->GetUpperLower()," LLLLLLL ");
+    EXPECT_EQ(H2->GetUpperLower()," FFFFFFF ");
     double E2comp=itsMPS->GetExpectation(H2);
-//    cout << std::setprecision(8) << E2 << " " << E2right << " " << E2comp << endl;
-    EXPECT_NEAR(E2,E2right,1e-13);
+    EXPECT_NEAR(E2,E2can,1e-13);
     EXPECT_NEAR(E2,E2comp ,1e-13);
     EXPECT_EQ(H2->GetMaxDw(),9);
     EXPECT_LT(truncError,1e-13);
