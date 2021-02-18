@@ -587,6 +587,23 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
     return std::make_tuple(Q,RLtrans);
 }
 
+void SVDShuffle(TriType ul,Direction lr, Matrix<double>& U, DiagonalMatrix<double>& s,Matrix<double>& VT, double eps)
+{
+    std::vector<index_t> reindex;
+    switch (lr)
+    {
+    case DLeft:
+        reindex=FindRowReIndex(ul,VT,eps); // Pass in the scalar matrix
+        break;
+    case DRight:
+        reindex=FindColReIndex(ul,U,eps); // Pass in the scalar matrix
+        break;
+    }
+    VT.ReIndexRows   (reindex);
+    s .ReIndexRows   (reindex);
+    U .ReIndexColumns(reindex);
+}
+
 
 template class MatrixO <double>;
 

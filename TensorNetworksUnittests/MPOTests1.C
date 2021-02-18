@@ -1,5 +1,6 @@
 #include "Tests.H"
 #include "TensorNetworks/Factory.H"
+#include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.H"
 #include "Operators/OperatorElement.H"
 #include "Operators/OperatorValuedMatrix.H"
@@ -45,6 +46,7 @@ public:
 
     void TestQR (MatrixOR OvM,Direction,TriType,Position);
     void TestSVD(MatrixOR OvM,Direction,TriType,Position);
+    void TestShuffle(MatrixOR OvM,Direction lr,double eps,double S);
     Direction Invert(Direction lr) const
     {
         if (lr==DLeft)
@@ -729,3 +731,104 @@ TEST_F(MPOTests1,OperatorValuedMatrixSVDH2BulkOnly)
         }
     }
 }
+#include "NumericalMethods/LapackSVDSolver.H"
+#include "oml/diagonalmatrix.h"
+
+
+
+
+void MPOTests1::TestShuffle(MatrixOR O,Direction lr,double eps,double S)
+{
+    SVCompressorR* comp=itsFactory->MakeMPOCompressor(0,eps);
+    LapackSVDSolver<double> solver;
+    MatrixOR Ocopy=O; //Save the testing later.
+    //
+    //  Make sure we are starting with a triangular operator valued matrix.
+    //
+    TriType ul=O.GetUpperLower();
+    EXPECT_TRUE(IsTriangular(ul,O,eps));
+    MatrixRT Of=O.Flatten(lr);
+    EXPECT_TRUE(IsTriangular(ul,Of,eps));
+    //
+    //  SVD->Compress->Shuffle
+    //
+    MatLimits lim=Of.ReBase(1,1); //Numerical routines only work with fortran indexing.
+    auto [U,s,VT]=solver.SolveAll(Of,eps);
+    comp->Compress(U,s,VT);
+    SVDShuffle(ul,lr,U,s,VT,eps);
+    EXPECT_TRUE(IsTriangular(ul,VT,eps));
+    EXPECT_TRUE(IsTriangular(ul,U ,eps));
+    //
+    //  Make sure we can rebuild O from the heavily processed U*s*VT
+    //  And the O is now triangular
+    //
+    MatrixRT Of1=U*s*VT;
+    EXPECT_TRUE(IsTriangular(ul,Of1,eps));
+    Of1.ReBase(lim);
+    O.UnFlatten(Of1);
+    EXPECT_TRUE(IsTriangular(ul,O,eps));
+    EXPECT_NEAR(MaxDelta(O,Ocopy),0.0,eps);
+    //
+    //  Make sure OpVal versions of U/VT are also triangular.
+    //
+    switch (lr)
+    {
+    case DLeft:
+        {
+            MatrixOR Uo(O);
+            U.ReBase(0,0);
+            Uo.UnFlatten(U);
+            EXPECT_TRUE(IsTriangular(ul,Uo,eps));
+        }
+        break;
+    case DRight:
+        {
+            MatrixOR Vo(O);
+            VT.ReBase(0,0);
+            Vo.UnFlatten(VT);
+            EXPECT_TRUE(IsTriangular(ul,Vo,eps));
+        }
+        break;
+    }
+}
+
+TEST_F(MPOTests1,SVDShuffleH)
+{
+    double eps=1e-14;
+    for (double S=0.5;S<=2.5;S+=0.5)
+    {
+        Setup(S);
+        {
+            MatrixOR O(itsOperatorClient->GetMatrixO(Lower));
+            TestShuffle(O,DLeft ,eps,S);
+            TestShuffle(O,DRight,eps,S);
+        }
+        {
+            MatrixOR O(itsOperatorClient->GetMatrixO(Upper));
+            TestShuffle(O,DLeft ,eps,S);
+            TestShuffle(O,DRight,eps,S);
+        }
+    }
+}
+
+TEST_F(MPOTests1,SVDShuffleH2)
+{
+    double eps=1e-14;
+    for (double S=0.5;S<=0.5;S+=0.5)
+    {
+        Setup(S);
+        {
+            MatrixOR H(itsOperatorClient->GetMatrixO(Lower));
+            MatrixOR H2=TensorProduct(H,H);
+            TestShuffle(H2,DLeft ,eps,S);
+            TestShuffle(H2,DRight,eps,S);
+        }
+        {
+            MatrixOR H(itsOperatorClient->GetMatrixO(Upper));
+            MatrixOR H2=TensorProduct(H,H);
+            TestShuffle(H2,DLeft ,eps,S);
+            TestShuffle(H2,DRight,eps,S);
+        }
+    }
+}
+

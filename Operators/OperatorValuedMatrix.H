@@ -134,7 +134,25 @@ template <class T> Matrix<T> TensorProduct(const Matrix<T>& a, const Matrix<T>& 
     return r;
 }
 
+template <class T> bool IsTriangular(TriType ul,const Matrix<T>& m,double eps)
+{
+    bool ret=false;
+    switch (ul)
+    {
+    case Upper:
+        ret=IsUpperTriangular(m,eps);
+        break;
+    case Lower:
+        ret=IsLowerTriangular(m,eps);
+        break;
+    case Full:
+        ret=false;
+    }
+    return ret;
+}
 
+
+void SVDShuffle(TriType ul,Direction lr, Matrix<double>& U, DiagonalMatrix<double>& s,Matrix<double>& VT, double eps);
 
 } //namespace
 

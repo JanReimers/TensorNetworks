@@ -22,4 +22,18 @@ public:
 
 };
 
+
+#include "TensorNetworks/Enums.H"
+#include <vector>
+#include "oml/imp/index_t.h"
+//
+//  In order to sort the singular values in descending order (required for compression)canned SVD
+//  routines must shuffle the rows and columns of U and VT.  THis destroys triangularity.
+//  These routines attempt to find a re-indexing (row or column re-shuffling) the restores
+//  triangularity.
+//  Create a re-indexing array to bring the matrix UL into Upper/Lower triangular form
+//
+std::vector<index_t>  FindRowReIndex(TensorNetworks::TriType ul,const Matrix<double>& UL, double eps);
+std::vector<index_t>  FindColReIndex(TensorNetworks::TriType ul,const Matrix<double>& UL, double eps);
+
 #endif // SVDSOLVER_H

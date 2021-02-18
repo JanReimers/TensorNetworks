@@ -48,3 +48,85 @@ template class SparseSVDSolverClient<dcmplx>;
 template class SparseEigenSolverClient<double>;
 template class SparseEigenSolverClient<dcmplx>;
 
+
+#include "TensorNetworks/Enums.H"
+//
+//  Search right to left for the last non zero element, and return it's index.
+//
+index_t FindLast(const Vector<double>& v,double eps)
+{
+    VecLimits l=v.GetLimits();
+    index_t last_index=l.Low;
+    for (index_t i=l.High;i>l.Low;i--)
+         if (fabs(v(i))>eps)
+         {
+             last_index=i;
+             break;
+         }
+     return last_index;
+}
+//
+//  Search left to right for the first non zero element, and return it's index.
+//
+index_t FindFirst(const Vector<double>& v,double eps)
+{
+    VecLimits l=v.GetLimits();
+    index_t first_index=l.High;
+    for (index_t i=l.Low;i<l.High;i++)
+         if (fabs(v(i))>eps)
+         {
+             first_index=i;
+             break;
+         }
+     return first_index;
+}
+
+//
+//  Create a re-indexing array to bring the matrix into Upper/Lower triangular form
+//
+std::vector<index_t>  FindRowReIndex(TensorNetworks::TriType ul,const Matrix<double>& UL, double eps)
+{
+    MatLimits l=UL.GetLimits();
+    //
+    //  Search each row for the first/last non-zero element.
+    //        col     row
+    std::map<index_t,index_t> index;
+    for (index_t ir:UL.rows())
+    {
+        if      (ul==TensorNetworks::Lower) index[FindLast (UL.GetRow(ir),eps)]=ir;
+        else if (ul==TensorNetworks::Upper) index[FindFirst(UL.GetRow(ir),eps)]=ir;
+        else assert(false);
+    }
+    //
+    //  Build up the re-index array from <col,row> map.
+    //
+    std::vector<index_t> reindex;
+    for (const auto& [key, value] : index)
+        reindex.push_back(value-l.Row.Low); //Row numbers need to be zero based for the oml ReIndex routines.
+
+    return reindex;
+}
+std::vector<index_t>  FindColReIndex(TensorNetworks::TriType ul,const Matrix<double>& U, double eps)
+{
+    MatLimits l=U.GetLimits();
+    //
+    //  Search each col for the first/last non-zero element.
+    //        row     col
+    std::map<index_t,index_t> index;
+    for (index_t ic:U.cols())
+    {
+        if      (ul==TensorNetworks::Lower) index[FindFirst(U.GetColumn(ic),eps)]=ic;
+        else if (ul==TensorNetworks::Upper) index[FindLast (U.GetColumn(ic),eps)]=ic;
+        else assert(false);
+    }
+    //
+    //  Build up the re-index array from <row,col> map.
+    //
+    std::vector<index_t> reindex;
+    for (const auto& [key, value] : index)
+        reindex.push_back(value-l.Col.Low); //Col numbers need to be zero based for the oml ReIndex routines.
+
+    return reindex;
+}
+
+
