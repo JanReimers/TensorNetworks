@@ -136,17 +136,20 @@ template <class T> Matrix<T> TensorProduct(const Matrix<T>& a, const Matrix<T>& 
 
 template <class T> bool IsTriangular(TriType ul,const Matrix<T>& m,double eps)
 {
-    bool ret=false;
-    switch (ul)
+    bool ret=true;
+    if (m.GetNumCols()>1 && m.GetNumRows()>1)
     {
-    case Upper:
-        ret=IsUpperTriangular(m,eps);
-        break;
-    case Lower:
-        ret=IsLowerTriangular(m,eps);
-        break;
-    case Full:
-        ret=false;
+        switch (ul)
+        {
+        case Upper:
+            ret=IsUpperTriangular(m,eps);
+            break;
+        case Lower:
+            ret=IsLowerTriangular(m,eps);
+            break;
+        case Full:
+            ret=false;
+        }
     }
     return ret;
 }
