@@ -90,11 +90,11 @@ std::vector<index_t>  FindRowReIndex(TensorNetworks::TriType ul,const Matrix<dou
     //
     //  Search each row for the first/last non-zero element.
     //        col     row
-    std::map<index_t,index_t> index;
+    std::multimap<index_t,index_t> index;
     for (index_t ir:UL.rows())
     {
-        if      (ul==TensorNetworks::Lower) index[FindLast (UL.GetRow(ir),eps)]=ir;
-        else if (ul==TensorNetworks::Upper) index[FindFirst(UL.GetRow(ir),eps)]=ir;
+        if      (ul==TensorNetworks::Lower) index.insert({FindLast (UL.GetRow(ir),eps),ir});
+        else if (ul==TensorNetworks::Upper) index.insert({FindFirst(UL.GetRow(ir),eps),ir});
         else assert(false);
     }
     //
@@ -112,11 +112,11 @@ std::vector<index_t>  FindColReIndex(TensorNetworks::TriType ul,const Matrix<dou
     //
     //  Search each col for the first/last non-zero element.
     //        row     col
-    std::map<index_t,index_t> index;
+    std::multimap<index_t,index_t> index;
     for (index_t ic:U.cols())
     {
-        if      (ul==TensorNetworks::Lower) index[FindFirst(U.GetColumn(ic),eps)]=ic;
-        else if (ul==TensorNetworks::Upper) index[FindLast (U.GetColumn(ic),eps)]=ic;
+        if      (ul==TensorNetworks::Lower) index.insert({FindFirst(U.GetColumn(ic),eps),ic});
+        else if (ul==TensorNetworks::Upper) index.insert({FindLast (U.GetColumn(ic),eps),ic});
         else assert(false);
     }
     //
