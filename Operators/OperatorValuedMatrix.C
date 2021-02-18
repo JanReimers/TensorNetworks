@@ -343,10 +343,11 @@ template <class T> void MatrixO<T>::UnFlatten(const Matrix<T>& F)
 {
     int Nr=this->GetNumRows();
     int Nc=this->GetNumCols();
+    MatLimits l=this->GetLimits();
     if (F.GetNumRows()==itsd*itsd*Nr)
     {
         if (F.GetNumCols()<Nc)
-            this->SetLimits(Nr,F.GetNumCols(),true);
+            this->SetLimits(l.Row,VecLimits(l.Col.Low,F.GetNumCols()+l.Col.Low-1),true);
         for (index_t j:this->cols())
         {
             int w=this->GetLimits().Row.Low;
@@ -360,7 +361,7 @@ template <class T> void MatrixO<T>::UnFlatten(const Matrix<T>& F)
     else if (F.GetNumCols()==itsd*itsd*this->GetNumCols())
     {
         if (F.GetNumRows()<Nr)
-            this->SetLimits(F.GetNumRows(),Nc,true);
+            this->SetLimits(VecLimits(l.Row.Low,F.GetNumRows()+l.Row.Low-1),l.Col,true);
 
         for (index_t i:this->rows())
         {
