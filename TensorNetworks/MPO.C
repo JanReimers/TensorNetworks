@@ -64,6 +64,15 @@ std::string MPO::GetNormStatus () const
      return status;
 }
 
+std::string  MPO::GetUpperLower() const
+{
+     int L=GetL();
+     std::string status(L,' ');
+     for (int ia=2;ia<=L-1;ia++)
+           status[ia-1]=GetSiteOperator(ia)->GetUpperLower(1e-13);
+     return status;
+}
+
 
 
 void MPO::Product(const MPO* O2)

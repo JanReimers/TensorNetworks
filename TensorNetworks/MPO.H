@@ -29,7 +29,8 @@ public:
     virtual int         GetMaxDw() const;
     virtual void        Report(std::ostream&) const; //Show Dws, Fnorms, U/L status etc.
     virtual void        Dump  (std::ostream&) const; //Show all data in W matrices
-    virtual std::string GetNormStatus () const;
+    virtual std::string GetNormStatus() const;
+    virtual std::string GetUpperLower() const;
     //
     //  High level MPO operations
     //

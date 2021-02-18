@@ -43,6 +43,7 @@ public:
 
     virtual void Report(std::ostream&) const=0;
     virtual char GetNormStatus(double eps) const=0;
+    virtual char GetUpperLower(double eps) const=0;
 };
 
 }
