@@ -15,9 +15,9 @@ template <class T> class MatrixO : public Matrix<OperatorElement<T> >
     typedef std::tuple<index_t  ,index_t   > IIType;
 public:
     MatrixO();
-    MatrixO(int d);
+    MatrixO(int d,TriType);
     MatrixO(int d, const MatLimits&);
-    MatrixO(int Dw1, int Dw2,double S);
+    MatrixO(int Dw1, int Dw2,double S,TriType);
     MatrixO(const Base   & m);
     MatrixO(const MatrixO& m);
     MatrixO(MatrixO&& m);
@@ -27,18 +27,17 @@ public:
     void SetUpperLower(TriType ul); //Row and column matrices have no way of knowing (I think?)
     IIType GetChi12() const;
 
-    void CheckUL();
     MatrixO& operator=(const MatrixO& m);
     MatrixO& operator=(MatrixO&& m);
     template <class A, Store M, Data D> MatrixO(const Indexable <EType,A,M,D,MatrixShape>& m)
     : Base(m)
     {
-        CheckUL();
+        Setd();
     }
     template <class A, Store M, Data D> const MatrixO& operator=(const Indexable <EType,A,M,D,MatrixShape>& m)
     {
         Base::operator=(m);
-        CheckUL();
+        Setd();
         return *this;
     }
     MatrixO<T>& operator*=(const T& s);
@@ -64,6 +63,8 @@ public:
     }
     std::ostream& PrettyPrint(std::ostream& os) const;
 private:
+    void Setd();
+    void CheckUL();
     Matrix<T> ExtractM(Matrix<T>& RL) const;
 
     int     itsd;

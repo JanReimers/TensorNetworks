@@ -17,11 +17,11 @@ template <class T> MatrixO<T>::MatrixO()
     , itsUL(Full)
 {}
 
-template <class T> MatrixO<T>::MatrixO(int d)
+template <class T> MatrixO<T>::MatrixO(int d,TriType ul)
     : Matrix<OperatorElement<T> >()
     , itsd(d)
     , itsTruncationError(0)
-    , itsUL(Full)
+    , itsUL(ul)
 {}
 
 template <class T> MatrixO<T>::MatrixO(int d, const MatLimits& lim)
@@ -59,11 +59,11 @@ template <class T> MatrixO<T>::MatrixO(MatrixO&& m)
 }
 
 
-template <class T> MatrixO<T>::MatrixO(int Dw1, int Dw2,double S)
+template <class T> MatrixO<T>::MatrixO(int Dw1, int Dw2,double S,TriType ul)
     : Matrix<OperatorElement<T> >(0,Dw1-1,0,Dw2-1)
     , itsd(2*S+1)
     , itsTruncationError(0)
-    , itsUL(Full)
+    , itsUL(ul)
 {
     OperatorElement<T> Z=OperatorZ(S);
     Fill(*this,Z);
@@ -124,7 +124,10 @@ template <class T> void MatrixO<T>::CheckUL()
             itsUL=Full;
         }
     }
+}
 
+template <class T> void MatrixO<T>::Setd()
+{
     MatLimits l=this->GetLimits();
     OperatorElement<T> e=(*this)(l.Row.Low,l.Col.Low);
     itsd=e.GetNumRows();
@@ -299,7 +302,6 @@ template <class T> void MatrixO<T>::SetV(Direction lr,const MatrixO& V)
     for (index_t i:V.rows())
         for (index_t j:V.cols())
             (*this)(i,j)=V(i,j);
-//    CheckUL();
 }
 
 template <class T> Matrix<T> MatrixO<T>::Flatten(Direction lr) const

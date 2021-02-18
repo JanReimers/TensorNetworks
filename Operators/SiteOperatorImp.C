@@ -14,7 +14,7 @@ SiteOperatorImp::SiteOperatorImp(int d)
     , itsDw(1,1)
     , itsTruncationError(0.0)
     , itsWs(d,d)
-    , itsWOvM(d)
+    , itsWOvM(d,Lower)
 {
     MatrixRT I0(1,1),I1(1,1);
     I0(1,1)=0.0;
@@ -159,7 +159,6 @@ void SiteOperatorImp::SyncWtoO()
             for (index_t w2:itsWOvM.cols())
                 itsWOvM(w1,w2)(m,n)=W(w1+1,w2+1);
         }
-    itsWOvM.CheckUL();
 }
 
 void SiteOperatorImp::SyncOtoW()

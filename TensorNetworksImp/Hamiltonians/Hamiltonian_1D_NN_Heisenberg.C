@@ -60,7 +60,7 @@ MatrixOR  Hamiltonian_1D_NN_Heisenberg::GetMatrixO(TriType ul) const
     switch (ul)
     {
     case Lower:
-        W=MatrixOR(Dw,Dw,itsS);
+        W=MatrixOR(Dw,Dw,itsS,ul);
         W(0,0)=OperatorI (itsS);
         W(1,0)=OperatorSp(itsS);
         W(2,0)=OperatorSm(itsS);
@@ -72,7 +72,7 @@ MatrixOR  Hamiltonian_1D_NN_Heisenberg::GetMatrixO(TriType ul) const
         W(4,4)=OperatorI (itsS);
         break;
     case Upper:
-        W=MatrixOR(Dw,Dw,itsS);
+        W=MatrixOR(Dw,Dw,itsS,ul);
         W(0,0)=OperatorI (itsS);
         W(0,1)=OperatorSp(itsS);
         W(0,2)=OperatorSm(itsS);
@@ -87,8 +87,7 @@ MatrixOR  Hamiltonian_1D_NN_Heisenberg::GetMatrixO(TriType ul) const
     default:
         assert(false);
     }
-    W.CheckUL();
-    return W; //This gets copy elided to UL check gets donw
+    return W; //This gets copy elided to UL check gets done
 }
 
 } //namespace
