@@ -224,16 +224,6 @@ SiteOperatorImp* SiteOperatorImp::GetNeighbour(Direction lr) const
     return ret;
 }
 
-//void SiteOperatorImp::SetW(int m, int n, const MatrixRT& W)
-//{
-//    itsWs(m+1,n+1)=W;
-//
-//    itsWOvM.SetChi12(itsDw.Dw1-2,itsDw.Dw2-2,false); //Don't bother preserving the data.
-//    for (index_t i:itsWOvM.rows())
-//    for (index_t j:itsWOvM.cols())
-//          itsWOvM(i,j)(m,n)=W(i+1,j+1);
-//}
-
 void SiteOperatorImp::SetLimits()
 {
     itsDw.w1_first.SetLimits(itsDw.Dw2);

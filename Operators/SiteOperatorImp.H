@@ -79,7 +79,6 @@ class SiteOperatorImp : public virtual SiteOperator
         void     GaugeTransform(const MatrixRT& R, const MatrixRT& Rinv);
         double   Contract_sM(int M) const;
         double   Contract_sM1(int M) const;
-        MatrixRT ContractDel(Direction lr) const;
     protected:
 
         int      itsd; //2*S+1
