@@ -32,6 +32,42 @@ template <class T> OperatorElement<T>::~OperatorElement()
     //dtor
 }
 
+//
+// Fill with unit op x s
+//
+template <class T> OperatorElement<T>& OperatorElement<T>::operator=(T s)
+{
+    *this=OperatorI(itsS)*s;
+    return *this;
+}
+
+template <> OperatorElement<double> OperatorElement<double>::Create(SpinOperator so,double S)
+{
+    OperatorElement<double> O;
+        switch (so)
+        {
+        case Sx:
+            O=OperatorSx(S);
+            break;
+        case Sy:
+            assert(false);//O=OperatorSy(S);  THis is a complex operator
+            break;
+        case Sz:
+            O=OperatorSz(S);
+            break;
+        case Sp:
+            O=OperatorSp(S);
+            break;
+        case Sm:
+            O=OperatorSm(S);
+            break;
+        }
+    return O;
+}
+
+
+
+
  OperatorI::OperatorI(double S)
  : OperatorElement(2*S+1,S)
  {

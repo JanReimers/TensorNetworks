@@ -20,7 +20,7 @@ namespace TensorNetworks
     class Dw12;
     class SpinCalculator;
     class OperatorClient;
-    class OperatorClient1;
+    class OperatorClient;
 
     template <class T> class SVCompressor;
     typedef SVCompressor<dcmplx> SVCompressorC;

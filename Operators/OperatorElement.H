@@ -1,6 +1,7 @@
 #ifndef OPERATORELEMENT_H
 #define OPERATORELEMENT_H
 
+#include "TensorNetworks/Enums.H"
 #include "oml/matrix.h"
 
 
@@ -17,11 +18,14 @@ public:
     OperatorElement(int d,double S);
     virtual ~OperatorElement();
 
+    OperatorElement& operator=(T s);
     template <class A, Store M, Data D> const OperatorElement& operator=(const Indexable <T,A,M,D,MatrixShape>& m)
     {
         Matrix<T>::operator=(m);
         return *this;
     }
+
+    static OperatorElement Create(SpinOperator,double S);
 
 protected:
     double itsS;

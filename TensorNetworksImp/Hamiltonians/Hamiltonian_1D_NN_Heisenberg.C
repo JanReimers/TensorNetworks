@@ -24,28 +24,6 @@ Hamiltonian_1D_NN_Heisenberg::~Hamiltonian_1D_NN_Heisenberg()
 //     cout << "Hamiltonian_1D_NN_Heisenberg destructor." << endl;
 }
 
-//      [ 1       0        0      0    0 ]
-//      [ S+      0        0      0    0 ]
-//  W = [ S-      0        0      0    0 ]
-//      [ Sz      0        0      0    0 ]
-//      [ hzSz  Jxy/2*S- Jxy/2*S+ JzSz 1 ]
-//
-MatrixRT Hamiltonian_1D_NN_Heisenberg::GetW (int m, int n) const
-{
-    MatrixRT W(Dw,Dw);
-    Fill(W,0.0);
-    W(1,1)=I(m,n);
-    W(2,1)=itsSC.GetSp(m,n);
-    W(3,1)=itsSC.GetSm(m,n);
-    W(4,1)=itsSC.GetSz(m,n);
-    W(5,1)=itshz*itsSC.GetSz(m,n);
-    W(5,2)=itsJxy/2.0*itsSC.GetSm(m,n);
-    W(5,3)=itsJxy/2.0*itsSC.GetSp(m,n);
-    W(5,4)=itsJz     *itsSC.GetSz(m,n); //The get return 2*Sz to avoid half integers
-    W(5,5)=I(m,n);
-    return W;
-}
-
 
 double Hamiltonian_1D_NN_Heisenberg::GetH(int ma,int na,int mb,int nb) const
 {
@@ -60,6 +38,13 @@ MatrixOR  Hamiltonian_1D_NN_Heisenberg::GetMatrixO(TriType ul) const
     switch (ul)
     {
     case Lower:
+//      [ 1       0        0      0    0 ]
+//      [ S+      0        0      0    0 ]
+//  W = [ S-      0        0      0    0 ]
+//      [ Sz      0        0      0    0 ]
+//      [ hzSz  Jxy/2*S- Jxy/2*S+ JzSz 1 ]
+//
+
         W=MatrixOR(Dw,Dw,itsS,ul);
         W(0,0)=OperatorI (itsS);
         W(1,0)=OperatorSp(itsS);
@@ -72,6 +57,12 @@ MatrixOR  Hamiltonian_1D_NN_Heisenberg::GetMatrixO(TriType ul) const
         W(4,4)=OperatorI (itsS);
         break;
     case Upper:
+//      [ 1       S+       S-     Sz   hzSz     ]
+//      [ 0       0        0      0    Jxy/2*S- ]
+//  W = [ 0       0        0      0    Jxy/2*S+ ]
+//      [ 0       0        0      0    JzSz     ]
+//      [ 0       0        0      0     1       ]
+//
         W=MatrixOR(Dw,Dw,itsS,ul);
         W(0,0)=OperatorI (itsS);
         W(0,1)=OperatorSp(itsS);
@@ -87,7 +78,7 @@ MatrixOR  Hamiltonian_1D_NN_Heisenberg::GetMatrixO(TriType ul) const
     default:
         assert(false);
     }
-    return W; //This gets copy elided to UL check gets done
+    return W;
 }
 
 } //namespace

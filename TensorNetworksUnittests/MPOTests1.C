@@ -19,6 +19,14 @@ using TensorNetworks::Position;
 using TensorNetworks::PBulk;
 using TensorNetworks::PLeft;
 using TensorNetworks::PRight;
+using TensorNetworks::OperatorSz;
+using TensorNetworks::OperatorSx;
+using TensorNetworks::OperatorSy;
+using TensorNetworks::OperatorSp;
+using TensorNetworks::OperatorSm;
+using TensorNetworks::OperatorI;
+using TensorNetworks::OperatorZ;
+using TensorNetworks::OperatorElement;
 
 class MPOTests1 : public ::testing::Test
 {
@@ -58,7 +66,7 @@ public:
 
     double eps;
            TensorNetworks::Factory*         itsFactory;
-    const  TensorNetworks::OperatorClient1* itsOperatorClient;
+    const  TensorNetworks::OperatorClient* itsOperatorClient;
 };
 
 void MakeLRBOperator(MatrixOR& OvM,TriType ul,Position lbr)
@@ -185,11 +193,12 @@ TEST_F(MPOTests1,MakeHamiltonian)
     Setup(0.5);
 }
 
+
 TEST_F(MPOTests1,OperatorElement1)
 {
     double S=0.5;
     {
-        TensorNetworks::OperatorSz Sz12(S);
+        OperatorSz Sz12(S);
         EXPECT_EQ(Sz12(0,0),-0.5);
         EXPECT_EQ(Sz12(1,0), 0.0);
         EXPECT_EQ(Sz12(0,1), 0.0);
@@ -197,7 +206,7 @@ TEST_F(MPOTests1,OperatorElement1)
     }
 
     {
-        TensorNetworks::OperatorSp Sp12(S);
+        OperatorSp Sp12(S);
         EXPECT_EQ(Sp12(0,0), 0.0);
         EXPECT_EQ(Sp12(1,0), 1.0);
         EXPECT_EQ(Sp12(0,1), 0.0);
@@ -205,7 +214,7 @@ TEST_F(MPOTests1,OperatorElement1)
     }
 
     {
-        TensorNetworks::OperatorSm Sm12(S);
+        OperatorSm Sm12(S);
         EXPECT_EQ(Sm12(0,0), 0.0);
         EXPECT_EQ(Sm12(1,0), 0.0);
         EXPECT_EQ(Sm12(0,1), 1.0);
@@ -213,14 +222,14 @@ TEST_F(MPOTests1,OperatorElement1)
     }
 
     {
-        TensorNetworks::OperatorSy Sy12(S);
+        OperatorSy Sy12(S);
         EXPECT_EQ(Sy12(0,0), 0.0);
         EXPECT_EQ(Sy12(1,0), dcmplx(0.0,-0.5));
         EXPECT_EQ(Sy12(0,1), dcmplx(0.0, 0.5));
         EXPECT_EQ(Sy12(1,1), 0.0);
     }
     {
-        TensorNetworks::OperatorSx Sx12(S);
+        OperatorSx Sx12(S);
         EXPECT_EQ(Sx12(0,0), 0.0);
         EXPECT_EQ(Sx12(1,0), 0.5);
         EXPECT_EQ(Sx12(0,1), 0.5);
@@ -228,18 +237,39 @@ TEST_F(MPOTests1,OperatorElement1)
     }
 }
 
+TEST_F(MPOTests1,OperatorElement2)
+{
+    OperatorElement<double> Oe(2,0.5);
+    Oe=1.0;
+    EXPECT_EQ(Oe(0,0),1.0);
+    EXPECT_EQ(Oe(1,0),0.0);
+    EXPECT_EQ(Oe(0,1),0.0);
+    EXPECT_EQ(Oe(1,1),1.0);
+    Oe=0.0;
+    EXPECT_EQ(Oe(0,0),0.0);
+    EXPECT_EQ(Oe(1,0),0.0);
+    EXPECT_EQ(Oe(0,1),0.0);
+    EXPECT_EQ(Oe(1,1),0.0);
+    Oe=1.1;
+    EXPECT_EQ(Oe(0,0),1.1);
+    EXPECT_EQ(Oe(1,0),0.0);
+    EXPECT_EQ(Oe(0,1),0.0);
+    EXPECT_EQ(Oe(1,1),1.1);
+}
+
+
 TEST_F(MPOTests1,OperatorValuedMatrix1)
 {
     double S=0.5;
     Setup(S);
     MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
-    EXPECT_EQ(OvM(0,0),TensorNetworks::OperatorI (S));
-    EXPECT_EQ(OvM(1,0),TensorNetworks::OperatorSp(S));
-    EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorSm(S));
-    EXPECT_EQ(OvM(3,0),TensorNetworks::OperatorSz(S));
-    EXPECT_EQ(OvM(0,1),TensorNetworks::OperatorZ (S));
-    EXPECT_EQ(OvM(0,2),TensorNetworks::OperatorZ (S));
-    EXPECT_EQ(OvM(0,3),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM(0,0),OperatorI (S));
+    EXPECT_EQ(OvM(1,0),OperatorSp(S));
+    EXPECT_EQ(OvM(2,0),OperatorSm(S));
+    EXPECT_EQ(OvM(3,0),OperatorSz(S));
+    EXPECT_EQ(OvM(0,1),OperatorZ (S));
+    EXPECT_EQ(OvM(0,2),OperatorZ (S));
+    EXPECT_EQ(OvM(0,3),OperatorZ (S));
     EXPECT_EQ(OvM.GetUpperLower(),Lower);
 }
 
@@ -248,13 +278,13 @@ TEST_F(MPOTests1,OperatorValuedMatrix2)
     double S=1.0;
     Setup(S);
     MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
-    EXPECT_EQ(OvM(0,0),TensorNetworks::OperatorI (S));
-    EXPECT_EQ(OvM(1,0),TensorNetworks::OperatorSp(S));
-    EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorSm(S));
-    EXPECT_EQ(OvM(3,0),TensorNetworks::OperatorSz(S));
-    EXPECT_EQ(OvM(0,1),TensorNetworks::OperatorZ (S));
-    EXPECT_EQ(OvM(0,2),TensorNetworks::OperatorZ (S));
-    EXPECT_EQ(OvM(0,3),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM(0,0),OperatorI (S));
+    EXPECT_EQ(OvM(1,0),OperatorSp(S));
+    EXPECT_EQ(OvM(2,0),OperatorSm(S));
+    EXPECT_EQ(OvM(3,0),OperatorSz(S));
+    EXPECT_EQ(OvM(0,1),OperatorZ (S));
+    EXPECT_EQ(OvM(0,2),OperatorZ (S));
+    EXPECT_EQ(OvM(0,3),OperatorZ (S));
     EXPECT_EQ(OvM.GetUpperLower(),Lower);
 }
 
@@ -263,13 +293,13 @@ TEST_F(MPOTests1,OperatorValuedMatrix3)
     double S=0.5;
     Setup(S);
     MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
-    EXPECT_EQ(OvM(0,0),TensorNetworks::OperatorI (S));
-    EXPECT_EQ(OvM(0,1),TensorNetworks::OperatorSp(S));
-    EXPECT_EQ(OvM(0,2),TensorNetworks::OperatorSm(S));
-    EXPECT_EQ(OvM(0,3),TensorNetworks::OperatorSz(S));
-    EXPECT_EQ(OvM(1,0),TensorNetworks::OperatorZ (S));
-    EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorZ (S));
-    EXPECT_EQ(OvM(3,0),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM(0,0),OperatorI (S));
+    EXPECT_EQ(OvM(0,1),OperatorSp(S));
+    EXPECT_EQ(OvM(0,2),OperatorSm(S));
+    EXPECT_EQ(OvM(0,3),OperatorSz(S));
+    EXPECT_EQ(OvM(1,0),OperatorZ (S));
+    EXPECT_EQ(OvM(2,0),OperatorZ (S));
+    EXPECT_EQ(OvM(3,0),OperatorZ (S));
     EXPECT_EQ(OvM.GetUpperLower(),Upper);
 }
 
@@ -278,15 +308,40 @@ TEST_F(MPOTests1,OperatorValuedMatrix4)
     double S=1.0;
     Setup(S);
     MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
-    EXPECT_EQ(OvM(0,0),TensorNetworks::OperatorI (S));
-    EXPECT_EQ(OvM(0,1),TensorNetworks::OperatorSp(S));
-    EXPECT_EQ(OvM(0,2),TensorNetworks::OperatorSm(S));
-    EXPECT_EQ(OvM(0,3),TensorNetworks::OperatorSz(S));
-    EXPECT_EQ(OvM(1,0),TensorNetworks::OperatorZ (S));
-    EXPECT_EQ(OvM(2,0),TensorNetworks::OperatorZ (S));
-    EXPECT_EQ(OvM(3,0),TensorNetworks::OperatorZ (S));
+    EXPECT_EQ(OvM(0,0),OperatorI (S));
+    EXPECT_EQ(OvM(0,1),OperatorSp(S));
+    EXPECT_EQ(OvM(0,2),OperatorSm(S));
+    EXPECT_EQ(OvM(0,3),OperatorSz(S));
+    EXPECT_EQ(OvM(1,0),OperatorZ (S));
+    EXPECT_EQ(OvM(2,0),OperatorZ (S));
+    EXPECT_EQ(OvM(3,0),OperatorZ (S));
     EXPECT_EQ(OvM.GetUpperLower(),Upper);
 }
+
+TEST_F(MPOTests1,OperatorValuedMatrix5)
+{
+    double S=0.5;
+    {
+        MatrixOR OvM(1,1,S,Lower);
+        Unit(OvM);
+        EXPECT_EQ(OvM(0,0),OperatorI (S));
+    }
+    {
+        MatrixOR OvM(3,3,S,Lower);
+        Unit(OvM);
+        EXPECT_EQ(OvM(0,0),OperatorI(S));
+        EXPECT_EQ(OvM(1,1),OperatorI(S));
+        EXPECT_EQ(OvM(2,2),OperatorI(S));
+        EXPECT_EQ(OvM(0,1),OperatorZ(S));
+        EXPECT_EQ(OvM(0,2),OperatorZ(S));
+        EXPECT_EQ(OvM(1,0),OperatorZ(S));
+        EXPECT_EQ(OvM(1,2),OperatorZ(S));
+        EXPECT_EQ(OvM(2,0),OperatorZ(S));
+        EXPECT_EQ(OvM(2,1),OperatorZ(S));
+    }
+
+}
+
 
 
 TEST_F(MPOTests1,OperatorValuedMatrixGetVUpper)

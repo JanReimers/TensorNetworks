@@ -23,17 +23,34 @@ Hamiltonian_1D_NN_TransverseIsing::~Hamiltonian_1D_NN_TransverseIsing()
 //     cout << "Hamiltonian_1D_NN_TransverseIsing destructor." << endl;
 }
 
-MatrixRT Hamiltonian_1D_NN_TransverseIsing::GetW (int m, int n) const
+MatrixOR  Hamiltonian_1D_NN_TransverseIsing::GetMatrixO(TriType ul) const
 {
-    MatrixRT W(Dw,Dw);
-    Fill(W,0.0);
-    W(1,1)=I(m,n);
-    W(2,1)=itsSC.GetSz(m,n);
-    W(3,1)=itshx*itsSC.GetSx(m,n);
-    W(3,2)=itsJ *itsSC.GetSz(m,n);
-    W(3,3)=I(m,n);
-    return W;
+    MatrixOR W;
+    switch (ul)
+    {
+    case Lower:
+        W=MatrixOR(Dw,Dw,itsS,ul);
+        W(0,0)=OperatorI (itsS);
+        W(1,0)=OperatorSz(itsS);
+        W(2,0)=itshx     *OperatorSx(itsS);
+        W(2,1)=itsJ      *OperatorSz(itsS);
+        W(2,2)=OperatorI (itsS);
+        break;
+    case Upper:
+        W=MatrixOR(Dw,Dw,itsS,ul);
+        W(0,0)=OperatorI (itsS);
+        W(0,1)=OperatorSz(itsS);
+        W(0,2)=itshx     *OperatorSx(itsS);
+        W(1,2)=itsJ      *OperatorSz(itsS);
+        W(2,2)=OperatorI (itsS);
+       break;
+    case Full:
+    default:
+        assert(false);
+    }
+    return W; //This gets copy elided to UL check gets done
 }
+
 
 double Hamiltonian_1D_NN_TransverseIsing::GetH(int ma,int na,int mb,int nb) const
 {

@@ -14,34 +14,20 @@ SiteOperatorImp::SiteOperatorImp(int d)
     , itsDw(1,1)
     , itsTruncationError(0.0)
     , itsWs(d,d)
-    , itsWOvM(d,Lower)
+    , itsWOvM(1,1,d,Lower)
 {
-    MatrixRT I0(1,1),I1(1,1);
-    I0(1,1)=0.0;
-    I1(1,1)=1.0;
-
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
-        {
-            itsWs(m+1,n+1)= (m==n) ? I1 : I0;
-            assert(itsWs(m+1,n+1).GetNumRows()==itsDw.Dw1);
-            assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
-        }
-
+    Unit(itsWOvM);
+    SyncOtoW();
 }
 
+//
+//  Not covered by MPO tests, try the Expectation tests.
+//
 SiteOperatorImp::SiteOperatorImp(int d, double S, SpinOperator so) //Construct spin operator
     : SiteOperatorImp(d)
 {
-    SpinCalculator sc(S);
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
-        {
-            itsWs(m+1,n+1)=sc.Get(m,n,so);
-            assert(itsWs(m+1,n+1).GetNumRows()==itsDw.Dw1);
-            assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
-        }
-    SyncWtoO();
+    itsWOvM(0,0)=OperatorElement<double>::Create(so,S);
+    SyncOtoW();
 }
 //
 //  Build from a W rep object
@@ -49,15 +35,16 @@ SiteOperatorImp::SiteOperatorImp(int d, double S, SpinOperator so) //Construct s
 SiteOperatorImp::SiteOperatorImp(int d, const OperatorClient* H)
     : SiteOperatorImp(d)
 {
+    itsWOvM=H->GetMatrixO(Lower);
     itsDw=H->GetDw12();
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
-        {
-            itsWs(m+1,n+1)=H->GetW(m,n);
-            assert(itsWs(m+1,n+1).GetNumRows()==itsDw.Dw1);
-            assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
-        }
-    SyncWtoO();
+//    for (int m=0; m<itsd; m++)
+//        for (int n=0; n<itsd; n++)
+//        {
+//            itsWs(m+1,n+1)=H->GetW(m,n);
+//            assert(itsWs(m+1,n+1).GetNumRows()==itsDw.Dw1);
+//            assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
+//        }
+    SyncOtoW();
     CheckSync();
 }
 
@@ -267,21 +254,14 @@ void SiteOperatorImp::Product(const SiteOperator* O2)
 //    cout << "O2  D1,D2=" << O2Dw.Dw1 << " " << O2Dw.Dw2 << " ";
 //    cout << "New D1,D2=" << Dw.Dw1 << " " << Dw.Dw2 << endl;
 
-
-    TensorT newWs(itsd,itsd);
-    for (int m=0; m<itsd; m++)
-        for (int o=0; o<itsd; o++)
-        {
-            MatrixRT Wmo(Dw.Dw1,Dw.Dw2);
-            Fill(Wmo,0.0);
-            for (int n=0; n<itsd; n++)
-                Wmo+=TensorProduct(GetW(m,n),O2i->GetW(n,o));
-            newWs(m+1,o+1)=Wmo;
-        }
-    itsWs=newWs;  //Use SetiW instead
-
+//    cout << "itsWOvM=" << itsWOvM.GetLimits() << " " << itsWOvM.GetUpperLower() << endl;
+//    cout << "O2i->itsWOvM=" << O2i->itsWOvM.GetLimits()<< " " <<  O2i->itsWOvM.GetUpperLower()  << endl;
+    TriType ul=itsWOvM.GetUpperLower();
+    MatrixOR WW=TensorProduct(itsWOvM,O2i->itsWOvM);
+    itsWOvM=WW;
+    itsWOvM.SetUpperLower(ul);
     itsDw=Dw;
-    SyncWtoO();
+    SyncOtoW();
 }
 
 

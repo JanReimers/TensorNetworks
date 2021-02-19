@@ -18,6 +18,7 @@ public:
     MatrixO(int d,TriType);
     MatrixO(int d, const MatLimits&);
     MatrixO(int Dw1, int Dw2,double S,TriType);
+    MatrixO(int Dw1, int Dw2,int d,TriType);
     MatrixO(const Base   & m);
     MatrixO(const MatrixO& m);
     MatrixO(MatrixO&& m);
@@ -155,6 +156,12 @@ template <class T> bool IsTriangular(TriType ul,const Matrix<T>& m,double eps)
     return ret;
 }
 
+template <class T> void Unit(MatrixO<T>& m)
+{
+    for (index_t i:m.rows())
+        for (index_t j:m.cols())
+            m(i,j)= (i==j) ? 1.0 : 0.0;
+}
 
 void SVDShuffle(TriType ul,Direction lr, Matrix<double>& U, DiagonalMatrix<double>& s,Matrix<double>& VT, double eps);
 

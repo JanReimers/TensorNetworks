@@ -69,18 +69,6 @@ public:
     Vector3CT CalcHeffRight(int isite,bool cache=false) const {return GetMPSImp()->CalcHeffRight(itsH,isite,cache);}
     void LoadHeffCaches() {GetMPSImp()->LoadHeffCaches(itsH);}
 
-    MatrixRT GetW1(int m, int n) {return itsOperatorClient->GetW(m,n);}
-    MatrixRT GetW (int isite, int m, int n)
-    {
-        const TensorNetworks::MPO* hmpo=itsH;
-        return hmpo->GetSiteOperator(isite)->GetW(m,n);
-    }
-    MatrixRT GetiW(int isite, int m, int n)
-    {
-        const TensorNetworks::iMPO* hmpo=itsiH;
-        return hmpo->GetSiteOperator(isite)->GetW(m,n);
-    }
-
           TensorNetworks::MPSImp* GetMPSImp()       {return dynamic_cast<      TensorNetworks::MPSImp*>(itsMPS);}
     const TensorNetworks::MPSImp* GetMPSImp() const {return dynamic_cast<const TensorNetworks::MPSImp*>(itsMPS);}
 
@@ -102,13 +90,6 @@ TEST_F(MPOTests,MakeHamiltonian)
     Setup(10,0.5,2);
 }
 
-
-TEST_F(MPOTests,CheckThatWsGotLoaded)
-{
-    Setup(10,0.5,2);
-    EXPECT_EQ(ToString(GetW(2,0,0)),"(1:5),(1:5) \n[ 1 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ -0.5 0 0 0 0 ]\n[ -0 0 0 -0.5 1 ]\n");
-    EXPECT_EQ(ToString(GetW(2,0,1)),"(1:5),(1:5) \n[ 0 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 1 0 0 0 0 ]\n[ 0 0 0 0 0 ]\n[ 0 0.5 0 0 0 ]\n");
-}
 
 double MPOTests::ENeel(double s) const
 {

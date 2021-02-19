@@ -69,6 +69,17 @@ template <class T> MatrixO<T>::MatrixO(int Dw1, int Dw2,double S,TriType ul)
     Fill(*this,Z);
 }
 
+template <class T> MatrixO<T>::MatrixO(int Dw1, int Dw2,int d,TriType ul)
+    : Matrix<OperatorElement<T> >(0,Dw1-1,0,Dw2-1)
+    , itsd(d)
+    , itsTruncationError(0)
+    , itsUL(ul)
+{
+    double S=0.5*(d-1);
+    OperatorElement<T> Z=OperatorZ(S);
+    Fill(*this,Z);
+}
+
 
 template <class T> MatrixO<T>::~MatrixO()
 {
