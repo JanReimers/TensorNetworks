@@ -162,7 +162,13 @@
 		<Unit filename="Operators/SiteOperatorImpCompress.C">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="Operators/SiteOperatorImpQRIter.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="Operators/SiteOperatorImpRehsape.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/SiteOperatorImpiCanonicalTriangular.C">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/SiteOperatorLeft.C">
@@ -250,10 +256,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.H" />
-		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg_Upper.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg_Upper.H" />
 		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_TransverseIsing.C">
 			<Option compilerVar="CC" />
 		</Unit>
