@@ -134,7 +134,7 @@ template <class T> void MatrixO<T>::Setd()
 }
 template <class T> void MatrixO<T>::SetUpperLower(TriType ul)
 {
-    assert(this->GetNumRows()==1 || this->GetNumCols()==1);
+//    assert(this->GetNumRows()==1 || this->GetNumCols()==1);
     assert(ul==Upper || ul==Lower);
     itsUL=ul;
 }
