@@ -247,7 +247,19 @@ TEST_F(MPOTests,TestMPOCombineForH2)
     delete H2;
 }
 
-TEST_F(MPOTests,TestMPOCompressForH2)
+TEST_F(MPOTests,TestMPOStdCompressForH)
+{
+    int L=10,D=8;
+    Setup(L,0.5,D);
+    itsMPS->InitializeWith(TensorNetworks::Random);
+    itsMPS->Normalize(TensorNetworks::DRight);
+    itsH->CanonicalForm();
+    double truncError=itsH->Compress(TensorNetworks::Std,0,1e-13);
+    EXPECT_EQ(itsH->GetMaxDw(),5);
+    EXPECT_LT(truncError,1e-13);
+}
+
+TEST_F(MPOTests,TestMPOStdCompressForH2)
 {
     int L=10,D=8;
     Setup(L,0.5,D);

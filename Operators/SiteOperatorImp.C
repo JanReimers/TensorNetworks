@@ -224,15 +224,15 @@ SiteOperatorImp* SiteOperatorImp::GetNeighbour(Direction lr) const
     return ret;
 }
 
-void SiteOperatorImp::SetW(int m, int n, const MatrixRT& W)
-{
-    itsWs(m+1,n+1)=W;
-
-    itsWOvM.SetChi12(itsDw.Dw1-2,itsDw.Dw2-2,false); //Don't bother preserving the data.
-    for (index_t i:itsWOvM.rows())
-    for (index_t j:itsWOvM.cols())
-          itsWOvM(i,j)(m,n)=W(i+1,j+1);
-}
+//void SiteOperatorImp::SetW(int m, int n, const MatrixRT& W)
+//{
+//    itsWs(m+1,n+1)=W;
+//
+//    itsWOvM.SetChi12(itsDw.Dw1-2,itsDw.Dw2-2,false); //Don't bother preserving the data.
+//    for (index_t i:itsWOvM.rows())
+//    for (index_t j:itsWOvM.cols())
+//          itsWOvM(i,j)(m,n)=W(i+1,j+1);
+//}
 
 void SiteOperatorImp::SetLimits()
 {
@@ -344,23 +344,23 @@ double SiteOperatorImp::GetFrobeniusNorm() const
     return fn;
 }
 
-bool SiteOperatorImp::isOrthonormal(Direction lr,const MatrixRT& Q) const
-{
-    bool ret=false;
-    double d=itsd;
-    switch (lr)
-    {
-    case DLeft:
-        ret=IsUnit(Transpose(Q)*Q/d,1e-13);
-        break;
-    case DRight:
-        ret=IsUnit(Q*Transpose(Q)/d,1e-13);
-        break;
-    default:
-        assert(false);
-    }
-    return ret;
-}
+//bool SiteOperatorImp::isOrthonormal(Direction lr,const MatrixRT& Q) const
+//{
+//    bool ret=false;
+//    double d=itsd;
+//    switch (lr)
+//    {
+//    case DLeft:
+//        ret=IsUnit(Transpose(Q)*Q/d,1e-13);
+//        break;
+//    case DRight:
+//        ret=IsUnit(Q*Transpose(Q)/d,1e-13);
+//        break;
+//    default:
+//        assert(false);
+//    }
+//    return ret;
+//}
 
 char SiteOperatorImp::GetNormStatus(double eps) const
 {
@@ -368,18 +368,18 @@ char SiteOperatorImp::GetNormStatus(double eps) const
     if (itsDw.Dw1*itsDw.Dw2>4096) return '?';
     char ret='W'; //Not normalized
     {
-        MatrixRT QL=ReshapeV(DLeft);
-        if (QL.GetNumRows()==0)
+        MatrixOR V=itsWOvM.GetV(DLeft);
+        if (V.GetNumRows()==0)
             ret='l';
-        else if (isOrthonormal(DLeft,QL))
+        else if (V.IsOrthonormal(DLeft,eps))
             ret='L';
     }
     if (ret!='l')
     {
-        MatrixRT QR=ReshapeV(DRight);
-        if (QR.GetNumCols()==0)
+        MatrixOR V=itsWOvM.GetV(DRight);
+        if (V.GetNumCols()==0)
             ret='r';
-        else if (isOrthonormal(DRight,QR))
+        else if (V.IsOrthonormal(DRight,eps))
         {
             if (ret=='L')
                 ret='I';

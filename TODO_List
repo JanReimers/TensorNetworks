@@ -4,6 +4,7 @@ Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
     -Move IsTriangular(ul,m) to oml side.
     -Can we simplify some code with Mul(Direction,a,b) mat mul function?
     -Rename MPOTest1 to OpValMatrixTests.
+    -Need op*(Matrix,MatrixO) to pass ul through
     Done: -SVD:
         Try swapping rows/cols on U/VT in each block to maintain upper/lower.
         Have a look at Lapack DGESVJ, it accepts Upper/Lower as input. Not clear if U/VT respect U/L

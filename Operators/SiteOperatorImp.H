@@ -43,7 +43,6 @@ class SiteOperatorImp : public virtual SiteOperator
         //  As per Parker et. al.
         //
         virtual void    CanonicalFormOvM(Direction LR);
-        virtual void    CanonicalForm(Direction LR);
         virtual void   iCanonicalFormQRIter(Direction LR); //Infinite lattice iMPO version
         virtual void   iCanonicalFormTriangular(Direction LR); //Infinite lattice iMPO version
 
@@ -63,25 +62,14 @@ class SiteOperatorImp : public virtual SiteOperator
         friend class MPOTesting;
         friend class iMPOImp;
 
-
-        virtual MatrixRT GetV(Direction,int m, int n) const =0;
-        virtual void     SetV(Direction,int m, int n, const MatrixRT& V)=0;
-                void     SetW(          int m, int n, const MatrixRT& W);
         SiteOperatorImp* GetNeighbour(Direction) const;
 
         double CompressStd   (Direction,const SVCompressorR*);
-        double CompressParker(Direction,const SVCompressorR*);
         double CompressParkerOvM(Direction,const SVCompressorR*);
-        void   SVDTransfer   (Direction lr,const DiagonalMatrixRT& s,const MatrixRT& UV);
         void   QLTransfer    (Direction lr,const MatrixRT& L);
 
-        MatrixRT ReshapeW(Direction lr) const;
-        MatrixRT ReshapeV(Direction lr) const;
-        void     ReshapeW(Direction lr,const MatrixRT& Q);
-        void     ReshapeV(Direction lr,const MatrixRT& Q);
         void     NewBondDimensions(int D1, int D2, bool saveData=false);
 
-        bool     isOrthonormal(Direction lr,const MatrixRT& Q) const;
         void     AccumulateTruncationError(double err);
 
         MatrixRT BuildK(int M) const;
