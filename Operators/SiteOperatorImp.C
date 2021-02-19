@@ -204,23 +204,17 @@ void SiteOperatorImp::SetLimits()
     itsDw.w2_last .SetLimits(itsDw.Dw1);
 //    Fill(Dw.w1_first,1);
 //    Fill(DW.w2_last ,Dw.Dw2);
+
     Fill(itsDw.w1_first,itsDw.Dw1);
     Fill(itsDw.w2_last ,1);
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
-        {
-            const MatrixRT& W=itsWs(m+1,n+1);
-            for (int w1=1; w1<=itsDw.Dw1; w1++)
-                for (int w2=1; w2<=itsDw.Dw2; w2++)
-                    if (W(w1,w2)!=0.0)
-                    {
-                        if (itsDw.w1_first(w2)>w1) itsDw.w1_first(w2)=w1;
-                        if (itsDw.w2_last (w1)<w2) itsDw.w2_last (w1)=w2;
-                    }
-//            cout << "W(" << m << "," << n << ")=" << W << endl;
-//            cout << "w1_first=" << Dw.w1_first << endl;
-//            cout << "w2_last =" << Dw.w2_last  << endl;
-        }
+    for (index_t w1:itsWOvM.rows())
+        for (index_t w2:itsWOvM.cols())
+            if (fabs(itsWOvM(w1,w2))>0.0) //TOT should be using and eps~1e-15 here.
+            {
+                if (itsDw.w1_first(w2+1)>w1+1) itsDw.w1_first(w2+1)=w1+1;
+                if (itsDw.w2_last (w1+1)<w2+1) itsDw.w2_last (w1+1)=w2+1;
+            }
+
     CheckDws();
 }
 
@@ -269,17 +263,17 @@ void SiteOperatorImp::Report(std::ostream& os) const
 char SiteOperatorImp::GetUpperLower(double eps) const
 {
     char ret=' ';
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
+//    for (int m=0; m<itsd; m++)
+//        for (int n=0; n<itsd; n++)
         {
-            if (IsUpperTriangular(GetW(n,m),eps))
+            if (IsUpperTriangular(itsWOvM,eps))
             {
                 if (ret==' ')
                     ret='U';
                 else if (ret=='L')
                     ret='M'; //Mix
             }
-            else if (IsLowerTriangular(GetW(n,m),eps))
+            else if (IsLowerTriangular(itsWOvM,eps))
             {
                 if (ret==' ')
                     ret='L';
