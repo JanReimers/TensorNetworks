@@ -335,13 +335,14 @@ TEST_F(MPOTests,TestMPOCompressForE2)
     delete H1;
     delete H2;
 }
-TEST_F(MPOTests,TestL2MPOTrotter2)
+TEST_F(MPOTests,TestL2MPOTrotter2_S12)
 {
     int L=4,D=2;
     double S=0.5,dt=0.1,epsMPO=1e-4;
     Setup(L,S,D);
     TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::CNone,epsMPO);
 //    expH->CanonicalForm(); this changes the Dws
+//    expH->Report(cout);
     double truncError=expH->Compress(TensorNetworks::Std,0,epsMPO);
     for (int is=2;is<=L-1;is++)
     {
@@ -349,6 +350,18 @@ TEST_F(MPOTests,TestL2MPOTrotter2)
         EXPECT_EQ(Dw.Dw1,4);
         EXPECT_EQ(Dw.Dw2,4);
     }
+    EXPECT_LT(truncError,epsMPO*50);
+}
+TEST_F(MPOTests,TestL2MPOTrotter2_S1)
+{
+    int L=4,D=2;
+    double S=1.0,dt=0.1,epsMPO=1e-4;
+    Setup(L,S,D);
+    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::CNone,epsMPO);
+    //expH->CanonicalForm(); //Can't handle exp(H) yet.
+    double truncError=expH->Compress(TensorNetworks::Std,0,epsMPO);
+//    expH->Report(cout);
+    EXPECT_EQ(expH->GetMaxDw(),10);
     EXPECT_LT(truncError,epsMPO*50);
 }
 

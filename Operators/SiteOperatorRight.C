@@ -52,18 +52,20 @@ SiteOperatorRight::~SiteOperatorRight()
 
 void SiteOperatorRight::Init_lr(int oneIndex)
 {
-    MatrixRT itsr(SiteOperatorImp::itsDw.Dw2,1);
-    Fill(itsr,0.0);
-    itsr(oneIndex,1)=1.0;
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
-        {
-            MatrixRT W=GetW(m,n);
-            itsWs(m+1,n+1)=W*itsr;
-        }
+    MatrixRT r(0,SiteOperatorImp::itsDw.Dw2-1,0,0);
+    Fill(r,0.0);
+    r(oneIndex-1,0)=1.0;
+
+    itsWOvM=MatrixOR(itsWOvM*r);
+
+//    for (int m=0; m<itsd; m++)
+//        for (int n=0; n<itsd; n++)
+//        {
+//            MatrixRT W=GetW(m,n);
+//            itsWs(m+1,n+1)=W*itsr;
+//        }
      itsDw.Dw2=1;
-     SetLimits();
-     SyncWtoO();
+     SyncOtoW();
      itsWOvM.SetUpperLower(Lower);
 }
 

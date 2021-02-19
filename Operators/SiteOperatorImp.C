@@ -48,47 +48,40 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const Di
     : SiteOperatorImp(d)
 {
     int Dw=s.GetNumRows();
+    assert(Dw==d*d);
+    assert(U.GetNumCols()==Dw);
+    assert(U.GetNumRows()==Dw);
+
     if (lr==DLeft)
     {
+        itsWOvM.SetChi12(-1,Dw-2,false);
         itsDw=Dw12(1,Dw);
         int i1=1; //Linear index for (m,n) = 1+m+p*n
-        //  Fill W^(m,n)_w matrices
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++,i1++)
-            {
-                itsWs(m+1,n+1)=MatrixRT(1,Dw);
                 for (int w=1; w<=Dw; w++)
-                    itsWs(m+1,n+1)(1,w)=U(i1,w)*sqrt(s(w,w));
-                //cout << "Left itsWs(" << m << "," << n << ") = " << itsWs(m+1,n+1) << endl;
-                assert(itsWs(m+1,n+1).GetNumRows()==itsDw.Dw1);
-                assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
-            }
+                    itsWOvM(0,w-1)(m,n)=U(i1,w)*sqrt(s(w,w));
     }
     else if (lr==DRight)
     {
+        itsWOvM.SetChi12(Dw-2,-1,false);
         itsDw=Dw12(Dw,1);
         int i2=1; //Linear index for (m,n) = 1+m+p*n
-        //  Fill W^(m,n)_w matrices
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++,i2++)
-            {
-                itsWs(m+1,n+1)=MatrixRT(Dw,1);
                 for (int w=1; w<=Dw; w++)
-                    itsWs(m+1,n+1)(w,1)=sqrt(s(w,w))*U(w,i2); //U is actually VT
-                //cout << "Right itsWs(" << m << "," << n << ") = " << itsWs(m+1,n+1) << endl;
-                assert(itsWs(m+1,n+1).GetNumRows()==itsDw.Dw1);
-                assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
-            }
+                    itsWOvM(w-1,0)(m,n)=sqrt(s(w,w))*U(w,i2); //U is actually VT
     }
     else
     {
         // Must have been called with one of the spin decomposition types.
         assert(false);
     }
-    SyncWtoO();
+    SyncOtoW();
 }
 //
-// Construct with W operator
+// Construct with W operator. Called by iMPOImp::MakeUnitcelliMPO
+// Need to change MakeUnitcelliMPO over to OpValMatrix to fix this.
 //
 SiteOperatorImp::SiteOperatorImp(int d, const TensorT& W)
     : SiteOperatorImp(d)
@@ -144,8 +137,8 @@ void SiteOperatorImp::SyncWtoO()
 void SiteOperatorImp::SyncOtoW()
 {
     auto [X1,X2]=itsWOvM.GetChi12();
-    int D1=X1+2;
-    int D2=X2+2;
+    index_t D1=X1+2;
+    index_t D2=X2+2;
     if (itsDw.Dw1!=D1 || itsDw.Dw2!=D2)
     {
         for (int m=0; m<itsd; m++)
@@ -153,7 +146,8 @@ void SiteOperatorImp::SyncOtoW()
         {
             VectorRT lastRow=itsWs(m+1,n+1).GetRow(itsDw.Dw1);
             itsWs(m+1,n+1).SetLimits(D1,D2,true);
-            itsWs(m+1,n+1).GetRow(D1)=lastRow.SubVector(D2);
+            if (D2<=itsDw.Dw2)
+                itsWs(m+1,n+1).GetRow(D1)=lastRow.SubVector(D2);
 
         }
         itsDw.Dw1=D1;
@@ -227,7 +221,7 @@ void SiteOperatorImp::SetLimits()
 //            cout << "w1_first=" << Dw.w1_first << endl;
 //            cout << "w2_last =" << Dw.w2_last  << endl;
         }
-
+    CheckDws();
 }
 
 void  SiteOperatorImp::AccumulateTruncationError(double err)

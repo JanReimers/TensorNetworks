@@ -328,11 +328,12 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
         int N1=L.GetNumCols(); //N1=0 on the first site.
         if (N1>0 && N1!=itsDw.Dw2)
         {
-            if (GetW(0,0).GetNumCols()!=L.GetNumRows())
+            if (itsWOvM.GetNumCols()!=L.GetNumRows())
                 NewBondDimensions(itsDw.Dw1,N1,true);
             else
                 itsDw.Dw2=N1; //The contraction below will automatically reshape the Ws.
         }
+        assert(itsWOvM.GetColLimits()==L.GetRowLimits());
         TriType ul=itsWOvM.GetUpperLower();
         itsWOvM=MatrixOR(itsWOvM*L);
         itsWOvM.SetUpperLower(ul);
@@ -343,11 +344,12 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
         int N1=L.GetNumRows(); //N1=0 on the first site.
         if (N1>0 && N1!=itsDw.Dw1)
         {
-            if (GetW(0,0).GetNumRows()!=L.GetNumCols())
+            if (itsWOvM.GetNumRows()!=L.GetNumCols())
                 NewBondDimensions(N1,itsDw.Dw2,true);
             else
                 itsDw.Dw1=N1; //The contraction below will automatically reshape the As.
         }
+        assert(L.GetColLimits()==itsWOvM.GetRowLimits());
         TriType ul=itsWOvM.GetUpperLower();
         itsWOvM=MatrixOR(L*itsWOvM);
         itsWOvM.SetUpperLower(ul);

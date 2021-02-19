@@ -54,20 +54,14 @@ SiteOperatorLeft::~SiteOperatorLeft()
 
 void SiteOperatorLeft::Init_lr(int oneIndex)
 {
-    MatrixRT itsl(1,SiteOperatorImp::itsDw.Dw1);
-    Fill(itsl,0.0);
-    itsl(1,oneIndex)=1.0;
+    MatrixRT l(0,0,0,SiteOperatorImp::itsDw.Dw1-1);
+    Fill(l,0.0);
+    l(0,oneIndex-1)=1.0;
 
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
-        {
-            MatrixRT W=GetW(m,n);
-            itsWs(m+1,n+1)=itsl*W;
-        }
-     itsDw.Dw1=1;
-     SetLimits();
-     SyncWtoO();
-     itsWOvM.SetUpperLower(Lower);
+    itsWOvM=MatrixOR(l*itsWOvM);
+    itsDw.Dw1=1;
+    SyncOtoW();
+    itsWOvM.SetUpperLower(Lower);
 }
 
 void SiteOperatorLeft::CheckDws() const

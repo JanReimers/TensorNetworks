@@ -1,5 +1,6 @@
 
 Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
+    -Get CanonicalFOrm working for exp(H)
     -Move Upper/Lower enum to oml side
     -Move IsTriangular(ul,m) to oml side.
     -Can we simplify some code with Mul(Direction,a,b) mat mul function?
