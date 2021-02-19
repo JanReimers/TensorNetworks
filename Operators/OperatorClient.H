@@ -2,7 +2,6 @@
 #define OPERATORCLIENT_H
 
 #include "TensorNetworks/Namespace.H"
-#include "TensorNetworks/Dw12.H"
 #include "TensorNetworksImp/Typedefs.H"
 #include "Operators/OperatorValuedMatrix.H"
 
@@ -19,10 +18,10 @@ public:
     virtual ~OperatorClient() {}
 
     virtual double    GetS   () const=0;
-    virtual Dw12      GetDw12() const=0;
     virtual Matrix4RT GetH12 () const  ; //Two site interaction matrix
-    virtual double    GetH   (int ma,int na,int mb,int nb) const=0;
     virtual MatrixOR  GetMatrixO(TriType ul) const=0; //w1, w2 are zero based.
+private:
+    virtual double    GetH   (int ma,int na,int mb,int nb) const=0;
 };
 
 }

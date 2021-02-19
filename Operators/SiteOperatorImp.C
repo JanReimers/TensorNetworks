@@ -36,14 +36,7 @@ SiteOperatorImp::SiteOperatorImp(int d, const OperatorClient* H)
     : SiteOperatorImp(d)
 {
     itsWOvM=H->GetMatrixO(Lower);
-    itsDw=H->GetDw12();
-//    for (int m=0; m<itsd; m++)
-//        for (int n=0; n<itsd; n++)
-//        {
-//            itsWs(m+1,n+1)=H->GetW(m,n);
-//            assert(itsWs(m+1,n+1).GetNumRows()==itsDw.Dw1);
-//            assert(itsWs(m+1,n+1).GetNumCols()==itsDw.Dw2);
-//        }
+    itsDw=Dw12(itsWOvM.GetNumRows(),itsWOvM.GetNumCols());
     SyncOtoW();
     CheckSync();
 }
