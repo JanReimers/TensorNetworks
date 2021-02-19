@@ -44,18 +44,18 @@ template <class T> MatrixO<T>::MatrixO(const MatrixO& m)
     : Matrix<OperatorElement<T> >(m)
     , itsd(m.itsd)
     , itsTruncationError(0)
-    , itsUL(Full)
+    , itsUL(m.itsUL)
 {
-    CheckUL();
+//    CheckUL();
 }
 
 template <class T> MatrixO<T>::MatrixO(MatrixO&& m)
     : Matrix<OperatorElement<T> >(m)
     , itsd(m.itsd)
     , itsTruncationError(0)
-    , itsUL(Full)
+    , itsUL(m.itsUL)
 {
-    CheckUL();
+//    CheckUL();
 }
 
 
