@@ -19,11 +19,7 @@ class SiteOperatorRight
         SiteOperatorRight(int d, const TensorT& W); //Construct with W operator
         virtual ~SiteOperatorRight();
 
-        virtual MatrixRT GetV(Direction,int m, int n) const;
-        virtual void     SetV(Direction,int m, int n, const MatrixRT& V);
-
         virtual char GetLRB() const {return 'R';}
-        virtual void CheckDws() const;
 private:
         virtual void Init_lr(int oneIndex);
 };

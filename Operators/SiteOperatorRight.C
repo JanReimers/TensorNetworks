@@ -57,77 +57,10 @@ void SiteOperatorRight::Init_lr(int oneIndex)
     r(oneIndex-1,0)=1.0;
 
     itsWOvM=MatrixOR(itsWOvM*r);
-
-//    for (int m=0; m<itsd; m++)
-//        for (int n=0; n<itsd; n++)
-//        {
-//            MatrixRT W=GetW(m,n);
-//            itsWs(m+1,n+1)=W*itsr;
-//        }
-     itsDw.Dw2=1;
-     SyncOtoW();
-     itsWOvM.SetUpperLower(Lower);
+    itsDw.Dw2=1;
+    SyncOtoW();
+    itsWOvM.SetUpperLower(Lower);
 }
-
-
-void SiteOperatorRight::CheckDws() const
-{
-#ifdef DEBUG
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
-        {
-            const MatrixRT& W=GetW(m,n);
-            assert(W.GetNumCols()==1);
-            assert(W.GetNumRows()==itsDw.Dw1);
-        }
-#endif
-    SiteOperatorImp::CheckDws();
-}
-
-
-
-MatrixRT SiteOperatorRight::GetV(Direction lr,int m, int n) const
-{
-    MatrixRT V(itsDw.Dw1-1,1);
-    const MatrixRT& W=GetW(m,n);
-    switch (lr)
-    {
-    case DLeft:
-        for (int w1=2;w1<=itsDw.Dw1;w1++)
-            V(w1-1,1)=W(w1,1);
-        break;
-    case DRight:
-        for (int w1=1;w1<=itsDw.Dw1-1;w1++)
-            V(w1,1)=W(w1,1);
-        break;
-    }
-    return V;
-}
-
-//
-//  Load row matrix starting at second index
-//
-void SiteOperatorRight::SetV (Direction lr,int m, int n, const MatrixRT& V)
-{
-    assert(V.GetNumCols()==1);
-    MatrixRT& W=itsWs(m+1,n+1);
-    assert(W.GetNumCols()==1);
-    assert(W.GetNumRows()==V.GetNumRows()+1);
-
-    switch (lr)
-    {
-    case DLeft:
-        for (int w1=2;w1<=itsDw.Dw1;w1++)
-            W(w1,1)=V(w1-1,1);
-        break;
-    case DRight:
-        for (int w1=1;w1<=itsDw.Dw1-1;w1++)
-            W(w1,1)=V(w1,1);
-        break;
-    }
-}
-
 
 } //namespace
-#define TYPE Matrix<double>
-#include "oml/src/matrix.cpp"
+
