@@ -47,7 +47,7 @@ public:
     TriType   GetUpperLower() const {return itsUL;}
     T         GetTrace(int a, int b, int c, int d) const;
     Matrix<T> GetOrthoMatrix(Direction) const;
-
+    bool      IsOrthonormal (Direction,double eps) const;
     MatrixO   GetV     (Direction) const;
     Matrix<T> Flatten  (Direction) const;
     QXType    BlockQX  (Direction) const;

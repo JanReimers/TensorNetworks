@@ -196,6 +196,11 @@ template <class T> T MatrixO<T>::GetTrace(int a, int b, int c, int d) const
     return ret/itsd;
 }
 
+template <class T> bool MatrixO<T>::IsOrthonormal(Direction lr,double eps) const
+{
+    return IsUnit(GetOrthoMatrix(lr),eps);
+}
+
 template <class T> Matrix<T> MatrixO<T>::GetOrthoMatrix(Direction lr) const
 {
     Matrix<T> O;
