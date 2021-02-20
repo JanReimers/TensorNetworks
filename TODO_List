@@ -6,8 +6,10 @@
             OpRange [Dw1,Dw2] GetOpRanges()
     -OR Override rows() cols() to only iterate over non-zero ranges of W
     -OR  just make a sparse MatrixOR and only store nonzero ops!
+-Add upper operators to unit tests.
 
 Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
+    -TOo much mixing up of S and d.  Pick one.
     -SiteOp should just be a MatrixOR without all the advanced functions
     -SetLimits using zero as criteria.  Should fabs(W)>eps
         BUT we need to get then SAME eps into the contraction routines.
@@ -18,7 +20,7 @@ Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
     Done: -Rename MPOTest1 to OvMTests.
     -COmbine:
         -Can we simplify some code with Mul(Direction,a,b) mat mul function?
-        -Need op*(Matrix,MatrixO) to pass ul through
+        Done: -Need op*(Matrix,MatrixO) to pass ul through
     Done: -SVD:
     -Do SetV(Q) inside SVD routine
     -Make a version of BlockQX that does SetV(Q) inside. SVD needs the current version return [Q,RL]

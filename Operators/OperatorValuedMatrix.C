@@ -24,11 +24,11 @@ template <class T> MatrixO<T>::MatrixO(int d,TriType ul)
     , itsUL(ul)
 {}
 
-template <class T> MatrixO<T>::MatrixO(int d, const MatLimits& lim)
+template <class T> MatrixO<T>::MatrixO(int d,TriType ul, const MatLimits& lim)
     : Matrix<OperatorElement<T> >(lim)
     , itsd(d)
     , itsTruncationError(0)
-    , itsUL(Full)
+    , itsUL(ul)
 {}
 
 template <class T> MatrixO<T>::MatrixO(const Base& m)
@@ -597,7 +597,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
             Grow(sV,MatLimits(VecLimits(0,Xs+1),RL.GetRowLimits()));
             RLtrans=sV*RL;
             Grow(U,MatLimits(Q.GetColLimits(),VecLimits(base,Xs+base)));
-            Q=MatrixO(Q*U);
+            Q=Q*U;
             assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
         }
         break;
@@ -609,7 +609,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
             Grow(Us,MatLimits(RL.GetColLimits(),VecLimits(0,Xs+1)));
             RLtrans=RL*Us;
             Grow(VT,MatLimits(VecLimits(base,Xs+base),Q.GetRowLimits()));
-            Q=MatrixO(VT*Q);
+            Q=VT*Q;
             assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
         }
         break;

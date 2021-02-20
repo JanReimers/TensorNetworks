@@ -10,13 +10,14 @@ namespace TensorNetworks
 template <class T> class MatrixO : public Matrix<OperatorElement<T> >
 {
     typedef OperatorElement<T> EType;
-    typedef Matrix<EType> Base;
     typedef std::tuple<MatrixO  ,Matrix<T> > QXType;
     typedef std::tuple<index_t  ,index_t   > IIType;
 public:
+    typedef Matrix<EType> Base;
+
     MatrixO();
     MatrixO(int d,TriType);
-    MatrixO(int d, const MatLimits&);
+    MatrixO(int d,TriType, const MatLimits&);
     MatrixO(int Dw1, int Dw2,double S,TriType);
     MatrixO(int Dw1, int Dw2,int d,TriType);
     MatrixO(const Base   & m);
@@ -25,20 +26,23 @@ public:
     virtual ~MatrixO();
 
     void SetChi12(int X1,int X2,bool preserve_data);
-    void SetUpperLower(TriType ul); //Row and column matrices have no way of knowing (I think?)
     IIType GetChi12() const;
 
     MatrixO& operator=(const MatrixO& m);
     MatrixO& operator=(MatrixO&& m);
-    template <class A, Store M, Data D> MatrixO(const Indexable <EType,A,M,D,MatrixShape>& m)
+    template <class A, Store M, Data D> MatrixO(int d, TriType ul,const Indexable <EType,A,M,D,MatrixShape>& m)
     : Base(m)
+    , itsd(d)
+    , itsTruncationError(0)
+    , itsUL(ul)
     {
-        Setd();
+        //Setd();
     }
     template <class A, Store M, Data D> const MatrixO& operator=(const Indexable <EType,A,M,D,MatrixShape>& m)
     {
         Base::operator=(m);
         Setd();
+        // TODO no way to transfer ul.
         return *this;
     }
     MatrixO<T>& operator*=(const T& s);
@@ -65,6 +69,7 @@ public:
         return m.PrettyPrint(os);
     }
     std::ostream& PrettyPrint(std::ostream& os) const;
+    void SetUpperLower(TriType ul); //Row and column matrices have no way of knowing (I think?)
 private:
     void Setd();
     void CheckUL();
@@ -88,17 +93,50 @@ template <class T> double MaxDelta(const MatrixO<T>& a, const MatrixO<T>& b)
             ret(i,j)=Max(fabs(a(i,j)-b(i,j)));
     return Max(fabs(ret));
 }
+
+inline TriType Combine(TriType a, TriType b)
+{
+    return (a==b) ? a : Full;
+}
+
 template <class T> MatrixO<T> operator-(const MatrixO<T>& a, const MatrixO<T>& b)
 {
     assert(a.GetLimits()==b.GetLimits());
     assert(a.Getd     ()==b.Getd     ());
-    MatrixO<T> ret(a.Getd(),a.GetLimits());
+    TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
+    MatrixO<T> ret(a.Getd(),ul,a.GetLimits());
     double S=0.5*(a.Getd()-1.0);
     OperatorElement<T> Z=OperatorZ(S);
     Fill(ret,Z);
     for (index_t i:a.rows())
         for (index_t j:a.cols())
             ret(i,j)=a(i,j)-b(i,j);
+    return ret;
+}
+
+template <class T> MatrixO<T> operator*(const MatrixO<T>& a, const MatrixO<T>& b)
+{
+    assert(a.GetColLimits()==b.GetRowLimits());
+    assert(a.Getd        ()==b.Getd        ());
+    TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
+    const typename MatrixO<T>::Base& ma(a),mb(b);
+    MatrixO<T> ret(a.Getd(),ul,ma*mb);
+    return ret;
+}
+
+template <class T> MatrixO<T> operator*(const Matrix<T>& a, const MatrixO<T>& b)
+{
+    assert(a.GetColLimits()==b.GetRowLimits());
+    const typename MatrixO<T>::Base mb(b);
+    MatrixO<T> ret(b.Getd(),b.GetUpperLower(),a*mb);
+    return ret;
+}
+
+template <class T> MatrixO<T> operator*(const MatrixO<T>& a, const Matrix<T>& b)
+{
+    assert(a.GetColLimits()==b.GetRowLimits());
+    const typename MatrixO<T>::Base& ma(a);
+    MatrixO<T> ret(a.Getd(),a.GetUpperLower(),ma*b);
     return ret;
 }
 
@@ -138,6 +176,15 @@ template <class T> Matrix<T> TensorProduct(const Matrix<T>& a, const Matrix<T>& 
     return r;
 }
 
+template <class T> MatrixO<T> TensorProduct(const MatrixO<T>& a, const MatrixO<T>& b)
+{
+    assert(a.Getd        ()==b.Getd        ());
+    TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
+    const typename MatrixO<T>::Base& ma(a),mb(b);
+    MatrixO<T> ret(a.Getd(),ul,TensorProduct(ma,mb));
+    return ret;
+}
+
 //
 //  This is a regular matrix product in the internal space (w1,w2) and a tensor product in
 //  physical space (n,m).
@@ -147,7 +194,8 @@ template <class T> MatrixO<T> HorizontalProduct(const MatrixO<T>& a, const Matri
     assert(a.GetColLimits()==b.GetRowLimits());
     MatLimits lim(a.GetRowLimits(),b.GetColLimits());
     int d=a.Getd()*b.Getd();
-    MatrixO<T> ret(d,lim);
+    TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
+    MatrixO<T> ret(d,ul,lim);
     double S=0.5*(d-1);
     OperatorElement<T> Z=OperatorZ(S);
     Fill(ret,Z);
@@ -176,6 +224,18 @@ template <class T> bool IsTriangular(TriType ul,const Matrix<T>& m,double eps)
         }
     }
     return ret;
+}
+
+template <class T> void Fill(MatrixO<T>& m, T f)
+{
+    int d=m.Getd();
+    OperatorElement<T> foe(d,0.5*(d-1));
+    OperatorElement<T> z(d,0.5*(d-1));
+    foe=f;
+    z=0.0;
+    for (index_t i:m.rows())
+        for (index_t j:m.cols())
+            m(i,j)= (i==j) ? foe : z;
 }
 
 template <class T> void Unit(MatrixO<T>& m)

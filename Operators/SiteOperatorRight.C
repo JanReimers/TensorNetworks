@@ -47,7 +47,7 @@ void SiteOperatorRight::Init_lr(int oneIndex)
     Fill(r,0.0);
     r(oneIndex-1,0)=1.0;
 
-    itsWs=MatrixOR(itsWs*r);
+    itsWs=itsWs*r;
     itsDw.Dw2=1;
     SetLimits();
     itsWs.SetUpperLower(Lower);

@@ -111,9 +111,7 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
                 itsDw.Dw2=N1; //The contraction below will automatically reshape the Ws.
         }
         assert(itsWs.GetColLimits()==L.GetRowLimits());
-        TriType ul=itsWs.GetUpperLower();
-        itsWs=MatrixOR(itsWs*L);
-        itsWs.SetUpperLower(ul);
+        itsWs=itsWs*L;
         break;
     }
     case DLeft:
@@ -127,9 +125,7 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
                 itsDw.Dw1=N1; //The contraction below will automatically reshape the As.
         }
         assert(L.GetColLimits()==itsWs.GetRowLimits());
-        TriType ul=itsWs.GetUpperLower();
-        itsWs=MatrixOR(L*itsWs);
-        itsWs.SetUpperLower(ul);
+        itsWs=L*itsWs;
         break;
     }
 

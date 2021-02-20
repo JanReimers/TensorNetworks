@@ -188,7 +188,7 @@ void OvMTests::TestSVD(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
     EXPECT_FALSE(IsUnit(Q.GetOrthoMatrix(Invert(lr)),eps));
 }
 
-TEST_F(OvMTests,MakeHamiltonian)
+TEST_F(OvMTests,Setup)
 {
     Setup(0.5);
 }
@@ -632,6 +632,50 @@ TEST_F(OvMTests,Upper2)
     EXPECT_FALSE(IsLowerTriangular(A,0.0));
 
 }
+TEST_F(OvMTests,OpMulMO)
+{
+    int M=8,N=4,d=2;
+    TriType ul=Lower;
+    VecLimits vl1(0,M-1);
+    VecLimits vl2(0,N-1);
+    MatLimits la(vl1,vl2);
+    MatLimits lb(vl2,vl1);
+    MatrixRT A(la);
+    MatrixOR B(d,ul,lb);
+    Fill(A,1.0);
+    Fill(B,1.0);
+
+    MatrixOR C=A*B;
+    EXPECT_EQ(C.Getd(),d);
+    EXPECT_EQ(C.GetUpperLower(),ul);
+
+    MatrixOR D=B*A;
+    EXPECT_EQ(D.Getd(),d);
+    EXPECT_EQ(D.GetUpperLower(),ul);
+}
+
+TEST_F(OvMTests,TensorProduct)
+{
+    int M=8,N=4,d=2;
+    TriType ul=Lower;
+    VecLimits vl1(0,M-1);
+    VecLimits vl2(0,N-1);
+    MatLimits la(vl1,vl2);
+    MatLimits lb(vl2,vl1);
+    MatrixOR A(d,ul,la);
+    MatrixOR B(d,ul,lb);
+    Fill(A,1.0);
+    Fill(B,1.0);
+
+    MatrixOR C=TensorProduct(A,B);
+    EXPECT_EQ(C.Getd(),d);
+    EXPECT_EQ(C.GetUpperLower(),ul);
+
+    MatrixOR D=TensorProduct(B,A);
+    EXPECT_EQ(D.Getd(),d);
+    EXPECT_EQ(D.GetUpperLower(),ul);
+}
+
 
 TEST_F(OvMTests,OperatorValuedMatrixQRBulk)
 {

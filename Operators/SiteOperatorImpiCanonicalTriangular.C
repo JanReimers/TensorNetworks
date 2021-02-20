@@ -59,9 +59,9 @@ void SiteOperatorImp::GaugeTransform(const MatrixRT& R, const MatrixRT& Rinv)
 {
     assert(R.GetLimits()==Rinv.GetLimits());
     assert(IsUnit(R*Rinv,1e-13));
-    TriType ul=itsWs.GetUpperLower();
-    itsWs=MatrixOR(Transpose(R*Transpose(itsWs)*Rinv));
-    itsWs.SetUpperLower(ul);
+  //  TriType ul=itsWs.GetUpperLower();
+    itsWs=Transpose(R*Transpose(itsWs)*Rinv); //ul might get lost in this step.
+//    itsWs.SetUpperLower(ul);
     SetLimits();
 
 }

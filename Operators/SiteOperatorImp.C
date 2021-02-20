@@ -163,10 +163,7 @@ void SiteOperatorImp::Product(const SiteOperator* O2)
 
 //    cout << "itsWOvM=" << itsWOvM.GetLimits() << " " << itsWOvM.GetUpperLower() << endl;
 //    cout << "O2i->itsWOvM=" << O2i->itsWOvM.GetLimits()<< " " <<  O2i->itsWOvM.GetUpperLower()  << endl;
-    TriType ul=itsWs.GetUpperLower();
-    MatrixOR WW=TensorProduct(itsWs,O2i->itsWs);
-    itsWs=WW;
-    itsWs.SetUpperLower(ul);
+    itsWs=TensorProduct(itsWs,O2i->itsWs);
     itsDw=Dw;
     SetLimits();
 }
