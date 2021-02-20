@@ -20,7 +20,7 @@ public:
     MatrixO(int d,TriType, const MatLimits&);
     MatrixO(int Dw1, int Dw2,double S,TriType);
     MatrixO(int Dw1, int Dw2,int d,TriType);
-    MatrixO(const Base   & m);
+    MatrixO(int d,TriType,const Base   & m);
     MatrixO(const MatrixO& m);
     MatrixO(MatrixO&& m);
     virtual ~MatrixO();
@@ -72,7 +72,7 @@ public:
     void SetUpperLower(TriType ul); //Row and column matrices have no way of knowing (I think?)
 private:
     void Setd();
-    void CheckUL();
+//    void CheckUL();
     Matrix<T> ExtractM(Matrix<T>& RL) const;
 
     int     itsd;

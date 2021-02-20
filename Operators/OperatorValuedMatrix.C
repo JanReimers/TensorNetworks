@@ -31,13 +31,12 @@ template <class T> MatrixO<T>::MatrixO(int d,TriType ul, const MatLimits& lim)
     , itsUL(ul)
 {}
 
-template <class T> MatrixO<T>::MatrixO(const Base& m)
+template <class T> MatrixO<T>::MatrixO(int d,TriType ul,const Base& m)
     : Matrix<OperatorElement<T> >(m)
-    , itsd(m(m.GetLimits().Row.Low,m.GetLimits().Col.Low).GetNumRows())
+    , itsd(d)
     , itsTruncationError(0)
-    , itsUL(Full)
+    , itsUL(ul)
 {
-    CheckUL();
 }
 
 template <class T> MatrixO<T>::MatrixO(const MatrixO& m)
@@ -46,7 +45,6 @@ template <class T> MatrixO<T>::MatrixO(const MatrixO& m)
     , itsTruncationError(0)
     , itsUL(m.itsUL)
 {
-//    CheckUL();
 }
 
 template <class T> MatrixO<T>::MatrixO(MatrixO&& m)
@@ -55,7 +53,6 @@ template <class T> MatrixO<T>::MatrixO(MatrixO&& m)
     , itsTruncationError(0)
     , itsUL(m.itsUL)
 {
-//    CheckUL();
 }
 
 
@@ -114,28 +111,28 @@ template <class T> void MatrixO<T>::SetChi12(int X1,int X2,bool preserve_data)
     }
 }
 
-template <class T> void MatrixO<T>::CheckUL()
-{
-    double eps=1e-8;
-    if (this->GetNumRows()<2 || this->GetNumCols()<2)
-    {
-        //itsUL=Lower; //Temporary kludge to get beyond the row/col matrix U/L ambiguity
-    }
-    else
-    {
-        if (IsLowerTriangular(*this,eps))
-            itsUL=Lower;
-        else if (IsUpperTriangular(*this,eps))
-        {
-            itsUL=Upper;
-        }
-        else
-        {
-//            cout << std::scientific << std::setprecision(1) << "Full matrix??=" << *this;
-            itsUL=Full;
-        }
-    }
-}
+//template <class T> void MatrixO<T>::CheckUL()
+//{
+//    double eps=1e-8;
+//    if (this->GetNumRows()<2 || this->GetNumCols()<2)
+//    {
+//        //itsUL=Lower; //Temporary kludge to get beyond the row/col matrix U/L ambiguity
+//    }
+//    else
+//    {
+//        if (IsLowerTriangular(*this,eps))
+//            itsUL=Lower;
+//        else if (IsUpperTriangular(*this,eps))
+//        {
+//            itsUL=Upper;
+//        }
+//        else
+//        {
+////            cout << std::scientific << std::setprecision(1) << "Full matrix??=" << *this;
+//            itsUL=Full;
+//        }
+//    }
+//}
 
 template <class T> void MatrixO<T>::Setd()
 {
@@ -263,38 +260,16 @@ template <class T> MatrixO<T> MatrixO<T>::GetV(Direction lr) const
     if (cl>l.Col.High) cl=l.Col.High; //enforce at least one column
     if (ch<l.Col.Low ) ch=l.Col.Low;  //enforce at least one column
     MatLimits lv;
-    switch (lr)
-    {
-    case DLeft:
-        switch(itsUL)
-        {
-        case Upper:
-            lv=MatLimits(l.Row.Low,rh,l.Col.Low,ch);
-            break;
-        case Lower:
-            lv=MatLimits(rl,l.Row.High,cl,l.Col.High);
-            break;
-        default:
-            assert(false);
-        }
-        break;
-    case DRight:
-        switch(itsUL)
-        {
-        case Upper:
-            lv=MatLimits(rl,l.Row.High,cl,l.Col.High);
-            break;
-        case Lower:
-            lv=MatLimits(l.Row.Low,rh,l.Col.Low,ch);
-            break;
-        default:
-            assert(false);
-        }
-        break;
-    }
+    if      ((lr==DLeft && itsUL==Upper) || (lr==DRight && itsUL==Lower))
+        lv=MatLimits(l.Row.Low,rh,l.Col.Low,ch);
+    else if ((lr==DLeft && itsUL==Lower) || (lr==DRight && itsUL== Upper))
+        lv=MatLimits(rl,l.Row.High,cl,l.Col.High);
+    else
+        assert(false);
+
     assert(lv.GetNumRows()>0);
     assert(lv.GetNumCols()>0);
-    return this->SubMatrix(lv);
+    return  MatrixO<T>(Getd(),itsUL,this->SubMatrix(lv));
 }
 
 template <class T> void MatrixO<T>::SetV(Direction lr,const MatrixO& V)
@@ -310,7 +285,7 @@ template <class T> void MatrixO<T>::SetV(Direction lr,const MatrixO& V)
     case DLeft:
         if (nc-1<X2)
             SetChi12(X1,nc-1,true); //we must save the old since V only holds part of W
-        break;
+        break; //May nee to save last column for upper tri matrices.
     case DRight:
         if (nr-1<X1)
         {
@@ -581,6 +556,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
     auto [U,s,VT]=solver.SolveAll(M,1e-14); //Solves M=U * s * VT
     itsTruncationError=comp->Compress(U,s,VT);
     int Xs=s.GetDiagonal().size();
+
 //    cout << "s=" << s.GetDiagonal() << endl;
     //
     //  Post processing:
@@ -598,7 +574,6 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
             RLtrans=sV*RL;
             Grow(U,MatLimits(Q.GetColLimits(),VecLimits(base,Xs+base)));
             Q=Q*U;
-            assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
         }
         break;
     case DRight:
@@ -610,10 +585,10 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
             RLtrans=RL*Us;
             Grow(VT,MatLimits(VecLimits(base,Xs+base),Q.GetRowLimits()));
             Q=VT*Q;
-            assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
         }
         break;
     }
+    assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
     return std::make_tuple(Q,RLtrans);
 }
 
