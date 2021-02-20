@@ -27,7 +27,7 @@ double SiteOperatorImp::Contract(int w11, int w12, int w21, int w22) const
     double r1=0.0;
     for (int m=0; m<itsd; m++)
     for (int n=0; n<itsd; n++)
-        r1+=itsWOvM(w11,w12)(m,n)*itsWOvM(w21,w22)(m,n);
+        r1+=itsWs(w11,w12)(m,n)*itsWs(w21,w22)(m,n);
 
     return r1/itsd; //Divide by Tr[I]
 }
@@ -59,10 +59,10 @@ void SiteOperatorImp::GaugeTransform(const MatrixRT& R, const MatrixRT& Rinv)
 {
     assert(R.GetLimits()==Rinv.GetLimits());
     assert(IsUnit(R*Rinv,1e-13));
-    TriType ul=itsWOvM.GetUpperLower();
-    itsWOvM=MatrixOR(Transpose(R*Transpose(itsWOvM)*Rinv));
-    itsWOvM.SetUpperLower(ul);
-    SyncOtoW();
+    TriType ul=itsWs.GetUpperLower();
+    itsWs=MatrixOR(Transpose(R*Transpose(itsWs)*Rinv));
+    itsWs.SetUpperLower(ul);
+    SetLimits();
 
 }
 

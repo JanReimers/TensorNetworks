@@ -13,10 +13,10 @@ SiteOperatorImp::SiteOperatorImp(int d)
     : itsd(d)
     , itsDw(1,1)
     , itsTruncationError(0.0)
-    , itsWOvM(1,1,d,Lower)
+    , itsWs(1,1,d,Lower)
 {
-    Unit(itsWOvM);
-    SyncOtoW();
+    Unit(itsWs);
+    SetLimits();
 }
 
 //
@@ -25,18 +25,18 @@ SiteOperatorImp::SiteOperatorImp(int d)
 SiteOperatorImp::SiteOperatorImp(int d, double S, SpinOperator so) //Construct spin operator
     : SiteOperatorImp(d)
 {
-    itsWOvM(0,0)=OperatorElement<double>::Create(so,S);
-    SyncOtoW();
+    itsWs(0,0)=OperatorElement<double>::Create(so,S);
+    SetLimits();
 }
 //
-//  Build from a W rep object
+//  Build from a OpClient Hamiltonian.
 //
 SiteOperatorImp::SiteOperatorImp(int d, const OperatorClient* H)
     : SiteOperatorImp(d)
 {
-    itsWOvM=H->GetMatrixO(Lower);
-    itsDw=Dw12(itsWOvM.GetNumRows(),itsWOvM.GetNumCols());
-    SyncOtoW();
+    itsWs=H->GetMatrixO(Lower);
+    itsDw=Dw12(itsWs.GetNumRows(),itsWs.GetNumCols());
+    SetLimits();
 }
 
 //
@@ -52,41 +52,41 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const Di
 
     if (lr==DLeft)
     {
-        itsWOvM.SetChi12(-1,Dw-2,false);
+        itsWs.SetChi12(-1,Dw-2,false);
         itsDw=Dw12(1,Dw);
         int i1=1; //Linear index for (m,n) = 1+m+p*n
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++,i1++)
                 for (int w=1; w<=Dw; w++)
-                    itsWOvM(0,w-1)(m,n)=U(i1,w)*sqrt(s(w,w));
+                    itsWs(0,w-1)(m,n)=U(i1,w)*sqrt(s(w,w));
     }
     else if (lr==DRight)
     {
-        itsWOvM.SetChi12(Dw-2,-1,false);
+        itsWs.SetChi12(Dw-2,-1,false);
         itsDw=Dw12(Dw,1);
         int i2=1; //Linear index for (m,n) = 1+m+p*n
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++,i2++)
                 for (int w=1; w<=Dw; w++)
-                    itsWOvM(w-1,0)(m,n)=sqrt(s(w,w))*U(w,i2); //U is actually VT
+                    itsWs(w-1,0)(m,n)=sqrt(s(w,w))*U(w,i2); //U is actually VT
     }
     else
     {
         // Must have been called with one of the spin decomposition types.
         assert(false);
     }
-    SyncOtoW();
+    SetLimits();
 }
 
-////
+//
 // Construct with W operator. Called by iMPOImp::MakeUnitcelliMPO
 //
 SiteOperatorImp::SiteOperatorImp(const MatrixOR& W)
     : SiteOperatorImp(W.Getd())
 {
-    itsWOvM=W;
-    itsDw=Dw12(itsWOvM.GetNumRows(),itsWOvM.GetNumCols());
-    SyncOtoW();
+    itsWs=W;
+    itsDw=Dw12(itsWs.GetNumRows(),itsWs.GetNumCols());
+    SetLimits();
 }
 
 
@@ -103,20 +103,6 @@ void SiteOperatorImp::SetNeighbours(SiteOperator* left, SiteOperator* right)
     itsRightNeighbour=dynamic_cast<SiteOperatorImp*>(right);
     assert(!left  || itsLeft_Neighbour); //if left is nonzero then did the cast work?
     assert(!right || itsRightNeighbour);
-}
-
-
-void SiteOperatorImp::SyncOtoW()
-{
-    auto [X1,X2]=itsWOvM.GetChi12();
-    index_t D1=X1+2;
-    index_t D2=X2+2;
-    if (itsDw.Dw1!=D1 || itsDw.Dw2!=D2)
-    {
-        itsDw.Dw1=D1;
-        itsDw.Dw2=D2;
-    }
-    SetLimits();
 }
 
 SiteOperatorImp* SiteOperatorImp::GetNeighbour(Direction lr) const
@@ -139,6 +125,8 @@ SiteOperatorImp* SiteOperatorImp::GetNeighbour(Direction lr) const
 
 void SiteOperatorImp::SetLimits()
 {
+    itsDw.Dw1=itsWs.GetNumRows();
+    itsDw.Dw2=itsWs.GetNumCols();
     itsDw.w1_first.SetLimits(itsDw.Dw2);
     itsDw.w2_last .SetLimits(itsDw.Dw1);
 //    Fill(Dw.w1_first,1);
@@ -146,9 +134,9 @@ void SiteOperatorImp::SetLimits()
 
     Fill(itsDw.w1_first,itsDw.Dw1);
     Fill(itsDw.w2_last ,1);
-    for (index_t w1:itsWOvM.rows())
-        for (index_t w2:itsWOvM.cols())
-            if (fabs(itsWOvM(w1,w2))>0.0) //TOT should be using and eps~1e-15 here.
+    for (index_t w1:itsWs.rows())
+        for (index_t w2:itsWs.cols())
+            if (fabs(itsWs(w1,w2))>0.0) //TOT should be using and eps~1e-15 here.
             {
                 if (itsDw.w1_first(w2+1)>w1+1) itsDw.w1_first(w2+1)=w1+1;
                 if (itsDw.w2_last (w1+1)<w2+1) itsDw.w2_last (w1+1)=w2+1;
@@ -175,12 +163,12 @@ void SiteOperatorImp::Product(const SiteOperator* O2)
 
 //    cout << "itsWOvM=" << itsWOvM.GetLimits() << " " << itsWOvM.GetUpperLower() << endl;
 //    cout << "O2i->itsWOvM=" << O2i->itsWOvM.GetLimits()<< " " <<  O2i->itsWOvM.GetUpperLower()  << endl;
-    TriType ul=itsWOvM.GetUpperLower();
-    MatrixOR WW=TensorProduct(itsWOvM,O2i->itsWOvM);
-    itsWOvM=WW;
-    itsWOvM.SetUpperLower(ul);
+    TriType ul=itsWs.GetUpperLower();
+    MatrixOR WW=TensorProduct(itsWs,O2i->itsWs);
+    itsWs=WW;
+    itsWs.SetUpperLower(ul);
     itsDw=Dw;
-    SyncOtoW();
+    SetLimits();
 }
 
 
@@ -201,14 +189,14 @@ void SiteOperatorImp::Report(std::ostream& os) const
 char SiteOperatorImp::GetUpperLower(double eps) const
 {
     char ret=' ';
-    if (IsUpperTriangular(itsWOvM,eps))
+    if (IsUpperTriangular(itsWs,eps))
     {
         if (ret==' ')
             ret='U';
         else if (ret=='L')
             ret='M'; //Mix
     }
-    else if (IsLowerTriangular(itsWOvM,eps))
+    else if (IsLowerTriangular(itsWs,eps))
     {
         if (ret==' ')
             ret='L';
@@ -222,7 +210,7 @@ char SiteOperatorImp::GetUpperLower(double eps) const
 
 double SiteOperatorImp::GetFrobeniusNorm() const
 {
-    return itsWOvM.GetFrobeniusNorm();
+    return itsWs.GetFrobeniusNorm();
 }
 
 char SiteOperatorImp::GetNormStatus(double eps) const
@@ -230,7 +218,7 @@ char SiteOperatorImp::GetNormStatus(double eps) const
     if (itsDw.Dw1*itsDw.Dw2>4096) return '?';
     char ret='W'; //Not normalized
     {
-        MatrixOR V=itsWOvM.GetV(DLeft);
+        MatrixOR V=itsWs.GetV(DLeft);
         if (V.GetNumRows()==0)
             ret='l';
         else if (V.IsOrthonormal(DLeft,eps))
@@ -238,7 +226,7 @@ char SiteOperatorImp::GetNormStatus(double eps) const
     }
     if (ret!='l')
     {
-        MatrixOR V=itsWOvM.GetV(DRight);
+        MatrixOR V=itsWs.GetV(DRight);
         if (V.GetNumCols()==0)
             ret='r';
         else if (V.IsOrthonormal(DRight,eps))

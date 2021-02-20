@@ -112,9 +112,9 @@ void MPO::CanonicalForm()
 {
     int L=GetL();
     for (int ia=1;ia<L;ia++)
-        GetSiteOperator(ia)->CanonicalFormOvM(DLeft);
+        GetSiteOperator(ia)->CanonicalForm(DLeft);
     for (int ia=L;ia>1;ia--)
-        GetSiteOperator(ia)->CanonicalFormOvM(DRight);
+        GetSiteOperator(ia)->CanonicalForm(DRight);
 }
 
 

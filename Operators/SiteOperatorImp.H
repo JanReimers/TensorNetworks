@@ -30,7 +30,7 @@ class SiteOperatorImp : public virtual SiteOperator
 
         virtual int             Getd   () const {return itsd;}
         virtual const Dw12&     GetDw12() const {return itsDw;}
-        virtual const MatrixOR& GetW   () const {return itsWOvM;}
+        virtual const MatrixOR& GetW   () const {return itsWs;}
         //
         //  Contract MPOs together
         //
@@ -42,7 +42,7 @@ class SiteOperatorImp : public virtual SiteOperator
         //
         //  As per Parker et. al.
         //
-        virtual void    CanonicalFormOvM(Direction LR);
+        virtual void    CanonicalForm(Direction LR);
         virtual void   iCanonicalFormQRIter(Direction LR); //Infinite lattice iMPO version
         virtual void   iCanonicalFormTriangular(Direction LR); //Infinite lattice iMPO version
 
@@ -52,19 +52,12 @@ class SiteOperatorImp : public virtual SiteOperator
         virtual char   GetUpperLower(double eps) const;
         virtual char   GetLRB() const=0;
         virtual void   SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
-    protected:
-//        void SyncWtoO();
-        void SyncOtoW();
-//        void CheckSync();
 
     private:
-        friend class MPOTesting;
-        friend class iMPOImp;
-
         SiteOperatorImp* GetNeighbour(Direction) const;
 
         double CompressStd   (Direction,const SVCompressorR*);
-        double CompressParkerOvM(Direction,const SVCompressorR*);
+        double CompressParker(Direction,const SVCompressorR*);
         void   QLTransfer    (Direction lr,const MatrixRT& L);
 
         void     NewBondDimensions(int D1, int D2, bool saveData=false);
@@ -83,7 +76,7 @@ class SiteOperatorImp : public virtual SiteOperator
         int      itsd; //2*S+1
         Dw12     itsDw;
         double   itsTruncationError;
-        MatrixOR itsWOvM; //Operator values matrix version of W.
+        MatrixOR itsWs; //Operator values matrix version of W.
         SiteOperatorImp* itsLeft_Neighbour;
         SiteOperatorImp* itsRightNeighbour;
 };

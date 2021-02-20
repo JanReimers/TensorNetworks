@@ -39,7 +39,6 @@ bool Shrink(MatrixRT& L, MatrixOR& Q,double eps)
 void SiteOperatorImp::iCanonicalFormQRIter(Direction lr)
 {
     assert(itsDw.Dw1==itsDw.Dw2); //Make sure we are square
-//    CheckSync();
     int X=itsDw.Dw1-2; //Chi
     MatrixRT Lp(0,X+1,0,X+1),Id(0,X+1,0,X+1);
     Unit(Lp);
@@ -49,7 +48,7 @@ void SiteOperatorImp::iCanonicalFormQRIter(Direction lr)
     int niter=1;
     do
     {
-        auto [Q,L]=itsWOvM.BlockQX(lr); //Solves V=Q*L
+        auto [Q,L]=itsWs.BlockQX(lr); //Solves V=Q*L
         X=itsDw.Dw1-2; //Chi
         assert(L.GetNumRows()==X+2);
         assert(L.GetNumCols()==X+2);
@@ -65,15 +64,15 @@ void SiteOperatorImp::iCanonicalFormQRIter(Direction lr)
             eta=Max(fabs(L-Id));
         }
         cout << "eta=" << eta << endl;
-        itsWOvM.SetV(lr,Q);
+        itsWs.SetV(lr,Q);
         // Get out here so we leave the Ws left normalized.
         if (niter++>100) break;
         //
         //  Do W->L*W
         //
-        itsWOvM=MatrixOR(L*itsWOvM); //ul gets lost in mul op.
-        itsWOvM.SetUpperLower(Lower);
-        assert(itsWOvM.GetUpperLower()==Lower);
+        itsWs=MatrixOR(L*itsWs); //ul gets lost in mul op.
+        itsWs.SetUpperLower(Lower);
+        assert(itsWs.GetUpperLower()==Lower);
         itsDw.Dw1=L.GetNumRows();
         Lp=MatrixRT(L*Lp);
 
@@ -81,7 +80,7 @@ void SiteOperatorImp::iCanonicalFormQRIter(Direction lr)
 //    cout << std::fixed << std::setprecision(2) << "Lp=" << Lp << endl;
 //    cout << std::fixed << std::setprecision(2) << "LpT*Lp=" << Transpose(Lp)*Lp << endl;
 
-    SyncOtoW();
+    SetLimits();
 }
 
 

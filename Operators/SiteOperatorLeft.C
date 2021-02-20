@@ -49,10 +49,10 @@ void SiteOperatorLeft::Init_lr(int oneIndex)
     Fill(l,0.0);
     l(0,oneIndex-1)=1.0;
 
-    itsWOvM=MatrixOR(l*itsWOvM);
+    itsWs=MatrixOR(l*itsWs);
     itsDw.Dw1=1;
-    SyncOtoW();
-    itsWOvM.SetUpperLower(Lower);
+    SetLimits();
+    itsWs.SetUpperLower(Lower);
 }
 
 } //namespace

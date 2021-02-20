@@ -21,7 +21,7 @@ double SiteOperatorImp::Compress(CompressType ct,Direction lr,const SVCompressor
         terror=CompressStd(lr,comp);
         break;
     case Parker:
-        terror=CompressParkerOvM(lr,comp);
+        terror=CompressParker(lr,comp);
         break;
     case CNone:
         break;
@@ -36,8 +36,7 @@ double SiteOperatorImp::Compress(CompressType ct,Direction lr,const SVCompressor
 double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
 {
     assert(comp);
-//    CheckSync();
-    MatrixRT  A=itsWOvM.Flatten(lr);
+    MatrixRT  A=itsWs.Flatten(lr);
     MatLimits lim=A.ReBase(1,1);
     LapackSVDSolver<double> solver;
     auto [U,sm,VT]=solver.SolveAll(A,1e-14); //Solves A=U * s * VT
@@ -56,7 +55,7 @@ double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
             VT.ReBase(lim);
             MatrixRT Us=U*sm;
             Us.ReBase(lim);
-            itsWOvM.UnFlatten(VT*s_avg);
+            itsWs.UnFlatten(VT*s_avg);
             if (itsLeft_Neighbour) itsLeft_Neighbour->QLTransfer(lr,Us);
             break;
         }
@@ -65,32 +64,30 @@ double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
             U.ReBase(lim);
             MatrixRT sV=sm*VT;
             sV.ReBase(lim);
-            itsWOvM.UnFlatten(U*s_avg);
+            itsWs.UnFlatten(U*s_avg);
             if (itsRightNeighbour) itsRightNeighbour->QLTransfer(lr,sV);
             break;
         }
     }
-    SyncOtoW(); //Get Q into the Ws.
+    SetLimits();
     return itsTruncationError;
 }
 
-double SiteOperatorImp::CompressParkerOvM(Direction lr,const SVCompressorR* comp)
+double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 {
-//    CheckSync();
-    auto [Q,RL]=itsWOvM.BlockSVD(lr,comp); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
-    itsWOvM.SetV(lr,Q); //Could be move inside BlockQX
-    SyncOtoW(); //Get Q into the Ws.
+    auto [Q,RL]=itsWs.BlockSVD(lr,comp); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
+    itsWs.SetV(lr,Q); //Could be move inside BlockQX
+    SetLimits();
     GetNeighbour(lr)->QLTransfer(lr,RL);
-    return itsWOvM.GetTruncationError();
+    return itsWs.GetTruncationError();
 }
 
 
-void SiteOperatorImp::CanonicalFormOvM(Direction lr)
+void SiteOperatorImp::CanonicalForm(Direction lr)
 {
-//    CheckSync();
-    auto [Q,RL]=itsWOvM.BlockQX(lr); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
-    itsWOvM.SetV(lr,Q); //Could be move inside BlockQX
-    SyncOtoW(); //Get Q into the Ws.
+    auto [Q,RL]=itsWs.BlockQX(lr); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
+    itsWs.SetV(lr,Q); //Could be move inside BlockQX
+    SetLimits();
     GetNeighbour(lr)->QLTransfer(lr,RL);
 }
 
@@ -108,15 +105,15 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
         int N1=L.GetNumCols(); //N1=0 on the first site.
         if (N1>0 && N1!=itsDw.Dw2)
         {
-            if (itsWOvM.GetNumCols()!=L.GetNumRows())
+            if (itsWs.GetNumCols()!=L.GetNumRows())
                 NewBondDimensions(itsDw.Dw1,N1,true);
             else
                 itsDw.Dw2=N1; //The contraction below will automatically reshape the Ws.
         }
-        assert(itsWOvM.GetColLimits()==L.GetRowLimits());
-        TriType ul=itsWOvM.GetUpperLower();
-        itsWOvM=MatrixOR(itsWOvM*L);
-        itsWOvM.SetUpperLower(ul);
+        assert(itsWs.GetColLimits()==L.GetRowLimits());
+        TriType ul=itsWs.GetUpperLower();
+        itsWs=MatrixOR(itsWs*L);
+        itsWs.SetUpperLower(ul);
         break;
     }
     case DLeft:
@@ -124,22 +121,20 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
         int N1=L.GetNumRows(); //N1=0 on the first site.
         if (N1>0 && N1!=itsDw.Dw1)
         {
-            if (itsWOvM.GetNumRows()!=L.GetNumCols())
+            if (itsWs.GetNumRows()!=L.GetNumCols())
                 NewBondDimensions(N1,itsDw.Dw2,true);
             else
                 itsDw.Dw1=N1; //The contraction below will automatically reshape the As.
         }
-        assert(L.GetColLimits()==itsWOvM.GetRowLimits());
-        TriType ul=itsWOvM.GetUpperLower();
-        itsWOvM=MatrixOR(L*itsWOvM);
-        itsWOvM.SetUpperLower(ul);
+        assert(L.GetColLimits()==itsWs.GetRowLimits());
+        TriType ul=itsWs.GetUpperLower();
+        itsWs=MatrixOR(L*itsWs);
+        itsWs.SetUpperLower(ul);
         break;
     }
 
     }
-    SyncOtoW();
     SetLimits();
-//    CheckSync();
 }
 
 
