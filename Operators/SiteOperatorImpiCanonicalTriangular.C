@@ -25,14 +25,10 @@ double SiteOperatorImp::ContractT(int w11, int w12, int w21, int w22) const
 double SiteOperatorImp::Contract(int w11, int w12, int w21, int w22) const
 {
     double r1=0.0;
-//    cout << " m  n   " << " Wt(" << w11+1 << "," << w12+1 << ") " << " W(" << w21+1 << "," << w22+1 << ")" << endl;
     for (int m=0; m<itsd; m++)
     for (int n=0; n<itsd; n++)
-    {
-        const MatrixRT& W=GetW(m,n); //Work on lower triangular version for now.
-        r1+=W(w11+1,w12+1)*W(w21+1,w22+1);
-//        cout << m << " " << n << " " << W(w11+1,w12+1) << " " << W(w21+1,w22+1) << " " << r1 << endl ;
-    }
+        r1+=itsWOvM(w11,w12)(m,n)*itsWOvM(w21,w22)(m,n);
+
     return r1/itsd; //Divide by Tr[I]
 }
 
@@ -67,13 +63,7 @@ void SiteOperatorImp::GaugeTransform(const MatrixRT& R, const MatrixRT& Rinv)
     itsWOvM=MatrixOR(Transpose(R*Transpose(itsWOvM)*Rinv));
     itsWOvM.SetUpperLower(ul);
     SyncOtoW();
-//    for (int m=0; m<itsd; m++)
-//    for (int n=0; n<itsd; n++)
-//    {
-//        const MatrixRT& W=Transpose(GetW(m,n));
-//        MatrixRT RWR=R*W*Rinv;
-//        SetW(m,n,Transpose(RWR));
-//    }
+
 }
 
 double SiteOperatorImp::Contract_sM(int M) const

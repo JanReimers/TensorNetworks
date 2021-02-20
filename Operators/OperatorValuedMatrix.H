@@ -48,6 +48,7 @@ public:
     double    GetTruncationError() const {return itsTruncationError;}
     TriType   GetUpperLower() const {return itsUL;}
     T         GetTrace(int a, int b, int c, int d) const;
+    double    GetFrobeniusNorm() const;
     Matrix<T> GetOrthoMatrix(Direction) const;
     bool      IsOrthonormal (Direction,double eps) const;
     MatrixO   GetV     (Direction) const;

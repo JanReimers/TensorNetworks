@@ -237,6 +237,15 @@ template <class T> Matrix<T> MatrixO<T>::GetOrthoMatrix(Direction lr) const
     return O;
 }
 
+template <class T> double MatrixO<T>::GetFrobeniusNorm() const
+{
+    double fn=0.0;
+    for (index_t i:this->rows())
+    for (index_t j:this->cols())
+        fn+=FrobeniusNorm((*this)(i,j));
+    return fn;
+}
+
 //
 //  THis routine is rather tricky because are actually 12 permutations here
 //  Left/Right * Upper/Lower * Column/Rectangular/Row matrix.

@@ -13,7 +13,6 @@ SiteOperatorImp::SiteOperatorImp(int d)
     : itsd(d)
     , itsDw(1,1)
     , itsTruncationError(0.0)
-    , itsWs(d,d)
     , itsWOvM(1,1,d,Lower)
 {
     Unit(itsWOvM);
@@ -38,7 +37,6 @@ SiteOperatorImp::SiteOperatorImp(int d, const OperatorClient* H)
     itsWOvM=H->GetMatrixO(Lower);
     itsDw=Dw12(itsWOvM.GetNumRows(),itsWOvM.GetNumCols());
     SyncOtoW();
-    CheckSync();
 }
 
 //
@@ -97,18 +95,6 @@ SiteOperatorImp::~SiteOperatorImp()
     //dtor
 }
 
-void SiteOperatorImp::CheckDws() const
-{
-#ifdef DEBUG
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
-        {
-            const MatrixRT& W=GetW(m,n);
-            assert(W.GetNumRows()==itsDw.Dw1);
-            assert(W.GetNumCols()==itsDw.Dw2);
-        }
-#endif
-}
 
 void SiteOperatorImp::SetNeighbours(SiteOperator* left, SiteOperator* right)
 {
@@ -119,18 +105,6 @@ void SiteOperatorImp::SetNeighbours(SiteOperator* left, SiteOperator* right)
     assert(!right || itsRightNeighbour);
 }
 
-void SiteOperatorImp::SyncWtoO()
-{
-    itsWOvM.SetChi12(itsDw.Dw1-2,itsDw.Dw2-2,false);
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
-        {
-            const MatrixRT& W=GetW(m,n);
-            for (index_t w1:itsWOvM.rows())
-            for (index_t w2:itsWOvM.cols())
-                itsWOvM(w1,w2)(m,n)=W(w1+1,w2+1);
-        }
-}
 
 void SiteOperatorImp::SyncOtoW()
 {
@@ -139,43 +113,10 @@ void SiteOperatorImp::SyncOtoW()
     index_t D2=X2+2;
     if (itsDw.Dw1!=D1 || itsDw.Dw2!=D2)
     {
-        for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
-        {
-            VectorRT lastRow=itsWs(m+1,n+1).GetRow(itsDw.Dw1);
-            itsWs(m+1,n+1).SetLimits(D1,D2,true);
-            if (D2<=itsDw.Dw2)
-                itsWs(m+1,n+1).GetRow(D1)=lastRow.SubVector(D2);
-
-        }
         itsDw.Dw1=D1;
         itsDw.Dw2=D2;
     }
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
-        {
-            MatrixRT W(itsDw.Dw1,itsDw.Dw2);
-            for (index_t w1:itsWOvM.rows())
-            for (index_t w2:itsWOvM.cols())
-                W(w1+1,w2+1)=itsWOvM(w1,w2)(m,n);
-            itsWs(m+1,n+1)=W; //Dont' call SetW here !!!
-        }
     SetLimits();
-}
-
-void SiteOperatorImp::CheckSync()
-{
-    for (int m=0; m<itsd; m++)
-    for (int n=0; n<itsd; n++)
-    {
-        const MatrixRT& W=GetW(m,n);
-        for (index_t w1:itsWOvM.rows())
-        for (index_t w2:itsWOvM.cols())
-            if(itsWOvM(w1,w2)(m,n)!=W(w1+1,w2+1))
-            {
-                cout << "Ovw(" << w1 << "," << w2 << ")(" << m << "," << n << "),W = " << itsWOvM(w1,w2)(m,n) << " " << W(w1+1,w2+1) << endl;
-            }
-    }
 }
 
 SiteOperatorImp* SiteOperatorImp::GetNeighbour(Direction lr) const
@@ -213,7 +154,6 @@ void SiteOperatorImp::SetLimits()
                 if (itsDw.w2_last (w1+1)<w2+1) itsDw.w2_last (w1+1)=w2+1;
             }
 
-    CheckDws();
 }
 
 void  SiteOperatorImp::AccumulateTruncationError(double err)
@@ -282,16 +222,11 @@ char SiteOperatorImp::GetUpperLower(double eps) const
 
 double SiteOperatorImp::GetFrobeniusNorm() const
 {
-    double fn=0.0;
-    for (int m=0; m<itsd; m++)
-        for (int n=0; n<itsd; n++)
-            fn+=FrobeniusNorm(GetW(n,m));
-    return fn;
+    return itsWOvM.GetFrobeniusNorm();
 }
 
 char SiteOperatorImp::GetNormStatus(double eps) const
 {
-//    cout << "Dw1*Dw2=" << itsDw.Dw1*itsDw.Dw2 << endl;
     if (itsDw.Dw1*itsDw.Dw2>4096) return '?';
     char ret='W'; //Not normalized
     {

@@ -36,7 +36,7 @@ double SiteOperatorImp::Compress(CompressType ct,Direction lr,const SVCompressor
 double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
 {
     assert(comp);
-    CheckSync();
+//    CheckSync();
     MatrixRT  A=itsWOvM.Flatten(lr);
     MatLimits lim=A.ReBase(1,1);
     LapackSVDSolver<double> solver;
@@ -76,7 +76,7 @@ double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
 
 double SiteOperatorImp::CompressParkerOvM(Direction lr,const SVCompressorR* comp)
 {
-    CheckSync();
+//    CheckSync();
     auto [Q,RL]=itsWOvM.BlockSVD(lr,comp); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
     itsWOvM.SetV(lr,Q); //Could be move inside BlockQX
     SyncOtoW(); //Get Q into the Ws.
@@ -87,7 +87,7 @@ double SiteOperatorImp::CompressParkerOvM(Direction lr,const SVCompressorR* comp
 
 void SiteOperatorImp::CanonicalFormOvM(Direction lr)
 {
-    CheckSync();
+//    CheckSync();
     auto [Q,RL]=itsWOvM.BlockQX(lr); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
     itsWOvM.SetV(lr,Q); //Could be move inside BlockQX
     SyncOtoW(); //Get Q into the Ws.
@@ -139,7 +139,7 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
     }
     SyncOtoW();
     SetLimits();
-    CheckSync();
+//    CheckSync();
 }
 
 

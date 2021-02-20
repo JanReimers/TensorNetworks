@@ -30,8 +30,7 @@ class SiteOperatorImp : public virtual SiteOperator
 
         virtual int             Getd   () const {return itsd;}
         virtual const Dw12&     GetDw12() const {return itsDw;}
-        virtual const MatrixRT& GetW(int m, int n) const {return itsWs(m+1,n+1);}
-        virtual const MatrixOR& GetW(            ) const {return itsWOvM;}
+        virtual const MatrixOR& GetW   () const {return itsWOvM;}
         //
         //  Contract MPOs together
         //
@@ -52,12 +51,11 @@ class SiteOperatorImp : public virtual SiteOperator
         virtual double GetFrobeniusNorm() const;
         virtual char   GetUpperLower(double eps) const;
         virtual char   GetLRB() const=0;
-        virtual void   CheckDws() const;
         virtual void   SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
     protected:
-        void SyncWtoO();
+//        void SyncWtoO();
         void SyncOtoW();
-        void CheckSync();
+//        void CheckSync();
 
     private:
         friend class MPOTesting;
@@ -85,7 +83,6 @@ class SiteOperatorImp : public virtual SiteOperator
         int      itsd; //2*S+1
         Dw12     itsDw;
         double   itsTruncationError;
-        TensorT  itsWs;
         MatrixOR itsWOvM; //Operator values matrix version of W.
         SiteOperatorImp* itsLeft_Neighbour;
         SiteOperatorImp* itsRightNeighbour;

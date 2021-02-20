@@ -39,7 +39,7 @@ bool Shrink(MatrixRT& L, MatrixOR& Q,double eps)
 void SiteOperatorImp::iCanonicalFormQRIter(Direction lr)
 {
     assert(itsDw.Dw1==itsDw.Dw2); //Make sure we are square
-    CheckSync();
+//    CheckSync();
     int X=itsDw.Dw1-2; //Chi
     MatrixRT Lp(0,X+1,0,X+1),Id(0,X+1,0,X+1);
     Unit(Lp);

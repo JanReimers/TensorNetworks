@@ -542,11 +542,11 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
 //    so->Report(cout); cout << endl;
     int Dw=so->GetDw12().Dw1;
     assert(Dw==so->GetDw12().Dw2);
+    const MatrixOR& W=so->GetW();
 #ifdef DEBUG
 //
 //  Lets check that W has the correct shape
 //
-    const MatrixOR& W=so->GetW();
     assert(IsLowerTriangular(W));
     for (int ma=0; ma<d; ma++)
         for (int na=0; na<d; na++)

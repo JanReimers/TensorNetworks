@@ -20,10 +20,9 @@ public:
     virtual const Dw12& GetDw12() const=0;
     virtual double      GetFrobeniusNorm() const=0;
     //
-    //  Generate MPO matrices.  m,n are quantum numbers for <m|Oa|n>
+    //  Get Operator Valued Matrix
     //
-    virtual const MatrixRT& GetW(int m, int n) const=0;
-    virtual const MatrixOR& GetW(            ) const=0;
+    virtual const MatrixOR& GetW() const=0;
     //
     //  Contract MPOs together
     //
