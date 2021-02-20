@@ -36,8 +36,8 @@ SiteOperatorBulk::SiteOperatorBulk(int d, Direction lr,const MatrixRT& U, const 
 //
 // Construct with W operator
 //
-SiteOperatorBulk::SiteOperatorBulk(int d, const TensorT& W)
-    : SiteOperatorImp(d,W)
+SiteOperatorBulk::SiteOperatorBulk(const MatrixOR& W)
+    : SiteOperatorImp(W)
 {
     SetLimits();
 }

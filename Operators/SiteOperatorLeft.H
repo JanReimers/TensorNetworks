@@ -15,7 +15,6 @@ class SiteOperatorLeft
         SiteOperatorLeft(int d,double S, SpinOperator so); //Construct with identity operator
         SiteOperatorLeft(int d, const OperatorClient* O);
         SiteOperatorLeft(int d, Direction lr , const MatrixRT& U, const DiagonalMatrixRT& expEvs);
-        SiteOperatorLeft(int d, const TensorT& W); //Construct with W operator
         virtual ~SiteOperatorLeft();
 
 //        virtual MatrixRT GetV(Direction,int m, int n) const;

@@ -44,6 +44,7 @@ public:
     MatrixO<T>& operator*=(const T& s);
 
     int       Getd() const {return itsd;}
+    double    GetS() const {return 0.5*(itsd-1);}
     double    GetTruncationError() const {return itsTruncationError;}
     TriType   GetUpperLower() const {return itsUL;}
     T         GetTrace(int a, int b, int c, int d) const;
@@ -73,7 +74,7 @@ private:
     TriType itsUL; //Upper or lower triangular.
 };
 
-typedef MatrixO<double> MatrixOR;
+//typedef MatrixO<double> MatrixOR;
 typedef MatrixO<dcmplx> MatrixOC;
 typedef Vector<OperatorElement<double>> VectorOR;
 
@@ -121,12 +122,12 @@ template <class T> Matrix<T> TensorProduct(const Matrix<T>& a, const Matrix<T>& 
     //  These loops need to run in the same order as SiteOperatorImp::Product
     //
     int i=r.GetRowLimits().Low;
-    for (index_t ia:a.rows())
     for (index_t ib:b.rows())
+    for (index_t ia:a.rows())
     {
         int j=r.GetColLimits().Low;
-        for (index_t ja:a.cols())
         for (index_t jb:b.cols())
+        for (index_t ja:a.cols())
         {
             r(i,j)=a(ia,ja)*b(ib,jb);
             j++;
@@ -134,6 +135,26 @@ template <class T> Matrix<T> TensorProduct(const Matrix<T>& a, const Matrix<T>& 
         i++;
     }
     return r;
+}
+
+//
+//  This is a regular matrix product in the internal space (w1,w2) and a tensor product in
+//  physical space (n,m).
+//
+template <class T> MatrixO<T> HorizontalProduct(const MatrixO<T>& a, const MatrixO<T>& b)
+{
+    assert(a.GetColLimits()==b.GetRowLimits());
+    MatLimits lim(a.GetRowLimits(),b.GetColLimits());
+    int d=a.Getd()*b.Getd();
+    MatrixO<T> ret(d,lim);
+    double S=0.5*(d-1);
+    OperatorElement<T> Z=OperatorZ(S);
+    Fill(ret,Z);
+    for (index_t w1:a.rows())
+        for (index_t w3:b.cols())
+            for (index_t w2:a.cols())
+                ret(w1,w3)+=TensorProduct(a(w1,w2),b(w2,w3));
+    return ret;
 }
 
 template <class T> bool IsTriangular(TriType ul,const Matrix<T>& m,double eps)

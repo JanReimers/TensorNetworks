@@ -14,12 +14,15 @@ template <class T> class Matrix4;
 //
 namespace TensorNetworks
 {
+    template <class T> class MatrixO;
+
     typedef std::complex<double> dcmplx;
     typedef Matrix  <dcmplx>  MatrixCT;
     typedef Matrix  <double>  MatrixRT;
-    typedef Vector   <double>  VectorRT;
-    typedef Vector   <dcmplx>  VectorCT;
-    typedef Matrix4  <double>  Matrix4RT;
+    typedef MatrixO <double>  MatrixOR;
+    typedef Vector  <double>  VectorRT;
+    typedef Vector  <dcmplx>  VectorCT;
+    typedef Matrix4 <double>  Matrix4RT;
 
     typedef DiagonalMatrix<double> DiagonalMatrixRT;
 };

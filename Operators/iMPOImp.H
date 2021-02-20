@@ -15,7 +15,7 @@ public:
     enum LoadWith {Identity};
     iMPOImp(int L, double S);
     iMPOImp(int L, double S,iMPOImp::LoadWith);
-    iMPOImp(int L, double S,const TensorT& W);
+    iMPOImp(int L, const MatrixOR& W);
     iMPOImp(int L, const OperatorClient* W);
     virtual ~iMPOImp();
 

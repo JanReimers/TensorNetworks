@@ -8,6 +8,7 @@
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/TNSLogger.H"
+#include "Operators/OperatorValuedMatrix.H"
 
 #include "TensorNetworksImp/MPS/Bond.H"
 
@@ -163,6 +164,8 @@ MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const iMPO* o,ThetaType tt) cons
     //  When Dw===w1==w3==1 (i.e. open legs at the edges of the operator) then this is
     //  easy.  But when Dw > 1 then this become non-trivial because the indices get combined (i1,w1) (i3,w3).
     //
+    const MatrixOR& WA=soA->GetW();
+    const MatrixOR& WB=soB->GetW();
     for (int mb=0; mb<itsd; mb++)
     for (int ma=0; ma<itsd; ma++)
     {
@@ -172,17 +175,15 @@ MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const iMPO* o,ThetaType tt) cons
         for (int nb=0; nb<itsd; nb++)
         for (int na=0; na<itsd; na++,nab++)
         {
-            const MatrixRT& WAmn=soA->GetW(ma,na);
-            const MatrixRT& WBmn=soB->GetW(mb,nb);
-            assert(WAmn.GetNumCols()==Dw2);
-            assert(WBmn.GetNumRows()==Dw2);
+            assert(WA.GetNumCols()==Dw2);
+            assert(WB.GetNumRows()==Dw2);
             Matrix4CT thetaw(D,Dw1,D,Dw1);
             for (int w3=1;w3<=Dw1;w3++)
             for (int w1=1;w1<=Dw1;w1++)
             {
                 double Omn(0);
                 for (int w2=1; w2<=Dw2; w2++)
-                    Omn+=WAmn(w1,w2)*WBmn(w2,w3);
+                    Omn+=WA(w1-1,w2-1)(ma,na)*WB(w2-1,w3-1)(mb,nb);
 
                 for (int i1=1;i1<=D;i1++)
                 for (int i3=1;i3<=D;i3++)
@@ -236,6 +237,8 @@ MPSSite::dVectorT  iTEBDStateImp::ContractThetaDw(const iMPO* o) const
     //  When Dw===w1==w3==1 (i.e. open legs at the edges of the operator) then this is
     //  easy.  But when Dw > 1 then this become non-trivial because the indices get combined (i1,w1) (i3,w3).
     //
+    const MatrixOR& WA=soA->GetW();
+    const MatrixOR& WB=soB->GetW();
     for (int mb=0; mb<itsd; mb++)
     for (int ma=0; ma<itsd; ma++)
     {
@@ -244,17 +247,15 @@ MPSSite::dVectorT  iTEBDStateImp::ContractThetaDw(const iMPO* o) const
         for (int nb=0; nb<itsd; nb++)
         for (int na=0; na<itsd; na++,nab++)
         {
-            const MatrixRT& WAmn=soA->GetW(ma,na);
-            const MatrixRT& WBmn=soB->GetW(mb,nb);
-            assert(WAmn.GetNumCols()==Dw2);
-            assert(WBmn.GetNumRows()==Dw2);
+            assert(WA.GetNumCols()==Dw2);
+            assert(WB.GetNumRows()==Dw2);
             Matrix4CT thetaw(D,Dw1,D,Dw1);
             for (int w3=1;w3<=Dw1;w3++)
             for (int w1=1;w1<=Dw1;w1++)
             {
                 double Omn(0);
                 for (int w2=1; w2<=Dw2; w2++)
-                    Omn+=WAmn(w1,w2)*WBmn(w2,w3);
+                    Omn+=WA(w1-1,w2-1)(ma,na)*WB(w2-1,w3-1)(mb,nb);
 
                 for (int i1=1;i1<=D;i1++)
                 for (int i3=1;i3<=D;i3++)
@@ -545,17 +546,17 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
 //
 //  Lets check that W has the correct shape
 //
+    const MatrixOR& W=so->GetW();
+    assert(IsLowerTriangular(W));
     for (int ma=0; ma<d; ma++)
         for (int na=0; na<d; na++)
         {
-            const MatrixRT& Wmn=so->GetW(ma,na);
-            assert(IsLowerTriangular(Wmn));
             for (int w1=1;w1<=Dw-1;w1++)
                 for (int w2=w1+1;w2<=Dw;w2++)
-                    if (Wmn(w1,w2)!=0.0)
+                    if (W(w1-1,w2-1)(ma,na)!=0.0)
                     {
-                        cout << "W(" << ma << "," << na << ")=" << Wmn << endl;
-                        assert(Wmn(w1,w2)==0.0);
+                        cout << "W(" << ma << "," << na << ")=" << W(w1-1,w2-1)(ma,na) << endl;
+                        assert(false);
                     }
         }
 #endif
@@ -573,12 +574,11 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
     for (int m=0; m<d; m++)
         for (int n=0; n<d; n++)
         {
-            const MatrixRT& Wmn=so->GetW(m,n);
             for (int i2=1;i2<=D;i2++)
             for (int j2=1;j2<=D;j2++)
                 for (int i1=1;i1<=D;i1++)
                 for (int j1=1;j1<=D;j1++)
-                    EDw(i2,j2)+=conj(A[m](i1,i2))*Wmn(Dw,Dw)*E[Dw](i1,j1)*A[n](j1,j2);
+                    EDw(i2,j2)+=conj(A[m](i1,i2))*W(Dw-1,Dw-1)(m,n)*E[Dw](i1,j1)*A[n](j1,j2);
         }
 //    cout << "E1=" << E1 << endl;
     assert(Max(fabs(E[Dw]-EDw))<1e-12);
@@ -595,22 +595,21 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
         for (int m=0; m<d; m++)
             for (int n=0; n<d; n++)
             {
-                const MatrixRT& Wmn=so->GetW(m,n);
-                if (Wmn(w1,w1)!=0.0) //Make sure there is nothing on the diagonal.
+                if (W(w1-1,w1-1)(m,n)!=0.0) //Make sure there is nothing on the diagonal.
                 {
-                    std::cerr << "diagonal W["<< m << "," << n << "](" << w1 << "," << w1 << ")=" << Wmn(w1,w1) << std::endl;
+//                    std::cerr << "diagonal W["<< m << "," << n << "](" << w1 << "," << w1 << ")=" << W(w1-1,w1-1)(m,n)<< std::endl;
                     assert(m==n); //should be only unit ops on the diagonal
 //                    assert(Wmn(w1,w1)==1.0);
                     diagonals.push_back(w1);
                 }
                 for (int w2=w1+1;w2<=Dw;w2++)
-                if (Wmn(w2,w1)!=0.0)
+                if (W(w2-1,w1-1)(m,n)!=0.0)
                 {
                     for (int i2=1;i2<=D;i2++)
                     for (int j2=1;j2<=D;j2++)
                         for (int i1=1;i1<=D;i1++)
                         for (int j1=1;j1<=D;j1++)
-                            C(i2,j2)+=conj(A[m](i1,i2))*Wmn(w2,w1)*E[w2](i1,j1)*A[n](j1,j2);
+                            C(i2,j2)+=conj(A[m](i1,i2))*W(w2-1,w1-1)(m,n)*E[w2](i1,j1)*A[n](j1,j2);
                 }
             }
 
@@ -680,7 +679,7 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
                     for (int m=0; m<d; m++)
                         Echeck(i2,j2)+=conj(A[m](i1,i2))*E[w1](i1,j1)*A[m](j1,j2);
              MatrixCT err=E[w1]-Echeck-C;
-             cout << "err=" << std::fixed << err << endl;
+//             cout << "err=" << std::fixed << err << endl;
 //             cout << std::scientific << Max(fabs(err)) << endl;
 
         }
@@ -697,13 +696,12 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
             for (int m=0; m<d; m++)
                 for (int n=0; n<d; n++)
                 {
-                    const MatrixRT& Wmn=so->GetW(m,n);
                     //cout << "W" << m << n << "=" << Wmn << endl;
                     for (int i2=1;i2<=D;i2++)
                     for (int j2=1;j2<=D;j2++)
                         for (int i1=1;i1<=D;i1++)
                         for (int j1=1;j1<=D;j1++)
-                            E[1](i2,j2)+=Wmn(w,1)*conj(A[m](i1,i2))*E[w](i1,j1)*A[n](j1,j2);
+                            E[1](i2,j2)+=W(w-1,0)(m,n)*conj(A[m](i1,i2))*E[w](i1,j1)*A[n](j1,j2);
                 }
         }
 
@@ -757,6 +755,8 @@ double iTEBDStateImp::GetExpectationDw1 (const MPO* o,int center) const
     assert(DwA1==1);
     assert(DwB2==1);
     assert(DwA2==DwB1);
+    const MatrixOR& WA=soA->GetW();
+    const MatrixOR& WB=soB->GetW();
     dcmplx expectation1(0.0);
     for (int na=0; na<itsd; na++)
         for (int nb=0; nb<itsd; nb++)
@@ -767,15 +767,13 @@ double iTEBDStateImp::GetExpectationDw1 (const MPO* o,int center) const
             for (int ma=0; ma<itsd; ma++)
                 for (int mb=0; mb<itsd; mb++)
                 {
-                    const MatrixRT& WAmn=soA->GetW(ma,na);
-                    const MatrixRT& WBmn=soB->GetW(mb,nb);
-                    assert(WAmn.GetNumRows()==1);
-                    assert(WAmn.GetNumCols()==DwA2);
-                    assert(WBmn.GetNumRows()==DwA2);
-                    assert(WBmn.GetNumCols()==1);
+                    assert(WA.GetNumRows()==1);
+                    assert(WA.GetNumCols()==DwA2);
+                    assert(WB.GetNumRows()==DwA2);
+                    assert(WB.GetNumCols()==1);
                     double Omn(0);
                     for (int w2=1; w2<=DwA2; w2++)
-                        Omn+=WAmn(1,w2)*WBmn(w2,1);
+                        Omn+=WA(0,w2-1)(ma,na)*WB(w2-1,0)(mb,nb);
 
                     MatrixCT theta13_m=conj(lambdaB()*GammaA()[ma])*lambdaA()*conj(GammaB()[mb])*lambdaB();
                     assert(theta13_m.GetNumRows()==D);

@@ -23,6 +23,7 @@ public:
     //  Generate MPO matrices.  m,n are quantum numbers for <m|Oa|n>
     //
     virtual const MatrixRT& GetW(int m, int n) const=0;
+    virtual const MatrixOR& GetW(            ) const=0;
     //
     //  Contract MPOs together
     //

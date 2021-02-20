@@ -79,18 +79,16 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const Di
     }
     SyncOtoW();
 }
-//
+
+////
 // Construct with W operator. Called by iMPOImp::MakeUnitcelliMPO
-// Need to change MakeUnitcelliMPO over to OpValMatrix to fix this.
 //
-SiteOperatorImp::SiteOperatorImp(int d, const TensorT& W)
-    : SiteOperatorImp(d)
+SiteOperatorImp::SiteOperatorImp(const MatrixOR& W)
+    : SiteOperatorImp(W.Getd())
 {
-    itsWs=W;
-    int Dw=itsWs(1,1).GetNumRows();
-    assert(itsWs(1,1).GetNumCols()==Dw);
-    itsDw=Dw12(Dw,Dw);
-    SyncWtoO();
+    itsWOvM=W;
+    itsDw=Dw12(itsWOvM.GetNumRows(),itsWOvM.GetNumCols());
+    SyncOtoW();
 }
 
 
@@ -263,26 +261,22 @@ void SiteOperatorImp::Report(std::ostream& os) const
 char SiteOperatorImp::GetUpperLower(double eps) const
 {
     char ret=' ';
-//    for (int m=0; m<itsd; m++)
-//        for (int n=0; n<itsd; n++)
-        {
-            if (IsUpperTriangular(itsWOvM,eps))
-            {
-                if (ret==' ')
-                    ret='U';
-                else if (ret=='L')
-                    ret='M'; //Mix
-            }
-            else if (IsLowerTriangular(itsWOvM,eps))
-            {
-                if (ret==' ')
-                    ret='L';
-                else if (ret=='U')
-                    ret='M'; //Mix
-            }
-            else
-                ret='F'; // Full
-        }
+    if (IsUpperTriangular(itsWOvM,eps))
+    {
+        if (ret==' ')
+            ret='U';
+        else if (ret=='L')
+            ret='M'; //Mix
+    }
+    else if (IsLowerTriangular(itsWOvM,eps))
+    {
+        if (ret==' ')
+            ret='L';
+        else if (ret=='U')
+            ret='M'; //Mix
+    }
+    else
+        ret='F'; // Full
     return ret;
 }
 
@@ -294,24 +288,6 @@ double SiteOperatorImp::GetFrobeniusNorm() const
             fn+=FrobeniusNorm(GetW(n,m));
     return fn;
 }
-
-//bool SiteOperatorImp::isOrthonormal(Direction lr,const MatrixRT& Q) const
-//{
-//    bool ret=false;
-//    double d=itsd;
-//    switch (lr)
-//    {
-//    case DLeft:
-//        ret=IsUnit(Transpose(Q)*Q/d,1e-13);
-//        break;
-//    case DRight:
-//        ret=IsUnit(Q*Transpose(Q)/d,1e-13);
-//        break;
-//    default:
-//        assert(false);
-//    }
-//    return ret;
-//}
 
 char SiteOperatorImp::GetNormStatus(double eps) const
 {

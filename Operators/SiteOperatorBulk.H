@@ -16,7 +16,7 @@ class SiteOperatorBulk
         SiteOperatorBulk(int d,double S, SpinOperator so); //Construct with identity operator
         SiteOperatorBulk(int d, const OperatorClient* O);
         SiteOperatorBulk(int d, Direction lr , const MatrixRT& U, const DiagonalMatrixRT& expEvs);
-        SiteOperatorBulk(int d, const TensorT& W); //Construct with W operator
+        SiteOperatorBulk(const MatrixOR& W); //Construct with W operator
         virtual ~SiteOperatorBulk();
 
         virtual char GetLRB  () const {return 'B';}

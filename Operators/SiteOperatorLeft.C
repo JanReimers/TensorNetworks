@@ -37,15 +37,6 @@ SiteOperatorLeft::SiteOperatorLeft(int d, Direction lr,const MatrixRT& U, const 
 {
     Init_lr(1);
 }
-//
-// Construct with W operator
-//
-SiteOperatorLeft::SiteOperatorLeft(int d, const TensorT& W)
-    : SiteOperatorImp(d,W)
-{
-    Init_lr(SiteOperatorImp::itsDw.Dw1);
-}
-
 
 SiteOperatorLeft::~SiteOperatorLeft()
 {

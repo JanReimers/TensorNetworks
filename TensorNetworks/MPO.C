@@ -1,4 +1,5 @@
 #include "TensorNetworks/MPO.H"
+#include "Operators/OperatorValuedMatrix.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
 #include "TensorNetworks/Factory.H"
@@ -46,12 +47,7 @@ void  MPO::Dump(std::ostream& os) const
     for (int ia=1;ia<=L;ia++)
     {
         os << "   Site " << ia << ": " << std::fixed << std::setprecision(3);
-        const SiteOperator* so=GetSiteOperator(ia);
-        int d=so->Getd();
-        for (int m=0;m<d;m++)
-        for (int n=0;n<d;n++)
-            os << "W(" << m << "," << n << ")=" << so->GetW(m,n) << std::endl;
-        os << std::endl;
+        os << "W=" << GetSiteOperator(ia)->GetW() << std::endl;
     }
 }
 

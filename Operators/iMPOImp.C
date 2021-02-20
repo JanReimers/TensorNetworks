@@ -40,11 +40,11 @@ iMPOImp::iMPOImp(int L, double S,LoadWith loadWith)
 //
 //  Load up the sites with copies of the W operator
 //
-iMPOImp::iMPOImp(int L, double S,const TensorT& W)
-    : iMPOImp(L,S)
+iMPOImp::iMPOImp(int L, const MatrixOR& W)
+    : iMPOImp(L,W.GetS())
 {
     for (int ia=1; ia<=itsL; ia++)
-        Insert(new SiteOperatorBulk(Getd(),W));
+        Insert(new SiteOperatorBulk(W));
     LinkSites();
 }
 //
@@ -125,55 +125,26 @@ iMPO* iMPOImp::MakeUnitcelliMPO(int unitcell) const
     int L=GetL();
     assert(L>=1);
     //
-    //  Usually unitcell==L, but maybe we can have 2 or more unit cells fit exaclty inside L.
-    //  We also need to support unitcell=N*L where N is an int.
+    //  Usually unit cell==L, but maybe we can have 2 or more unit cells fit exactly inside L.
+    //  We also need to support unit cell=N*L where N is an int.
     //
     int newL=L;
     if (L>unitcell)
     {
         newL=L/unitcell;
         assert(L%unitcell==0);  //Make sure unit cell and L are compatible.
-        assert(newL*unitcell==L); //THis should be the same as the L%unitcell==0 test above.
+        assert(newL*unitcell==L); //This should be the same as the L%unitcell==0 test above.
     }
     else if (L<unitcell)
     {
         assert(unitcell%L==0);  //Make sure unit cell and L are compatible.
 
     }
-    int d=iMPO::GetSiteOperator(1)->Getd();
+    MatrixOR WW=iMPO::GetSiteOperator(1)->GetW();
+    for (int ia=2;ia<=unitcell;ia++)
+        WW=HorizontalProduct(WW,iMPO::GetSiteOperator(ia)->GetW());
 
-    //
-    //  Work out the dimension of the unit cell Hilbert space.
-    //
-    int newd=1;
-    for (int ia=1;ia<=unitcell;ia++)
-    {
-        assert(iMPO::GetSiteOperator(ia)->Getd()==d); //Assume all site have the same d
-        newd*=d;
-    }
-    double newS=(newd-1)/2.0;
-    //
-    //  Create a tensor to store W
-    //
-    TensorT Wcell(newd,newd);
-
-    for (StateIterator m(unitcell,d); !m.end(); m++)
-        for (StateIterator n(unitcell,d); !n.end(); n++)
-        {
-            const Vector<int>& ms=m.GetQuantumNumbers();
-            const Vector<int>& ns=n.GetQuantumNumbers();
-
-            MatrixRT W=iMPO::GetSiteOperator(1)->GetW(ms(unitcell),ns(unitcell));
-            for (int ia=2;ia<=unitcell;ia++)
-                W*=iMPO::GetSiteOperator(ia)->GetW(ms(unitcell-ia+1),ns(unitcell-ia+1));
-            int mab=m.GetLinearIndex(); //one based
-            int nab=n.GetLinearIndex();
-//            cout << "mab, ms=" << mab << " " << ms << endl;
-            Wcell(mab,nab)=W;
-        }
-
-    return new iMPOImp(newL,newS,Wcell);
-
+    return new iMPOImp(newL,WW);
 }
 
 } //namespace

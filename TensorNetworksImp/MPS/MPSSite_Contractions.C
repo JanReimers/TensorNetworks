@@ -1,5 +1,6 @@
 #include "TensorNetworksImp/MPS/MPSSite.H"
 #include "TensorNetworksImp/MPS/Bond.H"
+#include "Operators/OperatorValuedMatrix.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/Dw12.H"
 #include "Containers/Matrix6.H"
@@ -84,28 +85,28 @@ MatrixCT MPSSite::GetNorm(Direction lr) const
     MatrixCT ret;
     switch(lr)
     {
-        case DLeft:
-        {
-            ret.SetLimits(itsD2,itsD2);
-            Fill(ret,std::complex<double>(0.0));
-            //
-            //  Sum_ip A^t(id) * A(id)
-            //
-            for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
-                ret+=conj(Transpose((*id)))*(*id);
-            break;
-        }
-        case DRight:
-        {
-            ret.SetLimits(itsD1,itsD1);
-            Fill(ret,std::complex<double>(0.0));
-            //
-            //  Sum_ip B(id)*B^t(id)
-            //
-            for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
-                ret+=(*id)*conj(Transpose((*id)));
-            break;
-        }
+    case DLeft:
+    {
+        ret.SetLimits(itsD2,itsD2);
+        Fill(ret,std::complex<double>(0.0));
+        //
+        //  Sum_ip A^t(id) * A(id)
+        //
+        for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
+            ret+=conj(Transpose((*id)))*(*id);
+        break;
+    }
+    case DRight:
+    {
+        ret.SetLimits(itsD1,itsD1);
+        Fill(ret,std::complex<double>(0.0));
+        //
+        //  Sum_ip B(id)*B^t(id)
+        //
+        for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
+            ret+=(*id)*conj(Transpose((*id)));
+        break;
+    }
     }
     return ret;
 }
@@ -115,39 +116,39 @@ MatrixCT MPSSite::GetCanonicalNorm(Direction lr) const
     MatrixCT ret;
     switch(lr)
     {
-        case DLeft:
+    case DLeft:
+    {
+        ret.SetLimits(itsD2,itsD2);
+        Fill(ret,std::complex<double>(0.0));
+        if (itsLeft_Bond)
         {
-            ret.SetLimits(itsD2,itsD2);
-            Fill(ret,std::complex<double>(0.0));
-            if (itsLeft_Bond)
-            {
-                const DiagonalMatrixRT& lambda=itsLeft_Bond->GetSVs();
-                //
-                //  Sum_ip A^t(id) * gamma^2 * A(id)
-                //
-                for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
-                    ret+=conj(Transpose((*id)))*lambda*lambda*(*id);
-            }
+            const DiagonalMatrixRT& lambda=itsLeft_Bond->GetSVs();
+            //
+            //  Sum_ip A^t(id) * gamma^2 * A(id)
+            //
+            for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
+                ret+=conj(Transpose((*id)))*lambda*lambda*(*id);
+        }
 
-            break;
-        }
-        case DRight:
+        break;
+    }
+    case DRight:
+    {
+        ret.SetLimits(itsD1,itsD1);
+        Fill(ret,std::complex<double>(0.0));
+        if (itsRightBond)
         {
-            ret.SetLimits(itsD1,itsD1);
-            Fill(ret,std::complex<double>(0.0));
-            if (itsRightBond)
+            const DiagonalMatrixRT& lambda=itsRightBond->GetSVs();
+            //
+            //  Sum_ip B(id) * gamma^2 * B^t(id)
+            //
+            for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
             {
-                const DiagonalMatrixRT& lambda=itsRightBond->GetSVs();
-                //
-                //  Sum_ip B(id) * gamma^2 * B^t(id)
-                //
-                for (cdIterT id=itsMs.begin(); id!=itsMs.end(); id++)
-                {
-                    ret+=(*id)*lambda*lambda*conj(Transpose((*id)));
-                }
+                ret+=(*id)*lambda*lambda*conj(Transpose((*id)));
             }
-            break;
         }
+        break;
+    }
     }
     return ret;
 }
@@ -159,21 +160,24 @@ GetHeff(const SiteOperator* mops,const Vector3CT& L,const Vector3CT& R) const
     Matrix6<dcmplx> Heff(itsd,itsD1,itsD2,itsd,itsD1,itsD2);
     Matrix6<dcmplx>::Subscriptor SHeff(Heff);
     const Dw12& Dws=mops->GetDw12();
-
+    const MatrixOR& WOvM=mops->GetW();
     for (int m=0; m<itsd; m++)
         for (int n=0; n<itsd; n++)
         {
-            const MatrixRT& W=mops->GetW(m,n);
-            assert(W.GetNumRows()==Dws.Dw1);
+            assert(WOvM.GetNumRows()==Dws.Dw1);
             Vector3CT WR(Dws.Dw1,itsD2,itsD2,1);
             #pragma omp parallel for collapse(2)
-             for (int i2=1; i2<=itsD2; i2++)
+            for (int i2=1; i2<=itsD2; i2++)
                 for (int j2=1; j2<=itsD2; j2++)
                 {
                     VectorCT WR(Dws.Dw1,FillType::Zero);
                     VectorCT::Subscriptor sWR(WR);
                     for (int w1=1; w1<=Dws.Dw1; w1++)
-                        WR(w1)=ContractWR(w1,i2,j2,W,Dws.w2_last(w1),R);
+                    {
+                        for (int w2=1; w2<=Dws.w2_last(w1); w2++)
+                            if (WOvM(w1-1,w2-1)(m,n)!=0.0)
+                                WR(w1)+=WOvM(w1-1,w2-1)(m,n)*R(w2,i2,j2);
+                    }
                     for (int i1=1; i1<=itsD1; i1++)
                         for (int j1=1; j1<=itsD1; j1++)
                         {
@@ -247,7 +251,7 @@ MatrixCT MPSSite::IterateRightF(const MPSSite* Psi2, const MatrixCT& Fap1,bool c
     return F;
 }
 
-MatrixCT MPSSite::IterateF(Direction lr ,const MatrixCT& Mold) const
+MatrixCT MPSSite::IterateF(Direction lr,const MatrixCT& Mold) const
 {
 //    cout << "IterateF D1,D2 Mold=" << itsD1 << "," << itsD2 << " " << Mold.GetLimits() << endl;
     MatrixCT M;
@@ -294,7 +298,7 @@ Vector3CT MPSSite::IterateLeft_F(const SiteOperator* so, const Vector3CT& Fam1,b
     Vector3CT::Subscriptor sF(F);
     for (int w2=1; w2<=Dw2; w2++)
         //#pragma omp parallel for collapse(2)
-         for (int i2=1; i2<=itsD2; i2++)
+        for (int i2=1; i2<=itsD2; i2++)
             for (int j2=1; j2<=itsD2; j2++)
                 sF(w2,i2,j2)=ContractAWFA(w2,i2,j2,so,Fam1);
     if (cache) itsHLeft_Cache=F;
@@ -315,24 +319,24 @@ dcmplx MPSSite::ContractWFA(int m, int w2, int i1, int j2, const SiteOperator* s
 {
     const Dw12& Dws1=so->GetDw12();
     dcmplx wfa(0.0);
+    const MatrixOR& WOvM=so->GetW();
     for (int n=0; n<itsd; n++)
     {
-        const MatrixRT& Wmn=so->GetW(m,n);
-        assert(Wmn.GetNumRows()==Dws1.Dw1);
+        assert(WOvM.GetNumRows()==Dws1.Dw1);
         for (int w1=1; w1<Dws1.w1_first(w2); w1++)
         {
-            if (Wmn(w1,w2)!=0)
+            if (WOvM(w1-1,w2-1)(m,n)!=0.0)
             {
-                cout << "W"<< m << n <<"(" << w1 << "," << w2 << ")=" << Wmn(w1,w2) << endl;
+                cout << "W"<< m << n <<"(" << w1 << "," << w2 << ")=" << WOvM(w1-1,w2-1) << endl;
                 cout << "Dws1.w1_first=" << Dws1.w1_first << endl;
             }
-            assert(Wmn(w1,w2)==0);
+            assert(WOvM(w1-1,w2-1)(m,n)==0.0);
         }
         for (int w1=Dws1.w1_first(w2); w1<=Dws1.Dw1; w1++)
-            if (Wmn(w1,w2)!=0.0)
+            if (WOvM(w1-1,w2-1)(m,n)!=0.0)
             {
 //                assert(fabs(Wmn(w1,w2))>0.0);
-                wfa+=Wmn(w1,w2)*ContractFA(n,w1,i1,j2,Fam1);
+                wfa+=WOvM(w1-1,w2-1)(m,n)*ContractFA(n,w1,i1,j2,Fam1);
             }
     }
     return wfa;
@@ -376,15 +380,15 @@ dcmplx MPSSite::ContractWFB(int m, int w1, int i2, int j1, const SiteOperator* s
 {
     const Dw12& Dws=so->GetDw12();
     dcmplx wfb(0.0);
+    const MatrixOR& WOvM=so->GetW();
     for (int n=0; n<itsd; n++)
     {
-        const MatrixRT& Wmn=so->GetW(m,n);
-        assert(Wmn.GetNumCols()==Dws.Dw2);
+        assert(WOvM.GetNumCols()==Dws.Dw2);
         for (int w2=1; w2<=Dws.w2_last(w1); w2++)
-            if (Wmn(w1,w2)!=0.0)
+            if (WOvM(w1-1,w2-1)(m,n)!=0.0)
             {
-                assert(fabs(Wmn(w1,w2))>0.0);
-                wfb+=Wmn(w1,w2)*ContractFB(n,w2,i2,j1,Fap1);
+                assert(fabs(WOvM(w1-1,w2-1)(m,n))>0.0);
+                wfb+=WOvM(w1-1,w2-1)(m,n)*ContractFB(n,w2,i2,j1,Fap1);
             }
     }
     return wfb;
@@ -584,6 +588,7 @@ void MPSSite::Contract(dVectorT& newAs,const SiteOperator* so)
     const Dw12& Dws=so->GetDw12();
     int newD1=itsD1*Dws.Dw1;
     int newD2=itsD2*Dws.Dw2;
+    const MatrixOR& WOvM=so->GetW();
 
     for (int n=0; n<itsd; n++)
     {
@@ -591,9 +596,8 @@ void MPSSite::Contract(dVectorT& newAs,const SiteOperator* so)
         Fill(newAs[n],dcmplx(0.0));
         for (int m=0; m<itsd; m++)
         {
-            const MatrixRT& W=so->GetW(n,m);
-            assert(W.GetNumRows()==Dws.Dw1);
-            assert(W.GetNumCols()==Dws.Dw2);
+            assert(WOvM.GetNumRows()==Dws.Dw1);
+            assert(WOvM.GetNumCols()==Dws.Dw2);
             int i1=1; //i1=(w1,j1)
             for (int w1=1; w1<=Dws.Dw1; w1++)
                 for (int j1=1; j1<=itsD1; j1++,i1++)
@@ -601,7 +605,7 @@ void MPSSite::Contract(dVectorT& newAs,const SiteOperator* so)
                     int i2=1; //i2=(w2,j2)
                     for (int w2=1; w2<=Dws.Dw2; w2++)
                         for (int j2=1; j2<=itsD2; j2++,i2++)
-                            newAs[n](i1,i2)+=W(w1,w2)*itsMs[m](j1,j2);
+                            newAs[n](i1,i2)+=WOvM(w1-1,w2-1)(n,m)*itsMs[m](j1,j2);
                 }
         }
         //  cout << "newAs[" << n << "]=" << newAs[n] << endl;
@@ -621,15 +625,15 @@ MatrixCT MPSSite::ContractLRM(const MatrixCT& M, const MatrixCT& L, const Matrix
     Fill(M_tilde,dcmplx(0.0));
 
 //    cout << "ContractLRM RM=" << RM.GetLimits() << endl;
-        for (int i2=1; i2<=itsD2; i2++)
-            for (int j1=1; j1<=L.GetNumCols(); j1++)
-            {
-                dcmplx RM(0);
-                for (int j2=1; j2<=R.GetNumCols(); j2++)
-                    RM+=R(i2,j2)*M(j1,j2);
-                for (int i1=1; i1<=itsD1; i1++)
-                    M_tilde(i1,i2)+=L(i1,j1)*RM;
-            }
+    for (int i2=1; i2<=itsD2; i2++)
+        for (int j1=1; j1<=L.GetNumCols(); j1++)
+        {
+            dcmplx RM(0);
+            for (int j2=1; j2<=R.GetNumCols(); j2++)
+                RM+=R(i2,j2)*M(j1,j2);
+            for (int i1=1; i1<=itsD1; i1++)
+                M_tilde(i1,i2)+=L(i1,j1)*RM;
+        }
     return M_tilde;
 }
 /*
@@ -653,7 +657,7 @@ Matrix4CT  MPSSite::GetTransferMatrix(Direction lr) const
     const DiagonalMatrixRT& lambda=GetBond(Invert(lr))->GetSVs();
     int D=itsD1;
     Matrix4CT E(D,D,D,D);
-    for (int m=0;m<itsd;m++)
+    for (int m=0; m<itsd; m++)
     {
 //        cout << "lambda,M=" << lambda.size() << " " << itsMs[m].GetLimits() << endl;
         MatrixCT theta;
@@ -671,10 +675,10 @@ Matrix4CT  MPSSite::GetTransferMatrix(Direction lr) const
         assert(theta.GetNumCols()==D);
 //        cout << "theta,D1,D2=" << theta.GetLimits() << " " << itsD1 << " " << itsD2 << endl;
         for (index_t i1:theta.rows())
-        for (index_t i2:theta.cols())
-            for (index_t j1:theta.rows())
-            for (index_t j2:theta.cols())
-                E(i1,j1,i2,j2)+=conj(theta(i1,i2))*theta(j1,j2);
+            for (index_t i2:theta.cols())
+                for (index_t j1:theta.rows())
+                    for (index_t j2:theta.cols())
+                        E(i1,j1,i2,j2)+=conj(theta(i1,i2))*theta(j1,j2);
     }
     return E;
 }

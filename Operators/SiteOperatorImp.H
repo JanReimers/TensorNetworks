@@ -23,7 +23,7 @@ class SiteOperatorImp : public virtual SiteOperator
         SiteOperatorImp(int d, double S, SpinOperator so); //Construct with identity operator
         SiteOperatorImp(int d, const OperatorClient* O);
         SiteOperatorImp(int d, Direction lr , const MatrixRT& U, const DiagonalMatrixRT& expEvs);
-        SiteOperatorImp(int d, const TensorT& W); //Construct with W operator
+        SiteOperatorImp(const MatrixOR& W); //Construct with W operator
     public:
         virtual ~SiteOperatorImp();
         void SetNeighbours(SiteOperator* left, SiteOperator* right);
@@ -31,6 +31,7 @@ class SiteOperatorImp : public virtual SiteOperator
         virtual int             Getd   () const {return itsd;}
         virtual const Dw12&     GetDw12() const {return itsDw;}
         virtual const MatrixRT& GetW(int m, int n) const {return itsWs(m+1,n+1);}
+        virtual const MatrixOR& GetW(            ) const {return itsWOvM;}
         //
         //  Contract MPOs together
         //
