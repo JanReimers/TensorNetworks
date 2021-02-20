@@ -302,6 +302,7 @@ template <class T> void MatrixO<T>::SetV(Direction lr,const MatrixO& V)
     for (index_t i:V.rows())
         for (index_t j:V.cols())
             (*this)(i,j)=V(i,j);
+
 }
 
 template <class T> Matrix<T> MatrixO<T>::Flatten(Direction lr) const
@@ -589,6 +590,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
         break;
     }
     assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
+    SetV(lr,Q);
     return std::make_tuple(Q,RLtrans);
 }
 

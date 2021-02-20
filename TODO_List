@@ -19,11 +19,13 @@ Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
     -Move tensor product to oml side.
     Done: -Rename MPOTest1 to OvMTests.
     -COmbine:
-        -Can we simplify some code with Mul(Direction,a,b) mat mul function?
+        -Can we simplify some code with Mul(Direction,a,b) mat mul function? Where?
         Done: -Need op*(Matrix,MatrixO) to pass ul through
     Done: -SVD:
-    -Do SetV(Q) inside SVD routine
-    -Make a version of BlockQX that does SetV(Q) inside. SVD needs the current version return [Q,RL]
+    Done: -Do SetV(Q) inside SVD routine
+    Wont Do: -Make a version of BlockQX that does SetV(Q) inside. SVD needs the current version return [Q,RL]
+        Returning both Q and RL is very important for unit testing.
+        So we would need two version of each .. not worth it.
     Done: -Grow test it is should always be zero based? No!!  Zero or 1.
     -OperatorElement op=(T), allow assign 1 and 0.  THen try Fill(OvM,0.0)
     -OperatorElement: recognize known operators for pretty print.

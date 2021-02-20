@@ -76,9 +76,8 @@ double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
 double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 {
     auto [Q,RL]=itsWs.BlockSVD(lr,comp); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
-    itsWs.SetV(lr,Q); //Could be move inside BlockQX
-    SetLimits();
     GetNeighbour(lr)->QLTransfer(lr,RL);
+    SetLimits();
     return itsWs.GetTruncationError();
 }
 
@@ -86,9 +85,9 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 void SiteOperatorImp::CanonicalForm(Direction lr)
 {
     auto [Q,RL]=itsWs.BlockQX(lr); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
-    itsWs.SetV(lr,Q); //Could be move inside BlockQX
-    SetLimits();
+    itsWs.SetV(lr,Q); // Can'y move this inside BlockQX because SVD needs to modify Q before call SetV
     GetNeighbour(lr)->QLTransfer(lr,RL);
+    SetLimits();
 }
 
 
