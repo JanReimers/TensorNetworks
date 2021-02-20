@@ -4,7 +4,6 @@
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/iMPO.H"
 #include "TensorNetworks/SiteOperator.H"
-#include "TensorNetworks/Dw12.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/TNSLogger.H"
@@ -134,10 +133,9 @@ MPSSite::dVectorT  iTEBDStateImp::ContractTheta(const iMPO* o,ThetaType tt) cons
             assert(false);
         break;
     }
-    assert(soA->GetDw12().Dw2==soB->GetDw12().Dw1);
-    assert(soA->GetDw12().Dw1==soB->GetDw12().Dw2);
-    int Dw2=soA->GetDw12().Dw2;
-    int Dw1=soA->GetDw12().Dw1; //Same as Dw3
+    assert(soA->GetRanges().Dw2==soB->GetRanges().Dw1);
+    assert(soA->GetRanges().Dw1==soB->GetRanges().Dw2);
+    auto [Dw1,Dw2]=soA->GetDws();
     //
     //  Create empty theta tensor
     //
@@ -211,10 +209,9 @@ MPSSite::dVectorT  iTEBDStateImp::ContractThetaDw(const iMPO* o) const
     assert(o->GetL()==2);
     const SiteOperator* soA=o->GetSiteOperator(1);
     const SiteOperator* soB=o->GetSiteOperator(2);
-    assert(soA->GetDw12().Dw2==soB->GetDw12().Dw1);
-    assert(soA->GetDw12().Dw1==soB->GetDw12().Dw2);
-    int Dw2=soA->GetDw12().Dw2;
-    int Dw1=soA->GetDw12().Dw1; //Same as Dw3
+    assert(soA->GetRanges().Dw2==soB->GetRanges().Dw1);
+    assert(soA->GetRanges().Dw1==soB->GetRanges().Dw2);
+    auto [Dw1,Dw2]=soA->GetDws();
     //
     //  Create empty theta tensor
     //
@@ -540,10 +537,11 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
 
     const SiteOperator* so=o->GetSiteOperator(1);
 //    so->Report(cout); cout << endl;
-    int Dw=so->GetDw12().Dw1;
-    assert(Dw==so->GetDw12().Dw2);
+    const OpRange& wr=so->GetRanges();
     const MatrixOR& W=so->GetW();
     assert(IsLowerTriangular(W));
+    int Dw=wr.Dw1;
+    assert(Dw==wr.Dw2);
 //
 //  Fill out E[5]
 //
@@ -730,11 +728,13 @@ double iTEBDStateImp::GetExpectationDw1 (const MPO* o,int center) const
 
     const SiteOperator* soA=o->GetSiteOperator(1);
     const SiteOperator* soB=o->GetSiteOperator(2);
-    int DwA2=soA->GetDw12().Dw2;
+    const OpRange& wr=soA->GetRanges();
+    int DwA2=wr.Dw2;
 #ifdef DEBUG
-    int DwA1=soA->GetDw12().Dw1;
-    int DwB1=soB->GetDw12().Dw1;
-    int DwB2=soB->GetDw12().Dw2;
+    int DwA1=wr.Dw1;
+    const OpRange& wrB=soB->GetRanges();
+    int DwB1=wrB.Dw1;
+    int DwB2=wrB.Dw2;
 #endif
     assert(DwA1==1);
     assert(DwB2==1);

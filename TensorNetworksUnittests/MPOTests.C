@@ -346,9 +346,9 @@ TEST_F(MPOTests,TestL2MPOTrotter2_S12)
     double truncError=expH->Compress(TensorNetworks::Std,0,epsMPO);
     for (int is=2;is<=L-1;is++)
     {
-        TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
-        EXPECT_EQ(Dw.Dw1,4);
-        EXPECT_EQ(Dw.Dw2,4);
+        auto [Dw1,Dw2]=expH->GetSiteOperator(is)->GetDws();
+        EXPECT_EQ(Dw1,4);
+        EXPECT_EQ(Dw2,4);
     }
     EXPECT_LT(truncError,epsMPO*50);
 }
@@ -374,9 +374,9 @@ TEST_F(MPOTests,TestL2iMPOTrotter1)
 //    expH->Report(cout);
     for (int is=1;is<=L;is++)
     {
-        TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
-        EXPECT_EQ(Dw.Dw1,4);
-        EXPECT_EQ(Dw.Dw2,4);
+        auto [Dw1,Dw2]=expH->GetSiteOperator(is)->GetDws();
+        EXPECT_EQ(Dw1,4);
+        EXPECT_EQ(Dw2,4);
     }
 }
 TEST_F(MPOTests,TestL2iMPOTrotter2)
@@ -388,9 +388,9 @@ TEST_F(MPOTests,TestL2iMPOTrotter2)
 //    expH->Report(cout);
     for (int is=1;is<=L;is++)
     {
-        TensorNetworks::Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
-        EXPECT_EQ(Dw.Dw1,4);
-        EXPECT_EQ(Dw.Dw2,4);
+        auto [Dw1,Dw2]=expH->GetSiteOperator(is)->GetDws();
+        EXPECT_EQ(Dw1,4);
+        EXPECT_EQ(Dw2,4);
     }
 }
 //TEST_F(MPOTests,TestL2iMPOTrotter4)

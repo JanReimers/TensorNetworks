@@ -2,10 +2,34 @@
 #define SITEOPERATOR_H
 
 #include "TensorNetworks/Namespace.H"
+#include "oml/imp/index_t.h"
+#include <vector>
+
+class MatLimits;
 
 namespace TensorNetworks
 {
 
+struct Range
+{
+    index_t Low,High;
+};
+
+typedef std::vector<Range> vRange;
+
+struct OpRange
+{
+    vRange rows; //Tight range for each row.
+    vRange cols; //Tight range for each col.
+    Range  row;  //Full range
+    Range  col;  //Full range
+    int    Dw1,Dw2; //Number of rows and cols.
+
+    void resize(const MatLimits& l);
+    void NonZeroAt(index_t i,index_t j);
+};
+
+std::ostream& operator<<(std::ostream&,const OpRange&);
 //
 //  The implementation of this class cache all the  <m|W|n> matrix elements
 //  so it can used in hot loops.
@@ -13,12 +37,15 @@ namespace TensorNetworks
 class SiteOperator
 {
 public:
+    typedef std::tuple<index_t  ,index_t   > IIType;
+
     SiteOperator() {};
     virtual ~SiteOperator() {};
 
-    virtual int         Getd   () const=0;
-    virtual const Dw12& GetDw12() const=0;
-    virtual double      GetFrobeniusNorm() const=0;
+    virtual int            Getd   () const=0;
+    virtual IIType         GetDws () const=0;
+    virtual const OpRange& GetRanges() const=0; //Summation ranges for contractions. Use this to avoid contracting over zeros elements
+    virtual double         GetFrobeniusNorm() const=0;
     //
     //  Get Operator Valued Matrix
     //

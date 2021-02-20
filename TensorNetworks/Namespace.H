@@ -17,7 +17,6 @@ namespace TensorNetworks
     class iMPO;
 
     class SiteOperator;
-    class Dw12;
     class SpinCalculator;
     class OperatorClient;
     class OperatorClient;

@@ -9,13 +9,13 @@ namespace TensorNetworks
 SiteOperatorLeft::SiteOperatorLeft(int d)
     : SiteOperatorImp(d)
 {
-    Init_lr(SiteOperatorImp::itsDw.Dw1);
+    Init_lr(SiteOperatorImp::itsOpRange.Dw1);
 }
 
 SiteOperatorLeft::SiteOperatorLeft(int d, double S, SpinOperator so) //Construct spin operator
     : SiteOperatorImp(d,S,so)
 {
-    Init_lr(SiteOperatorImp::itsDw.Dw1);
+    Init_lr(SiteOperatorImp::itsOpRange.Dw1);
 }
 
 
@@ -25,7 +25,7 @@ SiteOperatorLeft::SiteOperatorLeft(int d, double S, SpinOperator so) //Construct
 SiteOperatorLeft::SiteOperatorLeft(int d, const OperatorClient* H)
     : SiteOperatorImp(d,H)
 {
-    Init_lr(SiteOperatorImp::itsDw.Dw1);
+    Init_lr(SiteOperatorImp::itsOpRange.Dw1);
 }
 
 
@@ -45,12 +45,12 @@ SiteOperatorLeft::~SiteOperatorLeft()
 
 void SiteOperatorLeft::Init_lr(int oneIndex)
 {
-    MatrixRT l(0,0,0,SiteOperatorImp::itsDw.Dw1-1);
+    MatrixRT l(0,0,0,SiteOperatorImp::itsOpRange.Dw1-1);
     Fill(l,0.0);
     l(0,oneIndex-1)=1.0;
 
     itsWs=l*itsWs;
-    itsDw.Dw1=1;
+    itsOpRange.Dw1=1;
     SetLimits();
     itsWs.SetUpperLower(Lower);
 }

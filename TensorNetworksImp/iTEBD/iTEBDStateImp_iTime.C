@@ -4,7 +4,6 @@
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/iMPO.H"
 #include "TensorNetworks/SiteOperator.H"
-#include "TensorNetworks/Dw12.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/TNSLogger.H"
@@ -162,12 +161,14 @@ DiagonalMatrixRT Extend(const DiagonalMatrixRT& lambda,const iMPO* o)
     // Extract Dw from the MPO
     assert(o->GetL()==2);
     const SiteOperator* soA=o->GetSiteOperator(1);
+    const OpRange& wr=soA->GetRanges();
 #if DEBUG
     const SiteOperator* soB=o->GetSiteOperator(2);
-    assert(soA->GetDw12().Dw2==soB->GetDw12().Dw1);
-    assert(soA->GetDw12().Dw1==soB->GetDw12().Dw2);
+    const OpRange& wrB=soB->GetRanges();
+    assert(wr.Dw2==wrB.Dw1);
+    assert(wr.Dw1==wrB.Dw2);
 #endif
-    int Dw=soA->GetDw12().Dw1; //Same as Dw3
+    int Dw=wr.Dw1; //Same as Dw3
     //
     //  Now load Dw copies of lb into the extended lambdaB
     //

@@ -3,7 +3,6 @@
 
 #include "TensorNetworks/Namespace.H"
 #include "TensorNetworks/SiteOperator.H"
-#include "TensorNetworks/Dw12.H"
 #include "Operators/OperatorValuedMatrix.H"
 #include "TensorNetworksImp/Typedefs.H"
 #include "oml/matrix.h"
@@ -28,9 +27,10 @@ class SiteOperatorImp : public virtual SiteOperator
         virtual ~SiteOperatorImp();
         void SetNeighbours(SiteOperator* left, SiteOperator* right);
 
-        virtual int             Getd   () const {return itsd;}
-        virtual const Dw12&     GetDw12() const {return itsDw;}
-        virtual const MatrixOR& GetW   () const {return itsWs;}
+        virtual int             Getd     () const {return itsd;}
+        virtual const OpRange&  GetRanges() const {return itsOpRange;}
+        virtual IIType          GetDws   () const {return std::make_tuple(itsOpRange.Dw1,itsOpRange.Dw2);}
+        virtual const MatrixOR& GetW     () const {return itsWs;}
         //
         //  Contract MPOs together
         //
@@ -74,7 +74,8 @@ class SiteOperatorImp : public virtual SiteOperator
     protected:
 
         int      itsd; //2*S+1
-        Dw12     itsDw;
+//        Dw12     itsDw;
+        OpRange  itsOpRange;
         double   itsTruncationError;
         MatrixOR itsWs; //Operator values matrix version of W.
         SiteOperatorImp* itsLeft_Neighbour;

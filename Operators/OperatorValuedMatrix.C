@@ -395,7 +395,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
     MatLimits RLlim;
     VecLimits rlim=this->GetLimits().Row;
     VecLimits clim=this->GetLimits().Col;
-    int RLlow;
+    int RLlow=0;
 
     switch (itsUL)
     {

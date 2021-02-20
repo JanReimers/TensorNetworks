@@ -192,10 +192,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworks/CheckSpin.H" />
-		<Unit filename="TensorNetworks/Dw12.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworks/Dw12.H" />
 		<Unit filename="TensorNetworks/Enums.H" />
 		<Unit filename="TensorNetworks/Epsilons.C">
 			<Option compilerVar="CC" />
@@ -220,6 +216,9 @@
 		</Unit>
 		<Unit filename="TensorNetworks/MPS.H" />
 		<Unit filename="TensorNetworks/Namespace.H" />
+		<Unit filename="TensorNetworks/OpRange.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="TensorNetworks/SVCompressor.H" />
 		<Unit filename="TensorNetworks/SiteOperator.H" />
 		<Unit filename="TensorNetworks/TNSLogger.C">

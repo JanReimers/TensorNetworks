@@ -1,7 +1,6 @@
 #include "TensorNetworks/MPO.H"
 #include "Operators/OperatorValuedMatrix.H"
 #include "TensorNetworks/SiteOperator.H"
-#include "TensorNetworks/Dw12.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "oml/matrix.h"
@@ -20,7 +19,7 @@ int MPO::GetMaxDw() const
     int Dw=0;
     for (int ia=1;ia<=L;ia++)
     {
-        Dw=Max(Dw,GetSiteOperator(ia)->GetDw12().Dw2);
+        Dw=Max(Dw,GetSiteOperator(ia)->GetRanges().Dw2);
     }
     return Dw;
 }

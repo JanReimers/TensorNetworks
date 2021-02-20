@@ -2,7 +2,6 @@
 #include "TensorNetworksImp/MPS/Bond.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/SVCompressor.H"
-#include "TensorNetworks/Dw12.H"
 #include "NumericalMethods/LapackSVDSolver.H"
 #include "NumericalMethods/LapackQRSolver.H"
 #include "NumericalMethods/ArpackEigenSolver.H"

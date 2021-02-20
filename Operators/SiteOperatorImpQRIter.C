@@ -38,8 +38,8 @@ bool Shrink(MatrixRT& L, MatrixOR& Q,double eps)
 
 void SiteOperatorImp::iCanonicalFormQRIter(Direction lr)
 {
-    assert(itsDw.Dw1==itsDw.Dw2); //Make sure we are square
-    int X=itsDw.Dw1-2; //Chi
+    assert(itsOpRange.Dw1==itsOpRange.Dw2); //Make sure we are square
+    int X=itsOpRange.Dw1-2; //Chi
     MatrixRT Lp(0,X+1,0,X+1),Id(0,X+1,0,X+1);
     Unit(Lp);
     Unit(Id);
@@ -49,7 +49,7 @@ void SiteOperatorImp::iCanonicalFormQRIter(Direction lr)
     do
     {
         auto [Q,L]=itsWs.BlockQX(lr); //Solves V=Q*L
-        X=itsDw.Dw1-2; //Chi
+        X=itsOpRange.Dw1-2; //Chi
         assert(L.GetNumRows()==X+2);
         assert(L.GetNumCols()==X+2);
         if (Shrink(L,Q,1e-13))
@@ -72,7 +72,7 @@ void SiteOperatorImp::iCanonicalFormQRIter(Direction lr)
         //
         itsWs=L*itsWs; //ul gets lost in mul op.
         assert(itsWs.GetUpperLower()==Lower);
-        itsDw.Dw1=L.GetNumRows();
+        itsOpRange.Dw1=L.GetNumRows();
         Lp=MatrixRT(L*Lp);
 
     } while (eta>1e-13);

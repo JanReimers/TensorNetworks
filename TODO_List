@@ -1,22 +1,24 @@
 
--Replace Dw12 class with
-    1) int [Dw1,Dw2] GetDws();
-    2) OpRange {first} {last}
-    3) Setp up
-            OpRange [Dw1,Dw2] GetOpRanges()
+SiteOperatorImp:
+    Done: -Replace Dw12 class with
+        1) int [Dw1,Dw2] GetDws();
+        2) OpRange {first} {last}
+        3) Setp up
+                OpRange [Dw1,Dw2] GetOpRanges()
     -OR Override rows() cols() to only iterate over non-zero ranges of W
     -OR  just make a sparse MatrixOR and only store nonzero ops!
--Add upper operators to unit tests.
+    -Add upper operators to unit tests.
+    -SetLimits using zero as criteria.  Should fabs(W)>eps
+        BUT we need to get then SAME eps into the contraction routines.
+    -SiteOp should just be a MatrixOR without all the advanced functions
 
 Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
     Done: -Too much mixing up of S and d.  Pick one.
-    -SiteOp should just be a MatrixOR without all the advanced functions
-    -SetLimits using zero as criteria.  Should fabs(W)>eps
-        BUT we need to get then SAME eps into the contraction routines.
     -Get CanonicalFOrm working for exp(H)
     -Move Upper/Lower enum to oml side
     -Move IsTriangular(ul,m) to oml side.
     -Move tensor product to oml side.
+    -oml move index_t.h up from Imp folder.
     Done: -Rename MPOTest1 to OvMTests.
     -COmbine:
         -Can we simplify some code with Mul(Direction,a,b) mat mul function? Where?
@@ -27,7 +29,7 @@ Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
         Returning both Q and RL is very important for unit testing.
         So we would need two version of each .. not worth it.
     Done: -Grow test it is should always be zero based? No!!  Zero or 1.
-    -OperatorElement op=(T), allow assign 1 and 0.  THen try Fill(OvM,0.0)
+    Done: -OperatorElement op=(T), allow assign 1 and 0.  THen try Fill(OvM,0.0)
     -OperatorElement: recognize known operators for pretty print.
         -One way is to solve Op=a*I + b*Sx + c*Sy + d*Sz for abcd.  For d>2 this is not guaranteed to solve.
         -is it as easy as a=Tr(O,I) ?

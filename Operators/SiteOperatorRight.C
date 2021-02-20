@@ -43,12 +43,12 @@ SiteOperatorRight::~SiteOperatorRight()
 
 void SiteOperatorRight::Init_lr(int oneIndex)
 {
-    MatrixRT r(0,SiteOperatorImp::itsDw.Dw2-1,0,0);
+    MatrixRT r(0,SiteOperatorImp::itsOpRange.Dw2-1,0,0);
     Fill(r,0.0);
     r(oneIndex-1,0)=1.0;
 
     itsWs=itsWs*r;
-    itsDw.Dw2=1;
+    itsOpRange.Dw2=1;
     SetLimits();
     itsWs.SetUpperLower(Lower);
 }

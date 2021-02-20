@@ -3,7 +3,6 @@
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/MPO.H"
 #include "TensorNetworks/SiteOperator.H"
-#include "TensorNetworks/Dw12.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/Factory.H"
 #include "TensorNetworks/TNSLogger.H"

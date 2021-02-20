@@ -83,7 +83,7 @@ double SiteOperatorImp::Contract_sM(int M) const
 }
 double SiteOperatorImp::Contract_sM1(int M) const
 {
-    int X=itsDw.Dw1-2;
+    int X=itsOpRange.Dw1-2;
     double sM=0.0;
     for (int a=1;a<=X+1;a++)
         sM+=ContractT(M,a,M,a);
@@ -92,8 +92,8 @@ double SiteOperatorImp::Contract_sM1(int M) const
 }
 void SiteOperatorImp::iCanonicalFormTriangular(Direction lr)
 {
-    assert(itsDw.Dw1==itsDw.Dw2); //Make sure we are square
-    int X=itsDw.Dw1-2; //Chi
+    assert(itsOpRange.Dw1==itsOpRange.Dw2); //Make sure we are square
+    int X=itsOpRange.Dw1-2; //Chi
     MatLimits lim(0,X+1,0,X+1);
     MatrixRT RT(lim); //Accumulated gauge transform
     LinearSolver<double>* solver=new LapackLinearSolver<double>();;

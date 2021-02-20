@@ -102,12 +102,12 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
     case DRight:
     {
         int N1=L.GetNumCols(); //N1=0 on the first site.
-        if (N1>0 && N1!=itsDw.Dw2)
+        if (N1>0 && N1!=itsOpRange.Dw2)
         {
             if (itsWs.GetNumCols()!=L.GetNumRows())
-                NewBondDimensions(itsDw.Dw1,N1,true);
+                NewBondDimensions(itsOpRange.Dw1,N1,true);
             else
-                itsDw.Dw2=N1; //The contraction below will automatically reshape the Ws.
+                itsOpRange.Dw2=N1; //The contraction below will automatically reshape the Ws.
         }
         assert(itsWs.GetColLimits()==L.GetRowLimits());
         itsWs=itsWs*L;
@@ -116,12 +116,12 @@ void SiteOperatorImp::QLTransfer(Direction lr,const MatrixRT& L)
     case DLeft:
     {
         int N1=L.GetNumRows(); //N1=0 on the first site.
-        if (N1>0 && N1!=itsDw.Dw1)
+        if (N1>0 && N1!=itsOpRange.Dw1)
         {
             if (itsWs.GetNumRows()!=L.GetNumCols())
-                NewBondDimensions(N1,itsDw.Dw2,true);
+                NewBondDimensions(N1,itsOpRange.Dw2,true);
             else
-                itsDw.Dw1=N1; //The contraction below will automatically reshape the As.
+                itsOpRange.Dw1=N1; //The contraction below will automatically reshape the As.
         }
         assert(L.GetColLimits()==itsWs.GetRowLimits());
         itsWs=L*itsWs;

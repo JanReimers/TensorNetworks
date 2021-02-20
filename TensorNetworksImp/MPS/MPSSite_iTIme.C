@@ -1,10 +1,7 @@
 #include "TensorNetworksImp/MPS/MPSSite.H"
 #include "TensorNetworksImp/MPS/Bond.H"
 #include "TensorNetworks/SiteOperator.H"
-#include "TensorNetworks/Dw12.H"
-//#include "oml/minmax.h"
 #include "oml/cnumeric.h"
-//#include "oml/vector_io.h"
 #include "oml/random.h"
 #include <iostream>
 #include <iomanip>

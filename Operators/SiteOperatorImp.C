@@ -11,7 +11,6 @@ namespace TensorNetworks
 //
 SiteOperatorImp::SiteOperatorImp(int d)
     : itsd(d)
-    , itsDw(1,1)
     , itsTruncationError(0.0)
     , itsWs(1,1,d,Lower)
 {
@@ -35,7 +34,6 @@ SiteOperatorImp::SiteOperatorImp(int d, const OperatorClient* H)
     : SiteOperatorImp(d)
 {
     itsWs=H->GetMatrixO(Lower);
-    itsDw=Dw12(itsWs.GetNumRows(),itsWs.GetNumCols());
     SetLimits();
 }
 
@@ -53,7 +51,6 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const Di
     if (lr==DLeft)
     {
         itsWs.SetChi12(-1,Dw-2,false);
-        itsDw=Dw12(1,Dw);
         int i1=1; //Linear index for (m,n) = 1+m+p*n
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++,i1++)
@@ -63,7 +60,6 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const Di
     else if (lr==DRight)
     {
         itsWs.SetChi12(Dw-2,-1,false);
-        itsDw=Dw12(Dw,1);
         int i2=1; //Linear index for (m,n) = 1+m+p*n
         for (int m=0; m<itsd; m++)
             for (int n=0; n<itsd; n++,i2++)
@@ -85,7 +81,6 @@ SiteOperatorImp::SiteOperatorImp(const MatrixOR& W)
     : SiteOperatorImp(W.Getd())
 {
     itsWs=W;
-    itsDw=Dw12(itsWs.GetNumRows(),itsWs.GetNumCols());
     SetLimits();
 }
 
@@ -125,23 +120,12 @@ SiteOperatorImp* SiteOperatorImp::GetNeighbour(Direction lr) const
 
 void SiteOperatorImp::SetLimits()
 {
-    itsDw.Dw1=itsWs.GetNumRows();
-    itsDw.Dw2=itsWs.GetNumCols();
-    itsDw.w1_first.SetLimits(itsDw.Dw2);
-    itsDw.w2_last .SetLimits(itsDw.Dw1);
-//    Fill(Dw.w1_first,1);
-//    Fill(DW.w2_last ,Dw.Dw2);
-
-    Fill(itsDw.w1_first,itsDw.Dw1);
-    Fill(itsDw.w2_last ,1);
+    const MatLimits& l=itsWs.GetLimits();
+    itsOpRange.resize(itsWs.GetLimits());
     for (index_t w1:itsWs.rows())
         for (index_t w2:itsWs.cols())
             if (fabs(itsWs(w1,w2))>0.0) //TOT should be using and eps~1e-15 here.
-            {
-                if (itsDw.w1_first(w2+1)>w1+1) itsDw.w1_first(w2+1)=w1+1;
-                if (itsDw.w2_last (w1+1)<w2+1) itsDw.w2_last (w1+1)=w2+1;
-            }
-
+                itsOpRange.NonZeroAt(w1,w2);
 }
 
 void  SiteOperatorImp::AccumulateTruncationError(double err)
@@ -154,26 +138,17 @@ void SiteOperatorImp::Product(const SiteOperator* O2)
 {
     const SiteOperatorImp* O2i(dynamic_cast<const SiteOperatorImp*>(O2));
     assert(O2i);
-    Dw12 O2Dw=O2i->itsDw;
-    Dw12 Dw(itsDw.Dw1*O2Dw.Dw1,itsDw.Dw2*O2Dw.Dw2);
-
-//    cout << "MPO D1,D2=" << itsDw12.Dw1 << " " << itsDw12.Dw2 << " ";
-//    cout << "O2  D1,D2=" << O2Dw.Dw1 << " " << O2Dw.Dw2 << " ";
-//    cout << "New D1,D2=" << Dw.Dw1 << " " << Dw.Dw2 << endl;
-
-//    cout << "itsWOvM=" << itsWOvM.GetLimits() << " " << itsWOvM.GetUpperLower() << endl;
-//    cout << "O2i->itsWOvM=" << O2i->itsWOvM.GetLimits()<< " " <<  O2i->itsWOvM.GetUpperLower()  << endl;
     itsWs=TensorProduct(itsWs,O2i->itsWs);
-    itsDw=Dw;
     SetLimits();
+
 }
 
 
 void SiteOperatorImp::Report(std::ostream& os) const
 {
     os
-    << std::setw(3) << itsDw.Dw1 << " "
-    << std::setw(3) << itsDw.Dw2 << "   "
+    << std::setw(3) << itsOpRange.Dw1 << " "
+    << std::setw(3) << itsOpRange.Dw2 << "   "
     << std::scientific << std::setprecision(1) << itsTruncationError
     << " " << std::fixed << std::setprecision(1) << std::setw(5) << GetFrobeniusNorm()
     << " " << std::setw(4) << GetNormStatus(1e-13)
@@ -212,7 +187,7 @@ double SiteOperatorImp::GetFrobeniusNorm() const
 
 char SiteOperatorImp::GetNormStatus(double eps) const
 {
-    if (itsDw.Dw1*itsDw.Dw2>4096) return '?';
+    if (itsOpRange.Dw1*itsOpRange.Dw2>4096) return '?';
     char ret='W'; //Not normalized
     {
         MatrixOR V=itsWs.GetV(DLeft);
