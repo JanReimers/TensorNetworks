@@ -72,8 +72,7 @@ template <class T> MatrixO<T>::MatrixO(int Dw1, int Dw2,int d,TriType ul)
     , itsTruncationError(0)
     , itsUL(ul)
 {
-    double S=0.5*(d-1);
-    OperatorElement<T> Z=OperatorZ(S);
+    OperatorElement<T> Z=OperatorZ(d);
     Fill(*this,Z);
 }
 
@@ -95,8 +94,7 @@ template <class T> void MatrixO<T>::SetChi12(int X1,int X2,bool preserve_data)
         auto [X1o,X2o]=GetChi12(); //Save old size
         Base::SetLimits(0,X1+1,0,X2+1,preserve_data); //Save Data?
 
-        double S=0.5*(itsd-1.0);
-        OperatorElement<T> Z=OperatorZ(S);
+        OperatorElement<T> Z=OperatorZ(itsd);
         if (preserve_data)
         {
             // Zero new rows and columns (if any)

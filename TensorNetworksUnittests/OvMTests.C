@@ -239,7 +239,7 @@ TEST_F(OvMTests,OperatorElement1)
 
 TEST_F(OvMTests,OperatorElement2)
 {
-    OperatorElement<double> Oe(2,0.5);
+    OperatorElement<double> Oe(0.5);
     Oe=1.0;
     EXPECT_EQ(Oe(0,0),1.0);
     EXPECT_EQ(Oe(1,0),0.0);
@@ -255,6 +255,15 @@ TEST_F(OvMTests,OperatorElement2)
     EXPECT_EQ(Oe(1,0),0.0);
     EXPECT_EQ(Oe(0,1),0.0);
     EXPECT_EQ(Oe(1,1),1.1);
+}
+TEST_F(OvMTests,OperatorElement3)
+{
+    double f=1.1;
+    OperatorElement<double> Oe(2,f);
+    EXPECT_EQ(Oe(0,0),f);
+    EXPECT_EQ(Oe(1,0),0.0);
+    EXPECT_EQ(Oe(0,1),0.0);
+    EXPECT_EQ(Oe(1,1),f);
 }
 
 

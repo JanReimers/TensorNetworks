@@ -9,7 +9,7 @@
 -Add upper operators to unit tests.
 
 Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
-    -TOo much mixing up of S and d.  Pick one.
+    Done: -Too much mixing up of S and d.  Pick one.
     -SiteOp should just be a MatrixOR without all the advanced functions
     -SetLimits using zero as criteria.  Should fabs(W)>eps
         BUT we need to get then SAME eps into the contraction routines.

@@ -48,7 +48,7 @@ public:
     MatrixO<T>& operator*=(const T& s);
 
     int       Getd() const {return itsd;}
-    double    GetS() const {return 0.5*(itsd-1);}
+    double    GetS() const {return dtoS(itsd);}
     double    GetTruncationError() const {return itsTruncationError;}
     TriType   GetUpperLower() const {return itsUL;}
     T         GetTrace(int a, int b, int c, int d) const;
@@ -105,8 +105,7 @@ template <class T> MatrixO<T> operator-(const MatrixO<T>& a, const MatrixO<T>& b
     assert(a.Getd     ()==b.Getd     ());
     TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
     MatrixO<T> ret(a.Getd(),ul,a.GetLimits());
-    double S=0.5*(a.Getd()-1.0);
-    OperatorElement<T> Z=OperatorZ(S);
+    OperatorElement<T> Z=OperatorZ(a.Getd());
     Fill(ret,Z);
     for (index_t i:a.rows())
         for (index_t j:a.cols())
@@ -192,13 +191,15 @@ template <class T> MatrixO<T> TensorProduct(const MatrixO<T>& a, const MatrixO<T
 template <class T> MatrixO<T> HorizontalProduct(const MatrixO<T>& a, const MatrixO<T>& b)
 {
     assert(a.GetColLimits()==b.GetRowLimits());
+    // Establish limits/d/ul
     MatLimits lim(a.GetRowLimits(),b.GetColLimits());
     int d=a.Getd()*b.Getd();
     TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
+    // Create empty results matrix
     MatrixO<T> ret(d,ul,lim);
-    double S=0.5*(d-1);
-    OperatorElement<T> Z=OperatorZ(S);
+    OperatorElement<T> Z=OperatorZ(d);
     Fill(ret,Z);
+    //  Do the regular matrix product with tensor products for each element product.
     for (index_t w1:a.rows())
         for (index_t w3:b.cols())
             for (index_t w2:a.cols())
@@ -228,14 +229,16 @@ template <class T> bool IsTriangular(TriType ul,const Matrix<T>& m,double eps)
 
 template <class T> void Fill(MatrixO<T>& m, T f)
 {
-    int d=m.Getd();
-    OperatorElement<T> foe(d,0.5*(d-1));
-    OperatorElement<T> z(d,0.5*(d-1));
-    foe=f;
-    z=0.0;
+    OperatorElement<T> foe(m.Getd(),f);
+    Fill(m,foe);
+}
+
+template <class T> void Fill(MatrixO<T>& m, const OperatorElement<T>& f)
+{
+    assert(m.Getd()==f.Getd());
     for (index_t i:m.rows())
         for (index_t j:m.cols())
-            m(i,j)= (i==j) ? foe : z;
+            m(i,j)= f;
 }
 
 template <class T> void Unit(MatrixO<T>& m)

@@ -1,30 +1,47 @@
 #include "Operators/OperatorElement.H"
 #include "TensorNetworksImp/SpinCalculator.H"
+#include "TensorNetworks/CheckSpin.H"
 
 namespace TensorNetworks
 {
 
-template <class T> OperatorElement<T>::OperatorElement(int d,double S)
+template <class T> OperatorElement<T>::OperatorElement(int d)
 : Matrix<T>(0,d-1,0,d-1)
-, itsS(S)
-, itsd(2*S+1)
+, itsd(d)
 {
     Fill(*this,T(0.0));
-    //ctor
+}
+
+template <class T> OperatorElement<T>::OperatorElement(int d,T fillValue)
+: OperatorElement(d)
+{
+    *this=OperatorI(d)*fillValue;
 }
 
 template <class T> OperatorElement<T>::OperatorElement()
 : Matrix<T>()
-, itsS(0.0)
 , itsd(0)
 {
 }
 
-template <class T> OperatorElement<T>::OperatorElement(int)
+template <class T> OperatorElement<T>::OperatorElement(T S)
 : Matrix<T>()
-, itsS(0.0)
 , itsd(0)
 {
+    if (isValidSpin(S))
+    {
+        itsd=Stod(S);
+        Matrix<T>::SetLimits(0,itsd-1,0,itsd-1);
+    }
+    else if (S==0.0)
+    {
+        //S is not a spin. This gets called by oml matrix mul routines.
+    }
+    else
+    {
+        std::cerr << "OperatorElement(T S): Illegal spin value S=" << S << std::endl;
+        assert(false);
+    }
 }
 
 template <class T> OperatorElement<T>::~OperatorElement()
@@ -37,7 +54,7 @@ template <class T> OperatorElement<T>::~OperatorElement()
 //
 template <class T> OperatorElement<T>& OperatorElement<T>::operator=(T s)
 {
-    *this=OperatorI(itsS)*s;
+    *this=OperatorI(itsd)*s;
     return *this;
 }
 
@@ -69,7 +86,7 @@ template <> OperatorElement<double> OperatorElement<double>::Create(SpinOperator
 
 
  OperatorI::OperatorI(double S)
- : OperatorElement(2*S+1,S)
+ : OperatorElement(Stod(S))
  {
      for (int m=0;m<itsd;m++)
      for (int n=0;n<itsd;n++)
@@ -77,14 +94,14 @@ template <> OperatorElement<double> OperatorElement<double>::Create(SpinOperator
  }
 
 OperatorZ::OperatorZ(double S)
- : OperatorElement(2*S+1,S)
+ : OperatorElement(Stod(S))
  {
      Fill(*this,0.0);
  }
 
 
  OperatorSz::OperatorSz(double S)
- : OperatorElement(2*S+1,S)
+ : OperatorElement(Stod(S))
  {
      SpinCalculator sc(S);
      for (int m=0;m<itsd;m++)
@@ -93,7 +110,7 @@ OperatorZ::OperatorZ(double S)
  }
 
 OperatorSy::OperatorSy(double S)
- : OperatorElement(2*S+1,S)
+ : OperatorElement(Stod(S))
  {
      SpinCalculator sc(S);
      for (int m=0;m<itsd;m++)
@@ -102,7 +119,7 @@ OperatorSy::OperatorSy(double S)
  }
 
 OperatorSx::OperatorSx(double S)
- : OperatorElement(2*S+1,S)
+ : OperatorElement(Stod(S))
  {
      SpinCalculator sc(S);
      for (int m=0;m<itsd;m++)
@@ -111,7 +128,7 @@ OperatorSx::OperatorSx(double S)
  }
 
 OperatorSp::OperatorSp(double S)
- : OperatorElement(2*S+1,S)
+ : OperatorElement(Stod(S))
  {
      SpinCalculator sc(S);
      for (int m=0;m<itsd;m++)
@@ -120,7 +137,7 @@ OperatorSp::OperatorSp(double S)
  }
 
 OperatorSm::OperatorSm(double S)
- : OperatorElement(2*S+1,S)
+ : OperatorElement(Stod(S))
  {
      SpinCalculator sc(S);
      for (int m=0;m<itsd;m++)

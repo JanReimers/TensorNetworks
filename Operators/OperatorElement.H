@@ -14,8 +14,9 @@ template <class T> class OperatorElement : public Matrix<T>
 {
 public:
     OperatorElement();
-    OperatorElement(int fil); //Required by mat mul routines
-    OperatorElement(int d,double S);
+    OperatorElement(T S); //Required by mat mul routines
+    OperatorElement(int d); //Fill with 0s
+    OperatorElement(int d,T fillValue); //FIll with I*fullValue
     virtual ~OperatorElement();
 
     OperatorElement& operator=(T s);
@@ -25,13 +26,16 @@ public:
         return *this;
     }
 
+    int Getd() const {return itsd;}
+
     static OperatorElement Create(SpinOperator,double S);
 
 protected:
-    double itsS;
     int    itsd;
 };
 
+inline int    Stod(double S) {return 2*S+1;}
+inline double dtoS(int    d) {return 0.5*(d-1);}
 
 typedef OperatorElement<double> OperatorElementR;
 typedef OperatorElement<dcmplx> OperatorElementC;
@@ -41,6 +45,7 @@ class OperatorI : public OperatorElement<double>
 {
 public:
     OperatorI(double S);
+    OperatorI(int d) : OperatorI(dtoS(d)) {};
 };
 
 // Zero operator
@@ -48,36 +53,42 @@ class OperatorZ : public OperatorElement<double>
 {
 public:
     OperatorZ(double S);
+    OperatorZ(int d) : OperatorZ(dtoS(d)) {};
 };
 
 class OperatorSz : public OperatorElement<double>
 {
 public:
     OperatorSz(double S);
+    OperatorSz(int d) : OperatorSz(dtoS(d)) {};
 };
 
 class OperatorSy : public OperatorElement<dcmplx>
 {
 public:
     OperatorSy(double S);
+    OperatorSy(int d) : OperatorSy(dtoS(d)) {};
 };
 
 class OperatorSx : public OperatorElement<double>
 {
 public:
     OperatorSx(double S);
+    OperatorSx(int d) : OperatorSx(dtoS(d)) {};
 };
 
 class OperatorSp : public OperatorElement<double>
 {
 public:
     OperatorSp(double S);
+    OperatorSp(int d) : OperatorSp(dtoS(d)) {};
 };
 
 class OperatorSm : public OperatorElement<double>
 {
 public:
     OperatorSm(double S);
+    OperatorSm(int d) : OperatorSm(dtoS(d)) {};
 };
 
 
