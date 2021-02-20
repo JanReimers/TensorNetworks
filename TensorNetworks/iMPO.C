@@ -34,4 +34,15 @@ void iMPO::CanonicalForm()
 //        GetSiteOperator(ia)->iCanonicalForm(DRight);
 }
 
+void iMPO::CanonicalFormTri()
+{
+    GetSiteOperator(1)->iCanonicalFormTriangular(DLeft);
+}
+
+void iMPO::CanonicalFormQRIter()
+{
+    GetSiteOperator(1)->iCanonicalFormQRIter(DLeft);
+}
+
+
 }
