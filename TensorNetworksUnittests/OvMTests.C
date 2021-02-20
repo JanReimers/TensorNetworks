@@ -28,10 +28,10 @@ using TensorNetworks::OperatorI;
 using TensorNetworks::OperatorZ;
 using TensorNetworks::OperatorElement;
 
-class MPOTests1 : public ::testing::Test
+class OvMTests : public ::testing::Test
 {
 public:
-    MPOTests1()
+    OvMTests()
         : eps(3.0e-15)
         , itsFactory(TensorNetworks::Factory::GetFactory())
         , itsOperatorClient(0)
@@ -39,7 +39,7 @@ public:
         assert(itsFactory);
         StreamableObject::SetToPretty();
     }
-    ~MPOTests1()
+    ~OvMTests()
     {
         delete itsFactory;
         if (itsOperatorClient) delete itsOperatorClient;
@@ -110,7 +110,7 @@ void MakeLRBOperator(MatrixOR& OvM,TriType ul,Position lbr)
     }
 }
 
-void MPOTests1::TestQR(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
+void OvMTests::TestQR(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
 {
     int d=2*itsOperatorClient->GetS()+1;
     MakeLRBOperator(OvM,ul,lbr);
@@ -151,7 +151,7 @@ void MPOTests1::TestQR(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
     EXPECT_FALSE(IsUnit(Q.GetOrthoMatrix(Invert(lr)),d*eps));
 }
 
-void MPOTests1::TestSVD(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
+void OvMTests::TestSVD(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
 {
     int d=2*itsOperatorClient->GetS()+1;
     SVCompressorR* comp=itsFactory->MakeMPOCompressor(0,1e-14);
@@ -188,13 +188,13 @@ void MPOTests1::TestSVD(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
     EXPECT_FALSE(IsUnit(Q.GetOrthoMatrix(Invert(lr)),eps));
 }
 
-TEST_F(MPOTests1,MakeHamiltonian)
+TEST_F(OvMTests,MakeHamiltonian)
 {
     Setup(0.5);
 }
 
 
-TEST_F(MPOTests1,OperatorElement1)
+TEST_F(OvMTests,OperatorElement1)
 {
     double S=0.5;
     {
@@ -237,7 +237,7 @@ TEST_F(MPOTests1,OperatorElement1)
     }
 }
 
-TEST_F(MPOTests1,OperatorElement2)
+TEST_F(OvMTests,OperatorElement2)
 {
     OperatorElement<double> Oe(2,0.5);
     Oe=1.0;
@@ -258,7 +258,7 @@ TEST_F(MPOTests1,OperatorElement2)
 }
 
 
-TEST_F(MPOTests1,OperatorValuedMatrix1)
+TEST_F(OvMTests,OperatorValuedMatrix1)
 {
     double S=0.5;
     Setup(S);
@@ -273,7 +273,7 @@ TEST_F(MPOTests1,OperatorValuedMatrix1)
     EXPECT_EQ(OvM.GetUpperLower(),Lower);
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrix2)
+TEST_F(OvMTests,OperatorValuedMatrix2)
 {
     double S=1.0;
     Setup(S);
@@ -288,7 +288,7 @@ TEST_F(MPOTests1,OperatorValuedMatrix2)
     EXPECT_EQ(OvM.GetUpperLower(),Lower);
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrix3)
+TEST_F(OvMTests,OperatorValuedMatrix3)
 {
     double S=0.5;
     Setup(S);
@@ -303,7 +303,7 @@ TEST_F(MPOTests1,OperatorValuedMatrix3)
     EXPECT_EQ(OvM.GetUpperLower(),Upper);
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrix4)
+TEST_F(OvMTests,OperatorValuedMatrix4)
 {
     double S=1.0;
     Setup(S);
@@ -318,7 +318,7 @@ TEST_F(MPOTests1,OperatorValuedMatrix4)
     EXPECT_EQ(OvM.GetUpperLower(),Upper);
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrix5)
+TEST_F(OvMTests,OperatorValuedMatrix5)
 {
     double S=0.5;
     {
@@ -344,7 +344,7 @@ TEST_F(MPOTests1,OperatorValuedMatrix5)
 
 
 
-TEST_F(MPOTests1,OperatorValuedMatrixGetVUpper)
+TEST_F(OvMTests,OperatorValuedMatrixGetVUpper)
 {
     double S=0.5;
     Setup(S);
@@ -363,7 +363,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixGetVUpper)
         EXPECT_EQ(OvM(i,j),Vr(i,j));
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixGetVLower)
+TEST_F(OvMTests,OperatorValuedMatrixGetVLower)
 {
     double S=0.5;
     Setup(S);
@@ -382,7 +382,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixGetVLower)
         EXPECT_EQ(OvM(i,j),Vr(i,j));
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixSetVUpper)
+TEST_F(OvMTests,OperatorValuedMatrixSetVUpper)
 {
     double S=0.5;
     Setup(S);
@@ -396,7 +396,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixSetVUpper)
     EXPECT_EQ(OvM,Copy);
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixSetVLower)
+TEST_F(OvMTests,OperatorValuedMatrixSetVLower)
 {
     double S=0.5;
     Setup(S);
@@ -410,7 +410,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixSetVLower)
     EXPECT_EQ(OvM,Copy);
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixFlattenUpper)
+TEST_F(OvMTests,OperatorValuedMatrixFlattenUpper)
 {
     double S=0.5;
     Setup(S);
@@ -424,7 +424,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixFlattenUpper)
     EXPECT_EQ(OvM,Copy);
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixFlattenLower)
+TEST_F(OvMTests,OperatorValuedMatrixFlattenLower)
 {
     double S=0.5;
     Setup(S);
@@ -438,7 +438,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixFlattenLower)
     EXPECT_EQ(OvM,Copy);
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixFlattenVUpper)
+TEST_F(OvMTests,OperatorValuedMatrixFlattenVUpper)
 {
     double S=0.5;
     Setup(S);
@@ -465,7 +465,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixFlattenVUpper)
     }
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixFlattenVLower)
+TEST_F(OvMTests,OperatorValuedMatrixFlattenVLower)
 {
     double S=0.5;
     Setup(S);
@@ -492,7 +492,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixFlattenVLower)
     }
 }
 
-TEST_F(MPOTests1,Grow1)
+TEST_F(OvMTests,Grow1)
 {
     MatrixRT A(1,4,1,24);
     Unit(A);
@@ -500,7 +500,7 @@ TEST_F(MPOTests1,Grow1)
     TensorNetworks::Grow(A,l);
     EXPECT_TRUE(IsUnit(A));
 }
-TEST_F(MPOTests1,Grow2)
+TEST_F(OvMTests,Grow2)
 {
     MatrixRT A(1,24,1,4);
     Unit(A);
@@ -508,7 +508,7 @@ TEST_F(MPOTests1,Grow2)
     TensorNetworks::Grow(A,l);
     EXPECT_TRUE(IsUnit(A));
 }
-TEST_F(MPOTests1,Grow3)
+TEST_F(OvMTests,Grow3)
 {
     MatrixRT A(0,4,0,24);
     Unit(A);
@@ -530,7 +530,7 @@ TEST_F(MPOTests1,Grow3)
     }
     EXPECT_FALSE(IsUnit(A));
 }
-TEST_F(MPOTests1,Grow4)
+TEST_F(OvMTests,Grow4)
 {
     MatrixRT A(0,24,0,4);
     Unit(A);
@@ -553,7 +553,7 @@ TEST_F(MPOTests1,Grow4)
     EXPECT_FALSE(IsUnit(A));
 }
 
-TEST_F(MPOTests1,Grow5)
+TEST_F(OvMTests,Grow5)
 {
     MatrixRT A(0,4,0,4);
     Unit(A);
@@ -562,7 +562,7 @@ TEST_F(MPOTests1,Grow5)
     EXPECT_TRUE(IsUnit(A));
 }
 
-TEST_F(MPOTests1,Lower1)
+TEST_F(OvMTests,Lower1)
 {
     int M=4,N=24;
     MatrixRT A(M,N);
@@ -579,7 +579,7 @@ TEST_F(MPOTests1,Lower1)
     EXPECT_FALSE(IsUpperTriangular(A,0.0));
 
 }
-TEST_F(MPOTests1,Lower2)
+TEST_F(OvMTests,Lower2)
 {
     int M=24,N=4;
     MatrixRT A(M,N);
@@ -597,7 +597,7 @@ TEST_F(MPOTests1,Lower2)
 
 }
 
-TEST_F(MPOTests1,Upper1)
+TEST_F(OvMTests,Upper1)
 {
     int M=4,N=24;
     MatrixRT A(M,N);
@@ -615,7 +615,7 @@ TEST_F(MPOTests1,Upper1)
 
 }
 
-TEST_F(MPOTests1,Upper2)
+TEST_F(OvMTests,Upper2)
 {
     int M=24,N=4;
     MatrixRT A(M,N);
@@ -633,7 +633,7 @@ TEST_F(MPOTests1,Upper2)
 
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixQRBulk)
+TEST_F(OvMTests,OperatorValuedMatrixQRBulk)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
@@ -651,7 +651,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixQRBulk)
     }
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixQRBulkH2)
+TEST_F(OvMTests,OperatorValuedMatrixQRBulkH2)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
@@ -671,7 +671,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixQRBulkH2)
     }
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixQRLeft)
+TEST_F(OvMTests,OperatorValuedMatrixQRLeft)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
@@ -687,7 +687,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixQRLeft)
     }
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixQRLeftH2)
+TEST_F(OvMTests,OperatorValuedMatrixQRLeftH2)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
@@ -705,7 +705,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixQRLeftH2)
     }
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixQRRight)
+TEST_F(OvMTests,OperatorValuedMatrixQRRight)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
@@ -722,7 +722,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixQRRight)
 
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixQRRightH2)
+TEST_F(OvMTests,OperatorValuedMatrixQRRightH2)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
@@ -741,7 +741,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixQRRightH2)
 }
 
 
-TEST_F(MPOTests1,OperatorValuedMatrixSVD)
+TEST_F(OvMTests,OperatorValuedMatrixSVD)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
@@ -763,7 +763,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixSVD)
     }
 }
 
-TEST_F(MPOTests1,OperatorValuedMatrixSVDH2BulkOnly)
+TEST_F(OvMTests,OperatorValuedMatrixSVDH2BulkOnly)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
@@ -792,7 +792,7 @@ TEST_F(MPOTests1,OperatorValuedMatrixSVDH2BulkOnly)
 
 
 
-void MPOTests1::TestShuffle(MatrixOR O,Direction lr,double eps,double S)
+void OvMTests::TestShuffle(MatrixOR O,Direction lr,double eps,double S)
 {
     SVCompressorR* comp=itsFactory->MakeMPOCompressor(0,eps);
     LapackSVDSolver<double> solver;
@@ -847,7 +847,7 @@ void MPOTests1::TestShuffle(MatrixOR O,Direction lr,double eps,double S)
     }
 }
 
-TEST_F(MPOTests1,SVDShuffleH)
+TEST_F(OvMTests,SVDShuffleH)
 {
     double eps=1e-14;
     for (double S=0.5;S<=2.5;S+=0.5)
@@ -866,7 +866,7 @@ TEST_F(MPOTests1,SVDShuffleH)
     }
 }
 
-TEST_F(MPOTests1,SVDShuffleH2)
+TEST_F(OvMTests,SVDShuffleH2)
 {
     double eps=1e-14;
     for (double S=0.5;S<=0.5;S+=0.5)

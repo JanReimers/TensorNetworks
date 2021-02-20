@@ -102,14 +102,14 @@
 		<Unit filename="MPOTests.C">
 			<Option compilerVar="CPP" />
 		</Unit>
-		<Unit filename="MPOTests1.C">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="MPSNormTests.C">
 			<Option compilerVar="CPP" />
 		</Unit>
 		<Unit filename="MPSTests.C">
 			<Option compilerVar="CPP" />
+		</Unit>
+		<Unit filename="OvMTests.C">
+			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Tests.H" />
 		<Unit filename="VariationalGroundStateTests.C">

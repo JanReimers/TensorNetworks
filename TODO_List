@@ -1,37 +1,28 @@
 
+-Replace Dw12 class with
+    1) int [Dw1,Dw2] GetDws();
+    2) OpRange {first} {last}
+    3) Setp up
+            OpRange [Dw1,Dw2] GetOpRanges()
+    -OR Override rows() cols() to only iterate over non-zero ranges of W
+    -OR  just make a sparse MatrixOR and only store nonzero ops!
+
 Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
-    -Override rows() cols() to only iterate over non-zero ranges of W
+    -SiteOp should just be a MatrixOR without all the advanced functions
     -SetLimits using zero as criteria.  Should fabs(W)>eps
         BUT we need to get then SAME eps into the contraction routines.
     -Get CanonicalFOrm working for exp(H)
     -Move Upper/Lower enum to oml side
     -Move IsTriangular(ul,m) to oml side.
-    -Can we simplify some code with Mul(Direction,a,b) mat mul function?
-    -Rename MPOTest1 to OpValMatrixTests.
-    -Need op*(Matrix,MatrixO) to pass ul through
+    -Move tensor product to oml side.
+    Done: -Rename MPOTest1 to OvMTests.
+    -COmbine:
+        -Can we simplify some code with Mul(Direction,a,b) mat mul function?
+        -Need op*(Matrix,MatrixO) to pass ul through
     Done: -SVD:
-        Try swapping rows/cols on U/VT in each block to maintain upper/lower.
-        Have a look at Lapack DGESVJ, it accepts Upper/Lower as input. Not clear if U/VT respect U/L
-        THis is causing major problems.  Right now we can only SVD sweep one direction.
-        This is much harder than anticipated. No easy way to swap row and columns to maintian tri.
-        Current workaround
-            Set U/L at construction for the whole lattice.  This is "nominal" not actual UL, used for deciding
-            GetV block.
-            Doesn't work: 'One can re-run CanonicalForm *after* svd to restore tri form.
-    -Optimize for contraction.  THis means getting as close as we can to U/L-Tri or banded through
-        repeated row/col shuffling on each bond.
-        1) Sweep left to right
-        2) On each bond i
-            2.1) Find col reindex on W(i) and apply the corresponding row re-index to W(i+1)
-            2.2) increment I.
-        W(1) is row so no action.
-        W(2) we are free to permute both cols and rows
-        W(3) to W(L-1) we can only permute cols without messing up the previous matrix.
-        the algo is called CutHill-McKee http://ciprian-zavoianu.blogspot.com/2009/01/project-bandwidth-reduction.html
     -Do SetV(Q) inside SVD routine
     -Make a version of BlockQX that does SetV(Q) inside. SVD needs the current version return [Q,RL]
-    -Grow test it is should always be zero based? No!!  Zero or 1.
-    -Move tensor product to oml side.
+    Done: -Grow test it is should always be zero based? No!!  Zero or 1.
     -OperatorElement op=(T), allow assign 1 and 0.  THen try Fill(OvM,0.0)
     -OperatorElement: recognize known operators for pretty print.
         -One way is to solve Op=a*I + b*Sx + c*Sy + d*Sz for abcd.  For d>2 this is not guaranteed to solve.
@@ -39,20 +30,6 @@ Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
     Done: -Re-scale Q/R so QT*Q=d*I
     Done: -Calculate overlap <Wab*Wcd> for abcd=0..X+1  for R/L*U/L
         -GetV(lr).Overlap = <Vab*Vcd>
-    -Shadow classes using MatrixO
-        SiteOperator/SiteOperatorImp
-        MPO/MPOImp
-        iMPO/iMPOImp
-        We need to build up interfaces bit by bit so we need shadow those as well.
-        Support GetW(m,n) for now so we can calculate contractions <psi|O|psi>
-        Later, implement Psi->GetOverlap(MatrixO) contractions.
-        Do we get a benefit from an abstract SiteOperator?  MatrixO *is* the site operator.
-            (this is the data-centric approach)
-            if so then MPO->GetSiteOperator just returns MatrixO
-            It would be nice if ALL {m,n} sums occur inside MatrixO. Does MatrixO get very big?
-            Can we do the same MPS, Vector<Matrix<T>> M(i,j)(m) *is* the site
-            Should we just switch to iTensor right now?  Scary?
-
 
     -Advanced matrix shape tracking:
         What if it is both upper and lower?
