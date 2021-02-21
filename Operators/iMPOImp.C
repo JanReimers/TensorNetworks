@@ -1,7 +1,7 @@
 #include "Operators/iMPOImp.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworksImp/StateIterator.H"
-#include "Operators/SiteOperatorBulk.H"
+#include "Operators/SiteOperatorImp.H"
 #include "Operators/OperatorClient.H"
 #include "TensorNetworks/CheckSpin.H"
 
@@ -32,7 +32,7 @@ iMPOImp::iMPOImp(int L, double S,LoadWith loadWith)
 {
     assert(loadWith==Identity);
     for (int ia=1; ia<=itsL; ia++)
-        Insert(new SiteOperatorBulk(Getd()));
+        Insert(new SiteOperatorImp(Getd()));
 
     LinkSites();
 }
@@ -44,7 +44,7 @@ iMPOImp::iMPOImp(int L, const MatrixOR& W)
     : iMPOImp(L,W.GetS())
 {
     for (int ia=1; ia<=itsL; ia++)
-        Insert(new SiteOperatorBulk(W));
+        Insert(new SiteOperatorImp(W));
     LinkSites();
 }
 //
@@ -55,7 +55,7 @@ iMPOImp::iMPOImp(int L, const OperatorClient* W)
     : iMPOImp(L,W->GetS())
 {
     for (int ia=1; ia<=itsL; ia++)
-        Insert(new SiteOperatorBulk(Getd(),W));
+        Insert(new SiteOperatorImp(Getd(),PBulk,W));
     LinkSites();
 }
 

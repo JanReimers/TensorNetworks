@@ -2,7 +2,7 @@
 #include "TensorNetworks/iHamiltonian.H"
 #include "TensorNetworksImp/Typedefs.H"
 #include "Containers/Matrix4.H"
-#include "Operators/SiteOperatorBulk.H"
+#include "Operators/SiteOperatorImp.H"
 #include "NumericalMethods/LapackSVDSolver.H"
 #include "TensorNetworks/CheckSpin.H"
 #include "oml/diagonalmatrix.h"
@@ -43,23 +43,23 @@ iMPO_SpatialTrotter::iMPO_SpatialTrotter(double dt, Trotter type, const iHamilto
         {
             if (L%2)
             { //Odd # of sites
-               Insert(new SiteOperatorBulk(d));
+               Insert(new SiteOperatorImp(d));
                for (int ia=2;ia<=L;ia++)
                {
-                    Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
+                    Insert(new SiteOperatorImp(d,DLeft,PBulk ,U ,sm));
                     ia++;
                     if (ia!=L)
-                        Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
+                        Insert(new SiteOperatorImp(d,DRight,PBulk  ,VT,sm));
                     else
-                        Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
+                        Insert(new SiteOperatorImp(d,DRight,PBulk  ,VT,sm));
                }
             }
             else
             { //Even # of sites
                for (int ia=1;ia<=L;ia+=2)
                {
-                    Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
-                    Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
+                    Insert(new SiteOperatorImp(d,DRight,PBulk  ,VT,sm));
+                    Insert(new SiteOperatorImp(d,DLeft ,PBulk ,U ,sm));
                }
             }
             break;
@@ -68,26 +68,26 @@ iMPO_SpatialTrotter::iMPO_SpatialTrotter(double dt, Trotter type, const iHamilto
         {
             if (L%2)
             { //Odd # of sites
-               Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
+               Insert(new SiteOperatorImp(d,DLeft,PBulk  ,U ,sm));
                for (int ia=2;ia<L;ia++)
                {
-                    Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
+                    Insert(new SiteOperatorImp(d,DRight ,PBulk ,VT,sm));
                     ia++;
                     if (ia==L)
-                        Insert(new SiteOperatorBulk(d));
+                        Insert(new SiteOperatorImp(d));
                     else
-                        Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
+                        Insert(new SiteOperatorImp(d,DLeft,PBulk  ,U ,sm));
                }
             }
             else
             { //Even # of sites
-                Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
+                Insert(new SiteOperatorImp(d,DLeft,PBulk ,U ,sm));
                 for (int ia=2;ia<L;ia+=2)
                 {
-                    Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
-                    Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
+                    Insert(new SiteOperatorImp(d,DRight,PBulk  ,VT,sm));
+                    Insert(new SiteOperatorImp(d,DLeft ,PBulk ,U ,sm));
                 }
-                Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
+                Insert(new SiteOperatorImp(d,DRight ,PBulk ,VT,sm));
             }
             break;
         }

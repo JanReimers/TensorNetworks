@@ -1,7 +1,5 @@
 #include "Operators/MPOImp.H"
-#include "Operators/SiteOperatorLeft.H"
-#include "Operators/SiteOperatorBulk.H"
-#include "Operators/SiteOperatorRight.H"
+#include "Operators/SiteOperatorImp.H"
 #include "Operators/OperatorClient.H"
 #include "TensorNetworks/CheckSpin.H"
 
@@ -26,10 +24,8 @@ MPOImp::MPOImp(int L, double S,LoadWith loadWith)
     int d=Getd();
     assert(loadWith==Identity);
 
-    Insert(new SiteOperatorLeft(d));
-    for (int ia=2; ia<=itsL-1; ia++)
-        Insert(new SiteOperatorBulk(d));
-    Insert(new SiteOperatorRight(d));
+    for (int ia=1; ia<=itsL; ia++)
+        Insert(new SiteOperatorImp(d));
     LinkSites();
 
 }
@@ -38,29 +34,13 @@ MPOImp::MPOImp(int L, const OperatorClient* W)
     : MPOImp(L,W->GetS())
 {
     int d=Getd();
-    Insert(new SiteOperatorLeft(d,W));
+    Insert(new SiteOperatorImp(d,PLeft,W));
     for (int ia=2;ia<=GetL()-1;ia++)
-        Insert(new SiteOperatorBulk(d,W));
-    Insert(new SiteOperatorRight(d,W));
+        Insert(new SiteOperatorImp(d,PBulk,W));
+    Insert(new SiteOperatorImp(d,PRight,W));
     LinkSites();
 
 }
-
-
-//MPOImp::MPOImp(int L, double S, const TensorT& W)
-//    : MPOImp(L,S)
-//{
-//    //
-//    //  Load up the sites with copies of the W operator
-//    //
-//    int d=Getd();
-//    for (int ia=1; ia<=itsL; ia++)
-//    {
-//        Insert(new SiteOperatorBulk(d,W));
-//    }
-//}
-
-
 
 MPOImp::~MPOImp()
 {

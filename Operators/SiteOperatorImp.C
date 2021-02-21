@@ -30,17 +30,87 @@ SiteOperatorImp::SiteOperatorImp(int d, double S, SpinOperator so) //Construct s
 //
 //  Build from a OpClient Hamiltonian.
 //
-SiteOperatorImp::SiteOperatorImp(int d, const OperatorClient* H)
+SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H)
     : SiteOperatorImp(d)
 {
     itsWs=H->GetMatrixO(Lower);
     SetLimits();
+    Init_lr(lbr,itsOpRange.Dw1,1);
+    SetLimits();
+}
+
+void SiteOperatorImp::Init_lr(Position lbr, int lindex,int rindex)
+{
+    switch (lbr)
+    {
+    case PLeft:
+        {
+            int oneIndex=itsOpRange.Dw1;
+            MatrixRT l(0,0,0,itsOpRange.Dw1-1);
+            Fill(l,0.0);
+            l(0,lindex-1)=1.0;
+
+            itsWs=l*itsWs;
+            itsOpRange.Dw1=1;
+        }
+        break;
+    case PRight:
+        {
+            int oneIndex=1;
+            MatrixRT r(0,SiteOperatorImp::itsOpRange.Dw2-1,0,0);
+            Fill(r,0.0);
+            r(rindex-1,0)=1.0;
+
+            itsWs=itsWs*r;
+            itsOpRange.Dw2=1;
+        }
+        break;
+    case PBulk:
+        break;
+    }
+
+    SetLimits();
+    itsWs.SetUpperLower(Lower);
 }
 
 //
 // Build from a trotter decomp.
 //
-SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s)
+//SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s)
+//    : SiteOperatorImp(d)
+//{
+//    int Dw=s.GetNumRows();
+//    assert(Dw==d*d);
+//    assert(U.GetNumCols()==Dw);
+//    assert(U.GetNumRows()==Dw);
+//
+//    if (lr==DLeft)
+//    {
+//        itsWs.SetChi12(-1,Dw-2,false);
+//        int i1=1; //Linear index for (m,n) = 1+m+p*n
+//        for (int m=0; m<itsd; m++)
+//            for (int n=0; n<itsd; n++,i1++)
+//                for (int w=1; w<=Dw; w++)
+//                    itsWs(0,w-1)(m,n)=U(i1,w)*sqrt(s(w,w));
+//    }
+//    else if (lr==DRight)
+//    {
+//        itsWs.SetChi12(Dw-2,-1,false);
+//        int i2=1; //Linear index for (m,n) = 1+m+p*n
+//        for (int m=0; m<itsd; m++)
+//            for (int n=0; n<itsd; n++,i2++)
+//                for (int w=1; w<=Dw; w++)
+//                    itsWs(w-1,0)(m,n)=sqrt(s(w,w))*U(w,i2); //U is actually VT
+//    }
+//    else
+//    {
+//        // Must have been called with one of the spin decomposition types.
+//        assert(false);
+//    }
+//    SetLimits();
+//}
+//
+SiteOperatorImp::SiteOperatorImp(int d, Direction lr,Position lbr,const MatrixRT& U, const DiagonalMatrixRT& s)
     : SiteOperatorImp(d)
 {
     int Dw=s.GetNumRows();
@@ -71,6 +141,8 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const Di
         // Must have been called with one of the spin decomposition types.
         assert(false);
     }
+    SetLimits();
+    Init_lr(lbr,1,1);
     SetLimits();
 }
 

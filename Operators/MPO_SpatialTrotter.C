@@ -2,9 +2,7 @@
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworksImp/Typedefs.H"
 #include "Containers/Matrix4.H"
-#include "Operators/SiteOperatorBulk.H"
-#include "Operators/SiteOperatorLeft.H"
-#include "Operators/SiteOperatorRight.H"
+#include "Operators/SiteOperatorImp.H"
 #include "NumericalMethods/LapackSVDSolver.H"
 #include "TensorNetworks/TNSLogger.H"
 #include "TensorNetworks/CheckSpin.H"
@@ -43,26 +41,26 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,const Hamiltonian
             if (L%2)
             { //Odd # of sites
                 Logger->LogWarn(0,"MPO_SpatialTrotter with odd number of lattice sites will not compress effectively");
-                Insert(new SiteOperatorLeft(d,DLeft ,U,sm));
+                Insert(new SiteOperatorImp(d,DLeft ,PLeft,U,sm));
                 for (int ia=2;ia<=L;ia++)
                 {
-                    Insert(new SiteOperatorBulk(d,DRight ,VT ,sm));
+                    Insert(new SiteOperatorImp(d,DRight ,PBulk,VT ,sm));
                     ia++;
                     if (ia!=L)
-                        Insert(new SiteOperatorBulk(d,DLeft ,U,sm));
+                        Insert(new SiteOperatorImp(d,DLeft,PBulk ,U,sm));
                     else
-                        Insert(new SiteOperatorRight(d));
+                        Insert(new SiteOperatorImp(d));
                 }
             }
             else
             { //Even # of sites
-                Insert(new SiteOperatorLeft(d,DLeft,U,sm));
+                Insert(new SiteOperatorImp(d,DLeft,PLeft,U,sm));
                 for (int ia=2;ia<L;ia+=2)
                 {
-                    Insert(new SiteOperatorBulk(d,DRight,VT,sm));
-                    Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
+                    Insert(new SiteOperatorImp(d,DRight,PBulk,VT,sm));
+                    Insert(new SiteOperatorImp(d,DLeft ,PBulk,U ,sm));
                 }
-                Insert(new SiteOperatorRight(d,DRight ,VT ,sm));
+                Insert(new SiteOperatorImp(d,DRight ,PRight,VT ,sm));
             }
             break;
         }
@@ -71,26 +69,26 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,const Hamiltonian
             if (L%2)
             { //Odd # of sites
                Logger->LogWarn(0,"MPO_SpatialTrotter with odd number of lattice sites will not compress effectively");
-               Insert(new SiteOperatorLeft(d));
+               Insert(new SiteOperatorImp(d));
                for (int ia=2;ia<L;ia++)
                {
-                    Insert(new SiteOperatorBulk(d,DLeft ,U,sm));
+                    Insert(new SiteOperatorImp(d,DLeft,PBulk ,U,sm));
                     ia++;
                     if (ia==L)
-                        Insert(new SiteOperatorRight(d,DRight ,VT ,sm));
+                        Insert(new SiteOperatorImp(d,DRight ,PRight,VT ,sm));
                     else
-                        Insert(new SiteOperatorBulk(d,DRight ,VT ,sm));
+                        Insert(new SiteOperatorImp(d,DRight,PBulk ,VT ,sm));
                }
             }
             else
             { //Even # of sites
-                Insert(new SiteOperatorLeft(d,DRight ,VT,sm));
+                Insert(new SiteOperatorImp(d,DRight ,PLeft,VT,sm));
                 for (int ia=2;ia<L;ia+=2)
                 {
-                    Insert(new SiteOperatorBulk(d,DLeft ,U ,sm));
-                    Insert(new SiteOperatorBulk(d,DRight ,VT,sm));
+                    Insert(new SiteOperatorImp(d,DLeft,PBulk ,U ,sm));
+                    Insert(new SiteOperatorImp(d,DRight ,PBulk,VT,sm));
                 }
-                Insert(new SiteOperatorRight(d,DLeft ,U ,sm));
+                Insert(new SiteOperatorImp(d,DLeft ,PRight,U ,sm));
             }
             break;
         }
