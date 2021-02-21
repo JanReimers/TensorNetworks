@@ -335,7 +335,7 @@ TEST_F(MPOTests,TestMPOCompressForE2)
     delete H1;
     delete H2;
 }
-TEST_F(MPOTests,TestL2MPOTrotter2_S12)
+TEST_F(MPOTests,TestMPOTrotter2_L4_S12)
 {
     int L=4,D=2;
     double S=0.5,dt=0.1,epsMPO=1e-4;
@@ -352,7 +352,7 @@ TEST_F(MPOTests,TestL2MPOTrotter2_S12)
     }
     EXPECT_LT(truncError,epsMPO*50);
 }
-TEST_F(MPOTests,TestL2MPOTrotter2_S1)
+TEST_F(MPOTests,TestMPOTrotter2_L4_S1)
 {
     int L=4,D=2;
     double S=1.0,dt=0.1,epsMPO=1e-4;
@@ -364,8 +364,37 @@ TEST_F(MPOTests,TestL2MPOTrotter2_S1)
     EXPECT_EQ(expH->GetMaxDw(),10);
     EXPECT_LT(truncError,epsMPO*50);
 }
+TEST_F(MPOTests,TestMPOTrotter2_L5_S12)
+{
+    int L=5,D=2;
+    double S=0.5,dt=0.1,epsMPO=1e-4;
+    Setup(L,S,D);
+    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::CNone,epsMPO);
+//    expH->CanonicalForm(); this changes the Dws
+//    expH->Report(cout);
+    double truncError=expH->Compress(TensorNetworks::Std,0,epsMPO);
+    for (int is=2;is<=L-1;is++)
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(is)->GetDws();
+        EXPECT_EQ(Dw1,4);
+        EXPECT_EQ(Dw2,4);
+    }
+    EXPECT_LT(truncError,epsMPO*50);
+}
+TEST_F(MPOTests,TestMPOTrotter2_L5_S1)
+{
+    int L=5,D=2;
+    double S=1.0,dt=0.1,epsMPO=1e-4;
+    Setup(L,S,D);
+    TensorNetworks::MPO* expH=itsH->CreateOperator(dt,TensorNetworks::SecondOrder,TensorNetworks::CNone,epsMPO);
+    //expH->CanonicalForm(); //Can't handle exp(H) yet.
+    double truncError=expH->Compress(TensorNetworks::Std,0,epsMPO);
+//    expH->Report(cout);
+    EXPECT_EQ(expH->GetMaxDw(),10);
+    EXPECT_LT(truncError,epsMPO*50);
+}
 
-TEST_F(MPOTests,TestL2iMPOTrotter1)
+TEST_F(MPOTests,TestiMPOTrotter1_L2)
 {
     int L=2,D=2;
     double S=0.5,dt=0.00001,epsMPO=1e-14;
@@ -379,7 +408,7 @@ TEST_F(MPOTests,TestL2iMPOTrotter1)
         EXPECT_EQ(Dw2,4);
     }
 }
-TEST_F(MPOTests,TestL2iMPOTrotter2)
+TEST_F(MPOTests,TestiMPOTrotter2_L2)
 {
     int L=2,D=2;
     double S=0.5,dt=0.1,epsMPO=6e-3;
@@ -391,6 +420,52 @@ TEST_F(MPOTests,TestL2iMPOTrotter2)
         auto [Dw1,Dw2]=expH->GetSiteOperator(is)->GetDws();
         EXPECT_EQ(Dw1,4);
         EXPECT_EQ(Dw2,4);
+    }
+}
+TEST_F(MPOTests,TestiMPOTrotter1_L3)
+{
+    int L=3,D=2;
+    double S=0.5,dt=0.00001,epsMPO=1e-14;
+    Setup(L,S,D);
+    TensorNetworks::iMPO* expH=itsiH->CreateiMPO(dt,TensorNetworks::FirstOrder,TensorNetworks::Std,epsMPO);
+//    expH->Report(cout);
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(1)->GetDws();
+        EXPECT_EQ(Dw1,1);
+        EXPECT_EQ(Dw2,4);
+    }
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(2)->GetDws();
+        EXPECT_EQ(Dw1,4);
+        EXPECT_EQ(Dw2,4);
+    }
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(3)->GetDws();
+        EXPECT_EQ(Dw1,4);
+        EXPECT_EQ(Dw2,1);
+    }
+}
+TEST_F(MPOTests,  TestiMPOTrotter2_L3  )
+{
+    int L=3,D=2;
+    double S=0.5,dt=0.1,epsMPO=6e-3;
+    Setup(L,S,D);
+    TensorNetworks::iMPO* expH=itsiH->CreateiMPO(dt,TensorNetworks::SecondOrder,TensorNetworks::Std,epsMPO);
+//    expH->Report(cout);
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(1)->GetDws();
+        EXPECT_EQ(Dw1,1);
+        EXPECT_EQ(Dw2,4);
+    }
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(2)->GetDws();
+        EXPECT_EQ(Dw1,4);
+        EXPECT_EQ(Dw2,4);
+    }
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(3)->GetDws();
+        EXPECT_EQ(Dw1,4);
+        EXPECT_EQ(Dw2,1);
     }
 }
 //TEST_F(MPOTests,TestL2iMPOTrotter4)

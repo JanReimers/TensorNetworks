@@ -13,21 +13,13 @@ MPO_OneSite::MPO_OneSite(int L, double S ,int isite, SpinOperator o)
     assert(L>1);
     assert(d>1);
 
-    if (1==isite)
-        Insert(new SiteOperatorImp(d,S,o));
-    else
-        Insert(new SiteOperatorImp(d)); //Identity op
-    for (int ia=2;ia<=L-1;ia++)
+    for (int ia=1;ia<=L;ia++)
     {
         if (ia==isite)
-            Insert(new SiteOperatorImp(d,S,o));
+            Insert(new SiteOperatorImp(d,o));
         else
             Insert(new SiteOperatorImp(d)); //Identity op
     }
-    if (L==isite)
-        Insert(new SiteOperatorImp(d,S,o));
-    else
-        Insert(new SiteOperatorImp(d)); //Identity op
     LinkSites();
 }
 

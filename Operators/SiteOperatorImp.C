@@ -21,10 +21,10 @@ SiteOperatorImp::SiteOperatorImp(int d)
 //
 //  Not covered by MPO tests, try the Expectation tests.
 //
-SiteOperatorImp::SiteOperatorImp(int d, double S, SpinOperator so) //Construct spin operator
+SiteOperatorImp::SiteOperatorImp(int d, SpinOperator so) //Construct spin operator
     : SiteOperatorImp(d)
 {
-    itsWs(0,0)=OperatorElement<double>::Create(so,S);
+    itsWs(0,0)=OperatorElement<double>::Create(so,d);
     SetLimits();
 }
 //
@@ -34,81 +34,10 @@ SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H)
     : SiteOperatorImp(d)
 {
     itsWs=H->GetMatrixO(Lower);
-    SetLimits();
-    Init_lr(lbr,itsOpRange.Dw1,1);
-    SetLimits();
+    Init_lr(lbr,itsWs.GetNumRows()-1,0);
 }
-
-void SiteOperatorImp::Init_lr(Position lbr, int lindex,int rindex)
-{
-    switch (lbr)
-    {
-    case PLeft:
-        {
-            int oneIndex=itsOpRange.Dw1;
-            MatrixRT l(0,0,0,itsOpRange.Dw1-1);
-            Fill(l,0.0);
-            l(0,lindex-1)=1.0;
-
-            itsWs=l*itsWs;
-            itsOpRange.Dw1=1;
-        }
-        break;
-    case PRight:
-        {
-            int oneIndex=1;
-            MatrixRT r(0,SiteOperatorImp::itsOpRange.Dw2-1,0,0);
-            Fill(r,0.0);
-            r(rindex-1,0)=1.0;
-
-            itsWs=itsWs*r;
-            itsOpRange.Dw2=1;
-        }
-        break;
-    case PBulk:
-        break;
-    }
-
-    SetLimits();
-    itsWs.SetUpperLower(Lower);
-}
-
 //
 // Build from a trotter decomp.
-//
-//SiteOperatorImp::SiteOperatorImp(int d, Direction lr,const MatrixRT& U, const DiagonalMatrixRT& s)
-//    : SiteOperatorImp(d)
-//{
-//    int Dw=s.GetNumRows();
-//    assert(Dw==d*d);
-//    assert(U.GetNumCols()==Dw);
-//    assert(U.GetNumRows()==Dw);
-//
-//    if (lr==DLeft)
-//    {
-//        itsWs.SetChi12(-1,Dw-2,false);
-//        int i1=1; //Linear index for (m,n) = 1+m+p*n
-//        for (int m=0; m<itsd; m++)
-//            for (int n=0; n<itsd; n++,i1++)
-//                for (int w=1; w<=Dw; w++)
-//                    itsWs(0,w-1)(m,n)=U(i1,w)*sqrt(s(w,w));
-//    }
-//    else if (lr==DRight)
-//    {
-//        itsWs.SetChi12(Dw-2,-1,false);
-//        int i2=1; //Linear index for (m,n) = 1+m+p*n
-//        for (int m=0; m<itsd; m++)
-//            for (int n=0; n<itsd; n++,i2++)
-//                for (int w=1; w<=Dw; w++)
-//                    itsWs(w-1,0)(m,n)=sqrt(s(w,w))*U(w,i2); //U is actually VT
-//    }
-//    else
-//    {
-//        // Must have been called with one of the spin decomposition types.
-//        assert(false);
-//    }
-//    SetLimits();
-//}
 //
 SiteOperatorImp::SiteOperatorImp(int d, Direction lr,Position lbr,const MatrixRT& U, const DiagonalMatrixRT& s)
     : SiteOperatorImp(d)
@@ -141,11 +70,8 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,Position lbr,const MatrixRT
         // Must have been called with one of the spin decomposition types.
         assert(false);
     }
-    SetLimits();
-    Init_lr(lbr,1,1);
-    SetLimits();
+    Init_lr(lbr,0,0);
 }
-
 //
 // Construct with W operator. Called by iMPOImp::MakeUnitcelliMPO
 //
@@ -162,6 +88,33 @@ SiteOperatorImp::~SiteOperatorImp()
     //dtor
 }
 
+void SiteOperatorImp::Init_lr(Position lbr, int lindex,int rindex)
+{
+    switch (lbr)
+    {
+    case PLeft:
+        {
+            MatrixRT l(0,0,0,itsWs.GetNumRows()-1);
+            Fill(l,0.0);
+            l(0,lindex)=1.0;
+            itsWs=l*itsWs;
+        }
+        break;
+    case PRight:
+        {
+            MatrixRT r(0,itsWs.GetNumCols()-1,0,0);
+            Fill(r,0.0);
+            r(rindex,0)=1.0;
+            itsWs=itsWs*r;
+        }
+        break;
+    case PBulk:
+        break;
+    }
+
+    SetLimits();
+    itsWs.SetUpperLower(Lower);
+}
 
 void SiteOperatorImp::SetNeighbours(SiteOperator* left, SiteOperator* right)
 {
@@ -196,7 +149,7 @@ void SiteOperatorImp::SetLimits()
     itsOpRange.resize(itsWs.GetLimits());
     for (index_t w1:itsWs.rows())
         for (index_t w2:itsWs.cols())
-            if (fabs(itsWs(w1,w2))>0.0) //TOT should be using and eps~1e-15 here.
+            if (fabs(itsWs(w1,w2))>0.0) //TODO should be using and eps~1e-15 here.
                 itsOpRange.NonZeroAt(w1,w2);
 }
 
@@ -212,7 +165,6 @@ void SiteOperatorImp::Product(const SiteOperator* O2)
     assert(O2i);
     itsWs=TensorProduct(itsWs,O2i->itsWs);
     SetLimits();
-
 }
 
 

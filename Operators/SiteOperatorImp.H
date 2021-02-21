@@ -19,9 +19,8 @@ class SiteOperatorImp : public virtual SiteOperator
 public:
     typedef Matrix<MatrixRT> TensorT;
     SiteOperatorImp(int d); //Construct with identity operator
-    SiteOperatorImp(int d, double S, SpinOperator so); //Construct with identity operator
+    SiteOperatorImp(int d, SpinOperator so); //Construct with identity operator
     SiteOperatorImp(int d, Position lbr, const OperatorClient* O);
-//    SiteOperatorImp(int d, Direction lr , const MatrixRT& U, const DiagonalMatrixRT& expEvs);
     SiteOperatorImp(int d, Direction lr , Position lbr, const MatrixRT& U, const DiagonalMatrixRT& expEvs);
     SiteOperatorImp(const MatrixOR& W); //Construct with W operator
     virtual ~SiteOperatorImp();
@@ -75,7 +74,6 @@ private:
 protected:
 
     int      itsd; //2*S+1
-//        Dw12     itsDw;
     OpRange  itsOpRange;
     double   itsTruncationError;
     MatrixOR itsWs; //Operator values matrix version of W.

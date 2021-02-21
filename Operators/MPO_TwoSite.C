@@ -14,29 +14,15 @@ MPO_TwoSite::MPO_TwoSite(int L, double S ,int isite1,int isite2, SpinOperator so
     assert(L>1);
     assert(d>1);
 
-
-    if (1==isite1)
-        Insert(new SiteOperatorImp(d,S,so1));
-    else if (1==isite2)
-        Insert(new SiteOperatorImp(d,S,so2));
-    else
-        Insert(new SiteOperatorImp(d)); //Identity op
-    for (int ia=2;ia<=L-1;ia++)
+    for (int ia=1;ia<=L;ia++)
     {
         if (ia==isite1)
-            Insert(new SiteOperatorImp(d,S,so1));
+            Insert(new SiteOperatorImp(d,so1));
         else if (ia==isite2)
-            Insert(new SiteOperatorImp(d,S,so2));
+            Insert(new SiteOperatorImp(d,so2));
         else
             Insert(new SiteOperatorImp(d)); //Identity op
     }
-    if (L==isite1)
-        Insert(new SiteOperatorImp(d,S,so1));
-    else if (L==isite2)
-        Insert(new SiteOperatorImp(d,S,so2));
-    else
-        Insert(new SiteOperatorImp(d)); //Identity op
-
     LinkSites();
 }
 

@@ -30,14 +30,13 @@ MPOImp::MPOImp(int L, double S,LoadWith loadWith)
 
 }
 
+
 MPOImp::MPOImp(int L, const OperatorClient* W)
     : MPOImp(L,W->GetS())
 {
     int d=Getd();
-    Insert(new SiteOperatorImp(d,PLeft,W));
-    for (int ia=2;ia<=GetL()-1;ia++)
-        Insert(new SiteOperatorImp(d,PBulk,W));
-    Insert(new SiteOperatorImp(d,PRight,W));
+    for (int ia=1;ia<=GetL();ia++)
+        Insert(new SiteOperatorImp(d,GetPosition(L,ia),W));
     LinkSites();
 
 }

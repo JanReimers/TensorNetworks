@@ -28,7 +28,7 @@ public:
 
     int Getd() const {return itsd;}
 
-    static OperatorElement Create(SpinOperator,double S);
+    static OperatorElement Create(SpinOperator,int d);
 
 protected:
     int    itsd;

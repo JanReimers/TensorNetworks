@@ -38,6 +38,10 @@ protected:
     //
     //  Derived classes need to insert and then link the sites.
     //
+    Position GetPosition(int L,int ia)
+    {
+        return ia==1 ? PLeft : (ia==L ? PRight : PBulk);
+    }
     void    Insert(SiteOperator*);
     void    LinkSites(); //Set up left and right neighbour links
 private:

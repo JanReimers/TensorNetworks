@@ -58,25 +58,25 @@ template <class T> OperatorElement<T>& OperatorElement<T>::operator=(T s)
     return *this;
 }
 
-template <> OperatorElement<double> OperatorElement<double>::Create(SpinOperator so,double S)
+template <> OperatorElement<double> OperatorElement<double>::Create(SpinOperator so,int d)
 {
     OperatorElement<double> O;
         switch (so)
         {
         case Sx:
-            O=OperatorSx(S);
+            O=OperatorSx(d);
             break;
         case Sy:
             assert(false);//O=OperatorSy(S);  THis is a complex operator
             break;
         case Sz:
-            O=OperatorSz(S);
+            O=OperatorSz(d);
             break;
         case Sp:
-            O=OperatorSp(S);
+            O=OperatorSp(d);
             break;
         case Sm:
-            O=OperatorSm(S);
+            O=OperatorSm(d);
             break;
         }
     return O;

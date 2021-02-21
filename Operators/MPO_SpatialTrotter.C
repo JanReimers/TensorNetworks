@@ -41,26 +41,22 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,const Hamiltonian
             if (L%2)
             { //Odd # of sites
                 Logger->LogWarn(0,"MPO_SpatialTrotter with odd number of lattice sites will not compress effectively");
-                Insert(new SiteOperatorImp(d,DLeft ,PLeft,U,sm));
-                for (int ia=2;ia<=L;ia++)
+                for (int ia=1;ia<=L-1;ia++)
                 {
-                    Insert(new SiteOperatorImp(d,DRight ,PBulk,VT ,sm));
+                    Insert(new SiteOperatorImp(d,DLeft,GetPosition(L,ia) ,U ,sm));
                     ia++;
-                    if (ia!=L)
-                        Insert(new SiteOperatorImp(d,DLeft,PBulk ,U,sm));
-                    else
-                        Insert(new SiteOperatorImp(d));
+                    Insert(new SiteOperatorImp(d,DRight,GetPosition(L,ia),VT,sm));
                 }
+                Insert(new SiteOperatorImp(d)); //Identity op
             }
             else
             { //Even # of sites
-                Insert(new SiteOperatorImp(d,DLeft,PLeft,U,sm));
-                for (int ia=2;ia<L;ia+=2)
+                for (int ia=1;ia<=L;ia++)
                 {
-                    Insert(new SiteOperatorImp(d,DRight,PBulk,VT,sm));
-                    Insert(new SiteOperatorImp(d,DLeft ,PBulk,U ,sm));
+                    Insert(new SiteOperatorImp(d,DLeft ,GetPosition(L,ia),U ,sm));
+                    ia++;
+                    Insert(new SiteOperatorImp(d,DRight,GetPosition(L,ia),VT,sm));
                 }
-                Insert(new SiteOperatorImp(d,DRight ,PRight,VT ,sm));
             }
             break;
         }
@@ -70,25 +66,21 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,const Hamiltonian
             { //Odd # of sites
                Logger->LogWarn(0,"MPO_SpatialTrotter with odd number of lattice sites will not compress effectively");
                Insert(new SiteOperatorImp(d));
-               for (int ia=2;ia<L;ia++)
+               for (int ia=2;ia<=L-1;ia++)
                {
-                    Insert(new SiteOperatorImp(d,DLeft,PBulk ,U,sm));
+                    Insert(new SiteOperatorImp(d,DLeft,GetPosition(L,ia) ,U,sm));
                     ia++;
-                    if (ia==L)
-                        Insert(new SiteOperatorImp(d,DRight ,PRight,VT ,sm));
-                    else
-                        Insert(new SiteOperatorImp(d,DRight,PBulk ,VT ,sm));
+                    Insert(new SiteOperatorImp(d,DRight,GetPosition(L,ia),VT ,sm));
                }
             }
             else
             { //Even # of sites
-                Insert(new SiteOperatorImp(d,DRight ,PLeft,VT,sm));
-                for (int ia=2;ia<L;ia+=2)
+                for (int ia=1;ia<=L;ia++)
                 {
-                    Insert(new SiteOperatorImp(d,DLeft,PBulk ,U ,sm));
-                    Insert(new SiteOperatorImp(d,DRight ,PBulk,VT,sm));
+                    Insert(new SiteOperatorImp(d,DRight,GetPosition(L,ia),VT,sm));
+                    ia++;
+                    Insert(new SiteOperatorImp(d,DLeft ,GetPosition(L,ia),U ,sm));
                 }
-                Insert(new SiteOperatorImp(d,DLeft ,PRight,U ,sm));
             }
             break;
         }
