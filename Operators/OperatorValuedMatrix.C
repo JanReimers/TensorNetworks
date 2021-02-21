@@ -47,14 +47,6 @@ template <class T> MatrixO<T>::MatrixO(const MatrixO& m)
 {
 }
 
-template <class T> MatrixO<T>::MatrixO(MatrixO&& m)
-    : Matrix<OperatorElement<T> >(m)
-    , itsd(m.itsd)
-    , itsTruncationError(0)
-    , itsUL(m.itsUL)
-{
-}
-
 
 template <class T> MatrixO<T>::MatrixO(int Dw1, int Dw2,double S,TriType ul)
     : Matrix<OperatorElement<T> >(0,Dw1-1,0,Dw2-1)
@@ -109,29 +101,6 @@ template <class T> void MatrixO<T>::SetChi12(int X1,int X2,bool preserve_data)
     }
 }
 
-//template <class T> void MatrixO<T>::CheckUL()
-//{
-//    double eps=1e-8;
-//    if (this->GetNumRows()<2 || this->GetNumCols()<2)
-//    {
-//        //itsUL=Lower; //Temporary kludge to get beyond the row/col matrix U/L ambiguity
-//    }
-//    else
-//    {
-//        if (IsLowerTriangular(*this,eps))
-//            itsUL=Lower;
-//        else if (IsUpperTriangular(*this,eps))
-//        {
-//            itsUL=Upper;
-//        }
-//        else
-//        {
-////            cout << std::scientific << std::setprecision(1) << "Full matrix??=" << *this;
-//            itsUL=Full;
-//        }
-//    }
-//}
-
 template <class T> void MatrixO<T>::Setd()
 {
     MatLimits l=this->GetLimits();
@@ -140,27 +109,10 @@ template <class T> void MatrixO<T>::Setd()
 }
 template <class T> void MatrixO<T>::SetUpperLower(TriType ul)
 {
-//    assert(this->GetNumRows()==1 || this->GetNumCols()==1);
     assert(ul==Upper || ul==Lower);
     itsUL=ul;
 }
 
-template <class T> MatrixO<T>& MatrixO<T>::operator=(const MatrixO<T>& m)
-{
-    Base::operator=(m);
-    itsd=m.itsd;
-    itsTruncationError=m.itsTruncationError;
-    itsUL=m.itsUL;
-    return *this;
-}
-template <class T> MatrixO<T>& MatrixO<T>::operator=(MatrixO<T>&& m)
-{
-    Base::operator=(m);
-    itsd=m.itsd;
-    itsTruncationError=m.itsTruncationError;
-    itsUL=m.itsUL;
-    return *this;
-}
 
 template <class T> MatrixO<T>& MatrixO<T>::operator*=(const T& s)
 {

@@ -1,6 +1,6 @@
 
 SiteOperatorImp:
-    Do we still need Left/Right/Bulk site operators?
+    Done: Do we still need Left/Right/Bulk site operators?
     Done: -Replace Dw12 class with
         1) int [Dw1,Dw2] GetDws();
         2) OpRange {first} {last}
@@ -56,7 +56,7 @@ Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
     THis causes problems with OpValMatrix operators many of which depend the U/L determination
     We need to somehow determine U/L away from the edges and enforce the resulting U/l state
     on the edges.
--The Dw12 first/last index arrays are biased for lower triangular.
+Fixed: -The Dw12 first/last index arrays are biased for lower triangular.
 -expH MPO get scrambled when reducing to Canonical form.
     Get further scrambled after Parker-compress, std-compress is fine
     test is TestParkerSVDCompressExpHL8t1
