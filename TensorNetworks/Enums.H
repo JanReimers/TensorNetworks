@@ -1,6 +1,8 @@
 #ifndef ENUMS_H
 #define ENUMS_H
 
+#include "oml/imp/shape.h"
+
 namespace TensorNetworks
 {
     enum Position     {PLeft,PBulk,PRight};
@@ -11,7 +13,8 @@ namespace TensorNetworks
     enum TrotterOrder {TNone,FirstOrder,SecondOrder,FourthOrder};
     enum iTEBDType    {Gates,MPOs,iMPOs};
     enum CompressType {CNone,Std,Parker};
-    enum TriType      {Full,Upper,Lower};
+
+    using TriType=Store;
 };
 
 #endif // ENUMS_H

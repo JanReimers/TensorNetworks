@@ -8,8 +8,6 @@
 using dcmplx=TensorNetworks::dcmplx;
 using TensorNetworks::MatrixOR;
 using TensorNetworks::TriType;
-using TensorNetworks::Lower;
-using TensorNetworks::Upper;
 using TensorNetworks::Direction;
 using TensorNetworks::DLeft;
 using TensorNetworks::DRight;

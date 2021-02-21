@@ -13,8 +13,8 @@ int main(int argc, char **argv)
 //    testing::GTEST_FLAG(filter) = "MPSTests*";
 //    testing::GTEST_FLAG(filter) = "MPSNormTests.*";
 //    testing::GTEST_FLAG(filter) = "MPOTests.TestMPOStdCompressForH*";
-//    testing::GTEST_FLAG(filter) = "OvMTests.OperatorValuedMatrix5";
-    testing::GTEST_FLAG(filter) = "MPOTests.*:OvMTests.*";
+//    testing::GTEST_FLAG(filter) = "OvMTests.*";
+//    testing::GTEST_FLAG(filter) = "MPOTests.*:OvMTests.*";
 //    testing::GTEST_FLAG(filter) = "MPOTests.*";
 //    testing::GTEST_FLAG(filter) = "VariationalGroundStateTests.*";
 //    testing::GTEST_FLAG(filter) = "ImaginaryTimeTests.*";

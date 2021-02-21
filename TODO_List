@@ -1,5 +1,6 @@
 
 SiteOperatorImp:
+    Do we still need Left/Right/Bulk site operators?
     Done: -Replace Dw12 class with
         1) int [Dw1,Dw2] GetDws();
         2) OpRange {first} {last}
@@ -15,9 +16,9 @@ SiteOperatorImp:
 Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
     Done: -Too much mixing up of S and d.  Pick one.
     -Get CanonicalFOrm working for exp(H)
-    -Move Upper/Lower enum to oml side
-    -Move IsTriangular(ul,m) to oml side.
-    -Move tensor product to oml side.
+    Done:-Move Upper/Lower enum to oml side
+    Done:-Move IsTriangular(ul,m) to oml side.
+    Done:-Move tensor product to oml side.
     -oml move index_t.h up from Imp folder.
     Done: -Rename MPOTest1 to OvMTests.
     -COmbine:

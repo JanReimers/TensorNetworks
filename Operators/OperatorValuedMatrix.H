@@ -141,39 +141,8 @@ template <class T> MatrixO<T> operator*(const MatrixO<T>& a, const Matrix<T>& b)
 
 void Grow(Matrix<double>& m,const MatLimits& lim);
 
-inline VecLimits operator*(const VecLimits& a, const VecLimits& b)
-{
-    assert(a.Low==b.Low);
-    int size=a.size()*b.size();
-    return VecLimits(a.Low,a.Low+size-1);
-}
 
-inline MatLimits operator*(const MatLimits& a, const MatLimits& b)
-{
-    return MatLimits(a.Row*b.Row,a.Col*b.Col);
-}
 
-template <class T> Matrix<T> TensorProduct(const Matrix<T>& a, const Matrix<T>& b)
-{
-    Matrix<T> r(a.GetLimits()*b.GetLimits());
-    //
-    //  These loops need to run in the same order as SiteOperatorImp::Product
-    //
-    int i=r.GetRowLimits().Low;
-    for (index_t ib:b.rows())
-    for (index_t ia:a.rows())
-    {
-        int j=r.GetColLimits().Low;
-        for (index_t jb:b.cols())
-        for (index_t ja:a.cols())
-        {
-            r(i,j)=a(ia,ja)*b(ib,jb);
-            j++;
-        }
-        i++;
-    }
-    return r;
-}
 
 template <class T> MatrixO<T> TensorProduct(const MatrixO<T>& a, const MatrixO<T>& b)
 {
@@ -207,25 +176,7 @@ template <class T> MatrixO<T> HorizontalProduct(const MatrixO<T>& a, const Matri
     return ret;
 }
 
-template <class T> bool IsTriangular(TriType ul,const Matrix<T>& m,double eps)
-{
-    bool ret=true;
-    if (m.GetNumCols()>1 && m.GetNumRows()>1)
-    {
-        switch (ul)
-        {
-        case Upper:
-            ret=IsUpperTriangular(m,eps);
-            break;
-        case Lower:
-            ret=IsLowerTriangular(m,eps);
-            break;
-        case Full:
-            ret=false;
-        }
-    }
-    return ret;
-}
+
 
 template <class T> void Fill(MatrixO<T>& m, T f)
 {

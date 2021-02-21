@@ -93,8 +93,8 @@ std::vector<index_t>  FindRowReIndex(TensorNetworks::TriType ul,const Matrix<dou
     std::multimap<index_t,index_t> index;
     for (index_t ir:UL.rows())
     {
-        if      (ul==TensorNetworks::Lower) index.insert({FindLast (UL.GetRow(ir),eps),ir});
-        else if (ul==TensorNetworks::Upper) index.insert({FindFirst(UL.GetRow(ir),eps),ir});
+        if      (ul==Lower) index.insert({FindLast (UL.GetRow(ir),eps),ir});
+        else if (ul==Upper) index.insert({FindFirst(UL.GetRow(ir),eps),ir});
         else assert(false);
     }
     //
@@ -115,8 +115,8 @@ std::vector<index_t>  FindColReIndex(TensorNetworks::TriType ul,const Matrix<dou
     std::multimap<index_t,index_t> index;
     for (index_t ic:U.cols())
     {
-        if      (ul==TensorNetworks::Lower) index.insert({FindFirst(U.GetColumn(ic),eps),ic});
-        else if (ul==TensorNetworks::Upper) index.insert({FindLast (U.GetColumn(ic),eps),ic});
+        if      (ul==Lower) index.insert({FindFirst(U.GetColumn(ic),eps),ic});
+        else if (ul==Upper) index.insert({FindLast (U.GetColumn(ic),eps),ic});
         else assert(false);
     }
     //
