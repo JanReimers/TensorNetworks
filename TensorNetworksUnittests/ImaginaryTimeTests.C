@@ -41,7 +41,7 @@ public:
     {
         if (itsH)   delete itsH;
         if (itsMPS) delete itsMPS;
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0,Lower);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,Lower,1.0,1.0,0.0);
         itsMPS=itsH->CreateMPS(D);
         itsMPS->InitializeWith(TensorNetworks::Random);
     }

@@ -59,7 +59,7 @@ public:
     {
         delete itsH;
         delete itsMPS;
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0,ul);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,ul,1.0,1.0,0.0);
         itsMPS=itsH->CreateMPS(1);
         itsMPS->InitializeWith(TensorNetworks::Random);
 

@@ -16,31 +16,31 @@ Factory* Factory::GetFactory()
 }
 
 Hamiltonian* FactoryImp::
-Make1D_NN_HeisenbergHamiltonian(int L, double S, double Jxy, double Jz, double hz,TriType ul)
+Make1D_NN_HeisenbergHamiltonian(int L, double S,TriType ul, double Jxy, double Jz, double hz)
 {
     Hamiltonian_1D_NN_Heisenberg H(S,Jxy,Jz,hz);
     return new HamiltonianImp(L,&H,ul);
 }
 
 Hamiltonian*   FactoryImp::
-Make1D_NN_TransverseIsingHamiltonian(int L, double S, double J, double hx,TriType ul)
+Make1D_NN_TransverseIsingHamiltonian(int L, double S,TriType ul, double J, double hx)
 {
     Hamiltonian_1D_NN_TransverseIsing H(S,J,hx);
     return new HamiltonianImp(L,&H,ul);
 }
 
 iHamiltonian* FactoryImp::
-Make1D_NN_HeisenbergiHamiltonian(int L, double S, double Jxy, double Jz, double hz)
+Make1D_NN_HeisenbergiHamiltonian(int L, double S,TriType ul, double Jxy, double Jz, double hz)
 {
     Hamiltonian_1D_NN_Heisenberg H(S,Jxy,Jz,hz);
-    return new iHamiltonianImp(L,&H);
+    return new iHamiltonianImp(L,&H,ul);
 }
 
 iHamiltonian*   FactoryImp::
-Make1D_NN_TransverseIsingiHamiltonian(int L, double S, double J, double hx)
+Make1D_NN_TransverseIsingiHamiltonian(int L, double S,TriType ul, double J, double hx)
 {
     Hamiltonian_1D_NN_TransverseIsing H(S,J,hx);
-    return new iHamiltonianImp(L,&H);
+    return new iHamiltonianImp(L,&H,ul);
 }
 
 SVCompressorR* FactoryImp::MakeMPOCompressor(int Dmax, double epsSV)

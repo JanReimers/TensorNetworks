@@ -51,11 +51,11 @@ iMPOImp::iMPOImp(int L, const MatrixOR& W)
 //  Load up the sites with copies of the W operator
 //  For and iMPO the sites at the edge of the unit cell are considered Bulk
 //
-iMPOImp::iMPOImp(int L, const OperatorClient* W)
+iMPOImp::iMPOImp(int L, const OperatorClient* W,TriType ul)
     : iMPOImp(L,W->GetS())
 {
     for (int ia=1; ia<=itsL; ia++)
-        Insert(new SiteOperatorImp(Getd(),PBulk,W));
+        Insert(new SiteOperatorImp(Getd(),PBulk,W,ul));
     LinkSites();
 }
 

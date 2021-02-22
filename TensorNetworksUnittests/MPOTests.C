@@ -70,10 +70,10 @@ public:
         if (itsOperatorClient) delete itsOperatorClient;
         if (L>1)
         {
-            itsH =itsFactory->Make1D_NN_HeisenbergHamiltonian( L,S,1.0,1.0,0.0,ul);
+            itsH =itsFactory->Make1D_NN_HeisenbergHamiltonian( L,S,ul,1.0,1.0,0.0);
             itsMPS=itsH->CreateMPS(D);
         }
-        itsiH  =itsFactory->Make1D_NN_HeisenbergiHamiltonian(L,S,1.0,1.0,0.0);
+        itsiH  =itsFactory->Make1D_NN_HeisenbergiHamiltonian(L,S,ul,1.0,1.0,0.0);
         itsiMPS=itsiH->CreateiTEBDState(2,D,Gates,D*D*1e-10,1e-13);
         itsOperatorClient=new TensorNetworks::Hamiltonian_1D_NN_Heisenberg(S,1.0,1.0,0.0);
         assert(itsOperatorClient);
@@ -491,11 +491,11 @@ TEST_F(MPOTests,TestiMPOTrotter1_L2)
         EXPECT_EQ(Dw2,4);
     }
 }
-TEST_F(MPOTests,TestiMPOTrotter2_L2)
+TEST_F(MPOTests,TestiMPO_Lower_Trotter2_L2)
 {
     int L=2,D=2;
     double S=0.5,dt=0.1,epsMPO=6e-3;
-    Setup(L,S,D);
+    Setup(L,S,D,Lower);
     iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,Std,epsMPO);
 //    expH->Report(cout);
     for (int is=1;is<=L;is++)
@@ -505,11 +505,26 @@ TEST_F(MPOTests,TestiMPOTrotter2_L2)
         EXPECT_EQ(Dw2,4);
     }
 }
-TEST_F(MPOTests,TestiMPOTrotter1_L3)
+TEST_F(MPOTests,TestiMPO_Upper_Trotter2_L2)
+{
+    int L=2,D=2;
+    double S=0.5,dt=0.1,epsMPO=6e-3;
+    Setup(L,S,D,Upper);
+    iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,Std,epsMPO);
+//    expH->Report(cout);
+    for (int is=1;is<=L;is++)
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(is)->GetDws();
+        EXPECT_EQ(Dw1,4);
+        EXPECT_EQ(Dw2,4);
+    }
+}
+
+TEST_F(MPOTests,TestiMPO_Lower_Trotter1_L3)
 {
     int L=3,D=2;
     double S=0.5,dt=0.00001,epsMPO=1e-14;
-    Setup(L,S,D);
+    Setup(L,S,D,Lower);
     iMPO* expH=itsiH->CreateiMPO(dt,FirstOrder,Std,epsMPO);
 //    expH->Report(cout);
     {
@@ -528,11 +543,59 @@ TEST_F(MPOTests,TestiMPOTrotter1_L3)
         EXPECT_EQ(Dw2,1);
     }
 }
-TEST_F(MPOTests,  TestiMPOTrotter2_L3  )
+
+TEST_F(MPOTests,TestiMPO_Upper_Trotter1_L3)
+{
+    int L=3,D=2;
+    double S=0.5,dt=0.00001,epsMPO=1e-14;
+    Setup(L,S,D,Upper);
+    iMPO* expH=itsiH->CreateiMPO(dt,FirstOrder,Std,epsMPO);
+//    expH->Report(cout);
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(1)->GetDws();
+        EXPECT_EQ(Dw1,1);
+        EXPECT_EQ(Dw2,4);
+    }
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(2)->GetDws();
+        EXPECT_EQ(Dw1,4);
+        EXPECT_EQ(Dw2,4);
+    }
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(3)->GetDws();
+        EXPECT_EQ(Dw1,4);
+        EXPECT_EQ(Dw2,1);
+    }
+}
+
+TEST_F(MPOTests,  TestiMPO_Lower_Trotter2_L3  )
 {
     int L=3,D=2;
     double S=0.5,dt=0.1,epsMPO=6e-3;
-    Setup(L,S,D);
+    Setup(L,S,D,Lower);
+    iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,Std,epsMPO);
+//    expH->Report(cout);
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(1)->GetDws();
+        EXPECT_EQ(Dw1,1);
+        EXPECT_EQ(Dw2,4);
+    }
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(2)->GetDws();
+        EXPECT_EQ(Dw1,4);
+        EXPECT_EQ(Dw2,4);
+    }
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(3)->GetDws();
+        EXPECT_EQ(Dw1,4);
+        EXPECT_EQ(Dw2,1);
+    }
+}
+TEST_F(MPOTests,  TestiMPO_Upper_Trotter2_L3  )
+{
+    int L=3,D=2;
+    double S=0.5,dt=0.1,epsMPO=6e-3;
+    Setup(L,S,D,Upper);
     iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,Std,epsMPO);
 //    expH->Report(cout);
     {
@@ -607,11 +670,11 @@ TEST_F(MPOTests,TestParkerCanonical_Upper_L9H)
     EXPECT_EQ(H->GetMaxDw(),5);
 }
 
-TEST_F(MPOTests,TestParkerCanonicalTriL1iH)
+TEST_F(MPOTests,TestParkerCanonicalTri_Lower_L1iH)
 {
     int L=1,D=2;
     double S=0.5;
-    Setup(L,S,D);
+    Setup(L,S,D,Lower);
     itsiMPS->InitializeWith(Random);
     itsiMPS->Canonicalize(DLeft);
     itsiMPS->Orthogonalize(0,1e-13);
@@ -626,11 +689,32 @@ TEST_F(MPOTests,TestParkerCanonicalTriL1iH)
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_EQ(itsiH->GetMaxDw(),5);
 }
-TEST_F(MPOTests,TestParkerCanonicalQTIterL1iH)
+//TEST_F(MPOTests,TestParkerCanonicalTri_Upper_L1iH)
+//{
+//    int L=1,D=2;
+//    double S=0.5;
+//    Setup(L,S,D,Upper);
+//    itsiMPS->InitializeWith(Random);
+//    itsiMPS->Canonicalize(DLeft);
+//    itsiMPS->Orthogonalize(0,1e-13);
+//
+//
+//    EXPECT_EQ(itsiH->GetNormStatus(),"W");
+//    double E=itsiMPS->GetExpectation(itsiH);
+//    itsiH->CanonicalFormTri();
+//    EXPECT_EQ(itsiH->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
+////    itsiH->Report(cout);
+//    double Eright=itsiMPS->GetExpectation(itsiH);
+//    EXPECT_NEAR(E,Eright,1e-13);
+//    EXPECT_EQ(itsiH->GetMaxDw(),5);
+//}
+
+
+TEST_F(MPOTests,TestParkerCanonicalQTIter_Lower_L1iH)
 {
     int L=1,D=2;
     double S=0.5;
-    Setup(L,S,D);
+    Setup(L,S,D,Lower);
     itsiMPS->InitializeWith(Random);
     itsiMPS->Canonicalize(DLeft);
     itsiMPS->Orthogonalize(0,1e-13);
@@ -645,6 +729,26 @@ TEST_F(MPOTests,TestParkerCanonicalQTIterL1iH)
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_EQ(itsiH->GetMaxDw(),5);
 }
+
+//TEST_F(MPOTests,TestParkerCanonicalQTIter_Upper_L1iH)
+//{
+//    int L=1,D=2;
+//    double S=0.5;
+//    Setup(L,S,D,Upper);
+//    itsiMPS->InitializeWith(Random);
+//    itsiMPS->Canonicalize(DLeft);
+//    itsiMPS->Orthogonalize(0,1e-13);
+//
+//
+//    EXPECT_EQ(itsiH->GetNormStatus(),"W");
+//    double E=itsiMPS->GetExpectation(itsiH);
+//    itsiH->CanonicalFormQRIter();
+//    EXPECT_EQ(itsiH->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
+////    itsiH->Report(cout);
+//    double Eright=itsiMPS->GetExpectation(itsiH);
+//    EXPECT_NEAR(E,Eright,1e-13);
+//    EXPECT_EQ(itsiH->GetMaxDw(),5);
+//}
 
 /*
 TEST_F(MPOTests,TestParkerCanonicalL1iH2)

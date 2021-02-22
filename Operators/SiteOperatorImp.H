@@ -20,7 +20,7 @@ public:
     typedef Matrix<MatrixRT> TensorT;
     SiteOperatorImp(int d); //Construct with identity operator
     SiteOperatorImp(int d, SpinOperator so); //Construct with identity operator
-    SiteOperatorImp(int d, Position lbr, const OperatorClient* O);
+//    SiteOperatorImp(int d, Position lbr, const OperatorClient* O);
     SiteOperatorImp(int d, Position lbr, const OperatorClient* O,TriType ul);
     SiteOperatorImp(int d, Direction lr , Position lbr, const MatrixRT& U, const DiagonalMatrixRT& expEvs);
     SiteOperatorImp(const MatrixOR& W); //Construct with W operator

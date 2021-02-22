@@ -12,11 +12,11 @@ public:
     FactoryImp() {}
     virtual ~FactoryImp() {}
 
-    virtual  Hamiltonian*  Make1D_NN_HeisenbergHamiltonian       (int L, double S, double Jxy, double Jz, double hz,TriType);
-    virtual  Hamiltonian*  Make1D_NN_TransverseIsingHamiltonian  (int L, double S, double J, double hx,TriType);
+    virtual  Hamiltonian*  Make1D_NN_HeisenbergHamiltonian       (int L, double S,TriType, double Jxy, double Jz, double hz);
+    virtual  Hamiltonian*  Make1D_NN_TransverseIsingHamiltonian  (int L, double S,TriType, double J, double hx);
 
-    virtual iHamiltonian*  Make1D_NN_HeisenbergiHamiltonian      (int L, double S, double Jxy, double Jz, double hz);
-    virtual iHamiltonian*  Make1D_NN_TransverseIsingiHamiltonian (int L, double S, double J, double hx);
+    virtual iHamiltonian*  Make1D_NN_HeisenbergiHamiltonian      (int L, double S,TriType, double Jxy, double Jz, double hz);
+    virtual iHamiltonian*  Make1D_NN_TransverseIsingiHamiltonian (int L, double S,TriType, double J, double hx);
     virtual SVCompressorR* MakeMPOCompressor(int Dmax, double epsSV);
     virtual SVCompressorC* MakeMPSCompressor(int Dmax, double epsSV);
     virtual TNSLogger*     MakeSPDLogger(int level);

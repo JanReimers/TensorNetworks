@@ -37,13 +37,13 @@ public:
 // Heisenberg Hamiltonian
     void Setup(int L, double S, int D, TriType ul)
     {
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0,ul);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,ul,1.0,1.0,0.0);
         itsMPS=itsH->CreateMPS(D,1e-12,1e-12);
     }
 // Transverse Ising Hamiltonian
     void SetupTI(int L, double S, int D, double hx, TriType ul)
     {
-        itsH=itsFactory->Make1D_NN_TransverseIsingHamiltonian(L,S,1.0,hx,ul);
+        itsH=itsFactory->Make1D_NN_TransverseIsingHamiltonian(L,S,ul,1.0,hx);
         itsMPS=itsH->CreateMPS(D,1e-12,1e-12);
     }
 
@@ -140,7 +140,7 @@ TEST_F(VariationalGroundStateTests,TestSweep_Upper_L9S1D2)
     Setup(L,S,D,Upper);
     itsMPS->InitializeWith(Random);
     double Eupper=itsMPS->GetExpectation(itsH);
-    TensorNetworks::Hamiltonian* Hlower=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0,Lower);
+    TensorNetworks::Hamiltonian* Hlower=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,Lower,1.0,1.0,0.0);
     double Elower=itsMPS->GetExpectation(Hlower);
     EXPECT_NEAR(Eupper,Elower,1e-15);
 

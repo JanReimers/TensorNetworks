@@ -30,12 +30,12 @@ SiteOperatorImp::SiteOperatorImp(int d, SpinOperator so) //Construct spin operat
 //
 //  Build from a OpClient Hamiltonian.
 //
-SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H)
-    : SiteOperatorImp(d)
-{
-    itsWs=H->GetMatrixO(Lower);
-    Init_lr(lbr,itsWs.GetNumRows()-1,0);
-}
+//SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H)
+//    : SiteOperatorImp(d)
+//{
+//    itsWs=H->GetMatrixO(Lower);
+//    Init_lr(lbr,itsWs.GetNumRows()-1,0);
+//}
 
 SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H,TriType ul)
     : SiteOperatorImp(d)
@@ -170,6 +170,8 @@ void SiteOperatorImp::SetLimits()
         for (index_t w2:itsWs.cols())
             if (fabs(itsWs(w1,w2))>0.0) //TODO should be using and eps~1e-15 here.
                 itsOpRange.NonZeroAt(w1,w2);
+//    cout << "W=" << itsWs << endl;
+//    cout << "Ranges=" << itsOpRange << endl;
 }
 
 void  SiteOperatorImp::AccumulateTruncationError(double err)

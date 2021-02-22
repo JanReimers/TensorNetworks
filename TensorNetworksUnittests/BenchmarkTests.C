@@ -36,7 +36,7 @@ public:
 
     void Setup(int L, double S, int D,TriType ul)
     {
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0,ul);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,ul,1.0,1.0,0.0);
         itsMPS=itsH->CreateMPS(D,1e-12,1e-12);
     }
 

@@ -16,7 +16,7 @@ public:
     iMPOImp(int L, double S);
     iMPOImp(int L, double S,iMPOImp::LoadWith);
     iMPOImp(int L, const MatrixOR& W);
-    iMPOImp(int L, const OperatorClient* W);
+    iMPOImp(int L, const OperatorClient* W,TriType ul);
     virtual ~iMPOImp();
 
     virtual int    GetL() const {return itsL;}

@@ -1,7 +1,7 @@
 
 SiteOperatorImp:
     Done: -Add upper operators to finite lattice unit tests.
-    -Add upper operators to infinite lattice unit tests.
+    Done: -Add upper operators to infinite lattice unit tests.
     -Run Parker's' examples
     -Implement Parker iMPO SVD
     -SetLimits using zero as criteria.  Should fabs(W)>eps
@@ -34,6 +34,10 @@ MPO:
     -Trotter MPO and iMPO have a lot of duplicated code for calculating exp(-t*H) and factoring it.
         Done: -ExpH
         -Factor U*s*V = expH
+    -TestL2iMPOTrotter4 Get it running again
+    -TestParkerCanonicalTri_Upper_L1iH fails
+    -TestParkerCanonicalQTIter_Upper_L1iH fails
+    -TestRandomEnergyRangeSD_Upper fails
 iMPS
     -We need a horizontal tensor product like for MPOs, to make unit cell state
         The ordering or (ma,mb,..) -> m needs to controlled in one place.

@@ -41,7 +41,7 @@ public:
     void SetupH(int L, double S,TriType ul)
     {
         delete itsH;
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0,ul);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,ul,1.0,1.0,0.0);
     }
     void Setup(int L, double S,TriType ul)
     {
