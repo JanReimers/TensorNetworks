@@ -28,8 +28,8 @@ void MPO::Report(std::ostream& os) const
 {
     int L=GetL();
     os << "Matrix Product Operator for " << L << " sites." << std::endl;
-    os << " Site    Dw       SVD   F-norm    Norm  U/L  LRB" << std::endl;
-    os << "  #     1   2   Tr err    fin     stat          " << std::endl;
+    os << " Site    Dw       SVD   F-norm    Norm  U/L   U/L" << std::endl;
+    os << "  #     1   2   Tr err    fin     stat  meas. nom." << std::endl;
     os << "-----------------------------------------------------------" << std::endl;
     for (int ia=1;ia<=L;ia++)
     {

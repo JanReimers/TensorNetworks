@@ -167,6 +167,29 @@ void SiteOperatorImp::Product(const SiteOperator* O2)
     SetLimits();
 }
 
+char SiteOperatorImp::GetUL() const
+{
+    char ret('?');
+    switch (itsWs.GetUpperLower())
+    {
+    case Lower:
+        ret='L';
+        break;
+    case Upper:
+        ret='U';
+        break;
+    case Diagonal:
+        ret='D';
+        break;
+    case Full:
+        ret='F';
+        break;
+    default :
+        ret='?';
+
+    }
+    return ret;
+}
 
 void SiteOperatorImp::Report(std::ostream& os) const
 {
@@ -177,7 +200,7 @@ void SiteOperatorImp::Report(std::ostream& os) const
     << " " << std::fixed << std::setprecision(1) << std::setw(5) << GetFrobeniusNorm()
     << " " << std::setw(4) << GetNormStatus(1e-13)
     << " " << std::setw(4) << GetUpperLower(1e-13)
-    << " " << std::setw(4) << GetLRB() //Left, Bulk, Right
+    << " " << std::setw(4) << GetUL() // Upper lower
 //    << " " << itsDw12.w1_first << " " << itsDw12.w2_last
     ;
 }

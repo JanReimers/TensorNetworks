@@ -55,6 +55,7 @@ public:
 private:
     SiteOperatorImp* GetNeighbour(Direction) const;
     void Init_lr(Position lbr, int lindex,int rindex);
+    char GetUL() const;
 
     double CompressStd   (Direction,const SVCompressorR*);
     double CompressParker(Direction,const SVCompressorR*);
