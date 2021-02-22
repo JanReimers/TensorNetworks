@@ -1,82 +1,53 @@
 
 SiteOperatorImp:
-    Done: Do we still need Left/Right/Bulk site operators?
-    Done: -Replace Dw12 class with
-        1) int [Dw1,Dw2] GetDws();
-        2) OpRange {first} {last}
-        3) Setp up
-                OpRange [Dw1,Dw2] GetOpRanges()
-    -OR Override rows() cols() to only iterate over non-zero ranges of W
-    -OR  just make a sparse MatrixOR and only store nonzero ops!
-    -Add upper operators to unit tests.
+    Done: -Add upper operators to finite lattice unit tests.
+    -Add upper operators to infinite lattice unit tests.
+    -Run Parker's' examples
+    -Implement Parker iMPO SVD
     -SetLimits using zero as criteria.  Should fabs(W)>eps
         BUT we need to get then SAME eps into the contraction routines.
-    -SiteOp should just be a MatrixOR without all the advanced functions
+    -Upper/Lower determinations for edge site MPOs is ambiguous because those MPOs have either one row
+        or one column. So there is no well defined above/below the diagonal.
+        THis causes problems with OpValMatrix operators many of which depend the U/L determination
+        We need to somehow determine U/L away from the edges and enforce the resulting U/l state
+        on the edges.
 
-Operator Valued Matrix: (short form MatrixO<T> = MatrixOR for T=double.)
-    Done: -Too much mixing up of S and d.  Pick one.
     -Get CanonicalFOrm working for exp(H)
-    Done:-Move Upper/Lower enum to oml side
-    Done:-Move IsTriangular(ul,m) to oml side.
-    Done:-Move tensor product to oml side.
-    -oml move index_t.h up from Imp folder.
-    Done: -Rename MPOTest1 to OvMTests.
-    -COmbine:
-        -Can we simplify some code with Mul(Direction,a,b) mat mul function? Where?
-        Done: -Need op*(Matrix,MatrixO) to pass ul through
-    Done: -SVD:
-    Done: -Do SetV(Q) inside SVD routine
-    Wont Do: -Make a version of BlockQX that does SetV(Q) inside. SVD needs the current version return [Q,RL]
-        Returning both Q and RL is very important for unit testing.
-        So we would need two version of each .. not worth it.
-    Done: -Grow test it is should always be zero based? No!!  Zero or 1.
-    Done: -OperatorElement op=(T), allow assign 1 and 0.  THen try Fill(OvM,0.0)
-    -OperatorElement: recognize known operators for pretty print.
-        -One way is to solve Op=a*I + b*Sx + c*Sy + d*Sz for abcd.  For d>2 this is not guaranteed to solve.
-        -is it as easy as a=Tr(O,I) ?
-    Done: -Re-scale Q/R so QT*Q=d*I
-    Done: -Calculate overlap <Wab*Wcd> for abcd=0..X+1  for R/L*U/L
-        -GetV(lr).Overlap = <Vab*Vcd>
+    -expH MPO get scrambled when reducing to Canonical form.
+        Get further scrambled after Parker-compress, std-compress is fine
+        test is TestParkerSVDCompressExpHL8t1
+        Scrambled = no longer uppper/lower?
+    -Implement Parker algorithm #4, iMPO left canonical form for triangular W
+        Done BUT eq 60 for s_M fails
+    -Implement Parker algorithm #5, iMPO compression
+        JR: Sec. VII eq. 73: it Looks like C = L (or R), i.e just the gauge transform.  Correct?
+        DP: Yep, but since W_L and W_R and left/right-canonical it has a special block-diagonal form.
 
-    -Advanced matrix shape tracking:
-        What if it is both upper and lower?
-        Really 5 cases: Full, Upper, Lower, Diagonal, Zero
-        Could be two more cases: StrictlyUpper, StrictlyLower (nothing on diagonal)
-    Done -Make a pretty print
-    Done:-Track upper/lower as part of OvM class
-    Done: -Implement GetV for U/L*L/R
-    Done: -Implement SetV for U/L*L/R
-    Done: -Implement Flatten(Direction) and UnFlatten
-    Done: -Implement Block respecting QR for U/L*L/R
+OpValMatrix:
+    -Add (rather than combine) MPOs to do:
+                S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
 
+MPO:
+    -track SV spectrum or at least the Min(Sv).
+        -These need to live on bonds between sites.
+        -Ideally Dw would also live on the bonds
+    -Trotter MPO and iMPO have a lot of duplicated code for calculating exp(-t*H) and factoring it.
+        Done: -ExpH
+        -Factor U*s*V = expH
+iMPS
+    -We need a horizontal tensor product like for MPOs, to make unit cell state
+        The ordering or (ma,mb,..) -> m needs to controlled in one place.
+Numerics:
+    -Once rank revealing QL is robust, move into the QRSolver interface.
 
+-TestParkerSVDCompress_Upper_H2L9 fails and crashes, Lower version is fine.
+-VariationalGroundStateTests.TestSweep_Upper_L7S1GrowD27 is getting stuck
+    -Can't see whats going on because log level 2 is too noisy.
+    -These are also hitting maxiter (30 reporting 31)
 -Why all T's in MatrixRT etc. Whats wrong with MatrixR?
--Upper/Lower determinations for edge site MPOs is ambiguous because those MPOs have either one row
-    or one column. So there is no well defined above/below the diagonal.
-    THis causes problems with OpValMatrix operators many of which depend the U/L determination
-    We need to somehow determine U/L away from the edges and enforce the resulting U/l state
-    on the edges.
-Fixed: -The Dw12 first/last index arrays are biased for lower triangular.
--expH MPO get scrambled when reducing to Canonical form.
-    Get further scrambled after Parker-compress, std-compress is fine
-    test is TestParkerSVDCompressExpHL8t1
--MPO track SV spectrum or at least the Min(Sv).
-    -These need to live on bonds between sites.
-    -Ideally Dw would also live on the bonds
 -Log level 0 should have no output
 -iTEBDState::FindiTimeGroundState takes a Hamiltonian AND an iHamiltonian (yuck!)
     simply because we are not very good taking expectation values of iMPOs yet
--MPO Add (rather than combine) MPOs to do:
-            S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
--Done: MPO_SpatialTrotter(dt,TensorNetworks::Even,L,S,itsH), H knows L & S don't need them as arguments
--Trotter MPO and iMPO have a lot of duplicated code for calculating exp(-t*H) and factoring it.
-    Done: -ExpH
-    -Factor U*s*V = expH
--Add asserts to confirm zeros in Lp matrices are indeed zero.
--Simplify iMPO compression code
--Once rank revealing QL is robust, move into the QRSolver interface.
--Implement Parker algorithm #4, iMPO left canonical form for triangular W
--Implement Parker algorithm #5, iMPO compression
 
 
 
@@ -87,7 +58,7 @@ Next steps:
         -Start with one site TI model
         -Do we get the same issues?
     -Sort out iMPOS
-        -Study Parker
+        Done: -Study Parker
             Local Matrix Product Operators: Canonical Form, Compression, & Control Theory
             Efficient simulation of moire materials using the density matrix renormalization group appendix
         -Test 25x25 uncompressed H2 operator in recursive expectation routine.
@@ -101,7 +72,6 @@ Next steps:
 
 
         Done: -Code up MPO compression as per Parker.
-        -Code up iMPO compression as per Parker.
         -<E2> is not working, MPO get compressed to 1x4 - 4x1.  We need to learn how contract
             a Dw x Dw - Dw x Dw open MPO with eigen vectors to get <E2>.
             -We now have iH2, but after naive compression it is not even lower triangular.
@@ -131,11 +101,8 @@ Next steps:
 
 -iTEBD
     issues:
-        1) <E2> doesn't work. Maybe McCulloch's recursive expectation is needed.
-            Need a lower triangular iH2 to make this work.
-        2) Trotter 2nd and fourth order iMPOs behave exactly like first order.
-            Simple compression is possibly pushing important info to edges where it gets cutoff.
         3) All energies are in the ball park but too low compared to mp-toolkit. Maybe <E> is also wrong?
+            -Maybe we need to optimize <psi|phi>
         4) TestApplyiMPOIdentity always fails.  OrthonormalizeI bails because Vl is singular.  Gets 4/8 zero
            eigen values.
     -Can we generalize GetExpectation to MPOs with arbitrary L?
@@ -201,7 +168,21 @@ Next steps:
     -Done Try one tetrahedon.
     -Try iPEPS with iTEBD GS and Corner transfer matrix for contractions.
 
+----------------------------------------------------------------------------------------------------------
 Backburner:
+-oml move index_t.h up from Imp folder.
+-Can we simplify some code with Mul(Direction,a,b) mat mul function? Where?
+-OperatorElement: recognize known operators for pretty print.
+    -One way is to solve Op=a*I + b*Sx + c*Sy + d*Sz for abcd.  For d>2 this is not guaranteed to solve.
+    -is it as easy as a=Tr(O,I) ?
+
+-Advanced matrix shape tracking:
+    What if it is both upper and lower?
+    Really 5 cases: Full, Upper, Lower, Diagonal, Zero
+    Could be two more cases: StrictlyUpper, StrictlyLower (nothing on diagonal)
+-OR Override rows() cols() to only iterate over non-zero ranges of W
+-OR  just make a sparse MatrixOR and only store nonzero ops!
+-SiteOp should just be a MatrixOR without all the advanced functions
 - Possibly fixed: Heisenbug trap in MPSSite_Contractions.C line ~354 can be removed after enough test time (discovered 13 Oct 2020)
 - Right now SVMPOCompressor is unused. Do we need a different policy for MPOs? If not remove SVMPOCompressor
 - Move multiplotable back to Plotting
@@ -212,6 +193,37 @@ Backburner:
         -Might need to identify parameters with strings "Jxy"
 
 ----------------------------------------------------------------------------------------------------------
+Done: Simplify MPO compression code
+Done: MPO_SpatialTrotter(dt,TensorNetworks::Even,L,S,itsH), H knows L & S don't need them as arguments
+Done: -Need op*(Matrix,MatrixO) to pass ul through
+Fixed: -The Dw12 first/last index arrays are biased for lower triangular.
+Done: Do we still need Left/Right/Bulk site operators?
+Done: -Replace Dw12 class with
+    1) int [Dw1,Dw2] GetDws();
+    2) OpRange {first} {last}
+    3) Setp up
+            OpRange [Dw1,Dw2] GetOpRanges()
+Done: -Rename MPOTest1 to OvMTests.
+Done: -Too much mixing up of S and d.  Pick one.
+Done:-Move Upper/Lower enum to oml side
+Done:-Move IsTriangular(ul,m) to oml side.
+Done:-Move tensor product to oml side.
+Done: -SVD:
+Done: -Do SetV(Q) inside SVD routine
+Wont Do: -Make a version of BlockQX that does SetV(Q) inside. SVD needs the current version return [Q,RL]
+    Returning both Q and RL is very important for unit testing.
+    So we would need two version of each .. not worth it.
+Done: -Grow test it is should always be zero based? No!!  Zero or 1.
+Done: -OperatorElement op=(T), allow assign 1 and 0.  THen try Fill(OvM,0.0)
+Done: -Re-scale Q/R so QT*Q=d*I
+Done: -Calculate overlap <Wab*Wcd> for abcd=0..X+1  for R/L*U/L
+    -GetV(lr).Overlap = <Vab*Vcd>
+Done -Make a pretty print
+Done:-Track upper/lower as part of OvM class
+Done: -Implement GetV for U/L*L/R
+Done: -Implement SetV for U/L*L/R
+Done: -Implement Flatten(Direction) and UnFlatten
+Done: -Implement Block respecting QR for U/L*L/R
 Done: -oml implement Matrix<T>.RemoveColumn() and Matrix<T>.RemoveRow()
 Done: -iMPO can form, implement rank revealing QR
 Done: -At left edge we should get V=[b,I] not [0].  Fix ReshapeV accordingly

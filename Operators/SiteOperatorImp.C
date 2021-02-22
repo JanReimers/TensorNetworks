@@ -12,7 +12,7 @@ namespace TensorNetworks
 SiteOperatorImp::SiteOperatorImp(int d)
     : itsd(d)
     , itsTruncationError(0.0)
-    , itsWs(1,1,d,Lower)
+    , itsWs(1,1,d,Diagonal)
 {
     Unit(itsWs);
     SetLimits();
@@ -36,6 +36,26 @@ SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H)
     itsWs=H->GetMatrixO(Lower);
     Init_lr(lbr,itsWs.GetNumRows()-1,0);
 }
+
+SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H,TriType ul)
+    : SiteOperatorImp(d)
+{
+    itsWs=H->GetMatrixO(ul);
+    itsWs.SetUpperLower(ul);
+
+    switch (ul)
+    {
+    case Lower:
+        Init_lr(lbr,itsWs.GetNumRows()-1,0);
+        break;
+    case Upper:
+        Init_lr(lbr,0,itsWs.GetNumCols()-1);
+        break;
+    default:
+        assert(false);
+    }
+}
+
 //
 // Build from a trotter decomp.
 //
@@ -113,7 +133,6 @@ void SiteOperatorImp::Init_lr(Position lbr, int lindex,int rindex)
     }
 
     SetLimits();
-    itsWs.SetUpperLower(Lower);
 }
 
 void SiteOperatorImp::SetNeighbours(SiteOperator* left, SiteOperator* right)

@@ -8,8 +8,8 @@ using std::endl;
 namespace TensorNetworks
 {
 
-HamiltonianImp::HamiltonianImp(int L, const OperatorClient* W)
-    : MPOImp(L,W)
+HamiltonianImp::HamiltonianImp(int L, const OperatorClient* W,TriType ul)
+    : MPOImp(L,W,ul)
 {
     itsH12=W->GetH12();
 }

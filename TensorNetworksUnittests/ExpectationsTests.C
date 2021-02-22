@@ -7,12 +7,32 @@
 #include "Operators/MPO_OneSite.H"
 #include "Operators/MPO_TwoSite.H"
 
-//#include "oml/stream.h"
-//#include "oml/array_io.h"
 #include "oml/smatrix.h"
 #include "oml/numeric.h"
 
 using std::setw;
+
+using TensorNetworks::Random;
+//using TensorNetworks::Neel;
+//using TensorNetworks::DLeft;
+//using TensorNetworks::DRight;
+using TensorNetworks::IterationSchedule;
+using TensorNetworks::Epsilons;
+using TensorNetworks::MPS;
+using TensorNetworks::TriType;
+using TensorNetworks::SpinCalculator;
+using TensorNetworks::MPO;
+using TensorNetworks::MPO_OneSite;
+using TensorNetworks::MPO_TwoSite;
+using TensorNetworks::Sx;
+using TensorNetworks::Sz;
+using TensorNetworks::Sp;
+using TensorNetworks::Sm;
+//using TensorNetworks::;
+//using TensorNetworks::;
+//using TensorNetworks::;
+//using TensorNetworks::;
+
 
 class ExpectationsTests : public ::testing::Test
 {
@@ -35,11 +55,11 @@ public:
         delete itsMPS;
     }
 
-    void Setup(int L, double S, int D)
+    void Setup(int L, double S, int D, TriType ul)
     {
         delete itsH;
         delete itsMPS;
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0,ul);
         itsMPS=itsH->CreateMPS(1);
         itsMPS->InitializeWith(TensorNetworks::Random);
 
@@ -58,7 +78,7 @@ public:
 
 TEST_F(ExpectationsTests,TestSpinCalculatorS12)
 {
-    TensorNetworks::SpinCalculator sc(0.5);
+    SpinCalculator sc(0.5);
 
     EXPECT_EQ(ToString(sc.GetSx()),"(1:2),(1:2) \n[ 0 0.5 ]\n[ 0.5 0 ]\n");
     EXPECT_EQ(ToString(sc.GetSy()),"(1:2),(1:2) \n[ (0,0) (0,0.5) ]\n[ (0,-0.5) (0,0) ]\n");
@@ -74,18 +94,18 @@ TEST_F(ExpectationsTests,TestSweepL9S1D2)
 {
     int L=9,D=2;
     double S=0.5;
-    Setup(L,S,D);
+    Setup(L,S,D,Lower);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.45317425,1e-7);
 }
 
 
-TEST_F(ExpectationsTests,TestOneSiteDMs)
+TEST_F(ExpectationsTests,TestOneSiteDMs_Lower)
 {
     int L=9,D=4;
     double S=0.5;
-    Setup(L,S,D);
+    Setup(L,S,D,Lower);
     OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs();
     OneSiteDMs::ExpectationT traces=ro1.GetTraces();
     double eps=1e-14;
@@ -95,20 +115,34 @@ TEST_F(ExpectationsTests,TestOneSiteDMs)
     }
 }
 
-TEST_F(ExpectationsTests,TestOneSiteExpectations)
+TEST_F(ExpectationsTests,TestOneSiteDMs_Upper)
 {
     int L=9,D=4;
     double S=0.5;
-    Setup(L,S,D);
+    Setup(L,S,D,Upper);
+    OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs();
+    OneSiteDMs::ExpectationT traces=ro1.GetTraces();
+    double eps=1e-14;
+    for (int ia=1;ia<=L;ia++)
+    {
+         EXPECT_NEAR(traces(ia),1.0,eps);
+    }
+}
+
+TEST_F(ExpectationsTests,TestOneSiteExpectations_Lower)
+{
+    int L=9,D=4;
+    double S=0.5;
+    Setup(L,S,D,Lower);
 
     OneSiteDMs::ExpectationT Sx_mpo(L),Sz_mpo(L);
     Vector<std::complex<double> > Sp_mpo(L),Sm_mpo(L);
     for (int ia=1;ia<=L;ia++)
     {
-        TensorNetworks::MPO* Sxo=new TensorNetworks::MPO_OneSite(L,S ,ia, TensorNetworks::Sx);
-        TensorNetworks::MPO* Szo=new TensorNetworks::MPO_OneSite(L,S ,ia, TensorNetworks::Sz);
-        TensorNetworks::MPO* Spo=new TensorNetworks::MPO_OneSite(L,S ,ia, TensorNetworks::Sp);
-        TensorNetworks::MPO* Smo=new TensorNetworks::MPO_OneSite(L,S ,ia, TensorNetworks::Sm);
+        MPO* Sxo=new MPO_OneSite(L,S ,ia, Sx);
+        MPO* Szo=new MPO_OneSite(L,S ,ia, Sz);
+        MPO* Spo=new MPO_OneSite(L,S ,ia, Sp);
+        MPO* Smo=new MPO_OneSite(L,S ,ia, Sm);
         Sx_mpo(ia)=itsMPS->GetExpectation(Sxo);
         Sz_mpo(ia)=itsMPS->GetExpectation(Szo);
         Sp_mpo(ia)=itsMPS->GetExpectationC(Smo);
@@ -120,7 +154,7 @@ TEST_F(ExpectationsTests,TestOneSiteExpectations)
     }
     OneSiteDMs::ExpectationT Sy_mpo=-0.5*imag(Sp_mpo-Sm_mpo);
 
-    TensorNetworks::SpinCalculator sc(S);
+    SpinCalculator sc(S);
 
     OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs();
     OneSiteDMs::ExpectationT Sx=ro1.Contract(sc.GetSx());
@@ -150,16 +184,58 @@ TEST_F(ExpectationsTests,TestOneSiteExpectations)
     cout << "E=" << E << endl;
 */
 }
+
+TEST_F(ExpectationsTests,TestOneSiteExpectations_Upper)
+{
+    int L=9,D=4;
+    double S=0.5;
+    Setup(L,S,D,Upper);
+
+    OneSiteDMs::ExpectationT Sx_mpo(L),Sz_mpo(L);
+    Vector<std::complex<double> > Sp_mpo(L),Sm_mpo(L);
+    for (int ia=1;ia<=L;ia++)
+    {
+        MPO* Sxo=new MPO_OneSite(L,S ,ia, Sx);
+        MPO* Szo=new MPO_OneSite(L,S ,ia, Sz);
+        MPO* Spo=new MPO_OneSite(L,S ,ia, Sp);
+        MPO* Smo=new MPO_OneSite(L,S ,ia, Sm);
+        Sx_mpo(ia)=itsMPS->GetExpectation(Sxo);
+        Sz_mpo(ia)=itsMPS->GetExpectation(Szo);
+        Sp_mpo(ia)=itsMPS->GetExpectationC(Smo);
+        Sm_mpo(ia)=itsMPS->GetExpectationC(Spo);
+        delete Sxo;
+        delete Szo;
+        delete Spo;
+        delete Smo;
+    }
+    OneSiteDMs::ExpectationT Sy_mpo=-0.5*imag(Sp_mpo-Sm_mpo);
+
+    SpinCalculator sc(S);
+
+    OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs();
+    OneSiteDMs::ExpectationT Sx=ro1.Contract(sc.GetSx());
+    OneSiteDMs::ExpectationT Sy=ro1.Contract(sc.GetSy());
+    OneSiteDMs::ExpectationT Sz=ro1.Contract(sc.GetSz());
+
+    double eps=1e-14;
+    for (int ia=1;ia<=L;ia++)
+    {
+        EXPECT_NEAR(Sx(ia),Sx_mpo(ia),eps);
+        EXPECT_NEAR(Sy(ia),Sy_mpo(ia),eps);
+        EXPECT_NEAR(Sz(ia),Sz_mpo(ia),eps);
+    }
+
+}
 TEST_F(ExpectationsTests,TestFreezeL9S1D2)
 {
     int L=9,D=2,maxIter=100;
     double S=0.5;
-    Setup(L,S,D);
-    itsMPS->InitializeWith(TensorNetworks::Random);
+    Setup(L,S,D,Lower);
+    itsMPS->InitializeWith(Random);
     itsMPS->Freeze(L,S); //Site 0 spin up
 
 
-    TensorNetworks::IterationSchedule is;
+    IterationSchedule is;
     itsEps.itsDelatEnergy1Epsilon=1e-9;
     is.Insert({maxIter,D,itsEps});
 
@@ -169,7 +245,7 @@ TEST_F(ExpectationsTests,TestFreezeL9S1D2)
     EXPECT_NEAR(E/(L-1),-0.45317425 ,1e-7);
     EXPECT_LT(nSweep,maxIter);
 
-    TensorNetworks::SpinCalculator sc(S);
+    SpinCalculator sc(S);
     OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs();
     OneSiteDMs::ExpectationT Sx=ro1.Contract(sc.GetSx());
     OneSiteDMs::ExpectationT Sy=ro1.Contract(sc.GetSy());
@@ -188,7 +264,7 @@ SMatrix<Matrix<double> > SuseptibilityTensor(const OneSiteDMs& dm1,const TwoSite
     assert(dm2.GetL()==L);
     assert(dm2.GetS()==dm1.GetS());
     SMatrix<Matrix<double> > ret(L,L);
-    TensorNetworks::SpinCalculator sc(dm1.GetS());
+    SpinCalculator sc(dm1.GetS());
 
     OneSiteDMs::ExpectationT Sx=dm1.Contract(sc.GetSx());
     OneSiteDMs::ExpectationT Sy=dm1.Contract(sc.GetSy());
@@ -220,7 +296,7 @@ SMatrix<Matrix<double> > SuseptibilityTensor(const OneSiteDMs& dm1,const TwoSite
     return ret;
 }
 
-SMatrix<Matrix<double> > SuseptibilityTensor(const TensorNetworks::MPS* mps,const TwoSiteDMs& dm2)
+SMatrix<Matrix<double> > SuseptibilityTensor(const MPS* mps,const TwoSiteDMs& dm2)
 {
     int L=dm2.GetL();
     double S=dm2.GetS();
@@ -231,10 +307,10 @@ SMatrix<Matrix<double> > SuseptibilityTensor(const TensorNetworks::MPS* mps,cons
     Vector<std::complex<double> > Sp_mpo(L),Sm_mpo(L);
     for (int ia=1; ia<=L; ia++)
     {
-        TensorNetworks::MPO* Sxo=new TensorNetworks::MPO_OneSite(L,S,ia, TensorNetworks::Sx);
-        TensorNetworks::MPO* Szo=new TensorNetworks::MPO_OneSite(L,S,ia, TensorNetworks::Sz);
-        TensorNetworks::MPO* Spo=new TensorNetworks::MPO_OneSite(L,S,ia, TensorNetworks::Sp);
-        TensorNetworks::MPO* Smo=new TensorNetworks::MPO_OneSite(L,S,ia, TensorNetworks::Sm);
+        MPO* Sxo=new MPO_OneSite(L,S,ia, Sx);
+        MPO* Szo=new MPO_OneSite(L,S,ia, Sz);
+        MPO* Spo=new MPO_OneSite(L,S,ia, Sp);
+        MPO* Smo=new MPO_OneSite(L,S,ia, Sm);
         Sx_mpo(ia)=mps->GetExpectation(Sxo);
         Sz_mpo(ia)=mps->GetExpectation(Szo);
         Sp_mpo(ia)=mps->GetExpectationC(Smo);
@@ -247,7 +323,7 @@ SMatrix<Matrix<double> > SuseptibilityTensor(const TensorNetworks::MPS* mps,cons
     OneSiteDMs::ExpectationT Sy_mpo=-0.5*imag(Sp_mpo-Sm_mpo);
 
     SMatrix<Matrix<double> > ret(L,L);
-    TensorNetworks::SpinCalculator sc(dm2.GetS());
+    SpinCalculator sc(dm2.GetS());
 
 
     TwoSiteDMs::ExpectationT SxSx=dm2.Contract(sc.GetSxSx());
@@ -277,11 +353,11 @@ SMatrix<Matrix<double> > SuseptibilityTensor(const TensorNetworks::MPS* mps,cons
     return ret;
 }
 
-TEST_F(ExpectationsTests,TestTwoSiteDMs)
+TEST_F(ExpectationsTests,TestTwoSiteDMs_Lower)
 {
     int L=9,D=4;
     double S=0.5;
-    Setup(L,S,D);
+    Setup(L,S,D,Lower);
 
     TwoSiteDMs::ExpectationT SxSx_mpo(L,L),SxSz_mpo(L,L),SzSx_mpo(L,L),SzSz_mpo(L,L);
     SMatrix<std::complex<double> > SmSm_mpo(L,L),SmSp_mpo(L,L),SpSm_mpo(L,L),SpSp_mpo(L,L);
@@ -296,14 +372,14 @@ TEST_F(ExpectationsTests,TestTwoSiteDMs)
     for (int ia=1;ia<L;ia++)
         for (int ib=ia+1;ib<=L;ib++)
     {
-        TensorNetworks::MPO* SxSxo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sx,TensorNetworks::Sx);
-        TensorNetworks::MPO* SxSzo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sx,TensorNetworks::Sz);
-        TensorNetworks::MPO* SzSxo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sz,TensorNetworks::Sx);
-        TensorNetworks::MPO* SzSzo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sz,TensorNetworks::Sz);
-        TensorNetworks::MPO* SmSmo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sm,TensorNetworks::Sm);
-        TensorNetworks::MPO* SmSpo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sm,TensorNetworks::Sp);
-        TensorNetworks::MPO* SpSmo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sp,TensorNetworks::Sm);
-        TensorNetworks::MPO* SpSpo=new TensorNetworks::MPO_TwoSite(L,S ,ia,ib, TensorNetworks::Sp,TensorNetworks::Sp);
+        MPO* SxSxo=new MPO_TwoSite(L,S ,ia,ib, Sx,Sx);
+        MPO* SxSzo=new MPO_TwoSite(L,S ,ia,ib, Sx,Sz);
+        MPO* SzSxo=new MPO_TwoSite(L,S ,ia,ib, Sz,Sx);
+        MPO* SzSzo=new MPO_TwoSite(L,S ,ia,ib, Sz,Sz);
+        MPO* SmSmo=new MPO_TwoSite(L,S ,ia,ib, Sm,Sm);
+        MPO* SmSpo=new MPO_TwoSite(L,S ,ia,ib, Sm,Sp);
+        MPO* SpSmo=new MPO_TwoSite(L,S ,ia,ib, Sp,Sm);
+        MPO* SpSpo=new MPO_TwoSite(L,S ,ia,ib, Sp,Sp);
         SxSx_mpo(ia,ib)=itsMPS->GetExpectation (SxSxo);
         SxSz_mpo(ia,ib)=itsMPS->GetExpectation (SxSzo);
         SzSx_mpo(ia,ib)=itsMPS->GetExpectation (SzSxo);
@@ -335,7 +411,7 @@ TEST_F(ExpectationsTests,TestTwoSiteDMs)
             EXPECT_GT(VNs(ia,ib),0.0);
             EXPECT_LE(VNs(ia,ib),log(D));
         }
-    TensorNetworks::SpinCalculator sc(S);
+    SpinCalculator sc(S);
     TwoSiteDMs::ExpectationT SxSx=ros.Contract(sc.GetSxSx());
     TwoSiteDMs::ExpectationT SxSy=ros.Contract(sc.GetSxSy());
     TwoSiteDMs::ExpectationT SxSz=ros.Contract(sc.GetSxSz());

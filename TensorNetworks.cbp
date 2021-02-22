@@ -151,10 +151,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/OperatorValuedMatrix.H" />
-		<Unit filename="Operators/SiteOperatorBulk.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Operators/SiteOperatorBulk.H" />
 		<Unit filename="Operators/SiteOperatorImp.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -171,14 +167,6 @@
 		<Unit filename="Operators/SiteOperatorImpiCanonicalTriangular.C">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="Operators/SiteOperatorLeft.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Operators/SiteOperatorLeft.H" />
-		<Unit filename="Operators/SiteOperatorRight.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Operators/SiteOperatorRight.H" />
 		<Unit filename="Operators/iMPOImp.C">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -19,7 +19,7 @@ class HamiltonianImp
     , private MPOImp
 {
 public:
-    HamiltonianImp(int L, const OperatorClient* W);
+    HamiltonianImp(int L, const OperatorClient* W,TriType ul);
     virtual ~HamiltonianImp();
 
     virtual int    GetL    () const {return MPOImp::GetL    ();}

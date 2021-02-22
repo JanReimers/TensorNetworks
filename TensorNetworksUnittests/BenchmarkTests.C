@@ -7,10 +7,13 @@
 #include "TensorNetworks/Factory.H"
 #include <omp.h>
 
-//#include "oml/stream.h"
-//#include "oml/stopw.h"
 
 using std::setw;
+using TensorNetworks::Random;
+using TensorNetworks::Neel;
+using TensorNetworks::IterationSchedule;
+using TensorNetworks::Epsilons;
+using TensorNetworks::TriType;
 
 class BenchmarkTests : public ::testing::Test
 {
@@ -31,9 +34,9 @@ public:
         if (itsMPS) delete itsMPS;
     }
 
-    void Setup(int L, double S, int D)
+    void Setup(int L, double S, int D,TriType ul)
     {
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0,ul);
         itsMPS=itsH->CreateMPS(D,1e-12,1e-12);
     }
 
@@ -45,20 +48,45 @@ public:
 };
 
 #ifndef DEBUG
-TEST_F(BenchmarkTests,TestSweepL9S1D8)
+TEST_F(BenchmarkTests,TestSweep_Lower_L9S1D8)
 {
     int L=9,D=8,maxIter=100,Nreplicates=1;
     double S=0.5;
-    Setup(L,S,D);
+    Setup(L,S,D,Lower);
 
 
-    TensorNetworks::Epsilons eps(0.0);
-    TensorNetworks::IterationSchedule is;
+    Epsilons eps(0.0);
+    IterationSchedule is;
     is.Insert({maxIter,D,eps});
     double t_start=omp_get_wtime();
     for (int i=1;i<=Nreplicates;i++)
     {
-        itsMPS->InitializeWith(TensorNetworks::Neel);
+        itsMPS->InitializeWith(Neel);
+        itsMPS->FindVariationalGroundState(itsH,is);
+    }
+    double t_stop=omp_get_wtime();
+    cout << "Run time = " << (t_stop-t_start)/Nreplicates << " sec/replicate.";
+    itsMPS->Report(cout);
+
+    double E=itsMPS->GetExpectation(itsH);
+//    EXPECT_NEAR(E/(L-1),-0.4670402,1e-7); //For D=16
+    EXPECT_NEAR(E/(L-1),-0.4670375,1e-7); //For D=8
+}
+
+TEST_F(BenchmarkTests,TestSweep_Upper_L9S1D8)
+{
+    int L=9,D=8,maxIter=100,Nreplicates=1;
+    double S=0.5;
+    Setup(L,S,D,Upper);
+
+
+    Epsilons eps(0.0);
+    IterationSchedule is;
+    is.Insert({maxIter,D,eps});
+    double t_start=omp_get_wtime();
+    for (int i=1;i<=Nreplicates;i++)
+    {
+        itsMPS->InitializeWith(Neel);
         itsMPS->FindVariationalGroundState(itsH,is);
     }
     double t_stop=omp_get_wtime();

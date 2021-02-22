@@ -44,7 +44,7 @@ public:
         if (itsiH)         delete itsiH;
         if (itsState)      delete itsState;
         if (itsCompressor) delete itsCompressor;
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,1.0,1.0,0.0,Lower);
         itsiH=itsFactory->Make1D_NN_HeisenbergiHamiltonian(1,S,1.0,1.0,0.0);
         itsState=itsiH->CreateiTEBDState(L,D,itype,D*D*epsNorm,epsSVD);
         itsCompressor=itsFactory->MakeMPSCompressor(D,epsSVD);
