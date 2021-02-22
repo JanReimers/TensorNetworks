@@ -109,7 +109,14 @@ template <class T> double MaxDelta(const MatrixO<T>& a, const MatrixO<T>& b)
 
 inline TriType Combine(TriType a, TriType b)
 {
-    return (a==b) ? a : Full;
+    TriType ret=a;
+    if (a!=b)
+    {
+        if (a==Diagonal) ret=b;
+        else if (b==Diagonal) ret=a;
+        else if (a==Full || b==Full) ret=Full;
+    }
+    return ret;
 }
 
 template <class T> MatrixO<T> operator-(const MatrixO<T>& a, const MatrixO<T>& b)

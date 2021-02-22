@@ -214,6 +214,8 @@ template <class T> MatrixO<T> MatrixO<T>::GetV(Direction lr) const
         lv=MatLimits(l.Row.Low,rh,l.Col.Low,ch);
     else if ((lr==DLeft && itsUL==Lower) || (lr==DRight && itsUL== Upper))
         lv=MatLimits(rl,l.Row.High,cl,l.Col.High);
+    else if  ((lr==DLeft && itsUL==Diagonal) || (lr==DRight && itsUL==Diagonal))
+        lv=MatLimits(l.Row.Low,rh,l.Col.Low,ch);
     else
         assert(false);
 
