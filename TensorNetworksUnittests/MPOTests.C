@@ -855,7 +855,7 @@ TEST_F(MPOTests,TestParkerSVDCompress_Lower_H2L9)
 }
 
 // Fails
-/*TEST_F(MPOTests,TestParkerSVDCompress_Upper_H2L9)
+TEST_F(MPOTests,TestParkerSVDCompress_Upper_H2L9)
 {
     int L=9,D=2;
     double S=0.5;
@@ -869,14 +869,11 @@ TEST_F(MPOTests,TestParkerSVDCompress_Lower_H2L9)
     EXPECT_EQ(H2->GetNormStatus(),"WWWWWWWWW");
     EXPECT_EQ(H2->GetUpperLower()," UUUUUUU ");
     double E2=itsMPS->GetExpectation(H2);
-    H2->Report(cout);
     H2->CanonicalForm(); //Do we need to sweep both ways?
-    H2->Report(cout);
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     EXPECT_EQ(H2->GetUpperLower()," UUUUUUU ");
     double E2can=itsMPS->GetExpectation(H2);
     double truncError=H2->Compress(Parker,0,1e-13);
-    H2->Report(cout);
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     EXPECT_EQ(H2->GetUpperLower()," FFFFFFF ");
     double E2comp=itsMPS->GetExpectation(H2);
@@ -885,7 +882,7 @@ TEST_F(MPOTests,TestParkerSVDCompress_Lower_H2L9)
     EXPECT_EQ(H2->GetMaxDw(),9);
     EXPECT_LT(truncError,1e-13);
 }
-*/
+
 TEST_F(MPOTests,TestParkerSVDCompressH2L256)
 {
     int L=256,D=2;

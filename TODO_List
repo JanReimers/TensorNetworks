@@ -44,7 +44,7 @@ iMPS
 Numerics:
     -Once rank revealing QL is robust, move into the QRSolver interface.
 
--TestParkerSVDCompress_Upper_H2L9 fails and crashes, Lower version is fine.
+Fixed: -TestParkerSVDCompress_Upper_H2L9 fails and crashes, Lower version is fine.
 -VariationalGroundStateTests.TestSweep_Upper_L7S1GrowD27 is getting stuck
     -Can't see whats going on because log level 2 is too noisy.
     -These are also hitting maxiter (30 reporting 31)

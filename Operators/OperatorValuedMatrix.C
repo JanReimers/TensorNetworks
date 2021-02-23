@@ -236,8 +236,13 @@ template <class T> void MatrixO<T>::SetV(Direction lr,const MatrixO& V)
     {
     case DLeft:
         if (nc-1<X2)
+        {
+            VectorOR lastCol=this->GetColumn(X2+1);
+            assert(lastCol.size());
             SetChi12(X1,nc-1,true); //we must save the old since V only holds part of W
-        break; //May nee to save last column for upper tri matrices.
+            this->GetColumn(nc)=lastCol.SubVector(0,X1+1);
+        }
+        break;
     case DRight:
         if (nr-1<X1)
         {
