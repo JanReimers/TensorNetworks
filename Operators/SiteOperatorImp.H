@@ -66,13 +66,12 @@ private:
 
     void     AccumulateTruncationError(double err);
 
-    MatrixRT BuildK(int M) const;
-    VectorRT Buildc(int M) const;
-    double   Contract (int w11, int w12, int w21, int w22) const;
-    double   ContractT(int w11, int w12, int w21, int w22) const;
+    MatrixRT BuildK(int M,TriType ul) const;
+    VectorRT Buildc(int M,TriType ul) const;
+    double   ContractUL(int w11, int w12, int w21, int w22,TriType) const;
     void     GaugeTransform(const MatrixRT& R, const MatrixRT& Rinv);
-    double   Contract_sM(int M) const;
-    double   Contract_sM1(int M) const;
+    double   Contract_sM(int M,TriType ul) const;
+    double   Contract_sM1(int M,TriType ul) const;
 protected:
 
     int      itsd; //2*S+1

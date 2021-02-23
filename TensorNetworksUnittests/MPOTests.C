@@ -689,25 +689,25 @@ TEST_F(MPOTests,TestParkerCanonicalTri_Lower_L1iH)
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_EQ(itsiH->GetMaxDw(),5);
 }
-//TEST_F(MPOTests,TestParkerCanonicalTri_Upper_L1iH)
-//{
-//    int L=1,D=2;
-//    double S=0.5;
-//    Setup(L,S,D,Upper);
-//    itsiMPS->InitializeWith(Random);
-//    itsiMPS->Canonicalize(DLeft);
-//    itsiMPS->Orthogonalize(0,1e-13);
-//
-//
-//    EXPECT_EQ(itsiH->GetNormStatus(),"W");
-//    double E=itsiMPS->GetExpectation(itsiH);
-//    itsiH->CanonicalFormTri();
-//    EXPECT_EQ(itsiH->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
-////    itsiH->Report(cout);
-//    double Eright=itsiMPS->GetExpectation(itsiH);
-//    EXPECT_NEAR(E,Eright,1e-13);
-//    EXPECT_EQ(itsiH->GetMaxDw(),5);
-//}
+TEST_F(MPOTests,TestParkerCanonicalTri_Upper_L1iH)
+{
+    int L=1,D=2;
+    double S=0.5;
+    Setup(L,S,D,Upper);
+    itsiMPS->InitializeWith(Random);
+    itsiMPS->Canonicalize(DLeft);
+    itsiMPS->Orthogonalize(0,1e-13);
+
+
+    EXPECT_EQ(itsiH->GetNormStatus(),"W");
+    double E=itsiMPS->GetExpectation(itsiH);
+    itsiH->CanonicalFormTri();
+    EXPECT_EQ(itsiH->GetNormStatus(),"R"); //The last site ends up being both right and left normalized
+//    itsiH->Report(cout);
+    double Eright=itsiMPS->GetExpectation(itsiH);
+    EXPECT_NEAR(E,Eright,1e-13);
+    EXPECT_EQ(itsiH->GetMaxDw(),5);
+}
 
 
 TEST_F(MPOTests,TestParkerCanonicalQTIter_Lower_L1iH)

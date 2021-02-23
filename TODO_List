@@ -35,7 +35,7 @@ MPO:
         Done: -ExpH
         -Factor U*s*V = expH
     -TestL2iMPOTrotter4 Get it running again
-    -TestParkerCanonicalTri_Upper_L1iH fails
+    Fixed: -TestParkerCanonicalTri_Upper_L1iH fails
     Fixed: -TestParkerCanonicalQTIter_Upper_L1iH fails
     Fixed: -TestRandomEnergyRangeSD_Upper fails
 iMPS

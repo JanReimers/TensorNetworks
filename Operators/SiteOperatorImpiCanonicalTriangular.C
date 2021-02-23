@@ -11,46 +11,38 @@ namespace TensorNetworks
 
 using std::cout;
 using std::endl;
-
-
-
 //
 //  <Wdagger(w11,w12),W(w21,w22)>.  The ws are zero based.
 //
-double SiteOperatorImp::ContractT(int w11, int w12, int w21, int w22) const
+double SiteOperatorImp::ContractUL(int w11, int w12, int w21, int w22,TriType ul) const
 {
-    return Contract(w12,w11,w22,w21);
+    if (ul==Upper)
+        return itsWs.GetTrace(w12,w11,w21,w22);
+    else if (ul==Lower)
+        return itsWs.GetTrace(w11,w12,w22,w21);
+    else
+        assert(false);
 }
 
-double SiteOperatorImp::Contract(int w11, int w12, int w21, int w22) const
-{
-    double r1=0.0;
-    for (int m=0; m<itsd; m++)
-    for (int n=0; n<itsd; n++)
-        r1+=itsWs(w11,w12)(m,n)*itsWs(w21,w22)(m,n);
-
-    return r1/itsd; //Divide by Tr[I]
-}
-
-MatrixRT SiteOperatorImp::BuildK(int M) const
+MatrixRT SiteOperatorImp::BuildK(int M,TriType ul) const
 {
     MatrixRT K(M,M),I(M,M);
     Unit(I);
     for (int b=0;b<=M-1;b++)
     for (int a=0;a<=M-1;a++)
     {
-        K(b+1,a+1)=I(b+1,a+1)-Contract(b,a,M,M);
+        K(b+1,a+1)=I(b+1,a+1)-ContractUL(a,b,M,M,ul);
     }
     return K;
 }
-VectorRT SiteOperatorImp::Buildc(int M) const
+VectorRT SiteOperatorImp::Buildc(int M,TriType ul) const
 {
     VectorRT c(M);
     Fill(c,0.0);
     for (int b=0;b<=M-1;b++)
     for (int a=0;a<=M-1;a++)
     {
-        c(b+1)+=Contract(M,b,M,a);
+        c(b+1)+=ContractUL(b,M,a,M,ul);
     }
     return c;
 }
@@ -59,21 +51,26 @@ void SiteOperatorImp::GaugeTransform(const MatrixRT& R, const MatrixRT& Rinv)
 {
     assert(R.GetLimits()==Rinv.GetLimits());
     assert(IsUnit(R*Rinv,1e-13));
-  //  TriType ul=itsWs.GetUpperLower();
-    itsWs=Transpose(R*Transpose(itsWs)*Rinv); //ul might get lost in this step.
-//    itsWs.SetUpperLower(ul);
+    TriType ul=itsWs.GetUpperLower();
+    if (ul==Upper)
+        itsWs=R*itsWs*Rinv;
+    else if (ul==Lower)
+        itsWs=Transpose(R*Transpose(itsWs)*Rinv); //ul might get lost in this step.
+    else
+        assert(false);
+    assert(itsWs.GetUpperLower()==ul);
     SetLimits();
 
 }
 
-double SiteOperatorImp::Contract_sM(int M) const
+double SiteOperatorImp::Contract_sM(int M,TriType ul) const
 {
-    double dM=ContractT(M,M,M,M);
+    double dM=ContractUL(M,M,M,M,ul);
     assert(dM<1.0);
     assert(dM>=0.0);
     double sM=0.0;
     for (int a=0;a<=M;a++)
-        sM+=ContractT(a,M,a,M);
+        sM+=ContractUL(a,M,a,M,ul);
     cout << "sM,dM = " << sM << " " << dM << endl;
     assert(sM>=0.0);
     sM/=(1-dM);
@@ -81,12 +78,12 @@ double SiteOperatorImp::Contract_sM(int M) const
     return sqrt(sM);
 
 }
-double SiteOperatorImp::Contract_sM1(int M) const
+double SiteOperatorImp::Contract_sM1(int M,TriType ul) const
 {
     int X=itsOpRange.Dw1-2;
     double sM=0.0;
     for (int a=1;a<=X+1;a++)
-        sM+=ContractT(M,a,M,a);
+        sM+=ContractUL(M,a,M,a,ul);
     return sqrt(sM);
 
 }
@@ -94,14 +91,15 @@ void SiteOperatorImp::iCanonicalFormTriangular(Direction lr)
 {
     assert(itsOpRange.Dw1==itsOpRange.Dw2); //Make sure we are square
     int X=itsOpRange.Dw1-2; //Chi
+    TriType ul=itsWs.GetUpperLower();
     MatLimits lim(0,X+1,0,X+1);
     MatrixRT RT(lim); //Accumulated gauge transform
     LinearSolver<double>* solver=new LapackLinearSolver<double>();;
     for (int M=1;M<=X;M++)
     {
 //        cout << "Init del=" << ContractDel(DLeft) << endl;
-        MatrixRT K=BuildK(M);
-        VectorRT c=Buildc(M);
+        MatrixRT K=BuildK(M,ul);
+        VectorRT c=Buildc(M,ul);
 //        cout << "M=" << M << endl;
 //        cout << "K=" << K << endl;
 //        cout << "c=" << c << endl;
@@ -125,7 +123,7 @@ void SiteOperatorImp::iCanonicalFormTriangular(Direction lr)
 //            MatrixRT QL=ReshapeV(DLeft);
 //            cout << "Before norm QT*Q=" << Transpose(QL)*QL << endl;
 //        }
-        double sM=Contract_sM1(M);
+        double sM=Contract_sM1(M,ul);
         assert(fabs(sM)>1e-14);
 //        cout << "sM^2=" << sM*sM << endl;
         if (fabs(sM)>1e-14)
