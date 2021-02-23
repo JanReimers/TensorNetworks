@@ -158,6 +158,33 @@ template <class T> MatrixO<T> operator*(const MatrixO<T>& a, const Matrix<T>& b)
     MatrixO<T> ret(a.Getd(),a.GetUpperLower(),ma*b);
     return ret;
 }
+inline index_t Mirror(index_t i,const VecLimits& lim)
+{
+    assert(i>=lim.Low);
+    assert(i<=lim.High);
+    int dl=i-lim.Low;
+    int dh=lim.High-i;
+    int im=0;
+    if (dl<=dh)
+        im=lim.High-dl;
+    else
+        im=lim.Low+dh;
+    return im;
+}
+template <class T> void Mirror(Matrix<T>& a)
+{
+    const MatLimits& lim=a.GetLimits();
+    for (index_t i:a.rows())
+        for (index_t j:a.cols(i))
+        {
+            index_t im=Mirror(i,lim.Row);
+            index_t jm=Mirror(j,lim.Col);
+            T temp=a(i,j);
+            a(i,j)=a(im,jm);
+            a(im,jm)=temp;
+        }
+}
+
 
 void Grow(Matrix<double>& m,const MatLimits& lim);
 
