@@ -71,7 +71,7 @@ void SiteOperatorImp::iCanonicalFormQRIter(Direction lr)
         //  Do W->L*W
         //
         itsWs=L*itsWs; //ul gets lost in mul op.
-        assert(itsWs.GetUpperLower()==Lower);
+        //assert(itsWs.GetUpperLower()==Lower);
         itsOpRange.Dw1=L.GetNumRows();
         Lp=MatrixRT(L*Lp);
 
