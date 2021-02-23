@@ -696,27 +696,27 @@ TEST_F(iTEBDTests,TestRandomEnergyRangeSD_Lower)
         }
 }
 
-//TEST_F(iTEBDTests,TestRandomEnergyRangeSD_Upper)
-//{
-//    int UnitCell=2,Dmax=16;
-//#ifdef DEBUG
-//    Dmax=4;
-//#endif // DEBUG
-//    double epsSVD=0.0;
-//    for (int D=1;D<=Dmax;D*=2)
-//        for (double S=0.5;S<=2.5;S+=0.5)
-//        {
-//            Setup(UnitCell,S,D,epsSVD,Gates,Upper);
-////            cout << "S,D=" << S << " " << D << endl;
-//            itsState->InitializeWith(Random);
-//            itsState->Canonicalize(DLeft);
-//            itsState->Orthogonalize(itsCompressor);
-//            EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
-//            Matrix4RT Hlocal=itsiH->GetLocalMatrix();
-//            EXPECT_NEAR(itsState->GetExpectationmmnn(Hlocal),itsState->GetExpectation(itsiH  ),3e-14);
-////            EXPECT_NEAR(CalculateE(UnitCell,S),itsState->GetExpectation(itsiH  ),1e-14);
-//        }
-//}
+TEST_F(iTEBDTests,TestRandomEnergyRangeSD_Upper)
+{
+    int UnitCell=2,Dmax=16;
+#ifdef DEBUG
+    Dmax=4;
+#endif // DEBUG
+    double epsSVD=0.0;
+    for (int D=1;D<=Dmax;D*=2)
+        for (double S=0.5;S<=2.5;S+=0.5)
+        {
+            Setup(UnitCell,S,D,epsSVD,Gates,Upper);
+//            cout << "S,D=" << S << " " << D << endl;
+            itsState->InitializeWith(Random);
+            itsState->Canonicalize(DLeft);
+            itsState->Orthogonalize(itsCompressor);
+            EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
+            Matrix4RT Hlocal=itsiH->GetLocalMatrix();
+            EXPECT_NEAR(itsState->GetExpectationmmnn(Hlocal),itsState->GetExpectation(itsiH  ),3e-14);
+//            EXPECT_NEAR(CalculateE(UnitCell,S),itsState->GetExpectation(itsiH  ),1e-14);
+        }
+}
 
 IterationSchedule MakeSchedule(int maxIter,int D,TrotterOrder to,int deltaD=1)
 {

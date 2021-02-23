@@ -537,9 +537,20 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
 
     const SiteOperator* so=o->GetSiteOperator(1);
 //    so->Report(cout); cout << endl;
+//    const MatrixOR& Wref=so->GetW();
+//    MatrixOR W;
+//    if (Wref.GetUpperLower()==Upper)
+//        W=Transpose(Wref);
+//    else if (Wref.GetUpperLower()==Lower)
+//        W=Wref;
+//    else
+//        assert(false);
     MatrixOR W=so->GetW();
+    assert(W.GetUpperLower()!=Full);
     if (W.GetUpperLower()==Upper)
-        W=Transpose(W);
+        Mirror(W);
+
+
     assert(IsLowerTriangular(W));
     const OpRange& wr=so->GetRanges();
     int Dw=wr.Dw1;

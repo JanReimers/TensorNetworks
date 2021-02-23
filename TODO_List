@@ -37,7 +37,7 @@ MPO:
     -TestL2iMPOTrotter4 Get it running again
     -TestParkerCanonicalTri_Upper_L1iH fails
     Fixed: -TestParkerCanonicalQTIter_Upper_L1iH fails
-    -TestRandomEnergyRangeSD_Upper fails
+    Fixed: -TestRandomEnergyRangeSD_Upper fails
 iMPS
     -We need a horizontal tensor product like for MPOs, to make unit cell state
         The ordering or (ma,mb,..) -> m needs to controlled in one place.
