@@ -229,7 +229,15 @@ void SiteOperatorImp::Report(std::ostream& os) const
 char SiteOperatorImp::GetUpperLower(double eps) const
 {
     char ret=' ';
-    if (IsUpperTriangular(itsWs,eps))
+    if (itsWs.GetNumRows()<2 && itsWs.GetNumCols()<2)
+        ret='1';
+    else if (itsWs.GetNumRows()<2)
+        ret='R';
+    else if (itsWs.GetNumCols()<2)
+        ret='C';
+    else if (IsDiagonal(itsWs,eps))
+        ret='D';
+    else if (IsUpperTriangular(itsWs,eps))
     {
         if (ret==' ')
             ret='U';
