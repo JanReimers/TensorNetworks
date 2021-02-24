@@ -7,7 +7,6 @@ namespace TensorNetworks
 
 template <class T> OperatorElement<T>::OperatorElement(int d)
 : Matrix<T>(0,d-1,0,d-1)
-, itsd(d)
 {
     Fill(*this,T(0.0));
 }
@@ -20,18 +19,16 @@ template <class T> OperatorElement<T>::OperatorElement(int d,T fillValue)
 
 template <class T> OperatorElement<T>::OperatorElement()
 : Matrix<T>()
-, itsd(0)
 {
 }
 
 template <class T> OperatorElement<T>::OperatorElement(T S)
 : Matrix<T>()
-, itsd(0)
 {
     if (isValidSpin(S))
     {
-        itsd=Stod(S);
-        Matrix<T>::SetLimits(0,itsd-1,0,itsd-1);
+        int d=Stod(S);
+        Matrix<T>::SetLimits(0,d-1,0,d-1);
     }
     else if (S==0.0)
     {
@@ -54,7 +51,7 @@ template <class T> OperatorElement<T>::~OperatorElement()
 //
 template <class T> OperatorElement<T>& OperatorElement<T>::operator=(T s)
 {
-    *this=OperatorI(itsd)*s;
+    *this=OperatorI(Getd())*s;
     return *this;
 }
 
@@ -88,8 +85,8 @@ template <> OperatorElement<double> OperatorElement<double>::Create(SpinOperator
  OperatorI::OperatorI(double S)
  : OperatorElement(Stod(S))
  {
-     for (int m=0;m<itsd;m++)
-     for (int n=0;n<itsd;n++)
+     for (int m=0;m<Getd();m++)
+     for (int n=0;n<Getd();n++)
         (*this)(m,n)= (m==n) ? 1.0 : 0.0;
  }
 
@@ -104,8 +101,8 @@ OperatorZ::OperatorZ(double S)
  : OperatorElement(Stod(S))
  {
      SpinCalculator sc(S);
-     for (int m=0;m<itsd;m++)
-     for (int n=0;n<itsd;n++)
+     for (int m=0;m<Getd();m++)
+     for (int n=0;n<Getd();n++)
         (*this)(m,n)=sc.GetSz(m,n);
  }
 
@@ -113,8 +110,8 @@ OperatorSy::OperatorSy(double S)
  : OperatorElement(Stod(S))
  {
      SpinCalculator sc(S);
-     for (int m=0;m<itsd;m++)
-     for (int n=0;n<itsd;n++)
+     for (int m=0;m<Getd();m++)
+     for (int n=0;n<Getd();n++)
         (*this)(m,n)=sc.GetSy(m,n);
  }
 
@@ -122,8 +119,8 @@ OperatorSx::OperatorSx(double S)
  : OperatorElement(Stod(S))
  {
      SpinCalculator sc(S);
-     for (int m=0;m<itsd;m++)
-     for (int n=0;n<itsd;n++)
+     for (int m=0;m<Getd();m++)
+     for (int n=0;n<Getd();n++)
         (*this)(m,n)=sc.GetSx(m,n);
  }
 
@@ -131,8 +128,8 @@ OperatorSp::OperatorSp(double S)
  : OperatorElement(Stod(S))
  {
      SpinCalculator sc(S);
-     for (int m=0;m<itsd;m++)
-     for (int n=0;n<itsd;n++)
+     for (int m=0;m<Getd();m++)
+     for (int n=0;n<Getd();n++)
         (*this)(m,n)=sc.GetSp(m,n);
  }
 
@@ -140,8 +137,8 @@ OperatorSm::OperatorSm(double S)
  : OperatorElement(Stod(S))
  {
      SpinCalculator sc(S);
-     for (int m=0;m<itsd;m++)
-     for (int n=0;n<itsd;n++)
+     for (int m=0;m<Getd();m++)
+     for (int n=0;n<Getd();n++)
         (*this)(m,n)=sc.GetSm(m,n);
  }
 

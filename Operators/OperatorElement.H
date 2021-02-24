@@ -9,14 +9,17 @@ namespace TensorNetworks
 {
 
 using dcmplx=std::complex<double>;
+template <class T> class MatrixO;
 
 template <class T> class OperatorElement : public Matrix<T>
 {
+    typedef Matrix<T> Base;
 public:
     OperatorElement();
     OperatorElement(T S); //Required by mat mul routines
     OperatorElement(int d); //Fill with 0s
     OperatorElement(int d,T fillValue); //FIll with I*fullValue
+    OperatorElement(int d,const Base& m); //Fill with matrix
     virtual ~OperatorElement();
 
     OperatorElement& operator=(T s);
@@ -26,12 +29,17 @@ public:
         return *this;
     }
 
-    int Getd() const {return itsd;}
+    int Getd() const
+    {
+        assert(IsSquare());
+        return Base::GetNumRows();
+    }
 
+    bool IsSquare() const {return Base::GetNumRows()==Base::GetNumCols();}
     static OperatorElement Create(SpinOperator,int d);
+    friend class MatrixO<T>;
 
 protected:
-    int    itsd;
 };
 
 inline int    Stod(double S) {return 2*S+1;}
