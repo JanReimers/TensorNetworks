@@ -3,6 +3,7 @@
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.H"
 #include "TensorNetworks/iTEBDState.H"
 #include "Operators/MPO_SpatialTrotter.H"
+#include "Operators/MPO_TwoSite.H"
 #include "Containers/Matrix4.H"
 #include "TensorNetworks/Hamiltonian.H"
 #include "TensorNetworks/iHamiltonian.H"
@@ -30,6 +31,10 @@ using TensorNetworks::CNone;
 using TensorNetworks::FirstOrder;
 using TensorNetworks::SecondOrder;
 using TensorNetworks::FourthOrder;
+using TensorNetworks::MPO_TwoSite;
+using TensorNetworks::Sz;
+using TensorNetworks::Sp;
+using TensorNetworks::Sm;
 
 class MPOTests : public ::testing::Test
 {
@@ -83,6 +88,7 @@ public:
     Vector3CT CalcHeffLeft(int isite,bool cache=false) const {return GetMPSImp()->CalcHeffLeft (itsH,isite,cache);}
     Vector3CT CalcHeffRight(int isite,bool cache=false) const {return GetMPSImp()->CalcHeffRight(itsH,isite,cache);}
     void LoadHeffCaches() {GetMPSImp()->LoadHeffCaches(itsH);}
+    MPO* MakeEnergyMPO(int isite) const;
 
           TensorNetworks::MPSImp* GetMPSImp()       {return dynamic_cast<      TensorNetworks::MPSImp*>(itsMPS);}
     const TensorNetworks::MPSImp* GetMPSImp() const {return dynamic_cast<const TensorNetworks::MPSImp*>(itsMPS);}
@@ -96,7 +102,19 @@ public:
            TensorNetworks::iTEBDState*     itsiMPS;
 };
 
-
+MPO* MPOTests::MakeEnergyMPO(int isite) const
+{
+    int    L=itsH->GetL();
+    double S=itsH->GetS();
+    MPO* SS=new MPO_TwoSite(L,S ,isite,isite+1, Sz,Sz);
+    MPO* SpSmo=new MPO_TwoSite(L,S ,isite,isite+1, Sp,Sm);
+    MPO* SmSpo=new MPO_TwoSite(L,S ,isite,isite+1, Sm,Sp);
+    SS->Sum(SpSmo,0.5);
+    SS->Sum(SmSpo,0.5);
+    delete SmSpo;
+    delete SpSmo;
+    return SS;
+}
 
 
 
@@ -142,6 +160,19 @@ TEST_F(MPOTests,DoHamiltionExpectationNeelL10S1D1)
     itsMPS->InitializeWith(Neel);
     EXPECT_NEAR(itsMPS->GetExpectation(itsH),-2.25,1e-11);
 }
+
+TEST_F(MPOTests,DoBuildMPO_Neel)
+{
+    Setup(10,0.5,1);
+    itsMPS->InitializeWith(Neel);
+    MPO* h12=MakeEnergyMPO(2);
+    h12->Report(cout);
+    EXPECT_NEAR(itsMPS->GetExpectation(h12),-0.25,1e-11);
+//    h12->CanonicalForm();
+//    EXPECT_NEAR(itsMPS->GetExpectation(h12),-0.25,1e-11);
+    delete h12;
+}
+
 
 TEST_F(MPOTests,LeftNormalizeThenDoHamiltionExpectation)
 {

@@ -43,7 +43,7 @@ double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
     //
     //  Rescaling
     //
-    double s_avg=Sum(sm.GetDiagonal())/sm.size();
+    double s_avg=::Sum(sm.GetDiagonal())/sm.size();
     sm*=1.0/s_avg;
 
     AccumulateTruncationError(comp->Compress(U,sm,VT));

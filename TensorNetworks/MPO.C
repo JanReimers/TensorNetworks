@@ -77,6 +77,18 @@ void MPO::Product(const MPO* O2)
     for (int ia=1;ia<=L;ia++)
         GetSiteOperator(ia)->Product(O2->GetSiteOperator(ia));
 }
+void MPO::Sum(const MPO* O2)
+{
+    Sum(O2,1.0);
+}
+
+void MPO::Sum(const MPO* O2, double factor)
+{
+    int L=GetL();
+    assert(L==O2->GetL());
+    for (int ia=1;ia<=L;ia++)
+        GetSiteOperator(ia)->Sum(O2->GetSiteOperator(ia),factor);
+}
 
 double MPO::Compress(CompressType ct,int Dmax, double epsSV)
 {

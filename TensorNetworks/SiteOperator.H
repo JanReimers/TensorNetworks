@@ -51,9 +51,10 @@ public:
     //
     virtual const MatrixOR& GetW() const=0;
     //
-    //  Contract MPOs together
+    //  Combine MPOs together with tensor sum and product
     //
     virtual void Product(const SiteOperator* O2)=0;
+    virtual void Sum    (const SiteOperator* O2, double factor)=0;
     //
     //  SVD compress and normalize to reduce Dw Returns accumulated SVD truncation error.
     //

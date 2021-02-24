@@ -247,6 +247,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_TransverseIsing.H" />
+		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_PowerLaw.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_PowerLaw.H" />
 		<Unit filename="TensorNetworksImp/Hamiltonians/iHamiltonianImp.C">
 			<Option compilerVar="CC" />
 		</Unit>

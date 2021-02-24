@@ -32,9 +32,10 @@ public:
     virtual IIType          GetDws   () const {return std::make_tuple(itsOpRange.Dw1,itsOpRange.Dw2);}
     virtual const MatrixOR& GetW     () const {return itsWs;}
     //
-    //  Contract MPOs together
+    //  Combine MPOs together with tensor sum and product
     //
     virtual void   Product(const SiteOperator* O2);
+    virtual void   Sum    (const SiteOperator* O2, double factor);
     //
     //  SVD compress and normalize to reduce Dw. Returns accumulated SVD truncation error
     //
@@ -77,6 +78,7 @@ protected:
     int      itsd; //2*S+1
     OpRange  itsOpRange;
     double   itsTruncationError;
+    Position itsLBR;
     MatrixOR itsWs; //Operator values matrix version of W.
     SiteOperatorImp* itsLeft_Neighbour;
     SiteOperatorImp* itsRightNeighbour;

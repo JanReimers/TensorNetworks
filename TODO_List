@@ -16,7 +16,7 @@ SiteOperatorImp:
     -expH MPO get scrambled when reducing to Canonical form.
         Get further scrambled after Parker-compress, std-compress is fine
         test is TestParkerSVDCompressExpHL8t1
-        Scrambled = no longer uppper/lower?
+        Scrambled = no longer upper/lower?
     -Implement Parker algorithm #4, iMPO left canonical form for triangular W
         Done BUT eq 60 for s_M fails
     -Implement Parker algorithm #5, iMPO compression
@@ -24,8 +24,6 @@ SiteOperatorImp:
         DP: Yep, but since W_L and W_R and left/right-canonical it has a special block-diagonal form.
 
 OpValMatrix:
-    -Add (rather than combine) MPOs to do:
-                S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
 
 MPO:
     -track SV spectrum or at least the Min(Sv).
@@ -35,6 +33,7 @@ MPO:
         Done: -ExpH
         -Factor U*s*V = expH
     -TestL2iMPOTrotter4 Get it running again
+    -CanonicalForm handle diagonal MPOs (treat as lower?)
     Fixed: -TestParkerCanonicalTri_Upper_L1iH fails
     Fixed: -TestParkerCanonicalQTIter_Upper_L1iH fails
     Fixed: -TestRandomEnergyRangeSD_Upper fails
@@ -197,6 +196,8 @@ Backburner:
         -Might need to identify parameters with strings "Jxy"
 
 ----------------------------------------------------------------------------------------------------------
+Done: -Add MPOs to do:
+        S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
 Done: Simplify MPO compression code
 Done: MPO_SpatialTrotter(dt,TensorNetworks::Even,L,S,itsH), H knows L & S don't need them as arguments
 Done: -Need op*(Matrix,MatrixO) to pass ul through

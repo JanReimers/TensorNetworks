@@ -12,6 +12,7 @@ namespace TensorNetworks
 SiteOperatorImp::SiteOperatorImp(int d)
     : itsd(d)
     , itsTruncationError(0.0)
+    , itsLBR(PBulk)
     , itsWs(1,1,d,Diagonal)
 {
     Unit(itsWs);
@@ -27,19 +28,11 @@ SiteOperatorImp::SiteOperatorImp(int d, SpinOperator so) //Construct spin operat
     itsWs(0,0)=OperatorElement<double>::Create(so,d);
     SetLimits();
 }
-//
-//  Build from a OpClient Hamiltonian.
-//
-//SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H)
-//    : SiteOperatorImp(d)
-//{
-//    itsWs=H->GetMatrixO(Lower);
-//    Init_lr(lbr,itsWs.GetNumRows()-1,0);
-//}
 
 SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H,TriType ul)
     : SiteOperatorImp(d)
 {
+    itsLBR=lbr;
     itsWs=H->GetMatrixO(ul);
     itsWs.SetUpperLower(ul);
 
@@ -62,6 +55,7 @@ SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H,Tri
 SiteOperatorImp::SiteOperatorImp(int d, Direction lr,Position lbr,const MatrixRT& U, const DiagonalMatrixRT& s)
     : SiteOperatorImp(d)
 {
+    itsLBR=lbr;
     int Dw=s.GetNumRows();
     assert(Dw==d*d);
     assert(U.GetNumCols()==Dw);
@@ -142,6 +136,9 @@ void SiteOperatorImp::SetNeighbours(SiteOperator* left, SiteOperator* right)
     itsRightNeighbour=dynamic_cast<SiteOperatorImp*>(right);
     assert(!left  || itsLeft_Neighbour); //if left is nonzero then did the cast work?
     assert(!right || itsRightNeighbour);
+    if (!itsLeft_Neighbour) itsLBR=PLeft;
+    if (!itsRightNeighbour) itsLBR=PRight;
+    if (itsLBR==PBulk ) assert(itsLeft_Neighbour && itsRightNeighbour);
 }
 
 SiteOperatorImp* SiteOperatorImp::GetNeighbour(Direction lr) const
@@ -188,6 +185,23 @@ void SiteOperatorImp::Product(const SiteOperator* O2)
     assert(itsWs.Getd()==O2i->itsWs.Getd());
 
     itsWs=TensorProduct(itsWs,O2i->itsWs);
+    SetLimits();
+}
+
+void SiteOperatorImp::Sum(const SiteOperator* O2, double factor)
+{
+    assert(Getd()==O2->Getd());
+    const SiteOperatorImp* O2i(dynamic_cast<const SiteOperatorImp*>(O2));
+    assert(O2i);
+    assert(itsWs.Getd()==O2i->itsWs.Getd());
+    MatrixOR W2=O2i->itsWs;
+    W2*=factor;
+    if (itsLBR==PLeft)
+        itsWs=TensorSumLeft(itsWs,W2); //Concatenate rows
+    else if(itsLBR==PRight)
+        itsWs=TensorSumLeft(itsWs,W2); //Stack columns
+    else
+        itsWs=TensorSum(itsWs,W2);
     SetLimits();
 }
 

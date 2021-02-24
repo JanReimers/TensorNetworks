@@ -243,6 +243,52 @@ template <class T> Matrix<T> TensorSum(const Matrix<T>& a, const Matrix<T>& b)
     return r;
 }
 
+template <class T> Matrix<T> TensorSumLeft(const Matrix<T>& a, const Matrix<T>& b)
+{
+    const MatLimits& al=a.GetLimits();
+    const MatLimits& bl=b.GetLimits();
+    assert(al.GetNumRows()==1);
+    assert(bl.GetNumRows()==1);
+    MatLimits rl(al.Row,al.Col+bl.Col);
+    Matrix<T> r(rl);
+    Fill (r,T(0.0));
+
+    //
+    //  Transfer a block
+    //
+    int i=rl.Row.Low;
+    int j=rl.Col.Low;
+    for (index_t ja:a.cols())
+        r(i,j++)=a(i,ja);
+    for (index_t jb:b.cols())
+        r(i,j++)=b(i,jb);
+
+    return r;
+}
+
+template <class T> Matrix<T> TensorSumRight(const Matrix<T>& a, const Matrix<T>& b)
+{
+    const MatLimits& al=a.GetLimits();
+    const MatLimits& bl=b.GetLimits();
+    assert(al.GetNumCols()==1);
+    assert(bl.GetNumCols()==1);
+    MatLimits rl(al.Row+bl.Row,al.Col);
+    Matrix<T> r(rl);
+    Fill (r,T(0.0));
+
+    //
+    //  Transfer a block
+    //
+    int i=rl.Row.Low;
+    int j=rl.Col.Low;
+    for (index_t ia:a.rows())
+        r(i++,j)=a(ia,j);
+    for (index_t ib:b.rows())
+        r(i++,j)=b(ib,j);
+
+    return r;
+}
+
 template <class T> MatrixO<T> iTensorSum(const MatrixO<T>& a, const MatrixO<T>& b)
 {
     int d=a.Getd();

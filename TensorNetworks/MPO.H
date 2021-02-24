@@ -34,7 +34,9 @@ public:
     //
     //  High level MPO operations
     //
-    virtual void   Product(const MPO* O2);
+    virtual void   Product(const MPO* O2); //Tensor product
+    virtual void   Sum    (const MPO* O2, double factor); //Tensor sum this = this + factor*O2
+    virtual void   Sum    (const MPO* O2); //Tensor sum this = this + factor*O2
     virtual double Compress(CompressType,int Dmax, double epsSV);
     virtual double Compress(CompressType,const SVCompressorR*);
     virtual void   CanonicalForm(); //Sweep left and then right
