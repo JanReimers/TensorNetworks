@@ -37,6 +37,15 @@ template <class T> MatrixO<T>::MatrixO(int d,TriType ul,const Base& m)
     , itsTruncationError(0)
     , itsUL(ul)
 {
+    // Find and fix any un-initialized elements
+    OperatorElement<T> Z=OperatorZ(d);
+    for (index_t i:this->rows())
+    for (index_t j:this->cols())
+    {
+        if ((*this)(i,j).size()==0)
+            (*this)(i,j)=Z;
+    }
+
 }
 
 template <class T> MatrixO<T>::MatrixO(const MatrixO& m)

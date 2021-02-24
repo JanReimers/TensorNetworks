@@ -25,6 +25,7 @@ using TensorNetworks::OperatorSm;
 using TensorNetworks::OperatorI;
 using TensorNetworks::OperatorZ;
 using TensorNetworks::OperatorElement;
+using TensorNetworks::Stod;
 
 class OvMTests : public ::testing::Test
 {
@@ -659,6 +660,56 @@ TEST_F(OvMTests,OpMulMO)
     MatrixOR D=B*A;
     EXPECT_EQ(D.Getd(),d);
     EXPECT_EQ(D.GetUpperLower(),ul);
+}
+
+TEST_F(OvMTests,TensorSum)
+{
+    double S=0.5;
+    int d=Stod(S);
+    TriType ul=Upper;
+    Setup(S);
+    MatrixOR A=itsOperatorClient->GetMatrixO(ul);
+    A(0,4)=OperatorElement<double>(d,0.4); //Put markers throughout so we can see what ends up where.
+    A(1,1)=OperatorElement<double>(d,1.1);
+    A(1,2)=OperatorElement<double>(d,1.2);
+    A(1,3)=OperatorElement<double>(d,1.3);
+    A(2,2)=OperatorElement<double>(d,2.2);
+    A(2,3)=OperatorElement<double>(d,2.3);
+    A(3,3)=OperatorElement<double>(d,3.3);
+    MatrixOR B=A;
+    B*=10.0;
+    MatrixOR C=TensorSum(A,B);
+    EXPECT_EQ(C.Getd(),d);
+    EXPECT_EQ(C.GetUpperLower(),ul);
+    for (index_t i:A.rows())
+        for (index_t j:A.cols())
+            EXPECT_EQ(A(i,j),C(i,j));
+    for (index_t i:B.rows())
+        for (index_t j:B.cols())
+            EXPECT_EQ(B(i,j),C(i+5,j+5));
+}
+
+TEST_F(OvMTests,iTensorSum)
+{
+    double S=0.5;
+    int d=Stod(S);
+    TriType ul=Upper;
+    Setup(S);
+    MatrixOR A=itsOperatorClient->GetMatrixO(ul);
+    A(0,4)=OperatorElement<double>(d,0.4); //Put markers throughout so we can see what ends up where.
+    A(1,1)=OperatorElement<double>(d,1.1);
+    A(1,2)=OperatorElement<double>(d,1.2);
+    A(1,3)=OperatorElement<double>(d,1.3);
+    A(2,2)=OperatorElement<double>(d,2.2);
+    A(2,3)=OperatorElement<double>(d,2.3);
+    A(3,3)=OperatorElement<double>(d,3.3);
+    MatrixOR B=A;
+    B*=10.0;
+    MatrixOR C=iTensorSum(A,B);
+    //cout << "C=" << C << endl; //visual inspection is the easiest way to very this guy. Crappy for regression trapping though!
+    EXPECT_EQ(C.Getd(),d);
+    EXPECT_EQ(C.GetUpperLower(),ul);
+
 }
 
 TEST_F(OvMTests,TensorProduct)

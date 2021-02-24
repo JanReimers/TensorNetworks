@@ -188,7 +188,147 @@ template <class T> void Mirror(Matrix<T>& a)
 
 void Grow(Matrix<double>& m,const MatLimits& lim);
 
+inline VecLimits operator+(const VecLimits& a, const VecLimits& b)
+{
+    return VecLimits(a.Low,a.Low+a.size()+b.size()-1);
+}
 
+inline VecLimits iSum(const VecLimits& a, const VecLimits& b)
+{
+    return VecLimits(a.Low,a.Low+a.size()+b.size()-1-2);
+}
+
+inline MatLimits operator+(const MatLimits& a, const MatLimits& b)
+{
+   return  MatLimits(a.Row+b.Row,a.Col+b.Col);
+}
+
+inline MatLimits iSum(const MatLimits& a, const MatLimits& b)
+{
+   return  MatLimits(iSum(a.Row,b.Row),iSum(a.Col,b.Col));
+}
+
+template <class T> Matrix<T> TensorSum(const Matrix<T>& a, const Matrix<T>& b)
+{
+    const MatLimits& al=a.GetLimits();
+    const MatLimits& bl=b.GetLimits();
+    MatLimits rl=al+bl;
+    Matrix<T> r(rl);
+    Fill (r,T(0.0));
+
+    //
+    //  Transfer a block
+    //
+    int i=rl.Row.Low;
+    int j=0;
+    for (index_t ia:a.rows())
+    {
+        j=rl.Col.Low;
+        for (index_t ja:a.cols())
+            r(i,j++)=a(ia,ja);
+        i++;
+    }
+
+    //
+    //  Transfer b block
+    //
+    int jstart=j;
+    for (index_t ib:b.rows())
+    {
+        int j=jstart;
+        for (index_t jb:b.cols())
+            r(i,j++)=b(ib,jb);
+        i++;
+    }
+    return r;
+}
+
+template <class T> MatrixO<T> iTensorSum(const MatrixO<T>& a, const MatrixO<T>& b)
+{
+    int d=a.Getd();
+    assert(d==b.Getd());
+    TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
+    const MatLimits& al=a.GetLimits();
+    const MatLimits& bl=b.GetLimits();
+    MatLimits rl=iSum(al,bl);
+    MatrixO<T> r(d,ul,rl);
+    Fill (r,0.0);
+
+    //
+    //  Top and bottom rows
+    //
+    int i1=rl.Row.Low;
+    int in=rl.Row.High;
+    int j=rl.Col.Low;
+    r(i1,j  )=OperatorElement<T>(d,1.0);
+    r(in,j++)=a(al.Row.High,al.Col.Low)+b(bl.Row.High,bl.Col.Low);
+    for (index_t ja:a.cols())
+        if (ja>al.Col.Low && ja<al.Col.High)
+        {
+            r(i1,j  )=a(al.Row.Low ,ja);
+            r(in,j++)=a(al.Row.High,ja);
+        }
+    for (index_t jb:b.cols())
+        if (jb>bl.Col.Low && jb<bl.Col.High)
+        {
+            r(i1,j  )=b(bl.Row.Low ,jb);
+            r(in,j++)=b(bl.Row.High,jb);
+        }
+    r(i1,j)=a(al.Row.Low,al.Col.High)+b(bl.Row.Low,bl.Col.High);
+    r(in,j)=OperatorElement<T>(d,1.0);
+    //
+    //  Left and right columns
+    //
+    int j1=rl.Col.Low;
+    int jn=rl.Col.High;
+    int i=rl.Row.Low+1;
+    for (index_t ia:a.rows())
+        if (ia>al.Row.Low && ia<al.Row.High)
+        {
+            r(i  ,j1)=a(ia,al.Col.Low );
+            r(i++,jn)=a(ia,al.Col.High);
+        }
+    for (index_t ib:b.rows())
+        if (ib>bl.Row.Low && ib<bl.Row.High)
+        {
+            r(i  ,j1)=b(ib,bl.Col.Low );
+            r(i++,jn)=b(ib,bl.Col.High);
+        }
+    //
+    //  Now fill in the bulk
+    //
+    i=rl.Row.Low+1;
+    for (index_t ia:a.rows())
+        if (ia>al.Row.Low && ia<al.Row.High)
+        {
+            j=rl.Col.Low+1;
+            for (index_t ja:a.cols())
+                if (ja>al.Col.Low && ja<al.Col.High)
+                    r(i,j++)=a(ia,ja);
+            i++;
+        }
+    int jstart=j;
+    for (index_t ib:b.rows())
+        if (ib>bl.Row.Low && ib<bl.Row.High)
+        {
+            j=jstart;
+            for (index_t jb:b.cols())
+                if (jb>bl.Col.Low && jb<bl.Col.High)
+                    r(i,j++)=b(ib,jb);
+            i++;
+        }
+
+    return r;
+}
+
+template <class T> MatrixO<T> TensorSum(const MatrixO<T>& a, const MatrixO<T>& b)
+{
+    assert(a.Getd()==b.Getd());
+    TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
+    const typename MatrixO<T>::Base& ma(a),mb(b);
+    MatrixO<T> ret(a.Getd(),ul,TensorSum(ma,mb));
+    return ret;
+}
 
 
 template <class T> MatrixO<T> TensorProduct(const MatrixO<T>& a, const MatrixO<T>& b)

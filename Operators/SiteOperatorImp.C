@@ -182,8 +182,11 @@ void  SiteOperatorImp::AccumulateTruncationError(double err)
 
 void SiteOperatorImp::Product(const SiteOperator* O2)
 {
+    assert(Getd()==O2->Getd());
     const SiteOperatorImp* O2i(dynamic_cast<const SiteOperatorImp*>(O2));
     assert(O2i);
+    assert(itsWs.Getd()==O2i->itsWs.Getd());
+
     itsWs=TensorProduct(itsWs,O2i->itsWs);
     SetLimits();
 }
