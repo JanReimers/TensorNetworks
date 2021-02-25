@@ -3,10 +3,14 @@ SiteOperatorImp:
     Done: -Add upper operators to finite lattice unit tests.
     Done: -Add upper operators to infinite lattice unit tests.
     -Run Parker's' examples
+        Done: Eq 3,7
+        Two body as sum of exponential (ref 7)
+        Eq 34: H_1
+        Eq. 42,43 : L=30 sites, MPO starts with X=1000
     -Implement Parker iMPO SVD
     -SetLimits using zero as criteria.  Should fabs(W)>eps
         BUT we need to get then SAME eps into the contraction routines.
-    -Upper/Lower determinations for edge site MPOs is ambiguous because those MPOs have either one row
+    Done: -Upper/Lower determinations for edge site MPOs is ambiguous because those MPOs have either one row
         or one column. So there is no well defined above/below the diagonal.
         THis causes problems with OpValMatrix operators many of which depend the U/L determination
         We need to somehow determine U/L away from the edges and enforce the resulting U/l state
@@ -26,6 +30,10 @@ SiteOperatorImp:
 OpValMatrix:
 
 MPO:
+    -OperatorClient::GetH assumes QN's for two sites. We need a more general interface
+        int GetNBody() //Max # of interaction sites
+        Matrix GetH(std::vector<int> QNs)
+    -Figure out singe/double counting of H*Sz terms in Hamiltonians.
     -track SV spectrum or at least the Min(Sv).
         -These need to live on bonds between sites.
         -Ideally Dw would also live on the bonds
