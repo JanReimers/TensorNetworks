@@ -4,9 +4,9 @@ SiteOperatorImp:
     Done: -Add upper operators to infinite lattice unit tests.
     -Run Parker's' examples
         Done: Eq 3,7
-        Two body as sum of exponential (ref 7)
-        Eq 34: H_1
-        Eq. 42,43 : L=30 sites, MPO starts with X=1000
+        Done: Two body as sum of exponential (ref 7)
+        Eq 34: H_1 L=30 sites, MPO starts with X=1000
+        Eq. 42,43 :
     -Implement Parker iMPO SVD
     -SetLimits using zero as criteria.  Should fabs(W)>eps
         BUT we need to get then SAME eps into the contraction routines.

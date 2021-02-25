@@ -239,6 +239,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/Hamiltonians/HamiltonianImp.H" />
+		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_2Body_LongRange.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_2Body_LongRange.H" />
+		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_3Body.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_3Body.H" />
 		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -247,10 +255,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_TransverseIsing.H" />
-		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_PowerLaw.C">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_PowerLaw.H" />
 		<Unit filename="TensorNetworksImp/Hamiltonians/iHamiltonianImp.C">
 			<Option compilerVar="CC" />
 		</Unit>

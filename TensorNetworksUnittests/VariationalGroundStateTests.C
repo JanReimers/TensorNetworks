@@ -48,6 +48,11 @@ public:
         itsH=itsFactory->Make1D_NN_TransverseIsingHamiltonian(L,S,ul,1.0,hx);
         itsMPS=itsH->CreateMPS(D,1e-12,1e-12);
     }
+    void Setup2BodyLongRange(int L, double S, int D, double hx, int NN, TriType ul)
+    {
+        itsH=itsFactory->Make1D_2BodyLongRangeHamiltonian(L,S,ul,1.0,hx,NN);
+        itsMPS=itsH->CreateMPS(D,1e-12,1e-12);
+    }
     void Setup3Body(int L, double S, int D, double hx, TriType ul)
     {
         itsH=itsFactory->Make1D_3BodyHamiltonian(L,S,ul,1.0,1.0,hx);
@@ -566,6 +571,65 @@ TEST_F(VariationalGroundStateTests,Test3Body_Upper_L9S12D2Hz0)
     EXPECT_NEAR(E2,E1*E1,1e-5);
 }
 
+TEST_F(VariationalGroundStateTests,Test2BodyLR_Upper_L9S12D2Hz0)
+{
+    int L=9,DStart=2,D=2,maxIter=100;
+    double S=0.5,hx=0.0;
+    Setup2BodyLongRange(L,S,DStart,hx,3,Upper);
+    itsMPS->InitializeWith(Random);
+    EXPECT_EQ(itsH->GetMaxDw(),8);
+    itsH->CanonicalForm();
+    EXPECT_EQ(itsH->GetMaxDw(),8);
+    itsH->Compress(Parker,0,1e-10); //Compress down to Dw=5
+    EXPECT_EQ(itsH->GetMaxDw(),5);
+
+    Epsilons eps(1e-12);
+    eps.itsDelatEnergy1Epsilon=1e-9;
+    IterationSchedule is;
+    is.Insert({maxIter,DStart,eps});
+    is.Insert({maxIter,D,eps});
+
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+
+    double E1=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E1/(L-1),-0.21614583333,1e-7);
+    EXPECT_LT(nSweep,maxIter);
+
+    MPO* H2=itsH->CreateH2Operator();
+    double E2=itsMPS->GetExpectation(H2);
+    EXPECT_EQ(H2->GetMaxDw(),12); //if hx=0 it compresses a lot
+    EXPECT_NEAR(E2,E1*E1,1e-14); //D=2 should give is an eigen state since hx=0
+}
+
+TEST_F(VariationalGroundStateTests,Test2BodyLR_Lower_L9S12D2Hz0)
+{
+    int L=9,DStart=2,D=2,maxIter=100;
+    double S=0.5,hx=0.0;
+    Setup2BodyLongRange(L,S,DStart,hx,3,Lower);
+    itsMPS->InitializeWith(Random);
+    EXPECT_EQ(itsH->GetMaxDw(),8);
+    itsH->CanonicalForm();
+    EXPECT_EQ(itsH->GetMaxDw(),8);
+    itsH->Compress(Parker,0,1e-10); //Compress down to Dw=5
+    EXPECT_EQ(itsH->GetMaxDw(),5);
+
+    Epsilons eps(1e-12);
+    eps.itsDelatEnergy1Epsilon=1e-9;
+    IterationSchedule is;
+    is.Insert({maxIter,DStart,eps});
+    is.Insert({maxIter,D,eps});
+
+    int nSweep=itsMPS->FindVariationalGroundState(itsH,is);
+
+    double E1=itsMPS->GetExpectation(itsH);
+    EXPECT_NEAR(E1/(L-1),-0.21614583333,1e-7);
+    EXPECT_LT(nSweep,maxIter);
+
+    MPO* H2=itsH->CreateH2Operator();
+    double E2=itsMPS->GetExpectation(H2);
+    EXPECT_EQ(H2->GetMaxDw(),12); //if hx=0 it compresses a lot
+    EXPECT_NEAR(E2,E1*E1,1e-14); //D=2 should give is an eigen state since hx=0
+}
 
 
 

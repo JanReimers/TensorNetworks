@@ -3,6 +3,7 @@
 #include "TensorNetworksImp/Hamiltonians/iHamiltonianImp.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_TransverseIsing.H"
+#include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_2Body_LongRange.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_3Body.H"
 #include "TensorNetworksImp/SVCompressorImp.H"
 #include "TensorNetworksImp/SPDLogger.H"
@@ -30,7 +31,15 @@ Make1D_NN_TransverseIsingHamiltonian(int L, double S,TriType ul, double J, doubl
     return new HamiltonianImp(L,&H,ul);
 }
 
-Hamiltonian*   FactoryImp::
+Hamiltonian* FactoryImp::
+Make1D_2BodyLongRangeHamiltonian(int L, double S,TriType ul, double J, double hx, int NN)
+{
+    Hamiltonian_2Body_LongRange H(S,J,hx,NN);
+    return new HamiltonianImp(L,&H,ul);
+}
+
+
+Hamiltonian* FactoryImp::
 Make1D_3BodyHamiltonian(int L, double S,TriType ul, double J, double K, double hz)
 {
     Hamiltonian_3Body H(S,J,K,hz);

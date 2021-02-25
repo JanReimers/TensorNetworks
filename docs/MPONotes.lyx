@@ -431,6 +431,316 @@ noprefix "false"
 \end_layout
 
 \begin_layout Section
+MPO Examples
+\end_layout
+
+\begin_layout Standard
+The first example in the paper is (ignoring the field term)
+\begin_inset Formula 
+\[
+\hat{H}=\sum_{n=1}^{N}J\hat{X}_{n}\hat{X}_{n+1}+K\hat{X}_{n}\hat{Z}_{n+1}\hat{X}_{n+2}
+\]
+
+\end_inset
+
+with the corresponding MPO
+\begin_inset Formula 
+\[
+\hat{W}=\begin{bmatrix}\hat{𝕀} & \hat{X} & \hat{X} & 0 & 0\\
+0 & 0 & 0 & 0 & J\hat{X}\\
+0 & 0 & 0 & \hat{Z} & 0\\
+0 & 0 & 0 & 0 & K\hat{X}\\
+0 & 0 & 0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now we try and multply two of these together
+\begin_inset Formula 
+\[
+\hat{W}^{\left(n\right)}\hat{W}^{\left(n+1\right)}=\begin{bmatrix}\hat{𝕀} & \hat{X}_{n} & \hat{X}_{n} & 0 & 0\\
+0 & 0 & 0 & 0 & J\hat{X}_{n}\\
+0 & 0 & 0 & \hat{Z}_{n} & 0\\
+0 & 0 & 0 & 0 & K\hat{X}_{n}\\
+0 & 0 & 0 & 0 & \hat{𝕀}
+\end{bmatrix}\begin{bmatrix}\hat{𝕀} & \hat{X}_{n+1} & \hat{X}_{n+1} & 0 & 0\\
+0 & 0 & 0 & 0 & J\hat{X}_{n+1}\\
+0 & 0 & 0 & \hat{Z}_{n+1} & 0\\
+0 & 0 & 0 & 0 & K\hat{X}_{n+1}\\
+0 & 0 & 0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\begin{bmatrix}\hat{𝕀} & \hat{X}_{n+1} & \hat{X}_{n+1} & \hat{X}_{n}\hat{Z}_{n+1} & J\hat{X}_{n}\hat{X}_{n+1}\\
+0 & 0 & 0 & 0 & J\hat{X}_{n}\\
+0 & 0 & 0 & \hat{Z}_{n} & K\hat{Z}_{n}\hat{X}_{n+1}\\
+0 & 0 & 0 & 0 & K\hat{X}_{n}\\
+0 & 0 & 0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+Add one more
+\begin_inset Formula 
+\[
+\hat{W}^{\left(n\right)}\hat{W}^{\left(n+1\right)}\hat{W}^{\left(n+2\right)}=\begin{bmatrix}\hat{𝕀} & \hat{X}_{n+1} & \hat{X}_{n+1} & \hat{X}_{n}\hat{Z}_{n+1} & J\hat{X}_{n}\hat{X}_{n+1}\\
+0 & 0 & 0 & 0 & J\hat{X}_{n}\\
+0 & 0 & 0 & \hat{Z}_{n} & K\hat{Z}_{n}\hat{X}_{n+1}\\
+0 & 0 & 0 & 0 & K\hat{X}_{n}\\
+0 & 0 & 0 & 0 & \hat{𝕀}
+\end{bmatrix}\begin{bmatrix}\hat{𝕀} & \hat{X}_{n+2} & \hat{X}_{n+2} & 0 & 0\\
+0 & 0 & 0 & 0 & J\hat{X}_{n+2}\\
+0 & 0 & 0 & \hat{Z}_{n+2} & 0\\
+0 & 0 & 0 & 0 & K\hat{X}_{n+2}\\
+0 & 0 & 0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{bmatrix}\hat{𝕀} & \hat{X}_{n+2} & \hat{X}_{n+2} & \hat{X}_{n}\hat{Z}_{n+1}+\hat{X}_{n+1}\hat{Z}_{n+2} & \hat{d}\\
+0 & 0 & 0 & 0 & J\hat{X}_{n}\\
+0 & 0 & 0 & \hat{Z}_{n} & K\hat{Z}_{n}\hat{X}_{n+1}+K\hat{Z}_{n}\hat{X}_{n+2}\\
+0 & 0 & 0 & 0 & K\hat{X}_{n}\\
+0 & 0 & 0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{d}=J\hat{X}_{n}\hat{X}_{n+1}+J\hat{X}_{n+1}\hat{X}_{n+2}+K\hat{X}_{n}\hat{Z}_{n+1}\hat{X}_{n+2}
+\]
+
+\end_inset
+
+You can see the interaction sum building up as 
+\begin_inset Formula $\hat{d}$
+\end_inset
+
+ in top right corner.
+\end_layout
+
+\begin_layout Standard
+THe next example is
+\begin_inset Formula 
+\[
+H_{1}=\sum_{knm=1}^{N}J_{kn}J_{nm}Z_{k}Z_{n}Z_{m}+J_{nm}^{\prime}Z_{n}Z_{m}
+\]
+
+\end_inset
+
+with N=30 they get an MPO with 
+\begin_inset Formula $\chi=1000$
+\end_inset
+
+.
+ Just looking at the two body term, we need strings like 
+\begin_inset Formula $J_{nn+1}^{\prime}Z_{n}Z_{n+1}$
+\end_inset
+
+ , 
+\begin_inset Formula $J_{nn+2}^{\prime}Z_{n}\hat{𝕀}_{n+1}Z_{n+2}$
+\end_inset
+
+, 
+\begin_inset Formula $J_{nn+3}^{\prime}Z_{n}\hat{𝕀}_{n+1}\hat{𝕀}_{n+2}Z_{n+3}$
+\end_inset
+
+ etc.
+ the MPO for NN terms is
+\begin_inset Formula 
+\[
+\hat{W}_{NN}=\begin{bmatrix}\hat{𝕀} & Z & 0\\
+0 & 0 & JZ\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\hat{W}_{NNN}=\begin{bmatrix}\hat{𝕀} & Z & 0 & 0\\
+0 & 0 & \hat{𝕀} & 0\\
+0 & 0 & 0 & JZ\\
+0 & 0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{W}_{N^{4}}=\begin{bmatrix}\hat{𝕀} & Z & 0 & 0 & 0\\
+0 & 0 & \hat{𝕀} & 0 & 0\\
+0 & 0 & 0 & \hat{𝕀} & 0\\
+0 & 0 & 0 & 0 & JZ\\
+0 & 0 & 0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+The pattern is now obvious.
+ We just put the desired string one slot above the diagonal.
+ Now we should be able to do tensor sum to get an MPO that includes NN to
+ N^4 interctions
+\begin_inset Formula 
+\[
+\hat{W}_{NN+NNN+N^{4}}=\begin{bmatrix}\hat{𝕀} & Z & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & JZ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & \hat{𝕀} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & \hat{𝕀} & Z & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & \hat{𝕀} & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & JZ & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & \hat{𝕀} & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & \hat{𝕀} & Z & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \hat{𝕀} & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \hat{𝕀} & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & JZ\\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+But I think this has too many unit ops on the diagonal, What about
+\begin_inset Formula 
+\[
+\hat{W}_{NN+NNN+N^{4}}=\begin{bmatrix}\hat{𝕀} & Z & Z & 0 & Z & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & JZ\\
+0 & 0 & 0 & \hat{𝕀} & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & JZ\\
+0 & 0 & 0 & 0 & 0 & \hat{𝕀} & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & \hat{𝕀} & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & JZ\\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+Three body would be similar with one Z inserted in the string of identies
+ above the diagonal.
+\end_layout
+
+\begin_layout Subsection
+MPO Algebra
+\end_layout
+
+\begin_layout Standard
+Starting with two MPOs in regular form
+\begin_inset Formula 
+\[
+\hat{W}_{1}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}_{1} & \hat{d}_{1}\\
+0 & \hat{\boldsymbol{A}}_{1} & \hat{\boldsymbol{b}}_{1}\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix},\quad\hat{W}_{2}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}_{2} & \hat{d}_{2}\\
+0 & \hat{\boldsymbol{A}}_{2} & \hat{\boldsymbol{b}}_{2}\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+the sum is just the direct matrix sum
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Hubig2017"
+literal "false"
+
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\hat{W}_{1}\oplus\hat{W}_{2}=\begin{bmatrix}\hat{W}_{1} & 0\\
+0 & \hat{W}_{2}
+\end{bmatrix}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}_{1} & \hat{d}_{1} & 0 & 0 & 0\\
+0 & \hat{\boldsymbol{A}}_{1} & \hat{\boldsymbol{b}}_{1} & 0 & 0 & 0\\
+0 & 0 & \hat{𝕀} & 0 & 0 & 0\\
+0 & 0 & 0 & \hat{𝕀} & \hat{\boldsymbol{c}}_{2} & \hat{d}_{2}\\
+0 & 0 & 0 & 0 & \hat{\boldsymbol{A}}_{2} & \hat{\boldsymbol{b}}_{2}\\
+0 & 0 & 0 & 0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+which almost certainly ameinable to compression.
+ The product is a simple tensor product
+\begin_inset Formula 
+\[
+\hat{W}_{1}\otimes\hat{W}_{2}
+\]
+
+\end_inset
+
+which is no funct to write out in full.
+\end_layout
+
+\begin_layout Subsection
+iMPO Algebra
+\end_layout
+
+\begin_layout Standard
+We can do the same operations for iMPOs but we need to take blocking into
+ account
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Parker2019"
+literal "false"
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{W}_{1}\oplus\hat{W}_{2}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}_{1} & \hat{\boldsymbol{c}}_{2} & \hat{d}_{1}+\hat{d}_{2}\\
+0 & \hat{\boldsymbol{A}}_{1} & 0 & \hat{\boldsymbol{b}}_{1}\\
+0 & 0 & \hat{\boldsymbol{A}}_{2} & \hat{\boldsymbol{b}}_{2}\\
+0 & 0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+The product is only well defined if one of the operators is strictly local,
+ set Eq.
+ E10 in
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Parker2019"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
 Canonical form for finite MPOs
 \end_layout
 
