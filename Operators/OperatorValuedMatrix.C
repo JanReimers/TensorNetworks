@@ -446,7 +446,8 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
 //
 //  This is where the fixed limits (0....X+1) helps us.  We know exactly where M is.
 //  M is from (1..X1)x(1..X2) inside RL regardless of the limits RL.
-//  the M area of the RL matrix gets replaced by a unit matrix.
+//  the M area of the RL matrix gets replaced by a unit matrix. BUt ...
+//  we need Mp*RL to the have the same dimensions and the original RL
 //
 template <class T> Matrix<T> MatrixO<T>::ExtractM(Matrix<T>& RL) const
 {
@@ -456,13 +457,22 @@ template <class T> Matrix<T> MatrixO<T>::ExtractM(Matrix<T>& RL) const
         assert(X1>=0);
     if (X2<0)
         assert(X2>=0);
+    assert(X2>=X1); //If this fails we need to shrink RL to X2+2 x X2+2
     Matrix<T> M(X1,X2); //One based
+
     for (int w1=1;w1<=X1;w1++)
     for (int w2=1;w2<=X2;w2++)
     {
         M(w1,w2)=RL(w1,w2);
         RL(w1,w2)= (w1==w2) ? 1 : 0;
     }
+    if (X2>X1)
+    { //Fill in the rest of the unit matrix or X2>X1
+        RL.SetLimits(0,X2+1,0,X2+1,true); //save data
+        for (int w1=X1+1;w1<=X2;w1++)
+            for (int w2=1;w2<=X2;w2++)
+                RL(w1,w2)= (w1==w2) ? 1 : 0;
+   }
     return M;
 }
 
