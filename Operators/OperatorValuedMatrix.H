@@ -208,6 +208,21 @@ inline MatLimits iSum(const MatLimits& a, const MatLimits& b)
    return  MatLimits(iSum(a.Row,b.Row),iSum(a.Col,b.Col));
 }
 
+
+inline bool IsInitialized(const Matrix<double>& a)
+{
+    bool ret=true;
+    for (index_t i:a.rows())
+        for (index_t j:a.cols())
+            if (a(i,j)!=0.0 && log10(a(i,j))<-300)
+            {
+                ret=false;
+                std::cout << "Unintialized matrix element a(" << i << "," << j << ")=" << a(i,j) << std::endl;
+            }
+    return ret;
+}
+
+
 template <class T> Matrix<T> TensorSum(const Matrix<T>& a, const Matrix<T>& b)
 {
     const MatLimits& al=a.GetLimits();
