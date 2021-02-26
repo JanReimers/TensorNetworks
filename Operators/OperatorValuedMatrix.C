@@ -349,6 +349,11 @@ template <class T> void MatrixO<T>::UnFlatten(const Matrix<T>& F)
 
 }
 
+
+template <typename T> inline int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
+
 template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr) const
 {
     LapackQRSolver <double>  solver;
@@ -430,7 +435,15 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
     else
     {
         assert(fabs(scale)>0.0);
-        assert(fabs(fabs(scale)-sqrt(itsd))<1e-15);
+        if (fabs(fabs(scale)-sqrt(itsd))>=1e-15)
+        {
+//            cout << std::scientific << "Scale=" << std::setprecision(8) << scale << ", scale-root(d)="  << fabs(fabs(scale)-sqrt(itsd)) << endl;
+//            cout << std::scientific << std::setprecision(3) << "V=" << V << endl;
+//            cout << std::scientific << std::setprecision(3) << "Vf=" << Vf << endl;
+//            cout << std::scientific << std::setprecision(3) << "RL=" << RL << endl;
+            scale=sgn(scale)*sqrt(itsd);
+        }
+//        assert(fabs(fabs(scale)-sqrt(itsd))<1e-15);
     }
 
     assert(!isnan(RL));
