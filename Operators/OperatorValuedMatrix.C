@@ -464,6 +464,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
 //
 template <class T> Matrix<T> MatrixO<T>::ExtractM(Matrix<T>& RL) const
 {
+    assert(IsInitialized(RL));
     int X1=RL.GetNumRows()-2;
     int X2=RL.GetNumCols()-2;
     if (X1<0)
@@ -482,10 +483,12 @@ template <class T> Matrix<T> MatrixO<T>::ExtractM(Matrix<T>& RL) const
     if (X2>X1)
     { //Fill in the rest of the unit matrix or X2>X1
         RL.SetLimits(0,X2+1,0,X2+1,true); //save data
-        for (int w1=X1+1;w1<=X2;w1++)
-            for (int w2=1;w2<=X2;w2++)
+        for (int w1=X1+1;w1<=X2+1;w1++)
+            for (int w2=0;w2<=X2+1;w2++)
                 RL(w1,w2)= (w1==w2) ? 1 : 0;
    }
+    assert(IsInitialized(M));
+    assert(IsInitialized(RL));
     return M;
 }
 
@@ -494,6 +497,7 @@ template <class T> Matrix<T> MatrixO<T>::ExtractM(Matrix<T>& RL) const
 //
 void Grow(Matrix<double>& m,const MatLimits& lim)
 {
+    assert(IsInitialized(m));
     const VecLimits&  rl=lim.Row;
     const VecLimits&  cl=lim.Col;
     const VecLimits& mrl=m.GetLimits().Row;
@@ -528,6 +532,7 @@ void Grow(Matrix<double>& m,const MatLimits& lim)
         for (int j=rl.Low;j<=i1;j++) m(j,i2)= 0.0; // FIll out right column
         m(i1,i2)=1.0;
     }
+    assert(IsInitialized(m));
 
 }
 
@@ -537,11 +542,14 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
     //  Block respecting QR/QL/RQ/LQ
     //
     auto [Q,RL]=BlockQX(lr);
+    assert(IsInitialized(RL));
     assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
     //
     //  Isolate the M matrix and SVD/compress it.
     //
     Matrix<T> M=ExtractM(RL);
+    assert(IsInitialized(M));
+    assert(IsInitialized(RL));
     if (M.size()==0) return std::make_tuple(Q,RL);
     LapackSVDSolver <double>  solver;
     auto [U,s,VT]=solver.SolveAll(M,1e-14); //Solves M=U * s * VT
