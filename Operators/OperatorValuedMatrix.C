@@ -542,6 +542,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
     //  Isolate the M matrix and SVD/compress it.
     //
     Matrix<T> M=ExtractM(RL);
+    if (M.size()==0) return std::make_tuple(Q,RL);
     LapackSVDSolver <double>  solver;
     auto [U,s,VT]=solver.SolveAll(M,1e-14); //Solves M=U * s * VT
     itsTruncationError=comp->Compress(U,s,VT);
