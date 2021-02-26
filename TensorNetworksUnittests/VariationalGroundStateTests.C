@@ -99,7 +99,8 @@ TEST_F(VariationalGroundStateTests,TestSweep_Lower_L2S1D2)
 
     MPO* H2=itsH->CreateH2Operator();
     double E2=itsMPS->GetExpectation(H2);
-    EXPECT_EQ(H2->GetMaxDw(),4);
+    EXPECT_EQ(H2->GetMaxDw(),5); //Parker compression
+//    EXPECT_EQ(H2->GetMaxDw(),4); //Std compression
     EXPECT_NEAR(E2,E1*E1,1e-14);
 }
 
@@ -123,7 +124,8 @@ TEST_F(VariationalGroundStateTests,TestSweep_Upper_L2S1D2)
 
     MPO* H2=itsH->CreateH2Operator();
     double E2=itsMPS->GetExpectation(H2);
-    EXPECT_EQ(H2->GetMaxDw(),4);
+    EXPECT_EQ(H2->GetMaxDw(),5); //Parker compression
+//    EXPECT_EQ(H2->GetMaxDw(),4); //Std compression
     EXPECT_NEAR(E2,E1*E1,1e-14);
 }
 
@@ -437,7 +439,8 @@ TEST_F(VariationalGroundStateTests,TestTransverIsing_Lower_L2S1D2Hx0)
 
     MPO* H2=itsH->CreateH2Operator();
     double E2=itsMPS->GetExpectation(H2);
-    EXPECT_EQ(H2->GetMaxDw(),1); //if hx=0 it compresses a lot
+    EXPECT_EQ(H2->GetMaxDw(),2); //if hx=0,L=2 it compresses a lot, Parker gets 2
+//    EXPECT_EQ(H2->GetMaxDw(),1); //if hx=0, L=2 it compresses a lot, Std gets 1
     EXPECT_NEAR(E2,E1*E1,1e-14);
 }
 
@@ -598,7 +601,7 @@ TEST_F(VariationalGroundStateTests,Test2BodyLR_Upper_L9S12D2Hz0)
     MPO* H2=itsH->CreateH2Operator();
     double E2=itsMPS->GetExpectation(H2);
     EXPECT_EQ(H2->GetMaxDw(),12); //if hx=0 it compresses a lot
-    EXPECT_NEAR(E2,E1*E1,1e-14); //D=2 should give is an eigen state since hx=0
+    EXPECT_NEAR(E2,E1*E1,2e-14); //D=2 should give is an eigen state since hx=0
 }
 
 TEST_F(VariationalGroundStateTests,Test2BodyLR_Lower_L9S12D2Hz0)
@@ -628,7 +631,7 @@ TEST_F(VariationalGroundStateTests,Test2BodyLR_Lower_L9S12D2Hz0)
     MPO* H2=itsH->CreateH2Operator();
     double E2=itsMPS->GetExpectation(H2);
     EXPECT_EQ(H2->GetMaxDw(),12); //if hx=0 it compresses a lot
-    EXPECT_NEAR(E2,E1*E1,1e-14); //D=2 should give is an eigen state since hx=0
+    EXPECT_NEAR(E2,E1*E1,2e-14); //D=2 should give is an eigen state since hx=0
 }
 
 

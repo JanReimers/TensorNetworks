@@ -1,5 +1,9 @@
 
 SiteOperatorImp:
+    Handle diagonal ops, test=DoBuildMPO_Neel
+        OpValMatrix.C line 430 fails.
+        -CanonicalForm handle diagonal MPOs (treat as lower?)
+
     Done: -Add upper operators to finite lattice unit tests.
     Done: -Add upper operators to infinite lattice unit tests.
     -Run Parker's' examples
@@ -29,7 +33,9 @@ SiteOperatorImp:
 
 OpValMatrix:
 
+
 MPO:
+    Fixed: -For 2Body LR ham, parker compression of H2 destroys it.
     -OperatorClient::GetH assumes QN's for two sites. We need a more general interface
         int GetNBody() //Max # of interaction sites
         Matrix GetH(std::vector<int> QNs)
@@ -41,7 +47,6 @@ MPO:
         Done: -ExpH
         -Factor U*s*V = expH
     -TestL2iMPOTrotter4 Get it running again
-    -CanonicalForm handle diagonal MPOs (treat as lower?)
     Fixed: -TestParkerCanonicalTri_Upper_L1iH fails
     Fixed: -TestParkerCanonicalQTIter_Upper_L1iH fails
     Fixed: -TestRandomEnergyRangeSD_Upper fails

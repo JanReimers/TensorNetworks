@@ -14,6 +14,7 @@
 #include "Operators/SiteOperatorImp.H"
 #include "Containers/Matrix6.H"
 
+using TensorNetworks::Hamiltonian;
 using TensorNetworks::Random;
 using TensorNetworks::Neel;
 using TensorNetworks::DLeft;
@@ -166,9 +167,9 @@ TEST_F(MPOTests,DoBuildMPO_Neel)
     Setup(10,0.5,1);
     itsMPS->InitializeWith(Neel);
     MPO* h12=MakeEnergyMPO(2);
-    h12->Report(cout);
+//    h12->Report(cout);
     EXPECT_NEAR(itsMPS->GetExpectation(h12),-0.25,1e-11);
-//    h12->CanonicalForm();
+//    h12->CanonicalForm();  OpValMatrix.C line 430 fails.
 //    EXPECT_NEAR(itsMPS->GetExpectation(h12),-0.25,1e-11);
     delete h12;
 }
@@ -421,8 +422,8 @@ TEST_F(MPOTests,TestHamiltonianCreateH2L2)
     int L=2;
     Setup(L,0.5,1);
     MPO* H2=itsH->CreateH2Operator();
-    EXPECT_EQ(H2->GetMaxDw(),4);
-//    EXPECT_EQ(H2->GetMaxDw(),9); was expecting 9 but SVD for L=2 only gives Dw=4 = d*d
+    EXPECT_EQ(H2->GetMaxDw(),5); //Parker compression
+//    EXPECT_EQ(H2->GetMaxDw(),4); //Std compression
     delete H2;
 }
 
@@ -939,6 +940,57 @@ TEST_F(MPOTests,TestParkerSVDCompressH2L256)
     EXPECT_NEAR(E2,E2right,epsE);
     EXPECT_NEAR(E2,E2comp ,epsE);
     EXPECT_EQ(H2->GetMaxDw(),9);
+    EXPECT_LT(truncError,1e-13);
+}
+
+TEST_F(MPOTests,TestParkerSVDCompressH2_2Body_Upper)
+{
+    int L=8,D=2;
+    double epsE=2e-10;
+    double S=0.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(Random);
+    itsMPS->Normalize(DLeft);
+
+    Hamiltonian* Hlr=itsFactory->Make1D_2BodyLongRangeHamiltonian(L,S,Upper,1.0,0.0,3);
+    MPO* H2=Hlr->CreateUnitOperator();
+    H2->Product(Hlr);
+    H2->Product(Hlr);
+    double E2=itsMPS->GetExpectation(H2);
+    H2->CanonicalForm(); //Sweep both ways
+    double E2right=itsMPS->GetExpectation(H2);
+    double truncError=H2->Compress(Parker,0,1e-13);
+//    H2->Report(cout);
+    double E2comp=itsMPS->GetExpectation(H2);
+//    cout << E2 << " " << E2right << " " << E2comp << endl;
+    EXPECT_NEAR(E2,E2right,epsE);
+    EXPECT_NEAR(E2,E2comp ,epsE);
+    EXPECT_EQ(H2->GetMaxDw(),12);
+    EXPECT_LT(truncError,1e-13);
+}
+TEST_F(MPOTests,TestParkerSVDCompressH2_2Body_Lower)
+{
+    int L=8,D=2;
+    double epsE=2e-10;
+    double S=0.5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(Random);
+    itsMPS->Normalize(DLeft);
+
+    Hamiltonian* Hlr=itsFactory->Make1D_2BodyLongRangeHamiltonian(L,S,Lower,1.0,0.0,3);
+    MPO* H2=Hlr->CreateUnitOperator();
+    H2->Product(Hlr);
+    H2->Product(Hlr);
+    double E2=itsMPS->GetExpectation(H2);
+    H2->CanonicalForm(); //Sweep both ways
+    double E2right=itsMPS->GetExpectation(H2);
+    double truncError=H2->Compress(Parker,0,1e-13);
+//    H2->Report(cout);
+    double E2comp=itsMPS->GetExpectation(H2);
+//    cout << E2 << " " << E2right << " " << E2comp << endl;
+    EXPECT_NEAR(E2,E2right,epsE);
+    EXPECT_NEAR(E2,E2comp ,epsE);
+    EXPECT_EQ(H2->GetMaxDw(),12);
     EXPECT_LT(truncError,1e-13);
 }
 
