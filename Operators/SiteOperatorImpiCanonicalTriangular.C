@@ -22,6 +22,7 @@ double SiteOperatorImp::ContractUL(int w11, int w12, int w21, int w22,TriType ul
         return itsWs.GetTrace(w11,w12,w22,w21);
     else
         assert(false);
+    return 0.0;
 }
 
 MatrixRT SiteOperatorImp::BuildK(int M,TriType ul) const
