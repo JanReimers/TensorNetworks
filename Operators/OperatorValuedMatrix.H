@@ -30,6 +30,7 @@ public:
 //
     void SetChi12(int X1,int X2,bool preserve_data);
     void SetUpperLower(TriType ul); //Row and column matrices have no way of knowing
+    void SetUpperLower(); //Detect and set
 //
 // ASsign from overloaded operators
 //
@@ -85,7 +86,6 @@ public:
     std::ostream& PrettyPrint(std::ostream& os) const;
 private:
     void Setd();
-//    void CheckUL();
     Matrix<T> ExtractM(Matrix<T>& RL) const;
 
     int     itsd;

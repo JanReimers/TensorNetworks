@@ -85,6 +85,7 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,Position lbr,const MatrixRT
         assert(false);
     }
     Init_lr(lbr,0,0);
+    itsWs.SetUpperLower();
 }
 //
 // Construct with W operator. Called by iMPOImp::MakeUnitcelliMPO

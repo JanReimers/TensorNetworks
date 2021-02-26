@@ -15,6 +15,7 @@
 #include "Containers/Matrix6.H"
 
 using TensorNetworks::Hamiltonian;
+using TensorNetworks::MPS;
 using TensorNetworks::Random;
 using TensorNetworks::Neel;
 using TensorNetworks::DLeft;
@@ -994,7 +995,7 @@ TEST_F(MPOTests,TestParkerSVDCompressH2_2Body_Lower)
     EXPECT_LT(truncError,1e-13);
 }
 
-/*
+
 TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
 {
     int L=8,D=2;
@@ -1004,25 +1005,26 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
     itsMPS->Normalize(DLeft);
     MPO* expH=itsH->CreateOperator(dt,SecondOrder,CNone,epsMPO);
 //    iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,CNone,epsMPO);
-//    expH->Report(cout);
+    expH->Report(cout);
 
     MPS* psi1=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi1),1.0,1e-13);
 
     EXPECT_NEAR(itsMPS->GetOverlap(psi1),1.0,1e-13);
     expH->CanonicalForm(); //Do we need to sweep both ways?
-//    expH->Report(cout);
+    expH->Report(cout);
     MPS* psi3=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi3),1.0,1e-13);
 
-//    expH->Report(cout);
+    expH->Report(cout);
     double truncError=expH->Compress(Parker,0,epsMPO);
-//    expH->Report(cout);
+    expH->Report(cout);
     MPS* psi4=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi4),1.0,1e-13);
     EXPECT_EQ(expH->GetMaxDw(),2);
     EXPECT_LT(truncError,epsMPO); //Unit operator should have no compression error
 }
+
 TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
 {
     int L=9,D=2;
@@ -1049,9 +1051,9 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
     EXPECT_EQ(expH->GetMaxDw(),2);
     EXPECT_LT(truncError,epsMPO); //Unit operator should have no compression error
 }
-*/
-/*
-TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
+
+
+/*TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
 {
     int L=8,D=2;
     double S=0.5,dt=1.0,epsMPO=1e-13;

@@ -122,6 +122,18 @@ template <class T> void MatrixO<T>::SetUpperLower(TriType ul)
     itsUL=ul;
 }
 
+template <class T> void MatrixO<T>::SetUpperLower()
+{
+    if (IsLowerTriangular(*this))
+        itsUL=Lower;
+    else if (IsUpperTriangular(*this))
+        itsUL=Upper;
+    else if (IsDiagonal(*this))
+        itsUL=Diagonal;
+    else
+        itsUL=Full;
+}
+
 
 template <class T> MatrixO<T>& MatrixO<T>::operator*=(const T& s)
 {
