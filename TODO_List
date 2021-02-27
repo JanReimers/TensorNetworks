@@ -1,4 +1,19 @@
 
+exp(-t*H) MPOs
+    -in order to get these to work we need some major re-org.  The messy part is getting right
+     all the limits in the Grow steps for BlockQX and BlockSVD
+    -Another issue is rescaling Q and L after decomp.  The scale facter shoudl *always* be sqrt(d).
+        it's just a question of the where to the sign from.
+    -Imp steps
+        -Clean up GetMeasured and GetUpperLower
+
+        -Set the regular form or exp(H) form at construction time.  DOn't change it after that.
+        -Auto detect upper/lower RegularForm
+        -If not in regular for assume exp(-t*H) form which has no I ops at the corners
+            -In this GetV(lr) is just the full matrix
+        -If bulk of lattice is regular form the edges are
+        -Make separate BlockQX and BLockSVD routines for non-regular form
+
 SiteOperatorImp:
     Handle diagonal ops, test=DoBuildMPO_Neel
         OpValMatrix.C line 430 fails.

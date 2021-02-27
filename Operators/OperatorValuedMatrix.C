@@ -118,20 +118,32 @@ template <class T> void MatrixO<T>::Setd()
 }
 template <class T> void MatrixO<T>::SetUpperLower(TriType ul)
 {
-    assert(ul==Upper || ul==Lower);
+//    assert(ul==Upper || ul==Lower);
     itsUL=ul;
 }
 
-template <class T> void MatrixO<T>::SetUpperLower()
+template <class T> void MatrixO<T>::SetUpperLower(double eps)
 {
-    if (IsLowerTriangular(*this))
-        itsUL=Lower;
-    else if (IsUpperTriangular(*this))
-        itsUL=Upper;
-    else if (IsDiagonal(*this))
-        itsUL=Diagonal;
+    SetUpperLower(this->GetMeasuredShape(eps));
+}
+
+template <class T> TriType  MatrixO<T>::GetMeasuredShape(double eps) const
+{
+    TriType ret=Full;
+    if (IsDiagonal(*this,eps))
+        ret=Diagonal;
+    else if (this->GetNumRows()<2)
+        ret=Row;
+    else if (this->GetNumCols()<2)
+        ret=Column;
+    else if (IsUpperTriangular(*this,eps))
+        ret=Upper;
+    else if (IsLowerTriangular(*this,eps))
+        ret=Lower;
     else
-        itsUL=Full;
+        ret=Full;
+
+    return ret;
 }
 
 

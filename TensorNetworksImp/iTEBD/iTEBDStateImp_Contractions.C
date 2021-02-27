@@ -546,8 +546,8 @@ double iTEBDStateImp::GetExpectation (const dVectorT& A,const DiagonalMatrixRT& 
 //    else
 //        assert(false);
     MatrixOR W=so->GetW();
-    assert(W.GetUpperLower()!=Full);
-    if (W.GetUpperLower()==Upper)
+    assert(W.GetNominalShape()!=Full);
+    if (W.GetNominalShape()==Upper)
         Mirror(W);
 
 

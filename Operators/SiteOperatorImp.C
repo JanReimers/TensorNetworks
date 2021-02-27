@@ -85,7 +85,6 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,Position lbr,const MatrixRT
         assert(false);
     }
     Init_lr(lbr,0,0);
-    itsWs.SetUpperLower();
 }
 //
 // Construct with W operator. Called by iMPOImp::MakeUnitcelliMPO
@@ -206,10 +205,10 @@ void SiteOperatorImp::Sum(const SiteOperator* O2, double factor)
     SetLimits();
 }
 
-char SiteOperatorImp::GetUL() const
+char TriTypeToChar(TriType ul)
 {
     char ret('?');
-    switch (itsWs.GetUpperLower())
+    switch (ul)
     {
     case Lower:
         ret='L';
@@ -223,11 +222,22 @@ char SiteOperatorImp::GetUL() const
     case Full:
         ret='F';
         break;
+    case Row:
+        ret='R';
+        break;
+    case Column:
+        ret='C';
+        break;
     default :
         ret='?';
 
     }
     return ret;
+}
+
+char SiteOperatorImp::GetUL() const
+{
+    return TriTypeToChar(itsWs.GetNominalShape());
 }
 
 void SiteOperatorImp::Report(std::ostream& os) const
@@ -238,40 +248,41 @@ void SiteOperatorImp::Report(std::ostream& os) const
     << std::scientific << std::setprecision(1) << itsTruncationError
     << " " << std::fixed << std::setprecision(1) << std::setw(5) << GetFrobeniusNorm()
     << " " << std::setw(4) << GetNormStatus(1e-13)
-    << " " << std::setw(4) << GetUpperLower(1e-13)
+    << " " << std::setw(4) << GetMeasuredShape(1e-13)
     << " " << std::setw(4) << GetUL() // Upper lower
 //    << " " << itsDw12.w1_first << " " << itsDw12.w2_last
     ;
 }
 
-char SiteOperatorImp::GetUpperLower(double eps) const
+char SiteOperatorImp::GetMeasuredShape(double eps) const
 {
-    char ret=' ';
-    if (itsWs.GetNumRows()<2 && itsWs.GetNumCols()<2)
-        ret='1';
-    else if (itsWs.GetNumRows()<2)
-        ret='R';
-    else if (itsWs.GetNumCols()<2)
-        ret='C';
-    else if (IsDiagonal(itsWs,eps))
-        ret='D';
-    else if (IsUpperTriangular(itsWs,eps))
-    {
-        if (ret==' ')
-            ret='U';
-        else if (ret=='L')
-            ret='M'; //Mix
-    }
-    else if (IsLowerTriangular(itsWs,eps))
-    {
-        if (ret==' ')
-            ret='L';
-        else if (ret=='U')
-            ret='M'; //Mix
-    }
-    else
-        ret='F'; // Full
-    return ret;
+    return TriTypeToChar(itsWs.GetMeasuredShape(eps));
+//    char ret=' ';
+//    if (itsWs.GetNumRows()<2 && itsWs.GetNumCols()<2)
+//        ret='1';
+//    else if (itsWs.GetNumRows()<2)
+//        ret='R';
+//    else if (itsWs.GetNumCols()<2)
+//        ret='C';
+//    else if (IsDiagonal(itsWs,eps))
+//        ret='D';
+//    else if (IsUpperTriangular(itsWs,eps))
+//    {
+//        if (ret==' ')
+//            ret='U';
+//        else if (ret=='L')
+//            ret='M'; //Mix
+//    }
+//    else if (IsLowerTriangular(itsWs,eps))
+//    {
+//        if (ret==' ')
+//            ret='L';
+//        else if (ret=='U')
+//            ret='M'; //Mix
+//    }
+//    else
+//        ret='F'; // Full
+//    return ret;
 }
 
 double SiteOperatorImp::GetFrobeniusNorm() const

@@ -52,14 +52,14 @@ void SiteOperatorImp::GaugeTransform(const MatrixRT& R, const MatrixRT& Rinv)
 {
     assert(R.GetLimits()==Rinv.GetLimits());
     assert(IsUnit(R*Rinv,1e-13));
-    TriType ul=itsWs.GetUpperLower();
+    TriType ul=itsWs.GetNominalShape();
     if (ul==Upper)
         itsWs=R*itsWs*Rinv;
     else if (ul==Lower)
         itsWs=Transpose(R*Transpose(itsWs)*Rinv); //ul might get lost in this step.
     else
         assert(false);
-    assert(itsWs.GetUpperLower()==ul);
+    assert(itsWs.GetNominalShape()==ul);
     SetLimits();
 
 }
@@ -92,7 +92,7 @@ void SiteOperatorImp::iCanonicalFormTriangular(Direction lr)
 {
     assert(itsOpRange.Dw1==itsOpRange.Dw2); //Make sure we are square
     int X=itsOpRange.Dw1-2; //Chi
-    TriType ul=itsWs.GetUpperLower();
+    TriType ul=itsWs.GetNominalShape();
     MatLimits lim(0,X+1,0,X+1);
     MatrixRT RT(lim); //Accumulated gauge transform
     LinearSolver<double>* solver=new LapackLinearSolver<double>();;

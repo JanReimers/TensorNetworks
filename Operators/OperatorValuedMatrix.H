@@ -30,7 +30,7 @@ public:
 //
     void SetChi12(int X1,int X2,bool preserve_data);
     void SetUpperLower(TriType ul); //Row and column matrices have no way of knowing
-    void SetUpperLower(); //Detect and set
+    void SetUpperLower(double eps); //Detect and set
 //
 // ASsign from overloaded operators
 //
@@ -59,7 +59,8 @@ public:
     int       Getd() const {return itsd;}
     double    GetS() const {return dtoS(itsd);}
     double    GetTruncationError() const {return itsTruncationError;}
-    TriType   GetUpperLower() const {return itsUL;}
+    TriType   GetNominalShape() const {return itsUL;}
+    TriType   GetMeasuredShape(double eps) const;
     T         GetTrace(int a, int b, int c, int d) const; //<Wab,Wcd>
     double    GetFrobeniusNorm() const;
     Matrix<T> GetOrthoMatrix(Direction) const;
@@ -112,7 +113,9 @@ inline TriType Combine(TriType a, TriType b)
     TriType ret=a;
     if (a!=b)
     {
-        if (a==Diagonal) ret=b;
+        if (a==Row && b==Column) ret=Diagonal;
+        else if (a==Column && b==Row) ret=Full;
+        else if (a==Diagonal) ret=b;
         else if (b==Diagonal) ret=a;
         else if (a==Full || b==Full) ret=Full;
     }
@@ -123,13 +126,14 @@ template <class T> MatrixO<T> operator-(const MatrixO<T>& a, const MatrixO<T>& b
 {
     assert(a.GetLimits()==b.GetLimits());
     assert(a.Getd     ()==b.Getd     ());
-    TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
-    MatrixO<T> ret(a.Getd(),ul,a.GetLimits());
+    //TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
+    MatrixO<T> ret(a.Getd(),Full,a.GetLimits());
     OperatorElement<T> Z=OperatorZ(a.Getd());
     Fill(ret,Z);
     for (index_t i:a.rows())
         for (index_t j:a.cols())
             ret(i,j)=a(i,j)-b(i,j);
+    ret.SetUpperLower();
     return ret;
 }
 
@@ -137,7 +141,7 @@ template <class T> MatrixO<T> operator*(const MatrixO<T>& a, const MatrixO<T>& b
 {
     assert(a.GetColLimits()==b.GetRowLimits());
     assert(a.Getd        ()==b.Getd        ());
-    TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
+    TriType ul=Combine(a.GetNominalShape(),b.GetNominalShape());
     const typename MatrixO<T>::Base& ma(a),mb(b);
     MatrixO<T> ret(a.Getd(),ul,ma*mb);
     return ret;
@@ -147,7 +151,7 @@ template <class T> MatrixO<T> operator*(const Matrix<T>& a, const MatrixO<T>& b)
 {
     assert(a.GetColLimits()==b.GetRowLimits());
     const typename MatrixO<T>::Base mb(b);
-    MatrixO<T> ret(b.Getd(),b.GetUpperLower(),a*mb);
+    MatrixO<T> ret(b.Getd(),b.GetNominalShape(),a*mb);
     return ret;
 }
 
@@ -155,7 +159,7 @@ template <class T> MatrixO<T> operator*(const MatrixO<T>& a, const Matrix<T>& b)
 {
     assert(a.GetColLimits()==b.GetRowLimits());
     const typename MatrixO<T>::Base& ma(a);
-    MatrixO<T> ret(a.Getd(),a.GetUpperLower(),ma*b);
+    MatrixO<T> ret(a.Getd(),a.GetNominalShape(),ma*b);
     return ret;
 }
 inline index_t Mirror(index_t i,const VecLimits& lim)
@@ -308,7 +312,7 @@ template <class T> MatrixO<T> iTensorSum(const MatrixO<T>& a, const MatrixO<T>& 
 {
     int d=a.Getd();
     assert(d==b.Getd());
-    TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
+    TriType ul=Combine(a.GetNominalShape(),b.GetNominalShape());
     const MatLimits& al=a.GetLimits();
     const MatLimits& bl=b.GetLimits();
     MatLimits rl=iSum(al,bl);
@@ -385,7 +389,7 @@ template <class T> MatrixO<T> iTensorSum(const MatrixO<T>& a, const MatrixO<T>& 
 template <class T> MatrixO<T> TensorSum(const MatrixO<T>& a, const MatrixO<T>& b)
 {
     assert(a.Getd()==b.Getd());
-    TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
+    TriType ul=Combine(a.GetNominalShape(),b.GetNominalShape());
     const typename MatrixO<T>::Base& ma(a),mb(b);
     MatrixO<T> ret(a.Getd(),ul,TensorSum(ma,mb));
     return ret;
@@ -395,7 +399,7 @@ template <class T> MatrixO<T> TensorSum(const MatrixO<T>& a, const MatrixO<T>& b
 template <class T> MatrixO<T> TensorProduct(const MatrixO<T>& a, const MatrixO<T>& b)
 {
     assert(a.Getd        ()==b.Getd        ());
-    TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
+    TriType ul=Combine(a.GetNominalShape(),b.GetNominalShape());
     const typename MatrixO<T>::Base& ma(a),mb(b);
     MatrixO<T> ret(a.Getd(),ul,TensorProduct(ma,mb));
     return ret;
@@ -411,7 +415,7 @@ template <class T> MatrixO<T> HorizontalProduct(const MatrixO<T>& a, const Matri
     // Establish limits/d/ul
     MatLimits lim(a.GetRowLimits(),b.GetColLimits());
     int d=a.Getd()*b.Getd();
-    TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
+    TriType ul=Combine(a.GetNominalShape(),b.GetNominalShape());
     // Create empty results matrix
     MatrixO<T> ret(d,ul,lim);
     OperatorElement<T> Z=OperatorZ(d);

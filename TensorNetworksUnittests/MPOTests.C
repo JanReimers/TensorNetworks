@@ -869,15 +869,18 @@ TEST_F(MPOTests,TestParkerSVDCompress_Lower_H2L9)
     MPO* H2=itsH->CreateUnitOperator();
     H2->Product(itsH);
     H2->Product(itsH);
+    H2->Report(cout);
 
     EXPECT_EQ(H2->GetNormStatus(),"WWWWWWWWW");
     EXPECT_EQ(H2->GetUpperLower()," LLLLLLL ");
     double E2=itsMPS->GetExpectation(H2);
     H2->CanonicalForm(); //Do we need to sweep both ways?
+    H2->Report(cout);
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     EXPECT_EQ(H2->GetUpperLower()," LLLLLLL ");
     double E2can=itsMPS->GetExpectation(H2);
     double truncError=H2->Compress(Parker,0,1e-13);
+    H2->Report(cout);
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     EXPECT_EQ(H2->GetUpperLower()," FFFFFFF ");
     double E2comp=itsMPS->GetExpectation(H2);
@@ -995,7 +998,7 @@ TEST_F(MPOTests,TestParkerSVDCompressH2_2Body_Lower)
     EXPECT_LT(truncError,1e-13);
 }
 
-
+/*
 TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
 {
     int L=8,D=2;
@@ -1005,7 +1008,7 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
     itsMPS->Normalize(DLeft);
     MPO* expH=itsH->CreateOperator(dt,SecondOrder,CNone,epsMPO);
 //    iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,CNone,epsMPO);
-    expH->Report(cout);
+//    expH->Report(cout);
 
     MPS* psi1=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi1),1.0,1e-13);
@@ -1016,7 +1019,6 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
     MPS* psi3=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi3),1.0,1e-13);
 
-    expH->Report(cout);
     double truncError=expH->Compress(Parker,0,epsMPO);
     expH->Report(cout);
     MPS* psi4=itsMPS->Apply(expH);
@@ -1053,7 +1055,7 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
 }
 
 
-/*TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
+TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
 {
     int L=8,D=2;
     double S=0.5,dt=1.0,epsMPO=1e-13;
@@ -1065,7 +1067,7 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
     MPO* expH=itsH->CreateOperator(dt,FirstOrder,CNone,epsMPO);
 //    MPO* expH=itsH->CreateUnitOperator();
 //  MPO* expH=new MPO_SpatialTrotter(dt,Even,L,S,itsH);
-    expH->Report(cout);
+//    expH->Report(cout);
 //    expH->Dump(cout);
 
     EXPECT_NEAR(itsMPS->GetOverlap(itsMPS),1.0,1e-13);

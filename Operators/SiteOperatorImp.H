@@ -49,9 +49,11 @@ public:
     virtual void   Report(std::ostream&) const;
     virtual char   GetNormStatus(double eps) const;
     virtual double GetFrobeniusNorm() const;
-    virtual char   GetUpperLower(double eps) const;
+    virtual char   GetMeasuredShape(double eps) const;
     virtual char   GetLRB() const {return PBulk;}
     virtual void   SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
+    virtual void   SetUpperLower(TriType ul) {itsWs.SetUpperLower(ul);};
+    virtual char   GetUpperLower(double eps) const {return GetMeasuredShape(eps);}
 
 private:
     SiteOperatorImp* GetNeighbour(Direction) const;

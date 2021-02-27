@@ -278,7 +278,7 @@ TEST_F(OvMTests,OperatorValuedMatrix1)
     EXPECT_EQ(OvM(0,1),OperatorZ (S));
     EXPECT_EQ(OvM(0,2),OperatorZ (S));
     EXPECT_EQ(OvM(0,3),OperatorZ (S));
-    EXPECT_EQ(OvM.GetUpperLower(),Lower);
+    EXPECT_EQ(OvM.GetNominalShape(),Lower);
 }
 
 TEST_F(OvMTests,OperatorValuedMatrix2)
@@ -293,7 +293,7 @@ TEST_F(OvMTests,OperatorValuedMatrix2)
     EXPECT_EQ(OvM(0,1),OperatorZ (S));
     EXPECT_EQ(OvM(0,2),OperatorZ (S));
     EXPECT_EQ(OvM(0,3),OperatorZ (S));
-    EXPECT_EQ(OvM.GetUpperLower(),Lower);
+    EXPECT_EQ(OvM.GetNominalShape(),Lower);
 }
 
 TEST_F(OvMTests,OperatorValuedMatrix3)
@@ -308,7 +308,7 @@ TEST_F(OvMTests,OperatorValuedMatrix3)
     EXPECT_EQ(OvM(1,0),OperatorZ (S));
     EXPECT_EQ(OvM(2,0),OperatorZ (S));
     EXPECT_EQ(OvM(3,0),OperatorZ (S));
-    EXPECT_EQ(OvM.GetUpperLower(),Upper);
+    EXPECT_EQ(OvM.GetNominalShape(),Upper);
 }
 
 TEST_F(OvMTests,OperatorValuedMatrix4)
@@ -323,7 +323,7 @@ TEST_F(OvMTests,OperatorValuedMatrix4)
     EXPECT_EQ(OvM(1,0),OperatorZ (S));
     EXPECT_EQ(OvM(2,0),OperatorZ (S));
     EXPECT_EQ(OvM(3,0),OperatorZ (S));
-    EXPECT_EQ(OvM.GetUpperLower(),Upper);
+    EXPECT_EQ(OvM.GetNominalShape(),Upper);
 }
 
 TEST_F(OvMTests,OperatorValuedMatrix5)
@@ -655,11 +655,11 @@ TEST_F(OvMTests,OpMulMO)
 
     MatrixOR C=A*B;
     EXPECT_EQ(C.Getd(),d);
-    EXPECT_EQ(C.GetUpperLower(),ul);
+    EXPECT_EQ(C.GetNominalShape(),ul);
 
     MatrixOR D=B*A;
     EXPECT_EQ(D.Getd(),d);
-    EXPECT_EQ(D.GetUpperLower(),ul);
+    EXPECT_EQ(D.GetNominalShape(),ul);
 }
 
 TEST_F(OvMTests,TensorSum)
@@ -680,7 +680,7 @@ TEST_F(OvMTests,TensorSum)
     B*=10.0;
     MatrixOR C=TensorSum(A,B);
     EXPECT_EQ(C.Getd(),d);
-    EXPECT_EQ(C.GetUpperLower(),ul);
+    EXPECT_EQ(C.GetNominalShape(),ul);
     for (index_t i:A.rows())
         for (index_t j:A.cols())
             EXPECT_EQ(A(i,j),C(i,j));
@@ -708,7 +708,7 @@ TEST_F(OvMTests,iTensorSum)
     MatrixOR C=iTensorSum(A,B);
     //cout << "C=" << C << endl; //visual inspection is the easiest way to very this guy. Crappy for regression trapping though!
     EXPECT_EQ(C.Getd(),d);
-    EXPECT_EQ(C.GetUpperLower(),ul);
+    EXPECT_EQ(C.GetNominalShape(),ul);
 
 }
 
@@ -727,11 +727,11 @@ TEST_F(OvMTests,TensorProduct)
 
     MatrixOR C=TensorProduct(A,B);
     EXPECT_EQ(C.Getd(),d);
-    EXPECT_EQ(C.GetUpperLower(),ul);
+    EXPECT_EQ(C.GetNominalShape(),ul);
 
     MatrixOR D=TensorProduct(B,A);
     EXPECT_EQ(D.Getd(),d);
-    EXPECT_EQ(D.GetUpperLower(),ul);
+    EXPECT_EQ(D.GetNominalShape(),ul);
 }
 
 
@@ -902,7 +902,7 @@ void OvMTests::TestShuffle(MatrixOR O,Direction lr,double eps,double S)
     //
     //  Make sure we are starting with a triangular operator valued matrix.
     //
-    TriType ul=O.GetUpperLower();
+    TriType ul=O.GetNominalShape();
     EXPECT_TRUE(IsTriangular(ul,O,eps));
     MatrixRT Of=O.Flatten(lr);
     EXPECT_TRUE(IsTriangular(ul,Of,eps));
