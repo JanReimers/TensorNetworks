@@ -601,7 +601,7 @@ TEST_F(VariationalGroundStateTests,Test2BodyLR_Upper_L9S12D2Hz0)
     MPO* H2=itsH->CreateH2Operator();
     double E2=itsMPS->GetExpectation(H2);
     EXPECT_EQ(H2->GetMaxDw(),12); //if hx=0 it compresses a lot
-    EXPECT_NEAR(E2,E1*E1,2e-14); //D=2 should give is an eigen state since hx=0
+    EXPECT_NEAR(E2,E1*E1,3e-14); //D=2 should give is an eigen state since hx=0
 }
 
 TEST_F(VariationalGroundStateTests,Test2BodyLR_Lower_L9S12D2Hz0)
@@ -631,7 +631,7 @@ TEST_F(VariationalGroundStateTests,Test2BodyLR_Lower_L9S12D2Hz0)
     MPO* H2=itsH->CreateH2Operator();
     double E2=itsMPS->GetExpectation(H2);
     EXPECT_EQ(H2->GetMaxDw(),12); //if hx=0 it compresses a lot
-    EXPECT_NEAR(E2,E1*E1,2e-14); //D=2 should give is an eigen state since hx=0
+    EXPECT_NEAR(E2,E1*E1,3e-14); //D=2 should give is an eigen state since hx=0
 }
 
 
