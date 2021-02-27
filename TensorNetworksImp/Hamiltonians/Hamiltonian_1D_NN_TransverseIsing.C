@@ -23,28 +23,25 @@ Hamiltonian_1D_NN_TransverseIsing::~Hamiltonian_1D_NN_TransverseIsing()
 //     cout << "Hamiltonian_1D_NN_TransverseIsing destructor." << endl;
 }
 
-MatrixOR  Hamiltonian_1D_NN_TransverseIsing::GetMatrixO(TriType ul) const
+MatrixOR  Hamiltonian_1D_NN_TransverseIsing::GetW(MPOForm f) const
 {
-    MatrixOR W;
-    switch (ul)
+    MatrixOR W(Dw,Dw,itsS,f);
+    switch (f)
     {
-    case Lower:
-        W=MatrixOR(Dw,Dw,itsS,ul);
+    case RegularLower:
         W(0,0)=OperatorI (itsS);
         W(1,0)=OperatorSz(itsS);
         W(2,0)=itshx     *OperatorSx(itsS);
         W(2,1)=itsJ      *OperatorSz(itsS);
         W(2,2)=OperatorI (itsS);
         break;
-    case Upper:
-        W=MatrixOR(Dw,Dw,itsS,ul);
+    case RegularUpper:
         W(0,0)=OperatorI (itsS);
         W(0,1)=OperatorSz(itsS);
         W(0,2)=itshx     *OperatorSx(itsS);
         W(1,2)=itsJ      *OperatorSz(itsS);
         W(2,2)=OperatorI (itsS);
        break;
-    case Full:
     default:
         assert(false);
     }

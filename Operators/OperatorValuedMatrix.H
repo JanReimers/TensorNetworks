@@ -18,29 +18,29 @@ public:
 //  Construction zone
 //
     MatrixO();
-    MatrixO(int d,TriType);
-    MatrixO(int d,TriType, const MatLimits&);
-    MatrixO(int Dw1, int Dw2,double S,TriType);
-    MatrixO(int Dw1, int Dw2,int d,TriType);
-    MatrixO(int d,TriType,const Base   & m);
+//    MatrixO(int d,TriType);
+    MatrixO(int d,MPOForm, const MatLimits&);
+    MatrixO(int Dw1, int Dw2,double S,MPOForm);
+    MatrixO(int d,MPOForm,const Base   & m);
     MatrixO(const MatrixO& m);
     virtual ~MatrixO();
 //
 //  Change size and nominal upper/lower
 //
     void SetChi12(int X1,int X2,bool preserve_data);
-    void SetUpperLower(TriType ul); //Row and column matrices have no way of knowing
-    void SetUpperLower(double eps); //Detect and set
+//    void SetUpperLower(TriType ul); //Row and column matrices have no way of knowing
+//    void SetUpperLower(double eps); //Detect and set
 //
 // ASsign from overloaded operators
 //
-    template <class A, Store M, Data D> MatrixO(int d, TriType ul,const Indexable <EType,A,M,D,MatrixShape>& m)
+    template <class A, Store M, Data D> MatrixO(int d, MPOForm f,const Indexable <EType,A,M,D,MatrixShape>& m)
     : Base(m)
     , itsd(d)
     , itsTruncationError(0)
-    , itsUL(ul)
+    , itsForm(f)
     {
     }
+
     template <class A, Store M, Data D> const MatrixO& operator=(const Indexable <EType,A,M,D,MatrixShape>& m)
     {
         Base::operator=(m);
@@ -59,7 +59,7 @@ public:
     int       Getd() const {return itsd;}
     double    GetS() const {return dtoS(itsd);}
     double    GetTruncationError() const {return itsTruncationError;}
-    TriType   GetNominalShape() const {return itsUL;}
+    MPOForm   GetForm() const {return itsForm;}
     TriType   GetMeasuredShape(double eps) const;
     T         GetTrace(int a, int b, int c, int d) const; //<Wab,Wcd>
     double    GetFrobeniusNorm() const;
@@ -91,7 +91,7 @@ private:
 
     int     itsd;
     double  itsTruncationError; //Should live on the bond with the SVs.
-    TriType itsUL; //*Nominal* Upper or lower triangular.
+    MPOForm itsForm;
 };
 
 //typedef MatrixO<double> MatrixOR;
@@ -118,6 +118,19 @@ inline TriType Combine(TriType a, TriType b)
         else if (a==Diagonal) ret=b;
         else if (b==Diagonal) ret=a;
         else if (a==Full || b==Full) ret=Full;
+    }
+    return ret;
+}
+inline MPOForm Combine(MPOForm a, MPOForm b)
+{
+    MPOForm ret=a;
+    if (a==FUnit && (b==RegularLower || b==RegularUpper))
+        ret=b;
+    else if (b==FUnit && (a==RegularLower || a==RegularUpper))
+        ret=b;
+    else if (a!=b)
+    {
+       ret=FUnknown;
     }
     return ret;
 }
@@ -151,7 +164,7 @@ template <class T> MatrixO<T> operator*(const Matrix<T>& a, const MatrixO<T>& b)
 {
     assert(a.GetColLimits()==b.GetRowLimits());
     const typename MatrixO<T>::Base mb(b);
-    MatrixO<T> ret(b.Getd(),b.GetNominalShape(),a*mb);
+    MatrixO<T> ret(b.Getd(),b.GetForm(),a*mb);
     return ret;
 }
 
@@ -159,7 +172,7 @@ template <class T> MatrixO<T> operator*(const MatrixO<T>& a, const Matrix<T>& b)
 {
     assert(a.GetColLimits()==b.GetRowLimits());
     const typename MatrixO<T>::Base& ma(a);
-    MatrixO<T> ret(a.Getd(),a.GetNominalShape(),ma*b);
+    MatrixO<T> ret(a.Getd(),a.GetForm(),ma*b);
     return ret;
 }
 inline index_t Mirror(index_t i,const VecLimits& lim)
@@ -312,11 +325,11 @@ template <class T> MatrixO<T> iTensorSum(const MatrixO<T>& a, const MatrixO<T>& 
 {
     int d=a.Getd();
     assert(d==b.Getd());
-    TriType ul=Combine(a.GetNominalShape(),b.GetNominalShape());
+    MPOForm f=Combine(a.GetForm(),b.GetForm());
     const MatLimits& al=a.GetLimits();
     const MatLimits& bl=b.GetLimits();
     MatLimits rl=iSum(al,bl);
-    MatrixO<T> r(d,ul,rl);
+    MatrixO<T> r(d,f,rl);
     Fill (r,0.0);
 
     //
@@ -389,9 +402,9 @@ template <class T> MatrixO<T> iTensorSum(const MatrixO<T>& a, const MatrixO<T>& 
 template <class T> MatrixO<T> TensorSum(const MatrixO<T>& a, const MatrixO<T>& b)
 {
     assert(a.Getd()==b.Getd());
-    TriType ul=Combine(a.GetNominalShape(),b.GetNominalShape());
+    MPOForm f=Combine(a.GetForm(),b.GetForm());
     const typename MatrixO<T>::Base& ma(a),mb(b);
-    MatrixO<T> ret(a.Getd(),ul,TensorSum(ma,mb));
+    MatrixO<T> ret(a.Getd(),f,TensorSum(ma,mb));
     return ret;
 }
 
@@ -399,9 +412,9 @@ template <class T> MatrixO<T> TensorSum(const MatrixO<T>& a, const MatrixO<T>& b
 template <class T> MatrixO<T> TensorProduct(const MatrixO<T>& a, const MatrixO<T>& b)
 {
     assert(a.Getd        ()==b.Getd        ());
-    TriType ul=Combine(a.GetNominalShape(),b.GetNominalShape());
+    MPOForm f=Combine(a.GetForm(),b.GetForm());
     const typename MatrixO<T>::Base& ma(a),mb(b);
-    MatrixO<T> ret(a.Getd(),ul,TensorProduct(ma,mb));
+    MatrixO<T> ret(a.Getd(),f,TensorProduct(ma,mb));
     return ret;
 }
 
@@ -415,9 +428,9 @@ template <class T> MatrixO<T> HorizontalProduct(const MatrixO<T>& a, const Matri
     // Establish limits/d/ul
     MatLimits lim(a.GetRowLimits(),b.GetColLimits());
     int d=a.Getd()*b.Getd();
-    TriType ul=Combine(a.GetNominalShape(),b.GetNominalShape());
+    MPOForm f=Combine(a.GetForm(),b.GetForm());
     // Create empty results matrix
-    MatrixO<T> ret(d,ul,lim);
+    MatrixO<T> ret(d,f,lim);
     OperatorElement<T> Z=OperatorZ(d);
     Fill(ret,Z);
     //  Do the regular matrix product with tensor products for each element product.

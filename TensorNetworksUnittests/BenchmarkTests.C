@@ -14,6 +14,9 @@ using TensorNetworks::Neel;
 using TensorNetworks::IterationSchedule;
 using TensorNetworks::Epsilons;
 using TensorNetworks::TriType;
+using TensorNetworks::MPOForm;
+using TensorNetworks::RegularLower;
+using TensorNetworks::RegularUpper;
 
 class BenchmarkTests : public ::testing::Test
 {
@@ -34,9 +37,9 @@ public:
         if (itsMPS) delete itsMPS;
     }
 
-    void Setup(int L, double S, int D,TriType ul)
+    void Setup(int L, double S, int D,MPOForm f)
     {
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,ul,1.0,1.0,0.0);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,f,1.0,1.0,0.0);
         itsMPS=itsH->CreateMPS(D,1e-12,1e-12);
     }
 
@@ -52,7 +55,7 @@ TEST_F(BenchmarkTests,TestSweep_Lower_L9S1D8)
 {
     int L=9,D=8,maxIter=100,Nreplicates=1;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
 
 
     Epsilons eps(0.0);
@@ -77,7 +80,7 @@ TEST_F(BenchmarkTests,TestSweep_Upper_L9S1D8)
 {
     int L=9,D=8,maxIter=100,Nreplicates=1;
     double S=0.5;
-    Setup(L,S,D,Upper);
+    Setup(L,S,D,RegularUpper);
 
 
     Epsilons eps(0.0);

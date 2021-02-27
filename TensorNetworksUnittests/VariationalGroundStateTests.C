@@ -17,6 +17,10 @@ using TensorNetworks::MPO;
 using TensorNetworks::TriType;
 using TensorNetworks::Std;
 using TensorNetworks::Parker;
+using TensorNetworks::MPOForm;
+using TensorNetworks::RegularLower;
+using TensorNetworks::RegularUpper;
+
 
 class VariationalGroundStateTests : public ::testing::Test
 {
@@ -37,25 +41,25 @@ public:
         if (itsMPS) delete itsMPS;
     }
 // Heisenberg Hamiltonian
-    void Setup(int L, double S, int D, TriType ul)
+    void Setup(int L, double S, int D,MPOForm f)
     {
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,ul,1.0,1.0,0.0);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,f,1.0,1.0,0.0);
         itsMPS=itsH->CreateMPS(D,1e-12,1e-12);
     }
 // Transverse Ising Hamiltonian
-    void SetupTI(int L, double S, int D, double hx, TriType ul)
+    void SetupTI(int L, double S, int D, double hx,MPOForm f)
     {
-        itsH=itsFactory->Make1D_NN_TransverseIsingHamiltonian(L,S,ul,1.0,hx);
+        itsH=itsFactory->Make1D_NN_TransverseIsingHamiltonian(L,S,f,1.0,hx);
         itsMPS=itsH->CreateMPS(D,1e-12,1e-12);
     }
-    void Setup2BodyLongRange(int L, double S, int D, double hx, int NN, TriType ul)
+    void Setup2BodyLongRange(int L, double S, int D, double hx, int NN,MPOForm f)
     {
-        itsH=itsFactory->Make1D_2BodyLongRangeHamiltonian(L,S,ul,1.0,hx,NN);
+        itsH=itsFactory->Make1D_2BodyLongRangeHamiltonian(L,S,f,1.0,hx,NN);
         itsMPS=itsH->CreateMPS(D,1e-12,1e-12);
     }
-    void Setup3Body(int L, double S, int D, double hx, TriType ul)
+    void Setup3Body(int L, double S, int D, double hx,MPOForm f)
     {
-        itsH=itsFactory->Make1D_3BodyHamiltonian(L,S,ul,1.0,1.0,hx);
+        itsH=itsFactory->Make1D_3BodyHamiltonian(L,S,f,1.0,1.0,hx);
         itsMPS=itsH->CreateMPS(D,1e-12,1e-12);
     }
 
@@ -70,7 +74,7 @@ public:
 
 TEST_F(VariationalGroundStateTests,TestIdentityOperator)
 {
-    Setup(10,0.5,2,Lower);
+    Setup(10,0.5,2,RegularLower);
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DLeft);
     MPO* IO=itsH->CreateUnitOperator();
@@ -83,7 +87,7 @@ TEST_F(VariationalGroundStateTests,TestSweep_Lower_L2S1D2)
 {
     int L=2,D=2,maxIter=100;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -108,7 +112,7 @@ TEST_F(VariationalGroundStateTests,TestSweep_Upper_L2S1D2)
 {
     int L=2,D=2,maxIter=100;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -134,7 +138,7 @@ TEST_F(VariationalGroundStateTests,TestSweep_Lower_L9S1D2)
 {
     int L=9,D=2,maxIter=100;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -152,10 +156,10 @@ TEST_F(VariationalGroundStateTests,TestSweep_Upper_L9S1D2)
 {
     int L=9,D=2,maxIter=100;
     double S=0.5;
-    Setup(L,S,D,Upper);
+    Setup(L,S,D,RegularUpper);
     itsMPS->InitializeWith(Random);
     double Eupper=itsMPS->GetExpectation(itsH);
-    TensorNetworks::Hamiltonian* Hlower=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,Lower,1.0,1.0,0.0);
+    TensorNetworks::Hamiltonian* Hlower=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,RegularLower,1.0,1.0,0.0);
     double Elower=itsMPS->GetExpectation(Hlower);
     EXPECT_NEAR(Eupper,Elower,1e-15);
 
@@ -177,7 +181,7 @@ TEST_F(VariationalGroundStateTests,TestSweep_Lower_L9S1D8_growD)
 {
     int L=9,Dstart=2,D=8,maxIter=100;
     double S=0.5;
-    Setup(L,S,Dstart,Lower);
+    Setup(L,S,Dstart,RegularLower);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -197,7 +201,7 @@ TEST_F(VariationalGroundStateTests,TestSweep_Lower_L9S1D8)
 {
     int L=9,D=8,maxIter=100;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -217,7 +221,7 @@ TEST_F(VariationalGroundStateTests,TestSweep_Lower_L9S1D4)
 {
     int L=9,D=4,maxIter=100;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -235,7 +239,7 @@ TEST_F(VariationalGroundStateTests,TestSweep_Upper_L9S1D4)
 {
     int L=9,D=4,maxIter=100;
     double S=0.5;
-    Setup(L,S,D,Upper);
+    Setup(L,S,D,RegularUpper);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -254,7 +258,7 @@ TEST_F(VariationalGroundStateTests,TestFreeze_Lower_L9S1D2)
 {
     int L=9,D=2,maxIter=100;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     itsMPS->InitializeWith(Neel);
     itsMPS->Freeze(1,0.5); //Site 0 spin up
 
@@ -275,7 +279,7 @@ TEST_F(VariationalGroundStateTests,TestSweep_Lower_L9S5D2)
 {
     int L=9,D=2,maxIter=100;
     double S=2.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -296,7 +300,7 @@ TEST_F(VariationalGroundStateTests,TestSweep_Lower_L6S1GrowD27)
 {
     int L=6,Dstart=2,Dend=27;
     double S=1.0;
-    Setup(L,S,Dstart,Lower);
+    Setup(L,S,Dstart,RegularLower);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -324,7 +328,7 @@ TEST_F(VariationalGroundStateTests,TestSweep_Upper_L7S1GrowD27)
 {
     int L=7,Dstart=2,Dend=27;
     double S=1.0;
-    Setup(L,S,Dstart,Upper);
+    Setup(L,S,Dstart,RegularUpper);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -344,7 +348,7 @@ TEST_F(VariationalGroundStateTests,TestSweep_Lower_L8S1GrowD27)
 {
     int L=8,Dstart=2,Dend=27;
     double S=1.0;
-    Setup(L,S,Dstart,Lower);
+    Setup(L,S,Dstart,RegularLower);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -373,7 +377,7 @@ TEST_F(VariationalGroundStateTests,TestSweep_Upper_L19S1D8)
 {
     int L=19,D=8,maxIter=100;
     double S=0.5;
-    Setup(L,S,D,Upper);
+    Setup(L,S,D,RegularUpper);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -423,7 +427,7 @@ TEST_F(VariationalGroundStateTests,TestTransverIsing_Lower_L2S1D2Hx0)
 {
     int L=2,D=2,maxIter=100;
     double S=0.5,hx=0.0;
-    SetupTI(L,S,D,hx,Lower);
+    SetupTI(L,S,D,hx,RegularLower);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -448,7 +452,7 @@ TEST_F(VariationalGroundStateTests,TestTransverIsing_Upper_L9S1D2Hx0)
 {
     int L=9,D=2,maxIter=100;
     double S=0.5,hx=0.0;
-    SetupTI(L,S,D,hx,Upper);
+    SetupTI(L,S,D,hx,RegularUpper);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -473,7 +477,7 @@ TEST_F(VariationalGroundStateTests,TestTransverIsing_Lower_L9S1D2Hx1)
 {
     int L=9,D=2,maxIter=100;
     double S=0.5,hx=1.0;
-    SetupTI(L,S,D,hx,Lower);
+    SetupTI(L,S,D,hx,RegularLower);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -497,7 +501,7 @@ TEST_F(VariationalGroundStateTests,TestTransverIsing_Lower_L9S1D8Hx1)
 {
     int L=9,DStart=2,D=8,maxIter=100;
     double S=0.5,hx=1.0;
-    SetupTI(L,S,DStart,hx,Lower);
+    SetupTI(L,S,DStart,hx,RegularLower);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -522,7 +526,7 @@ TEST_F(VariationalGroundStateTests,TestTransverIsing_Upper_L9S1D8Hx1)
 {
     int L=9,DStart=2,D=8,maxIter=100;
     double S=0.5,hx=1.0;
-    SetupTI(L,S,DStart,hx,Upper);
+    SetupTI(L,S,DStart,hx,RegularUpper);
     itsMPS->InitializeWith(Random);
 
     Epsilons eps(1e-12);
@@ -547,7 +551,7 @@ TEST_F(VariationalGroundStateTests,Test3Body_Upper_L9S12D2Hz0)
 {
     int L=9,DStart=2,D=4,maxIter=100;
     double S=0.5,hz=0.5;
-    Setup3Body(L,S,DStart,hz,Upper);
+    Setup3Body(L,S,DStart,hz,RegularUpper);
     itsMPS->InitializeWith(Random);
     EXPECT_EQ(itsH->GetMaxDw(),5);
     itsH->CanonicalForm();
@@ -578,7 +582,7 @@ TEST_F(VariationalGroundStateTests,Test2BodyLR_Upper_L9S12D2Hz0)
 {
     int L=9,DStart=2,D=2,maxIter=100;
     double S=0.5,hx=0.0;
-    Setup2BodyLongRange(L,S,DStart,hx,3,Upper);
+    Setup2BodyLongRange(L,S,DStart,hx,3,RegularUpper);
     itsMPS->InitializeWith(Random);
     EXPECT_EQ(itsH->GetMaxDw(),8);
     itsH->CanonicalForm();
@@ -608,7 +612,7 @@ TEST_F(VariationalGroundStateTests,Test2BodyLR_Lower_L9S12D2Hz0)
 {
     int L=9,DStart=2,D=2,maxIter=100;
     double S=0.5,hx=0.0;
-    Setup2BodyLongRange(L,S,DStart,hx,3,Lower);
+    Setup2BodyLongRange(L,S,DStart,hx,3,RegularLower);
     itsMPS->InitializeWith(Random);
     EXPECT_EQ(itsH->GetMaxDw(),8);
     itsH->CanonicalForm();

@@ -26,6 +26,9 @@ using TensorNetworks::OperatorI;
 using TensorNetworks::OperatorZ;
 using TensorNetworks::OperatorElement;
 using TensorNetworks::Stod;
+using TensorNetworks::MPOForm;
+using TensorNetworks::RegularLower;
+using TensorNetworks::RegularUpper;
 
 class OvMTests : public ::testing::Test
 {
@@ -87,7 +90,6 @@ void MakeLRBOperator(MatrixOR& OvM,TriType ul,Position lbr)
             assert(false);
         }
         OvM=MatrixOR(l*OvM);
-        OvM.SetUpperLower(ul);
     }
     if (lbr==PRight)
     {
@@ -105,7 +107,6 @@ void MakeLRBOperator(MatrixOR& OvM,TriType ul,Position lbr)
             assert(false);
         }
         OvM=MatrixOR(OvM*r);
-        OvM.SetUpperLower(ul);
     }
 }
 
@@ -270,7 +271,7 @@ TEST_F(OvMTests,OperatorValuedMatrix1)
 {
     double S=0.5;
     Setup(S);
-    MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+    MatrixOR OvM(itsOperatorClient->GetW(RegularLower));
     EXPECT_EQ(OvM(0,0),OperatorI (S));
     EXPECT_EQ(OvM(1,0),OperatorSp(S));
     EXPECT_EQ(OvM(2,0),OperatorSm(S));
@@ -278,14 +279,14 @@ TEST_F(OvMTests,OperatorValuedMatrix1)
     EXPECT_EQ(OvM(0,1),OperatorZ (S));
     EXPECT_EQ(OvM(0,2),OperatorZ (S));
     EXPECT_EQ(OvM(0,3),OperatorZ (S));
-    EXPECT_EQ(OvM.GetNominalShape(),Lower);
+    EXPECT_EQ(OvM.GetForm(),RegularLower);
 }
 
 TEST_F(OvMTests,OperatorValuedMatrix2)
 {
     double S=1.0;
     Setup(S);
-    MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+    MatrixOR OvM(itsOperatorClient->GetW(RegularLower));
     EXPECT_EQ(OvM(0,0),OperatorI (S));
     EXPECT_EQ(OvM(1,0),OperatorSp(S));
     EXPECT_EQ(OvM(2,0),OperatorSm(S));
@@ -293,14 +294,14 @@ TEST_F(OvMTests,OperatorValuedMatrix2)
     EXPECT_EQ(OvM(0,1),OperatorZ (S));
     EXPECT_EQ(OvM(0,2),OperatorZ (S));
     EXPECT_EQ(OvM(0,3),OperatorZ (S));
-    EXPECT_EQ(OvM.GetNominalShape(),Lower);
+    EXPECT_EQ(OvM.GetForm(),RegularLower);
 }
 
 TEST_F(OvMTests,OperatorValuedMatrix3)
 {
     double S=0.5;
     Setup(S);
-    MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+    MatrixOR OvM(itsOperatorClient->GetW(RegularUpper));
     EXPECT_EQ(OvM(0,0),OperatorI (S));
     EXPECT_EQ(OvM(0,1),OperatorSp(S));
     EXPECT_EQ(OvM(0,2),OperatorSm(S));
@@ -308,14 +309,14 @@ TEST_F(OvMTests,OperatorValuedMatrix3)
     EXPECT_EQ(OvM(1,0),OperatorZ (S));
     EXPECT_EQ(OvM(2,0),OperatorZ (S));
     EXPECT_EQ(OvM(3,0),OperatorZ (S));
-    EXPECT_EQ(OvM.GetNominalShape(),Upper);
+    EXPECT_EQ(OvM.GetForm(),RegularUpper);
 }
 
 TEST_F(OvMTests,OperatorValuedMatrix4)
 {
     double S=1.0;
     Setup(S);
-    MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+    MatrixOR OvM(itsOperatorClient->GetW(RegularUpper));
     EXPECT_EQ(OvM(0,0),OperatorI (S));
     EXPECT_EQ(OvM(0,1),OperatorSp(S));
     EXPECT_EQ(OvM(0,2),OperatorSm(S));
@@ -323,19 +324,19 @@ TEST_F(OvMTests,OperatorValuedMatrix4)
     EXPECT_EQ(OvM(1,0),OperatorZ (S));
     EXPECT_EQ(OvM(2,0),OperatorZ (S));
     EXPECT_EQ(OvM(3,0),OperatorZ (S));
-    EXPECT_EQ(OvM.GetNominalShape(),Upper);
+    EXPECT_EQ(OvM.GetForm(),RegularUpper);
 }
 
 TEST_F(OvMTests,OperatorValuedMatrix5)
 {
     double S=0.5;
     {
-        MatrixOR OvM(1,1,S,Lower);
+        MatrixOR OvM(1,1,S,RegularLower);
         Unit(OvM);
         EXPECT_EQ(OvM(0,0),OperatorI (S));
     }
     {
-        MatrixOR OvM(3,3,S,Lower);
+        MatrixOR OvM(3,3,S,RegularLower);
         Unit(OvM);
         EXPECT_EQ(OvM(0,0),OperatorI(S));
         EXPECT_EQ(OvM(1,1),OperatorI(S));
@@ -352,11 +353,11 @@ TEST_F(OvMTests,OperatorValuedMatrix5)
 
 
 
-TEST_F(OvMTests,OperatorValuedMatrixGetVUpper)
+TEST_F(OvMTests,GetVUpper)
 {
     double S=0.5;
     Setup(S);
-    MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+    MatrixOR OvM(itsOperatorClient->GetW(RegularUpper));
     MatrixOR Vl=OvM.GetV(DLeft);
     MatrixOR Vr=OvM.GetV(DRight);
     EXPECT_EQ(OvM.GetNumRows(),Vl.GetNumRows()+1);
@@ -371,11 +372,11 @@ TEST_F(OvMTests,OperatorValuedMatrixGetVUpper)
         EXPECT_EQ(OvM(i,j),Vr(i,j));
 }
 
-TEST_F(OvMTests,OperatorValuedMatrixGetVLower)
+TEST_F(OvMTests,GetVLower)
 {
     double S=0.5;
     Setup(S);
-    MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+    MatrixOR OvM(itsOperatorClient->GetW(RegularLower));
     MatrixOR Vl=OvM.GetV(DLeft);
     MatrixOR Vr=OvM.GetV(DRight);
     EXPECT_EQ(OvM.GetNumRows(),Vl.GetNumRows()+1);
@@ -390,11 +391,11 @@ TEST_F(OvMTests,OperatorValuedMatrixGetVLower)
         EXPECT_EQ(OvM(i,j),Vr(i,j));
 }
 
-TEST_F(OvMTests,OperatorValuedMatrixSetVUpper)
+TEST_F(OvMTests,SetVUpper)
 {
     double S=0.5;
     Setup(S);
-    MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+    MatrixOR OvM(itsOperatorClient->GetW(RegularUpper));
     MatrixOR Copy(OvM);
     MatrixOR Vl=OvM.GetV(DLeft);
     Copy.SetV(DLeft,Vl);
@@ -404,11 +405,11 @@ TEST_F(OvMTests,OperatorValuedMatrixSetVUpper)
     EXPECT_EQ(OvM,Copy);
 }
 
-TEST_F(OvMTests,OperatorValuedMatrixSetVLower)
+TEST_F(OvMTests,SetVLower)
 {
     double S=0.5;
     Setup(S);
-    MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+    MatrixOR OvM(itsOperatorClient->GetW(RegularLower));
     MatrixOR Copy(OvM);
     MatrixOR Vl=OvM.GetV(DLeft);
     Copy.SetV(DLeft,Vl);
@@ -418,11 +419,11 @@ TEST_F(OvMTests,OperatorValuedMatrixSetVLower)
     EXPECT_EQ(OvM,Copy);
 }
 
-TEST_F(OvMTests,OperatorValuedMatrixFlattenUpper)
+TEST_F(OvMTests,FlattenUpper)
 {
     double S=0.5;
     Setup(S);
-    MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+    MatrixOR OvM(itsOperatorClient->GetW(RegularUpper));
     MatrixOR Copy(OvM);
     Matrix<double> F=Copy.Flatten(DLeft);
     Copy.UnFlatten(F);
@@ -432,11 +433,11 @@ TEST_F(OvMTests,OperatorValuedMatrixFlattenUpper)
     EXPECT_EQ(OvM,Copy);
 }
 
-TEST_F(OvMTests,OperatorValuedMatrixFlattenLower)
+TEST_F(OvMTests,FlattenLower)
 {
     double S=0.5;
     Setup(S);
-    MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+    MatrixOR OvM(itsOperatorClient->GetW(RegularLower));
     MatrixOR Copy(OvM);
     Matrix<double> F=Copy.Flatten(DLeft);
     Copy.UnFlatten(F);
@@ -446,11 +447,11 @@ TEST_F(OvMTests,OperatorValuedMatrixFlattenLower)
     EXPECT_EQ(OvM,Copy);
 }
 
-TEST_F(OvMTests,OperatorValuedMatrixFlattenVUpper)
+TEST_F(OvMTests,FlattenVUpper)
 {
     double S=0.5;
     Setup(S);
-    MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+    MatrixOR OvM(itsOperatorClient->GetW(RegularUpper));
     {
         MatrixOR V=OvM.GetV(DLeft);
         MatrixOR Copy(V);
@@ -473,11 +474,11 @@ TEST_F(OvMTests,OperatorValuedMatrixFlattenVUpper)
     }
 }
 
-TEST_F(OvMTests,OperatorValuedMatrixFlattenVLower)
+TEST_F(OvMTests,FlattenVLower)
 {
     double S=0.5;
     Setup(S);
-    MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+    MatrixOR OvM(itsOperatorClient->GetW(RegularLower));
     {
         MatrixOR V=OvM.GetV(DLeft);
         MatrixOR Copy(V);
@@ -643,32 +644,32 @@ TEST_F(OvMTests,Upper2)
 TEST_F(OvMTests,OpMulMO)
 {
     int M=8,N=4,d=2;
-    TriType ul=Lower;
+    MPOForm f=RegularLower;
     VecLimits vl1(0,M-1);
     VecLimits vl2(0,N-1);
     MatLimits la(vl1,vl2);
     MatLimits lb(vl2,vl1);
     MatrixRT A(la);
-    MatrixOR B(d,ul,lb);
+    MatrixOR B(d,f,lb);
     Fill(A,1.0);
     Fill(B,1.0);
 
     MatrixOR C=A*B;
     EXPECT_EQ(C.Getd(),d);
-    EXPECT_EQ(C.GetNominalShape(),ul);
+    EXPECT_EQ(C.GetForm(),RegularLower);
 
     MatrixOR D=B*A;
     EXPECT_EQ(D.Getd(),d);
-    EXPECT_EQ(D.GetNominalShape(),ul);
+    EXPECT_EQ(D.GetForm(),RegularLower);
 }
 
 TEST_F(OvMTests,TensorSum)
 {
     double S=0.5;
     int d=Stod(S);
-    TriType ul=Upper;
+    MPOForm f=RegularUpper;
     Setup(S);
-    MatrixOR A=itsOperatorClient->GetMatrixO(ul);
+    MatrixOR A=itsOperatorClient->GetW(f);
     A(0,4)=OperatorElement<double>(d,0.4); //Put markers throughout so we can see what ends up where.
     A(1,1)=OperatorElement<double>(d,1.1);
     A(1,2)=OperatorElement<double>(d,1.2);
@@ -680,7 +681,7 @@ TEST_F(OvMTests,TensorSum)
     B*=10.0;
     MatrixOR C=TensorSum(A,B);
     EXPECT_EQ(C.Getd(),d);
-    EXPECT_EQ(C.GetNominalShape(),ul);
+    EXPECT_EQ(C.GetForm(),RegularUpper);
     for (index_t i:A.rows())
         for (index_t j:A.cols())
             EXPECT_EQ(A(i,j),C(i,j));
@@ -693,9 +694,9 @@ TEST_F(OvMTests,iTensorSum)
 {
     double S=0.5;
     int d=Stod(S);
-    TriType ul=Upper;
+    MPOForm f=RegularUpper;
     Setup(S);
-    MatrixOR A=itsOperatorClient->GetMatrixO(ul);
+    MatrixOR A=itsOperatorClient->GetW(f);
     A(0,4)=OperatorElement<double>(d,0.4); //Put markers throughout so we can see what ends up where.
     A(1,1)=OperatorElement<double>(d,1.1);
     A(1,2)=OperatorElement<double>(d,1.2);
@@ -708,64 +709,64 @@ TEST_F(OvMTests,iTensorSum)
     MatrixOR C=iTensorSum(A,B);
     //cout << "C=" << C << endl; //visual inspection is the easiest way to very this guy. Crappy for regression trapping though!
     EXPECT_EQ(C.Getd(),d);
-    EXPECT_EQ(C.GetNominalShape(),ul);
+    EXPECT_EQ(C.GetForm(),RegularUpper);
 
 }
 
 TEST_F(OvMTests,TensorProduct)
 {
     int M=8,N=4,d=2;
-    TriType ul=Lower;
+    MPOForm f=RegularLower;
     VecLimits vl1(0,M-1);
     VecLimits vl2(0,N-1);
     MatLimits la(vl1,vl2);
     MatLimits lb(vl2,vl1);
-    MatrixOR A(d,ul,la);
-    MatrixOR B(d,ul,lb);
+    MatrixOR A(d,f,la);
+    MatrixOR B(d,f,lb);
     Fill(A,1.0);
     Fill(B,1.0);
 
     MatrixOR C=TensorProduct(A,B);
     EXPECT_EQ(C.Getd(),d);
-    EXPECT_EQ(C.GetNominalShape(),ul);
+    EXPECT_EQ(C.GetForm(),RegularLower);
 
     MatrixOR D=TensorProduct(B,A);
     EXPECT_EQ(D.Getd(),d);
-    EXPECT_EQ(D.GetNominalShape(),ul);
+    EXPECT_EQ(D.GetForm(),RegularLower);
 }
 
 
-TEST_F(OvMTests,OperatorValuedMatrixQRBulk)
+TEST_F(OvMTests,QRBulk)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
         Setup(S);
         {
-            MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+            MatrixOR OvM(itsOperatorClient->GetW(RegularUpper));
             TestQR(OvM,DLeft ,Upper,PBulk);
             TestQR(OvM,DRight,Upper,PBulk);
         }
         {
-            MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+            MatrixOR OvM(itsOperatorClient->GetW(RegularLower));
             TestQR(OvM,DLeft ,Lower,PBulk);
             TestQR(OvM,DRight,Lower,PBulk);
         }
     }
 }
 
-TEST_F(OvMTests,OperatorValuedMatrixQRBulkH2)
+TEST_F(OvMTests,QRBulkH2)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
         Setup(S);
         {
-            MatrixOR H(itsOperatorClient->GetMatrixO(Upper));
+            MatrixOR H(itsOperatorClient->GetW(RegularUpper));
             MatrixOR H2=TensorProduct(H,H);
             TestQR(H2,DLeft ,Upper,PBulk);
             TestQR(H2,DRight,Upper,PBulk);
         }
         {
-            MatrixOR H(itsOperatorClient->GetMatrixO(Lower));
+            MatrixOR H(itsOperatorClient->GetW(RegularLower));
             MatrixOR H2=TensorProduct(H,H);
             TestQR(H2,DLeft ,Lower,PBulk);
             TestQR(H2,DRight,Lower,PBulk);
@@ -773,69 +774,69 @@ TEST_F(OvMTests,OperatorValuedMatrixQRBulkH2)
     }
 }
 
-TEST_F(OvMTests,OperatorValuedMatrixQRLeft)
+TEST_F(OvMTests,QRLeft)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
         Setup(S);
         {
-            MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+            MatrixOR OvM(itsOperatorClient->GetW(RegularUpper));
             TestQR(OvM,DLeft ,Upper,PLeft);
         }
         {
-            MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+            MatrixOR OvM(itsOperatorClient->GetW(RegularLower));
             TestQR(OvM,DLeft ,Lower,PLeft);
         }
     }
 }
 
-TEST_F(OvMTests,OperatorValuedMatrixQRLeftH2)
+TEST_F(OvMTests,QRLeftH2)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
         Setup(S);
         {
-            MatrixOR H(itsOperatorClient->GetMatrixO(Upper));
+            MatrixOR H(itsOperatorClient->GetW(RegularUpper));
             MatrixOR H2=TensorProduct(H,H);
             TestQR(H2,DLeft ,Upper,PLeft);
         }
         {
-            MatrixOR H(itsOperatorClient->GetMatrixO(Lower));
+            MatrixOR H(itsOperatorClient->GetW(RegularLower));
             MatrixOR H2=TensorProduct(H,H);
             TestQR(H2,DLeft ,Lower,PLeft);
         }
     }
 }
 
-TEST_F(OvMTests,OperatorValuedMatrixQRRight)
+TEST_F(OvMTests,QRRight)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
         Setup(S);
         {
-            MatrixOR OvM(itsOperatorClient->GetMatrixO(Upper));
+            MatrixOR OvM(itsOperatorClient->GetW(RegularUpper));
             TestQR(OvM,DRight ,Upper,PRight);
         }
         {
-            MatrixOR OvM(itsOperatorClient->GetMatrixO(Lower));
+            MatrixOR OvM(itsOperatorClient->GetW(RegularLower));
             TestQR(OvM,DRight ,Lower,PRight);
         }
     }
 
 }
 
-TEST_F(OvMTests,OperatorValuedMatrixQRRightH2)
+TEST_F(OvMTests,QRRightH2)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
         Setup(S);
         {
-            MatrixOR H(itsOperatorClient->GetMatrixO(Upper));
+            MatrixOR H(itsOperatorClient->GetW(RegularUpper));
             MatrixOR H2=TensorProduct(H,H);
             TestQR(H2,DRight,Upper,PRight);
         }
         {
-            MatrixOR H(itsOperatorClient->GetMatrixO(Lower));
+            MatrixOR H(itsOperatorClient->GetW(RegularLower));
             MatrixOR H2=TensorProduct(H,H);
             TestQR(H2,DRight,Lower,PRight);
         }
@@ -843,20 +844,20 @@ TEST_F(OvMTests,OperatorValuedMatrixQRRightH2)
 }
 
 
-TEST_F(OvMTests,OperatorValuedMatrixSVD)
+TEST_F(OvMTests,SVD)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
         Setup(S);
         {
-            MatrixOR H(itsOperatorClient->GetMatrixO(Upper));
+            MatrixOR H(itsOperatorClient->GetW(RegularUpper));
             TestSVD(H,DLeft ,Upper,PLeft);
             TestSVD(H,DRight,Upper,PRight);
             TestSVD(H,DLeft ,Upper,PBulk);
             TestSVD(H,DRight,Upper,PBulk);
         }
         {
-            MatrixOR H(itsOperatorClient->GetMatrixO(Lower));
+            MatrixOR H(itsOperatorClient->GetW(RegularLower));
             TestSVD(H,DLeft ,Lower,PLeft);
             TestSVD(H,DRight,Lower,PRight);
             TestSVD(H,DLeft ,Lower,PBulk);
@@ -865,13 +866,13 @@ TEST_F(OvMTests,OperatorValuedMatrixSVD)
     }
 }
 
-TEST_F(OvMTests,OperatorValuedMatrixSVDH2BulkOnly)
+TEST_F(OvMTests,SVDH2BulkOnly)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
         Setup(S);
         {
-            MatrixOR H(itsOperatorClient->GetMatrixO(Upper));
+            MatrixOR H(itsOperatorClient->GetW(RegularUpper));
             MatrixOR H2=TensorProduct(H,H);
 //            TestSVD(H2,DLeft ,Upper,PLeft); //These won't work, we need canonical form 1,d,d^2 etc for Dws
 //            TestSVD(H2,DRight,Upper,PRight);
@@ -879,7 +880,7 @@ TEST_F(OvMTests,OperatorValuedMatrixSVDH2BulkOnly)
             TestSVD(H2,DRight,Upper,PBulk);
         }
         {
-            MatrixOR H(itsOperatorClient->GetMatrixO(Lower));
+            MatrixOR H(itsOperatorClient->GetW(RegularLower));
             MatrixOR H2=TensorProduct(H,H);
 //            TestSVD(H2,DLeft ,Lower,PLeft); //These won't work, we need canonical form 1,d,d^2 etc for Dws
 //            TestSVD(H2,DRight,Lower,PRight);
@@ -888,11 +889,10 @@ TEST_F(OvMTests,OperatorValuedMatrixSVDH2BulkOnly)
         }
     }
 }
+
+
 #include "NumericalMethods/LapackSVDSolver.H"
 #include "oml/diagonalmatrix.h"
-
-
-
 
 void OvMTests::TestShuffle(MatrixOR O,Direction lr,double eps,double S)
 {
@@ -902,7 +902,8 @@ void OvMTests::TestShuffle(MatrixOR O,Direction lr,double eps,double S)
     //
     //  Make sure we are starting with a triangular operator valued matrix.
     //
-    TriType ul=O.GetNominalShape();
+    MPOForm f=O.GetForm();
+    TriType ul= (f==RegularLower) ? Lower : Upper;
     EXPECT_TRUE(IsTriangular(ul,O,eps));
     MatrixRT Of=O.Flatten(lr);
     EXPECT_TRUE(IsTriangular(ul,Of,eps));
@@ -956,12 +957,12 @@ TEST_F(OvMTests,SVDShuffleH)
     {
         Setup(S);
         {
-            MatrixOR O(itsOperatorClient->GetMatrixO(Lower));
+            MatrixOR O(itsOperatorClient->GetW(RegularLower));
             TestShuffle(O,DLeft ,eps,S);
             TestShuffle(O,DRight,eps,S);
         }
         {
-            MatrixOR O(itsOperatorClient->GetMatrixO(Upper));
+            MatrixOR O(itsOperatorClient->GetW(RegularUpper));
             TestShuffle(O,DLeft ,eps,S);
             TestShuffle(O,DRight,eps,S);
         }
@@ -975,13 +976,13 @@ TEST_F(OvMTests,SVDShuffleH2)
     {
         Setup(S);
         {
-            MatrixOR H(itsOperatorClient->GetMatrixO(Lower));
+            MatrixOR H(itsOperatorClient->GetW(RegularLower));
             MatrixOR H2=TensorProduct(H,H);
             TestShuffle(H2,DLeft ,eps,S);
             TestShuffle(H2,DRight,eps,S);
         }
         {
-            MatrixOR H(itsOperatorClient->GetMatrixO(Upper));
+            MatrixOR H(itsOperatorClient->GetW(RegularUpper));
             MatrixOR H2=TensorProduct(H,H);
             TestShuffle(H2,DLeft ,eps,S);
             TestShuffle(H2,DRight,eps,S);

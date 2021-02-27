@@ -23,6 +23,9 @@ using TensorNetworks::TrotterOrder;
 using TensorNetworks::Std;
 using TensorNetworks::IterationSchedule;
 using TensorNetworks::Epsilons;
+using TensorNetworks::MPOForm;
+using TensorNetworks::RegularLower;
+using TensorNetworks::RegularUpper;
 
 
 
@@ -53,14 +56,14 @@ public:
         if (itsCompressor) delete itsCompressor;
     }
 
-    void Setup(int L, double S, int D, double epsSVD,TensorNetworks::iTEBDType itype,TriType ul=Lower)
+    void Setup(int L, double S, int D, double epsSVD,TensorNetworks::iTEBDType itype,MPOForm f=RegularLower)
     {
         if (itsH)          delete itsH;
         if (itsiH)         delete itsiH;
         if (itsState)      delete itsState;
         if (itsCompressor) delete itsCompressor;
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,ul,1.0,1.0,0.0);
-        itsiH=itsFactory->Make1D_NN_HeisenbergiHamiltonian(1,S,ul,1.0,1.0,0.0);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,f,1.0,1.0,0.0);
+        itsiH=itsFactory->Make1D_NN_HeisenbergiHamiltonian(1,S,f,1.0,1.0,0.0);
         itsState=itsiH->CreateiTEBDState(L,D,itype,D*D*epsNorm,epsSVD);
         itsCompressor=itsFactory->MakeMPSCompressor(D,epsSVD);
     }
@@ -627,7 +630,7 @@ TEST_F(iTEBDTests,TestNeelEnergy_Lower_S12)
 {
     int UnitCell=2,D=1;
     double S=0.5,epsSVD=0.0;
-    Setup(UnitCell,S,D,epsSVD,Gates,Lower);
+    Setup(UnitCell,S,D,epsSVD,Gates,RegularLower);
     itsState->InitializeWith(Neel);
     EXPECT_EQ(itsState->GetNormStatus(),"II");
     Matrix4RT Hlocal=itsiH->GetLocalMatrix();
@@ -639,7 +642,7 @@ TEST_F(iTEBDTests,TestNeelEnergy_Upper_S12)
 {
     int UnitCell=2,D=1;
     double S=0.5,epsSVD=0.0;
-    Setup(UnitCell,S,D,epsSVD,Gates,Upper);
+    Setup(UnitCell,S,D,epsSVD,Gates,RegularUpper);
     itsState->InitializeWith(Neel);
     EXPECT_EQ(itsState->GetNormStatus(),"II");
     Matrix4RT Hlocal=itsiH->GetLocalMatrix();
@@ -652,7 +655,7 @@ TEST_F(iTEBDTests,TestNeelEnergy_Lower_S1)
 {
     int UnitCell=2,D=1;
     double S=1.0,epsSVD=0.0;
-    Setup(UnitCell,S,D,epsSVD,Gates,Lower);
+    Setup(UnitCell,S,D,epsSVD,Gates,RegularLower);
     itsState->InitializeWith(Neel);
     EXPECT_EQ(itsState->GetNormStatus(),"II");
     Matrix4RT Hlocal=itsiH->GetLocalMatrix();
@@ -664,7 +667,7 @@ TEST_F(iTEBDTests,TestNeelEnergy_Upper_S1)
 {
     int UnitCell=2,D=1;
     double S=1.0,epsSVD=0.0;
-    Setup(UnitCell,S,D,epsSVD,Gates,Upper);
+    Setup(UnitCell,S,D,epsSVD,Gates,RegularUpper);
     itsState->InitializeWith(Neel);
     EXPECT_EQ(itsState->GetNormStatus(),"II");
     Matrix4RT Hlocal=itsiH->GetLocalMatrix();
@@ -684,14 +687,14 @@ TEST_F(iTEBDTests,TestRandomEnergyRangeSD_Lower)
     for (int D=1;D<=Dmax;D*=2)
         for (double S=0.5;S<=2.5;S+=0.5)
         {
-            Setup(UnitCell,S,D,epsSVD,Gates,Lower);
+            Setup(UnitCell,S,D,epsSVD,Gates,RegularLower);
 //            cout << "S,D=" << S << " " << D << endl;
             itsState->InitializeWith(Random);
             itsState->Canonicalize(DLeft);
             itsState->Orthogonalize(itsCompressor);
             EXPECT_EQ(itsState->GetNormStatus(),D==1 ? "II" : "GG");
             Matrix4RT Hlocal=itsiH->GetLocalMatrix();
-            EXPECT_NEAR(itsState->GetExpectationmmnn(Hlocal),itsState->GetExpectation(itsiH  ),3e-14);
+            EXPECT_NEAR(itsState->GetExpectationmmnn(Hlocal),itsState->GetExpectation(itsiH  ),4e-14);
 //            EXPECT_NEAR(CalculateE(UnitCell,S),itsState->GetExpectation(itsiH  ),1e-14);
         }
 }
@@ -706,7 +709,7 @@ TEST_F(iTEBDTests,TestRandomEnergyRangeSD_Upper)
     for (int D=1;D<=Dmax;D*=2)
         for (double S=0.5;S<=2.5;S+=0.5)
         {
-            Setup(UnitCell,S,D,epsSVD,Gates,Upper);
+            Setup(UnitCell,S,D,epsSVD,Gates,RegularUpper);
 //            cout << "S,D=" << S << " " << D << endl;
             itsState->InitializeWith(Random);
             itsState->Canonicalize(DLeft);
@@ -740,7 +743,7 @@ TEST_F(iTEBDTests,FindiTimeGS_Lower_D4S12_Gates_FirstOrder)
     D=4;
     maxIter=1000;
 #endif // DEBUG
-    Setup(UnitCell,S,2,epsSVD,Gates,Lower);
+    Setup(UnitCell,S,2,epsSVD,Gates,RegularLower);
     itsState->InitializeWith(Random);
     IterationSchedule is=MakeSchedule(maxIter,D,FirstOrder);
     itsState->FindiTimeGroundState(itsH,itsiH,is);

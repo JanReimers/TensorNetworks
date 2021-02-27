@@ -28,10 +28,10 @@ using TensorNetworks::Sx;
 using TensorNetworks::Sz;
 using TensorNetworks::Sp;
 using TensorNetworks::Sm;
-//using TensorNetworks::;
-//using TensorNetworks::;
-//using TensorNetworks::;
-//using TensorNetworks::;
+using TensorNetworks::MPOForm;
+using TensorNetworks::RegularLower;
+using TensorNetworks::RegularUpper;
+
 
 
 class ExpectationsTests : public ::testing::Test
@@ -55,11 +55,11 @@ public:
         delete itsMPS;
     }
 
-    void Setup(int L, double S, int D, TriType ul)
+    void Setup(int L, double S, int D,MPOForm f)
     {
         delete itsH;
         delete itsMPS;
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,ul,1.0,1.0,0.0);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,f,1.0,1.0,0.0);
         itsMPS=itsH->CreateMPS(1);
         itsMPS->InitializeWith(TensorNetworks::Random);
 
@@ -94,7 +94,7 @@ TEST_F(ExpectationsTests,TestSweepL9S1D2)
 {
     int L=9,D=2;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
 
     double E=itsMPS->GetExpectation(itsH);
     EXPECT_NEAR(E/(L-1),-0.45317425,1e-7);
@@ -105,7 +105,7 @@ TEST_F(ExpectationsTests,TestOneSiteDMs_Lower)
 {
     int L=9,D=4;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs();
     OneSiteDMs::ExpectationT traces=ro1.GetTraces();
     double eps=1e-14;
@@ -119,7 +119,7 @@ TEST_F(ExpectationsTests,TestOneSiteDMs_Upper)
 {
     int L=9,D=4;
     double S=0.5;
-    Setup(L,S,D,Upper);
+    Setup(L,S,D,RegularUpper);
     OneSiteDMs ro1=itsMPS->CalculateOneSiteDMs();
     OneSiteDMs::ExpectationT traces=ro1.GetTraces();
     double eps=1e-14;
@@ -133,7 +133,7 @@ TEST_F(ExpectationsTests,TestOneSiteExpectations_Lower)
 {
     int L=9,D=4;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
 
     OneSiteDMs::ExpectationT Sx_mpo(L),Sz_mpo(L);
     Vector<std::complex<double> > Sp_mpo(L),Sm_mpo(L);
@@ -189,7 +189,7 @@ TEST_F(ExpectationsTests,TestOneSiteExpectations_Upper)
 {
     int L=9,D=4;
     double S=0.5;
-    Setup(L,S,D,Upper);
+    Setup(L,S,D,RegularUpper);
 
     OneSiteDMs::ExpectationT Sx_mpo(L),Sz_mpo(L);
     Vector<std::complex<double> > Sp_mpo(L),Sm_mpo(L);
@@ -230,7 +230,7 @@ TEST_F(ExpectationsTests,TestFreezeL9S1D2)
 {
     int L=9,D=2,maxIter=100;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     itsMPS->InitializeWith(Random);
     itsMPS->Freeze(L,S); //Site 0 spin up
 
@@ -357,7 +357,7 @@ TEST_F(ExpectationsTests,TestTwoSiteDMs_Lower)
 {
     int L=9,D=4;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
 
     TwoSiteDMs::ExpectationT SxSx_mpo(L,L),SxSz_mpo(L,L),SzSx_mpo(L,L),SzSz_mpo(L,L);
     SMatrix<std::complex<double> > SmSm_mpo(L,L),SmSp_mpo(L,L),SpSm_mpo(L,L),SpSp_mpo(L,L);

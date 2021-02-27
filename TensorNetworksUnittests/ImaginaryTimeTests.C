@@ -16,6 +16,9 @@ using TensorNetworks::TrotterOrder;
 using TensorNetworks::FirstOrder;
 using TensorNetworks::SecondOrder;
 using TensorNetworks::FourthOrder;
+using TensorNetworks::MPOForm;
+using TensorNetworks::RegularLower;
+using TensorNetworks::RegularUpper;
 
 class ImaginaryTimeTests : public ::testing::Test
 {
@@ -41,7 +44,7 @@ public:
     {
         if (itsH)   delete itsH;
         if (itsMPS) delete itsMPS;
-        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,Lower,1.0,1.0,0.0);
+        itsH=itsFactory->Make1D_NN_HeisenbergHamiltonian(L,S,RegularLower,1.0,1.0,0.0);
         itsMPS=itsH->CreateMPS(D);
         itsMPS->InitializeWith(TensorNetworks::Random);
     }

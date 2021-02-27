@@ -13,6 +13,7 @@ namespace TensorNetworks
     enum TrotterOrder {TNone,FirstOrder,SecondOrder,FourthOrder};
     enum iTEBDType    {Gates,MPOs,iMPOs};
     enum CompressType {CNone,Std,Parker};
+    enum MPOForm      {FUnknown,RegularUpper,RegularLower,expH,FUnit};
 
     using TriType=Store;
 };

@@ -14,28 +14,22 @@ template <class T> MatrixO<T>::MatrixO()
     : Matrix<OperatorElement<T> >()
     , itsd(0)
     , itsTruncationError(0)
-    , itsUL(Full)
+    , itsForm(FUnknown)
 {}
 
-template <class T> MatrixO<T>::MatrixO(int d,TriType ul)
-    : Matrix<OperatorElement<T> >()
-    , itsd(d)
-    , itsTruncationError(0)
-    , itsUL(ul)
-{}
-
-template <class T> MatrixO<T>::MatrixO(int d,TriType ul, const MatLimits& lim)
+template <class T> MatrixO<T>::MatrixO(int d,MPOForm f, const MatLimits& lim)
     : Matrix<OperatorElement<T> >(lim)
     , itsd(d)
     , itsTruncationError(0)
-    , itsUL(ul)
-{}
+    , itsForm(f)
+{
+}
 
-template <class T> MatrixO<T>::MatrixO(int d,TriType ul,const Base& m)
+template <class T> MatrixO<T>::MatrixO(int d,MPOForm f,const Base& m)
     : Matrix<OperatorElement<T> >(m)
     , itsd(d)
     , itsTruncationError(0)
-    , itsUL(ul)
+    , itsForm(f)
 {
     // Find and fix any un-initialized elements
     OperatorElement<T> Z=OperatorZ(d);
@@ -52,31 +46,20 @@ template <class T> MatrixO<T>::MatrixO(const MatrixO& m)
     : Matrix<OperatorElement<T> >(m)
     , itsd(m.itsd)
     , itsTruncationError(0)
-    , itsUL(m.itsUL)
+    , itsForm(m.itsForm)
 {
 }
 
-
-template <class T> MatrixO<T>::MatrixO(int Dw1, int Dw2,double S,TriType ul)
+template <class T> MatrixO<T>::MatrixO(int Dw1, int Dw2,double S,MPOForm f)
     : Matrix<OperatorElement<T> >(0,Dw1-1,0,Dw2-1)
     , itsd(2*S+1)
     , itsTruncationError(0)
-    , itsUL(ul)
+    , itsForm(f)
+
 {
     OperatorElement<T> Z=OperatorZ(S);
     Fill(*this,Z);
 }
-
-template <class T> MatrixO<T>::MatrixO(int Dw1, int Dw2,int d,TriType ul)
-    : Matrix<OperatorElement<T> >(0,Dw1-1,0,Dw2-1)
-    , itsd(d)
-    , itsTruncationError(0)
-    , itsUL(ul)
-{
-    OperatorElement<T> Z=OperatorZ(d);
-    Fill(*this,Z);
-}
-
 
 template <class T> MatrixO<T>::~MatrixO()
 {
@@ -115,16 +98,6 @@ template <class T> void MatrixO<T>::Setd()
     MatLimits l=this->GetLimits();
     OperatorElement<T> e=(*this)(l.Row.Low,l.Col.Low);
     itsd=e.GetNumRows();
-}
-template <class T> void MatrixO<T>::SetUpperLower(TriType ul)
-{
-//    assert(ul==Upper || ul==Lower);
-    itsUL=ul;
-}
-
-template <class T> void MatrixO<T>::SetUpperLower(double eps)
-{
-    SetUpperLower(this->GetMeasuredShape(eps));
 }
 
 template <class T> TriType  MatrixO<T>::GetMeasuredShape(double eps) const
@@ -243,18 +216,20 @@ template <class T> MatrixO<T> MatrixO<T>::GetV(Direction lr) const
     if (cl>l.Col.High) cl=l.Col.High; //enforce at least one column
     if (ch<l.Col.Low ) ch=l.Col.Low;  //enforce at least one column
     MatLimits lv;
-    if      ((lr==DLeft && itsUL==Upper) || (lr==DRight && itsUL==Lower))
+    if      ((lr==DLeft && itsForm==RegularUpper) || (lr==DRight && itsForm==RegularLower))
         lv=MatLimits(l.Row.Low,rh,l.Col.Low,ch);
-    else if ((lr==DLeft && itsUL==Lower) || (lr==DRight && itsUL== Upper))
+    else if ((lr==DLeft && itsForm==RegularLower) || (lr==DRight && itsForm== RegularUpper))
         lv=MatLimits(rl,l.Row.High,cl,l.Col.High);
-    else if  ((lr==DLeft && itsUL==Diagonal) || (lr==DRight && itsUL==Diagonal))
-        lv=MatLimits(l.Row.Low,rh,l.Col.Low,ch);
+    else if (itsForm==expH)
+        lv=this->GetLimits();
     else
         assert(false);
+//    else if  ((lr==DLeft && itsUL==Diagonal) || (lr==DRight && itsUL==Diagonal))
+//        lv=MatLimits(l.Row.Low,rh,l.Col.Low,ch);
 
     assert(lv.GetNumRows()>0);
     assert(lv.GetNumCols()>0);
-    return  MatrixO<T>(Getd(),itsUL,this->SubMatrix(lv));
+    return  MatrixO<T>(Getd(),itsForm,this->SubMatrix(lv));
 }
 
 template <class T> void MatrixO<T>::SetV(Direction lr,const MatrixO& V)
@@ -394,9 +369,9 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
     VecLimits clim=this->GetLimits().Col;
     int RLlow=0;
 
-    switch (itsUL)
+    switch (itsForm)
     {
-    case Upper:
+    case RegularUpper:
         switch (lr)
         {
         case DLeft:
@@ -423,7 +398,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
         break;
         }
         break;
-    case Lower:
+    case RegularLower:
         switch (lr)
         {
         case DLeft:

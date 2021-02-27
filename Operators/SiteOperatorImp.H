@@ -20,7 +20,7 @@ public:
     typedef Matrix<MatrixRT> TensorT;
     SiteOperatorImp(int d); //Construct with identity operator
     SiteOperatorImp(int d, SpinOperator so); //Construct with identity operator
-    SiteOperatorImp(int d, Position lbr, const OperatorClient* O,TriType ul);
+    SiteOperatorImp(int d, Position lbr, const OperatorClient* O,MPOForm);
     SiteOperatorImp(int d, Direction lr , Position lbr, const MatrixRT& U, const DiagonalMatrixRT& expEvs);
     SiteOperatorImp(const MatrixOR& W); //Construct with W operator
     virtual ~SiteOperatorImp();
@@ -52,13 +52,12 @@ public:
     virtual char   GetMeasuredShape(double eps) const;
     virtual char   GetLRB() const {return PBulk;}
     virtual void   SetLimits(); //Fix up itsDw12 by inspecting zeros in Wmn
-    virtual void   SetUpperLower(TriType ul) {itsWs.SetUpperLower(ul);};
     virtual char   GetUpperLower(double eps) const {return GetMeasuredShape(eps);}
 
 private:
     SiteOperatorImp* GetNeighbour(Direction) const;
     void Init_lr(Position lbr, int lindex,int rindex);
-    char GetUL() const;
+    char GetForm() const;
 
     double CompressStd   (Direction,const SVCompressorR*);
     double CompressParker(Direction,const SVCompressorR*);
@@ -68,12 +67,12 @@ private:
 
     void     AccumulateTruncationError(double err);
 
-    MatrixRT BuildK(int M,TriType ul) const;
-    VectorRT Buildc(int M,TriType ul) const;
-    double   ContractUL(int w11, int w12, int w21, int w22,TriType) const;
+    MatrixRT BuildK(int M,MPOForm ul) const;
+    VectorRT Buildc(int M,MPOForm ul) const;
+    double   ContractUL(int w11, int w12, int w21, int w22,MPOForm) const;
     void     GaugeTransform(const MatrixRT& R, const MatrixRT& Rinv);
-    double   Contract_sM(int M,TriType ul) const;
-    double   Contract_sM1(int M,TriType ul) const;
+    double   Contract_sM(int M,MPOForm ul) const;
+    double   Contract_sM1(int M,MPOForm ul) const;
 protected:
 
     int      itsd; //2*S+1

@@ -24,7 +24,7 @@ public:
     enum LoadWith {Identity};
     MPOImp(int L, double S);
     MPOImp(int L, double S,LoadWith);
-    MPOImp(int L, const OperatorClient* W,TriType ul);
+    MPOImp(int L, const OperatorClient* W,MPOForm f);
     virtual ~MPOImp();
 
     virtual int    GetL() const {return itsL;}

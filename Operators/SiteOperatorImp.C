@@ -13,7 +13,7 @@ SiteOperatorImp::SiteOperatorImp(int d)
     : itsd(d)
     , itsTruncationError(0.0)
     , itsLBR(PBulk)
-    , itsWs(1,1,d,Diagonal)
+   , itsWs(1,1,dtoS(d),FUnit)
 {
     Unit(itsWs);
     SetLimits();
@@ -29,19 +29,18 @@ SiteOperatorImp::SiteOperatorImp(int d, SpinOperator so) //Construct spin operat
     SetLimits();
 }
 
-SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H,TriType ul)
-    : SiteOperatorImp(d)
+SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H,MPOForm f)
+    : itsd(d)
+    , itsTruncationError(0.0)
+    , itsLBR(lbr)
+    , itsWs(H->GetW(f))
 {
-    itsLBR=lbr;
-    itsWs=H->GetMatrixO(ul);
-    itsWs.SetUpperLower(ul);
-
-    switch (ul)
+    switch (f)
     {
-    case Lower:
+    case RegularLower:
         Init_lr(lbr,itsWs.GetNumRows()-1,0);
         break;
-    case Upper:
+    case RegularUpper:
         Init_lr(lbr,0,itsWs.GetNumCols()-1);
         break;
     default:
@@ -234,10 +233,36 @@ char TriTypeToChar(TriType ul)
     }
     return ret;
 }
-
-char SiteOperatorImp::GetUL() const
+char FormToChar(MPOForm f)
 {
-    return TriTypeToChar(itsWs.GetNominalShape());
+    char ret(' ');
+    switch (f)
+    {
+    case RegularLower:
+        ret='L';
+        break;
+    case RegularUpper:
+        ret='U';
+        break;
+    case expH:
+        ret='E';
+        break;
+    case FUnit:
+        ret='1';
+        break;
+    case FUnknown:
+        ret='?';
+        break;
+    default :
+        ret='-';
+
+    }
+    return ret;
+}
+
+char SiteOperatorImp::GetForm() const
+{
+    return FormToChar(itsWs.GetForm());
 }
 
 void SiteOperatorImp::Report(std::ostream& os) const
@@ -249,7 +274,7 @@ void SiteOperatorImp::Report(std::ostream& os) const
     << " " << std::fixed << std::setprecision(1) << std::setw(5) << GetFrobeniusNorm()
     << " " << std::setw(4) << GetNormStatus(1e-13)
     << " " << std::setw(4) << GetMeasuredShape(1e-13)
-    << " " << std::setw(4) << GetUL() // Upper lower
+    << " " << std::setw(4) << GetForm() // Upper lower
 //    << " " << itsDw12.w1_first << " " << itsDw12.w2_last
     ;
 }
@@ -257,32 +282,6 @@ void SiteOperatorImp::Report(std::ostream& os) const
 char SiteOperatorImp::GetMeasuredShape(double eps) const
 {
     return TriTypeToChar(itsWs.GetMeasuredShape(eps));
-//    char ret=' ';
-//    if (itsWs.GetNumRows()<2 && itsWs.GetNumCols()<2)
-//        ret='1';
-//    else if (itsWs.GetNumRows()<2)
-//        ret='R';
-//    else if (itsWs.GetNumCols()<2)
-//        ret='C';
-//    else if (IsDiagonal(itsWs,eps))
-//        ret='D';
-//    else if (IsUpperTriangular(itsWs,eps))
-//    {
-//        if (ret==' ')
-//            ret='U';
-//        else if (ret=='L')
-//            ret='M'; //Mix
-//    }
-//    else if (IsLowerTriangular(itsWs,eps))
-//    {
-//        if (ret==' ')
-//            ret='L';
-//        else if (ret=='U')
-//            ret='M'; //Mix
-//    }
-//    else
-//        ret='F'; // Full
-//    return ret;
 }
 
 double SiteOperatorImp::GetFrobeniusNorm() const
@@ -294,26 +293,26 @@ char SiteOperatorImp::GetNormStatus(double eps) const
 {
     if (itsOpRange.Dw1*itsOpRange.Dw2>4096) return '?';
     char ret='W'; //Not normalized
+    MPOForm f=itsWs.GetForm();
+    bool isLeft=false,isRight=false;
+    if (f==RegularUpper || f==RegularLower)
     {
-        MatrixOR V=itsWs.GetV(DLeft);
-        if (V.GetNumRows()==0)
-            ret='l';
-        else if (V.IsOrthonormal(DLeft,eps))
-            ret='L';
+        isLeft =itsWs.GetV(DLeft ).IsOrthonormal(DLeft ,eps);
+        isRight=itsWs.GetV(DRight).IsOrthonormal(DRight,eps);
     }
-    if (ret!='l')
+    else
     {
-        MatrixOR V=itsWs.GetV(DRight);
-        if (V.GetNumCols()==0)
-            ret='r';
-        else if (V.IsOrthonormal(DRight,eps))
-        {
-            if (ret=='L')
-                ret='I';
-            else
-                ret='R';
-        }
+        isLeft =itsWs.IsOrthonormal(DLeft ,eps);
+        isRight=itsWs.IsOrthonormal(DRight,eps);
     }
+
+    if (isLeft && isRight)
+        ret='I';
+    else if (isLeft)
+        ret='L';
+    else if (isRight)
+        ret='R';
+
     return ret;
 }
 

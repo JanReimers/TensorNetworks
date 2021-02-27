@@ -24,19 +24,19 @@ Hamiltonian_2Body_LongRange::~Hamiltonian_2Body_LongRange()
 //     cout << "Hamiltonian_1D_NN_TransverseIsing destructor." << endl;
 }
 
-MatrixOR  Hamiltonian_2Body_LongRange::GetMatrixO(TriType ul) const
+MatrixOR  Hamiltonian_2Body_LongRange::GetW(MPOForm f) const
 {
     //
     //  DW = 2+Sum(i,i=1..NN) = NN*(NN+1)/2
     //
     int Dw=2+itsNN*(itsNN+1)/2;
     int iblock=0;
-    MatrixOR W(Dw,Dw,itsS,ul);
+    MatrixOR W(Dw,Dw,itsS,f);
     W(0   ,0   )=OperatorI (itsS);
     W(Dw-1,Dw-1)=OperatorI (itsS);
-    switch (ul)
+    switch (f)
     {
-    case Lower:
+    case RegularLower:
         W(Dw-1,0)=itshx*OperatorSx(itsS);
         for (int i=1;i<=itsNN;i++)
         {
@@ -47,7 +47,7 @@ MatrixOR  Hamiltonian_2Body_LongRange::GetMatrixO(TriType ul) const
             iblock+=i;
         }
         break;
-    case Upper:
+    case RegularUpper:
         W(0   ,Dw-1)=itshx*OperatorSx(itsS);
         for (int i=1;i<=itsNN;i++)
         {
@@ -59,7 +59,6 @@ MatrixOR  Hamiltonian_2Body_LongRange::GetMatrixO(TriType ul) const
         }
         //cout << W << endl;
        break;
-    case Full:
     default:
         assert(false);
     }

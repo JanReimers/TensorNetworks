@@ -17,7 +17,7 @@ class iHamiltonianImp
     , private iMPOImp
 {
 public:
-    iHamiltonianImp(int L, const OperatorClient* W,TriType ul);
+    iHamiltonianImp(int L, const OperatorClient* W,MPOForm);
     virtual ~iHamiltonianImp();
 
     virtual int    GetL    () const {return iMPOImp::GetL    ();}

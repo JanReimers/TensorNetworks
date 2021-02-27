@@ -18,9 +18,9 @@ public:
     //
     //  OperatorClient interface
     //
-    virtual double    GetS   () const {return itsS;}
-    virtual double    GetH   (int ma,int na,int mb,int nb) const;
-    virtual MatrixOR GetMatrixO(TriType ul)  const;
+    virtual double   GetS() const {return itsS;}
+    virtual double   GetH(int ma,int na,int mb,int nb) const;
+    virtual MatrixOR GetW(MPOForm)  const;
 
 private:
     static const int Dw=5;

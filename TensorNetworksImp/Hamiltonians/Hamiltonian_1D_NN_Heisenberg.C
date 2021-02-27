@@ -32,12 +32,12 @@ double Hamiltonian_1D_NN_Heisenberg::GetH(int ma,int na,int mb,int nb) const
     +itshz*(itsSC.GetSz(ma,na)+itsSC.GetSz(mb,nb)); //Should we only include one stie here?
 }
 
-MatrixOR  Hamiltonian_1D_NN_Heisenberg::GetMatrixO(TriType ul) const
+MatrixOR  Hamiltonian_1D_NN_Heisenberg::GetW(MPOForm f) const
 {
-    MatrixOR W;
-    switch (ul)
+    MatrixOR W(Dw,Dw,itsS,f);
+    switch (f)
     {
-    case Lower:
+    case RegularLower:
 //      [ 1       0        0      0    0 ]
 //      [ S+      0        0      0    0 ]
 //  W = [ S-      0        0      0    0 ]
@@ -45,7 +45,6 @@ MatrixOR  Hamiltonian_1D_NN_Heisenberg::GetMatrixO(TriType ul) const
 //      [ hzSz  Jxy/2*S- Jxy/2*S+ JzSz 1 ]
 //
 
-        W=MatrixOR(Dw,Dw,itsS,ul);
         W(0,0)=OperatorI (itsS);
         W(1,0)=OperatorSp(itsS);
         W(2,0)=OperatorSm(itsS);
@@ -56,14 +55,13 @@ MatrixOR  Hamiltonian_1D_NN_Heisenberg::GetMatrixO(TriType ul) const
         W(4,3)=itsJz     *OperatorSz(itsS);
         W(4,4)=OperatorI (itsS);
         break;
-    case Upper:
+    case RegularUpper:
 //      [ 1       S+       S-     Sz   hzSz     ]
 //      [ 0       0        0      0    Jxy/2*S- ]
 //  W = [ 0       0        0      0    Jxy/2*S+ ]
 //      [ 0       0        0      0    JzSz     ]
 //      [ 0       0        0      0     1       ]
 //
-        W=MatrixOR(Dw,Dw,itsS,ul);
         W(0,0)=OperatorI (itsS);
         W(0,1)=OperatorSp(itsS);
         W(0,2)=OperatorSm(itsS);
@@ -74,7 +72,6 @@ MatrixOR  Hamiltonian_1D_NN_Heisenberg::GetMatrixO(TriType ul) const
         W(3,4)=itsJz     *OperatorSz(itsS);
         W(4,4)=OperatorI (itsS);
         break;
-    case Full:
     default:
         assert(false);
     }

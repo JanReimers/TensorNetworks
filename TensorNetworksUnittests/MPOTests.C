@@ -37,6 +37,9 @@ using TensorNetworks::MPO_TwoSite;
 using TensorNetworks::Sz;
 using TensorNetworks::Sp;
 using TensorNetworks::Sm;
+using TensorNetworks::MPOForm;
+using TensorNetworks::RegularLower;
+using TensorNetworks::RegularUpper;
 
 class MPOTests : public ::testing::Test
 {
@@ -68,7 +71,7 @@ public:
         if (itsOperatorClient) delete itsOperatorClient;
     }
 
-    void Setup(int L, double S, int D,TriType ul=Lower)
+    void Setup(int L, double S, int D,MPOForm f=RegularLower)
     {
         if (itsH  ) delete itsH;
         if (itsiH ) delete itsiH;
@@ -77,10 +80,10 @@ public:
         if (itsOperatorClient) delete itsOperatorClient;
         if (L>1)
         {
-            itsH =itsFactory->Make1D_NN_HeisenbergHamiltonian( L,S,ul,1.0,1.0,0.0);
+            itsH =itsFactory->Make1D_NN_HeisenbergHamiltonian( L,S,f,1.0,1.0,0.0);
             itsMPS=itsH->CreateMPS(D);
         }
-        itsiH  =itsFactory->Make1D_NN_HeisenbergiHamiltonian(L,S,ul,1.0,1.0,0.0);
+        itsiH  =itsFactory->Make1D_NN_HeisenbergiHamiltonian(L,S,f,1.0,1.0,0.0);
         itsiMPS=itsiH->CreateiTEBDState(2,D,Gates,D*D*1e-10,1e-13);
         itsOperatorClient=new TensorNetworks::Hamiltonian_1D_NN_Heisenberg(S,1.0,1.0,0.0);
         assert(itsOperatorClient);
@@ -135,7 +138,7 @@ TEST_F(MPOTests,DoHamiltionExpectation_Lower_L10S1_5D2)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
-        Setup(10,S,2,Lower);
+        Setup(10,S,2,RegularLower);
         itsMPS->InitializeWith(Neel);
         EXPECT_NEAR(itsMPS->GetExpectation(itsH),ENeel(S),1e-11);
     }
@@ -144,7 +147,7 @@ TEST_F(MPOTests,DoHamiltionExpectation_Upper_L10S1_5D2)
 {
     for (double S=0.5;S<=2.5;S+=0.5)
     {
-        Setup(10,S,2,Upper);
+        Setup(10,S,2,RegularUpper);
         itsMPS->InitializeWith(Neel);
         EXPECT_NEAR(itsMPS->GetExpectation(itsH),ENeel(S),1e-11);
     }
@@ -240,7 +243,7 @@ TEST_F(MPOTests,TestGetLRIterateL10S1D6)
 TEST_F(MPOTests,TestGetLRIterate_Lower_L10S5D2)
 {
     int L=10;
-    Setup(L,2.5,2,Lower);
+    Setup(L,2.5,2,RegularLower);
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DRight);
     Vector3CT L3=CalcHeffLeft(L+1);
@@ -254,7 +257,7 @@ TEST_F(MPOTests,TestGetLRIterate_Lower_L10S5D2)
 TEST_F(MPOTests,TestGetLRIterate_Upper_L10S5D2)
 {
     int L=10;
-    Setup(L,2.5,2,Upper);
+    Setup(L,2.5,2,RegularUpper);
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DRight);
     Vector3CT L3=CalcHeffLeft(L+1);
@@ -302,7 +305,7 @@ TEST_F(MPOTests,TestMPOCombineForH2)
 TEST_F(MPOTests,TestMPOStdCompressForH_Lower)
 {
     int L=10,D=8;
-    Setup(L,0.5,D,Lower);
+    Setup(L,0.5,D,RegularLower);
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DRight);
     EXPECT_EQ(itsH->GetUpperLower()," LLLLLLLL ");
@@ -316,7 +319,7 @@ TEST_F(MPOTests,TestMPOStdCompressForH_Lower)
 TEST_F(MPOTests,TestMPOStdCompressForH_Upper)
 {
     int L=10,D=8;
-    Setup(L,0.5,D,Upper);
+    Setup(L,0.5,D,RegularUpper);
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DRight);
     EXPECT_EQ(itsH->GetUpperLower()," UUUUUUUU ");
@@ -331,7 +334,7 @@ TEST_F(MPOTests,TestMPOStdCompressForH_Upper)
 TEST_F(MPOTests,TestMPOStdCompressForH2_Lower)
 {
     int L=10,D=8;
-    Setup(L,0.5,D,Lower);
+    Setup(L,0.5,D,RegularLower);
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DRight);
     EXPECT_EQ(itsH->GetUpperLower()," LLLLLLLL ");
@@ -354,7 +357,7 @@ TEST_F(MPOTests,TestMPOStdCompressForH2_Lower)
 TEST_F(MPOTests,TestMPOStdCompressForH2_Upper)
 {
     int L=10,D=8;
-    Setup(L,0.5,D,Upper);
+    Setup(L,0.5,D,RegularUpper);
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DRight);
     EXPECT_EQ(itsH->GetUpperLower()," UUUUUUUU ");
@@ -528,7 +531,7 @@ TEST_F(MPOTests,TestiMPO_Lower_Trotter2_L2)
 {
     int L=2,D=2;
     double S=0.5,dt=0.1,epsMPO=6e-3;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,Std,epsMPO);
 //    expH->Report(cout);
     for (int is=1;is<=L;is++)
@@ -542,7 +545,7 @@ TEST_F(MPOTests,TestiMPO_Upper_Trotter2_L2)
 {
     int L=2,D=2;
     double S=0.5,dt=0.1,epsMPO=6e-3;
-    Setup(L,S,D,Upper);
+    Setup(L,S,D,RegularUpper);
     iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,Std,epsMPO);
 //    expH->Report(cout);
     for (int is=1;is<=L;is++)
@@ -557,7 +560,7 @@ TEST_F(MPOTests,TestiMPO_Lower_Trotter1_L3)
 {
     int L=3,D=2;
     double S=0.5,dt=0.00001,epsMPO=1e-14;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     iMPO* expH=itsiH->CreateiMPO(dt,FirstOrder,Std,epsMPO);
 //    expH->Report(cout);
     {
@@ -581,7 +584,7 @@ TEST_F(MPOTests,TestiMPO_Upper_Trotter1_L3)
 {
     int L=3,D=2;
     double S=0.5,dt=0.00001,epsMPO=1e-14;
-    Setup(L,S,D,Upper);
+    Setup(L,S,D,RegularUpper);
     iMPO* expH=itsiH->CreateiMPO(dt,FirstOrder,Std,epsMPO);
 //    expH->Report(cout);
     {
@@ -605,7 +608,7 @@ TEST_F(MPOTests,  TestiMPO_Lower_Trotter2_L3  )
 {
     int L=3,D=2;
     double S=0.5,dt=0.1,epsMPO=6e-3;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,Std,epsMPO);
 //    expH->Report(cout);
     {
@@ -628,7 +631,7 @@ TEST_F(MPOTests,  TestiMPO_Upper_Trotter2_L3  )
 {
     int L=3,D=2;
     double S=0.5,dt=0.1,epsMPO=6e-3;
-    Setup(L,S,D,Upper);
+    Setup(L,S,D,RegularUpper);
     iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,Std,epsMPO);
 //    expH->Report(cout);
     {
@@ -665,7 +668,7 @@ TEST_F(MPOTests,TestParkerCanonical_Lower_L9H)
 {
     int L=9,D=2;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
 //    itsH->Report(cout);
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DLeft);
@@ -686,7 +689,7 @@ TEST_F(MPOTests,TestParkerCanonical_Upper_L9H)
 {
     int L=9,D=2;
     double S=0.5;
-    Setup(L,S,D,Upper);
+    Setup(L,S,D,RegularUpper);
 //    itsH->Report(cout);
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DLeft);
@@ -707,7 +710,7 @@ TEST_F(MPOTests,TestParkerCanonicalTri_Lower_L1iH)
 {
     int L=1,D=2;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     itsiMPS->InitializeWith(Random);
     itsiMPS->Canonicalize(DLeft);
     itsiMPS->Orthogonalize(0,1e-13);
@@ -726,7 +729,7 @@ TEST_F(MPOTests,TestParkerCanonicalTri_Upper_L1iH)
 {
     int L=1,D=2;
     double S=0.5;
-    Setup(L,S,D,Upper);
+    Setup(L,S,D,RegularUpper);
     itsiMPS->InitializeWith(Random);
     itsiMPS->Canonicalize(DLeft);
     itsiMPS->Orthogonalize(0,1e-13);
@@ -747,7 +750,7 @@ TEST_F(MPOTests,TestParkerCanonicalQTIter_Lower_L1iH)
 {
     int L=1,D=2;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     itsiMPS->InitializeWith(Random);
     itsiMPS->Canonicalize(DLeft);
     itsiMPS->Orthogonalize(0,1e-13);
@@ -767,7 +770,7 @@ TEST_F(MPOTests,TestParkerCanonicalQTIter_Upper_L1iH)
 {
     int L=1,D=2;
     double S=0.5;
-    Setup(L,S,D,Upper);
+    Setup(L,S,D,RegularUpper);
     itsiMPS->InitializeWith(Random);
     itsiMPS->Canonicalize(DLeft);
     itsiMPS->Orthogonalize(0,1e-13);
@@ -812,7 +815,7 @@ TEST_F(MPOTests,TestParkerSVDCompress_Lower_HL9)
 {
     int L=9,D=2;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DLeft);
 
@@ -837,7 +840,7 @@ TEST_F(MPOTests,TestParkerSVDCompress_Upper_HL9)
 {
     int L=9,D=2;
     double S=0.5;
-    Setup(L,S,D,Upper);
+    Setup(L,S,D,RegularUpper);
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DLeft);
 
@@ -863,24 +866,21 @@ TEST_F(MPOTests,TestParkerSVDCompress_Lower_H2L9)
 {
     int L=9,D=2;
     double S=0.5;
-    Setup(L,S,D,Lower);
+    Setup(L,S,D,RegularLower);
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DLeft);
     MPO* H2=itsH->CreateUnitOperator();
     H2->Product(itsH);
     H2->Product(itsH);
-    H2->Report(cout);
 
     EXPECT_EQ(H2->GetNormStatus(),"WWWWWWWWW");
     EXPECT_EQ(H2->GetUpperLower()," LLLLLLL ");
     double E2=itsMPS->GetExpectation(H2);
     H2->CanonicalForm(); //Do we need to sweep both ways?
-    H2->Report(cout);
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     EXPECT_EQ(H2->GetUpperLower()," LLLLLLL ");
     double E2can=itsMPS->GetExpectation(H2);
     double truncError=H2->Compress(Parker,0,1e-13);
-    H2->Report(cout);
     EXPECT_EQ(H2->GetNormStatus(),"WRRRRRRRR");
     EXPECT_EQ(H2->GetUpperLower()," FFFFFFF ");
     double E2comp=itsMPS->GetExpectation(H2);
@@ -895,7 +895,7 @@ TEST_F(MPOTests,TestParkerSVDCompress_Upper_H2L9)
 {
     int L=9,D=2;
     double S=0.5;
-    Setup(L,S,D,Upper);
+    Setup(L,S,D,RegularUpper);
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DLeft);
     MPO* H2=itsH->CreateUnitOperator();
@@ -956,7 +956,7 @@ TEST_F(MPOTests,TestParkerSVDCompressH2_2Body_Upper)
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DLeft);
 
-    Hamiltonian* Hlr=itsFactory->Make1D_2BodyLongRangeHamiltonian(L,S,Upper,1.0,0.0,3);
+    Hamiltonian* Hlr=itsFactory->Make1D_2BodyLongRangeHamiltonian(L,S,RegularUpper,1.0,0.0,3);
     MPO* H2=Hlr->CreateUnitOperator();
     H2->Product(Hlr);
     H2->Product(Hlr);
@@ -981,7 +981,7 @@ TEST_F(MPOTests,TestParkerSVDCompressH2_2Body_Lower)
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DLeft);
 
-    Hamiltonian* Hlr=itsFactory->Make1D_2BodyLongRangeHamiltonian(L,S,Lower,1.0,0.0,3);
+    Hamiltonian* Hlr=itsFactory->Make1D_2BodyLongRangeHamiltonian(L,S,RegularLower,1.0,0.0,3);
     MPO* H2=Hlr->CreateUnitOperator();
     H2->Product(Hlr);
     H2->Product(Hlr);
