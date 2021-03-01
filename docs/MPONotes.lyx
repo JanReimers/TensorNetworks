@@ -2210,6 +2210,24 @@ By definition of the QR/QL algorithm the L/R matrices are lower/upper triangular
  operator.
  As a result the canonical form sweeps will leave intact the upper/lower
  form of and MPO.
+ This also begs the quest: what happens if we try and put a non triangular
+ MPO into canonical form.
+ The first problem is that the V-block is no ambiguous, do we choose the
+ upper or lower version in table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:V-blocks"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+? Also for somthing like 
+\begin_inset Formula $\exp\left(\tau H\right)$
+\end_inset
+
+ there are no identity ops in the corners.
 \end_layout
 
 \begin_layout Section
@@ -2254,14 +2272,34 @@ R=\begin{bmatrix}1 & t & 0\\
 \end_inset
 
 and do an SVD decomposition on the dimension 
-\begin_inset Formula $\chi\times\chi$
+\begin_inset Formula $\chi\times\chi^{\prime}$
 \end_inset
 
  sub block 
 \begin_inset Formula $\mathsf{R}$
 \end_inset
 
+(if 
+\begin_inset Formula $R$
+\end_inset
 
+ not square, 
+\begin_inset Formula $\chi\neq\chi^{\prime}$
+\end_inset
+
+ then 
+\begin_inset Formula $R^{\prime}$
+\end_inset
+
+ needs to reshaped accordingly in for the product 
+\begin_inset Formula $MR^{\prime}$
+\end_inset
+
+ to yeidl the corect shape of 
+\begin_inset Formula $R$
+\end_inset
+
+)
 \begin_inset Formula 
 \[
 M=\begin{bmatrix}1 & 0 & 0\\
@@ -2754,10 +2792,10 @@ QR
 0 & \mathsf{R} & t\\
 0 & 0 & 1
 \end{bmatrix}=\begin{bmatrix}1 & 0 & 0\\
-0 & \mathsf{R} & 0\\
+0 & \mathsf{𝕀} & t\\
 0 & 0 & 1
 \end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
-0 & \mathsf{𝕀} & t\\
+0 & \mathsf{R} & 0\\
 0 & 0 & 1
 \end{bmatrix}$
 \end_inset
@@ -2775,10 +2813,10 @@ QR
 t & \mathsf{L} & 0\\
 0 & 0 & 1
 \end{bmatrix}=\begin{bmatrix}1 & 0 & 0\\
-0 & \mathsf{L} & 0\\
+t & \mathsf{𝕀} & 0\\
 0 & 0 & 1
 \end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
-t & \mathsf{𝕀} & 0\\
+0 & \mathsf{L} & 0\\
 0 & 0 & 1
 \end{bmatrix}$
 \end_inset
@@ -2998,6 +3036,140 @@ As with the QR canonical form algorithm, we would like the triangular to
 
 ) to achieve a triangular structure.
  
+\end_layout
+
+\begin_layout Subsection
+Non triangular
+\end_layout
+
+\begin_layout Standard
+If the R matrix is filled out for a left sweep we have
+\begin_inset Formula 
+\[
+R=\begin{bmatrix}1 & \boldsymbol{t} & s\\
+0 & \mathsf{R} & \boldsymbol{r}\\
+0 & 0 & 1
+\end{bmatrix}=MR^{\prime}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{R} & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & \boldsymbol{t} & s\\
+0 & \mathsf{𝕀} & \boldsymbol{r^{\prime}}\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\boldsymbol{r}=\mathsf{R}\boldsymbol{r}^{\boldsymbol{\prime}}
+\]
+
+\end_inset
+
+so we need to use triangular solver to 
+\begin_inset Formula $r^{\prime}$
+\end_inset
+
+ from 
+\begin_inset Formula $r$
+\end_inset
+
+.
+ But thats no all.
+ 
+\begin_inset Formula $\mathsf{R}$
+\end_inset
+
+ is almost always singular, after compression we have
+\begin_inset Formula 
+\[
+\boldsymbol{r}=\mathsf{\tilde{U}\tilde{s}\tilde{V}^{\dagger}}\boldsymbol{r}^{\prime}
+\]
+
+\end_inset
+
+from which we can extract 
+\begin_inset Formula $r^{\prime}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boldsymbol{r}^{\prime}=\tilde{\mathsf{V}}\frac{1}{\tilde{\mathsf{s}}}\mathsf{\tilde{U}}^{\dagger}\boldsymbol{r}
+\]
+
+\end_inset
+
+For a right sweep we have 
+\begin_inset Formula 
+\[
+R=\begin{bmatrix}1 & \boldsymbol{r} & s\\
+0 & \mathsf{R} & \boldsymbol{t}\\
+0 & 0 & 1
+\end{bmatrix}=R^{\prime}M=\begin{bmatrix}1 & \boldsymbol{r}^{\prime} & s\\
+0 & \mathsf{\mathbb{I}} & \boldsymbol{t}\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{R} & 0\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boldsymbol{r}=\boldsymbol{r}^{\prime}\mathsf{R}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boldsymbol{r}^{\prime}=\boldsymbol{r}\tilde{\mathsf{V}}\frac{1}{\mathsf{\tilde{s}}}\mathsf{\tilde{U}}^{\dagger}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If this gets too messy to code (especially since 
+\begin_inset Formula $R^{\prime}$
+\end_inset
+
+ often need grow in order to main the correct shape of 
+\begin_inset Formula $R$
+\end_inset
+
+) how about solving
+\begin_inset Formula 
+\[
+R=R^{\prime}\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{U}\tilde{s}\tilde{V}^{\dagger}} & 0\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+R^{\prime}=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{\tilde{V}\frac{1}{\tilde{\mathsf{s}}}}\mathsf{\tilde{U}}^{\dagger} & 0\\
+0 & 0 & 1
+\end{bmatrix}R
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section

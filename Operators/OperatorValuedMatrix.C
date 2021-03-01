@@ -17,6 +17,13 @@ template <class T> MatrixO<T>::MatrixO()
     , itsForm(FUnknown)
 {}
 
+template <class T> MatrixO<T>::MatrixO(int d,MPOForm f)
+    : Matrix<OperatorElement<T> >()
+    , itsd(d)
+    , itsTruncationError(0)
+    , itsForm(f)
+{
+}
 template <class T> MatrixO<T>::MatrixO(int d,MPOForm f, const MatLimits& lim)
     : Matrix<OperatorElement<T> >(lim)
     , itsd(d)
@@ -45,7 +52,7 @@ template <class T> MatrixO<T>::MatrixO(int d,MPOForm f,const Base& m)
 template <class T> MatrixO<T>::MatrixO(const MatrixO& m)
     : Matrix<OperatorElement<T> >(m)
     , itsd(m.itsd)
-    , itsTruncationError(0)
+    , itsTruncationError(m.itsTruncationError)
     , itsForm(m.itsForm)
 {
 }
@@ -353,7 +360,42 @@ template <typename T> inline int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
 
-template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr) const
+template <class T> typename MatrixO<T>::QXType MatrixO<T>::QX(Direction lr)
+{
+    switch (itsForm)
+    {
+    case expH:
+        return this->Full_QX(lr);
+        break;
+    case RegularUpper:
+    case RegularLower:
+        return this->BlockQX(lr);
+        break;
+    default:
+        assert(false);
+        return QXType(MatrixOR(),MatrixRT());
+    }
+}
+
+template <class T> typename MatrixO<T>::QXType MatrixO<T>::SVD (Direction lr,const SVCompressorR* comp)
+{
+    switch (itsForm)
+    {
+    case expH:
+        return this->Full_SVD(lr,comp);
+        break;
+    case RegularUpper:
+    case RegularLower:
+        return this->BlockSVD(lr,comp);
+        break;
+    default:
+        assert(false);
+        return QXType(MatrixOR(),MatrixRT());
+    }
+}
+
+
+template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
 {
     LapackQRSolver <double>  solver;
     MatrixO   V=GetV(lr);
@@ -455,13 +497,48 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
     return std::make_tuple(V,RL);
 }
 
+template <class T> typename MatrixO<T>::QXType MatrixO<T>::Full_QX(Direction lr)
+{
+    assert(itsForm==expH);
+    LapackQRSolver <double>  solver;
+    Matrix<T> Wf=this->Flatten(lr);
+    MatLimits Wlim=Wf.ReBase(1,1);
+    assert(FrobeniusNorm(Wf)>0.0); //Make sure we didn't get all zeros
+    Matrix <T> R,Q;
+
+    switch (lr)
+    {
+        case DLeft:
+        {
+            std::tie(Q,R)=solver.SolveThinQR(Wf);
+            R.ReBase(Wlim.Col.Low,Wlim.Col.Low);
+        }
+        break;
+        case DRight:
+        {
+            std::tie(R,Q)=solver.SolveThinRQ(Wf);
+            R.ReBase(Wlim.Row.Low,Wlim.Row.Low);
+       }
+        break;
+    }
+    assert(!isnan(R));
+    assert(!isinf(R));
+    assert(IsUpperTriangular(R));
+    Q.ReBase(Wlim);
+    this->UnFlatten(Q);
+    double scale=sqrt(itsd);
+    R/=scale;
+    (*this)*=scale;
+    return std::make_tuple(*this,R);
+}
+
 //
 //  This is where the fixed limits (0....X+1) helps us.  We know exactly where M is.
 //  M is from (1..X1)x(1..X2) inside RL regardless of the limits RL.
 //  the M area of the RL matrix gets replaced by a unit matrix. BUt ...
 //  we need Mp*RL to the have the same dimensions and the original RL
 //
-template <class T> Matrix<T> MatrixO<T>::ExtractM(Matrix<T>& RL) const
+template <class T> Matrix<T> MatrixO<T>::ExtractM(Matrix<T>& RL,bool buildRp) const
 {
     assert(IsInitialized(RL));
     int X1=RL.GetNumRows()-2;
@@ -470,22 +547,30 @@ template <class T> Matrix<T> MatrixO<T>::ExtractM(Matrix<T>& RL) const
         assert(X1>=0);
     if (X2<0)
         assert(X2>=0);
-    assert(X2>=X1); //If this fails we need to shrink RL to X2+2 x X2+2
+    assert(X2>=X1); //If this fails we need to shrink RL
     Matrix<T> M(X1,X2); //One based
 
     for (int w1=1;w1<=X1;w1++)
     for (int w2=1;w2<=X2;w2++)
-    {
         M(w1,w2)=RL(w1,w2);
-        RL(w1,w2)= (w1==w2) ? 1 : 0;
+
+
+    if (buildRp)
+    {
+        for (int w1=1;w1<=X1;w1++)
+        for (int w2=1;w2<=X2;w2++)
+            RL(w1,w2)= (w1==w2) ? 1 : 0;
+        if (X2>X1)
+        { //Fill in the rest of the unit matrix or X2>X1
+            RL.SetLimits(0,X2+1,0,X2+1,true); //save data
+            // Move the last row
+            RL.GetRow(X2+1)=RL.GetRow(X1+1);
+            for (int w1=X1+1;w1<=X2;w1++)
+                for (int w2=0;w2<=X2+1;w2++)
+                    RL(w1,w2)= (w1==w2) ? 1 : 0;
+       }
+
     }
-    if (X2>X1)
-    { //Fill in the rest of the unit matrix or X2>X1
-        RL.SetLimits(0,X2+1,0,X2+1,true); //save data
-        for (int w1=X1+1;w1<=X2+1;w1++)
-            for (int w2=0;w2<=X2+1;w2++)
-                RL(w1,w2)= (w1==w2) ? 1 : 0;
-   }
     assert(IsInitialized(M));
     assert(IsInitialized(RL));
     return M;
@@ -535,6 +620,83 @@ void Grow(Matrix<double>& m,const MatLimits& lim)
 
 }
 
+MatrixRT SolveRp(Direction lr, const MatrixRT& R, const MatrixRT& U, const DiagonalMatrixRT& s, const MatrixRT& VT)
+{
+    assert(Max(s.GetDiagonal())>1e-14);
+    DiagonalMatrixRT sinv=1.0/s;
+    MatrixRT Minv=Transpose(VT)*sinv*Transpose(U);
+    int X1=Minv.GetNumRows();
+    int X2=Minv.GetNumCols();
+    Grow(Minv,MatLimits(0,X1+1,0,X2+1));
+    MatrixRT Rp;
+    switch (lr)
+    {
+    case DLeft:
+        Rp=Minv*R;
+        break;
+    case DRight:
+        Rp=R*Minv;
+        break;
+    }
+    return Rp;
+}
+
+template <class T> typename MatrixO<T>::QXType MatrixO<T>::Full_SVD(Direction lr,const SVCompressorR* comp)
+{
+    //
+    //  Block respecting QR/QL/RQ/LQ
+    //
+    auto [Q,R]=Full_QX(lr);
+    assert(IsInitialized(R));
+    assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
+    //
+    //  Isolate the M matrix and SVD/compress it.
+    //
+    Matrix<T> M=ExtractM(R,false);
+    assert(IsInitialized(M));
+    assert(IsInitialized(R));
+    if (M.size()==0)
+    {
+        *this=Q;
+        return std::make_tuple(Q,R);
+    }
+    LapackSVDSolver <double>  solver;
+    auto [U,s,VT]=solver.SolveAll(M,1e-14); //Solves M=U * s * VT
+    itsTruncationError+=comp->Compress(U,s,VT);
+    int Xs=s.GetDiagonal().size();
+
+//    cout << std::fixed << std::setprecision(4) << "s=" << s.GetDiagonal() << endl;
+    //
+    //  Post processing:
+    //      1) Get RLtrans ready for transfer to the neighbouring site
+    //      2) Integrate U (or VT) into Q
+    if (Xs>0) R=SolveRp(lr,R,U,s,VT);
+    MatrixRT RLtrans; //THis gets transferred to the neighbouring site;
+    switch (lr)
+    {
+    case DLeft:
+        {
+            Matrix<T> sV=s*VT;
+            Grow(sV,MatLimits(VecLimits(0,Xs+1),R.GetRowLimits()));
+            RLtrans=sV*R;
+            Grow(U,MatLimits(Q.GetColLimits(),VecLimits(0,Xs+1)));
+            Q=Q*U;
+        }
+        break;
+    case DRight:
+        {
+            Matrix<T> Us=U*s;
+            Grow(Us,MatLimits(R.GetColLimits(),VecLimits(0,Xs+1)));
+            RLtrans=R*Us;
+            Grow(VT,MatLimits(VecLimits(0,Xs+1),Q.GetRowLimits()));
+            Q=VT*Q;
+        }
+        break;
+    }
+    assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
+    *this=Q;
+    return std::make_tuple(Q,RLtrans);
+}
 template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr,const SVCompressorR* comp)
 {
     //

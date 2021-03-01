@@ -1,5 +1,5 @@
 
-exp(-t*H) MPOs
+Done: exp(-t*H) MPOs
     -in order to get these to work we need some major re-org.  The messy part is getting right
      all the limits in the Grow steps for BlockQX and BlockSVD
     -Another issue is rescaling Q and L after decomp.  The scale facter shoudl *always* be sqrt(d).
@@ -35,8 +35,8 @@ SiteOperatorImp:
         We need to somehow determine U/L away from the edges and enforce the resulting U/l state
         on the edges.
 
-    -Get CanonicalFOrm working for exp(H)
-    -expH MPO get scrambled when reducing to Canonical form.
+    Done: -Get CanonicalFOrm working for exp(H)
+    Done: -expH MPO get scrambled when reducing to Canonical form.
         Get further scrambled after Parker-compress, std-compress is fine
         test is TestParkerSVDCompressExpHL8t1
         Scrambled = no longer upper/lower?
@@ -47,7 +47,7 @@ SiteOperatorImp:
         DP: Yep, but since W_L and W_R and left/right-canonical it has a special block-diagonal form.
 
 OpValMatrix:
-
+    -Try rank revealing QR for CanonicalForm. Any effect?
 
 MPO:
     Fixed: -For 2Body LR ham, parker compression of H2 destroys it.
@@ -61,10 +61,15 @@ MPO:
     -Trotter MPO and iMPO have a lot of duplicated code for calculating exp(-t*H) and factoring it.
         Done: -ExpH
         -Factor U*s*V = expH
-    -TestL2iMPOTrotter4 Get it running again
+    Fixed: -TestL2iMPOTrotter4 Get it running again
     Fixed: -TestParkerCanonicalTri_Upper_L1iH fails
     Fixed: -TestParkerCanonicalQTIter_Upper_L1iH fails
     Fixed: -TestRandomEnergyRangeSD_Upper fails
+
+
+-Hamiltonian Use canonical form and Parker compress for all trotter MPOs
+-iHamiltonian Use canonical form and Parker compress for all trotter MPOs
+
 iMPS
     -We need a horizontal tensor product like for MPOs, to make unit cell state
         The ordering or (ma,mb,..) -> m needs to controlled in one place.

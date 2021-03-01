@@ -11,7 +11,7 @@ namespace TensorNetworks
 //
 SiteOperatorImp::SiteOperatorImp(int d, MPOForm f)
     : itsd(d)
-    , itsTruncationError(0.0)
+//    , itsTruncationError(0.0)
     , itsLBR(PBulk)
    , itsWs(1,1,dtoS(d),f)
 {
@@ -31,7 +31,7 @@ SiteOperatorImp::SiteOperatorImp(int d, SpinOperator so) //Construct spin operat
 
 SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H,MPOForm f)
     : itsd(d)
-    , itsTruncationError(0.0)
+//    , itsTruncationError(0.0)
     , itsLBR(lbr)
     , itsWs(H->GetW(f))
 {
@@ -53,7 +53,7 @@ SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H,MPO
 //
 SiteOperatorImp::SiteOperatorImp(int d, Direction lr,Position lbr,const MatrixRT& U, const DiagonalMatrixRT& s)
     : itsd(d)
-    , itsTruncationError(0.0)
+//    , itsTruncationError(0.0)
     , itsLBR(lbr)
     , itsWs(d,expH)
 {
@@ -173,10 +173,10 @@ void SiteOperatorImp::SetLimits()
 //    cout << "Ranges=" << itsOpRange << endl;
 }
 
-void  SiteOperatorImp::AccumulateTruncationError(double err)
-{
-    itsTruncationError=sqrt(itsTruncationError*itsTruncationError+err*err);
-}
+//void  SiteOperatorImp::AccumulateTruncationError(double err)
+//{
+//    itsTruncationError=sqrt(itsTruncationError*itsTruncationError+err*err);
+//}
 
 
 void SiteOperatorImp::Product(const SiteOperator* O2)
@@ -273,7 +273,7 @@ void SiteOperatorImp::Report(std::ostream& os) const
     os
     << std::setw(3) << itsOpRange.Dw1 << " "
     << std::setw(3) << itsOpRange.Dw2 << "   "
-    << std::scientific << std::setprecision(1) << itsTruncationError
+    << std::scientific << std::setprecision(1) << itsWs.GetTruncationError()
     << " " << std::fixed << std::setprecision(1) << std::setw(5) << GetFrobeniusNorm()
     << " " << std::setw(4) << GetNormStatus(1e-13)
     << " " << std::setw(4) << GetMeasuredShape(1e-13)

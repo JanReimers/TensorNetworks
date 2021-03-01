@@ -18,7 +18,7 @@ public:
 //  Construction zone
 //
     MatrixO();
-//    MatrixO(int d,TriType);
+    MatrixO(int d,MPOForm);
     MatrixO(int d,MPOForm, const MatLimits&);
     MatrixO(int Dw1, int Dw2,double S,MPOForm);
     MatrixO(int d,MPOForm,const Base   & m);
@@ -68,10 +68,10 @@ public:
 //
 //  V block operations
 //
-    MatrixO   GetV     (Direction) const;
-    void      SetV     (Direction,const MatrixO& V);
-    QXType    BlockQX  (Direction) const;
-    QXType    BlockSVD (Direction,const SVCompressorR* comp) ;
+    MatrixO   GetV(Direction) const;
+    void      SetV(Direction,const MatrixO& V);
+    QXType    QX  (Direction);
+    QXType    SVD (Direction,const SVCompressorR* comp) ;
 //
 //  Flatten for QR and SVD decompositions
 //
@@ -86,8 +86,13 @@ public:
     }
     std::ostream& PrettyPrint(std::ostream& os) const;
 private:
+    QXType    Full_QX  (Direction);
+    QXType    BlockQX  (Direction);
+    QXType    Full_SVD (Direction,const SVCompressorR* comp) ;
+    QXType    BlockSVD (Direction,const SVCompressorR* comp) ;
+
     void Setd();
-    Matrix<T> ExtractM(Matrix<T>& RL) const;
+    Matrix<T> ExtractM(Matrix<T>& RL,bool buildRp=true) const;
 
     int     itsd;
     double  itsTruncationError; //Should live on the bond with the SVs.
@@ -108,25 +113,12 @@ template <class T> double MaxDelta(const MatrixO<T>& a, const MatrixO<T>& b)
     return Max(fabs(ret));
 }
 
-inline TriType Combine(TriType a, TriType b)
-{
-    TriType ret=a;
-    if (a!=b)
-    {
-        if (a==Row && b==Column) ret=Diagonal;
-        else if (a==Column && b==Row) ret=Full;
-        else if (a==Diagonal) ret=b;
-        else if (b==Diagonal) ret=a;
-        else if (a==Full || b==Full) ret=Full;
-    }
-    return ret;
-}
 inline MPOForm Combine(MPOForm a, MPOForm b)
 {
     MPOForm ret=a;
-    if (a==FUnit && (b==RegularLower || b==RegularUpper))
+    if (a==FUnit && (b==RegularLower || b==RegularUpper || b==expH))
         ret=b;
-    else if (b==FUnit && (a==RegularLower || a==RegularUpper))
+    else if (b==FUnit && (a==RegularLower || a==RegularUpper || a==expH))
         ret=b;
     else if (a!=b)
     {

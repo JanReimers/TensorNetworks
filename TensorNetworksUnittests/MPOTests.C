@@ -650,19 +650,24 @@ TEST_F(MPOTests,  TestiMPO_Upper_Trotter2_L3  )
         EXPECT_EQ(Dw2,1);
     }
 }
-//TEST_F(MPOTests,TestL2iMPOTrotter4)
-//{
-//    int L=2,D=2;
-//    double S=0.5,dt=0.1,epsMPO=1e-4;
-//    Setup(L,S,D);
-//    iMPO* expH=itsH->CreateiMPO(dt,FourthOrder,epsMPO);
-//    for (int is=1;is<=L;is++)
-//    {
-//        Dw12 Dw=expH->GetSiteOperator(is)->GetDw12();
-//        EXPECT_EQ(Dw.Dw1,4);
-//        EXPECT_EQ(Dw.Dw2,4);
-//    }
-//}
+
+TEST_F(MPOTests,TestL2iMPOTrotter4)
+{
+    int L=2,D=2;
+    double S=0.5,dt=0.1,epsMPO=1e-3;
+    Setup(L,S,D);
+    iMPO* expH=itsiH->CreateiMPO(dt,FourthOrder,Std,epsMPO);
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(1)->GetDws();
+        EXPECT_EQ(Dw1,4);
+        EXPECT_EQ(Dw2,7);
+    }
+    {
+        auto [Dw1,Dw2]=expH->GetSiteOperator(2)->GetDws();
+        EXPECT_EQ(Dw1,7);
+        EXPECT_EQ(Dw2,4);
+    }
+}
 
 TEST_F(MPOTests,TestParkerCanonical_Lower_L9H)
 {
@@ -998,7 +1003,7 @@ TEST_F(MPOTests,TestParkerSVDCompressH2_2Body_Lower)
     EXPECT_LT(truncError,1e-13);
 }
 
-/*
+
 TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
 {
     int L=8,D=2;
@@ -1015,17 +1020,19 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
 
     EXPECT_NEAR(itsMPS->GetOverlap(psi1),1.0,1e-13);
     expH->CanonicalForm(); //Do we need to sweep both ways?
-    expH->Report(cout);
+//    expH->Report(cout);
     MPS* psi3=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi3),1.0,1e-13);
 
     double truncError=expH->Compress(Parker,0,epsMPO);
-    expH->Report(cout);
+//    expH->Report(cout);
     MPS* psi4=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi4),1.0,1e-13);
-    EXPECT_EQ(expH->GetMaxDw(),2);
+    EXPECT_EQ(expH->GetMaxDw(),3);
+    EXPECT_EQ(truncError,0.0);
     EXPECT_LT(truncError,epsMPO); //Unit operator should have no compression error
 }
+
 
 TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
 {
@@ -1035,7 +1042,6 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DLeft);
     MPO* expH=itsH->CreateOperator(dt,SecondOrder,CNone,epsMPO);
-//    iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,CNone,epsMPO);
 //    expH->Report(cout);
 
     MPS* psi1=itsMPS->Apply(expH);
@@ -1050,7 +1056,8 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
     double truncError=expH->Compress(Parker,0,epsMPO);
     MPS* psi4=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi4),1.0,1e-13);
-    EXPECT_EQ(expH->GetMaxDw(),2);
+    EXPECT_EQ(expH->GetMaxDw(),3);
+    EXPECT_EQ(truncError,0.0);
     EXPECT_LT(truncError,epsMPO); //Unit operator should have no compression error
 }
 
@@ -1058,36 +1065,55 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
 TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
 {
     int L=8,D=2;
-    double S=0.5,dt=1.0,epsMPO=1e-13;
+    double S=0.5,dt=0.1,epsMPO=1e-5;
     Setup(L,S,D);
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DLeft);
-//    Matrix4RT H12=itsH->GetLocalMatrix();
-//    iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,CNone,epsMPO);
-    MPO* expH=itsH->CreateOperator(dt,FirstOrder,CNone,epsMPO);
-//    MPO* expH=itsH->CreateUnitOperator();
-//  MPO* expH=new MPO_SpatialTrotter(dt,Even,L,S,itsH);
-//    expH->Report(cout);
-//    expH->Dump(cout);
-
+    MPO* expH=itsH->CreateOperator(dt,SecondOrder,CNone,epsMPO);
     EXPECT_NEAR(itsMPS->GetOverlap(itsMPS),1.0,1e-13);
     MPS* psi1=itsMPS->Apply(expH);
     double o1=psi1->GetOverlap(psi1);
-//    itsMPS->Report(cout);
     expH->CanonicalForm(); //Sweep both ways
-    expH->Report(cout);
     MPS* psi2=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi2),o1,1e-13);
 
-//    double truncError=expH->Compress(Std,0,epsMPO);
-//    expH->Report(cout);
-//    MPS* psi4=itsMPS->Apply(expH);
-//    EXPECT_NEAR(psi1->GetOverlap(psi4),o1,1e-13);
+    double truncError=expH->Compress(Parker,0,epsMPO);
+    expH->Report(cout);
+    MPS* psi4=itsMPS->Apply(expH);
+    EXPECT_NEAR(psi1->GetOverlap(psi4),o1,5*epsMPO);
 
-//    EXPECT_EQ(expH->GetMaxDw(),4);
-//    EXPECT_LT(truncError,epsMPO);
+    EXPECT_EQ(expH->GetMaxDw(),5);
+    EXPECT_GT(truncError,0.0);
+    EXPECT_LT(truncError,epsMPO);
 }
-*/
+
+//Try a large lattice
+TEST_F(MPOTests,TestParkerSVDCompressExpHL256t1)
+{
+    int L=256,D=2;
+    double S=0.5,dt=0.1,epsMPO=1e-5;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(Random);
+    itsMPS->Normalize(DLeft);
+    MPO* expH=itsH->CreateOperator(dt,SecondOrder,CNone,epsMPO);
+    EXPECT_NEAR(itsMPS->GetOverlap(itsMPS),1.0,1e-13);
+    MPS* psi1=itsMPS->Apply(expH);
+    double o1=psi1->GetOverlap(psi1);
+    expH->CanonicalForm(); //Sweep both ways
+//    expH->Report(cout);
+    MPS* psi2=itsMPS->Apply(expH);
+    EXPECT_NEAR(psi1->GetOverlap(psi2),o1,1e-13);
+
+    double truncError=expH->Compress(Parker,0,epsMPO);
+//    expH->Report(cout);
+    MPS* psi4=itsMPS->Apply(expH);
+    EXPECT_NEAR(psi1->GetOverlap(psi4),o1,L*epsMPO);
+
+    EXPECT_EQ(expH->GetMaxDw(),5);
+    EXPECT_GT(truncError,0.0);
+    EXPECT_LT(truncError,epsMPO);
+}
+
 
 #ifndef DEBUG
 

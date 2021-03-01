@@ -46,7 +46,7 @@ double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
     double s_avg=::Sum(sm.GetDiagonal())/sm.size();
     sm*=1.0/s_avg;
 
-    AccumulateTruncationError(comp->Compress(U,sm,VT));
+    double TruncationError=comp->Compress(U,sm,VT);
 //    cout << "s_avg, sm=" << s_avg << " " << sm.GetDiagonal() << endl;ing site.
     switch (lr)
     {
@@ -70,12 +70,12 @@ double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
         }
     }
     SetLimits();
-    return itsTruncationError;
+    return itsWs.GetTruncationError();
 }
 
 double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 {
-    auto [Q,RL]=itsWs.BlockSVD(lr,comp); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
+    auto [Q,RL]=itsWs.SVD(lr,comp); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
     GetNeighbour(lr)->QLTransfer(lr,RL);
     SetLimits();
     return itsWs.GetTruncationError();
@@ -84,8 +84,9 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 
 void SiteOperatorImp::CanonicalForm(Direction lr)
 {
-    auto [Q,RL]=itsWs.BlockQX(lr); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
-    itsWs.SetV(lr,Q); // Can'y move this inside BlockQX because SVD needs to modify Q before call SetV
+    auto [Q,RL]=itsWs.QX(lr); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
+    if (itsWs.GetForm()==RegularUpper || itsWs.GetForm()==RegularLower )
+        itsWs.SetV(lr,Q); // Can'y move this inside BlockQX because SVD needs to modify Q before call SetV
     GetNeighbour(lr)->QLTransfer(lr,RL);
     SetLimits();
 }

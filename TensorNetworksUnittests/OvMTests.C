@@ -115,7 +115,7 @@ void OvMTests::TestQR(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
     int d=2*itsOperatorClient->GetS()+1;
     MakeLRBOperator(OvM,ul,lbr);
     MatrixOR V=OvM.GetV(lr);
-    auto [Q,R]=OvM.BlockQX(lr);
+    auto [Q,R]=OvM.QX(lr);
     MatrixRT R1=R;
     if (lr==DLeft)
         R1.SetLimits(MatLimits(Q.GetColLimits(),V.GetColLimits()),true); //Shrink R back to Q size so we can multiply.
@@ -157,7 +157,7 @@ void OvMTests::TestSVD(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
     SVCompressorR* comp=itsFactory->MakeMPOCompressor(0,1e-14);
     MakeLRBOperator(OvM,ul,lbr);
     MatrixOR V=OvM.GetV(lr);
-    auto [Q,R]=OvM.BlockSVD(lr,comp);
+    auto [Q,R]=OvM.SVD(lr,comp);
     MatrixOR V1;
     if (lr==DLeft)
     {

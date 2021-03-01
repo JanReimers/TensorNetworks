@@ -48,7 +48,7 @@ void SiteOperatorImp::iCanonicalFormQRIter(Direction lr)
     int niter=1;
     do
     {
-        auto [Q,L]=itsWs.BlockQX(lr); //Solves V=Q*L
+        auto [Q,L]=itsWs.QX(lr); //Solves V=Q*L
         X=itsOpRange.Dw1-2; //Chi
         assert(L.GetNumRows()==X+2);
         assert(L.GetNumCols()==X+2);
