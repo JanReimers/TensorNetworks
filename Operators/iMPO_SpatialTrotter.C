@@ -26,13 +26,13 @@ iMPO_SpatialTrotter::iMPO_SpatialTrotter(double dt, Trotter type, const iHamilto
     int d=Getd();
     assert(type==Odd || type==Even);
 
-    Matrix4RT expH=H->GetExponentH(dt);
-    int N=expH.Flatten().GetNumRows();
+    Matrix4RT exph=H->GetExponentH(dt);
+    int N=exph.Flatten().GetNumRows();
 //
 // Now SVD to factor exp(-dt*H)
 //
     LapackSVDSolver<double> solver;
-    auto [U,sm,VT]=solver.Solve(expH.Flatten(),1e-12,N); //Solves A=U * s * VT
+    auto [U,sm,VT]=solver.Solve(exph.Flatten(),1e-12,N); //Solves A=U * s * VT
 
     //
     //  Load up site operators with special ops at the edges
@@ -43,7 +43,7 @@ iMPO_SpatialTrotter::iMPO_SpatialTrotter(double dt, Trotter type, const iHamilto
         {
             if (L%2)
             { //Odd # of sites
-               Insert(new SiteOperatorImp(d));
+               Insert(new SiteOperatorImp(d,expH));
                for (int ia=2;ia<=L;ia++)
                {
                     Insert(new SiteOperatorImp(d,DLeft,PBulk ,U ,sm));
@@ -74,7 +74,7 @@ iMPO_SpatialTrotter::iMPO_SpatialTrotter(double dt, Trotter type, const iHamilto
                     Insert(new SiteOperatorImp(d,DRight ,PBulk ,VT,sm));
                     ia++;
                     if (ia==L)
-                        Insert(new SiteOperatorImp(d));
+                        Insert(new SiteOperatorImp(d,expH));
                     else
                         Insert(new SiteOperatorImp(d,DLeft,PBulk  ,U ,sm));
                }

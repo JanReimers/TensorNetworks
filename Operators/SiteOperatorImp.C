@@ -9,11 +9,11 @@ namespace TensorNetworks
 //
 //  Build with Dw=1 identity operators
 //
-SiteOperatorImp::SiteOperatorImp(int d)
+SiteOperatorImp::SiteOperatorImp(int d, MPOForm f)
     : itsd(d)
     , itsTruncationError(0.0)
     , itsLBR(PBulk)
-   , itsWs(1,1,dtoS(d),FUnit)
+   , itsWs(1,1,dtoS(d),f)
 {
     Unit(itsWs);
     SetLimits();
@@ -23,7 +23,7 @@ SiteOperatorImp::SiteOperatorImp(int d)
 //  Not covered by MPO tests, try the Expectation tests.
 //
 SiteOperatorImp::SiteOperatorImp(int d, SpinOperator so) //Construct spin operator
-    : SiteOperatorImp(d)
+    : SiteOperatorImp(d,FUnit)
 {
     itsWs(0,0)=OperatorElement<double>::Create(so,d);
     SetLimits();
@@ -52,7 +52,10 @@ SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H,MPO
 // Build from a trotter decomp.
 //
 SiteOperatorImp::SiteOperatorImp(int d, Direction lr,Position lbr,const MatrixRT& U, const DiagonalMatrixRT& s)
-    : SiteOperatorImp(d)
+    : itsd(d)
+    , itsTruncationError(0.0)
+    , itsLBR(lbr)
+    , itsWs(d,expH)
 {
     itsLBR=lbr;
     int Dw=s.GetNumRows();
@@ -89,7 +92,7 @@ SiteOperatorImp::SiteOperatorImp(int d, Direction lr,Position lbr,const MatrixRT
 // Construct with W operator. Called by iMPOImp::MakeUnitcelliMPO
 //
 SiteOperatorImp::SiteOperatorImp(const MatrixOR& W)
-    : SiteOperatorImp(W.Getd())
+    : SiteOperatorImp(W.Getd(),W.GetForm())
 {
     itsWs=W;
     SetLimits();

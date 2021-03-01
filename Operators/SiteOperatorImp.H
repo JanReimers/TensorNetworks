@@ -18,7 +18,8 @@ class SiteOperatorImp : public virtual SiteOperator
 {
 public:
     typedef Matrix<MatrixRT> TensorT;
-    SiteOperatorImp(int d); //Construct with identity operator
+//    SiteOperatorImp(int d); //Construct with identity operator
+    SiteOperatorImp(int d,MPOForm); //Construct with identity operator and predetermined MPO form
     SiteOperatorImp(int d, SpinOperator so); //Construct with identity operator
     SiteOperatorImp(int d, Position lbr, const OperatorClient* O,MPOForm);
     SiteOperatorImp(int d, Direction lr , Position lbr, const MatrixRT& U, const DiagonalMatrixRT& expEvs);

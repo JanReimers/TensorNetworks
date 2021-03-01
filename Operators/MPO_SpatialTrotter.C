@@ -23,13 +23,13 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,const Hamiltonian
     int L=GetL();
     assert(type==Odd || type==Even);
 
-    Matrix4RT expH=H->GetExponentH(dt);
-    int N=expH.Flatten().GetNumRows();
+    Matrix4RT exph=H->GetExponentH(dt);
+    int N=exph.Flatten().GetNumRows();
 //
 // Now SVD to factor exp(-dt*H)
 //
     LapackSVDSolver<double> solver;
-    auto [U,sm,VT]=solver.Solve(expH.Flatten(),1e-12,N); //Solves A=U * s * VT
+    auto [U,sm,VT]=solver.Solve(exph.Flatten(),1e-12,N); //Solves A=U * s * VT
 
     //
     //  Load up site operators with special ops at the edges
@@ -47,7 +47,7 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,const Hamiltonian
                     ia++;
                     Insert(new SiteOperatorImp(d,DRight,GetPosition(L,ia),VT,sm));
                 }
-                Insert(new SiteOperatorImp(d)); //Identity op
+                Insert(new SiteOperatorImp(d,expH)); //Identity op
             }
             else
             { //Even # of sites
@@ -65,7 +65,7 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,const Hamiltonian
             if (L%2)
             { //Odd # of sites
                Logger->LogWarn(0,"MPO_SpatialTrotter with odd number of lattice sites will not compress effectively");
-               Insert(new SiteOperatorImp(d));
+               Insert(new SiteOperatorImp(d,expH));
                for (int ia=2;ia<=L-1;ia++)
                {
                     Insert(new SiteOperatorImp(d,DLeft,GetPosition(L,ia) ,U,sm));

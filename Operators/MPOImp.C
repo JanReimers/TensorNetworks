@@ -25,7 +25,7 @@ MPOImp::MPOImp(int L, double S,LoadWith loadWith)
     assert(loadWith==Identity);
 
     for (int ia=1; ia<=itsL; ia++)
-        Insert(new SiteOperatorImp(d));
+        Insert(new SiteOperatorImp(d,FUnit));
     LinkSites();
 
 }

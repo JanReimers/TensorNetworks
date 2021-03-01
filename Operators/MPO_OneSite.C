@@ -18,7 +18,7 @@ MPO_OneSite::MPO_OneSite(int L, double S ,int isite, SpinOperator o)
         if (ia==isite)
             Insert(new SiteOperatorImp(d,o));
         else
-            Insert(new SiteOperatorImp(d)); //Identity op
+            Insert(new SiteOperatorImp(d,FUnit)); //Identity op
     }
     LinkSites();
 }

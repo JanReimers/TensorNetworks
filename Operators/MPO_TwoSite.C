@@ -21,7 +21,7 @@ MPO_TwoSite::MPO_TwoSite(int L, double S ,int isite1,int isite2, SpinOperator so
         else if (ia==isite2)
             Insert(new SiteOperatorImp(d,so2));
         else
-            Insert(new SiteOperatorImp(d)); //Identity op
+            Insert(new SiteOperatorImp(d,FUnit)); //Identity op
     }
     LinkSites();
 }
