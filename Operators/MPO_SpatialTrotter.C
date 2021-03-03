@@ -40,7 +40,7 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,const Hamiltonian
         {
             if (L%2)
             { //Odd # of sites
-                Logger->LogWarn(0,"MPO_SpatialTrotter with odd number of lattice sites will not compress effectively");
+//                Logger->LogWarn(0,"MPO_SpatialTrotter with odd number of lattice sites will not compress effectively");
                 for (int ia=1;ia<=L-1;ia++)
                 {
                     Insert(new SiteOperatorImp(d,DLeft,GetPosition(L,ia) ,U ,sm));
@@ -64,7 +64,7 @@ MPO_SpatialTrotter::MPO_SpatialTrotter(double dt, Trotter type,const Hamiltonian
         {
             if (L%2)
             { //Odd # of sites
-               Logger->LogWarn(0,"MPO_SpatialTrotter with odd number of lattice sites will not compress effectively");
+//               Logger->LogWarn(0,"MPO_SpatialTrotter with odd number of lattice sites will not compress effectively");
                Insert(new SiteOperatorImp(d,expH));
                for (int ia=2;ia<=L-1;ia++)
                {
