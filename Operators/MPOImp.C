@@ -111,7 +111,7 @@ SiteOperator* MPOImp::GetSiteOperator(int isite)
     return itsSites[isite];
 }
 
-void   MPOImp::Report(std::ostream& os) const
+void MPOImp::Report(std::ostream& os) const
 {
     MPO::Report(os); //List the sites
     os << "  Bond  D   Rank  Entropy   Min(Sv)   SvError " << std::endl;

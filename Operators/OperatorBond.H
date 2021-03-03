@@ -38,7 +38,6 @@ class OperatorBond
         void SetSingularValues(const DiagonalMatrixRT& s, double compessionError);
         void ClearSingularValues(Direction lr,const MatrixRT& R);
         void UpdateBondEntropy();
-        //static double GetNorm(const DiagonalMatrixRT&);
         //
         //  lr is the normalization direction.  For normalization we need to access the right bond.
         //

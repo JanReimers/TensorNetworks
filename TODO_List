@@ -1,7 +1,7 @@
 
 exp(-t*H) MPOs
     Done: Parker M-block Compress
-    Full block compress
+    DOne: Full block compress
     Try shuffling U (and Evs) to get lower or upper triangular.
 
 SiteOperatorImp:
@@ -40,6 +40,8 @@ OpValMatrix:
     -Try rank revealing QR for CanonicalForm. Any effect?
 
 MPO:
+    -Compress Automatically check for CanoncialForm and do it if not canform.
+    -Do we need an GetTruncationError member function?
     Fixed: -For 2Body LR ham, parker compression of H2 destroys it.
     -OperatorClient::GetH assumes QN's for two sites. We need a more general interface
         int GetNBody() //Max # of interaction sites
