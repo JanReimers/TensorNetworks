@@ -14,6 +14,9 @@ namespace TensorNetworks
 //  All operator are initialized as unit operators with Dw=1.
 //  Non trivial MPOs are then created using the Product function in MPO.H
 //
+class OperatorBond;
+
+
 class MPOImp
     : public virtual MPO
 {
@@ -30,6 +33,7 @@ public:
     virtual int    GetL() const {return itsL;}
     virtual int    Getd() const {return 2*itsS+1;}
     virtual double GetS() const {return itsS;}
+    virtual void   Report(std::ostream&) const; //Show Dws, Fnorms, U/L status etc.
 
     virtual const SiteOperator* GetSiteOperator(int isite) const;
     virtual       SiteOperator* GetSiteOperator(int isite);
@@ -45,10 +49,12 @@ protected:
     void    LinkSites(); //Set up left and right neighbour links
 private:
     typedef optr_vector<SiteOperator*> SitesType;
+    typedef optr_vector<OperatorBond*> BondsType;
 
     int       itsL;
     double    itsS;
     SitesType itsSites;
+    BondsType itsBonds;
 };
 
 }

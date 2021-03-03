@@ -28,8 +28,8 @@ void MPO::Report(std::ostream& os) const
 {
     int L=GetL();
     os << "Matrix Product Operator for " << L << " sites." << std::endl;
-    os << " Site    Dw       SVD   F-norm Norm  U/L   U/L" << std::endl;
-    os << "  #     1   2   Tr err    fin  stat  meas. nom." << std::endl;
+    os << " Site    Dw     F-norm Norm  U/L   U/L" << std::endl;
+    os << "  #     1   2     fin  stat  meas. nom." << std::endl;
     os << "-----------------------------------------------------------" << std::endl;
     for (int ia=1;ia<=L;ia++)
     {
@@ -102,19 +102,18 @@ double MPO::Compress(CompressType ct,int Dmax, double epsSV)
 
 double MPO::Compress(CompressType ct, const SVCompressorR* compressor)
 {
+    if (ct==CNone) return 0.0;
     double terror=0.0;
     int L=GetL();
     for (int ia=1;ia<L;ia++)
     {
-//        std::cout << "Site " << ia << ": ";
-        double err=GetSiteOperator(ia)->Compress(ct,DLeft ,compressor);
-        terror+=err*err;
+        terror+=GetSiteOperator(ia)->Compress(ct,DLeft ,compressor);
+//        std::cout << "Site " << ia << ": " << std::scientific << terror  << std::endl;
     }
     for (int ia=L;ia>1;ia--)
     {
-//        std::cout << "Site " << ia << ": ";
-        double err=GetSiteOperator(ia)->Compress(ct,DRight ,compressor);
-        terror+=err*err;
+        terror+=GetSiteOperator(ia)->Compress(ct,DRight ,compressor);
+ //       std::cout << "Site " << ia << ": " << std::scientific << terror << std::endl;
     }
     return sqrt(terror)/(L-1); //Truncation error per site.
 }

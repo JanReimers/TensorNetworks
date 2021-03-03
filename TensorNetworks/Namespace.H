@@ -19,7 +19,6 @@ namespace TensorNetworks
     class SiteOperator;
     class SpinCalculator;
     class OperatorClient;
-    class OperatorClient;
 
     template <class T> class SVCompressor;
     typedef SVCompressor<dcmplx> SVCompressorC;

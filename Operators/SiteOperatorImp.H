@@ -14,6 +14,8 @@ class MPOTests;
 namespace TensorNetworks
 {
 
+class OperatorBond;
+
 class SiteOperatorImp : public virtual SiteOperator
 {
 public:
@@ -24,7 +26,7 @@ public:
     SiteOperatorImp(int d, Direction lr , Position lbr, const MatrixRT& U, const DiagonalMatrixRT& expEvs);
     SiteOperatorImp(const MatrixOR& W); //Construct with W operator
     virtual ~SiteOperatorImp();
-    void SetNeighbours(SiteOperator* left, SiteOperator* right);
+    void SetNeighbours(OperatorBond* leftBond, OperatorBond* rightBond);
 
     virtual int             Getd     () const {return itsd;}
     virtual const OpRange&  GetRanges() const {return itsOpRange;}
@@ -55,7 +57,8 @@ public:
     virtual char   GetUpperLower(double eps) const {return GetMeasuredShape(eps);}
 
 private:
-    SiteOperatorImp* GetNeighbour(Direction) const;
+    friend class OperatorBond;
+    OperatorBond* GetBond(Direction) const;
     void Init_lr(Position lbr, int lindex,int rindex);
     char GetForm() const;
 
@@ -77,11 +80,10 @@ protected:
 
     int      itsd; //2*S+1
     OpRange  itsOpRange;
-//    double   itsTruncationError;
     Position itsLBR;
     MatrixOR itsWs; //Operator values matrix version of W.
-    SiteOperatorImp* itsLeft_Neighbour;
-    SiteOperatorImp* itsRightNeighbour;
+    OperatorBond*    itsLeft_Bond;
+    OperatorBond*    itsRightBond;
 };
 
 }

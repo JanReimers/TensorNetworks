@@ -18,7 +18,7 @@ template <class T> class SVCompressor
 
         virtual int  GetDmax() const=0;
         virtual bool Donly  () const=0;
-        // Returns compression error of discarded vector space. =sqrt(Sum(s^2)) for discarded Svs
+        // Returns compression error of discarded vector space. =Sum(s^2) for discarded Svs
         virtual double Compress(MatrixT& U, DiagonalMatrixRT& s, MatrixT& Vdagger) const=0;
         virtual double Compress(dVectorT& gamma, DiagonalMatrixRT& lambda) const=0;
 };

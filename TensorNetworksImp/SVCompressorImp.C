@@ -69,7 +69,7 @@ template <class T> double SVCompressorImp<T>::Compress(MatrixT& U, DiagonalMatri
         s*=rescaleS;
 //        cout << "SVCompressorImptruncation D,N,intS2=" << D << " " << N << " " << integratedS2 << " " << s.GetLimits() << endl;
     }
-    return sqrt(integratedS2);
+    return integratedS2;
 }
 
 template <class T> double SVCompressorImp<T>::Compress(dVectorT& gamma, DiagonalMatrixRT& s) const
@@ -125,7 +125,7 @@ template <class T> double SVCompressorImp<T>::Compress(dVectorT& gamma, Diagonal
         s*=rescaleS;
 //        cout << "SVCompressorImptruncation D,N,intS2=" << D << " " << N << " " << integratedS2 << " " << s.GetLimits() << endl;
     }
-    return sqrt(integratedS2);
+    return integratedS2;
 }
 
 template class SVCompressorImp<dcmplx>;

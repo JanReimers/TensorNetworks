@@ -131,28 +131,26 @@ void SiteOperatorImp::Init_lr(Position lbr, int lindex,int rindex)
     SetLimits();
 }
 
-void SiteOperatorImp::SetNeighbours(SiteOperator* left, SiteOperator* right)
+void SiteOperatorImp::SetNeighbours(OperatorBond* leftBond, OperatorBond* rightBond)
 {
-    assert(left || right); //At least one needs to be non zero
-    itsLeft_Neighbour=dynamic_cast<SiteOperatorImp*>(left);
-    itsRightNeighbour=dynamic_cast<SiteOperatorImp*>(right);
-    assert(!left  || itsLeft_Neighbour); //if left is nonzero then did the cast work?
-    assert(!right || itsRightNeighbour);
-    if (!itsLeft_Neighbour) itsLBR=PLeft;
-    if (!itsRightNeighbour) itsLBR=PRight;
-    if (itsLBR==PBulk ) assert(itsLeft_Neighbour && itsRightNeighbour);
+    assert(leftBond || rightBond); //At least one needs to be non zero
+    itsLeft_Bond=leftBond;
+    itsRightBond=rightBond;
+    if (!itsLeft_Bond) itsLBR=PLeft;
+    if (!itsRightBond) itsLBR=PRight;
+    if (itsLBR==PBulk ) assert(itsLeft_Bond && itsRightBond);
 }
 
-SiteOperatorImp* SiteOperatorImp::GetNeighbour(Direction lr) const
+OperatorBond* SiteOperatorImp::GetBond(Direction lr) const
 {
-    SiteOperatorImp* ret=0;
+    OperatorBond* ret=0;
     switch(lr)
     {
     case DLeft:
-        ret=itsRightNeighbour;
+        ret=itsRightBond;
         break;
     case DRight:
-        ret=itsLeft_Neighbour;
+        ret=itsLeft_Bond;
         break;
     default:
         assert(false);
@@ -273,7 +271,6 @@ void SiteOperatorImp::Report(std::ostream& os) const
     os
     << std::setw(3) << itsOpRange.Dw1 << " "
     << std::setw(3) << itsOpRange.Dw2 << "   "
-    << std::scientific << std::setprecision(1) << itsWs.GetTruncationError()
     << " " << std::fixed << std::setprecision(1) << std::setw(5) << GetFrobeniusNorm()
     << " " << std::setw(4) << GetNormStatus(1e-13)
     << " " << std::setw(4) << GetMeasuredShape(1e-13)

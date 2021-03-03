@@ -1,5 +1,6 @@
 #include "Operators/MPOImp.H"
 #include "Operators/SiteOperatorImp.H"
+#include "Operators/OperatorBond.H"
 #include "Operators/OperatorClient.H"
 #include "TensorNetworks/CheckSpin.H"
 
@@ -60,25 +61,41 @@ void MPOImp::Insert(SiteOperator* so)
 void MPOImp::LinkSites()
 {
     assert(static_cast<int>(itsSites.size())-1==itsL);
+    //
+    //  Create bond objects
+    //
+    itsBonds.push_back(0);  //Dummy space holder. We want this array to be 1 based.
+    for (int i=1; i<itsL; i++)
+    {
+        auto [Dw1,Dw2]=itsSites[i]->GetDws();
+        itsBonds.push_back(new OperatorBond(Dw2));
+    }
+
     SiteOperatorImp* s=dynamic_cast<SiteOperatorImp*>(itsSites[1]);
     assert(s);
     if (itsL>1)
     {
-        s->SetNeighbours(0,itsSites[2]);
+        s->SetNeighbours(0,itsBonds[1]);
         for (int ia=2; ia<=itsL-1; ia++)
         {
             s=dynamic_cast<SiteOperatorImp*>(itsSites[ia]);
             assert(s);
-            s->SetNeighbours(itsSites[ia-1],itsSites[ia+1]);
+            s->SetNeighbours(itsBonds[ia-1],itsBonds[ia]);
         }
         s=dynamic_cast<SiteOperatorImp*>(itsSites[itsL]);
         assert(s);
-        s->SetNeighbours(itsSites[itsL-1],0);
+        s->SetNeighbours(itsBonds[itsL-1],0);
     }
     else
     {
+        assert(false); //Trap to figure out if this code path ever gets used.
         s->SetNeighbours(0,0);
     }
+    //
+    //  Tell each bond about its left and right sites.
+    //
+    for (int i=1; i<itsL; i++)
+        itsBonds[i]->SetSites(itsSites[i],itsSites[i+1]);
 }
 
 const SiteOperator* MPOImp::GetSiteOperator(int isite) const
@@ -94,5 +111,16 @@ SiteOperator* MPOImp::GetSiteOperator(int isite)
     return itsSites[isite];
 }
 
+void   MPOImp::Report(std::ostream& os) const
+{
+    MPO::Report(os); //List the sites
+    os << "  Bond  D   Rank  Entropy   Min(Sv)   SvError " << std::endl;
+    for (int ib=1; ib<itsL; ib++)
+    {
+        os << std::setw(3) << ib << "  ";
+        itsBonds[ib]->Report(os);
+        os << std::endl;
+    }
+}
 
 } //namespace

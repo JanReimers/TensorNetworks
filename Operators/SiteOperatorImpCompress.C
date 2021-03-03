@@ -1,4 +1,5 @@
 #include "Operators/SiteOperatorImp.H"
+#include "Operators/OperatorBond.H"
 #include "TensorNetworks/SVCompressor.H"
 #include "TensorNetworks/TNSLogger.H"
 #include "NumericalMethods/LapackSVDSolver.H"
@@ -39,46 +40,49 @@ double SiteOperatorImp::CompressStd(Direction lr,const SVCompressorR* comp)
     MatrixRT  A=itsWs.Flatten(lr);
     MatLimits lim=A.ReBase(1,1);
     LapackSVDSolver<double> solver;
-    auto [U,sm,VT]=solver.SolveAll(A,1e-14); //Solves A=U * s * VT
+    auto [U,s,VT]=solver.SolveAll(A,1e-14); //Solves A=U * s * VT
     //
     //  Rescaling
     //
-    double s_avg=::Sum(sm.GetDiagonal())/sm.size();
-    sm*=1.0/s_avg;
+    double s_avg=::Sum(s.GetDiagonal())/s.size();
+    s*=1.0/s_avg;
 
-    double TruncationError=comp->Compress(U,sm,VT);
+    double truncationError=comp->Compress(U,s,VT);
 //    cout << "s_avg, sm=" << s_avg << " " << sm.GetDiagonal() << endl;ing site.
+    MatrixRT Rtrans; //Gauge transform that is transferred to the next site.
+    MatrixRT Q; //Orthogonal matrix for this site.
+    U.ReBase(lim);
+    s.ReBase(lim);
+    VT.ReBase(lim);
     switch (lr)
     {
         case DRight:
         {
-            VT.ReBase(lim);
-            MatrixRT Us=U*sm;
-            Us.ReBase(lim);
-            itsWs.UnFlatten(VT*s_avg);
-            if (itsLeft_Neighbour) itsLeft_Neighbour->QLTransfer(lr,Us);
+            Rtrans=U*s;
+            Q=VT*s_avg;
             break;
         }
         case DLeft:
         {
-            U.ReBase(lim);
-            MatrixRT sV=sm*VT;
-            sV.ReBase(lim);
-            itsWs.UnFlatten(U*s_avg);
-            if (itsRightNeighbour) itsRightNeighbour->QLTransfer(lr,sV);
+            Rtrans=s*VT;
+            Q=U*s_avg;
             break;
         }
     }
+    itsWs.UnFlatten(Q);
+    s.ReBase(1);
+    GetBond(lr)->GaugeTransfer(lr,truncationError,s,Rtrans);
     SetLimits();
-    return itsWs.GetTruncationError();
+    return truncationError;
 }
 
 double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 {
-    auto [Q,RL]=itsWs.SVD(lr,comp); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
-    GetNeighbour(lr)->QLTransfer(lr,RL);
+    auto [truncError,s,Rtrans]=itsWs.SVD(lr,comp); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
+    GetBond(lr)->GaugeTransfer(lr,truncError,s,Rtrans);
+//    GetNeighbour(lr)->QLTransfer(lr,RL);
     SetLimits();
-    return itsWs.GetTruncationError();
+    return truncError;
 }
 
 
@@ -87,7 +91,8 @@ void SiteOperatorImp::CanonicalForm(Direction lr)
     auto [Q,RL]=itsWs.QX(lr); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
     if (itsWs.GetForm()==RegularUpper || itsWs.GetForm()==RegularLower )
         itsWs.SetV(lr,Q); // Can'y move this inside BlockQX because SVD needs to modify Q before call SetV
-    GetNeighbour(lr)->QLTransfer(lr,RL);
+    GetBond(lr)->GaugeTransfer(lr,RL);
+ //   GetNeighbour(lr)->QLTransfer(lr,RL);
     SetLimits();
 }
 

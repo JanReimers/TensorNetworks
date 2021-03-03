@@ -1,15 +1,18 @@
-#include "TensorNetworksImp/MPS/Bond.H"
-#include "TensorNetworksImp/MPS/MPSSite.H"
+#include "Operators/OperatorBond.H"
+#include "Operators/SiteOperatorImp.H"
+#include "TensorNetworks/SiteOperator.H"
+#include "TensorNetworks/Typedefs.H"
 #include "oml/diagonalmatrix.h"
+#include "oml/matrix.h"
 #include <iostream>
 #include <iomanip>
 
 namespace TensorNetworks
 {
 
-Bond::Bond(int D, double epsSV)
+OperatorBond::OperatorBond(int D)
     : itsSingularValues(D)
-    , itsEpsSV(epsSV)
+    , itsEpsSV(0.0)
     , itsBondEntropy(0.0)
     , itsMinSV(0.0)
     , itsMaxDelta(0.0)
@@ -23,46 +26,26 @@ Bond::Bond(int D, double epsSV)
     Fill(itsSingularValues,1.0/D);  //Start with maximum entanglement.
 }
 
-Bond::~Bond()
+OperatorBond::~OperatorBond()
 {
     //dtor
 }
 
-void Bond::CloneState(const Bond* b2)
+void OperatorBond::SetSites(SiteOperator* left, SiteOperator* right)
 {
-    itsSingularValues =b2->itsSingularValues;
-    itsEpsSV          =b2->itsEpsSV;
-    itsBondEntropy    =b2->itsBondEntropy;
-    itsCompessionError=b2->itsCompessionError;
-    itsMinSV          =b2->itsMinSV;
-    itsMaxDelta       =b2->itsMaxDelta;
-    itsD              =b2->itsD;
-    itsRank           =b2->itsRank;
-}
-
-Bond* Bond::Clone() const
-{
-    assert(this);
-    Bond* b=new Bond(itsD,itsEpsSV);
-    b->CloneState(this);
-    return b;
-}
-
-void Bond::SetSites(MPSSite* left, MPSSite* right)
-{
-    itsLeft_Site=left;
-    itsRightSite=right;
+    itsLeft_Site=dynamic_cast<SiteOperatorImp*>(left );
+    itsRightSite=dynamic_cast<SiteOperatorImp*>(right);
     assert(itsLeft_Site);
     assert(itsRightSite);
 }
 
-void Bond::NewBondDimension(int D)
+void OperatorBond::NewBondDimension(int D)
 {
     assert(D>=1);
     assert(itsD==itsSingularValues.size());
     if (D>itsD)
     { //Grow
-        double fill=Min(itsSingularValues)/10.0;
+        double fill=0.0;
         itsSingularValues.SetLimits(D,true);
 
         for (int i=itsD+1;i<=D;i++)
@@ -79,32 +62,32 @@ void Bond::NewBondDimension(int D)
         itsD=D;
         UpdateBondEntropy();
     }
-    itsSingularValues/=GetNorm(itsSingularValues);
 }
 
-void Bond::SetSingularValues(const DiagonalMatrixRT& s,double compressionError)
+void OperatorBond::SetSingularValues(const DiagonalMatrixRT& s,double compressionError)
 {
     assert(itsD==itsSingularValues.GetNumRows());
     //std::cout << "SingularValues=" << s << std::endl;
-    DiagonalMatrixRT sn=s/GetNorm(s); //Make sure it is normalized
-    if (sn.GetNumRows()!=itsD)
+    //DiagonalMatrixRT sn=s/GetNorm(s); //Make sure it is normalized
+    if (s.GetNumRows()!=itsD)
     { //Pad with zeros so we can get a delta l.
-        int newD=sn.GetNumRows();
+        int newD=s.GetNumRows();
         itsSingularValues.SetLimits(newD,newD);
         for (int i=itsD+1;i<=newD;i++) itsSingularValues(i)=0.0;
     }
-    itsMaxDelta=Max(fabs(sn-itsSingularValues));
+    itsMaxDelta=Max(fabs(s-itsSingularValues));
 //    std::cout << "new max delta =" << itsMaxDelta << " " << sn.GetDiagonal()-itsSingularValues.GetDiagonal() << std::endl;
-    itsSingularValues=sn;
+    itsSingularValues=s;
     itsD=s.GetNumRows();
 
     itsRank=itsD;
-    itsMinSV=itsSingularValues(itsD);
+    if (itsD>0)
+        itsMinSV=itsSingularValues(itsD);
     itsCompessionError+=compressionError;
     UpdateBondEntropy();
 }
 
-void Bond::ClearSingularValues(Direction lr,const MatrixCT& R)
+void OperatorBond::ClearSingularValues(Direction lr,const MatrixRT& R)
 {
     int D=0;
     switch (lr)
@@ -132,13 +115,13 @@ void Bond::ClearSingularValues(Direction lr,const MatrixCT& R)
 }
 
 
-double Bond::GetNorm(const DiagonalMatrixRT& s)
-{
-    double s2=s.GetDiagonal()*s.GetDiagonal();
-    return sqrt(s2);
-}
+//double OperatorBond::GetNorm(const DiagonalMatrixRT& s)
+//{
+//    double s2=s.GetDiagonal()*s.GetDiagonal();
+//    return sqrt(s2);
+//}
 
-void Bond::UpdateBondEntropy()
+void OperatorBond::UpdateBondEntropy()
 {
     itsBondEntropy=0.0;
     for (int i=1;i<=itsD;i++)
@@ -151,56 +134,57 @@ void Bond::UpdateBondEntropy()
             itsRank--;
         }
     }
-    if (itsBondEntropy<0.0 && itsD>1)
-        std::cerr << "Warning negative bond entropy s=" << itsSingularValues << std::endl;
+//    We dont normalize operator SVs so bond entropy can easily go negative, therefore no warning.
+//    if (itsBondEntropy<0.0 && itsD>1)
+//        std::cerr << "Warning negative bond entropy s=" << itsSingularValues << std::endl;
 }
 
 //
 //  Direction is the normaliztions direction, which i opposite to the direction that UV gets tranferred.
 //
-void Bond::SVDTransfer(Direction lr,double compressionError,const DiagonalMatrixRT& s,const MatrixCT& UV)
+void OperatorBond::GaugeTransfer(Direction lr,double compressionError,const DiagonalMatrixRT& s,const MatrixRT& R)
 {
     SetSingularValues(s,compressionError);
     assert(GetSite(lr));
     // We have to forward the un-normalized Svs, otherwise R/L normalization breaks.
-    GetSite(lr)->SVDTransfer(lr,s,UV);
+    GetSite(lr)->QLTransfer(lr,R);
 }
 
-void Bond::TransferQR(Direction lr,const MatrixCT& R)
+void OperatorBond::GaugeTransfer(Direction lr,const MatrixRT& R)
 {
     ClearSingularValues(lr,R);
     assert(GetSite(lr));
     // We have to forward the un-normalized Svs, otherwise R/L normalization breaks.
-    GetSite(lr)->TransferQR(lr,R);
+    GetSite(lr)->QLTransfer(lr,R);
 }
 
-void Bond::CanonicalTransfer(Direction lr,double compressionError,const DiagonalMatrixRT& s,const MatrixCT& UV)
+void OperatorBond::CanonicalTransfer(Direction lr,double compressionError,const DiagonalMatrixRT& s,const MatrixRT& UV)
 {
     SetSingularValues(s,compressionError);
     assert(GetSite(lr));
-    GetSite(lr)->SVDTransfer(lr,UV);
+//    GetSite(lr)->SVDTransfer(lr,UV);
 }
 
-void Bond::Report(std::ostream& os) const
+void OperatorBond::Report(std::ostream& os) const
 {
     os
                                                   << std::setw(4)  << itsD
                                                   << std::setw(4)  << itsRank
        << std::fixed      << std::setprecision(6) << std::setw(12) << itsBondEntropy
        << std::scientific << std::setprecision(1) << std::setw(10) << itsMinSV
-       << std::scientific << std::setprecision(1) << std::setw(10) << itsCompessionError
+       << std::scientific << std::setprecision(1) << std::setw(10) << sqrt(itsCompessionError)
        ;
 
 }
 
- double Bond::GetMaxDelta(const Bond& cache) const
- {
-     VectorRT s=cache.itsSingularValues.GetDiagonal();
-     int Dold=s.size();
-     s.SetLimits(itsD,true);
-     for (int i=Dold+1;i<=itsD;i++) s(i)=0.0;
-     assert(itsSingularValues.size()==s.size());
-     return Max(fabs(itsSingularValues.GetDiagonal()-s));
- }
+// double OperatorBond::GetMaxDelta(const OperatorBond& cache) const
+// {
+//     VectorRT s=cache.itsSingularValues.GetDiagonal();
+//     int Dold=s.size();
+//     s.SetLimits(itsD,true);
+//     for (int i=Dold+1;i<=itsD;i++) s(i)=0.0;
+//     assert(itsSingularValues.size()==s.size());
+//     return Max(fabs(itsSingularValues.GetDiagonal()-s));
+// }
 
 } //namespace

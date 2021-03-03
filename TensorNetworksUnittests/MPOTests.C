@@ -1012,7 +1012,6 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
     itsMPS->InitializeWith(Random);
     itsMPS->Normalize(DLeft);
     MPO* expH=itsH->CreateOperator(dt,SecondOrder,CNone,epsMPO);
-//    iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,CNone,epsMPO);
 //    expH->Report(cout);
 
     MPS* psi1=itsMPS->Apply(expH);
@@ -1020,16 +1019,17 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
 
     EXPECT_NEAR(itsMPS->GetOverlap(psi1),1.0,1e-13);
     expH->CanonicalForm(); //Do we need to sweep both ways?
+    EXPECT_EQ(expH->GetNormStatus(),"RRRRRRRR");
 //    expH->Report(cout);
     MPS* psi3=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi3),1.0,1e-13);
 
     double truncError=expH->Compress(Parker,0,epsMPO);
+    EXPECT_EQ(expH->GetNormStatus(),"RRRRRRRR");
 //    expH->Report(cout);
     MPS* psi4=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi4),1.0,1e-13);
     EXPECT_EQ(expH->GetMaxDw(),3);
-    EXPECT_EQ(truncError,0.0);
     EXPECT_LT(truncError,epsMPO); //Unit operator should have no compression error
 }
 
@@ -1049,15 +1049,16 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
 
     EXPECT_NEAR(itsMPS->GetOverlap(psi1),1.0,1e-13);
     expH->CanonicalForm();
+    EXPECT_EQ(expH->GetNormStatus(),"RRRRRRRRR");
 //    expH->Report(cout);
     MPS* psi3=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi3),1.0,1e-13);
 
     double truncError=expH->Compress(Parker,0,epsMPO);
+    EXPECT_EQ(expH->GetNormStatus(),"RRRRRRRRR");
     MPS* psi4=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi4),1.0,1e-13);
     EXPECT_EQ(expH->GetMaxDw(),3);
-    EXPECT_EQ(truncError,0.0);
     EXPECT_LT(truncError,epsMPO); //Unit operator should have no compression error
 }
 
@@ -1074,17 +1075,20 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
     MPS* psi1=itsMPS->Apply(expH);
     double o1=psi1->GetOverlap(psi1);
     expH->CanonicalForm(); //Sweep both ways
+    EXPECT_EQ(expH->GetNormStatus(),"WRRRRRRR");
+//    expH->Report(cout);
     MPS* psi2=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi2),o1,1e-13);
 
     double truncError=expH->Compress(Parker,0,epsMPO);
-    expH->Report(cout);
+    EXPECT_EQ(expH->GetNormStatus(),"WRRRRRRR");
+//    expH->Report(cout);
     MPS* psi4=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi4),o1,5*epsMPO);
 
     EXPECT_EQ(expH->GetMaxDw(),5);
     EXPECT_GT(truncError,0.0);
-    EXPECT_LT(truncError,epsMPO);
+    EXPECT_LT(truncError,2*epsMPO);
 }
 
 //Try a large lattice

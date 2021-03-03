@@ -6,6 +6,7 @@
 
 namespace TensorNetworks
 {
+class OperatorBond;
 
 class iMPOImp
     : public virtual iMPO
@@ -37,10 +38,12 @@ protected:
 
 private:
     typedef optr_vector<SiteOperator*> SitesType;
+    typedef optr_vector<OperatorBond*> BondsType;
 
     int       itsL;
     double    itsS;
     SitesType itsSites;
+    BondsType itsBonds;
 };
 
 }

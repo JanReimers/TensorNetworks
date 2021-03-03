@@ -3,6 +3,7 @@
 
 #include "Operators/OperatorElement.H"
 #include "TensorNetworks/Namespace.H"
+#include "oml/diagonalmatrix.h"
 
 namespace TensorNetworks
 {
@@ -10,7 +11,8 @@ namespace TensorNetworks
 template <class T> class MatrixO : public Matrix<OperatorElement<T> >
 {
     typedef OperatorElement<T> EType;
-    typedef std::tuple<MatrixO  ,Matrix<T> > QXType;
+    typedef std::tuple<MatrixO  ,Matrix<T> >  QXType;
+    typedef std::tuple<double, DiagonalMatrixRT ,Matrix<T> > SVDType;
     typedef std::tuple<index_t  ,index_t   > IIType;
 public:
     typedef Matrix<EType> Base;
@@ -36,7 +38,6 @@ public:
     template <class A, Store M, Data D> MatrixO(int d, MPOForm f,const Indexable <EType,A,M,D,MatrixShape>& m)
     : Base(m)
     , itsd(d)
-    , itsTruncationError(0)
     , itsForm(f)
     {
     }
@@ -58,7 +59,7 @@ public:
     IIType    GetChi12() const;
     int       Getd() const {return itsd;}
     double    GetS() const {return dtoS(itsd);}
-    double    GetTruncationError() const {return itsTruncationError;}
+//    double    GetTruncationError() const {return (itsTruncationError);}
     MPOForm   GetForm() const {return itsForm;}
     TriType   GetMeasuredShape(double eps) const;
     T         GetTrace(int a, int b, int c, int d) const; //<Wab,Wcd>
@@ -71,7 +72,7 @@ public:
     MatrixO   GetV(Direction) const;
     void      SetV(Direction,const MatrixO& V);
     QXType    QX  (Direction);
-    QXType    SVD (Direction,const SVCompressorR* comp) ;
+    SVDType   SVD (Direction,const SVCompressorR* comp) ;
 //
 //  Flatten for QR and SVD decompositions
 //
@@ -86,16 +87,20 @@ public:
     }
     std::ostream& PrettyPrint(std::ostream& os) const;
 private:
+    friend class SiteOperatorImp;
     QXType    Full_QX  (Direction);
     QXType    BlockQX  (Direction);
-    QXType    Full_SVD (Direction,const SVCompressorR* comp) ;
-    QXType    BlockSVD (Direction,const SVCompressorR* comp) ;
+    SVDType   Full_SVD (Direction,const SVCompressorR* comp) ;
+    SVDType   BlockSVD (Direction,const SVCompressorR* comp) ;
 
     void Setd();
     Matrix<T> ExtractM(Matrix<T>& RL,bool buildRp=true) const;
-
+//
+// Extra data or traits go here. Be vry careful adding any more traits here. If at all possible
+// store these traits on a site operator or operator bond.
+// Getting these traits propagated through all overloaded operators is very painful.
+//
     int     itsd;
-    double  itsTruncationError; //Should live on the bond with the SVs.
     MPOForm itsForm;
 };
 

@@ -9,6 +9,7 @@ namespace TensorNetworks
     class iTEBDStateImp;
     class MPSSite;
     class Bond;
+    class SiteOperatorImp;
     template <class T> class FullStateImp;
 }
 

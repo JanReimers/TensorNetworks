@@ -13,21 +13,18 @@ namespace TensorNetworks
 template <class T> MatrixO<T>::MatrixO()
     : Matrix<OperatorElement<T> >()
     , itsd(0)
-    , itsTruncationError(0)
     , itsForm(FUnknown)
 {}
 
 template <class T> MatrixO<T>::MatrixO(int d,MPOForm f)
     : Matrix<OperatorElement<T> >()
     , itsd(d)
-    , itsTruncationError(0)
     , itsForm(f)
 {
 }
 template <class T> MatrixO<T>::MatrixO(int d,MPOForm f, const MatLimits& lim)
     : Matrix<OperatorElement<T> >(lim)
     , itsd(d)
-    , itsTruncationError(0)
     , itsForm(f)
 {
 }
@@ -35,7 +32,6 @@ template <class T> MatrixO<T>::MatrixO(int d,MPOForm f, const MatLimits& lim)
 template <class T> MatrixO<T>::MatrixO(int d,MPOForm f,const Base& m)
     : Matrix<OperatorElement<T> >(m)
     , itsd(d)
-    , itsTruncationError(0)
     , itsForm(f)
 {
     // Find and fix any un-initialized elements
@@ -52,7 +48,6 @@ template <class T> MatrixO<T>::MatrixO(int d,MPOForm f,const Base& m)
 template <class T> MatrixO<T>::MatrixO(const MatrixO& m)
     : Matrix<OperatorElement<T> >(m)
     , itsd(m.itsd)
-    , itsTruncationError(m.itsTruncationError)
     , itsForm(m.itsForm)
 {
 }
@@ -60,7 +55,6 @@ template <class T> MatrixO<T>::MatrixO(const MatrixO& m)
 template <class T> MatrixO<T>::MatrixO(int Dw1, int Dw2,double S,MPOForm f)
     : Matrix<OperatorElement<T> >(0,Dw1-1,0,Dw2-1)
     , itsd(2*S+1)
-    , itsTruncationError(0)
     , itsForm(f)
 
 {
@@ -377,21 +371,22 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::QX(Direction lr)
     }
 }
 
-template <class T> typename MatrixO<T>::QXType MatrixO<T>::SVD (Direction lr,const SVCompressorR* comp)
+template <class T> typename MatrixO<T>::SVDType MatrixO<T>::SVD (Direction lr,const SVCompressorR* comp)
 {
+    SVDType ret;
     switch (itsForm)
     {
     case expH:
-        return this->Full_SVD(lr,comp);
+        ret=this->Full_SVD(lr,comp);
         break;
     case RegularUpper:
     case RegularLower:
-        return this->BlockSVD(lr,comp);
+        ret=this->BlockSVD(lr,comp);
         break;
     default:
         assert(false);
-        return QXType(MatrixOR(),MatrixRT());
     }
+    return ret;
 }
 
 
@@ -641,7 +636,7 @@ MatrixRT SolveRp(Direction lr, const MatrixRT& R, const MatrixRT& U, const Diago
     return Rp;
 }
 
-template <class T> typename MatrixO<T>::QXType MatrixO<T>::Full_SVD(Direction lr,const SVCompressorR* comp)
+template <class T> typename MatrixO<T>::SVDType MatrixO<T>::Full_SVD(Direction lr,const SVCompressorR* comp)
 {
     //
     //  Block respecting QR/QL/RQ/LQ
@@ -658,11 +653,11 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::Full_SVD(Direction lr
     if (M.size()==0)
     {
         *this=Q;
-        return std::make_tuple(Q,R);
+        return std::make_tuple(0,DiagonalMatrixRT(),R);
     }
     LapackSVDSolver <double>  solver;
     auto [U,s,VT]=solver.SolveAll(M,1e-14); //Solves M=U * s * VT
-    itsTruncationError+=comp->Compress(U,s,VT);
+    double truncationError=comp->Compress(U,s,VT);
     int Xs=s.GetDiagonal().size();
 
 //    cout << std::fixed << std::setprecision(4) << "s=" << s.GetDiagonal() << endl;
@@ -694,10 +689,11 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::Full_SVD(Direction lr
         break;
     }
     assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
-    *this=Q;
-    return std::make_tuple(Q,RLtrans);
+    *this=static_cast<const Base&>(Q);
+    return std::make_tuple(truncationError,s,RLtrans);
 }
-template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr,const SVCompressorR* comp)
+
+template <class T> typename MatrixO<T>::SVDType MatrixO<T>::BlockSVD(Direction lr,const SVCompressorR* comp)
 {
     //
     //  Block respecting QR/QL/RQ/LQ
@@ -711,10 +707,10 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
     Matrix<T> M=ExtractM(RL);
     assert(IsInitialized(M));
     assert(IsInitialized(RL));
-    if (M.size()==0) return std::make_tuple(Q,RL);
+    if (M.size()==0) return std::make_tuple(0.0,DiagonalMatrixRT(),RL);
     LapackSVDSolver <double>  solver;
     auto [U,s,VT]=solver.SolveAll(M,1e-14); //Solves M=U * s * VT
-    itsTruncationError=comp->Compress(U,s,VT);
+    double truncationError=comp->Compress(U,s,VT);
     int Xs=s.GetDiagonal().size();
 
 //    cout << "s=" << s.GetDiagonal() << endl;
@@ -750,7 +746,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockSVD(Direction lr
     }
     assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
     SetV(lr,Q);
-    return std::make_tuple(Q,RLtrans);
+    return std::make_tuple(truncationError,s,RLtrans);
 }
 
 void SVDShuffle(TriType ul,Direction lr, Matrix<double>& U, DiagonalMatrix<double>& s,Matrix<double>& VT, double eps)

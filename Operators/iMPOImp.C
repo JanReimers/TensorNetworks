@@ -1,5 +1,6 @@
 #include "Operators/iMPOImp.H"
 #include "TensorNetworks/SiteOperator.H"
+#include "Operators/OperatorBond.H"
 #include "TensorNetworksImp/StateIterator.H"
 #include "Operators/SiteOperatorImp.H"
 #include "Operators/OperatorClient.H"
@@ -73,25 +74,40 @@ iMPOImp::~iMPOImp()
 void iMPOImp::LinkSites()
 {
     assert(static_cast<int>(itsSites.size())-1==itsL);
+    //
+    //  Create bond objects
+    //
+    itsBonds.push_back(0);  //Dummy space holder. We want this array to be 1 based.
+    for (int i=1; i<=itsL; i++)
+    {
+        auto [Dw1,Dw2]=itsSites[i]->GetDws();
+        itsBonds.push_back(new OperatorBond(Dw2));
+    }
     SiteOperatorImp* s=dynamic_cast<SiteOperatorImp*>(itsSites[1]);
     assert(s);
     if (itsL>1)
     {
-        s->SetNeighbours(itsSites[itsL],itsSites[2]);
+        s->SetNeighbours(itsBonds[itsL],itsBonds[1]);
         for (int ia=2; ia<=itsL-1; ia++)
         {
             s=dynamic_cast<SiteOperatorImp*>(itsSites[ia]);
             assert(s);
-            s->SetNeighbours(itsSites[ia-1],itsSites[ia+1]);
+            s->SetNeighbours(itsBonds[ia-1],itsBonds[ia]);
         }
         s=dynamic_cast<SiteOperatorImp*>(itsSites[itsL]);
         assert(s);
-        s->SetNeighbours(itsSites[itsL-1],itsSites[1]);
+        s->SetNeighbours(itsBonds[itsL-1],itsBonds[itsL]);
     }
     else
     {
-        s->SetNeighbours(s,s);
+        s->SetNeighbours(itsBonds[1],itsBonds[1]);
     }
+    //
+    //  Tell each bond about its left and right sites.
+    //
+    for (int i=1; i<itsL; i++)
+        itsBonds[i]->SetSites(itsSites[i],itsSites[i+1]);
+    itsBonds[itsL]->SetSites(itsSites[itsL],itsSites[1]);
 }
 
 void iMPOImp::Insert(SiteOperator* so)

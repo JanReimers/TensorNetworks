@@ -139,6 +139,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Operators/MPO_TwoSite.H" />
+		<Unit filename="Operators/OperatorBond.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Operators/OperatorBond.H" />
 		<Unit filename="Operators/OperatorClient.C">
 			<Option compilerVar="CC" />
 		</Unit>

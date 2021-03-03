@@ -157,7 +157,8 @@ void OvMTests::TestSVD(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
     SVCompressorR* comp=itsFactory->MakeMPOCompressor(0,1e-14);
     MakeLRBOperator(OvM,ul,lbr);
     MatrixOR V=OvM.GetV(lr);
-    auto [Q,R]=OvM.SVD(lr,comp);
+    auto [truncError,s,R]=OvM.SVD(lr,comp);
+    MatrixOR Q=OvM.GetV(lr);
     MatrixOR V1;
     if (lr==DLeft)
     {
@@ -172,18 +173,6 @@ void OvMTests::TestSVD(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
 
     EXPECT_NEAR(MaxDelta(V,V1),0.0,d*d*eps);
 
-// Currently the SVD does not support this. We need to swap rows/columns of U/VT in degenerate blocks to fix this.
-//    if (ul==Upper)
-//    {
-////        EXPECT_TRUE(IsUpperTriangular(R)); Not guaranteed for SVD
-//        EXPECT_TRUE(IsUpperTriangular(Q,eps));
-//    }
-//    if (ul==Lower)
-//    {
-////        EXPECT_TRUE(IsLowerTriangular(R)); Not guaranteed for SVD
-//        cout << "Q=" << Q << endl;
-//        EXPECT_TRUE(IsLowerTriangular(Q,eps));
-//    }
     EXPECT_TRUE(IsUnit(Q.GetOrthoMatrix(lr),eps));
     EXPECT_FALSE(IsUnit(Q.GetOrthoMatrix(Invert(lr)),eps));
 }
