@@ -65,6 +65,9 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order,CompressType c
             MPO_SpatialTrotter Weven(dt,Even,this);
             W->Product(&Wodd);
             W->Product(&Weven);
+            if (ct==Parker)
+                W->CanonicalForm();
+            W->Compress(ct,0,epsMPO);
             break;
         }
         case SecondOrder :
@@ -76,6 +79,8 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order,CompressType c
             W->Product(&Wodd);
             W->Product(&Weven);
             W->Product(&Wodd);
+            if (ct==Parker)
+                W->CanonicalForm();
             W->Compress(ct,0,epsMPO);
             break;
         }
@@ -97,15 +102,11 @@ MPO* HamiltonianImp::CreateOperator(double dt, TrotterOrder order,CompressType c
                 MPO_SpatialTrotter Weven(ts(it)    ,Even,this);
                 U.Product(&Wodd);
                 U.Product(&Weven);
-                //U.Compress(0,1e-12); //Does not seem to help
                 U.Product(&Wodd);
-                //U.Report(cout);
-                U.Compress(ct,0,epsMPO); //Useful for large S
-                //U.Report(cout);
                 W->Product(&U);
-                //W->Report(cout);
+                if (ct==Parker)
+                    W->CanonicalForm();
                 W->Compress(ct,0,epsMPO);
-                //W->Report(cout);
                 assert(W->GetMaxDw()<=4096);
             }
             break;

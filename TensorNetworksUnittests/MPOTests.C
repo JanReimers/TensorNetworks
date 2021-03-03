@@ -1090,6 +1090,21 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
     EXPECT_GT(truncError,0.0);
     EXPECT_LT(truncError,2*epsMPO);
 }
+TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1_FourthOrder)
+{
+    int L=8,D=2;
+    double S=0.5,dt=0.1,epsMPO=1e-10;
+    Setup(L,S,D);
+    itsMPS->InitializeWith(Random);
+    itsMPS->Normalize(DLeft);
+    MPO* expH=itsH->CreateOperator(dt,FourthOrder,Parker,epsMPO);
+    EXPECT_EQ(expH->GetNormStatus(),"WRRRRRRR");
+    expH->Report(cout);
+
+    EXPECT_EQ(expH->GetMaxDw(),6);
+//    EXPECT_GT(truncError,0.0);
+//    EXPECT_LT(truncError,2*epsMPO);
+}
 
 //Try a large lattice
 TEST_F(MPOTests,TestParkerSVDCompressExpHL256t1)
