@@ -71,7 +71,7 @@ public:
 //
     MatrixO   GetV(Direction) const;
     void      SetV(Direction,const MatrixO& V);
-    QXType    QX  (Direction);
+    Matrix<T> QX  (Direction); //Return gauge transform matrix to transfer to the next site.
     SVDType   SVD (Direction,const SVCompressorR* comp) ;
 //
 //  Flatten for QR and SVD decompositions

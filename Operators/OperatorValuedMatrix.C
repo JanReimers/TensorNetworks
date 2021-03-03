@@ -354,21 +354,24 @@ template <typename T> inline int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
 
-template <class T> typename MatrixO<T>::QXType MatrixO<T>::QX(Direction lr)
+template <class T> Matrix<T> MatrixO<T>::QX(Direction lr)
 {
+    MatrixO<T> Q;
+    Matrix<T>  R;
     switch (itsForm)
     {
     case expH:
-        return this->Full_QX(lr);
+        std::tie(Q,R)=Full_QX(lr);
         break;
     case RegularUpper:
     case RegularLower:
-        return this->BlockQX(lr);
+        std::tie(Q,R)=BlockQX(lr);
+        SetV(lr,Q);
         break;
     default:
         assert(false);
-        return QXType(MatrixOR(),MatrixRT());
     }
+    return R;
 }
 
 template <class T> typename MatrixO<T>::SVDType MatrixO<T>::SVD (Direction lr,const SVCompressorR* comp)

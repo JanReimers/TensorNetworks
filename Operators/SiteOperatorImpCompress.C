@@ -80,19 +80,15 @@ double SiteOperatorImp::CompressParker(Direction lr,const SVCompressorR* comp)
 {
     auto [truncError,s,Rtrans]=itsWs.SVD(lr,comp); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
     GetBond(lr)->GaugeTransfer(lr,truncError,s,Rtrans);
-//    GetNeighbour(lr)->QLTransfer(lr,RL);
     SetLimits();
     return truncError;
 }
 
 
+// Do QX=QR/RQ/QL/LQ decomposition of the V-block and pass it on the the next site.
 void SiteOperatorImp::CanonicalForm(Direction lr)
 {
-    auto [Q,RL]=itsWs.QX(lr); // Do QX=QR/RQ/QL/LQ decomposition of the V-block
-    if (itsWs.GetForm()==RegularUpper || itsWs.GetForm()==RegularLower )
-        itsWs.SetV(lr,Q); // Can'y move this inside BlockQX because SVD needs to modify Q before call SetV
-    GetBond(lr)->GaugeTransfer(lr,RL);
- //   GetNeighbour(lr)->QLTransfer(lr,RL);
+    GetBond(lr)->GaugeTransfer(lr,itsWs.QX(lr));
     SetLimits();
 }
 
