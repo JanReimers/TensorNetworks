@@ -66,19 +66,21 @@ void OperatorBond::NewBondDimension(int D)
 
 void OperatorBond::SetSingularValues(const DiagonalMatrixRT& s,double compressionError)
 {
+    DiagonalMatrixRT s1=s;
+    s1.ReBase(1);
     assert(itsD==itsSingularValues.GetNumRows());
     //std::cout << "SingularValues=" << s << std::endl;
     //DiagonalMatrixRT sn=s/GetNorm(s); //Make sure it is normalized
-    if (s.GetNumRows()!=itsD)
+    if (s1.GetNumRows()!=itsD)
     { //Pad with zeros so we can get a delta l.
-        int newD=s.GetNumRows();
+        int newD=s1.GetNumRows();
         itsSingularValues.SetLimits(newD,newD);
         for (int i=itsD+1;i<=newD;i++) itsSingularValues(i)=0.0;
     }
-    itsMaxDelta=Max(fabs(s-itsSingularValues));
+    itsMaxDelta=Max(fabs(s1-itsSingularValues));
 //    std::cout << "new max delta =" << itsMaxDelta << " " << sn.GetDiagonal()-itsSingularValues.GetDiagonal() << std::endl;
-    itsSingularValues=s;
-    itsD=s.GetNumRows();
+    itsSingularValues=s1;
+    itsD=s1.GetNumRows();
 
     itsRank=itsD;
     if (itsD>0)
@@ -123,10 +125,11 @@ void OperatorBond::ClearSingularValues(Direction lr,const MatrixRT& R)
 
 void OperatorBond::UpdateBondEntropy()
 {
+    double norm_squared=itsSingularValues.GetDiagonal()*itsSingularValues.GetDiagonal();
     itsBondEntropy=0.0;
     for (int i=1;i<=itsD;i++)
     {
-        double s2=itsSingularValues(i)*itsSingularValues(i);
+        double s2=(itsSingularValues(i)*itsSingularValues(i))/norm_squared;
         if (s2>0.0) itsBondEntropy-=s2*log(s2);
         if (fabs(itsSingularValues(i))<itsEpsSV)
         {
@@ -174,6 +177,8 @@ void OperatorBond::Report(std::ostream& os) const
        << std::scientific << std::setprecision(1) << std::setw(10) << itsMinSV
        << std::scientific << std::setprecision(1) << std::setw(10) << sqrt(itsCompessionError)
        ;
+       if (itsMinSV>0.0 && itsD<20)
+           os << " " << itsSingularValues.GetDiagonal();
 
 }
 

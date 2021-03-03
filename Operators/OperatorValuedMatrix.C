@@ -636,7 +636,7 @@ MatrixRT SolveRp(Direction lr, const MatrixRT& R, const MatrixRT& U, const Diago
     return Rp;
 }
 
-template <class T> typename MatrixO<T>::SVDType MatrixO<T>::Full_SVD(Direction lr,const SVCompressorR* comp)
+template <class T> typename MatrixO<T>::SVDType MatrixO<T>::FullMSVD(Direction lr,const SVCompressorR* comp)
 {
     //
     //  Block respecting QR/QL/RQ/LQ
@@ -684,6 +684,47 @@ template <class T> typename MatrixO<T>::SVDType MatrixO<T>::Full_SVD(Direction l
             Grow(Us,MatLimits(R.GetColLimits(),VecLimits(0,Xs+1)));
             RLtrans=R*Us;
             Grow(VT,MatLimits(VecLimits(0,Xs+1),Q.GetRowLimits()));
+            Q=VT*Q;
+        }
+        break;
+    }
+    assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
+    *this=static_cast<const Base&>(Q);
+    return std::make_tuple(truncationError,s,RLtrans);
+}
+
+template <class T> typename MatrixO<T>::SVDType MatrixO<T>::Full_SVD(Direction lr,const SVCompressorR* comp)
+{
+    //
+    //  Block respecting QR/QL/RQ/LQ
+    //
+    auto [Q,R]=Full_QX(lr);
+    assert(IsInitialized(R));
+    assert(IsUnit(Q.GetOrthoMatrix(lr),1e-14));
+    LapackSVDSolver <double>  solver;
+    MatLimits lim=R.ReBase(1,1);
+    auto [U,s,VT]=solver.SolveAll(R,1e-14); //Solves R=U * s * VT
+    double truncationError=comp->Compress(U,s,VT);
+    U .ReBase(lim);
+    s .ReBase(lim);
+    VT.ReBase(lim);
+//    cout << std::fixed << std::setprecision(4) << "s=" << s.GetDiagonal() << endl;
+    //
+    //  Post processing:
+    //      1) Get RLtrans ready for transfer to the neighbouring site
+    //      2) Integrate U (or VT) into Q
+    MatrixRT RLtrans; //THis gets transferred to the neighbouring site;
+    switch (lr)
+    {
+    case DLeft:
+        {
+            RLtrans=s*VT;
+            Q=Q*U;
+        }
+        break;
+    case DRight:
+        {
+            RLtrans=U*s;
             Q=VT*Q;
         }
         break;

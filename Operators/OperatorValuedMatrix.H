@@ -90,6 +90,7 @@ private:
     friend class SiteOperatorImp;
     QXType    Full_QX  (Direction);
     QXType    BlockQX  (Direction);
+    SVDType   FullMSVD (Direction,const SVCompressorR* comp) ;
     SVDType   Full_SVD (Direction,const SVCompressorR* comp) ;
     SVDType   BlockSVD (Direction,const SVCompressorR* comp) ;
 

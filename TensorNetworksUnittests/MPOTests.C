@@ -1025,11 +1025,11 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t0)
     EXPECT_NEAR(psi1->GetOverlap(psi3),1.0,1e-13);
 
     double truncError=expH->Compress(Parker,0,epsMPO);
-    EXPECT_EQ(expH->GetNormStatus(),"RRRRRRRR");
+    EXPECT_EQ(expH->GetNormStatus(),"IIIIIIII");
 //    expH->Report(cout);
     MPS* psi4=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi4),1.0,1e-13);
-    EXPECT_EQ(expH->GetMaxDw(),3);
+    EXPECT_EQ(expH->GetMaxDw(),1);
     EXPECT_LT(truncError,epsMPO); //Unit operator should have no compression error
 }
 
@@ -1055,10 +1055,10 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL9t0)
     EXPECT_NEAR(psi1->GetOverlap(psi3),1.0,1e-13);
 
     double truncError=expH->Compress(Parker,0,epsMPO);
-    EXPECT_EQ(expH->GetNormStatus(),"RRRRRRRRR");
+    EXPECT_EQ(expH->GetNormStatus(),"IIIIIIIII");
     MPS* psi4=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi4),1.0,1e-13);
-    EXPECT_EQ(expH->GetMaxDw(),3);
+    EXPECT_EQ(expH->GetMaxDw(),1);
     EXPECT_LT(truncError,epsMPO); //Unit operator should have no compression error
 }
 
@@ -1086,7 +1086,7 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL8t1)
     MPS* psi4=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi4),o1,5*epsMPO);
 
-    EXPECT_EQ(expH->GetMaxDw(),5);
+    EXPECT_EQ(expH->GetMaxDw(),4);
     EXPECT_GT(truncError,0.0);
     EXPECT_LT(truncError,2*epsMPO);
 }
@@ -1113,7 +1113,7 @@ TEST_F(MPOTests,TestParkerSVDCompressExpHL256t1)
     MPS* psi4=itsMPS->Apply(expH);
     EXPECT_NEAR(psi1->GetOverlap(psi4),o1,L*epsMPO);
 
-    EXPECT_EQ(expH->GetMaxDw(),5);
+    EXPECT_EQ(expH->GetMaxDw(),4);
     EXPECT_GT(truncError,0.0);
     EXPECT_LT(truncError,epsMPO);
 }
