@@ -33,6 +33,7 @@ public:
     virtual int    GetL() const {return itsL;}
     virtual int    Getd() const {return 2*itsS+1;}
     virtual double GetS() const {return itsS;}
+    virtual double GetTruncationError() const;
     virtual void   Report(std::ostream&) const; //Show Dws, Fnorms, U/L status etc.
 
     virtual const SiteOperator* GetSiteOperator(int isite) const;

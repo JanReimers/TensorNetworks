@@ -22,12 +22,12 @@ class OperatorBond
         void GaugeTransfer    (Direction lr,const MatrixRT& R);
         void CanonicalTransfer(Direction lr,double compessionError,const DiagonalMatrixRT& s,const MatrixRT& UV);
 
-        double GetBondEntropy() const {return itsBondEntropy;}
-        double GetMinSV      () const {return itsMinSV;}
-        double GetMaxDelta   () const {return itsMaxDelta;}
-//        double GetMaxDelta   (const Bond& cache) const;
-        int    GetDw         () const {return itsD;}
-        int    GetRank       () const {return itsRank;}
+        double GetBondEntropy    () const {return itsBondEntropy;}
+        double GetMinSV          () const {return itsMinSV;}
+        double GetMaxDelta       () const {return itsMaxDelta;}
+        double GetTruncationError() const {return itsTruncationError;}
+        int    GetDw             () const {return itsD;}
+        int    GetRank           () const {return itsRank;}
         const DiagonalMatrixRT& GetSVs () const {return itsSingularValues;}
 
         void Report    (std::ostream&) const;
@@ -52,7 +52,7 @@ class OperatorBond
         double itsBondEntropy;
         double itsMinSV;
         double itsMaxDelta; //Maximum delta lambda
-        double itsCompessionError; // sum of reject S_i^2
+        double itsTruncationError; // sum of reject S_i^2
         int    itsD;
         int    itsRank; //Rank <=D depending on zero SVs
         SiteOperatorImp* itsLeft_Site;

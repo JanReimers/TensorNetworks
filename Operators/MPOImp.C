@@ -123,4 +123,13 @@ void   MPOImp::Report(std::ostream& os) const
     }
 }
 
+double MPOImp::GetTruncationError() const
+{
+    double ret=0.0;
+    for (int ib=1; ib<itsL; ib++)
+        ret+=itsBonds[ib]->GetTruncationError();
+    return sqrt(ret);
+}
+
+
 } //namespace

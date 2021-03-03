@@ -23,6 +23,7 @@ public:
     virtual int    GetL() const {return itsL;}
     virtual int    Getd() const {return 2*itsS+1;}
     virtual double GetS() const {return itsS;}
+    virtual double GetTruncationError() const;
 
     virtual const  SiteOperator* GetSiteOperator(int isite) const;
     virtual        SiteOperator* GetSiteOperator(int isite);

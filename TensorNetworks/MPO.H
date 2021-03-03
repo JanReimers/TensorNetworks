@@ -27,6 +27,7 @@ public:
     //
     virtual int         GetL() const=0;
     virtual int         GetMaxDw() const;
+    virtual double      GetTruncationError() const=0;
     virtual void        Report(std::ostream&) const; //Show Dws, Fnorms, U/L status etc.
     virtual void        Dump  (std::ostream&) const; //Show all data in W matrices
     virtual std::string GetNormStatus() const;

@@ -16,7 +16,7 @@ OperatorBond::OperatorBond(int D)
     , itsBondEntropy(0.0)
     , itsMinSV(0.0)
     , itsMaxDelta(0.0)
-    , itsCompessionError(-99)
+    , itsTruncationError(-99)
     , itsD(D)
     , itsRank(0)
     , itsLeft_Site(0)
@@ -56,7 +56,7 @@ void OperatorBond::NewBondDimension(int D)
     else
     { //Shrink/compress
         for (int i=D+1;i<=itsD;i++)
-            itsCompessionError+=itsSingularValues(i)*itsSingularValues(i);
+            itsTruncationError+=itsSingularValues(i)*itsSingularValues(i);
         itsSingularValues.SetLimits(D,true);
         itsMinSV=itsSingularValues(D);
         itsD=D;
@@ -85,7 +85,7 @@ void OperatorBond::SetSingularValues(const DiagonalMatrixRT& s,double compressio
     itsRank=itsD;
     if (itsD>0)
         itsMinSV=itsSingularValues(itsD);
-    itsCompessionError+=compressionError;
+    itsTruncationError+=compressionError;
     UpdateBondEntropy();
 }
 
@@ -112,7 +112,7 @@ void OperatorBond::ClearSingularValues(Direction lr,const MatrixRT& R)
     itsD=D;
     itsRank=itsD;
     itsMinSV=0.0;
-    itsCompessionError=0.0;
+    itsTruncationError=0.0;
     itsBondEntropy=0.0;
 }
 
@@ -175,7 +175,7 @@ void OperatorBond::Report(std::ostream& os) const
                                                   << std::setw(4)  << itsRank
        << std::fixed      << std::setprecision(6) << std::setw(12) << itsBondEntropy
        << std::scientific << std::setprecision(1) << std::setw(10) << itsMinSV
-       << std::scientific << std::setprecision(1) << std::setw(10) << sqrt(itsCompessionError)
+       << std::scientific << std::setprecision(1) << std::setw(10) << sqrt(itsTruncationError)
        ;
        if (itsMinSV>0.0 && itsD<20)
            os << " " << itsSingularValues.GetDiagonal();

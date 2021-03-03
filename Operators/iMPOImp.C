@@ -163,6 +163,15 @@ iMPO* iMPOImp::MakeUnitcelliMPO(int unitcell) const
     return new iMPOImp(newL,WW);
 }
 
+double iMPOImp::GetTruncationError() const
+{
+    double ret=0.0;
+    for (int ib=1; ib<=itsL; ib++)
+        ret+=itsBonds[ib]->GetTruncationError();
+    return sqrt(ret);
+}
+
+
 } //namespace
 
 
