@@ -20,6 +20,11 @@ public:
     virtual QRType  SolveThinQL(const MatrixT&)=0; // returns [Q,L]
     virtual QRType  SolveThinLQ(const MatrixT&)=0; // mirror image version returns [L,Q]
 
+    virtual QRType  SolveRankRevealingQR(const MatrixT&, double eps)=0; // returns [Q,R]
+    virtual QRType  SolveRankRevealingRQ(const MatrixT&, double eps)=0; // returns [Q,L]
+    virtual QRType  SolveRankRevealingQL(const MatrixT&, double eps)=0; // returns [R,Q]
+    virtual QRType  SolveRankRevealingLQ(const MatrixT&, double eps)=0; // returns [L,Q]
+
 };
 
 #endif // QRSOLVER_H

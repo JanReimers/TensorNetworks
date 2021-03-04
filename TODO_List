@@ -1,16 +1,9 @@
 
 exp(-t*H) MPOs
-    Done: Parker M-block Compress
-    DOne: Full block compress
     Try shuffling U (and Evs) to get lower or upper triangular.
 
 SiteOperatorImp:
-    Handle diagonal ops, test=DoBuildMPO_Neel
-        OpValMatrix.C line 430 fails.
-        -CanonicalForm handle diagonal MPOs (treat as lower?)
 
-    Done: -Add upper operators to finite lattice unit tests.
-    Done: -Add upper operators to infinite lattice unit tests.
     -Run Parker's' examples
         Done: Eq 3,7
         Done: Two body as sum of exponential (ref 7)
@@ -19,17 +12,6 @@ SiteOperatorImp:
     -Implement Parker iMPO SVD
     -SetLimits using zero as criteria.  Should fabs(W)>eps
         BUT we need to get then SAME eps into the contraction routines.
-    Done: -Upper/Lower determinations for edge site MPOs is ambiguous because those MPOs have either one row
-        or one column. So there is no well defined above/below the diagonal.
-        THis causes problems with OpValMatrix operators many of which depend the U/L determination
-        We need to somehow determine U/L away from the edges and enforce the resulting U/l state
-        on the edges.
-
-    Done: -Get CanonicalFOrm working for exp(H)
-    Done: -expH MPO get scrambled when reducing to Canonical form.
-        Get further scrambled after Parker-compress, std-compress is fine
-        test is TestParkerSVDCompressExpHL8t1
-        Scrambled = no longer upper/lower?
     -Implement Parker algorithm #4, iMPO left canonical form for triangular W
         Done BUT eq 60 for s_M fails
     -Implement Parker algorithm #5, iMPO compression
@@ -42,22 +24,15 @@ OpValMatrix:
 MPO:
     -Compress Automatically check for CanoncialForm and do it if not canform.
     -Do we need an GetTruncationError member function?
-    Fixed: -For 2Body LR ham, parker compression of H2 destroys it.
     -OperatorClient::GetH assumes QN's for two sites. We need a more general interface
         int GetNBody() //Max # of interaction sites
         Matrix GetH(std::vector<int> QNs)
     -Figure out singe/double counting of H*Sz terms in Hamiltonians.
-    Done: -track SV spectrum or at least the Min(Sv).
-        -These need to live on bonds between sites.
     -Ideally Dw would also live on the bonds
     -Trotter MPO and iMPO have a lot of duplicated code for calculating exp(-t*H) and factoring it.
         Done: -ExpH
         -Factor U*s*V = expH
-    Fixed: -TestL2iMPOTrotter4 Get it running again
-    Fixed: -TestParkerCanonicalTri_Upper_L1iH fails
-    Fixed: -TestParkerCanonicalQTIter_Upper_L1iH fails
-    Fixed: -TestRandomEnergyRangeSD_Upper fails
-
+    Learn how to build MPOs from simple one site ops.  Read McCUllough
 
 -Hamiltonian Use canonical form and Parker compress for all trotter MPOs
 -iHamiltonian Use canonical form and Parker compress for all trotter MPOs
@@ -66,9 +41,7 @@ iMPS
     -We need a horizontal tensor product like for MPOs, to make unit cell state
         The ordering or (ma,mb,..) -> m needs to controlled in one place.
 Numerics:
-    -Once rank revealing QL is robust, move into the QRSolver interface.
 
-Fixed: -TestParkerSVDCompress_Upper_H2L9 fails and crashes, Lower version is fine.
 -VariationalGroundStateTests.TestSweep_Upper_L7S1GrowD27 is getting stuck
     -Can't see whats going on because log level 2 is too noisy.
     -These are also hitting maxiter (30 reporting 31)
@@ -221,6 +194,30 @@ Backburner:
         -Might need to identify parameters with strings "Jxy"
 
 ----------------------------------------------------------------------------------------------------------
+Done: Parker M-block Compress
+Done: Full block compress
+Done: -Add upper operators to finite lattice unit tests.
+Done: -Add upper operators to infinite lattice unit tests.
+Done: -Upper/Lower determinations for edge site MPOs is ambiguous because those MPOs have either one row
+    or one column. So there is no well defined above/below the diagonal.
+    THis causes problems with OpValMatrix operators many of which depend the U/L determination
+    We need to somehow determine U/L away from the edges and enforce the resulting U/l state
+    on the edges.
+
+Done: -Get CanonicalFOrm working for exp(H)
+Done: -expH MPO get scrambled when reducing to Canonical form.
+    Get further scrambled after Parker-compress, std-compress is fine
+    test is TestParkerSVDCompressExpHL8t1
+    Scrambled = no longer upper/lower?
+Done: -track SV spectrum or at least the Min(Sv).
+    -These need to live on bonds between sites.
+Fixed: -For 2Body LR ham, parker compression of H2 destroys it.
+Fixed: -TestL2iMPOTrotter4 Get it running again
+Fixed: -TestParkerCanonicalTri_Upper_L1iH fails
+Fixed: -TestParkerCanonicalQTIter_Upper_L1iH fails
+Fixed: -TestRandomEnergyRangeSD_Upper fails
+Done: -Once rank revealing QL is robust, move into the QRSolver interface.
+Fixed: -TestParkerSVDCompress_Upper_H2L9 fails and crashes, Lower version is fine.
 Done: -Add MPOs to do:
         S_1*S_2 = 0.5*(Sp_1*sm_2 + Sm_1*sp_2) + Sz_1+Sz_2
 Done: Simplify MPO compression code

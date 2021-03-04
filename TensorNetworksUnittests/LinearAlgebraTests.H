@@ -570,6 +570,23 @@ public:
         MakeSparse(ret,Density);
         return ret;
     }
+    Matrix<T> MakeMatrix(int Rank)
+    {
+        assert(Rank<=M);
+        assert(Rank<=N);
+        Matrix<T> ret(M,N);
+        Fill(ret,T(0.0));
+        for (int i=1;i<=Rank;i++)
+        {
+            Vector<T> v1(M),v2(N);
+            FillRandom(v1);
+            FillRandom(v2);
+            Matrix<T> op=OuterProduct(v1,v2);
+            ret+=op;
+        }
+        MakeSparse(ret,Density);
+        return ret;
+    }
 
     virtual void Validate(const Matrix<T>& Q)
     {
@@ -608,33 +625,70 @@ public:
         A=Base::MakeMatrix();
         {
             auto [Q,R]=itsSolver->SolveThinQR(A);
+            EXPECT_TRUE(IsUpperTriangular(R,eps));
             ValidateQR(Q,R);
         }
         {
             auto [R,Q]=itsSolver->SolveThinRQ(A);
+            EXPECT_TRUE(IsUpperTriangular(R,eps));
             ValidateRQ(R,Q);
         }
 
         {
             auto [Q,L]=itsSolver->SolveThinQL(A);
+            EXPECT_TRUE(IsLowerTriangular(L,eps));
             ValidateQR(Q,L);
         }
         {
             auto [L,Q]=itsSolver->SolveThinLQ(A);
+            EXPECT_TRUE(IsLowerTriangular(L,eps));
             ValidateRQ(L,Q);
         }
 
     }
+    //
+    //  Rank revealing QR tests
+    //
+    virtual void RunRRTests(int Rank)
+    {
+        A=Base::MakeMatrix(Rank);
+        {
+            auto [Q,R]=itsSolver->SolveRankRevealingQR(A,10*sqrt(N*M)*eps); //Need a little lattitude to remove all rows.
+            EXPECT_TRUE(IsUpperTriangular(R,eps));
+            ValidateQR(Q,R,Rank);
+        }
+        {
+            auto [R,Q]=itsSolver->SolveRankRevealingRQ(A,10*sqrt(N*M)*eps); //Need a little lattitude to remove all rows.
+            EXPECT_TRUE(IsUpperTriangular(R,eps));
+            ValidateRQ(R,Q,Rank);
+        }
+        {
+            auto [Q,L]=itsSolver->SolveRankRevealingQL(A,10*sqrt(N*M)*eps); //Need a little lattitude to remove all rows.
+            EXPECT_TRUE(IsLowerTriangular(L,eps));
+            ValidateQR(Q,L,Rank);
+        }
+        {
+            auto [L,Q]=itsSolver->SolveRankRevealingLQ(A,10*sqrt(N*M)*eps); //Need a little lattitude to remove all rows.
+            EXPECT_TRUE(IsLowerTriangular(L,eps));
+            ValidateRQ(L,Q,Rank);
+        }
+    }
+
     virtual void ValidateQR(const Matrix<T>& Q, const Matrix<T>& R)
     {
 
         Matrix<T> QT=Transpose(conj(Q));
-        int mn=Q.GetNumCols();
-        Matrix<T> Iq(mn,mn);
-        Unit(Iq);
-        EXPECT_NEAR(Max(fabs(QT*Q-Iq)),0.0,2*sqrt(N*M)*eps);
-        if (N==M)
         {
+            int mn=Q.GetNumCols();
+            Matrix<T> Iq(mn,mn);
+            Unit(Iq);
+            EXPECT_NEAR(Max(fabs(QT*Q-Iq)),0.0,2*sqrt(N*M)*eps);
+        }
+        if (N==M && Q.GetNumCols()==M)
+        {
+            int mn=Q.GetNumRows();
+            Matrix<T> Iq(mn,mn);
+            Unit(Iq);
             EXPECT_NEAR(Max(fabs(Q*QT-Iq)),0.0,2*sqrt(N*M)*eps);
         }
         Matrix<T> A1=Q*R;
@@ -645,17 +699,50 @@ public:
     {
 
         Matrix<T> QT=Transpose(conj(Q));
-        int mn=Q.GetNumRows();
-        Matrix<T> Iq(mn,mn);
-        Unit(Iq);
-        EXPECT_NEAR(Max(fabs(Q*QT-Iq)),0.0,2*sqrt(N*M)*eps);
-        if (N==M)
         {
+            int mn=Q.GetNumRows();
+            Matrix<T> Iq(mn,mn);
+            Unit(Iq);
+            EXPECT_NEAR(Max(fabs(Q*QT-Iq)),0.0,2*sqrt(N*M)*eps);
+        }
+        if (N==M && Q.GetNumRows()==M)
+        {
+            int mn=Q.GetNumCols();
+            Matrix<T> Iq(mn,mn);
+            Unit(Iq);
             EXPECT_NEAR(Max(fabs(QT*Q-Iq)),0.0,2*sqrt(N*M)*eps);
         }
         Matrix<T> A1=R*Q;
         Matrix<T> dA=A-A1;
         EXPECT_NEAR(Max(fabs(dA)),0.0,2*sqrt(N*M)*eps);
+    }
+    virtual void ValidateQR(const Matrix<T>& Q, const Matrix<T>& R,int Rank)
+    {
+        ValidateQR(Q,R);
+        if (M<=30 && N<=30)
+        {
+            EXPECT_EQ(Q.GetNumCols(),Rank);
+            EXPECT_EQ(R.GetNumRows(),Rank);
+        }
+        else
+        {
+            EXPECT_LE(Q.GetNumCols(),Rank+3); //FOr large M,N it is very has to build a test matrix with an exact Rank
+            EXPECT_LE(R.GetNumRows(),Rank+3);
+        }
+    }
+    virtual void ValidateRQ(const Matrix<T>& R, const Matrix<T>& Q,int Rank)
+    {
+        ValidateRQ(R,Q);
+        if (M<=30 && N<=30)
+        {
+            EXPECT_EQ(Q.GetNumRows(),Rank);
+            EXPECT_EQ(R.GetNumCols(),Rank);
+        }
+        else
+        {
+            EXPECT_LE(Q.GetNumRows(),Rank+3);
+            EXPECT_LE(R.GetNumCols(),Rank+3);
+        }
     }
 
     QRSolver<T>* itsSolver;

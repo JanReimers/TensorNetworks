@@ -319,5 +319,85 @@ template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::SolveTh
     return std::make_tuple(std::move(L),std::move(Q)); //Return [L,Q]
 }
 
+//
+//  Hunt for the zero pivots in L and remove those rows from L and columns from Q
+//
+template <class T> bool ShrinkQR(Matrix<T>& Q, Matrix<T>& R,double eps)
+{
+    Vector<T> diag=R.GetDiagonal();
+    std::vector<index_t> remove;
+    for (index_t i:diag.indices())
+    {
+        if (fabs(diag(i))<=eps) //fast feasibility study
+        {
+            double s=Sum(fabs(R.GetRow(i))); //Now check the whole row
+            if (s<=eps) remove.push_back(i);
+        }
+    }
+    for (auto i=remove.rbegin();i!=remove.rend();i++)
+    {
+        assert(Sum(fabs(R.GetRow(*i)))<eps); //Make sure we got the correct row
+        R.RemoveRow   (*i);
+        Q.RemoveColumn(*i);
+    }
+    return remove.size()>0;
+}
+//
+//  Hunt for the zero pivots in L and remove those cols from L and rows from Q
+//
+template <class T> bool ShrinkRQ(Matrix<T>& R, Matrix<T>& Q,double eps)
+{
+    Vector<T> diag=R.GetDiagonal();
+    std::vector<index_t> remove;
+    for (index_t i:diag.indices())
+    {
+        if (fabs(diag(i))<=eps) //fast feasibility study
+        {
+            double s=Sum(fabs(R.GetColumn(i))); //Now check the whole col
+            if (s<=eps) remove.push_back(i);
+        }
+    }
+    for (auto i=remove.rbegin();i!=remove.rend();i++)
+    {
+        assert(Sum(fabs(R.GetColumn(*i)))<eps); //Make sure we got the correct row
+        R.RemoveColumn(*i);
+        Q.RemoveRow   (*i);
+    }
+    return remove.size()>0;
+}
+
+template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::
+SolveRankRevealingQR(const MatrixT& A, double eps)
+{
+    auto [Q,R]=SolveThinQR(A);
+    ShrinkQR(Q,R,eps);
+    return std::make_tuple(Q,R);
+}
+template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::
+SolveRankRevealingRQ(const MatrixT& A, double eps)
+{
+    auto [R,Q]=SolveThinRQ(A);
+    ShrinkRQ(R,Q,eps);
+    return std::make_tuple(R,Q);
+}
+
+
+template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::
+SolveRankRevealingQL(const MatrixT& A, double eps)
+{
+    auto [Q,L]=SolveThinQL(A);
+    ShrinkQR(Q,L,eps);
+    return std::make_tuple(Q,L);
+}
+
+template <class T> typename LapackQRSolver<T>::QRType LapackQRSolver<T>::
+SolveRankRevealingLQ(const MatrixT& A, double eps)
+{
+    auto [L,Q]=SolveThinLQ(A);
+    ShrinkRQ(L,Q,eps);
+    return std::make_tuple(L,Q);
+}
+
+
 template class LapackQRSolver<double>;
 template class LapackQRSolver<dcmplx>;

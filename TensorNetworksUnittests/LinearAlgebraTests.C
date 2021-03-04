@@ -301,6 +301,21 @@ TEST_F(LinearAlgebraTests,LapackQRSolverComplex)
     QRTester<dcmplx>(new LapackQRSolver<dcmplx>(),Nqr  ,Nqr/2).RunTests();
 }
 
+TEST_F(LinearAlgebraTests,LapackRankRevealingQR_Real)
+{
+    QRTester<double>(new LapackQRSolver<double>(),Nqr  ,Nqr  ).RunRRTests(Nqr/2);
+    QRTester<double>(new LapackQRSolver<double>(),Nqr-1,Nqr  ).RunRRTests(Nqr/2);
+    QRTester<double>(new LapackQRSolver<double>(),Nqr  ,Nqr-1).RunRRTests(Nqr/2);
+}
+
+TEST_F(LinearAlgebraTests,LapackRankRevealingQR_Complex)
+{
+    QRTester<dcmplx>(new LapackQRSolver<dcmplx>(),Nqr  ,Nqr  ).RunRRTests(Nqr/2);
+    QRTester<dcmplx>(new LapackQRSolver<dcmplx>(),Nqr-1,Nqr  ).RunRRTests(Nqr/2);
+    QRTester<dcmplx>(new LapackQRSolver<dcmplx>(),Nqr  ,Nqr-1).RunRRTests(Nqr/2);
+}
+
+
 TEST_F(LinearAlgebraTests,LapackLinearSolverReal)
 {
     LinearTester<double>(new LapackLinearSolver<double>(),Nlinear).RunTests();
@@ -311,45 +326,3 @@ TEST_F(LinearAlgebraTests,LapackLinearSolverComplex)
     LinearTester<dcmplx>(new LapackLinearSolver<dcmplx>(),Nlinear).RunTests();
 }
 
-/*
-template <class T> Matrix<T> MakeLowerTriangularMatrix(int M, int N)
-{
-    Matrix<double> A(M,N);
-    FillRandom(A);
-    for (index_t i:A.rows())
-        for (index_t j:A.cols())
-            if (j>1 && i<M)  A(i,j)=0.0;
-    A(1,1)=1.0;
-    A(M,N)=1.0;
-    return A;
-}
-
-//
-//  This is failing miserably.  VT comes out dense.  There must be some
-//  property of W operators that preserve triangularity under SVD.
-//
-TEST_F(LinearAlgebraTests,SVDUpperTriangular)
-{
-    double eps=1e-14;
-    LapackSVDSolver<double> solver;
-    Matrix<double> A=MakeLowerTriangularMatrix<double>(10,10);
-    cout << "A=" << A << endl;
-    EXPECT_TRUE(IsLowerTriangular(A ,eps));
-    auto [U,s,VT]=solver.SolveAll(A,eps);
-    auto re=FindRowReIndex(TensorNetworks::Lower,VT,eps);
-    for (auto i:re) cout << i << " ";
-    cout << endl;
-    cout << "U=" << U << endl;
-    cout << "s=" << s << endl;
-    cout << "VT=" << VT << endl;
-    VT.ReIndexRows(re);
-    s .ReIndexRows(re);
-    U .ReIndexColumns(re);
-    Matrix<double> A1=U*s*VT;
-    EXPECT_TRUE(IsLowerTriangular(VT,eps));
-    EXPECT_TRUE(IsLowerTriangular(U ,eps));
-    EXPECT_TRUE(IsLowerTriangular(A1 ,eps));
-    EXPECT_NEAR(Max(fabs(A1-A)),0.0,eps);
-}
-
-*/
