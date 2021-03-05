@@ -115,6 +115,9 @@
 		<Unit filename="VariationalGroundStateTests.C">
 			<Option compilerVar="CPP" />
 		</Unit>
+		<Unit filename="iMPOTests.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="iTEBDTests.C">
 			<Option compilerVar="CPP" />
 		</Unit>

@@ -1,15 +1,12 @@
 #include "Tests.H"
 #include "TensorNetworksImp/MPS/MPSImp.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.H"
-#include "TensorNetworks/iTEBDState.H"
 #include "Operators/MPO_SpatialTrotter.H"
 #include "Operators/MPO_TwoSite.H"
 #include "Containers/Matrix4.H"
 #include "TensorNetworks/Hamiltonian.H"
-#include "TensorNetworks/iHamiltonian.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/MPO.H"
-#include "TensorNetworks/iMPO.H"
 #include "TensorNetworks/Factory.H"
 #include "Operators/SiteOperatorImp.H"
 #include "Containers/Matrix6.H"
@@ -23,9 +20,7 @@ using TensorNetworks::DRight;
 using TensorNetworks::IterationSchedule;
 using TensorNetworks::Epsilons;
 using TensorNetworks::MPO;
-using TensorNetworks::iMPO;
 using TensorNetworks::TriType;
-using TensorNetworks::Gates;
 using TensorNetworks::MPSImp;
 using TensorNetworks::Std;
 using TensorNetworks::Parker;
@@ -53,10 +48,8 @@ public:
         : eps(1.0e-13)
         , itsFactory(TensorNetworks::Factory::GetFactory())
         , itsH(0)
-        , itsiH(0)
         , itsOperatorClient(0)
         , itsMPS(0)
-        , itsiMPS(0)
     {
         assert(itsFactory);
         StreamableObject::SetToPretty();
@@ -65,26 +58,18 @@ public:
     {
         delete itsFactory;
         if (itsH  )  delete itsH;
-        if (itsiH )  delete itsiH;
         if (itsMPS)  delete itsMPS;
-        if (itsiMPS) delete itsiMPS;
         if (itsOperatorClient) delete itsOperatorClient;
     }
 
     void Setup(int L, double S, int D,MPOForm f=RegularLower)
     {
+        assert(L>1);
         if (itsH  ) delete itsH;
-        if (itsiH ) delete itsiH;
         if (itsMPS) delete itsMPS;
-        if (itsiMPS) delete itsiMPS;
         if (itsOperatorClient) delete itsOperatorClient;
-        if (L>1)
-        {
-            itsH =itsFactory->Make1D_NN_HeisenbergHamiltonian( L,S,f,1.0,1.0,0.0);
-            itsMPS=itsH->CreateMPS(D);
-        }
-        itsiH  =itsFactory->Make1D_NN_HeisenbergiHamiltonian(L,S,f,1.0,1.0,0.0);
-        itsiMPS=itsiH->CreateiTEBDState(2,D,Gates,D*D*1e-10,1e-13);
+        itsH =itsFactory->Make1D_NN_HeisenbergHamiltonian( L,S,f,1.0,1.0,0.0);
+        itsMPS=itsH->CreateMPS(D);
         itsOperatorClient=new TensorNetworks::Hamiltonian_1D_NN_Heisenberg(S,1.0,1.0,0.0);
         assert(itsOperatorClient);
     }
@@ -101,10 +86,8 @@ public:
     double eps;
            TensorNetworks::Factory*        itsFactory;
            TensorNetworks:: Hamiltonian*   itsH;
-           TensorNetworks::iHamiltonian*   itsiH;
     const  TensorNetworks::OperatorClient* itsOperatorClient;
            TensorNetworks::MPS*            itsMPS;
-           TensorNetworks::iTEBDState*     itsiMPS;
 };
 
 MPO* MPOTests::MakeEnergyMPO(int isite) const
@@ -114,7 +97,7 @@ MPO* MPOTests::MakeEnergyMPO(int isite) const
     MPO* SS=new MPO_TwoSite(L,S ,isite,isite+1, Sz,Sz);
     MPO* SpSmo=new MPO_TwoSite(L,S ,isite,isite+1, Sp,Sm);
     MPO* SmSpo=new MPO_TwoSite(L,S ,isite,isite+1, Sm,Sp);
-    SS->Sum(SpSmo,0.5);
+    SS->Sum(SpSmo,0.5); //This applies 0.5 to all the unit ops.
     SS->Sum(SmSpo,0.5);
     delete SmSpo;
     delete SpSmo;
@@ -172,8 +155,9 @@ TEST_F(MPOTests,DoBuildMPO_Neel)
     itsMPS->InitializeWith(Neel);
     MPO* h12=MakeEnergyMPO(2);
 //    h12->Report(cout);
+//    h12->Dump(cout);
     EXPECT_NEAR(itsMPS->GetExpectation(h12),-0.25,1e-11);
-//    h12->CanonicalForm();  OpValMatrix.C line 430 fails.
+//    h12->CanonicalForm();  //OpValMatrix.C line 430 fails.
 //    EXPECT_NEAR(itsMPS->GetExpectation(h12),-0.25,1e-11);
     delete h12;
 }
@@ -513,162 +497,6 @@ TEST_F(MPOTests,TestMPOTrotter2_L5_S1)
     EXPECT_LT(truncError,epsMPO*50);
 }
 
-TEST_F(MPOTests,TestiMPOTrotter1_L2)
-{
-    int L=2,D=2;
-    double S=0.5,dt=0.00001,epsMPO=1e-14;
-    Setup(L,S,D);
-    iMPO* expH=itsiH->CreateiMPO(dt,FirstOrder,Std,epsMPO);
-//    expH->Report(cout);
-    for (int is=1;is<=L;is++)
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(is)->GetDws();
-        EXPECT_EQ(Dw1,4);
-        EXPECT_EQ(Dw2,4);
-    }
-}
-TEST_F(MPOTests,TestiMPO_Lower_Trotter2_L2)
-{
-    int L=2,D=2;
-    double S=0.5,dt=0.1,epsMPO=6e-3;
-    Setup(L,S,D,RegularLower);
-    iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,Std,epsMPO);
-//    expH->Report(cout);
-    for (int is=1;is<=L;is++)
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(is)->GetDws();
-        EXPECT_EQ(Dw1,4);
-        EXPECT_EQ(Dw2,4);
-    }
-}
-TEST_F(MPOTests,TestiMPO_Upper_Trotter2_L2)
-{
-    int L=2,D=2;
-    double S=0.5,dt=0.1,epsMPO=6e-3;
-    Setup(L,S,D,RegularUpper);
-    iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,Std,epsMPO);
-//    expH->Report(cout);
-    for (int is=1;is<=L;is++)
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(is)->GetDws();
-        EXPECT_EQ(Dw1,4);
-        EXPECT_EQ(Dw2,4);
-    }
-}
-
-TEST_F(MPOTests,TestiMPO_Lower_Trotter1_L3)
-{
-    int L=3,D=2;
-    double S=0.5,dt=0.00001,epsMPO=1e-14;
-    Setup(L,S,D,RegularLower);
-    iMPO* expH=itsiH->CreateiMPO(dt,FirstOrder,Std,epsMPO);
-//    expH->Report(cout);
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(1)->GetDws();
-        EXPECT_EQ(Dw1,1);
-        EXPECT_EQ(Dw2,4);
-    }
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(2)->GetDws();
-        EXPECT_EQ(Dw1,4);
-        EXPECT_EQ(Dw2,4);
-    }
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(3)->GetDws();
-        EXPECT_EQ(Dw1,4);
-        EXPECT_EQ(Dw2,1);
-    }
-}
-
-TEST_F(MPOTests,TestiMPO_Upper_Trotter1_L3)
-{
-    int L=3,D=2;
-    double S=0.5,dt=0.00001,epsMPO=1e-14;
-    Setup(L,S,D,RegularUpper);
-    iMPO* expH=itsiH->CreateiMPO(dt,FirstOrder,Std,epsMPO);
-//    expH->Report(cout);
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(1)->GetDws();
-        EXPECT_EQ(Dw1,1);
-        EXPECT_EQ(Dw2,4);
-    }
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(2)->GetDws();
-        EXPECT_EQ(Dw1,4);
-        EXPECT_EQ(Dw2,4);
-    }
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(3)->GetDws();
-        EXPECT_EQ(Dw1,4);
-        EXPECT_EQ(Dw2,1);
-    }
-}
-
-TEST_F(MPOTests,  TestiMPO_Lower_Trotter2_L3  )
-{
-    int L=3,D=2;
-    double S=0.5,dt=0.1,epsMPO=6e-3;
-    Setup(L,S,D,RegularLower);
-    iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,Std,epsMPO);
-//    expH->Report(cout);
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(1)->GetDws();
-        EXPECT_EQ(Dw1,1);
-        EXPECT_EQ(Dw2,4);
-    }
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(2)->GetDws();
-        EXPECT_EQ(Dw1,4);
-        EXPECT_EQ(Dw2,4);
-    }
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(3)->GetDws();
-        EXPECT_EQ(Dw1,4);
-        EXPECT_EQ(Dw2,1);
-    }
-}
-TEST_F(MPOTests,  TestiMPO_Upper_Trotter2_L3  )
-{
-    int L=3,D=2;
-    double S=0.5,dt=0.1,epsMPO=6e-3;
-    Setup(L,S,D,RegularUpper);
-    iMPO* expH=itsiH->CreateiMPO(dt,SecondOrder,Std,epsMPO);
-//    expH->Report(cout);
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(1)->GetDws();
-        EXPECT_EQ(Dw1,1);
-        EXPECT_EQ(Dw2,4);
-    }
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(2)->GetDws();
-        EXPECT_EQ(Dw1,4);
-        EXPECT_EQ(Dw2,4);
-    }
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(3)->GetDws();
-        EXPECT_EQ(Dw1,4);
-        EXPECT_EQ(Dw2,1);
-    }
-}
-
-TEST_F(MPOTests,TestL2iMPOTrotter4)
-{
-    int L=2,D=2;
-    double S=0.5,dt=0.1,epsMPO=1e-3;
-    Setup(L,S,D);
-    iMPO* expH=itsiH->CreateiMPO(dt,FourthOrder,Std,epsMPO);
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(1)->GetDws();
-        EXPECT_EQ(Dw1,4);
-        EXPECT_EQ(Dw2,7);
-    }
-    {
-        auto [Dw1,Dw2]=expH->GetSiteOperator(2)->GetDws();
-        EXPECT_EQ(Dw1,7);
-        EXPECT_EQ(Dw2,4);
-    }
-}
-
 TEST_F(MPOTests,TestParkerCanonical_Lower_L9H)
 {
     int L=9,D=2;
@@ -710,111 +538,6 @@ TEST_F(MPOTests,TestParkerCanonical_Upper_L9H)
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_EQ(H->GetMaxDw(),5);
 }
-
-TEST_F(MPOTests,TestParkerCanonicalTri_Lower_L1iH)
-{
-    int L=1,D=2;
-    double S=0.5;
-    Setup(L,S,D,RegularLower);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
-
-    EXPECT_EQ(itsiH->GetNormStatus(),"W");
-    double E=itsiMPS->GetExpectation(itsiH);
-    itsiH->CanonicalFormTri();
-    EXPECT_EQ(itsiH->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
-//    itsiH->Report(cout);
-    double Eright=itsiMPS->GetExpectation(itsiH);
-    EXPECT_NEAR(E,Eright,1e-13);
-    EXPECT_EQ(itsiH->GetMaxDw(),5);
-}
-TEST_F(MPOTests,TestParkerCanonicalTri_Upper_L1iH)
-{
-    int L=1,D=2;
-    double S=0.5;
-    Setup(L,S,D,RegularUpper);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
-
-    EXPECT_EQ(itsiH->GetNormStatus(),"W");
-    double E=itsiMPS->GetExpectation(itsiH);
-    itsiH->CanonicalFormTri();
-    EXPECT_EQ(itsiH->GetNormStatus(),"R"); //The last site ends up being both right and left normalized
-//    itsiH->Report(cout);
-    double Eright=itsiMPS->GetExpectation(itsiH);
-    EXPECT_NEAR(E,Eright,1e-13);
-    EXPECT_EQ(itsiH->GetMaxDw(),5);
-}
-
-
-TEST_F(MPOTests,TestParkerCanonicalQTIter_Lower_L1iH)
-{
-    int L=1,D=2;
-    double S=0.5;
-    Setup(L,S,D,RegularLower);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
-
-    EXPECT_EQ(itsiH->GetNormStatus(),"W");
-    double E=itsiMPS->GetExpectation(itsiH);
-    itsiH->CanonicalFormQRIter();
-    EXPECT_EQ(itsiH->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
-//    itsiH->Report(cout);
-    double Eright=itsiMPS->GetExpectation(itsiH);
-    EXPECT_NEAR(E,Eright,1e-13);
-    EXPECT_EQ(itsiH->GetMaxDw(),5);
-}
-
-TEST_F(MPOTests,TestParkerCanonicalQTIter_Upper_L1iH)
-{
-    int L=1,D=2;
-    double S=0.5;
-    Setup(L,S,D,RegularUpper);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
-
-    EXPECT_EQ(itsiH->GetNormStatus(),"W");
-    double E=itsiMPS->GetExpectation(itsiH);
-    itsiH->CanonicalFormQRIter();
-    EXPECT_EQ(itsiH->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
-//    itsiH->Report(cout);
-    double Eright=itsiMPS->GetExpectation(itsiH);
-    EXPECT_NEAR(E,Eright,1e-13);
-    EXPECT_EQ(itsiH->GetMaxDw(),5);
-}
-
-/*
-TEST_F(MPOTests,TestParkerCanonicalL1iH2)
-{
-    int L=1,D=2;
-    double S=0.5;
-    Setup(L,S,D);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
-    iMPO* iH2=itsiH->CreateiUnitOperator();
-    iH2->Product(itsiH);
-    iH2->Product(itsiH);
-
-    EXPECT_EQ(iH2->GetNormStatus(),"W");
-    double E=itsiMPS->GetExpectation(iH2);
-    iH2->CanonicalForm();
-    EXPECT_EQ(iH2->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
-    iH2->Report(cout);
-    double Eright=itsiMPS->GetExpectation(iH2);
-    EXPECT_NEAR(E,Eright,2e-3); //Very lax right now because CanonicalForm is not fully converging
-    EXPECT_EQ(iH2->GetMaxDw(),15);
-}
-*/
 
 TEST_F(MPOTests,TestParkerSVDCompress_Lower_HL9)
 {
@@ -895,7 +618,6 @@ TEST_F(MPOTests,TestParkerSVDCompress_Lower_H2L9)
     EXPECT_LT(truncError,1e-13);
 }
 
-// Fails
 TEST_F(MPOTests,TestParkerSVDCompress_Upper_H2L9)
 {
     int L=9,D=2;
