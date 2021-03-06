@@ -4540,6 +4540,121 @@ x & 1
 
 \end_layout
 
+\begin_layout Subsection
+Unit cell QR iteration
+\end_layout
+
+\begin_layout Standard
+A two site iMPO is two operator valued matrices, multiplied in succession
+ infinitly many times:
+\begin_inset Formula 
+\[
+\hat{H}=\cdots\hat{W}^{(1)}\hat{W}^{(2)}\hat{W}^{(1)}\hat{W}^{(2)}\cdots
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Iterated QR
+\end_layout
+
+\begin_layout Standard
+For this algorithm we will use a subscript in 
+\begin_inset Formula $\hat{W}_{n}$
+\end_inset
+
+ to indicate the iteration number.
+ Iterations for upper triangular and left canonical form, start with a standard
+ block respecting QR decomposition
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $n=0$
+\end_inset
+
+, Set the accumulated gauge transform 
+\begin_inset Formula $G_{L}^{(1)}=G_{L}^{(2)}=𝕀$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\hat{QR}\left(\hat{W}_{n}^{(1)}\right)\rightarrow\hat{V}_{n}^{(1)}=\hat{Q}_{n}^{(1)}R_{n}^{(1)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\hat{QR}\left(\hat{W}_{n}^{(2)}\right)\rightarrow\hat{V}_{n}^{(2)}=\hat{Q}_{n}^{(2)}R_{n}^{(2)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Do rank revailing reduction on all Qs and Rs, giviing
+\begin_inset Formula 
+\[
+\hat{H}=\cdots\hat{Q}_{n}^{(1)}R_{n}^{(1)}\hat{Q}_{n}^{(2)}R_{n}^{(2)}\hat{Q}_{n}^{(1)}R_{n}^{(1)}\hat{Q}_{n}^{(2)}R_{n}^{(2)}\cdots
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\hat{W}_{n+1}^{(1)}=\tilde{R}_{n}^{(2)}\hat{\tilde{Q}}_{n}^{(1)},\quad\hat{W}_{n+1}^{(2)}=\tilde{R}_{n}^{(1)}\hat{\tilde{Q}}_{n}^{(2)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $G_{L}^{(1)}=\tilde{R}_{n}^{(1)}G_{L}^{(1)},\quad G_{L}^{(2)}=\tilde{R}_{n}^{(2)}G_{L}^{(2)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+if 
+\begin_inset Formula $\tilde{R}_{n}$
+\end_inset
+
+ is not square(because to step 3), or 
+\begin_inset Formula $\left\Vert \tilde{R}_{n}-𝕀\right\Vert >\varepsilon$
+\end_inset
+
+, increment 
+\begin_inset Formula $n$
+\end_inset
+
+ and goto 2.
+\end_layout
+
+\begin_layout Standard
+As the iterations proceed 
+\begin_inset Formula $R_{n}$
+\end_inset
+
+ should get closer and closer to the unit matrix, at which point 
+\begin_inset Formula $\hat{W}_{n+1}=\hat{Q}_{n}$
+\end_inset
+
+ which is by definition orthogonal.
+ The full gauge transformation is accumulated in 
+\begin_inset Formula $G_{L}$
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Section
 SVD compession of iMPOs
 \end_layout

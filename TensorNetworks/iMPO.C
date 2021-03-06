@@ -1,5 +1,6 @@
 #include "TensorNetworks/iMPO.H"
 #include "TensorNetworks/SiteOperator.H"
+#include "oml/matrix.h"
 #include <cassert>
 
 namespace TensorNetworks
@@ -39,9 +40,9 @@ void iMPO::CanonicalFormTri()
     GetSiteOperator(1)->iCanonicalFormTriangular(DLeft);
 }
 
-void iMPO::CanonicalFormQRIter()
+void iMPO::CanonicalFormQRIter(Direction lr)
 {
-    GetSiteOperator(1)->iCanonicalFormQRIter(DLeft);
+    GetSiteOperator(1)->iCanonicalFormQRIter(lr);
 }
 
 

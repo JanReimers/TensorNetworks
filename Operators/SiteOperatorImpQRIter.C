@@ -36,51 +36,52 @@ bool Shrink(MatrixRT& L, MatrixOR& Q,double eps)
     return remove.size()>0;
 }
 
-void SiteOperatorImp::iCanonicalFormQRIter(Direction lr)
+MatrixRT SiteOperatorImp::iCanonicalFormQRIter(Direction lr)
 {
     assert(itsOpRange.Dw1==itsOpRange.Dw2); //Make sure we are square
     int X=itsOpRange.Dw1-2; //Chi
-    MatrixRT Lp(0,X+1,0,X+1),Id(0,X+1,0,X+1);
-    Unit(Lp);
+    MatrixRT G(0,X+1,0,X+1),Id(0,X+1,0,X+1);
+    Unit(G);
     Unit(Id);
 
-    double eta=8.111111;
+    double eta=1.0;
     int niter=1;
     do
     {
-        MatrixRT L=itsWs.QX(lr); //Solves V=Q*L
-        MatrixOR Q=itsWs.GetV(lr);
-        X=itsOpRange.Dw1-2; //Chi
-        assert(L.GetNumRows()==X+2);
-        assert(L.GetNumCols()==X+2);
-        if (Shrink(L,Q,1e-13))
-        {
-//            cout << "L*Q-V=" << Max(fabs(Q*L-V)) << endl;
-//            assert(Max(fabs(Q*L-V))<1e-13);
-        }
-        eta=8.111;
+        MatrixRT L=itsWs.QXRR(lr,1e-13); //Solves V=Q*L, Q is stored in W
         if (L.GetNumRows()==L.GetNumCols())
         {
             Id.SetLimits(L.GetLimits(),true);
             eta=Max(fabs(L-Id));
+            cout << " L=" << L.GetLimits() << "eta=" << eta << endl;
         }
-        cout << "eta=" << eta << endl;
-        itsWs.SetV(lr,Q);
-        // Get out here so we leave the Ws left normalized.
-        if (niter++>100) break;
+        else
+        {
+            cout << " L=" << L.GetLimits() << endl;
+
+        }
+        if (niter++>100) break; // Get out here so we leave the Ws left normalized.
         //
         //  Do W->L*W
         //
-        itsWs=L*itsWs; //ul gets lost in mul op.
-        //assert(itsWs.GetUpperLower()==Lower);
-        itsOpRange.Dw1=L.GetNumRows();
-        Lp=MatrixRT(L*Lp);
+        switch(lr)
+        {
+        case DLeft:
+            itsWs=L*itsWs;
+            G=L*G; //Update gauge transform
+            break;
+        case DRight:
+            itsWs=itsWs*L;
+            G=G*L; //Update gauge transform
+            break;
+        }
 
     } while (eta>1e-13);
 //    cout << std::fixed << std::setprecision(2) << "Lp=" << Lp << endl;
 //    cout << std::fixed << std::setprecision(2) << "LpT*Lp=" << Transpose(Lp)*Lp << endl;
 
     SetLimits();
+    return G;
 }
 
 

@@ -18,6 +18,7 @@ using TensorNetworks::DRight;
 using TensorNetworks::IterationSchedule;
 using TensorNetworks::Epsilons;
 using TensorNetworks::iMPO;
+using TensorNetworks::iHamiltonian;
 using TensorNetworks::TriType;
 using TensorNetworks::Gates;
 using TensorNetworks::Std;
@@ -293,7 +294,7 @@ TEST_F(iMPOTests,TestParkerCanonicalTri_Upper_L1iH)
 }
 
 
-TEST_F(iMPOTests,TestParkerCanonicalQTIter_Lower_L1iH)
+TEST_F(iMPOTests,CanonicalQRIter_Left__Lower_L1_NNHeis)
 {
     int L=1,D=2;
     double S=0.5;
@@ -305,15 +306,33 @@ TEST_F(iMPOTests,TestParkerCanonicalQTIter_Lower_L1iH)
 
     EXPECT_EQ(itsiH->GetNormStatus(),"W");
     double E=itsiMPS->GetExpectation(itsiH);
-    itsiH->CanonicalFormQRIter();
+    itsiH->CanonicalFormQRIter(DLeft);
     EXPECT_EQ(itsiH->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
 //    itsiH->Report(cout);
     double Eright=itsiMPS->GetExpectation(itsiH);
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_EQ(itsiH->GetMaxDw(),5);
 }
+TEST_F(iMPOTests,CanonicalQRIter_Right_Lower_L1_NNHeis)
+{
+    int L=1,D=2;
+    double S=0.5;
+    Setup(L,S,D,RegularLower);
+    itsiMPS->InitializeWith(Random);
+    itsiMPS->Canonicalize(DLeft);
+    itsiMPS->Orthogonalize(0,1e-13);
 
-TEST_F(iMPOTests,TestParkerCanonicalQTIter_Upper_L1iH)
+
+    EXPECT_EQ(itsiH->GetNormStatus(),"W");
+    double E=itsiMPS->GetExpectation(itsiH);
+    itsiH->CanonicalFormQRIter(DRight);
+    EXPECT_EQ(itsiH->GetNormStatus(),"R"); //The last site ends up being both right and left normalized
+//    itsiH->Report(cout);
+    double Eright=itsiMPS->GetExpectation(itsiH);
+    EXPECT_NEAR(E,Eright,1e-13);
+    EXPECT_EQ(itsiH->GetMaxDw(),5);
+}
+TEST_F(iMPOTests,CanonicalQRIter_Left__Upper_L1_NNHeis)
 {
     int L=1,D=2;
     double S=0.5;
@@ -325,8 +344,27 @@ TEST_F(iMPOTests,TestParkerCanonicalQTIter_Upper_L1iH)
 
     EXPECT_EQ(itsiH->GetNormStatus(),"W");
     double E=itsiMPS->GetExpectation(itsiH);
-    itsiH->CanonicalFormQRIter();
+    itsiH->CanonicalFormQRIter(DLeft);
     EXPECT_EQ(itsiH->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
+//    itsiH->Report(cout);
+    double Eright=itsiMPS->GetExpectation(itsiH);
+    EXPECT_NEAR(E,Eright,1e-13);
+    EXPECT_EQ(itsiH->GetMaxDw(),5);
+}
+TEST_F(iMPOTests,CanonicalQRIter_Right_Upper_L1_NNHeis)
+{
+    int L=1,D=2;
+    double S=0.5;
+    Setup(L,S,D,RegularUpper);
+    itsiMPS->InitializeWith(Random);
+    itsiMPS->Canonicalize(DLeft);
+    itsiMPS->Orthogonalize(0,1e-13);
+
+
+    EXPECT_EQ(itsiH->GetNormStatus(),"W");
+    double E=itsiMPS->GetExpectation(itsiH);
+    itsiH->CanonicalFormQRIter(DRight);
+    EXPECT_EQ(itsiH->GetNormStatus(),"R"); //The last site ends up being both right and left normalized
 //    itsiH->Report(cout);
     double Eright=itsiMPS->GetExpectation(itsiH);
     EXPECT_NEAR(E,Eright,1e-13);
@@ -357,4 +395,107 @@ TEST_F(iMPOTests,TestParkerCanonicalL1iH2)
     EXPECT_EQ(iH2->GetMaxDw(),15);
 }
 */
+
+TEST_F(iMPOTests,CanonicalQRIter_Left__Lower_L1_LongRange4)
+{
+    int L=1,D=2,NN=4;
+    double S=0.5;
+    Setup(L,S,D,RegularLower);
+    itsiMPS->InitializeWith(Random);
+    itsiMPS->Canonicalize(DLeft);
+    itsiMPS->Orthogonalize(0,1e-13);
+
+    iHamiltonian* iH=itsFactory->Make1D_2BodyLongRangeiHamiltonian(L,S,RegularLower,1.0,0.0,NN);
+    EXPECT_EQ(iH->GetMaxDw(),12);
+    EXPECT_EQ(iH->GetNormStatus(),"W");
+    double E=itsiMPS->GetExpectation(iH);
+    iH->CanonicalFormQRIter(DLeft);
+    EXPECT_EQ(iH->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
+    double Eright=itsiMPS->GetExpectation(iH);
+    EXPECT_NEAR(E,Eright,1e-13);
+    EXPECT_EQ(iH->GetMaxDw(),6);
+}
+
+TEST_F(iMPOTests,CanonicalQRIter_Right_Lower_L1_LongRange4)
+{
+    int L=1,D=2,NN=4;
+    double S=0.5;
+    Setup(L,S,D,RegularLower);
+    itsiMPS->InitializeWith(Random);
+    itsiMPS->Canonicalize(DLeft);
+    itsiMPS->Orthogonalize(0,1e-13);
+
+    iHamiltonian* iH=itsFactory->Make1D_2BodyLongRangeiHamiltonian(L,S,RegularLower,1.0,0.0,NN);
+    EXPECT_EQ(iH->GetMaxDw(),12);
+    EXPECT_EQ(iH->GetNormStatus(),"W");
+    double E=itsiMPS->GetExpectation(iH);
+    iH->CanonicalFormQRIter(DRight);
+    EXPECT_EQ(iH->GetNormStatus(),"R"); //The last site ends up being both right and left normalized
+    double Eright=itsiMPS->GetExpectation(iH);
+    EXPECT_NEAR(E,Eright,1e-13);
+    EXPECT_EQ(iH->GetMaxDw(),6);
+}
+
+TEST_F(iMPOTests,CanonicalQRIter_Left__Upper_L1_LongRange4)
+{
+    int L=1,D=2,NN=4;
+    double S=0.5;
+    Setup(L,S,D,RegularUpper);
+    itsiMPS->InitializeWith(Random);
+    itsiMPS->Canonicalize(DLeft);
+    itsiMPS->Orthogonalize(0,1e-13);
+
+    iHamiltonian* iH=itsFactory->Make1D_2BodyLongRangeiHamiltonian(L,S,RegularUpper,1.0,0.0,NN);
+    EXPECT_EQ(iH->GetMaxDw(),12);
+    EXPECT_EQ(iH->GetNormStatus(),"W");
+    double E=itsiMPS->GetExpectation(iH);
+    iH->CanonicalFormQRIter(DLeft);
+    EXPECT_EQ(iH->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
+    double Eright=itsiMPS->GetExpectation(iH);
+    EXPECT_NEAR(E,Eright,1e-13);
+    EXPECT_EQ(iH->GetMaxDw(),6);
+}
+
+TEST_F(iMPOTests,CanonicalQRIter_Right_Upper_L1_LongRange4)
+{
+    int L=1,D=2,NN=4;
+    double S=0.5;
+    Setup(L,S,D,RegularUpper);
+    itsiMPS->InitializeWith(Random);
+    itsiMPS->Canonicalize(DLeft);
+    itsiMPS->Orthogonalize(0,1e-13);
+
+    iHamiltonian* iH=itsFactory->Make1D_2BodyLongRangeiHamiltonian(L,S,RegularUpper,1.0,0.0,NN);
+    EXPECT_EQ(iH->GetMaxDw(),12);
+    EXPECT_EQ(iH->GetNormStatus(),"W");
+    double E=itsiMPS->GetExpectation(iH);
+    iH->CanonicalFormQRIter(DRight);
+    EXPECT_EQ(iH->GetNormStatus(),"R"); //The last site ends up being both right and left normalized
+    double Eright=itsiMPS->GetExpectation(iH);
+    EXPECT_NEAR(E,Eright,1e-13);
+    EXPECT_EQ(iH->GetMaxDw(),6);
+}
+
+TEST_F(iMPOTests,CanonicalQRIter_Right_Upper_L1_LongRange10)
+{
+    int L=1,D=2,NN=10;
+    double S=0.5;
+    Setup(L,S,D,RegularLower);
+    itsiMPS->InitializeWith(Random);
+    itsiMPS->Canonicalize(DLeft);
+    itsiMPS->Orthogonalize(0,1e-13);
+
+    iHamiltonian* iH=itsFactory->Make1D_2BodyLongRangeiHamiltonian(L,S,RegularUpper,1.0,0.0,NN);
+    EXPECT_EQ(iH->GetMaxDw(),NN*(NN+1)/2+2);
+    EXPECT_EQ(iH->GetNormStatus(),"W");
+    double E=itsiMPS->GetExpectation(iH);
+    iH->CanonicalFormQRIter(DRight);
+//    iH->CanonicalFormQRIter(DLeft); //Fails??!?  Lower left is OK?!?!
+    EXPECT_EQ(iH->GetNormStatus(),"R"); //The last site ends up being both right and left normalized
+    double Eright=itsiMPS->GetExpectation(iH);
+    EXPECT_NEAR(E,Eright,1e-13);
+    EXPECT_EQ(iH->GetMaxDw(),NN+2);
+}
+
+
 

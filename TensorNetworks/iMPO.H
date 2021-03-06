@@ -22,7 +22,7 @@ public:
     virtual double Compress(CompressType ct,const SVCompressorR*);
     virtual void   CanonicalForm();
     virtual void   CanonicalFormTri();
-    virtual void   CanonicalFormQRIter();
+    virtual void   CanonicalFormQRIter(Direction lr);
 
 };
 

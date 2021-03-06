@@ -17,8 +17,10 @@ public:
     virtual  Hamiltonian*  Make1D_2BodyLongRangeHamiltonian    (int L, double S,MPOForm, double J, double hx, int NN);
     virtual  Hamiltonian*  Make1D_3BodyHamiltonian             (int L, double S,MPOForm, double J, double K, double hz);
 
-    virtual iHamiltonian*  Make1D_NN_HeisenbergiHamiltonian      (int L, double S,MPOForm, double Jxy, double Jz, double hz);
-    virtual iHamiltonian*  Make1D_NN_TransverseIsingiHamiltonian (int L, double S,MPOForm, double J, double hx);
+    virtual iHamiltonian*  Make1D_NN_HeisenbergiHamiltonian     (int L, double S,MPOForm, double Jxy, double Jz, double hz);
+    virtual iHamiltonian*  Make1D_NN_TransverseIsingiHamiltonian(int L, double S,MPOForm, double J, double hx);
+    virtual iHamiltonian*  Make1D_2BodyLongRangeiHamiltonian    (int L, double S,MPOForm, double J, double hx, int NN);
+
     virtual SVCompressorR* MakeMPOCompressor(int Dmax, double epsSV);
     virtual SVCompressorC* MakeMPSCompressor(int Dmax, double epsSV);
     virtual TNSLogger*     MakeSPDLogger(int level);

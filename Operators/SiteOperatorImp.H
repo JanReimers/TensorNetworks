@@ -44,9 +44,9 @@ public:
     //
     //  As per Parker et. al.
     //
-    virtual void    CanonicalForm(Direction LR);
-    virtual void   iCanonicalFormQRIter(Direction LR); //Infinite lattice iMPO version
-    virtual void   iCanonicalFormTriangular(Direction LR); //Infinite lattice iMPO version
+    virtual void     CanonicalForm(Direction LR);
+    virtual MatrixRT iCanonicalFormQRIter(Direction LR); //Infinite lattice iMPO version, Return gauge transform
+    virtual void     iCanonicalFormTriangular(Direction LR); //Infinite lattice iMPO version
 
     virtual void   Report(std::ostream&) const;
     virtual char   GetNormStatus(double eps) const;

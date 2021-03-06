@@ -3,6 +3,9 @@ Done: Separate MPOTests and iMPOTests
 exp(-t*H) MPOs
     Try shuffling U (and Evs) to get lower or upper triangular.
 
+-CanonicalQRIter_Right_Upper_L1_LongRange10 fail for DLeft but works for DRight
+        -All works Lower DLeft && DRight ?!?!?
+
 SiteOperatorImp:
 
     -Run Parker's' examples

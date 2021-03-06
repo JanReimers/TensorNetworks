@@ -60,6 +60,13 @@ Make1D_NN_TransverseIsingiHamiltonian(int L, double S,MPOForm f, double J, doubl
     return new iHamiltonianImp(L,&H,f);
 }
 
+iHamiltonian* FactoryImp::
+Make1D_2BodyLongRangeiHamiltonian(int L, double S,MPOForm f, double J, double hx, int NN)
+{
+    Hamiltonian_2Body_LongRange H(S,J,hx,NN);
+    return new iHamiltonianImp(L,&H,f);
+}
+
 SVCompressorR* FactoryImp::MakeMPOCompressor(int Dmax, double epsSV)
 {
 //    return new SVMPOCompressor(Dmax,epsSV);

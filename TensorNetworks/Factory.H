@@ -20,8 +20,9 @@ public:
     //
     //  For iHamiltonians L=Unit cell size.
     //
-    virtual iHamiltonian*  Make1D_NN_HeisenbergiHamiltonian      (int L, double S,MPOForm, double Jxy, double Jz, double hz)=0;
-    virtual iHamiltonian*  Make1D_NN_TransverseIsingiHamiltonian (int L, double S,MPOForm, double J, double hx)=0;
+    virtual iHamiltonian*  Make1D_NN_HeisenbergiHamiltonian     (int L, double S,MPOForm, double Jxy, double Jz, double hz)=0;
+    virtual iHamiltonian*  Make1D_NN_TransverseIsingiHamiltonian(int L, double S,MPOForm, double J, double hx)=0;
+    virtual iHamiltonian*  Make1D_2BodyLongRangeiHamiltonian    (int L, double S,MPOForm, double J, double hx, int NN)=0;
 
     virtual SVCompressorR* MakeMPOCompressor(int Dmax, double epsSV)=0;
     virtual SVCompressorC* MakeMPSCompressor(int Dmax, double epsSV)=0;
