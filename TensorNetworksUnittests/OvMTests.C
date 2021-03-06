@@ -54,7 +54,7 @@ public:
         assert(itsOperatorClient);
     }
 
-    void TestQR (MatrixOR OvM,Direction,TriType,Position);
+    void TestQR (MatrixOR OvM,Direction,TriType,Position,double epsRR=-1.0);
     void TestSVD(MatrixOR OvM,Direction,TriType,Position);
     void TestShuffle(MatrixOR OvM,Direction lr,double eps,double S);
     Direction Invert(Direction lr) const
@@ -110,12 +110,12 @@ void MakeLRBOperator(MatrixOR& OvM,TriType ul,Position lbr)
     }
 }
 
-void OvMTests::TestQR(MatrixOR OvM,Direction lr,TriType ul,Position lbr)
+void OvMTests::TestQR(MatrixOR OvM,Direction lr,TriType ul,Position lbr, double epsRR)
 {
     int d=2*itsOperatorClient->GetS()+1;
     MakeLRBOperator(OvM,ul,lbr);
     MatrixOR V=OvM.GetV(lr);
-    MatrixRT R=OvM.QX(lr);
+    MatrixRT R=OvM.QXRR(lr,epsRR);
     MatrixOR Q=OvM.GetV(lr);
     MatrixRT R1=R;
     if (lr==DLeft)
@@ -829,6 +829,25 @@ TEST_F(OvMTests,QRRightH2)
             MatrixOR H(itsOperatorClient->GetW(RegularLower));
             MatrixOR H2=TensorProduct(H,H);
             TestQR(H2,DRight,Lower,PRight);
+        }
+    }
+}
+
+TEST_F(OvMTests,RankRevealingQRRightH2)
+{
+    double epsRR=1e-10;
+    for (double S=0.5;S<=2.5;S+=0.5)
+    {
+        Setup(S);
+        {
+            MatrixOR H(itsOperatorClient->GetW(RegularUpper));
+            MatrixOR H2=TensorProduct(H,H);
+            TestQR(H2,DRight,Upper,PRight,epsRR);
+        }
+        {
+            MatrixOR H(itsOperatorClient->GetW(RegularLower));
+            MatrixOR H2=TensorProduct(H,H);
+            TestQR(H2,DRight,Lower,PRight,epsRR);
         }
     }
 }

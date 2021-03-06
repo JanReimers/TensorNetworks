@@ -72,6 +72,7 @@ public:
     MatrixO   GetV(Direction) const;
     void      SetV(Direction,const MatrixO& V);
     Matrix<T> QX  (Direction); //Return gauge transform matrix to transfer to the next site.
+    Matrix<T> QXRR(Direction,double epsRR); //Rank revealing version
     SVDType   SVD (Direction,const SVCompressorR* comp) ;
 //
 //  Flatten for QR and SVD decompositions
@@ -90,6 +91,7 @@ private:
     friend class SiteOperatorImp;
     QXType    Full_QX  (Direction);
     QXType    BlockQX  (Direction);
+    QXType    BlockQX  (Direction,double eps); //Rank revealing version, us eps<0 to skip RR
     SVDType   FullMSVD (Direction,const SVCompressorR* comp) ;
     SVDType   Full_SVD (Direction,const SVCompressorR* comp) ;
     SVDType   BlockSVD (Direction,const SVCompressorR* comp) ;

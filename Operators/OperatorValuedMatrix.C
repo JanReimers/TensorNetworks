@@ -373,6 +373,25 @@ template <class T> Matrix<T> MatrixO<T>::QX(Direction lr)
     }
     return R;
 }
+template <class T> Matrix<T> MatrixO<T>::QXRR(Direction lr, double epsRR)
+{
+    MatrixO<T> Q;
+    Matrix<T>  R;
+    switch (itsForm)
+    {
+    case expH:
+        std::tie(Q,R)=Full_QX(lr);
+        break;
+    case RegularUpper:
+    case RegularLower:
+        std::tie(Q,R)=BlockQX(lr,epsRR);
+        SetV(lr,Q);
+        break;
+    default:
+        assert(false);
+    }
+    return R;
+}
 
 template <class T> typename MatrixO<T>::SVDType MatrixO<T>::SVD (Direction lr,const SVCompressorR* comp)
 {
@@ -392,10 +411,14 @@ template <class T> typename MatrixO<T>::SVDType MatrixO<T>::SVD (Direction lr,co
     return ret;
 }
 
-
 template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
 {
-    LapackQRSolver <double>  solver;
+    return BlockQX(lr,-1.0); //No rank reduction
+}
+
+template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr,double epsRR)
+{
+    QRSolver<double>* solver=new LapackQRSolver<double>();
     MatrixO   V=GetV(lr);
     MatLimits Vlim=V.ReBase(1,1);
     Matrix<T> Vf=V.Flatten(lr);
@@ -416,7 +439,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
         {
         case DLeft:
         {
-            auto [Q,R]=solver.SolveThinQR(Vf);
+            auto [Q,R]=solver->SolveThinQR(Vf,epsRR);
             assert(IsUpperTriangular(R));
             V.UnFlatten(Q);
             RL=R;
@@ -427,7 +450,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
         break;
         case DRight:
         {
-            auto [R,Q]=solver.SolveThinRQ(Vf);
+            auto [R,Q]=solver->SolveThinRQ(Vf,epsRR);
             assert(IsUpperTriangular(R));
             V.UnFlatten(Q);
             RL=R;
@@ -443,7 +466,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
         {
         case DLeft:
         {
-            auto [Q,L]=solver.SolveThinQL(Vf);
+            auto [Q,L]=solver->SolveThinQL(Vf,epsRR);
             assert(IsLowerTriangular(L));
             V.UnFlatten(Q);
             RL=L;
@@ -454,7 +477,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
         break;
         case DRight:
         {
-            auto [L,Q]=solver.SolveThinLQ(Vf);
+            auto [L,Q]=solver->SolveThinLQ(Vf,epsRR);
             assert(IsLowerTriangular(L));
             V.UnFlatten(Q);
             RL=L;
@@ -468,6 +491,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::BlockQX(Direction lr)
     default:
         assert(false);
     }
+    delete solver;
     // Do some sanity checks before re-scaling.
     if (scale==0.0)
         scale=1.0;
