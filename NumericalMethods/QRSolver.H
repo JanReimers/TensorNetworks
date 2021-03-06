@@ -25,6 +25,34 @@ public:
     virtual QRType  SolveRankRevealingQL(const MatrixT&, double eps)=0; // returns [R,Q]
     virtual QRType  SolveRankRevealingLQ(const MatrixT&, double eps)=0; // returns [L,Q]
 
+    virtual QRType  SolveThinQR(const MatrixT& A,double eps)
+    {
+        if (eps>=0.0)
+            return SolveRankRevealingQR(A,eps);
+        else
+            return SolveThinQR(A);
+    }
+    virtual QRType  SolveThinRQ(const MatrixT& A,double eps)
+    {
+        if (eps>=0.0)
+            return SolveRankRevealingRQ(A,eps);
+        else
+            return SolveThinRQ(A);
+    }
+    virtual QRType  SolveThinQL(const MatrixT& A,double eps)
+    {
+        if (eps>=0.0)
+            return SolveRankRevealingQL(A,eps);
+        else
+            return SolveThinQL(A);
+    }
+    virtual QRType  SolveThinLQ(const MatrixT& A,double eps)
+    {
+        if (eps>=0.0)
+            return SolveRankRevealingLQ(A,eps);
+        else
+            return SolveThinLQ(A);
+    }
 };
 
 #endif // QRSOLVER_H
