@@ -497,5 +497,24 @@ TEST_F(iMPOTests,CanonicalQRIter_Right_Upper_L1_LongRange10)
     EXPECT_EQ(iH->GetMaxDw(),NN+2);
 }
 
+TEST_F(iMPOTests,CanonicalQRIter_Left__Lower_L1_3Body)
+{
+    int L=1,D=2;
+    double S=2.5;
+    Setup(L,S,D,RegularLower);
+    itsiMPS->InitializeWith(Random);
+    itsiMPS->Canonicalize(DLeft);
+    itsiMPS->Orthogonalize(0,1e-13);
+
+    iHamiltonian* iH=itsFactory->Make1D_3BodyiHamiltonian(L,S,RegularLower,1.0,0.5,0.0);
+    EXPECT_EQ(iH->GetMaxDw(),5);
+    EXPECT_EQ(iH->GetNormStatus(),"W");
+    double E=itsiMPS->GetExpectation(iH);
+    iH->CanonicalFormQRIter(DLeft);
+    EXPECT_EQ(iH->GetNormStatus(),"L"); //The last site ends up being both right and left normalized
+    double Eright=itsiMPS->GetExpectation(iH);
+    EXPECT_NEAR(E,Eright,1e-13);
+    EXPECT_EQ(iH->GetMaxDw(),3);
+}
 
 

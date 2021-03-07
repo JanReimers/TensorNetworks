@@ -67,6 +67,13 @@ Make1D_2BodyLongRangeiHamiltonian(int L, double S,MPOForm f, double J, double hx
     return new iHamiltonianImp(L,&H,f);
 }
 
+iHamiltonian* FactoryImp::
+Make1D_3BodyiHamiltonian(int L, double S,MPOForm f, double J, double K, double hz)
+{
+    Hamiltonian_3Body H(S,J,K,hz);
+    return new iHamiltonianImp(L,&H,f);
+}
+
 SVCompressorR* FactoryImp::MakeMPOCompressor(int Dmax, double epsSV)
 {
 //    return new SVMPOCompressor(Dmax,epsSV);
