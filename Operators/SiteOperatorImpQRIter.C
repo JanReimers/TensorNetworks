@@ -53,11 +53,11 @@ MatrixRT SiteOperatorImp::iCanonicalFormQRIter(Direction lr)
         {
             Id.SetLimits(L.GetLimits(),true);
             eta=Max(fabs(L-Id));
-            cout << " L=" << L.GetLimits() << "eta=" << eta << endl;
+//            cout << " L=" << L.GetLimits() << "eta=" << eta << endl;
         }
         else
         {
-            cout << " L=" << L.GetLimits() << endl;
+//            cout << " L=" << L.GetLimits() << endl;
 
         }
         if (niter++>100) break; // Get out here so we leave the Ws left normalized.

@@ -1,14 +1,16 @@
 #include "Tests.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.H"
+#include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_2Body_LongRange.H"
+#include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_3Body.H"
 #include "TensorNetworks/iTEBDState.H"
 #include "Operators/MPO_SpatialTrotter.H"
 #include "Operators/MPO_TwoSite.H"
+#include "Operators/SiteOperatorImp.H"
 #include "Containers/Matrix4.H"
 #include "TensorNetworks/iHamiltonian.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/iMPO.H"
 #include "TensorNetworks/Factory.H"
-#include "Operators/SiteOperatorImp.H"
 #include "Containers/Matrix6.H"
 
 using TensorNetworks::Random;
@@ -34,6 +36,17 @@ using TensorNetworks::Sm;
 using TensorNetworks::MPOForm;
 using TensorNetworks::RegularLower;
 using TensorNetworks::RegularUpper;
+using TensorNetworks::Stod;
+using TensorNetworks::SiteOperatorImp;
+using TensorNetworks::PBulk;
+using TensorNetworks::MatrixOR;
+using TensorNetworks::MaxDelta;
+//using TensorNetworks::;
+
+//using TensorNetworks::;
+//using TensorNetworks::;
+//using TensorNetworks::;
+
 
 class iMPOTests : public ::testing::Test
 {
@@ -273,6 +286,7 @@ TEST_F(iMPOTests,TestParkerCanonicalTri_Lower_L1iH)
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_EQ(itsiH->GetMaxDw(),5);
 }
+
 TEST_F(iMPOTests,TestParkerCanonicalTri_Upper_L1iH)
 {
     int L=1,D=2;
@@ -294,7 +308,7 @@ TEST_F(iMPOTests,TestParkerCanonicalTri_Upper_L1iH)
 }
 
 
-TEST_F(iMPOTests,CanonicalQRIter_Left__Lower_L1_NNHeis)
+TEST_F(iMPOTests,CanonicalQRIter_Left__Lower_L1_LongRangeHeis)
 {
     int L=1,D=2;
     double S=0.5;
@@ -313,7 +327,7 @@ TEST_F(iMPOTests,CanonicalQRIter_Left__Lower_L1_NNHeis)
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_EQ(itsiH->GetMaxDw(),5);
 }
-TEST_F(iMPOTests,CanonicalQRIter_Right_Lower_L1_NNHeis)
+TEST_F(iMPOTests,CanonicalQRIter_Right_Lower_L1_LongRangeHeis)
 {
     int L=1,D=2;
     double S=0.5;
@@ -332,7 +346,7 @@ TEST_F(iMPOTests,CanonicalQRIter_Right_Lower_L1_NNHeis)
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_EQ(itsiH->GetMaxDw(),5);
 }
-TEST_F(iMPOTests,CanonicalQRIter_Left__Upper_L1_NNHeis)
+TEST_F(iMPOTests,CanonicalQRIter_Left__Upper_L1_LongRangeHeis)
 {
     int L=1,D=2;
     double S=0.5;
@@ -351,7 +365,7 @@ TEST_F(iMPOTests,CanonicalQRIter_Left__Upper_L1_NNHeis)
     EXPECT_NEAR(E,Eright,1e-13);
     EXPECT_EQ(itsiH->GetMaxDw(),5);
 }
-TEST_F(iMPOTests,CanonicalQRIter_Right_Upper_L1_NNHeis)
+TEST_F(iMPOTests,CanonicalQRIter_Right_Upper_L1_LongRangeHeis)
 {
     int L=1,D=2;
     double S=0.5;
@@ -517,4 +531,129 @@ TEST_F(iMPOTests,CanonicalQRIter_Left__Lower_L1_3Body)
     EXPECT_EQ(iH->GetMaxDw(),3);
 }
 
+
+TEST_F(iMPOTests,CanonicalGaugeTransform_NNHeis_Upper)
+{
+    int L=1,D=2;
+    double S=0.5,eps=S*1e-15;
+    MPOForm f=RegularUpper;
+    Setup(L,S,D,f);
+
+    int d=Stod(S);
+    SiteOperatorImp* soL=new SiteOperatorImp(d,PBulk,itsOperatorClient,f);
+    SiteOperatorImp* soR=new SiteOperatorImp(d,PBulk,itsOperatorClient,f);
+    MatrixRT GL=soL->iCanonicalFormQRIter(DLeft);
+    MatrixRT GR=soR->iCanonicalFormQRIter(DRight);
+    EXPECT_EQ(soL->GetNormStatus(eps),'L');
+    EXPECT_EQ(soR->GetNormStatus(eps),'R');
+    MatrixRT G=GL*GR;
+    MatrixOR WL=soL->GetW();
+    MatrixOR WR=soR->GetW();
+    EXPECT_NEAR(MaxDelta(G*WR,WL*G),0.0,eps);
+    MatrixRT G1=soR->iCanonicalFormQRIter(DLeft);
+    EXPECT_NEAR(Max(fabs(G-G1)),0.0,eps); //Passes by flucke ?
+    MatrixOR WL1=soR->GetW();
+    EXPECT_NEAR(MaxDelta(G1*WR,WL1*G1),0.0,eps);
+    MatrixRT G2=soL->iCanonicalFormQRIter(DRight);
+//    EXPECT_NEAR(Max(fabs(G-G2)),0.0,eps); //Getting sign differences
+    MatrixOR WR1=soL->GetW();
+    EXPECT_NEAR(MaxDelta(G2*WR1,WL*G2),0.0,eps);
+
+    delete soL;
+    delete soR;
+}
+
+TEST_F(iMPOTests,CanonicalGaugeTransform_NNHeis_Lower)
+{
+    int L=1,D=2;
+    double S=0.5,eps=S*1e-15;
+    MPOForm f=RegularLower;
+    Setup(L,S,D,f);
+
+    int d=Stod(S);
+    SiteOperatorImp* soL=new SiteOperatorImp(d,PBulk,itsOperatorClient,f);
+    SiteOperatorImp* soR=new SiteOperatorImp(d,PBulk,itsOperatorClient,f);
+    MatrixRT GL=soL->iCanonicalFormQRIter(DLeft);
+    MatrixRT GR=soR->iCanonicalFormQRIter(DRight);
+    EXPECT_EQ(soL->GetNormStatus(eps),'L');
+    EXPECT_EQ(soR->GetNormStatus(eps),'R');
+    MatrixRT G=GL*GR;
+    MatrixOR WL=soL->GetW();
+    MatrixOR WR=soR->GetW();
+    EXPECT_NEAR(MaxDelta(G*WR,WL*G),0.0,eps);
+    MatrixRT G1=soR->iCanonicalFormQRIter(DLeft);
+    EXPECT_EQ(soR->GetNormStatus(eps),'L');
+//    EXPECT_NEAR(Max(fabs(G-G1)),0.0,eps); //Getting sign differences
+    MatrixOR WL1=soR->GetW();
+    EXPECT_NEAR(MaxDelta(G1*WR,WL1*G1),0.0,eps);
+    MatrixRT G2=soL->iCanonicalFormQRIter(DRight);
+    EXPECT_EQ(soL->GetNormStatus(eps),'R');
+//    EXPECT_NEAR(Max(fabs(G-G2)),0.0,eps); //Getting sign differences
+    MatrixOR WR1=soL->GetW();
+    EXPECT_NEAR(MaxDelta(G2*WR1,WL*G2),0.0,eps);
+
+    delete soL;
+    delete soR;
+}
+
+
+TEST_F(iMPOTests,CanonicalGaugeTransform_LongRangeHeis_Upper)
+{
+    int L=1,D=2,NN=8; //9 fails
+    double S=0.5,eps=1e-13;
+    MPOForm f=RegularUpper;
+    Setup(L,S,D,f);
+
+    int d=Stod(S);
+    TensorNetworks::Hamiltonian_2Body_LongRange H(S,1.0,0.0,NN);
+    SiteOperatorImp* soL=new SiteOperatorImp(d,PBulk,&H,f);
+    SiteOperatorImp* soR=new SiteOperatorImp(d,PBulk,&H,f);
+    MatrixRT GL=soL->iCanonicalFormQRIter(DLeft);
+    MatrixRT GR=soR->iCanonicalFormQRIter(DRight);
+    MatrixRT G=GL*GR;
+    EXPECT_EQ(soL->GetNormStatus(eps),'L');
+    EXPECT_EQ(soR->GetNormStatus(eps),'R');
+
+    MatrixOR WL=soL->GetW();
+    MatrixOR WR=soR->GetW();
+    EXPECT_NEAR(MaxDelta(G*WR,WL*G),0.0,1e-15);
+
+    MatrixRT G1=soR->iCanonicalFormQRIter(DLeft);
+    EXPECT_EQ(soR->GetNormStatus(eps),'L');
+    MatrixOR WL1=soR->GetW();
+    EXPECT_NEAR(MaxDelta(G1*WR,WL1*G1),0.0,1e-15);
+
+    delete soL;
+    delete soR;
+}
+
+TEST_F(iMPOTests,CanonicalGaugeTransform_LongRangeHeis_Lower)
+{
+    int L=1,D=2,NN=8;
+    double S=0.5,eps=1e-13;
+    MPOForm f=RegularLower;
+    Setup(L,S,D,f);
+
+    int d=Stod(S);
+    TensorNetworks::Hamiltonian_2Body_LongRange H(S,1.0,0.0,NN);
+    SiteOperatorImp* soL=new SiteOperatorImp(d,PBulk,&H,f);
+    SiteOperatorImp* soR=new SiteOperatorImp(d,PBulk,&H,f);
+    MatrixRT GL=soL->iCanonicalFormQRIter(DLeft);
+    MatrixRT GR=soR->iCanonicalFormQRIter(DRight);
+    MatrixRT G=GL*GR;
+    EXPECT_EQ(soL->GetNormStatus(eps),'L');
+    EXPECT_EQ(soR->GetNormStatus(eps),'R');
+
+    MatrixOR WL=soL->GetW();
+    MatrixOR WR=soR->GetW();
+    EXPECT_NEAR(MaxDelta(G*WR,WL*G),0.0,1e-15);
+
+    MatrixRT G1=soR->iCanonicalFormQRIter(DLeft);
+    EXPECT_EQ(soR->GetNormStatus(eps),'L');
+    MatrixOR WL1=soR->GetW();
+    EXPECT_NEAR(MaxDelta(G1*WR,WL1*G1),0.0,1e-15);
+
+    delete soL;
+    delete soR;
+}
 
