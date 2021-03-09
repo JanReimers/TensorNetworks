@@ -139,14 +139,13 @@ template <class T> MatrixO<T> operator-(const MatrixO<T>& a, const MatrixO<T>& b
 {
     assert(a.GetLimits()==b.GetLimits());
     assert(a.Getd     ()==b.Getd     ());
-    //TriType ul=Combine(a.GetUpperLower(),b.GetUpperLower());
-    MatrixO<T> ret(a.Getd(),Full,a.GetLimits());
+    MPOForm f=Combine(a.GetForm(),b.GetForm());
+    MatrixO<T> ret(a.Getd(),f,a.GetLimits());
     OperatorElement<T> Z=OperatorZ(a.Getd());
     Fill(ret,Z);
     for (index_t i:a.rows())
         for (index_t j:a.cols())
             ret(i,j)=a(i,j)-b(i,j);
-    ret.SetUpperLower();
     return ret;
 }
 
