@@ -11,9 +11,10 @@ namespace TensorNetworks
 //
 SiteOperatorImp::SiteOperatorImp(int d, MPOForm f)
     : itsd(d)
-//    , itsTruncationError(0.0)
     , itsLBR(PBulk)
-   , itsWs(1,1,dtoS(d),f)
+    , itsWs(1,1,dtoS(d),f)
+    , itsLeft_Bond(nullptr)
+    , itsRightBond(nullptr)
 {
     Unit(itsWs);
     SetLimits();
@@ -31,9 +32,10 @@ SiteOperatorImp::SiteOperatorImp(int d, SpinOperator so) //Construct spin operat
 
 SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H,MPOForm f)
     : itsd(d)
-//    , itsTruncationError(0.0)
     , itsLBR(lbr)
     , itsWs(H->GetW(f))
+    , itsLeft_Bond(nullptr)
+    , itsRightBond(nullptr)
 {
     switch (f)
     {
@@ -53,11 +55,11 @@ SiteOperatorImp::SiteOperatorImp(int d,Position lbr, const OperatorClient* H,MPO
 //
 SiteOperatorImp::SiteOperatorImp(int d, Direction lr,Position lbr,const MatrixRT& U, const DiagonalMatrixRT& s)
     : itsd(d)
-//    , itsTruncationError(0.0)
     , itsLBR(lbr)
     , itsWs(d,expH)
+    , itsLeft_Bond(nullptr)
+    , itsRightBond(nullptr)
 {
-    itsLBR=lbr;
     int Dw=s.GetNumRows();
     assert(Dw==d*d);
     assert(U.GetNumCols()==Dw);
