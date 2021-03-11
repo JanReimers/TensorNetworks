@@ -40,13 +40,19 @@ public:
     //
     //  SVD compress and normalize to reduce Dw. Returns accumulated SVD truncation error
     //
-    virtual double Compress(CompressType,Direction,const SVCompressorR*);
+    virtual double  Compress(CompressType,Direction,const SVCompressorR*);
+    virtual double iCompress(CompressType,Direction,const SVCompressorR*);
     //
     //  As per Parker et. al.
     //
-    virtual void     CanonicalForm(Direction LR);
-    virtual MatrixRT iCanonicalFormQRIter(Direction LR); //Infinite lattice iMPO version, Return gauge transform
+    virtual void      CanonicalForm(Direction LR);
     virtual void     iCanonicalFormTriangular(Direction LR); //Infinite lattice iMPO version
+    //
+    //  Low level QRiter routines (for iMPOs only)
+    //
+    virtual void   InitQRIter(); //Set itsG to unit matrix.
+    virtual double QRStep(Direction lr,double eps); //return eta = Max(fabs(L-Id))
+    virtual MatrixRT GetGaugeTransform() const {return itsG;}
 
     virtual void   Report(std::ostream&) const;
     virtual char   GetNormStatus(double eps) const;
@@ -61,6 +67,7 @@ private:
     OperatorBond* GetBond(Direction) const;
     void Init_lr(Position lbr, int lindex,int rindex);
     char GetForm() const;
+
 
     double CompressStd   (Direction,const SVCompressorR*);
     double CompressParker(Direction,const SVCompressorR*);
@@ -82,8 +89,9 @@ protected:
     OpRange  itsOpRange;
     Position itsLBR;
     MatrixOR itsWs; //Operator values matrix version of W.
-    OperatorBond*    itsLeft_Bond;
-    OperatorBond*    itsRightBond;
+    MatrixRT itsG; //Accumulated gauge transform from QR iterations.
+    OperatorBond* itsLeft_Bond;
+    OperatorBond* itsRightBond;
 };
 
 }

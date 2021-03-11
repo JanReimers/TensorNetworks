@@ -42,8 +42,32 @@ void iMPO::CanonicalFormTri()
 
 void iMPO::CanonicalFormQRIter(Direction lr)
 {
-    GetSiteOperator(1)->iCanonicalFormQRIter(lr);
+    int L=GetL();
+    for (int ia=1;ia<=L;ia++)
+        GetSiteOperator(ia)->InitQRIter(); //Reset all G's to unit
+
+    double eps=1e-13; //Cutoff for RR QR
+    double eta=0.0;
+    int niter=0,maxIter=20;
+    do
+    {
+        eta=0.0;
+        switch (lr)
+        {
+        case DLeft:
+            for (int ia=1;ia<=L;ia++)
+                eta=Max(eta,GetSiteOperator(ia)->QRStep(lr,eps));
+            break;
+        case DRight:
+            for (int ia=L;ia>=1;ia--)
+                eta=Max(eta,GetSiteOperator(ia)->QRStep(lr,eps));
+            break;
+        }
+        niter++;
+    } while (eta>1e-13 && niter <maxIter);
+    if (niter==maxIter)
+        std::cout << "CanonicalFormQRIter failed to converge, eta=" << eta << std::endl;
 }
 
 
-}
+} //namespace

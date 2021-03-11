@@ -65,8 +65,13 @@ public:
     //          Phys. Rev. B 102, 035147 (2020), 2019
     //
     virtual void     CanonicalForm(Direction LR)=0;
-    virtual MatrixRT iCanonicalFormQRIter(Direction LR)=0; //Infinite lattice iMPO version
     virtual void     iCanonicalFormTriangular(Direction LR)=0; //Infinite lattice iMPO version
+    //
+    //  Low level QRiter routines (for iMPOs only)
+    //
+    virtual void     InitQRIter()=0; //Set itsG to unit matrix.
+    virtual double   QRStep(Direction lr,double eps)=0; //return eta = Max(fabs(L-Id))
+    virtual MatrixRT GetGaugeTransform() const=0;
 
     virtual void Report(std::ostream&) const=0;
     virtual char GetNormStatus(double eps) const=0;

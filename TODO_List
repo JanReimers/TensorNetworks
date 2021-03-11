@@ -6,6 +6,17 @@ exp(-t*H) MPOs
 -CanonicalQRIter_Right_Upper_L1_LongRange10 fail for DLeft but works for DRight
         -All works Lower DLeft && DRight ?!?!?
 
+-QRIter (and much more) for iMPS: Article (Vanderstraeten2019)
+Vanderstraeten, L.; Haegeman, J. & Verstraete, F.
+Tangent-space methods for uniform matrix product states
+SciPost Physics Lecture Notes, Stichting SciPost, 2019
+
+-Design: SiteOperator/SiteOperatorImp have a lot of iMPO and MPO specific stuff.  Need to separate
+-Design: iMPO derived from MPO ... why??
+
+-Tri can form, clean up code.  Get DRight working.
+-Tri can form, Test gauge transforms
+
 SiteOperatorImp:
 
     -Run Parker's' examples
@@ -68,15 +79,10 @@ Next steps:
             Efficient simulation of moire materials using the density matrix renormalization group appendix
         -Test 25x25 uncompressed H2 operator in recursive expectation routine.
             Fails: We get a unsolvable system of eqs when there are unit ops on the diagonal.
-            -Try and make and (H-E)^2 operator
+            -Try and make an (H-E)^2 operator
             -Compress exp(-t*H) operator
                 -exp(-t*H) doesn't have unit ops in the same places
                 -exp(-t*H) is not upper or nor lower triangular.
-                Fixed: -We get a rectangular V(mnw1,w2) with more rows than columns.  Lapack QL won't handle this.
-            Done: -MPOs Store accumulated truncation error for each site.
-
-
-        Done: -Code up MPO compression as per Parker.
         -<E2> is not working, MPO get compressed to 1x4 - 4x1.  We need to learn how contract
             a Dw x Dw - Dw x Dw open MPO with eigen vectors to get <E2>.
             -We now have iH2, but after naive compression it is not even lower triangular.
@@ -198,6 +204,9 @@ Backburner:
         -Might need to identify parameters with strings "Jxy"
 
 ----------------------------------------------------------------------------------------------------------
+Fixed: -We get a rectangular V(mnw1,w2) with more rows than columns.  Lapack QL won't handle this.
+Done: -MPOs Store accumulated truncation error for each site.
+Done: -Code up MPO compression as per Parker.
 Done: Parker M-block Compress
 Done: Full block compress
 Done: -Add upper operators to finite lattice unit tests.

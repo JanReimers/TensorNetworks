@@ -3195,6 +3195,13 @@ ning.
 
 \begin_layout Subsection
 Iterated QR
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Iterated-QR"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -4557,10 +4564,6 @@ A two site iMPO is two operator valued matrices, multiplied in succession
 
 \end_layout
 
-\begin_layout Subsection
-Iterated QR
-\end_layout
-
 \begin_layout Standard
 For this algorithm we will use a subscript in 
 \begin_inset Formula $\hat{W}_{n}$
@@ -4657,6 +4660,337 @@ As the iterations proceed
 
 \begin_layout Section
 SVD compession of iMPOs
+\end_layout
+
+\begin_layout Standard
+From section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Iterated-QR"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ we have
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{W}_{L}G_{L}=G_{L}\hat{W}_{0}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+G_{R}\hat{W}_{R}=\hat{W}_{0}G_{R}
+\]
+
+\end_inset
+
+and we need to know both of the gauge transforms in order to calculate to
+ full gauge transform between left and right canonical forms
+\begin_inset Formula 
+\[
+G_{L}G_{R}\hat{W}_{R}=\hat{W}_{L}G_{L}G_{R}
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+G\hat{W}_{R}=\hat{W}_{L}G
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $G=G_{L}G_{R}$
+\end_inset
+
+There are two way to go about this
+\end_layout
+
+\begin_layout Enumerate
+Run the QRIter algorithm on 
+\begin_inset Formula $\hat{W}_{0}$
+\end_inset
+
+ , in both the left and right directions.
+ This requires making two copies of 
+\begin_inset Formula $\hat{W}_{0}$
+\end_inset
+
+.
+ Then take the product 
+\begin_inset Formula $G=G_{L}G_{R}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Run the left QRIter algorithm on 
+\begin_inset Formula $\hat{W}_{0}$
+\end_inset
+
+ to get 
+\begin_inset Formula $W_{L}$
+\end_inset
+
+ and 
+\begin_inset Formula $G_{L}$
+\end_inset
+
+ (which is discarded).
+ The run the right QRIter algorithm on 
+\begin_inset Formula $W_{L}$
+\end_inset
+
+ to get 
+\begin_inset Formula $W_{R}$
+\end_inset
+
+ and 
+\begin_inset Formula $G$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Once we have 
+\begin_inset Formula $G$
+\end_inset
+
+ it should look like
+\begin_inset Formula 
+\[
+G=\begin{bmatrix}1 & 0 & 0\\
+0 & \mathsf{G} & 0\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+And we do the usual SVD on 
+\begin_inset Formula $\mathsf{G}=\mathsf{UsV}$
+\end_inset
+
+, Compress 
+\begin_inset Formula $\mathsf{G}\approx\mathsf{\tilde{U}\tilde{s}\tilde{V}}$
+\end_inset
+
+.
+ THi s mixed canonical form the iMPO now looks like this
+\begin_inset Formula 
+\[
+\hat{H}=\cdots\hat{W}_{L}\hat{W}_{L}G\hat{W}_{R}\hat{W}_{R}\cdots
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\cdots\hat{W}_{L}\hat{W}_{L}UsV\hat{W}_{R}\hat{W}_{R}\cdots
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\approx\cdots\hat{W}_{L}\hat{W}_{L}\tilde{U}\tilde{s}\tilde{V}\hat{W}_{R}\hat{W}_{R}\cdots
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\cdots\tilde{U}^{\dagger}\hat{W}_{L}\tilde{U}\tilde{U}^{\dagger}\hat{W}_{L}\tilde{U}\tilde{s}\tilde{V}\hat{W}_{R}\tilde{V}^{\dagger}\tilde{V}\hat{W}_{R}\tilde{V}^{\dagger}\cdots
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\cdots\hat{Q}\hat{Q}\tilde{s}\hat{P}\hat{P}\cdots
+\]
+
+\end_inset
+
+We can now make a left canonical compressed iMPO from 
+\begin_inset Formula $\hat{Q}$
+\end_inset
+
+, or a right canonical comrpessed iMPO from 
+\begin_inset Formula $\hat{P}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{H}=\cdots\hat{Q}\hat{Q}\cdots
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{H}=\cdots\hat{P}\hat{P}\cdots
+\]
+
+\end_inset
+
+As a bonus we get a diagonal gauge transform between left and right canonical
+\begin_inset Formula 
+\[
+\hat{Q}\tilde{s}=\tilde{s}\hat{P}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+IN order ensure the 
+\begin_inset Formula $G$
+\end_inset
+
+ is block diagonal we a transform the zeros out 
+\begin_inset Formula $\hat{\boldsymbol{b}}$
+\end_inset
+
+and 
+\begin_inset Formula $\hat{\boldsymbol{c}}$
+\end_inset
+
+ in
+\begin_inset Formula 
+\[
+\hat{W}=\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}} & \hat{d}\\
+0 & \hat{\boldsymbol{A}} & \hat{\boldsymbol{b}}\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+So than
+\begin_inset Formula 
+\[
+L\hat{W}L^{-1}=\begin{bmatrix}\hat{𝕀} & 0 & \hat{d}\\
+0 & \hat{\boldsymbol{A}} & 0\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $L$
+\end_inset
+
+ has the form
+\begin_inset Formula 
+\[
+L=\begin{bmatrix}1 & \boldsymbol{t} & 0\\
+0 & 𝕀 & \boldsymbol{s}\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+Solving
+\begin_inset Formula 
+\[
+L\hat{W}=\begin{bmatrix}\hat{𝕀} & 0 & \hat{d}\\
+0 & \hat{\boldsymbol{A}} & 0\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}L
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{bmatrix}1 & \boldsymbol{t} & 0\\
+0 & 𝕀 & \boldsymbol{s}\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}} & \hat{d}\\
+0 & \hat{\boldsymbol{A}} & \hat{\boldsymbol{b}}\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}=\begin{bmatrix}\hat{𝕀} & 0 & \hat{d}\\
+0 & \hat{\boldsymbol{A}} & 0\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}\begin{bmatrix}1 & \boldsymbol{t} & 0\\
+0 & 𝕀 & \boldsymbol{s}\\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}}+\boldsymbol{t}\hat{\boldsymbol{A}} & \hat{d}+\boldsymbol{t}\hat{\boldsymbol{b}}\\
+0 & \hat{\boldsymbol{A}} & \hat{\boldsymbol{b}}+\hat{𝕀}\boldsymbol{s}\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}=\begin{bmatrix}\hat{𝕀} & \boldsymbol{t}\hat{𝕀} & \hat{d}\\
+0 & \hat{\boldsymbol{A}} & \hat{\boldsymbol{A}}\boldsymbol{s}\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}
+\]
+
+\end_inset
+
+giving
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{c}}+\boldsymbol{t}\hat{\boldsymbol{A}}=\boldsymbol{t}\hat{𝕀}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{b}}+\hat{𝕀}\boldsymbol{s}=\hat{\boldsymbol{A}}\boldsymbol{s}
+\]
+
+\end_inset
+
+or we need solve
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{c}}=\boldsymbol{t}\left(\hat{𝕀}-\hat{\boldsymbol{A}}\right),\:for\:\boldsymbol{t}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{b}}=\left(\hat{\boldsymbol{A}}-\hat{𝕀}\right)\boldsymbol{s}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -5097,10 +5431,6 @@ options "plain"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 
 \end_layout
 
