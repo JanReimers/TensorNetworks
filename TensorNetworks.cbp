@@ -171,6 +171,9 @@
 		<Unit filename="Operators/SiteOperatorImpiCanonicalTriangular.C">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="Operators/SiteOperatorImpiCompress.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="Operators/iMPOImp.C">
 			<Option compilerVar="CC" />
 		</Unit>

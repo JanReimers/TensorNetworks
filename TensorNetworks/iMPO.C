@@ -9,18 +9,28 @@ double iMPO::Compress(CompressType ct, const SVCompressorR* compressor)
 {
     double terror=0.0;
     int L=GetL();
-    for (int ia=1;ia<=L;ia++)
+    if (ct==Parker)
     {
-//        std::cout << "Site " << ia << ": ";
-        double err=GetSiteOperator(ia)->Compress(ct,DLeft ,compressor);
-        terror+=err*err;
+        CanonicalFormQRIter(DRight);
+        for (int ia=1;ia<=L;ia++)
+            GetSiteOperator(ia)->ZeroRowCol(DLeft); //Zero out row or column outside the V block
+        CanonicalFormQRIter(DLeft); //Store gauge transforms for each site
+        for (int ia=1;ia<=L;ia++)
+        {
+    //        std::cout << "Site " << ia << ": ";
+            terror+=GetSiteOperator(ia)->iCompress(ct,DRight ,compressor); //Works on the gauge transforms we just stored.
+        }
+
     }
-    for (int ia=L;ia>=1;ia--)
+    else
     {
-//        std::cout << "Site " << ia << ": ";
-        double err=GetSiteOperator(ia)->Compress(ct,DRight ,compressor);
-        terror+=err*err;
+        for (int ia=1;ia<=L;ia++)
+            terror+=GetSiteOperator(ia)->iCompress(ct,DLeft  ,compressor); //Works on the gauge transforms we just stored.
+        for (int ia=L;ia>=1;ia--)
+            terror+=GetSiteOperator(ia)->iCompress(ct,DRight ,compressor);
     }
+
+
     return sqrt(terror)/(L-1); //Truncation error per site.
 }
 

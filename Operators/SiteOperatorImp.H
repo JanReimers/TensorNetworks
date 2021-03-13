@@ -48,11 +48,12 @@ public:
     virtual void      CanonicalForm(Direction LR);
     virtual void     iCanonicalFormTriangular(Direction LR); //Infinite lattice iMPO version
     //
-    //  Low level QRiter routines (for iMPOs only)
+    //  Low level QRiter and SVD routines (for iMPOs only)
     //
-    virtual void   InitQRIter(); //Set itsG to unit matrix.
-    virtual double QRStep(Direction lr,double eps); //return eta = Max(fabs(L-Id))
+    virtual void     InitQRIter(); //Set itsG to unit matrix.
+    virtual double   QRStep(Direction lr,double eps); //return eta = Max(fabs(L-Id))
     virtual MatrixRT GetGaugeTransform() const {return itsG;}
+    virtual void     ZeroRowCol(Direction lr);
 
     virtual void   Report(std::ostream&) const;
     virtual char   GetNormStatus(double eps) const;
@@ -69,9 +70,10 @@ private:
     char GetForm() const;
 
 
-    double CompressStd   (Direction,const SVCompressorR*);
-    double CompressParker(Direction,const SVCompressorR*);
-    void   QLTransfer    (Direction lr,const MatrixRT& L);
+    double  CompressStd   (Direction,const SVCompressorR*);
+    double  CompressParker(Direction,const SVCompressorR*);
+    double iCompressParker(Direction,const SVCompressorR*);
+    void    QLTransfer    (Direction lr,const MatrixRT& L);
 
     void     NewBondDimensions(int D1, int D2, bool saveData=false);
 

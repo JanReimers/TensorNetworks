@@ -88,6 +88,9 @@ public:
         itsiMPS=itsiH->CreateiTEBDState(2,D,Gates,D*D*1e-10,1e-13);
         itsOperatorClient=new TensorNetworks::Hamiltonian_1D_NN_Heisenberg(S,1.0,1.0,0.0);
         assert(itsOperatorClient);
+        itsiMPS->InitializeWith(Random);
+        itsiMPS->Canonicalize(DLeft);
+        itsiMPS->Orthogonalize(0,1e-13);
     }
     double ENeel(double S) const;
 
@@ -277,10 +280,6 @@ TEST_F(iMPOTests,TestParkerCanonicalTri_Lower_L1iH)
     int L=1,D=2;
     double S=0.5;
     Setup(L,S,D,RegularLower);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
 
     EXPECT_EQ(itsiH->GetNormStatus(),"W");
     double E=itsiMPS->GetExpectation(itsiH);
@@ -297,10 +296,6 @@ TEST_F(iMPOTests,TestParkerCanonicalTri_Upper_L1iH)
     int L=1,D=2;
     double S=0.5;
     Setup(L,S,D,RegularUpper);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
 
     EXPECT_EQ(itsiH->GetNormStatus(),"W");
     double E=itsiMPS->GetExpectation(itsiH);
@@ -318,10 +313,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Left__Lower_L1_NNHeis)
     int L=1,D=2;
     double S=0.5;
     Setup(L,S,D,RegularLower);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
 
     EXPECT_EQ(itsiH->GetNormStatus(),"W");
     double E=itsiMPS->GetExpectation(itsiH);
@@ -337,10 +328,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Right_Lower_L1_NNHeis)
     int L=1,D=2;
     double S=0.5;
     Setup(L,S,D,RegularLower);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
 
     EXPECT_EQ(itsiH->GetNormStatus(),"W");
     double E=itsiMPS->GetExpectation(itsiH);
@@ -356,10 +343,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Left__Upper_L1_NNHeis)
     int L=1,D=2;
     double S=0.5;
     Setup(L,S,D,RegularUpper);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
 
     EXPECT_EQ(itsiH->GetNormStatus(),"W");
     double E=itsiMPS->GetExpectation(itsiH);
@@ -375,10 +358,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Right_Upper_L1_NNHeis)
     int L=1,D=2;
     double S=0.5;
     Setup(L,S,D,RegularUpper);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
 
     EXPECT_EQ(itsiH->GetNormStatus(),"W");
     double E=itsiMPS->GetExpectation(itsiH);
@@ -394,10 +373,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Left__Lower_L2_NNHeis)
     int L=2,D=2;
     double S=0.5;
     Setup(L,S,D,RegularLower);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
 
     EXPECT_EQ(itsiH->GetNormStatus(),"WW");
     double E=itsiMPS->GetExpectation(itsiH);
@@ -413,10 +388,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Right_Lower_L2_NNHeis)
     int L=2,D=2;
     double S=0.5;
     Setup(L,S,D,RegularLower);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
 
     EXPECT_EQ(itsiH->GetNormStatus(),"WW");
     double E=itsiMPS->GetExpectation(itsiH);
@@ -432,10 +403,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Left__Upper_L2_NNHeis)
     int L=2,D=2;
     double S=0.5;
     Setup(L,S,D,RegularUpper);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
 
     EXPECT_EQ(itsiH->GetNormStatus(),"WW");
     double E=itsiMPS->GetExpectation(itsiH);
@@ -451,10 +418,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Right_Upper_L2_NNHeis)
     int L=2,D=2;
     double S=0.5;
     Setup(L,S,D,RegularUpper);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
-
 
     EXPECT_EQ(itsiH->GetNormStatus(),"WW");
     double E=itsiMPS->GetExpectation(itsiH);
@@ -472,9 +435,6 @@ TEST_F(iMPOTests,TestParkerCanonicalL1iH2)
     int L=1,D=2;
     double S=0.5;
     Setup(L,S,D);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
 
     iMPO* iH2=itsiH->CreateiUnitOperator();
     iH2->Product(itsiH);
@@ -496,9 +456,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Left__Lower_L1_LongRange4)
     int L=1,D=2,NN=4;
     double S=0.5;
     Setup(L,S,D,RegularLower);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
 
     iHamiltonian* iH=itsFactory->Make1D_2BodyLongRangeiHamiltonian(L,S,RegularLower,1.0,0.0,NN);
     EXPECT_EQ(iH->GetMaxDw(),12);
@@ -516,9 +473,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Right_Lower_L1_LongRange4)
     int L=1,D=2,NN=4;
     double S=0.5;
     Setup(L,S,D,RegularLower);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
 
     iHamiltonian* iH=itsFactory->Make1D_2BodyLongRangeiHamiltonian(L,S,RegularLower,1.0,0.0,NN);
     EXPECT_EQ(iH->GetMaxDw(),12);
@@ -536,9 +490,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Left__Upper_L1_LongRange4)
     int L=1,D=2,NN=4;
     double S=0.5;
     Setup(L,S,D,RegularUpper);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
 
     iHamiltonian* iH=itsFactory->Make1D_2BodyLongRangeiHamiltonian(L,S,RegularUpper,1.0,0.0,NN);
     EXPECT_EQ(iH->GetMaxDw(),12);
@@ -556,9 +507,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Right_Upper_L1_LongRange4)
     int L=1,D=2,NN=4;
     double S=0.5;
     Setup(L,S,D,RegularUpper);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
 
     iHamiltonian* iH=itsFactory->Make1D_2BodyLongRangeiHamiltonian(L,S,RegularUpper,1.0,0.0,NN);
     EXPECT_EQ(iH->GetMaxDw(),12);
@@ -576,9 +524,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Right_Upper_L1_LongRange10)
     int L=1,D=2,NN=10;
     double S=0.5;
     Setup(L,S,D,RegularLower);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
 
     iHamiltonian* iH=itsFactory->Make1D_2BodyLongRangeiHamiltonian(L,S,RegularUpper,1.0,0.0,NN);
     EXPECT_EQ(iH->GetMaxDw(),NN*(NN+1)/2+2);
@@ -597,9 +542,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Right_Upper_L2_LongRange10)
     int L=2,D=2,NN=10;
     double S=0.5;
     Setup(L,S,D,RegularLower);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
 
     iHamiltonian* iH=itsFactory->Make1D_2BodyLongRangeiHamiltonian(L,S,RegularUpper,1.0,0.0,NN);
     EXPECT_EQ(iH->GetMaxDw(),NN*(NN+1)/2+2);
@@ -618,9 +560,6 @@ TEST_F(iMPOTests,CanonicalQRIter_Left__Lower_L1_3Body)
     int L=1,D=2;
     double S=2.5;
     Setup(L,S,D,RegularLower);
-    itsiMPS->InitializeWith(Random);
-    itsiMPS->Canonicalize(DLeft);
-    itsiMPS->Orthogonalize(0,1e-13);
 
     iHamiltonian* iH=itsFactory->Make1D_3BodyiHamiltonian(L,S,RegularLower,1.0,0.5,0.0);
     EXPECT_EQ(iH->GetMaxDw(),5);
@@ -643,10 +582,17 @@ TEST_F(iMPOTests,CanonicalGaugeTransform_NNHeis_Upper)
 
     iMPOImp l(L,itsOperatorClient,f);
     iMPOImp r(L,itsOperatorClient,f);
+    double El=itsiMPS->GetExpectation(&l);
+    double Er=itsiMPS->GetExpectation(&r);
+    EXPECT_NEAR(El,Er,eps);
+
+
     SiteOperator* ls=l.GetSiteOperator(1);
     SiteOperator* rs=r.GetSiteOperator(1);
     l.CanonicalFormQRIter(DLeft);
     r.CanonicalFormQRIter(DRight);
+    EXPECT_NEAR(El,itsiMPS->GetExpectation(&l),eps);
+    EXPECT_NEAR(Er,itsiMPS->GetExpectation(&r),eps);
     MatrixRT GL=ls->GetGaugeTransform();
     MatrixRT GR=rs->GetGaugeTransform();
     EXPECT_EQ(ls->GetNormStatus(eps),'L');
@@ -657,6 +603,7 @@ TEST_F(iMPOTests,CanonicalGaugeTransform_NNHeis_Upper)
     EXPECT_NEAR(MaxDelta(G*WR,WL*G),0.0,eps);
 
     r.CanonicalFormQRIter(DLeft);
+    EXPECT_NEAR(Er,itsiMPS->GetExpectation(&r),eps);
     EXPECT_EQ(rs->GetNormStatus(eps),'L');
     MatrixRT G1=rs->GetGaugeTransform();
     EXPECT_NEAR(Max(fabs(G-G1)),0.0,eps); //Passes by flucke ?
@@ -664,6 +611,7 @@ TEST_F(iMPOTests,CanonicalGaugeTransform_NNHeis_Upper)
     EXPECT_NEAR(MaxDelta(G1*WR,WL1*G1),0.0,eps);
     l.CanonicalFormQRIter(DRight);
     EXPECT_EQ(ls->GetNormStatus(eps),'R');
+    EXPECT_NEAR(El,itsiMPS->GetExpectation(&l),eps);
     MatrixRT G2=ls->GetGaugeTransform();
 //    EXPECT_NEAR(Max(fabs(G-G2)),0.0,eps); //Getting sign differences
     MatrixOR WR1=ls->GetW();
@@ -679,10 +627,17 @@ TEST_F(iMPOTests,CanonicalGaugeTransform_NNHeis_Lower)
 
     iMPOImp l(L,itsOperatorClient,f);
     iMPOImp r(L,itsOperatorClient,f);
+    double El=itsiMPS->GetExpectation(&l);
+    double Er=itsiMPS->GetExpectation(&r);
+    EXPECT_NEAR(El,Er,eps);
+
     SiteOperator* ls=l.GetSiteOperator(1);
     SiteOperator* rs=r.GetSiteOperator(1);
     l.CanonicalFormQRIter(DLeft);
     r.CanonicalFormQRIter(DRight);
+    EXPECT_NEAR(El,itsiMPS->GetExpectation(&l),eps);
+    EXPECT_NEAR(Er,itsiMPS->GetExpectation(&r),eps);
+
     MatrixRT GL=ls->GetGaugeTransform();
     MatrixRT GR=rs->GetGaugeTransform();
     EXPECT_EQ(ls->GetNormStatus(eps),'L');
@@ -694,12 +649,14 @@ TEST_F(iMPOTests,CanonicalGaugeTransform_NNHeis_Lower)
 
     r.CanonicalFormQRIter(DLeft);
     EXPECT_EQ(rs->GetNormStatus(eps),'L');
+    EXPECT_NEAR(Er,itsiMPS->GetExpectation(&r),eps);
     MatrixRT G1=rs->GetGaugeTransform();
 //    EXPECT_NEAR(Max(fabs(G-G1)),0.0,eps); //Getting sign differences
     MatrixOR WL1=rs->GetW();
     EXPECT_NEAR(MaxDelta(G1*WR,WL1*G1),0.0,eps);
     l.CanonicalFormQRIter(DRight);
     EXPECT_EQ(ls->GetNormStatus(eps),'R');
+    EXPECT_NEAR(El,itsiMPS->GetExpectation(&l),eps);
     MatrixRT G2=ls->GetGaugeTransform();
 //    EXPECT_NEAR(Max(fabs(G-G2)),0.0,eps); //Getting sign differences
     MatrixOR WR1=ls->GetW();
@@ -717,6 +674,10 @@ TEST_F(iMPOTests,CanonicalGaugeTransform_LongRangeHeis_Upper)
     TensorNetworks::Hamiltonian_2Body_LongRange H(S,1.0,0.0,NN);
     iMPOImp l(L,&H,f);
     iMPOImp r(L,&H,f);
+    double El=itsiMPS->GetExpectation(&l);
+    double Er=itsiMPS->GetExpectation(&r);
+    EXPECT_NEAR(El,Er,eps);
+
     SiteOperator* ls=l.GetSiteOperator(1);
     SiteOperator* rs=r.GetSiteOperator(1);
 
@@ -724,6 +685,8 @@ TEST_F(iMPOTests,CanonicalGaugeTransform_LongRangeHeis_Upper)
     r.CanonicalFormQRIter(DRight);
     EXPECT_EQ(ls->GetNormStatus(eps),'L');
     EXPECT_EQ(rs->GetNormStatus(eps),'R');
+    EXPECT_NEAR(El,itsiMPS->GetExpectation(&l),eps);
+    EXPECT_NEAR(Er,itsiMPS->GetExpectation(&r),eps);
 
     MatrixRT GL=ls->GetGaugeTransform();
     MatrixRT GR=rs->GetGaugeTransform();
@@ -735,6 +698,7 @@ TEST_F(iMPOTests,CanonicalGaugeTransform_LongRangeHeis_Upper)
 
     r.CanonicalFormQRIter(DLeft);
     EXPECT_EQ(rs->GetNormStatus(eps),'L');
+    EXPECT_NEAR(Er,itsiMPS->GetExpectation(&r),eps);
     MatrixRT G1=rs->GetGaugeTransform();
     MatrixOR WL1=rs->GetW();
     EXPECT_NEAR(MaxDelta(G1*WR,WL1*G1),0.0,1e-15);
@@ -752,6 +716,10 @@ TEST_F(iMPOTests,CanonicalGaugeTransform_LongRangeHeis_Lower)
     TensorNetworks::Hamiltonian_2Body_LongRange H(S,1.0,0.0,NN);
     iMPOImp l(L,&H,f);
     iMPOImp r(L,&H,f);
+    double El=itsiMPS->GetExpectation(&l);
+    double Er=itsiMPS->GetExpectation(&r);
+    EXPECT_NEAR(El,Er,eps);
+
     SiteOperator* ls=l.GetSiteOperator(1);
     SiteOperator* rs=r.GetSiteOperator(1);
 
@@ -759,6 +727,8 @@ TEST_F(iMPOTests,CanonicalGaugeTransform_LongRangeHeis_Lower)
     r.CanonicalFormQRIter(DRight);
     EXPECT_EQ(ls->GetNormStatus(eps),'L');
     EXPECT_EQ(rs->GetNormStatus(eps),'R');
+    EXPECT_NEAR(El,itsiMPS->GetExpectation(&l),eps);
+    EXPECT_NEAR(Er,itsiMPS->GetExpectation(&r),eps);
 
     MatrixRT GL=ls->GetGaugeTransform();
     MatrixRT GR=rs->GetGaugeTransform();
@@ -770,8 +740,35 @@ TEST_F(iMPOTests,CanonicalGaugeTransform_LongRangeHeis_Lower)
 
     r.CanonicalFormQRIter(DLeft);
     EXPECT_EQ(rs->GetNormStatus(eps),'L');
+    EXPECT_NEAR(Er,itsiMPS->GetExpectation(&r),eps);
     MatrixRT G1=rs->GetGaugeTransform();
     MatrixOR WL1=rs->GetW();
     EXPECT_NEAR(MaxDelta(G1*WR,WL1*G1),0.0,1e-15);
 
 }
+
+TEST_F(iMPOTests,iCompress_Upper_L1_LongRange5)
+{
+    int L=1,D=2,NN=5;
+    double S=0.5;
+    MPOForm f=RegularUpper;
+    Setup(L,S,D,f);
+
+//    iHamiltonian* iH=itsFactory->Make1D_3BodyiHamiltonian(L,S,f,1.0,0.5,0.0);
+    iHamiltonian* iH=itsFactory->Make1D_3BodyLongRangeiHamiltonian(L,S,f,1.0,0.0,NN);
+    EXPECT_EQ(iH->GetMaxDw(),17);
+    EXPECT_EQ(iH->GetNormStatus(),"W");
+    double E=itsiMPS->GetExpectation(iH);
+    iH->CanonicalFormQRIter(DRight);
+    EXPECT_EQ(iH->GetNormStatus(),"R"); //The last site ends up being both right and left normalized
+    EXPECT_NEAR(E,itsiMPS->GetExpectation(iH),1e-13);
+    EXPECT_EQ(iH->GetMaxDw(),6);
+    iH->Compress(Parker,0,1e-15);
+    EXPECT_EQ(iH->GetMaxDw(),4);
+    EXPECT_EQ(iH->GetNormStatus(),"W"); // iH is only approximatly orthogonal now.
+    //EXPECT_NEAR(E,itsiMPS->GetExpectation(iH),1e-13); SVD destroys the triangular structure, so right now we can't test the expectation value
+    iH->CanonicalFormQRIter(DRight);
+}
+
+
+

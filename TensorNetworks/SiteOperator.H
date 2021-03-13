@@ -58,7 +58,8 @@ public:
     //
     //  SVD compress and normalize to reduce Dw Returns accumulated SVD truncation error.
     //
-    virtual double Compress(CompressType,Direction,const SVCompressorR*)=0;
+    virtual double  Compress(CompressType,Direction,const SVCompressorR*)=0;
+    virtual double iCompress(CompressType,Direction,const SVCompressorR*)=0;
     //
     //  as per: Parker, D. E.; Cao, X. & Zaletel, M. P.
     //          Local Matrix Product Operators: Canonical Form, Compression, and Control Theory
@@ -72,6 +73,7 @@ public:
     virtual void     InitQRIter()=0; //Set itsG to unit matrix.
     virtual double   QRStep(Direction lr,double eps)=0; //return eta = Max(fabs(L-Id))
     virtual MatrixRT GetGaugeTransform() const=0;
+    virtual void     ZeroRowCol(Direction lr)=0;
 
     virtual void Report(std::ostream&) const=0;
     virtual char GetNormStatus(double eps) const=0;

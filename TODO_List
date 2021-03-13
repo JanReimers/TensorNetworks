@@ -1,4 +1,5 @@
 
+-We need a way to evaluate expectation values of non triangular iMPOs, in order to test post SVD energy.
 Done: Separate MPOTests and iMPOTests
 exp(-t*H) MPOs
     Try shuffling U (and Evs) to get lower or upper triangular.
@@ -7,9 +8,9 @@ exp(-t*H) MPOs
         -All works Lower DLeft && DRight ?!?!?
 
 -QRIter (and much more) for iMPS: Article (Vanderstraeten2019)
-Vanderstraeten, L.; Haegeman, J. & Verstraete, F.
-Tangent-space methods for uniform matrix product states
-SciPost Physics Lecture Notes, Stichting SciPost, 2019
+            Vanderstraeten, L.; Haegeman, J. & Verstraete, F.
+            Tangent-space methods for uniform matrix product states
+            SciPost Physics Lecture Notes, Stichting SciPost, 2019
 
 -Design: SiteOperator/SiteOperatorImp have a lot of iMPO and MPO specific stuff.  Need to separate
 -Design: iMPO derived from MPO ... why??
@@ -56,7 +57,7 @@ iMPS
     -We need a horizontal tensor product like for MPOs, to make unit cell state
         The ordering or (ma,mb,..) -> m needs to controlled in one place.
 Numerics:
-
+    Linear solves solve A*x=b, need to support x*A=b (use transpose of A)
 -VariationalGroundStateTests.TestSweep_Upper_L7S1GrowD27 is getting stuck
     -Can't see whats going on because log level 2 is too noisy.
     -These are also hitting maxiter (30 reporting 31)
