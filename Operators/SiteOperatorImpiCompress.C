@@ -48,8 +48,8 @@ void SiteOperatorImp::ZeroRowCol(Direction lr)
     //
     //  Solver solves A*x=b, but here we need x*A=b, so we just transpose A to get that effect.
     //
-    LapackLinearSolver<double> s;
-    VectorRT t=s.SolveLowerTri(Transpose(Id-A0),c0);
+    LinearSolver<double>* s=new LapackLinearSolver<double>();
+    VectorRT t=s->SolveUpperTri(c0,Id-A0);
     MatrixRT G(W0.GetLimits());
     MatrixRT Ginv(W0.GetLimits());
     Unit(G);
