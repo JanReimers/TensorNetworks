@@ -30,8 +30,6 @@ public:
 //  Change size and nominal upper/lower
 //
     void SetChi12(int X1,int X2,bool preserve_data);
-//    void SetUpperLower(TriType ul); //Row and column matrices have no way of knowing
-//    void SetUpperLower(double eps); //Detect and set
 //
 // ASsign from overloaded operators
 //
@@ -59,10 +57,11 @@ public:
     IIType    GetChi12() const;
     int       Getd() const {return itsd;}
     double    GetS() const {return dtoS(itsd);}
-//    double    GetTruncationError() const {return (itsTruncationError);}
     MPOForm   GetForm() const {return itsForm;}
     TriType   GetMeasuredShape(double eps) const;
     T         GetTrace(int a, int b, int c, int d) const; //<Wab,Wcd>
+    T         GetUnitTrace(int c, int d) const; //<I,Wcd>
+    MatrixRT  GetUnitTrace() const;  //Tr(<I,W>)
     double    GetFrobeniusNorm() const;
     Matrix<T> GetOrthoMatrix(Direction) const;
     bool      IsOrthonormal (Direction,double eps) const;

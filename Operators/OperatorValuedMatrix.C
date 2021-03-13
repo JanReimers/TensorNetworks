@@ -133,7 +133,7 @@ template <class T> MatrixO<T>& MatrixO<T>::operator*=(const T& s)
 template <class T> std::ostream& MatrixO<T>::PrettyPrint(std::ostream& os) const
 {
     assert(itsd>1);
-    os << std::fixed << std::setprecision(2) << this->GetLimits() << std::endl;
+    os << std::fixed << std::setprecision(6) << this->GetLimits() << std::endl;
     for (index_t i:this->rows())
     {
         for (int m=0;m<itsd;m++)
@@ -158,6 +158,14 @@ template <class T> T MatrixO<T>::GetTrace(int a, int b, int c, int d) const
     for (int m=0;m<itsd;m++)
     for (int n=0;n<itsd;n++)
         ret+=conj((*this)(b,a))(m,n)*(*this)(c,d)(m,n);
+    return ret/itsd;
+}
+template <class T> T MatrixO<T>::GetUnitTrace(int c, int d) const
+{
+    T ret(0.0);
+    for (int m=0;m<itsd;m++)
+//        for (int n=0;n<itsd;n++)
+            ret+=(*this)(c,d)(m,m);
     return ret/itsd;
 }
 
@@ -189,6 +197,16 @@ template <class T> Matrix<T> MatrixO<T>::GetOrthoMatrix(Direction lr) const
         break;
     }
     return O;
+}
+
+template <class T> MatrixRT MatrixO<T>::GetUnitTrace() const
+{
+    MatrixRT ret(this->GetLimits());
+    Fill(ret,0.0);
+    for (index_t a:this->rows())
+        for (index_t b:this->cols())
+                ret(a,b)+=GetUnitTrace(a,b);
+    return ret;
 }
 
 template <class T> double MatrixO<T>::GetFrobeniusNorm() const
