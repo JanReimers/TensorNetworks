@@ -25,17 +25,17 @@ SiteOperatorImp:
         Done: Two body as sum of exponential (ref 7)
         Eq 34: H_1 L=30 sites, MPO starts with X=1000
         Eq. 42,43 :
-    -Implement Parker iMPO SVD
+    Done: -Implement Parker iMPO SVD
     -SetLimits using zero as criteria.  Should fabs(W)>eps
         BUT we need to get then SAME eps into the contraction routines.
     -Implement Parker algorithm #4, iMPO left canonical form for triangular W
         Done BUT eq 60 for s_M fails
-    -Implement Parker algorithm #5, iMPO compression
+    Done: -Implement Parker algorithm #5, iMPO compression
         JR: Sec. VII eq. 73: it Looks like C = L (or R), i.e just the gauge transform.  Correct?
         DP: Yep, but since W_L and W_R and left/right-canonical it has a special block-diagonal form.
 
 OpValMatrix:
-    -Try rank revealing QR for CanonicalForm. Any effect?
+    Done: -Try rank revealing QR for CanonicalForm. Any effect?
 
 MPO:
     -Compress Automatically check for CanoncialForm and do it if not canform.
@@ -57,7 +57,7 @@ iMPS
     -We need a horizontal tensor product like for MPOs, to make unit cell state
         The ordering or (ma,mb,..) -> m needs to controlled in one place.
 Numerics:
-    Linear solves solve A*x=b, need to support x*A=b (use transpose of A)
+    Done: Linear solves solve A*x=b, need to support x*A=b (use transpose of A)
 -VariationalGroundStateTests.TestSweep_Upper_L7S1GrowD27 is getting stuck
     -Can't see whats going on because log level 2 is too noisy.
     -These are also hitting maxiter (30 reporting 31)

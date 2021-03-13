@@ -36,10 +36,25 @@ double SiteOperatorImp::iCompress(CompressType ct,Direction lr,const SVCompresso
 void SiteOperatorImp::ZeroRowCol(Direction lr)
 {
     auto [X1,X2]=itsWs.GetChi12();
+    MPOForm f=itsWs.GetForm();
     MatrixRT W0=itsWs.GetUnitTrace(); //<I,W>
+
+    int rowindex=0;
+    switch (f)
+    {
+    case RegularUpper:
+        rowindex=0;
+        break;
+    case RegularLower:
+        rowindex=X1+1;
+        break;
+    default:
+        assert(false);
+    }
+
 //    cout << "W0=" << W0 << endl;
-    VectorRT toprow=W0.GetRow(0);
-    VectorRT c0=toprow.SubVector(1,X2);
+//    VectorRT toprow=W0.GetRow(rowindex);
+    VectorRT c0=VectorRT(W0.GetRow(rowindex)).SubVector(1,X2);
 //    cout << "c0=" << c0 << endl;
     MatrixRT A0=itsWs.ExtractM(W0,false);
 //    cout << "A0=" << A0 << endl;
@@ -49,21 +64,33 @@ void SiteOperatorImp::ZeroRowCol(Direction lr)
     //  Solver solves A*x=b, but here we need x*A=b, so we just transpose A to get that effect.
     //
     LinearSolver<double>* s=new LapackLinearSolver<double>();
-    VectorRT t=s->SolveUpperTri(c0,Id-A0);
+    VectorRT t;
+    switch (f)
+    {
+    case RegularUpper:
+        t=s->SolveUpperTri(c0,Id-A0);
+        break;
+    case RegularLower:
+        t=s->SolveLowerTri(c0,Id-A0);
+        break;
+    default:
+        assert(false);
+    }
+
     MatrixRT G(W0.GetLimits());
     MatrixRT Ginv(W0.GetLimits());
     Unit(G);
     Unit(Ginv);
     for (int i=1;i<=X2;i++)
     {
-        G(0,i)=t(i);
-        Ginv(0,i)=-t(i);
+        G   (rowindex,i)= t(i);
+        Ginv(rowindex,i)=-t(i);
     }
     assert(IsUnit(G*Ginv,1e-15));
 #ifdef DEBUG
     W0=G*W0*Ginv;
     for (int i=1;i<=X2;i++)
-        assert(fabs(W0(0,i))<1e-13);
+        assert(fabs(W0(rowindex,i))<1e-13);
 #endif
     itsWs=G*itsWs*Ginv;
 }

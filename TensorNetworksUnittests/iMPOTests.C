@@ -771,4 +771,28 @@ TEST_F(iMPOTests,iCompress_Upper_L1_LongRange5)
 }
 
 
+TEST_F(iMPOTests,iCompress_Lower_L1_LongRange5)
+{
+    int L=1,D=2,NN=5;
+    double S=0.5;
+    MPOForm f=RegularLower;
+    Setup(L,S,D,f);
+
+//    iHamiltonian* iH=itsFactory->Make1D_3BodyiHamiltonian(L,S,f,1.0,0.5,0.0);
+    iHamiltonian* iH=itsFactory->Make1D_3BodyLongRangeiHamiltonian(L,S,f,1.0,0.0,NN);
+    EXPECT_EQ(iH->GetMaxDw(),17);
+    EXPECT_EQ(iH->GetNormStatus(),"W");
+    double E=itsiMPS->GetExpectation(iH);
+    iH->CanonicalFormQRIter(DRight);
+    EXPECT_EQ(iH->GetNormStatus(),"R"); //The last site ends up being both right and left normalized
+    EXPECT_NEAR(E,itsiMPS->GetExpectation(iH),1e-13);
+    EXPECT_EQ(iH->GetMaxDw(),6);
+    iH->Compress(Parker,0,1e-15);
+    EXPECT_EQ(iH->GetMaxDw(),4);
+    EXPECT_EQ(iH->GetNormStatus(),"W"); // iH is only approximatly orthogonal now.
+    //EXPECT_NEAR(E,itsiMPS->GetExpectation(iH),1e-13); SVD destroys the triangular structure, so right now we can't test the expectation value
+    iH->CanonicalFormQRIter(DRight);
+}
+
+
 

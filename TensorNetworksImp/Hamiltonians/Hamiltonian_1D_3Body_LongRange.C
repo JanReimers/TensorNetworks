@@ -42,7 +42,7 @@ MatrixOR  Hamiltonian_3Body_LongRange::GetW(MPOForm f) const
         {
             W(iblock+1,0)=OperatorSz(itsS)*OperatorSz(itsS);
             for (int j=1;j<i;j++)
-                W(iblock+1+j,iblock+j)=OperatorI(itsS);
+                W(iblock+1+j,iblock+j)=1.0/(j*j)*OperatorSz(itsS);
             W(Dw-1,iblock+i)=itsJ/(i*i)*OperatorSz(itsS)*OperatorSz(itsS);
             iblock+=i;
         }
@@ -54,7 +54,6 @@ MatrixOR  Hamiltonian_3Body_LongRange::GetW(MPOForm f) const
             W(0,iblock+1)=OperatorSz(itsS)*OperatorSz(itsS);
             for (int j=1;j<i;j++)
                 W(iblock+j,iblock+1+j)=1.0/(j*j)*OperatorSz(itsS);
-//                W(iblock+j,iblock+1+j)=OperatorSx(itsS)+i*OperatorSz(itsS)*OperatorSz(itsS);
             W(iblock+i,Dw-1)=itsJ/(i*i)*OperatorSz(itsS)*OperatorSz(itsS);
             iblock+=i;
         }

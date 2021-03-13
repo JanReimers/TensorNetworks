@@ -4788,7 +4788,7 @@ And we do the usual SVD on
 \end_inset
 
 .
- THi s mixed canonical form the iMPO now looks like this
+ The mixed canonical form the iMPO now looks like this
 \begin_inset Formula 
 \[
 \hat{H}=\cdots\hat{W}_{L}\hat{W}_{L}G\hat{W}_{R}\hat{W}_{R}\cdots
@@ -4986,6 +4986,585 @@ or we need solve
 \begin_inset Formula 
 \[
 \hat{\boldsymbol{b}}=\left(\hat{\boldsymbol{A}}-\hat{𝕀}\right)\boldsymbol{s}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="10" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+L/R
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Item
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Upper
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lower
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}\hat{𝕀} & \hat{\boldsymbol{c}} & \hat{d}\\
+0 & \hat{\boldsymbol{A}} & \hat{\boldsymbol{b}}\\
+0 & 0 & \hat{𝕀}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}\hat{𝕀} & 0 & 0\\
+\hat{\boldsymbol{b}} & \hat{\boldsymbol{A}} & 0\\
+\hat{d} & \hat{\boldsymbol{c}} & \hat{𝕀}
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="3" alignment="center" valignment="middle" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Left
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Need to zero 
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\boldsymbol{c_{0}}=Tr\left[\hat{\boldsymbol{c}}\right]$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $L$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}1 & \boldsymbol{t} & 0\\
+\boldsymbol{0} & 𝕀 & \boldsymbol{0}\\
+0 & \boldsymbol{0} & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}1 & \boldsymbol{0} & 0\\
+\boldsymbol{0} & 𝕀 & \boldsymbol{0}\\
+0 & \boldsymbol{t} & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $L^{-1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}1 & -\boldsymbol{t} & 0\\
+\boldsymbol{0} & 𝕀 & \boldsymbol{0}\\
+0 & \boldsymbol{0} & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}1 & \boldsymbol{0} & 0\\
+\boldsymbol{0} & 𝕀 & \boldsymbol{0}\\
+0 & -\boldsymbol{t} & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Need to solve
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\boldsymbol{c_{0}}=\boldsymbol{t}\left(𝕀-A_{0}\right)$
+\end_inset
+
+ for 
+\begin_inset Formula $\boldsymbol{t}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="3" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Right
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Need to zero 
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\boldsymbol{b_{0}}=Tr\left[\hat{\boldsymbol{b}}\right]$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $L$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}1 & \boldsymbol{0} & 0\\
+\boldsymbol{0} & 𝕀 & \boldsymbol{s}\\
+0 & \boldsymbol{0} & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}1 & \boldsymbol{0} & 0\\
+\boldsymbol{s} & 𝕀 & \boldsymbol{0}\\
+0 & \boldsymbol{0} & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $L^{-1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}1 & \boldsymbol{0} & 0\\
+\boldsymbol{0} & 𝕀 & -\boldsymbol{s}\\
+0 & \boldsymbol{0} & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\begin{bmatrix}1 & \boldsymbol{0} & 0\\
+-\boldsymbol{s} & 𝕀 & \boldsymbol{0}\\
+0 & \boldsymbol{0} & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Need to solve
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\boldsymbol{b_{0}}=\left(A_{0}-𝕀\right)\boldsymbol{s}$
+\end_inset
+
+ for 
+\begin_inset Formula $\boldsymbol{s}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Row/Col clearing for Upp/Lower and Left/Right iMPO compression.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+LWL^{-1}=\begin{bmatrix}1 & \boldsymbol{0} & 0\\
+\boldsymbol{0} & \mathbb{I} & \boldsymbol{0}\\
+0 & \boldsymbol{t} & 1
+\end{bmatrix}\begin{bmatrix}\hat{\mathbb{I}} & 0 & 0\\
+\hat{\boldsymbol{b}} & \hat{\boldsymbol{A}} & 0\\
+\hat{d} & \hat{\boldsymbol{c}} & \hat{\mathbb{I}}
+\end{bmatrix}\begin{bmatrix}1 & \boldsymbol{0} & 0\\
+\boldsymbol{0} & \mathbb{I} & \boldsymbol{0}\\
+0 & -\boldsymbol{t} & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\begin{bmatrix}1 & \boldsymbol{0} & 0\\
+\boldsymbol{0} & \mathbb{I} & \boldsymbol{0}\\
+0 & \boldsymbol{t} & 1
+\end{bmatrix}\begin{bmatrix}\hat{\mathbb{I}} & 0 & 0\\
+\hat{\boldsymbol{b}} & \hat{\boldsymbol{A}} & 0\\
+\hat{d} & \hat{\boldsymbol{c}}-\boldsymbol{t} & \hat{\mathbb{I}}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\begin{bmatrix}\hat{\mathbb{I}} & 0 & 0\\
+\hat{\boldsymbol{b}} & \hat{\boldsymbol{A}} & 0\\
+\hat{d} & tA+\hat{\boldsymbol{c}}-\boldsymbol{t} & \hat{\mathbb{I}}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+t\left(A-\mathbb{I}\right)+\hat{\boldsymbol{c}}=0
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{c}}=t\left(\mathbb{I}-A\right)
 \]
 
 \end_inset
