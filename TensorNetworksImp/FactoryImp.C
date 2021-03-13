@@ -4,6 +4,7 @@
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_TransverseIsing.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_2Body_LongRange.H"
+#include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_3Body_LongRange.H"
 #include "TensorNetworksImp/Hamiltonians/Hamiltonian_1D_3Body.H"
 #include "TensorNetworksImp/SVCompressorImp.H"
 #include "TensorNetworksImp/SPDLogger.H"
@@ -37,6 +38,12 @@ Make1D_2BodyLongRangeHamiltonian(int L, double S,MPOForm f, double J, double hx,
     Hamiltonian_2Body_LongRange H(S,J,hx,NN);
     return new HamiltonianImp(L,&H,f);
 }
+Hamiltonian* FactoryImp::
+Make1D_3BodyLongRangeHamiltonian(int L, double S,MPOForm f, double J, double hx, int NN)
+{
+    Hamiltonian_3Body_LongRange H(S,J,hx,NN);
+    return new HamiltonianImp(L,&H,f);
+}
 
 
 Hamiltonian* FactoryImp::
@@ -64,6 +71,13 @@ iHamiltonian* FactoryImp::
 Make1D_2BodyLongRangeiHamiltonian(int L, double S,MPOForm f, double J, double hx, int NN)
 {
     Hamiltonian_2Body_LongRange H(S,J,hx,NN);
+    return new iHamiltonianImp(L,&H,f);
+}
+
+iHamiltonian* FactoryImp::
+Make1D_3BodyLongRangeiHamiltonian(int L, double S,MPOForm f, double J, double hx, int NN)
+{
+    Hamiltonian_3Body_LongRange H(S,J,hx,NN);
     return new iHamiltonianImp(L,&H,f);
 }
 
