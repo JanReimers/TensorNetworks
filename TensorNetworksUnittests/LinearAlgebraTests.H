@@ -769,21 +769,21 @@ public:
         A=MakeMatrix('U');
         FillRandom(b);
         {
-            Vector<T> x=itsSolver->SolveUpperTri(A,b);
-            Validate(x);
+            Vector<T> xr=itsSolver->SolveUpperTri(A,b); //Solve A*x=b
+            Vector<T> xl=itsSolver->SolveUpperTri(b,A); //Solve b=x*A
+            Validate(xr,xl);
         }
         A=MakeMatrix('L');
         {
-            Vector<T> x=itsSolver->SolveLowerTri(A,b);
-            Validate(x);
+            Vector<T> xr=itsSolver->SolveLowerTri(A,b);
+            Vector<T> xl=itsSolver->SolveLowerTri(b,A);
+            Validate(xr,xl);
         }
     }
-    virtual void Validate(const Vector<T>& x)
+    virtual void Validate(const Vector<T>& xr,const Vector<T>& xl)
     {
-
-        Vector<T> b1=A*x;
-        Vector<T> db=b-b1;
-        EXPECT_NEAR(Max(fabs(db)),0.0,sqrt(N)*eps);
+        EXPECT_NEAR(Max(fabs(b-A*xr)),0.0,sqrt(N)*eps);
+        EXPECT_NEAR(Max(fabs(b-xl*A)),0.0,sqrt(N)*eps);
     }
 
     Matrix<T> MakeMatrix(char ul)

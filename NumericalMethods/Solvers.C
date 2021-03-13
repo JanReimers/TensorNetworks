@@ -1,6 +1,7 @@
 #include "NumericalMethods/SparseSVDSolver.H"
 #include "NumericalMethods/SparseEigenSolver.H"
 #include "NumericalMethods/EigenSolver.H"
+#include "NumericalMethods/LinearSolver.H"
 #include "Containers/SparseMatrix.H"
 #include "oml/matrix.h"
 #include "oml/vector.h"
@@ -22,6 +23,16 @@ SparseEigenSolver<T>::SolveLeft_NonSym(const SparseMatrixT& A,double eps, int Nu
     return std::make_tuple(conj(U),conj(d));
 }
 
+template <class T> typename LinearSolver<T>::VectorT
+LinearSolver<T>::SolveUpperTri(const VectorT& b,const MatrixT& A)
+{
+    return SolveLowerTri(Transpose(A),b);
+}
+template <class T> typename LinearSolver<T>::VectorT
+LinearSolver<T>::SolveLowerTri(const VectorT& b,const MatrixT& A)
+{
+    return SolveUpperTri(Transpose(A),b);
+}
 //
 //  static variable. Kludge for getting the matrix into the Mat*Vec routines.
 //
@@ -47,6 +58,8 @@ template class SparseSVDSolverClient<double>;
 template class SparseSVDSolverClient<dcmplx>;
 template class SparseEigenSolverClient<double>;
 template class SparseEigenSolverClient<dcmplx>;
+template class LinearSolver<double>;
+template class LinearSolver<dcmplx>;
 
 
 #include "TensorNetworks/Enums.H"
@@ -128,5 +141,6 @@ std::vector<index_t>  FindColReIndex(TensorNetworks::TriType ul,const Matrix<dou
 
     return reindex;
 }
+
 
 

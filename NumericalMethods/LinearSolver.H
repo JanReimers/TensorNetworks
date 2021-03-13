@@ -16,10 +16,16 @@ protected:
 public:
     virtual ~LinearSolver() {};
 //
-//  Non packed triangular systems, solve
+//  Non packed triangular systems
+//      solve A*x=b
 //
     virtual VectorT SolveUpperTri(const MatrixT& A,const VectorT& b)=0; // A is upper triangular
     virtual VectorT SolveLowerTri(const MatrixT& A,const VectorT& b)=0; // A is lower triangular
+//
+//      solve b=x*A
+//
+    virtual VectorT SolveUpperTri(const VectorT& b,const MatrixT& A); // A is upper triangular
+    virtual VectorT SolveLowerTri(const VectorT& b,const MatrixT& A); // A is lower triangular
 };
 
 #endif // LINEARSOLVER_H
