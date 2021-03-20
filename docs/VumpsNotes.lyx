@@ -1,0 +1,1579 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Notes on Variation Uniform Matrix Product States (VUMPS)
+\end_layout
+
+\begin_layout Author
+Jan Reimers
+\end_layout
+
+\begin_layout Date
+Feb.
+ 2021
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+Inifinite lattices methods assume a uniform sequence of Matrices in the
+ iMPS.
+ Indroductory notes usually focus on a single matrix repeated and demonstrate
+ this using a transverse Ising model with ferromagnetic interactions, the
+ ground state being perfectly represented with a uniform iMPS, with one
+ site in the repeating unit cell.
+ But most models of interested have a ground state that can only be represent
+ with two or more sites in the unit cell, even thought the iMPO only has
+ one site in the unit cell.
+ In other standard breaking of translational symmetry.
+ So a typical sequence of events is to describe the essential ideas of a
+ new method (VUMPS, environment recycling, canonical/orthogonal forms etc)
+ in terms of a model that only requires one site per unit, and then latter
+ augment the algorithms to deal a multi-site unit cell ansatz for the iMPS.
+\end_layout
+
+\begin_layout Standard
+Initial offerings for dealing with infinite lattices were based on the TEBD
+ algorithm introduced by Vidal 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "vidal_efficient_2003,Vidal2007"
+literal "false"
+
+\end_inset
+
+ which employs the imaginary time evolution method to iterate towards a
+ ground state.
+ In general imaginary time evolution is much slower to converge than variational
+ methods, but much easier to code or implement in its simplest form.
+ Variational methods for infinte lattice systems were introduced by Stauber
+ et.
+ al.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ZaunerStauber2018"
+literal "false"
+
+\end_inset
+
+ followed by some lecture notes 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Vanderstraeten2019"
+literal "false"
+
+\end_inset
+
+ which I will be following here.
+\end_layout
+
+\begin_layout Standard
+An important concept in this work is that of a tangent space.
+ From Wikipedia
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Wikipedia2021"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Quote
+In differential geometry, one can attach to every point 
+\begin_inset Formula $x$
+\end_inset
+
+ of a differentiable manifold a tangent space—a real vector space that intuitive
+ly contains the possible directions in which one can tangentially pass through
+ 
+\begin_inset Formula $x$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Just like Roger Penrose I need a picture in order to unpack this definition.
+ Fig 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Tangent-space"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ shows an example where the differentiable manifold is a sphere, the dot
+ is the point 
+\begin_inset Formula $x$
+\end_inset
+
+ and the tangent plane that just touches the sphere at 
+\begin_inset Formula $x$
+\end_inset
+
+ is indicated.
+ The plane can be defined by any two indepenedent vector lying in the plane.
+ If the manifold (sphere in fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Tangent-space"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is defined by some function 
+\begin_inset Formula $f\left(\boldsymbol{x}\right)=c$
+\end_inset
+
+ then the gradient of 
+\begin_inset Formula $f$
+\end_inset
+
+ ....
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename 330px-Image_Tangent-plane.svg.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Tangent-space"
+
+\end_inset
+
+Tangent space of 3 sphere.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+One site unit cell theory
+\end_layout
+
+\begin_layout Subsection
+Uniform MPS
+\end_layout
+
+\begin_layout Standard
+The MPS ansatz is uniform, and each site has the same 
+\begin_inset Formula $d$
+\end_inset
+
+ dimensional local Hilbert space 
+\begin_inset Formula $\left|n\right\rangle ,\:n=0\ldots d-1$
+\end_inset
+
+ and
+\begin_inset Formula 
+\[
+\left|\psi\right\rangle =\sum_{\left\{ n\right\} }\left(\ldots M^{n_{a-1}}M^{n_{a}}M^{n_{a+1}}\ldots\right)\left(\ldots\left|n_{a-1}\right\rangle \left|n_{a}\right\rangle \left|n_{a+1}\right\rangle \ldots\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{\left\{ n\right\} }\left(\ldots M^{n_{a-1}}M^{n_{a}}M^{n_{a+1}}\ldots\right)\left|\boldsymbol{n}\right\rangle 
+\]
+
+\end_inset
+
+Here each 
+\begin_inset Formula $M^{n}$
+\end_inset
+
+ is a 
+\begin_inset Formula $D\times D\times d$
+\end_inset
+
+ 3-tensor that has its own site dependent quantum number, but the internal
+ degrees of freedom are uniform along the lattice.
+ So there are only 
+\begin_inset Formula $d$
+\end_inset
+
+ matrices to optimize, instead of 
+\begin_inset Formula $Ld$
+\end_inset
+
+ for a finite lattice of extent 
+\begin_inset Formula $L$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Canonical forms
+\end_layout
+
+\begin_layout Standard
+As usual we can always gauge transform the 
+\begin_inset Formula $M$
+\end_inset
+
+into left 
+\begin_inset Formula $A$
+\end_inset
+
+ or right 
+\begin_inset Formula $B$
+\end_inset
+
+ orthogonal forms such that
+\begin_inset Formula 
+\[
+\sum_{n}A^{\dagger n}A^{n}=𝕀,\quad\sum_{n}B^{n}B^{\dagger n}=𝕀
+\]
+
+\end_inset
+
+Writing out in full for 
+\begin_inset Formula $A$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{nk}A_{ik}^{\dagger n}A_{kj}^{n}=\delta_{ij}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+One can think of 
+\begin_inset Formula $𝕀$
+\end_inset
+
+ as being a left eigen vector of the 
+\begin_inset Formula $A$
+\end_inset
+
+transfer matrix
+\begin_inset Formula 
+\[
+T_{A}=\sum_{n}A^{\dagger n}\otimes A^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+T_{A\left(i_{1}i_{2}j_{1}j_{2}\right)}=\sum_{n}A_{i_{1}i_{2}}^{\dagger n}\otimes A_{j_{1}j_{2}}^{n}
+\]
+
+\end_inset
+
+and 
+\begin_inset Formula $𝕀$
+\end_inset
+
+ as being a right eigen vector of the 
+\begin_inset Formula $B$
+\end_inset
+
+transfer matrix
+\begin_inset Formula 
+\[
+T_{B}=\sum_{n}B^{n}\otimes B^{\dagger n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can also define a right eigen vector for 
+\begin_inset Formula $T_{A}$
+\end_inset
+
+ such that
+\begin_inset Formula 
+\[
+\sum_{n}A^{\dagger n}RA^{n}=R
+\]
+
+\end_inset
+
+or in full
+\begin_inset Formula 
+\[
+\sum_{ni_{2}j_{2}}A_{i_{1}i_{2}}^{\dagger n}R_{i_{2}j_{2}}A_{j_{1}j_{2}}^{n}=R_{i_{1}j_{1}}
+\]
+
+\end_inset
+
+And similarly for 
+\begin_inset Formula $B$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{n}B_{j_{1}j_{2}}^{n}L_{j_{1}i_{1}}B_{i_{1}i_{2}}^{\dagger n}=L_{j_{2}i_{2}}
+\]
+
+\end_inset
+
+THis can all be represented in diagroms and shown in fig.
+ 
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Vumps-1.png
+	lyxscale 40
+	scale 30
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Left and right isometries
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can also write wave function in mixed canonical for about a center site
+\begin_inset Formula 
+\begin{equation}
+\left|\psi\right\rangle =\sum_{\left\{ n\right\} }\left(\ldots A^{n_{a-1}}M^{n_{a}}B^{n_{a+1}}\ldots\right)\left|\boldsymbol{n}\right\rangle \label{eq:Mixed CanForm a}
+\end{equation}
+
+\end_inset
+
+or about central bond
+\begin_inset Formula 
+\begin{equation}
+\left|\psi\right\rangle =\sum_{\left\{ n\right\} }\left(\ldots A^{n_{a-1}}A^{n_{a}}CB^{n_{a+1}}\ldots\right)\left|\boldsymbol{n}\right\rangle \label{eq:Mixed CanForm b}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $C$
+\end_inset
+
+ is a bond matrix whose singular values are the Schmidt values describing
+ the entanglement entropy across that bond.
+ In diagrams this looks like
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Vumps-2.png
+	lyxscale 80
+	scale 60
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Mixed canonical form
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Gauge Transform
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $C$
+\end_inset
+
+is also the gauge transform between 
+\begin_inset Formula $A$
+\end_inset
+
+ and 
+\begin_inset Formula $B$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+M^{n}=A_{C}^{n}=A^{n}C=CB^{n}\label{eq:Gauge Transform}
+\end{equation}
+
+\end_inset
+
+and is related to 
+\begin_inset Formula $L$
+\end_inset
+
+ and 
+\begin_inset Formula $R$
+\end_inset
+
+ above
+\begin_inset Formula 
+\[
+L=C^{\dagger}C,\;R=CC^{\dagger}
+\]
+
+\end_inset
+
+Using eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Gauge Transform"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ we can rotate the center throughout the lattice in either direction.
+ Normalization of the state, eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Mixed CanForm b"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ implies that
+\begin_inset Formula 
+\[
+Tr\left[CC^{\dagger}\right]=1
+\]
+
+\end_inset
+
+Now one can define left and right partial states
+\begin_inset Formula 
+\[
+\left|\psi_{L}^{i}\right\rangle =\sum_{\left\{ n\right\} }\left(\ldots A^{n_{a-2}}A^{n_{a-1}}\right)_{i}\left|\ldots n_{a-2}n_{a-1}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|\psi_{R}^{i}\right\rangle =\sum_{\left\{ n\right\} }\left(B^{n_{a+1}}B^{n_{a+2}}\ldots\right)\left|n_{a+1}n_{a+2}\ldots\right\rangle 
+\]
+
+\end_inset
+
+from which we can define reduces basis states 
+\begin_inset Formula 
+\[
+\left|\psi^{\left(inj\right)}\right\rangle =\left|\psi_{L}^{i}\right\rangle \left|n\right\rangle \left|\psi_{R}^{j}\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|\psi^{\left(ij\right)}\right\rangle =\left|\psi_{L}^{i}\right\rangle \left|\psi_{R}^{j}\right\rangle 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Reduced Hamiltonian
+\end_layout
+
+\begin_layout Standard
+If we minimize the energy expectation
+\begin_inset Formula 
+\[
+\left\langle E\right\rangle =\frac{\left\langle \psi\left|\hat{H}\right|\psi\right\rangle }{\left\langle \psi|\psi\right\rangle }
+\]
+
+\end_inset
+
+with recpect 
+\begin_inset Formula $M^{n}$
+\end_inset
+
+ (or 
+\begin_inset Formula $A_{C}^{n}$
+\end_inset
+
+ in the paper) we get an expression for reduced or superblock Hamiltonian,
+ which corresponds to the diagram in fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Reduced-Hamiltonian for AC"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ with the expression
+\begin_inset Formula 
+\[
+H_{M\left(i_{1}ni_{2}\right)}^{\left(j_{1}mj_{2}\right)}=\left\langle \psi^{\left(j_{1}mj_{2}\right)}\left|\hat{H}\right|\psi^{\left(i_{1}ni_{2}\right)}\right\rangle 
+\]
+
+\end_inset
+
+=_
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Vumps-3.png
+	lyxscale 50
+	scale 50
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename Vumps-4.png
+	lyxscale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Reduced-Hamiltonian for AC"
+
+\end_inset
+
+Reduced Hamiltonian for the center site.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Alternately one can minimize WRT to 
+\begin_inset Formula $C$
+\end_inset
+
+ in eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Mixed CanForm b"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and get
+\begin_inset Formula 
+\[
+H_{C\left(i_{1}i_{2}\right)}^{\left(j_{1}j_{2}\right)}=\left\langle \psi^{\left(j_{1}j_{2}\right)}\left|\hat{H}\right|\psi^{\left(i_{1}i_{2}\right)}\right\rangle 
+\]
+
+\end_inset
+
+One can think of this a zero site effective Hamiltonian.
+ The paper now states
+\end_layout
+
+\begin_layout Quote
+In an efficient implementation, these effective eigen- value problems are
+ typically solved using an iterative eigensolver, so that we only need to
+ implement the action of 
+\begin_inset Formula $H_{M}$
+\end_inset
+
+ and 
+\begin_inset Formula $H_{C}$
+\end_inset
+
+ onto 
+\begin_inset Formula $M$
+\end_inset
+
+ and 
+\begin_inset Formula $C$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The first clause is fine, we flatten each group of three indices into one,
+ and find the lowest eigen pair to get a improved 
+\begin_inset Formula $M$
+\end_inset
+
+ or 
+\begin_inset Formula $C$
+\end_inset
+
+.
+ I don't know what they mean by 
+\begin_inset Quotes eld
+\end_inset
+
+action of 
+\begin_inset Formula $H_{M}$
+\end_inset
+
+ onto 
+\begin_inset Formula $M$
+\end_inset
+
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ They make it sound like we are doing imaginary time evolution?!
+\end_layout
+
+\begin_layout Subsection
+Transfer Matrix
+\end_layout
+
+\begin_layout Standard
+Oddly in order to proceed with the next step when working with an MPO representa
+tion of the Hamiltonian we have to jump to Appendix C, section 2 ! We start
+ with defining the left and right transfer matrices
+\begin_inset Formula 
+\[
+T_{L\left(w_{1}w_{2}\right)}=\sum_{mn}W_{w_{1}w_{2}}^{mn}A^{*m}\otimes A^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+T_{R\left(w_{1}w_{2}\right)}=\sum_{mn}W_{w_{1}w_{2}}^{mn}B^{*m}\otimes B^{n}
+\]
+
+\end_inset
+
+or with no supression of internal indices
+\begin_inset Formula 
+\[
+T_{L\left(w_{1}i_{1}i_{2}\right)\left(w_{2}j_{1}j_{2}\right)}=\sum_{mn}W_{w_{1}w_{2}}^{mn}A_{i_{1}i_{2}}^{*m}\otimes A_{j_{1}j_{2}}^{n}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+T_{R\left(w_{1}i_{1}i_{2}\right)\left(w_{2}j_{1}j_{2}\right)}=\sum_{mn}W_{w_{1}w_{2}}^{mn}B_{i_{1}i_{2}}^{*m}\otimes B_{j_{1}j_{2}}^{n}
+\]
+
+\end_inset
+
+where I have grouped in indices ready for eigen decomposition.
+ For a lower triabgular 
+\begin_inset Formula $W$
+\end_inset
+
+ we define
+\begin_inset Formula 
+\[
+\left(Y_{Lw_{2}}\right|=\sum_{w_{1}>w_{2}}\left(L_{w_{1}}\right|T_{L\left(w_{1}w_{2}\right)}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left(Y_{Lw_{2}i_{2}j_{2}}\right|=\sum_{w_{1}>w_{2}}\sum_{i_{1}j_{1}}\left(L_{w_{1}i_{1}j_{1}}\right|T_{L\left(w_{1}i_{1}j_{1}w_{2}i_{2}j_{2}\right)}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|Y_{Rw_{1}}\right)=\sum_{w_{2}<w_{1}}T_{R\left(w_{1}w_{2}\right)}\left|R_{w_{2}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|Y_{Rw_{1}i_{1}j_{2}}\right)=\sum_{w_{2}<w_{1}}\sum_{i_{2}j_{2}}T_{R\left(w_{1}i_{1}j_{2}w_{2}i_{2}j_{2}\right)}\left|R_{w_{2}i_{2}j_{2}}\right)
+\]
+
+\end_inset
+
+The fixed point equations are now
+\begin_inset Formula 
+\[
+\left(L_{wi_{2}j_{2}}\right|=\left(L_{wi_{1}j_{1}}\right|T_{L\left(wi_{1}j_{1}wi_{2}j_{2}\right)}+\left(Y_{Lwi_{2}j_{2}}\right|
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|R_{w}\right)=T_{R\left(ww\right)}\left|R_{w}\right)+\left|Y_{Rw}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|R_{wi_{1}j_{1}}\right)=T_{R\left(wi_{1}j_{1}wi_{2}j_{2}\right)}\left|R_{wi_{2}j_{2}}\right)+\left|Y_{Rwi_{1}j_{1}}\right)
+\]
+
+\end_inset
+
+For the left handed equation we start with 
+\begin_inset Formula $w=D_{w}$
+\end_inset
+
+ and we get
+\begin_inset Formula 
+\[
+\left(L_{D_{W}}\right|=\left(L_{D_{W}}\right|T_{L\left(D_{W}D_{W}\right)}+\left(Y_{LD_{W}}\right|
+\]
+
+\end_inset
+
+with
+\begin_inset Formula 
+\[
+T_{L\left(D_{W}D_{W}\right)}=\sum_{mn}W_{D_{W}D_{W}}^{mn}A^{\dagger m}\otimes A^{n}
+\]
+
+\end_inset
+
+but for an iMPO in regular form we know 
+\begin_inset Formula $W_{D_{W}D_{W}}^{mn}=𝕀^{mn}$
+\end_inset
+
+ yielding
+\begin_inset Formula 
+\[
+T_{L\left(D_{W}D_{W}\right)}=\sum_{m}A^{\dagger m}\otimes A^{m}=T_{A}
+\]
+
+\end_inset
+
+also
+\begin_inset Formula 
+\[
+\left(Y_{LD_{W}}\right|=\sum_{w_{1}>D_{W}}\left(L_{w_{1}}\right|T_{L\left(w_{1}D_{W}\right)}=0
+\]
+
+\end_inset
+
+and finally
+\begin_inset Formula 
+\[
+\left(L_{D_{W}}\right|=\left(L_{D_{W}}\right|T_{A}
+\]
+
+\end_inset
+
+so 
+\begin_inset Formula $L_{D_{W}}$
+\end_inset
+
+ must be the left eigen vector (acutally eigen matrix) of 
+\begin_inset Formula $T_{A}$
+\end_inset
+
+ which we know is just 
+\begin_inset Formula $𝕀$
+\end_inset
+
+, therefore
+\begin_inset Formula 
+\[
+L_{D_{W}}=R_{1}=𝕀
+\]
+
+\end_inset
+
+On the right side for 
+\begin_inset Formula $w=2$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|Y_{R2}\right)=\sum_{w_{2}<2}T_{R\left(2w_{2}\right)}\left|R_{w_{2}}\right)=T_{R\left(21\right)}\left|R_{1}\right)=T_{R\left(21\right)}𝕀
+\]
+
+\end_inset
+
+and 
+\begin_inset Formula 
+\[
+\left|R_{2}\right)=T_{R\left(22\right)}\left|R_{2}\right)+\left|Y_{R2}\right)=0+T_{R\left(21\right)}𝕀
+\]
+
+\end_inset
+
+the same holds for 
+\begin_inset Formula $w=3..D_{w}-1$
+\end_inset
+
+, Then at 
+\begin_inset Formula $w=D_{w}$
+\end_inset
+
+we have
+\begin_inset Formula 
+\[
+\left|Y_{RD_{w}}\right)=\sum_{w_{2}<D_{w}}T_{R\left(D_{w}w_{2}\right)}\left|R_{w_{2}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=T_{R\left(D_{w}1\right)}\left|R_{1}\right)+T_{R\left(D_{w}2\right)}\left|R_{2}\right)+\cdots+T_{R\left(D_{w}D_{w}-1\right)}\left|R_{D_{w}-1}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=T_{R\left(D_{w}1\right)}𝕀+T_{R\left(D_{w}2\right)}\left|R_{2}\right)+\cdots+T_{R\left(D_{w}D_{w}-1\right)}\left|R_{D_{w}-1}\right)
+\]
+
+\end_inset
+
+and 
+\begin_inset Formula 
+\[
+\left|R_{D_{w}}\right)=T_{R\left(D_{w}D_{w}\right)}\left|R_{D_{w}}\right)+\left|Y_{RD_{w}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{m}B^{\dagger m}\otimes B^{m}\left|R_{D_{w}}\right)+\left|Y_{RD_{w}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=T_{R}\left|R_{D_{w}}\right)+\left|Y_{RD_{w}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left(𝕀-T_{R}\right)\left|R_{D_{w}}\right)=\left|Y_{RD_{w}}\right)
+\]
+
+\end_inset
+
+This has to modified to project out infite lattice contribution
+\begin_inset Formula 
+\[
+\left[\mathbb{I}-T_{R}+\left|𝕀\right)\left(L\right|\right]\left|R_{D_{w}}\right)=\left|Y_{RD_{w}}\right)-\left|𝕀\right)\left(L|Y_{RD_{w}}\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\left(L|Y_{RD_{w}}\right)=e$
+\end_inset
+
+ is just number whihc happens to be energy per site.
+ On other hand 
+\begin_inset Formula $\left|𝕀\right)\left(L\right|$
+\end_inset
+
+ is a projector and right now I am not sure how to unpack it for coding.
+ In general everything above has internal indicies suppressed.
+ We need to unsupress them in order to make code.
+\end_layout
+
+\begin_layout Subsection
+Index Grouping
+\end_layout
+
+\begin_layout Standard
+Lets start by unpacking the right eigenvector of the iMPS transfer matrix
+\begin_inset Formula 
+\[
+\sum_{n}A^{\dagger n}RA^{n}=R
+\]
+
+\end_inset
+
+or in full
+\begin_inset Formula 
+\[
+\sum_{ni_{2}j_{2}}A_{i_{1}i_{2}}^{\dagger n}R_{i_{2}j_{2}}A_{j_{1}j_{2}}^{n}=R_{i_{1}j_{1}}
+\]
+
+\end_inset
+
+and do the followinf index groupings
+\begin_inset Formula 
+\[
+\left(i_{1}j_{1}\right)\rightarrow i,\;\left(i_{2}j_{2}\right)\rightarrow j
+\]
+
+\end_inset
+
+then the eigen eq.
+ becomes
+\begin_inset Formula 
+\[
+\sum_{j}T_{Aij}R_{j}=R_{i}
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\begin{equation}
+T_{A}\left|R\right)=\left|R\right)\label{eq:TA Right Ev}
+\end{equation}
+
+\end_inset
+
+This looks tidy, but the definition of 
+\begin_inset Formula $T_{A}$
+\end_inset
+
+ is a little disjointed
+\begin_inset Formula 
+\begin{equation}
+T_{Aij}=T_{A\left(i_{1}j_{1}\right)\left(i_{2}j_{2}\right)}=\sum_{n}A_{i_{1}i_{2}}^{\dagger n}A_{j_{1}j_{2}}^{n}\label{eq:TAij}
+\end{equation}
+
+\end_inset
+
+but easy to code.
+ Also the isometry relation
+\begin_inset Formula 
+\[
+\delta_{i_{2}j_{2}}=\sum_{ni_{1}j_{1}}A_{i_{1}i_{2}}^{\dagger n}\delta_{i_{1}j_{1}}A_{j_{1}j_{2}}^{n}
+\]
+
+\end_inset
+
+would look like 
+\begin_inset Formula 
+\[
+\delta_{j}=\sum_{i}\delta_{i}T_{Aij}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the iMPO transfer matrix
+\begin_inset Formula 
+\[
+T_{L\left(w_{1}i\right)\left(w_{2}j\right)}=T_{L\left(w_{1}i_{1}j_{1}\right)\left(w_{2}i_{2}j_{2}\right)}=\sum_{mn}W_{w_{1}w_{2}}^{mn}A_{i_{1}i_{2}}^{\dagger m}\otimes A_{j_{1}j_{2}}^{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Algorithm
+\end_layout
+
+\begin_layout Subsubsection
+\begin_inset Formula $L^{W}R^{W}\left(\hat{W},A^{n},B^{n},\left|R\right),\left(L\right|,\epsilon\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\left(L_{D_{w}}^{W}\right|=𝕀$
+\end_inset
+
+, or 
+\begin_inset Formula $\left(L_{D_{w}ij}^{W}\right|=\delta_{ij}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\left|R_{1}^{W}\right)=𝕀$
+\end_inset
+
+, or 
+\begin_inset Formula $\left|R_{1ij}^{W}\right)=\delta_{ij}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+for 
+\begin_inset Formula $w=D_{w}-1\rightarrow1$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Check 
+\begin_inset Formula $T_{L\left(ww\right)}=0$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+If not we need to solve some systems to back out 
+\begin_inset Formula $L^{W}$
+\end_inset
+
+.
+ Save this complication for later.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+\begin_inset Formula $\left(L_{w}^{W}\right|=\sum_{w_{1}>w}\left(L_{w_{1}}\right|T_{L\left(w_{1}w\right)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\left|R_{w}^{W}\right)=\sum_{w_{2}<w}T_{R\left(ww_{2}\right)}\left|R_{w_{2}}\right)$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Return 
+\begin_inset Formula $L^{W}$
+\end_inset
+
+ and 
+\begin_inset Formula $R^{W}$
+\end_inset
+
+ (these are each arrays of 
+\begin_inset Formula $D\times D$
+\end_inset
+
+ matrices)
+\end_layout
+
+\begin_layout Subsubsection
+\begin_inset Formula $H_{A_{C}}$
+\end_inset
+
+ and 
+\begin_inset Formula $H_{C}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Calculate 
+\begin_inset Formula $L^{W}R^{W}\left(\hat{W},A^{n},B^{n},\left|R\right),\left(L\right|,\epsilon\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $H_{A_{C}\left(i_{1}mi_{2}\right)\left(j_{1}nj_{2}\right)}=\sum_{w_{1}w_{2}}\hat{W}_{w_{1}w_{2}}^{mn}L_{i_{1}w_{1}j_{1}}^{W}R_{i_{2}w_{2}j_{2}}^{W}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $H_{C\left(i_{1}i_{2}\right)\left(j_{1}j_{2}\right)}=\sum_{w}L_{i_{1}wj_{1}}^{W}R_{i_{2}wj_{2}}^{W}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+VUMPS
+\end_layout
+
+\begin_layout Enumerate
+Build the lower triangular iMPO 
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+ with dimension 
+\begin_inset Formula $D_{w}\times D_{w}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Create a random iMPO 
+\begin_inset Formula $M^{n}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Find the left canonical form 
+\begin_inset Formula $A^{n}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Calculate 
+\begin_inset Formula $T_{A}$
+\end_inset
+
+ from eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:TAij"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Enumerate
+Find the right eigen vector 
+\begin_inset Formula $\left|R\right)$
+\end_inset
+
+, eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:TA Right Ev"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Repeat 3-6 for the right canincal form yielding 
+\begin_inset Formula $B^{n}$
+\end_inset
+
+, 
+\begin_inset Formula $T_{R}$
+\end_inset
+
+ and 
+\begin_inset Formula $\left(L\right|$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Calculate 
+\begin_inset Formula $H_{A_{C}}$
+\end_inset
+
+ and 
+\begin_inset Formula $H_{C}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Find the ground state eigen solution of 
+\begin_inset Formula $H_{A_{C}}A_{C}=E_{A_{C}}A_{C}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Find the ground state eigen solution of 
+\begin_inset Formula $H_{C}C=E_{C}C$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+SVD Decompose the product 
+\begin_inset Formula $A_{C}^{l}C^{\dagger}=\sum_{j}A_{C\left(ni,j\right)}C_{jk}^{\dagger}=U^{l}s^{l}V^{\dagger l}$
+\end_inset
+
+, calculate 
+\begin_inset Formula $A=U^{l}V^{\dagger l}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+SVD Decompose the product 
+\begin_inset Formula $C^{\dagger}A_{C}^{r}=\sum_{i}C_{ij}^{\dagger}A_{C\left(j,nk\right)}=U^{r}s^{r}V^{\dagger r}$
+\end_inset
+
+, calculate 
+\begin_inset Formula $B=U^{r}V^{\dagger r}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Trivial example
+\end_layout
+
+\begin_layout Standard
+Ferromagnetic state for 
+\begin_inset Formula $d=2$
+\end_inset
+
+, 
+\begin_inset Formula $L=1$
+\end_inset
+
+, 
+\begin_inset Formula $D=1$
+\end_inset
+
+, 
+\begin_inset Formula $D_{w}=3$
+\end_inset
+
+ we have
+\begin_inset Formula 
+\[
+M^{0}=A^{0}=B^{0}=\begin{bmatrix}1\end{bmatrix},\;M^{1}=A^{1}=B^{1}=\begin{bmatrix}0\end{bmatrix}
+\]
+
+\end_inset
+
+ for spin up.
+\begin_inset Formula 
+\[
+\sum_{n}A^{\dagger n}A^{n}=\begin{bmatrix}1\end{bmatrix},\quad\sum_{n}B^{n}B^{\dagger n}=\begin{bmatrix}1\end{bmatrix}
+\]
+
+\end_inset
+
+also
+\begin_inset Formula 
+\[
+T_{A}=\sum_{n}A^{\dagger n}\otimes A^{n}=\begin{bmatrix}1\end{bmatrix}
+\]
+
+\end_inset
+
+same for 
+\begin_inset Formula $T_{B}$
+\end_inset
+
+.
+\begin_inset Formula 
+\[
+\hat{W}=\begin{bmatrix}𝕀 & 0 & 0\\
+\hat{Z} & 0 & 0\\
+0 & \hat{Z} & 𝕀
+\end{bmatrix},\;\hat{Z}=\begin{bmatrix}-\frac{1}{2} & 0\\
+0 & \frac{1}{2}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+T_{L\left(w_{1}w_{2}\right)}=T_{R\left(w_{1}w_{2}\right)}=\sum_{mn}W_{w_{1}w_{2}}^{mn}A^{\dagger m}\otimes A^{n}=W_{w_{1}w_{2}}^{11}=\begin{bmatrix}1 & 0 & 0\\
+-\frac{1}{2} & 0 & 0\\
+0 & -\frac{1}{2} & 1
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left(L_{2}^{W}\right|=\sum_{w_{1}>2}\left(L_{w_{1}}^{W}\right|T_{L\left(w_{1}2\right)}=L_{3}^{W}T_{L\left(32\right)}=\begin{bmatrix}-\frac{1}{2}\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|R_{2}^{W}\right)=\sum_{w_{2}<2}T_{R\left(2w_{2}\right)}\left|R_{w_{2}}^{W}\right)=T_{R\left(21\right)}\left|R_{1}^{W}\right)=\begin{bmatrix}-\frac{1}{2}\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left(Y_{L1}\right|=\sum_{w_{1}>1}\left(L_{w_{1}}\right|T_{L\left(w_{1}1\right)}=\left(L_{2}\right|T_{L\left(21\right)}+\left(L_{3}\right|T_{L\left(31\right)}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\begin{bmatrix}-\frac{1}{2}\end{bmatrix}-\frac{1}{2}+\begin{bmatrix}1\end{bmatrix}0=\begin{bmatrix}\frac{1}{4}\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left|Y_{RD_{w}}\right)=\sum_{w_{2}<D_{w}}T_{R\left(D_{w}w_{2}\right)}\left|R_{w_{2}}\right)=T_{R\left(31\right)}\left|R_{1}\right)+T_{R\left(32\right)}\left|R_{2}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=0\begin{bmatrix}1\end{bmatrix}+-\frac{1}{2}\begin{bmatrix}-\frac{1}{2}\end{bmatrix}=\begin{bmatrix}\frac{1}{4}\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+References
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintCited"
+bibfiles "MPS1"
+options "bibtotoc,plain"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
