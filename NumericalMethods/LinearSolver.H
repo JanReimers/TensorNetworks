@@ -26,6 +26,11 @@ public:
 //
     virtual VectorT SolveUpperTri(const VectorT& b,const MatrixT& A); // A is upper triangular
     virtual VectorT SolveLowerTri(const VectorT& b,const MatrixT& A); // A is lower triangular
+//
+//  Full solver
+//
+    virtual VectorT Solve(const MatrixT& A,const VectorT& b)=0; // A*x=b
+    virtual VectorT Solve(const VectorT& b,const MatrixT& A);   // b=x*A
 };
 
 #endif // LINEARSOLVER_H

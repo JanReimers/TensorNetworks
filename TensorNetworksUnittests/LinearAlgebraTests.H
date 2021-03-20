@@ -775,8 +775,14 @@ public:
         }
         A=MakeMatrix('L');
         {
-            Vector<T> xr=itsSolver->SolveLowerTri(A,b);
-            Vector<T> xl=itsSolver->SolveLowerTri(b,A);
+            Vector<T> xr=itsSolver->SolveLowerTri(A,b); //Solve A*x=b
+            Vector<T> xl=itsSolver->SolveLowerTri(b,A); //Solve b=x*A
+            Validate(xr,xl);
+        }
+        A=MakeMatrix('F');
+        {
+            Vector<T> xr=itsSolver->Solve(A,b); //Solve A*x=b
+            Vector<T> xl=itsSolver->Solve(b,A); //Solve b=x*A
             Validate(xr,xl);
         }
     }
@@ -802,6 +808,8 @@ public:
                 for (index_t i:ret.rows(j+1))
                     ret(i,j)=T(0.0);
         }
+        else if (ul=='F')
+        {}//Noop
         else
             assert(false);
 

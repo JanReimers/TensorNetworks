@@ -33,6 +33,11 @@ LinearSolver<T>::SolveLowerTri(const VectorT& b,const MatrixT& A)
 {
     return SolveUpperTri(Transpose(A),b);
 }
+template <class T> typename LinearSolver<T>::VectorT
+LinearSolver<T>::Solve(const VectorT& b,const MatrixT& A)
+{
+    return Solve(Transpose(A),b);
+}
 //
 //  static variable. Kludge for getting the matrix into the Mat*Vec routines.
 //
