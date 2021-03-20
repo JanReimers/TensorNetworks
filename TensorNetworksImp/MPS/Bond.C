@@ -1,5 +1,6 @@
 #include "TensorNetworksImp/MPS/Bond.H"
-#include "TensorNetworksImp/MPS/MPSSite.H"
+//#include "TensorNetworksImp/MPS/MPSSite.H"
+#include "oml/matrix.h"
 #include "oml/diagonalmatrix.h"
 #include <iostream>
 #include <iomanip>
@@ -48,7 +49,7 @@ Bond* Bond::Clone() const
     return b;
 }
 
-void Bond::SetSites(MPSSite* left, MPSSite* right)
+void Bond::SetSites(Site* left, Site* right)
 {
     itsLeft_Site=left;
     itsRightSite=right;

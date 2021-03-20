@@ -14,6 +14,7 @@ namespace TensorNetworks
 
     class iTEBDState;
     class iHamiltonian;
+    class iMPS;
     class iMPO;
 
     class SiteOperator;

@@ -22,6 +22,7 @@ iHamiltonianImp::~iHamiltonianImp()
 
 } //namespace
 
+#include "TensorNetworksImp/iMPS/iMPSImp.H"
 #include "TensorNetworksImp/iTEBD/iTEBDGates.H"
 #include "TensorNetworksImp/iTEBD/iTEBDMPOs.H"
 #include "TensorNetworksImp/iTEBD/iTEBDiMPOs.H"
@@ -38,6 +39,11 @@ namespace TensorNetworks
 //  Create states.  Why are these here?  Because the Hamiltonian is the
 //  only thing that knows L,S,Dw
 //
+iMPS* iHamiltonianImp::CreateiMPS(int L,int D,double normEps,double epsSV) const
+{
+    return new iMPSImp(L,GetS(),D,normEps,epsSV);
+}
+
 iTEBDState* iHamiltonianImp::CreateiTEBDState(int D,iTEBDType type,double normEps,double epsSV) const
 {
     return CreateiTEBDState(GetL(),D,type,normEps,epsSV);

@@ -566,7 +566,7 @@ template <class T> typename MatrixO<T>::QXType MatrixO<T>::Full_QX(Direction lr)
     assert(IsUpperTriangular(R));
     Q.ReBase(Wlim);
     this->UnFlatten(Q);
-    double scale=sqrt(itsd);
+    double scale=sqrt(itsd); //What about sign changes?
     R/=scale;
     (*this)*=scale;
     return std::make_tuple(*this,R);

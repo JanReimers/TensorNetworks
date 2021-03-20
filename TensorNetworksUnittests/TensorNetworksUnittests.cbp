@@ -121,6 +121,9 @@
 		<Unit filename="iTEBDTests.C">
 			<Option compilerVar="CPP" />
 		</Unit>
+		<Unit filename="iVUMPSTests.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="main.C">
 			<Option compilerVar="CPP" />
 		</Unit>

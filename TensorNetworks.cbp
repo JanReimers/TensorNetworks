@@ -20,6 +20,7 @@
 					<Add option="-DDEBUG" />
 					<Add directory="NumericalMethods" />
 					<Add directory="Operators" />
+					<Add directory="TensorNetworksImp/iMPS" />
 				</Compiler>
 				<Linker>
 					<Add directory="../Debug" />
@@ -41,6 +42,7 @@
 					<Add option="-DNDEBUG" />
 					<Add directory="NumericalMethods" />
 					<Add directory="Operators" />
+					<Add directory="TensorNetworksImp/iMPS" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />
@@ -233,6 +235,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworks/iMPO.H" />
+		<Unit filename="TensorNetworks/iMPS.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworks/iMPS.H" />
 		<Unit filename="TensorNetworks/iTEBDState.H" />
 		<Unit filename="TensorNetworksImp/FactoryImp.C">
 			<Option compilerVar="CC" />
@@ -254,6 +260,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_3Body.H" />
+		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_3Body_LongRange.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_3Body_LongRange.H" />
 		<Unit filename="TensorNetworksImp/Hamiltonians/Hamiltonian_1D_NN_Heisenberg.C">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -324,6 +334,18 @@
 		</Unit>
 		<Unit filename="TensorNetworksImp/StateIterator.H" />
 		<Unit filename="TensorNetworksImp/Typedefs.H" />
+		<Unit filename="TensorNetworksImp/iMPS/Tensor3.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/iMPS/Tensor3.H" />
+		<Unit filename="TensorNetworksImp/iMPS/iMPSImp.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/iMPS/iMPSImp.H" />
+		<Unit filename="TensorNetworksImp/iMPS/iMPSSite.C">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TensorNetworksImp/iMPS/iMPSSite.H" />
 		<Unit filename="TensorNetworksImp/iTEBD/iTEBDGates.C">
 			<Option compilerVar="CC" />
 		</Unit>

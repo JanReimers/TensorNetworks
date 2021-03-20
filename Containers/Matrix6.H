@@ -1,6 +1,7 @@
 #ifndef MATRIX6_H
 #define MATRIX6_H
 
+#include "Containers/Matrix4.H"
 #include "oml/matrix.h"
 
 using std::cout;
@@ -10,7 +11,7 @@ using std::endl;
 //
 template <class T> class Matrix6
 {
-    typedef Matrix<T> MatrixRT;
+    typedef Matrix<T> MatrixT;
     public:
         Matrix6(int _M1,int _M2,int _M3, int _N1, int _N2, int _N3, int mnLow=0)
          : M1(_M1),M2(_M2),M3(_M3),N1(_N1),N2(_N2),N3(_N3), itsmnLow(1-mnLow)
@@ -49,7 +50,7 @@ template <class T> class Matrix6
                 return itsS(itsM.index1(m,i1,i2),itsM.index2(n,j1,j2));
             }
             private:
-            typename MatrixRT::Subscriptor itsS;
+            typename MatrixT::Subscriptor itsS;
             const Matrix6& itsM;
             };
         T& operator()(int m, int i1, int i2, int n, int j1, int j2)
@@ -89,7 +90,8 @@ template <class T> class Matrix6
 
         void ClearLimits() {itsData.SetLimits(0,0);}
 
-        MatrixRT& Flatten() {return itsData;}
+        MatrixT&   Flatten() {return itsData;}
+        Matrix4<T> SubMatrix(int m, int n) const;
 
         friend std::ostream& operator<<(std::ostream& os,const Matrix6& m) {return os << m.itsData;}
         friend class Subscriptor;
@@ -111,7 +113,18 @@ template <class T> class Matrix6
     private:
         int M1,M2,M3,N1,N2,N3;
         int itsmnLow;
-        MatrixRT itsData;
+        MatrixT itsData;
 };
+
+template <class T> Matrix4<T> Matrix6<T>::SubMatrix(int m, int n) const
+{
+    Matrix4<T> ret(M2,M3,N2,N3);
+    for (int i1=1; i1<=M2; i1++)
+    for (int j1=1; j1<=M3; j1++)
+        for (int i2=1; i2<=N2; i2++)
+        for (int j2=1; j2<=N3; j2++)
+            ret(i1,j1,i2,j2)=(*this)(m,i1,j1,n,i2,j2);
+    return ret;
+}
 
 #endif // MATRIX6_H

@@ -2,6 +2,7 @@
 #define MATRIXPRODUCTSITE_H
 
 #include "TensorNetworksImp/Namespace.H"
+#include "TensorNetworksImp/MPS/Bond.H"
 #include "Containers/Vector3.H"
 #include "oml/matrix.h"
 #include <vector>
@@ -12,7 +13,7 @@ template <class T> class EigenSolver;
 namespace TensorNetworks
 {
 
-class MPSSite
+class MPSSite : public virtual Site
 {
     public:
 //--------------------------------------------------------------------------------------

@@ -9,6 +9,16 @@
 namespace TensorNetworks
 {
 
+class Site
+{
+public:
+    virtual ~Site() {};
+    virtual void SVDTransfer(Direction lr,const DiagonalMatrixRT& s, const MatrixCT& UV)=0;
+    virtual void SVDTransfer(Direction lr,const MatrixCT& UV)=0;
+    virtual void TransferQR (Direction lr,const MatrixCT& R)=0;
+
+};
+
 class Bond
 {
 
@@ -17,7 +27,7 @@ class Bond
         virtual ~Bond();
         void CloneState(const Bond* b2);
         Bond* Clone() const;
-        void SetSites(MPSSite* left, MPSSite* right);
+        void SetSites(Site* left, Site* right);
         void NewBondDimension(int D);
 
         void SVDTransfer      (Direction lr,double compessionError,const DiagonalMatrixRT& s,const MatrixCT& UV);
@@ -45,7 +55,7 @@ class Bond
         //
         //  lr is the normalization direction.  For normalization we need to access the right bond.
         //
-        MPSSite* GetSite(Direction lr)
+        Site* GetSite(Direction lr)
         {
             return lr==DLeft ? itsRightSite : itsLeft_Site;
         }
@@ -58,8 +68,8 @@ class Bond
         double itsCompessionError; // sum of reject S_i^2
         int    itsD;
         int    itsRank; //Rank <=D depending on zero SVs
-        MPSSite* itsLeft_Site;
-        MPSSite* itsRightSite;
+        Site* itsLeft_Site;
+        Site* itsRightSite;
 
 };
 }
