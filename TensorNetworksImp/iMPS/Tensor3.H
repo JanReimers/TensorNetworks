@@ -56,6 +56,26 @@ private:
     std::vector<MatrixCT> itsMs; //
 };
 
+template <class T> Vector<T> Flatten(const Matrix<T>& m)
+{
+    Vector<T> v(m.GetNumRows()*m.GetNumCols());
+    int ij=1;
+    for (index_t j:m.cols())
+        for (index_t i:m.rows())
+            v(ij++)=m(i,j);
+    return v;
+}
+template <class T> Matrix<T> UnFlatten(const Vector<T>& v)
+{
+    int N=sqrt(v.size());
+    Matrix<T> m(N,N);
+    int ij=1;
+    for (index_t j:m.cols())
+        for (index_t i:m.rows())
+            m(i,j)=v(ij++);
+    return m;
+}
+
 } //namespace
 
 #endif // TENSOR3_H

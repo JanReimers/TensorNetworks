@@ -264,35 +264,35 @@ Matrix6CT Tensor3::GetTransferMatrix(Direction lr,const MatrixOR& W) const
     OperatorZ Z(d);
     Tw.Fill(dcmplx(0.0));
 
-        for (index_t w1=0;w1<=X1+1;w1++)
-        for (index_t w2=0;w2<=X2+1;w2++)
+    for (index_t w1=0;w1<=X1+1;w1++)
+    for (index_t w2=0;w2<=X2+1;w2++)
+    {
+        if (!(W(w1,w2)==Z))
         {
-            if (!(W(w1,w2)==Z))
-            {
-            for (index_t i1=1;i1<=D1;i1++)
-            for (index_t i2=1;i2<=D2;i2++)
-                for (index_t j1=1;j1<=D1;j1++)
-                for (index_t j2=1;j2<=D2;j2++)
+        for (index_t i1=1;i1<=D1;i1++)
+        for (index_t i2=1;i2<=D2;i2++)
+            for (index_t j1=1;j1<=D1;j1++)
+            for (index_t j2=1;j2<=D2;j2++)
+                {
+                    dcmplx t(0.0);
+                    switch (lr)
                     {
-                        dcmplx t(0.0);
-                        switch (lr)
-                        {
-                        case DLeft:
-                            for (int m=0;m<d;m++)
-                            for (int n=0;n<d;n++)
-                                t+=W(w1,w2)(m,n)*conj(itsMs[m](i1,i2))*itsMs[n](j1,j2);
-                            break;
-                        case DRight:
-                            for (int m=0;m<d;m++)
-                            for (int n=0;n<d;n++)
-                                t+=W(w1,w2)(m,n)*itsMs[m](i1,i2)*conj(itsMs[n](j1,j2));
-                            break;
-                        }
-                        Tw(w1+1,i1,j1,w2+1,i2,j2)=t;
+                    case DLeft:
+                        for (int m=0;m<d;m++)
+                        for (int n=0;n<d;n++)
+                            t+=W(w1,w2)(m,n)*conj(itsMs[m](i1,i2))*itsMs[n](j1,j2);
+                        break;
+                    case DRight:
+                        for (int m=0;m<d;m++)
+                        for (int n=0;n<d;n++)
+                            t+=W(w1,w2)(m,n)*itsMs[m](i1,i2)*conj(itsMs[n](j1,j2));
+                        break;
                     }
+                    Tw(w1+1,i1,j1,w2+1,i2,j2)=t;
+                }
 
-         }
-           }
+        }
+    }
     return Tw;
 }
 
