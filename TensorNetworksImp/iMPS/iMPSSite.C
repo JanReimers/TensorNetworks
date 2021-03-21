@@ -209,11 +209,9 @@ void iMPSSite::SaveAB_CalcLR(Direction lr)
     {
     case DLeft:
         itsA=itsM;
-        itsR=itsA.GetTMEigenVector(lr);
         break;
     case DRight:
         itsB=itsM;
-        itsL=itsB.GetTMEigenVector(lr);
         break;
     }
 }
@@ -264,9 +262,10 @@ Matrix4CT ContractHC(const Tensor3& LW, const Tensor3& RW)
 
 void iMPSSite::Refine (const iHamiltonian* H,const Epsilons& eps)
 {
+    double epsHerm=5e-8;
     const SiteOperator* so=H->GetSiteOperator(1);
     const MatrixOR& W=so->GetW();
-    cout << "W=" << W << endl;
+    //cout << "W=" << W << endl;
     auto [d,D1,D2]=itsA.GetDimensions();
     auto [X1,X2]=W.GetChi12();
     assert(X1==X2);
@@ -275,6 +274,8 @@ void iMPSSite::Refine (const iHamiltonian* H,const Epsilons& eps)
     Matrix6CT TWR=itsB.GetTransferMatrix(DRight,W);
     MatrixCT  TL=itsA.GetTransferMatrix(DLeft );
     MatrixCT  TR=itsB.GetTransferMatrix(DRight);
+    itsR=itsA.GetTMEigenVector(DLeft );
+    itsL=itsB.GetTMEigenVector(DRight);
     assert(Max(fabs(TL-TWL.SubMatrix(1 ,1 ).Flatten()))<1e-15);
     assert(Max(fabs(TL-TWL.SubMatrix(Dw,Dw).Flatten()))<1e-15);
     assert(Max(fabs(TR-TWR.SubMatrix(1 ,1 ).Flatten()))<1e-15);
@@ -342,10 +343,12 @@ void iMPSSite::Refine (const iHamiltonian* H,const Epsilons& eps)
     LapackSVDSolver<dcmplx> SVDsolver;
     {
         auto [U,s,VT]=SVDsolver.SolveAll(XL,1e-14);
+        cout << std::scientific << "XL min s=" << Min(s.GetDiagonal()) << endl;
         assert(Min(s.GetDiagonal())>1e-14);
     }
     {
         auto [U,s,VT]=SVDsolver.SolveAll(XR,1e-14);
+        cout << std::scientific << "XR min s=" << Min(s.GetDiagonal()) << endl;
         assert(Min(s.GetDiagonal())>1e-14);
     }
 
@@ -360,41 +363,72 @@ void iMPSSite::Refine (const iHamiltonian* H,const Epsilons& eps)
     {
         //cout << "LW(" << w << ")=" << LW(w) << endl;
         cout << std::scientific << Max(fabs(LW(w)-~LW(w))) << endl;
-        assert(IsHermitian(LW(w),1e-13));
+        assert(IsHermitian(LW(w),epsHerm));
     }
     for (int w=1;w<=Dw;w++)
     {
         //cout << "RW(" << w << ")=" << RW(w) << endl;
         cout << std::scientific << Max(fabs(RW(w)-~RW(w))) << endl;
-        assert(IsHermitian(RW(w),1e-13));
+        assert(IsHermitian(RW(w),epsHerm));
     }
 
     Matrix6CT Hac=ContractHAC(W,LW,RW);
+    MatrixCT  Hacf=Hac.Flatten();
     //cout << "Hac=" << Hac << endl;
-    assert(IsHermitian(Hac.Flatten(),1e-13));
+    assert(IsHermitian(Hacf,epsHerm));
     Matrix4CT Hc=ContractHC(LW,RW);
+    MatrixCT  Hcf=Hc.Flatten();
     //cout << "Hc=" << Hc << endl;
-    assert(IsHermitian(Hc.Flatten(),1e-13));
+    assert(IsHermitian(Hcf,epsHerm));
 
+    Hacf=0.5*(Hacf+~Hacf);
+    Hcf =0.5*(Hcf +~Hcf );
     LapackEigenSolver<dcmplx> asolver;
-    auto [Ac,eAc]=asolver.Solve(Hac.Flatten(),1e-12,1);
-    auto [Cf ,eC ]=asolver.Solve(Hc .Flatten(),1e-12,1);
+    auto [Acf,eAc]=asolver.Solve(Hacf,1e-12,1);
+    auto [Cf ,eC ]=asolver.Solve(Hcf ,1e-12,1);
 
+    Tensor3 Ac(d,D1,D2);
+    Ac.UnFlatten(VectorCT(Acf.GetColumn(1)));
     MatrixCT C=UnFlatten(VectorCT(Cf.GetColumn(1)));
+    MatrixCT Cdagger=~C;
     cout << std::fixed;
     //cout << "Ac=" << Ac << endl;
     cout << "eAc=" << eAc << endl;
-    cout << "C=" << C << endl;
+    //cout << "C=" << C << endl;
     cout << "eC=" << eC << endl;
 
     {
         auto [U,s,VT]=SVDsolver.SolveAll(C,1e-14);
-        cout << std::scientific << "C svs=" << s.GetDiagonal() << endl;
+        //cout << std::scientific << "C svs=" << s.GetDiagonal() << endl;
+        cout << std::scientific << "C min s=" << Min(s.GetDiagonal()) << endl;
         assert(Min(s.GetDiagonal())>1e-14);
         double s2=s.GetDiagonal()*s.GetDiagonal();
-        cout << "s*s-1=" << s2-1.0 << endl;
+        //cout << "s*s-1=" << s2-1.0 << endl;
         assert(fabs(s2-1.0)<1e-13);
     }
+
+    MatrixCT AcL=Ac.Flatten(DLeft);
+    MatrixCT AcR=Ac.Flatten(DRight);
+    MatrixCT AcC=AcL*Cdagger;
+    MatrixCT CAc=Cdagger*AcR;
+    Tensor3 Anew(d,D1,D2),Bnew(d,D1,D2);
+    {
+        auto [Ul,sl,VTl]=SVDsolver.SolveAll(AcC,1e-14);
+        auto [Ur,sr,VTr]=SVDsolver.SolveAll(CAc,1e-14);
+        //cout << "Ul*Vl=" << Ul*VTl << endl;
+        //cout << "Ur*Vr=" << Ur*VTr << endl;
+        Anew.UnFlatten(DLeft ,Ul*VTl);
+        Bnew.UnFlatten(DRight,Ur*VTr);
+    }
+    //cout << "Anew=" << Anew << endl;
+    //cout << "Bnew=" << Bnew << endl;
+
+    itsA=Anew;
+    itsB=Bnew;
+
+    //cout << "A.Norm=" << itsA.GetNorm(DLeft) << endl;
+    //cout << "B.Norm=" << itsB.GetNorm(DRight) << endl;
+
 }
 
 

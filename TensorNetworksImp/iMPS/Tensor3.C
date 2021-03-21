@@ -69,6 +69,18 @@ void Tensor3::Unit(int n)
     ::Unit(itsMs[n1]);
 }
 
+void Tensor3::UnFlatten(const VectorCT& v)
+{
+    auto [d,D1,D2]=GetDimensions();
+    assert(v.size()==d*D1*D2);
+    int nij=1;
+    for (index_t j=1;j<=D2;j++)
+        for (index_t i=1;i<=D1;i++)
+             for (auto& M:itsMs)
+                M(i,j)=v(nij++);
+}
+
+
 MatLimits Tensor3::GetLimits() const
 {
     assert(itsMs.size()>0);

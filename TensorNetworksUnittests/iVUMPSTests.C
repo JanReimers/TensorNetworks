@@ -49,12 +49,12 @@ public:
         if (itsCompressor) delete itsCompressor;
     }
 
-    void Setup(int L, double S, int D, double epsSVD,MPOForm f)
+    void Setup(int L, double S, int D, double hx, double epsSVD,MPOForm f)
     {
         if (itsiH)         delete itsiH;
         if (itsiMPS)       delete itsiMPS;
         if (itsCompressor) delete itsCompressor;
-        itsiH=itsFactory->Make1D_NN_TransverseIsingiHamiltonian(1,S,f,1.0,0.0);
+        itsiH=itsFactory->Make1D_NN_TransverseIsingiHamiltonian(1,S,f,1.0,hx);
         itsiMPS=itsiH->CreateiMPS(L,D,D*D*epsNorm,epsSVD);
         itsCompressor=itsFactory->MakeMPSCompressor(D,epsSVD);
     }
@@ -71,9 +71,9 @@ public:
 TEST_F(iVUMPSTests,TestSetup)
 {
     int UnitCell=1,D=2;
-    double S=0.5,epsSVD=0.0;
+    double S=0.5,hx=0.0,epsSVD=0.0;
     MPOForm f=RegularLower;
-    Setup(UnitCell,S,D,epsSVD,f);
+    Setup(UnitCell,S,D,hx,epsSVD,f);
     itsiMPS->InitializeWith(Random);
     EXPECT_EQ(itsiMPS->GetNormStatus(),"M");
 }
@@ -81,11 +81,11 @@ TEST_F(iVUMPSTests,TestSetup)
 TEST_F(iVUMPSTests,TestNormQR_D2_L1)
 {
     int UnitCell=1,D=2;
-    double epsSVD=0.0;
+    double hx=0.0,epsSVD=0.0;
     MPOForm f=RegularLower;
     for (double S=0.5;S<=2.5;S+=0.5)
     {
-        Setup(UnitCell,S,D,epsSVD,f);
+        Setup(UnitCell,S,D,hx,epsSVD,f);
         itsiMPS->InitializeWith(Random);
         itsiMPS->NormalizeQR(DLeft);
         EXPECT_EQ(itsiMPS->GetNormStatus(),"A");
@@ -97,11 +97,11 @@ TEST_F(iVUMPSTests,TestNormQR_D2_L1)
 TEST_F(iVUMPSTests,TestNormQR_D6_L1)
 {
     int UnitCell=1,D=6;
-    double epsSVD=0.0;
+    double hx=0.0,epsSVD=0.0;
     MPOForm f=RegularLower;
     for (double S=0.5;S<=2.5;S+=0.5)
     {
-        Setup(UnitCell,S,D,epsSVD,f);
+        Setup(UnitCell,S,D,hx,epsSVD,f);
         itsiMPS->InitializeWith(Random);
         itsiMPS->NormalizeQR(DLeft);
         EXPECT_EQ(itsiMPS->GetNormStatus(),"A");
@@ -113,11 +113,11 @@ TEST_F(iVUMPSTests,TestNormQR_D6_L1)
 TEST_F(iVUMPSTests,TestNormQR_D6_L10)
 {
     int UnitCell=10,D=6;
-    double epsSVD=0.0;
+    double hx=0.0,epsSVD=0.0;
     MPOForm f=RegularLower;
     for (double S=0.5;S<=2.5;S+=0.5)
     {
-        Setup(UnitCell,S,D,epsSVD,f);
+        Setup(UnitCell,S,D,hx,epsSVD,f);
         itsiMPS->InitializeWith(Random);
         itsiMPS->NormalizeQR(DLeft);
         EXPECT_EQ(itsiMPS->GetNormStatus(),"AAAAAAAAAA");
@@ -128,10 +128,10 @@ TEST_F(iVUMPSTests,TestNormQR_D6_L10)
 
 TEST_F(iVUMPSTests,TestFindGS_D2_L1)
 {
-    int UnitCell=1,D=2,maxIter=1;
-    double S=0.5,epsSVD=0.0,eps=1e-9;
+    int UnitCell=1,D=8,maxIter=10;
+    double S=0.5,hx=0.5,epsSVD=0.0,eps=1e-9;
     MPOForm f=RegularLower;
-    Setup(UnitCell,S,D,epsSVD,f);
+    Setup(UnitCell,S,D,hx,epsSVD,f);
     itsiMPS->InitializeWith(Random);
 
     IterationSchedule is;

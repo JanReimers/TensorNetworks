@@ -21,6 +21,9 @@ public:
     ~Tensor3() {}
     void InitializeWith(State,int sgn);
     void Unit(int n); //Make this(n,i,j)=delta_ij = unit matrix
+    MatrixCT   Flatten(Direction) const;
+    void     UnFlatten(Direction,const MatrixCT& F);
+    void     UnFlatten(const VectorCT&);
 
     int       Getd     () const {return itsMs.size();}
     int       GetD1    () const {return itsMs[0].GetNumRows();}
@@ -49,8 +52,6 @@ public:
 private:
 
     MatrixCT InitNorm (Direction) const;
-    MatrixCT   Flatten(Direction) const;
-    void     UnFlatten(Direction,const MatrixCT& F);
 
     int itsmnLow;
     std::vector<MatrixCT> itsMs; //
