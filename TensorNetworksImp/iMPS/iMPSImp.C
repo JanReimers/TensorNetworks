@@ -241,10 +241,17 @@ void iMPSImp::FindVariationalGroundState(const iHamiltonian* H,const IterationSc
 void iMPSImp::FindVariationalGroundState(const iHamiltonian* H,const IterationScheduleLine& isl)
 {
     int in=0;
+    double eta=1.0;
+    double de=0.0;
     for (; in<isl.itsMaxGSSweepIterations; in++)
     {
         for (int ia=1;ia<=itsL;ia++)
-            itsSites[ia]->Refine(H,isl.itsEps);
+        {
+            eta=itsSites[ia]->Refine(H,isl.itsEps);
+            de=std::max(de,fabs(itsSites[ia]->GetIterDE()));
+        }
+        if (eta<isl.itsEps.itsDeltaLambdaEpsilon ) break;
+        if (de <isl.itsEps.itsDelatEnergy1Epsilon) break;
     }
 
 }

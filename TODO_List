@@ -1,4 +1,20 @@
 
+VUMPS:
+    Done: -Initial code for 1 site.
+    Done: -Calculate site energy e = (YL_1|R) = (L|YR_Dw)
+    Done: -Calculate etaL = || AC-AL*C ||^2, etaR=||AC-C*AR||^2 and use for convergence
+    Done: -Check or use L=C_dagger*C, R= C*C_dagger, Tr[C*C_dagger]=1
+        Not working very well.
+    Done: -Break iteration on convergence of dE, etaL,etaR
+    -SVD polar decomposition of AC and C
+    -QR decomposition of AC and C
+    -Store Sv of C on bond object.
+    -L>1 unit cell
+    -Avoid calculating H_AC and H_C, use SparseEigenSolverClient
+    -Handle zero SVs in C, and shrink D accordingly.
+    -Start using logger to track iterations
+    -Set numerous unit tests for L={1,2,4}, D=1,2,8,32, S=0.5,1.0,1.5
+
 New Techniques:
     -Parker MPO compression
     -Learn how to build MPOs from simple one site ops.  Read McCUllough

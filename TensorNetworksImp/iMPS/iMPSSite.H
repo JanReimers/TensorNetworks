@@ -37,7 +37,7 @@ public:
 //
 //  Required for ground state calculations
 //
-          void     Refine (const iHamiltonian* H,const Epsilons& eps);
+          double     Refine (const iHamiltonian* H,const Epsilons& eps);
 //        Matrix6CT GetHeff(const SiteOperator* so,const Vector3CT& L,const Vector3CT& R) const;
 //        const    Vector3CT& GetHeffCache(Direction lr) const
 //        {
@@ -143,10 +143,6 @@ private:
     dVectorT itsMs;   //We need a separate matrix for each of the p basis states on one site.
     Tensor3  itsM,itsA,itsB; //M[n], and left and right versions A[n],B[n]
     MatrixCT itsG; //Gauge transform from the most recent normalization sweep.
-    VectorCT itsR; //Right eigen vector for the left  transfer matrix.
-    VectorCT itsL; //Left  eigen vector for the right transfer matrix.
-//    Vector3CT itsHLeft_Cache,itsHRightCache; //L/R tensors for <Psi|H|Psi>
-//    mutable MatrixCT itsLeft_Cache ,itsRightCache;  //L/R matrices for <Psi|Psi>
     EigenSolver<dcmplx>* itsEigenSolver;
 
     int        itsNumUpdates;

@@ -54,7 +54,7 @@ public:
         if (itsiH)         delete itsiH;
         if (itsiMPS)       delete itsiMPS;
         if (itsCompressor) delete itsCompressor;
-        itsiH=itsFactory->Make1D_NN_TransverseIsingiHamiltonian(1,S,f,1.0,hx);
+        itsiH=itsFactory->Make1D_NN_TransverseIsingiHamiltonian(1,S,f,-1.0,hx);
         itsiMPS=itsiH->CreateiMPS(L,D,D*D*epsNorm,epsSVD);
         itsCompressor=itsFactory->MakeMPSCompressor(D,epsSVD);
     }
@@ -128,8 +128,8 @@ TEST_F(iVUMPSTests,TestNormQR_D6_L10)
 
 TEST_F(iVUMPSTests,TestFindGS_D2_L1)
 {
-    int UnitCell=1,D=8,maxIter=10;
-    double S=0.5,hx=0.5,epsSVD=0.0,eps=1e-9;
+    int UnitCell=1,D=2,maxIter=30;
+    double S=0.5,hx=1.0,epsSVD=0.0,eps=1e-14;
     MPOForm f=RegularLower;
     Setup(UnitCell,S,D,hx,epsSVD,f);
     itsiMPS->InitializeWith(Random);
