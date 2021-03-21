@@ -133,7 +133,7 @@ template <class T> MatrixO<T>& MatrixO<T>::operator*=(const T& s)
 template <class T> std::ostream& MatrixO<T>::PrettyPrint(std::ostream& os) const
 {
     assert(itsd>1);
-    os << std::fixed << std::setprecision(6) << this->GetLimits() << std::endl;
+    os << std::fixed << std::setprecision(2) << this->GetLimits() << std::endl;
     for (index_t i:this->rows())
     {
         for (int m=0;m<itsd;m++)
