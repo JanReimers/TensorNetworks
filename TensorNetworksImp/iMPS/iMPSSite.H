@@ -37,7 +37,7 @@ public:
 //
 //  Required for ground state calculations
 //
-          double     Refine (const iHamiltonian* H,const Epsilons& eps);
+          double     Refine (const SiteOperator*,const Epsilons& eps);
 //        Matrix6CT GetHeff(const SiteOperator* so,const Vector3CT& L,const Vector3CT& R) const;
 //        const    Vector3CT& GetHeffCache(Direction lr) const
 //        {

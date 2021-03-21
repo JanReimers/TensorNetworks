@@ -12,7 +12,7 @@ VUMPS:
     -L>1 unit cell
     -Avoid calculating H_AC and H_C, use SparseEigenSolverClient
     -Handle zero SVs in C, and shrink D accordingly.
-    -Start using logger to track iterations
+    Done: -Start using logger to track iterations
     -Set numerous unit tests for L={1,2,4}, D=1,2,8,32, S=0.5,1.0,1.5
 
 New Techniques:

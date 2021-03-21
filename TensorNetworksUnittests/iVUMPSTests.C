@@ -128,11 +128,13 @@ TEST_F(iVUMPSTests,TestNormQR_D6_L10)
 
 TEST_F(iVUMPSTests,TestFindGS_D2_L1)
 {
-    int UnitCell=1,D=2,maxIter=30;
-    double S=0.5,hx=1.0,epsSVD=0.0,eps=1e-14;
+    int UnitCell=1,D=8,maxIter=30;
+    double S=0.5,hx=0.1,epsSVD=0.0;
     MPOForm f=RegularLower;
     Setup(UnitCell,S,D,hx,epsSVD,f);
     itsiMPS->InitializeWith(Random);
+    Epsilons eps(1e-14);
+    eps.itsDeltaLambdaEpsilon=1e-8;
 
     IterationSchedule is;
     is.Insert({maxIter,D,eps});

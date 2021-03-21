@@ -1,6 +1,6 @@
 #include "TensorNetworksImp/iMPS/iMPSSite.H"
 #include "TensorNetworksImp/MPS/Bond.H"
-#include "TensorNetworks/iHamiltonian.H"
+//#include "TensorNetworks/iHamiltonian.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/CheckSpin.H"
 #include "Operators/OperatorValuedMatrix.H"
@@ -260,11 +260,10 @@ Matrix4CT ContractHC(const Tensor3& LW, const Tensor3& RW)
     return Hc;
 }
 
-double iMPSSite::Refine (const iHamiltonian* H,const Epsilons& eps)
+double iMPSSite::Refine (const SiteOperator* h,const Epsilons& eps)
 {
     double epsHerm=5e-8;
-    const SiteOperator* so=H->GetSiteOperator(1);
-    const MatrixOR& W=so->GetW();
+    const MatrixOR& W=h->GetW();
     //cout << "W=" << W << endl;
     auto [d,D1,D2]=itsA.GetDimensions();
     auto [X1,X2]=W.GetChi12();
@@ -450,8 +449,8 @@ double iMPSSite::Refine (const iHamiltonian* H,const Epsilons& eps)
         etaG+=FrobeniusNorm(itsA(n)*C-C*itsB(n));
     etaG/=d;
 
-    cout << std::fixed << std::setprecision(12) << "E=" << itsEmin;
-    cout << std::scientific << std::setprecision(1) << " DE=" << itsIterDE << "  etaL,etaR,etaG=" << etaL << " " << etaR << " " << etaG << endl;
+//    cout << std::fixed << std::setprecision(12) << "E=" << itsEmin;
+//    cout << std::scientific << std::setprecision(1) << " DE=" << itsIterDE << "  etaL,etaR,etaG=" << etaL << " " << etaR << " " << etaG << endl;
 
     //cout << "A.Norm=" << itsA.GetNorm(DLeft) << endl;
     //cout << "B.Norm=" << itsB.GetNorm(DRight) << endl;

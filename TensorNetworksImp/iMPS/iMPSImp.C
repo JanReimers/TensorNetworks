@@ -5,6 +5,7 @@
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/TNSLogger.H"
 #include "TensorNetworks/CheckSpin.H"
+#include "TensorNetworks/TNSLogger.H"
 #include "Containers/Matrix4.H"
 #include <iostream>
 #include <iomanip>
@@ -240,19 +241,26 @@ void iMPSImp::FindVariationalGroundState(const iHamiltonian* H,const IterationSc
 
 void iMPSImp::FindVariationalGroundState(const iHamiltonian* H,const IterationScheduleLine& isl)
 {
+    assert(Logger); //Make sure we have global logger.
+    Logger->LogInfo(2,"iter      E        dE    Gauge eta");
+
     int in=0;
     double eta=1.0;
-    double de=0.0;
+    double dE=0.0,E=0.0;
     for (; in<isl.itsMaxGSSweepIterations; in++)
     {
+        dE=E=0.0;
         for (int ia=1;ia<=itsL;ia++)
         {
-            eta=itsSites[ia]->Refine(H,isl.itsEps);
-            de=std::max(de,fabs(itsSites[ia]->GetIterDE()));
+            eta=itsSites[ia]->Refine(H->GetSiteOperator(ia),isl.itsEps);
+            E+=itsSites[ia]->GetSiteEnergy();
+            dE=std::max(dE,fabs(itsSites[ia]->GetIterDE()));
         }
-        if (eta<isl.itsEps.itsDeltaLambdaEpsilon ) break;
-        if (de <isl.itsEps.itsDelatEnergy1Epsilon) break;
+        E/=itsL;
+        Logger->LogInfoV(2,"%4d %.13f %.1e %.1e",in,E,dE,eta);
+        if (eta<isl.itsEps.itsDeltaLambdaEpsilon && dE <isl.itsEps.itsDelatEnergy1Epsilon) break;
     }
+    Logger->LogInfoV(0,"Variational iMPS GS D=%4d, %4d iterations, <E>=%.13f",GetMaxD(),in,E);
 
 }
 
