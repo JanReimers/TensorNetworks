@@ -93,19 +93,18 @@ Introduction
 \end_layout
 
 \begin_layout Standard
-Inifinite lattices methods assume a uniform sequence of Matrices in the
- iMPS.
- Indroductory notes usually focus on a single matrix repeated and demonstrate
+Infinite lattices methods assume a uniform sequence of Matrices in the iMPS.
+ Introductory notes usually focus on a single matrix repeated and demonstrate
  this using a transverse Ising model with ferromagnetic interactions, the
  ground state being perfectly represented with a uniform iMPS, with one
  site in the repeating unit cell.
- But most models of interested have a ground state that can only be represent
+ But most models of interested have a ground state that can only be represented
  with two or more sites in the unit cell, even thought the iMPO only has
  one site in the unit cell.
- In other standard breaking of translational symmetry.
+ In other words standard breaking of translational symmetry.
  So a typical sequence of events is to describe the essential ideas of a
  new method (VUMPS, environment recycling, canonical/orthogonal forms etc)
- in terms of a model that only requires one site per unit, and then latter
+ in terms of a model that only requires one site per unit, and then later
  augment the algorithms to deal a multi-site unit cell ansatz for the iMPS.
 \end_layout
 
@@ -123,7 +122,7 @@ literal "false"
  ground state.
  In general imaginary time evolution is much slower to converge than variational
  methods, but much easier to code or implement in its simplest form.
- Variational methods for infinte lattice systems were introduced by Stauber
+ Variational methods for infinite lattice systems were introduced by Stauber
  et.
  al.
  
@@ -195,7 +194,7 @@ noprefix "false"
 \end_inset
 
  is indicated.
- The plane can be defined by any two indepenedent vector lying in the plane.
+ The plane can be defined by any two independent vector lying in the plane.
  If the manifold (sphere in fig.
  
 \begin_inset CommandInset ref
@@ -367,7 +366,7 @@ One can think of
 transfer matrix
 \begin_inset Formula 
 \[
-T_{A}=\sum_{n}A^{\dagger n}\otimes A^{n}
+T_{A}=\sum_{n}A^{*n}\otimes A^{n}
 \]
 
 \end_inset
@@ -375,7 +374,7 @@ T_{A}=\sum_{n}A^{\dagger n}\otimes A^{n}
 
 \begin_inset Formula 
 \[
-T_{A\left(i_{1}i_{2}j_{1}j_{2}\right)}=\sum_{n}A_{i_{1}i_{2}}^{\dagger n}\otimes A_{j_{1}j_{2}}^{n}
+T_{A\left(i_{1}j_{1}i_{2}j_{2}\right)}=\sum_{n}A_{i_{2}i_{1}}^{*n}\otimes A_{j_{1}j_{2}}^{n}
 \]
 
 \end_inset
@@ -391,7 +390,7 @@ and
 transfer matrix
 \begin_inset Formula 
 \[
-T_{B}=\sum_{n}B^{n}\otimes B^{\dagger n}
+T_{B}=\sum_{n}B^{n}\otimes B^{*n}
 \]
 
 \end_inset
@@ -407,7 +406,7 @@ We can also define a right eigen vector for
  such that
 \begin_inset Formula 
 \[
-\sum_{n}A^{\dagger n}RA^{n}=R
+\sum_{n}A^{*n}RA^{n}=R
 \]
 
 \end_inset
@@ -415,7 +414,7 @@ We can also define a right eigen vector for
 or in full
 \begin_inset Formula 
 \[
-\sum_{ni_{2}j_{2}}A_{i_{1}i_{2}}^{\dagger n}R_{i_{2}j_{2}}A_{j_{1}j_{2}}^{n}=R_{i_{1}j_{1}}
+\sum_{ni_{2}j_{2}}A_{i_{2}i_{1}}^{*n}R_{i_{2}j_{2}}A_{j_{1}j_{2}}^{n}=R_{i_{1}j_{1}}
 \]
 
 \end_inset
@@ -427,12 +426,12 @@ And similarly for
 
 \begin_inset Formula 
 \[
-\sum_{n}B_{j_{1}j_{2}}^{n}L_{j_{1}i_{1}}B_{i_{1}i_{2}}^{\dagger n}=L_{j_{2}i_{2}}
+\sum_{n}B_{j_{1}j_{2}}^{n}L_{j_{1}i_{1}}B_{i_{2}i_{1}}^{*n}=L_{j_{2}i_{2}}
 \]
 
 \end_inset
 
-THis can all be represented in diagroms and shown in fig.
+This can all be represented in diagrams and shown in fig.
  
 \begin_inset Float figure
 wide false
@@ -473,7 +472,8 @@ Left and right isometries
 \end_layout
 
 \begin_layout Standard
-We can also write wave function in mixed canonical for about a center site
+We can also write the wave function in mixed canonical for about a center
+ site
 \begin_inset Formula 
 \begin{equation}
 \left|\psi\right\rangle =\sum_{\left\{ n\right\} }\left(\ldots A^{n_{a-1}}M^{n_{a}}B^{n_{a+1}}\ldots\right)\left|\boldsymbol{n}\right\rangle \label{eq:Mixed CanForm a}
@@ -620,7 +620,7 @@ Now one can define left and right partial states
 
 \end_inset
 
-from which we can define reduces basis states 
+from which we can define reduced basis states 
 \begin_inset Formula 
 \[
 \left|\psi^{\left(inj\right)}\right\rangle =\left|\psi_{L}^{i}\right\rangle \left|n\right\rangle \left|\psi_{R}^{j}\right\rangle 
@@ -652,7 +652,7 @@ If we minimize the energy expectation
 
 \end_inset
 
-with recpect 
+with respect 
 \begin_inset Formula $M^{n}$
 \end_inset
 
@@ -660,7 +660,7 @@ with recpect
 \begin_inset Formula $A_{C}^{n}$
 \end_inset
 
- in the paper) we get an expression for reduced or superblock Hamiltonian,
+ in the paper) we get an expression for reduced or super-block Hamiltonian,
  which corresponds to the diagram in fig.
  
 \begin_inset CommandInset ref
@@ -752,60 +752,25 @@ H_{C\left(i_{1}i_{2}\right)}^{\left(j_{1}j_{2}\right)}=\left\langle \psi^{\left(
 \end_inset
 
 One can think of this a zero site effective Hamiltonian.
- The paper now states
-\end_layout
-
-\begin_layout Quote
-In an efficient implementation, these effective eigen- value problems are
- typically solved using an iterative eigensolver, so that we only need to
- implement the action of 
+ Iterative sparse eign solvers, don't require the matrix, they require one
+ to evaluate the action of of the matrix on a supplied trial eigne vector.
+ So we need the action of 
 \begin_inset Formula $H_{M}$
 \end_inset
 
- and 
+ on 
+\begin_inset Formula $M$
+\end_inset
+
+ and the action of 
 \begin_inset Formula $H_{C}$
 \end_inset
 
- onto 
-\begin_inset Formula $M$
-\end_inset
-
- and 
+ on 
 \begin_inset Formula $C$
 \end_inset
 
 .
-\end_layout
-
-\begin_layout Standard
-The first clause is fine, we flatten each group of three indices into one,
- and find the lowest eigen pair to get a improved 
-\begin_inset Formula $M$
-\end_inset
-
- or 
-\begin_inset Formula $C$
-\end_inset
-
-.
- I don't know what they mean by 
-\begin_inset Quotes eld
-\end_inset
-
-action of 
-\begin_inset Formula $H_{M}$
-\end_inset
-
- onto 
-\begin_inset Formula $M$
-\end_inset
-
-
-\begin_inset Quotes erd
-\end_inset
-
-.
- They make it sound like we are doing imaginary time evolution?!
 \end_layout
 
 \begin_layout Subsection
@@ -826,15 +791,15 @@ T_{L\left(w_{1}w_{2}\right)}=\sum_{mn}W_{w_{1}w_{2}}^{mn}A^{*m}\otimes A^{n}
 
 \begin_inset Formula 
 \[
-T_{R\left(w_{1}w_{2}\right)}=\sum_{mn}W_{w_{1}w_{2}}^{mn}B^{*m}\otimes B^{n}
+T_{R\left(w_{1}w_{2}\right)}=\sum_{mn}W_{w_{1}w_{2}}^{mn}B^{m}\otimes B^{*n}
 \]
 
 \end_inset
 
-or with no supression of internal indices
+or with no suppression of internal indices
 \begin_inset Formula 
 \[
-T_{L\left(w_{1}i_{1}i_{2}\right)\left(w_{2}j_{1}j_{2}\right)}=\sum_{mn}W_{w_{1}w_{2}}^{mn}A_{i_{1}i_{2}}^{*m}\otimes A_{j_{1}j_{2}}^{n}
+T_{L\left(w_{1}i_{1}j_{1}\right)\left(w_{2}i_{2}j_{2}\right)}=\sum_{mn}W_{w_{1}w_{2}}^{mn}A_{i_{2}i_{1}}^{*m}\otimes A_{j_{1}j_{2}}^{n}
 \]
 
 \end_inset
@@ -842,13 +807,13 @@ T_{L\left(w_{1}i_{1}i_{2}\right)\left(w_{2}j_{1}j_{2}\right)}=\sum_{mn}W_{w_{1}w
 
 \begin_inset Formula 
 \[
-T_{R\left(w_{1}i_{1}i_{2}\right)\left(w_{2}j_{1}j_{2}\right)}=\sum_{mn}W_{w_{1}w_{2}}^{mn}B_{i_{1}i_{2}}^{*m}\otimes B_{j_{1}j_{2}}^{n}
+T_{R\left(w_{1}i_{1}j_{1}\right)\left(w_{2}i_{2}j_{2}\right)}=\sum_{mn}W_{w_{1}w_{2}}^{mn}B_{i_{1}i_{2}}^{m}\otimes B_{j_{2}j_{1}}^{*n}
 \]
 
 \end_inset
 
 where I have grouped in indices ready for eigen decomposition.
- For a lower triabgular 
+ For a lower triangular 
 \begin_inset Formula $W$
 \end_inset
 
@@ -885,6 +850,14 @@ where I have grouped in indices ready for eigen decomposition.
 \end_inset
 
 The fixed point equations are now
+\begin_inset Formula 
+\[
+\left(L_{w}\right|=\left(L_{w}\right|T_{L\left(ww\right)}+\left(Y_{Lw}\right|
+\]
+
+\end_inset
+
+
 \begin_inset Formula 
 \[
 \left(L_{wi_{2}j_{2}}\right|=\left(L_{wi_{1}j_{1}}\right|T_{L\left(wi_{1}j_{1}wi_{2}j_{2}\right)}+\left(Y_{Lwi_{2}j_{2}}\right|
@@ -935,7 +908,7 @@ but for an iMPO in regular form we know
  yielding
 \begin_inset Formula 
 \[
-T_{L\left(D_{W}D_{W}\right)}=\sum_{m}A^{\dagger m}\otimes A^{m}=T_{A}
+T_{L\left(D_{W}D_{W}\right)}=\sum_{m}A^{*m}\otimes A^{m}=T_{A}
 \]
 
 \end_inset
@@ -960,7 +933,7 @@ so
 \begin_inset Formula $L_{D_{W}}$
 \end_inset
 
- must be the left eigen vector (acutally eigen matrix) of 
+ must be the left eigen vector (actually eigen matrix) of 
 \begin_inset Formula $T_{A}$
 \end_inset
 
@@ -1060,7 +1033,18 @@ and
 
 \end_inset
 
-This has to modified to project out infite lattice contribution
+This has to modified to project out infinite lattice contribution
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left(L_{1}\right|\left[\mathbb{I}-T_{L}+\left|R\right)\left(𝕀\right|\right]=\left(Y_{L1}\right|-\left(Y_{L1}\right|\left|R\right)\left(𝕀\right|
+\]
+
+\end_inset
+
+
 \begin_inset Formula 
 \[
 \left[\mathbb{I}-T_{R}+\left|𝕀\right)\left(L\right|\right]\left|R_{D_{w}}\right)=\left|Y_{RD_{w}}\right)-\left|𝕀\right)\left(L|Y_{RD_{w}}\right)
@@ -1078,8 +1062,8 @@ where
 \end_inset
 
  is a projector and right now I am not sure how to unpack it for coding.
- In general everything above has internal indicies suppressed.
- We need to unsupress them in order to make code.
+ In general everything above has internal indices suppressed.
+ We need to un-supress them in order to make code.
 \end_layout
 
 \begin_layout Subsection
@@ -1103,7 +1087,7 @@ or in full
 
 \end_inset
 
-and do the followinf index groupings
+and do the following index groupings
 \begin_inset Formula 
 \[
 \left(i_{1}j_{1}\right)\rightarrow i,\;\left(i_{2}j_{2}\right)\rightarrow j
@@ -1207,7 +1191,7 @@ Algorithm
 
 \begin_layout Enumerate
 for 
-\begin_inset Formula $w=D_{w}-1\rightarrow1$
+\begin_inset Formula $w=D_{w}-1\rightarrow2$
 \end_inset
 
 
@@ -1234,20 +1218,44 @@ If not we need to solve some systems to back out
 
 \end_deeper
 \begin_layout Enumerate
-\begin_inset Formula $\left(L_{w}^{W}\right|=\sum_{w_{1}>w}\left(L_{w_{1}}\right|T_{L\left(w_{1}w\right)}$
+\begin_inset Formula $\left(L_{w}^{W}\right|=\sum_{w_{1}>w}\left(L_{w_{1}}^{W}\right|T_{L\left(w_{1}w\right)}$
 \end_inset
 
 
 \end_layout
 
 \begin_layout Enumerate
-\begin_inset Formula $\left|R_{w}^{W}\right)=\sum_{w_{2}<w}T_{R\left(ww_{2}\right)}\left|R_{w_{2}}\right)$
+\begin_inset Formula $\left|R_{w}^{W}\right)=\sum_{w_{2}<w}T_{R\left(ww_{2}\right)}\left|R_{w_{2}}^{W}\right)$
 \end_inset
 
 
 \end_layout
 
 \end_deeper
+\begin_layout Enumerate
+Solve 
+\begin_inset Formula $\left(L_{1}^{W}\right|\left[\mathbb{I}-T_{L}+\left|R\right)\left(\mathbb{I}\right|\right]=\left(Y_{L1}\right|-\left(Y_{L1}\right|\left|R\right)\left(\mathbb{I}\right|$
+\end_inset
+
+ for 
+\begin_inset Formula $L_{1}^{W}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Solve 
+\begin_inset Formula $\left[\mathbb{I}-T_{R}+\left|\mathbb{I}\right)\left(L\right|\right]\left|R_{D_{w}}^{W}\right)=\left|Y_{RD_{w}}\right)-\left|\mathbb{I}\right)\left(L|Y_{RD_{w}}\right)$
+\end_inset
+
+ for 
+\begin_inset Formula $R_{D_{w}}^{W}$
+\end_inset
+
+
+\end_layout
+
 \begin_layout Enumerate
 Return 
 \begin_inset Formula $L^{W}$
@@ -1326,7 +1334,7 @@ Find the left canonical form
 \begin_inset Formula $A^{n}$
 \end_inset
 
-
+ (I prefer QR iteration)
 \end_layout
 
 \begin_layout Enumerate
@@ -1368,7 +1376,7 @@ noprefix "false"
 \end_layout
 
 \begin_layout Enumerate
-Repeat 3-6 for the right canincal form yielding 
+Repeat 3-6 for the right canonical form yielding 
 \begin_inset Formula $B^{n}$
 \end_inset
 
@@ -1435,63 +1443,116 @@ SVD Decompose the product
 
 \end_layout
 
-\begin_layout Subsection
-Trivial example
+\begin_layout Section
+Multi site unit cell
 \end_layout
 
 \begin_layout Standard
-Ferromagnetic state for 
-\begin_inset Formula $d=2$
+When there is 
+\begin_inset Formula $L>1$
 \end_inset
 
-, 
-\begin_inset Formula $L=1$
-\end_inset
-
-, 
-\begin_inset Formula $D=1$
-\end_inset
-
-, 
-\begin_inset Formula $D_{w}=3$
-\end_inset
-
- we have
+ sites per unit cell we have
 \begin_inset Formula 
 \[
-M^{0}=A^{0}=B^{0}=\begin{bmatrix}1\end{bmatrix},\;M^{1}=A^{1}=B^{1}=\begin{bmatrix}0\end{bmatrix}
+\mathbb{M}^{\mathbb{N}}=M^{n}M^{n_{2}}\cdots M^{n_{L}}
 \]
 
 \end_inset
 
- for spin up.
+
 \begin_inset Formula 
 \[
-\sum_{n}A^{\dagger n}A^{n}=\begin{bmatrix}1\end{bmatrix},\quad\sum_{n}B^{n}B^{\dagger n}=\begin{bmatrix}1\end{bmatrix}
+\left|\psi\right\rangle =\sum_{\left\{ n\right\} }\left(\ldots\mathbb{M}^{\mathbb{N}_{a-1}}\mathbb{M}^{\mathbb{N}_{a}}\mathbb{M}^{\mathbb{N}_{a+1}}\ldots\right)\left(\ldots\left|\mathbb{N}_{a-1}\right\rangle \left|\mathbb{N}_{a}\right\rangle \left|\mathbb{N}_{a+1}\right\rangle \ldots\right)
 \]
 
 \end_inset
 
-also
+where 
+\begin_inset Formula $\mathbb{N=\left\{ \mathrm{n_{1}n_{2}\cdots n_{L}}\right\} }$
+\end_inset
+
+ is a group of quantum numbers.
+ There are two complication with this
+\end_layout
+
+\begin_layout Enumerate
+The gauge transform now takes the form
 \begin_inset Formula 
 \[
-T_{A}=\sum_{n}A^{\dagger n}\otimes A^{n}=\begin{bmatrix}1\end{bmatrix}
+M^{n}\left(k\right)=A^{n}\left(k\right)C\left(k\right)=C\left(k-1\right)B^{n}\left(k\right)
 \]
 
 \end_inset
 
-same for 
-\begin_inset Formula $T_{B}$
+where 
+\begin_inset Formula $k$
+\end_inset
+
+ is the site indes within the unit cell.
+\end_layout
+
+\begin_layout Enumerate
+In the paper 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ZaunerStauber2018"
+literal "false"
+
+\end_inset
+
+ they write
+\begin_inset Formula 
+\[
+\sum_{n}A^{*n}\left(k\right)R\left(k\right)A^{n}\left(k\right)=R\left(k-1\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{n}B^{n}\left(k\right)L\left(k-1\right)B^{*n}\left(k\right)=L\left(k\right)
+\]
+
+\end_inset
+
+Because if #1 for each site 
+\begin_inset Formula $k$
+\end_inset
+
+ we need to recalculate 
+\begin_inset Formula $C\left(k\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $C\left(k-1\right)$
 \end_inset
 
 .
+ #2 is not an eigen equation, and they don't explain how to solve this system
+ of couple eigen equations.
+ But we can present it as
 \begin_inset Formula 
 \[
-\hat{W}=\begin{bmatrix}𝕀 & 0 & 0\\
-\hat{Z} & 0 & 0\\
-0 & \hat{Z} & 𝕀
-\end{bmatrix},\;\hat{Z}=\begin{bmatrix}-\frac{1}{2} & 0\\
-0 & \frac{1}{2}
+\begin{bmatrix}0 & T_{A}\left(2\right) & 0 & \cdots & 0 & 0\\
+0 & 0 & T_{A}\left(3\right) & \cdots & 0 & 0\\
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots\\
+0 & 0 & 0 & \cdots & T_{A}\left(L-1\right) & 0\\
+0 & 0 & 0 & \cdots & 0 & T_{A}\left(L\right)\\
+T_{A}\left(1\right) & 0 & 0 & \cdots & 0 & 0
+\end{bmatrix}\begin{bmatrix}R\left(1\right)\\
+R\left(2\right)\\
+R\left(3\right)\\
+\vdots\\
+R\left(L-1\right)\\
+R\left(L\right)
+\end{bmatrix}=\begin{bmatrix}R\left(1\right)\\
+R\left(2\right)\\
+R\left(3\right)\\
+\vdots\\
+R\left(L-1\right)\\
+R\left(L\right)
 \end{bmatrix}
 \]
 
@@ -1500,63 +1561,34 @@ same for
 
 \begin_inset Formula 
 \[
-T_{L\left(w_{1}w_{2}\right)}=T_{R\left(w_{1}w_{2}\right)}=\sum_{mn}W_{w_{1}w_{2}}^{mn}A^{\dagger m}\otimes A^{n}=W_{w_{1}w_{2}}^{11}=\begin{bmatrix}1 & 0 & 0\\
--\frac{1}{2} & 0 & 0\\
-0 & -\frac{1}{2} & 1
+\begin{bmatrix}0 & 0 & \cdots & 0 & 0 & T_{B}\left(1\right)\\
+T_{B}\left(2\right) & 0 & \cdots & 0 & 0 & 0\\
+0 & T_{B}\left(3\right) & \cdots & 0 & 0 & 0\\
+\vdots & \vdots & \ddots & \vdots & \vdots & \vdots\\
+0 & 0 & \cdots & T_{B}\left(L-1\right) & 0 & 0\\
+0 & 0 & \cdots & 0 & T_{B}\left(L\right) & 0
+\end{bmatrix}\begin{bmatrix}L\left(1\right)\\
+L\left(2\right)\\
+L\left(3\right)\\
+\vdots\\
+L\left(L-1\right)\\
+L\left(L\right)
+\end{bmatrix}=\begin{bmatrix}L\left(1\right)\\
+L\left(2\right)\\
+L\left(3\right)\\
+\vdots\\
+L\left(L-1\right)\\
+L\left(L\right)
 \end{bmatrix}
 \]
 
 \end_inset
 
-
-\begin_inset Formula 
-\[
-\left(L_{2}^{W}\right|=\sum_{w_{1}>2}\left(L_{w_{1}}^{W}\right|T_{L\left(w_{1}2\right)}=L_{3}^{W}T_{L\left(32\right)}=\begin{bmatrix}-\frac{1}{2}\end{bmatrix}
-\]
-
+Is there some unitary transform that allows us to convert this into 
+\begin_inset Formula $L$
 \end_inset
 
-
-\begin_inset Formula 
-\[
-\left|R_{2}^{W}\right)=\sum_{w_{2}<2}T_{R\left(2w_{2}\right)}\left|R_{w_{2}}^{W}\right)=T_{R\left(21\right)}\left|R_{1}^{W}\right)=\begin{bmatrix}-\frac{1}{2}\end{bmatrix}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\left(Y_{L1}\right|=\sum_{w_{1}>1}\left(L_{w_{1}}\right|T_{L\left(w_{1}1\right)}=\left(L_{2}\right|T_{L\left(21\right)}+\left(L_{3}\right|T_{L\left(31\right)}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-=\begin{bmatrix}-\frac{1}{2}\end{bmatrix}-\frac{1}{2}+\begin{bmatrix}1\end{bmatrix}0=\begin{bmatrix}\frac{1}{4}\end{bmatrix}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\left|Y_{RD_{w}}\right)=\sum_{w_{2}<D_{w}}T_{R\left(D_{w}w_{2}\right)}\left|R_{w_{2}}\right)=T_{R\left(31\right)}\left|R_{1}\right)+T_{R\left(32\right)}\left|R_{2}\right)
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-=0\begin{bmatrix}1\end{bmatrix}+-\frac{1}{2}\begin{bmatrix}-\frac{1}{2}\end{bmatrix}=\begin{bmatrix}\frac{1}{4}\end{bmatrix}
-\]
-
-\end_inset
-
-
+ decoupled eigen problems?
 \end_layout
 
 \begin_layout Section
