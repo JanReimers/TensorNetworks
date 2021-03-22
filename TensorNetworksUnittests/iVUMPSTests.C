@@ -126,18 +126,91 @@ TEST_F(iVUMPSTests,TestNormQR_D6_L10)
     }
 }
 
-TEST_F(iVUMPSTests,TestFindGS_D2_L1)
+TEST_F(iVUMPSTests,TestFindGS_S12_D2_L1_h01)
 {
-    int UnitCell=1,D=8,maxIter=30;
-    double S=0.5,hx=0.1,epsSVD=0.0;
+    int UnitCell=1,D=2,maxIter=30;
+    double S=0.5,hx=0.1,epsSVD=0.0,epsE=1e-14;
     MPOForm f=RegularLower;
     Setup(UnitCell,S,D,hx,epsSVD,f);
     itsiMPS->InitializeWith(Random);
-    Epsilons eps(1e-14);
+    Epsilons eps(epsE);
     eps.itsDeltaLambdaEpsilon=1e-8;
 
     IterationSchedule is;
     is.Insert({maxIter,D,eps});
-    itsiMPS->FindVariationalGroundState(itsiH,is);
+    double Eeigen=itsiMPS->FindVariationalGroundState(itsiH,is);
+    double Eex   =itsiMPS->GetExpectation(itsiH);
+    EXPECT_NEAR(Eeigen,Eex,epsE);
+    EXPECT_NEAR(Eeigen,-0.25250795696355421,epsE);
+}
+TEST_F(iVUMPSTests,TestFindGS_S12_D4_L1_h01)
+{
+    int UnitCell=1,D=4,maxIter=30;
+    double S=0.5,hx=0.1,epsSVD=0.0,epsE=1e-14;
+    MPOForm f=RegularLower;
+    Setup(UnitCell,S,D,hx,epsSVD,f);
+    itsiMPS->InitializeWith(Random);
+    Epsilons eps(epsE);
+    eps.itsDeltaLambdaEpsilon=1e-8;
 
+    IterationSchedule is;
+    is.Insert({maxIter,D,eps});
+    double Eeigen=itsiMPS->FindVariationalGroundState(itsiH,is);
+    double Eex   =itsiMPS->GetExpectation(itsiH);
+    EXPECT_NEAR(Eeigen,Eex,epsE);
+    EXPECT_NEAR(Eeigen,-0.25250795716599872,epsE);
+}
+
+TEST_F(iVUMPSTests,TestFindGS_S12_D8_L1_h04)
+{
+    int UnitCell=1,D=8,maxIter=100;
+    double S=0.5,hx=0.4,epsSVD=0.0,epsE=1e-12;
+    MPOForm f=RegularLower;
+    Setup(UnitCell,S,D,hx,epsSVD,f);
+    itsiMPS->InitializeWith(Random);
+    Epsilons eps(epsE);
+    eps.itsDeltaLambdaEpsilon=1e-10;
+
+    IterationSchedule is;
+    is.Insert({maxIter,D,eps});
+    double Eeigen=itsiMPS->FindVariationalGroundState(itsiH,is);
+    double Eex   =itsiMPS->GetExpectation(itsiH);
+    EXPECT_NEAR(Eeigen,Eex,epsE);
+    EXPECT_NEAR(Eeigen,-0.2931323911399,epsE);
+}
+
+TEST_F(iVUMPSTests,TestFindGS_S10_D8_L1_h04)
+{
+    int UnitCell=1,D=8,maxIter=100;
+    double S=1.0,hx=0.4,epsSVD=0.0,epsE=1e-12;
+    MPOForm f=RegularLower;
+    Setup(UnitCell,S,D,hx,epsSVD,f);
+    itsiMPS->InitializeWith(Random);
+    Epsilons eps(epsE);
+    eps.itsDeltaLambdaEpsilon=1e-9;
+
+    IterationSchedule is;
+    is.Insert({maxIter,D,eps});
+    double Eeigen=itsiMPS->FindVariationalGroundState(itsiH,is);
+    double Eex   =itsiMPS->GetExpectation(itsiH);
+    EXPECT_NEAR(Eeigen,Eex,epsE);
+    EXPECT_NEAR(Eeigen,-1.0401827662967,epsE);
+}
+
+TEST_F(iVUMPSTests,TestFindGS_S32_D8_L1_h04)
+{
+    int UnitCell=1,D=8,maxIter=100;
+    double S=1.5,hx=0.4,epsSVD=0.0,epsE=1e-12;
+    MPOForm f=RegularLower;
+    Setup(UnitCell,S,D,hx,epsSVD,f);
+    itsiMPS->InitializeWith(Random);
+    Epsilons eps(epsE);
+    eps.itsDeltaLambdaEpsilon=5e-9;
+
+    IterationSchedule is;
+    is.Insert({maxIter,D,eps});
+    double Eeigen=itsiMPS->FindVariationalGroundState(itsiH,is);
+    double Eex   =itsiMPS->GetExpectation(itsiH);
+    EXPECT_NEAR(Eeigen,Eex,epsE);
+    EXPECT_NEAR(Eeigen,-2.2900520735365,epsE);
 }

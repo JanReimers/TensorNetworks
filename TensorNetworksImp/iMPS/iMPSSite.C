@@ -1,6 +1,5 @@
 #include "TensorNetworksImp/iMPS/iMPSSite.H"
 #include "TensorNetworksImp/MPS/Bond.H"
-//#include "TensorNetworks/iHamiltonian.H"
 #include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/CheckSpin.H"
 #include "Operators/OperatorValuedMatrix.H"
@@ -8,6 +7,7 @@
 #include "NumericalMethods/ArpackEigenSolver.H"
 #include "NumericalMethods/LapackSVDSolver.H"
 #include "NumericalMethods/LapackLinearSolver.H"
+#include "TensorNetworks/TNSLogger.H"
 #include "Containers/Matrix6.H"
 #include <iostream>
 #include <iomanip>
@@ -264,123 +264,9 @@ double iMPSSite::Refine (const SiteOperator* h,const Epsilons& eps)
 {
     double epsHerm=5e-8;
     const MatrixOR& W=h->GetW();
-    //cout << "W=" << W << endl;
     auto [d,D1,D2]=itsA.GetDimensions();
-    auto [X1,X2]=W.GetChi12();
-    assert(X1==X2);
-    int Dw=X1+2;
-    Matrix6CT TWL=itsA.GetTransferMatrix(DLeft ,W);
-    Matrix6CT TWR=itsB.GetTransferMatrix(DRight,W);
-    MatrixCT  TL=itsA.GetTransferMatrix(DLeft );
-    MatrixCT  TR=itsB.GetTransferMatrix(DRight);
-    VectorCT  R=itsA.GetTMEigenVector(DLeft );
-    VectorCT  L=itsB.GetTMEigenVector(DRight);
-//    VectorCT LG=Flatten(~itsG*itsG);
-//    VectorCT RG=Flatten(itsG*~itsG);
-//    cout << "L-~itsG*itsG=" << itsL-LG << endl;
-//    cout << "R-itsG*~itsG=" << itsR-RG << endl;
-    assert(Max(fabs(TL-TWL.SubMatrix(1 ,1 ).Flatten()))<1e-15);
-    assert(Max(fabs(TL-TWL.SubMatrix(Dw,Dw).Flatten()))<1e-15);
-    assert(Max(fabs(TR-TWR.SubMatrix(1 ,1 ).Flatten()))<1e-15);
-    assert(Max(fabs(TR-TWR.SubMatrix(Dw,Dw).Flatten()))<1e-15);
-    Tensor3 LW(Dw,D1,D2,1);
-    Tensor3 RW(Dw,D1,D2,1);
-    LW.Unit(Dw);
-    RW.Unit(1);
-    cout << std::setprecision(3);
-    for (int w=Dw-1;w>1;w--)
-    {
-        assert(Max(fabs(TWL.SubMatrix(w,w).Flatten()))==0.0);
-        assert(Max(fabs(TWR.SubMatrix(w,w).Flatten()))==0.0);
-        for (int w1=w+1;w1<=Dw;w1++)
-            LW(w)+=LW(w1)*TWL.SubMatrix(w1,w);
-        for (int w2=1;w2<w;w2++)
-            RW(w)+=TWR.SubMatrix(w,w2)*RW(w2);
-        assert(IsHermitian(LW(w),1e-15));
-        assert(IsHermitian(RW(w),1e-15));
-//        cout << "LW(" << w << ")=" << LW(w) << endl;
-//        cout << "RW(" << w << ")=" << RW(w) << endl;
-    }
-    //
-    //  Now we need YL_1 and YR_Dw
-    //
-    MatrixCT YL(D1,D2),YR(D1,D2);
-    Fill(YL,dcmplx(0.0));
-    Fill(YR,dcmplx(0.0));
-    for (int w1=2;w1<=Dw;w1++)
-        YL+=LW(w1)*TWL.SubMatrix(w1,1);
-    for (int w2=1;w2< Dw;w2++)
-        YR+=TWR.SubMatrix(Dw,w2)*RW(w2);
-
-    assert(IsHermitian(YL,1e-15));
-    assert(IsHermitian(YR,1e-15));
-//    cout << "YL=" << YL << endl;
-//    cout << "YR=" << YR << endl;
-    VectorCT YLf=Flatten(YL);
-    VectorCT YRf=Flatten(YR);
-
-    assert(TL.GetLimits()==TR.GetLimits()); //should both be D1^2 x D2^2
-    MatrixCT I(TL.GetLimits()),IL(D1,D1),IR(D2,D2);
-    Unit(I),Unit(IL);Unit(IR);
-    VectorCT ILf=Flatten(IL);
-    VectorCT IRf=Flatten(IR);
-//    cout << "ILf=" << ILf << endl;
-//    cout << "IRf=" << IRf << endl;
-
-
-    MatrixCT PL=OuterProduct(R,ILf);
-    MatrixCT PR=OuterProduct(IRf,L);
-//    cout << "PL=" << PL << endl;
-//    cout << "PR=" << PL << endl;
-
-    MatrixCT XL=I-TL+PL;
-    MatrixCT XR=I-TR+PR;
-//    cout << "XL=" << XL << endl;
-//    cout << "XR=" << XR << endl;
-
-    VectorCT vL=YLf-YLf*PL;
-    VectorCT vR=YRf-PR*YRf;
-//    cout << "vL=" << vL << endl;
-//    cout << "vR=" << vR << endl;
-
-    LapackSVDSolver<dcmplx> SVDsolver;
-    {
-        auto [U,s,VT]=SVDsolver.SolveAll(XL,1e-14);
-        //cout << std::scientific << "XL min s=" << Min(s.GetDiagonal()) << endl;
-        assert(Min(s.GetDiagonal())>1e-14);
-    }
-    {
-        auto [U,s,VT]=SVDsolver.SolveAll(XR,1e-14);
-        //cout << std::scientific << "XR min s=" << Min(s.GetDiagonal()) << endl;
-        assert(Min(s.GetDiagonal())>1e-14);
-    }
-
-    LapackLinearSolver<dcmplx> solver;
-    VectorCT LW1f=solver.Solve(vL,XL);
-    VectorCT RWDf=solver.Solve(XR,vR);
-    //cout << "LW1f=" << LW1f << endl;
-    //cout << "RWDf=" << RWDf << endl;
-    LW(1 )=UnFlatten(LW1f);
-    RW(Dw)=UnFlatten(RWDf);
-    for (int w=1;w<=Dw;w++)
-    {
-        //cout << "LW(" << w << ")=" << LW(w) << endl;
-//        cout << std::scientific << Max(fabs(LW(w)-~LW(w))) << endl;
-        assert(IsHermitian(LW(w),epsHerm));
-    }
-    for (int w=1;w<=Dw;w++)
-    {
-        //cout << "RW(" << w << ")=" << RW(w) << endl;
-//        cout << std::scientific << Max(fabs(RW(w)-~RW(w))) << endl;
-        assert(IsHermitian(RW(w),epsHerm));
-    }
-    //
-    //  Site energy e = (YL_1|R) = (L|YR_Dw)
-    //
-    dcmplx el=YLf*R;
-    dcmplx er=L*YRf;
-    assert(fabs(std::imag(el))<1e-12);
-    assert(fabs(std::imag(er))<1e-12);
+    auto [el,LW]=itsA.GetLW(W);
+    auto [er,RW]=itsB.GetRW(W);
     double e=0.5*std::real(el+er);
     itsIterDE=e-itsEmin;
     itsEmin=e;
@@ -410,6 +296,7 @@ double iMPSSite::Refine (const SiteOperator* h,const Epsilons& eps)
     //cout << "C=" << C << endl;
    // cout << "eC=" << eC << endl;
 
+    LapackSVDSolver<dcmplx> SVDsolver;
     {
         auto [U,s,VT]=SVDsolver.SolveAll(C,1e-14);
         //cout << std::scientific << "C svs=" << s.GetDiagonal() << endl;
@@ -418,6 +305,7 @@ double iMPSSite::Refine (const SiteOperator* h,const Epsilons& eps)
         double s2=s.GetDiagonal()*s.GetDiagonal();
         //cout << "s*s-1=" << s2-1.0 << endl;
         assert(fabs(s2-1.0)<1e-13);
+        itsRightBond->SetSingularValues(s,0.0);
     }
 
     MatrixCT AcL=Ac.Flatten(DLeft);
@@ -455,6 +343,194 @@ double iMPSSite::Refine (const SiteOperator* h,const Epsilons& eps)
     //cout << "A.Norm=" << itsA.GetNorm(DLeft) << endl;
     //cout << "B.Norm=" << itsB.GetNorm(DRight) << endl;
     return std::max(etaL,etaR);
+}
+
+double iMPSSite::GetExpectation(const SiteOperator* so) const
+{
+
+    assert(so);
+    MatrixOR W=so->GetW();
+    assert(W.GetForm()==RegularLower);
+    assert(IsLowerTriangular(W));
+    return itsA.GetExpectation(W);
+
+    /*
+//    auto [d,D1,D2]=itsA.GetDimensions();
+    const OpRange& wr=so->GetRanges();
+    int Dw=wr.Dw1;
+    assert(Dw==wr.Dw2);
+//
+//  Fill out E[5]
+//
+    dVectorT E(Dw+1);
+    E[Dw]=MatrixCT(D1,D2);
+    Unit(E[Dw]);
+//
+//  Check E[Dw] is self consistent
+//
+    MatrixCT EDw(D1,D2);
+    Fill(EDw,dcmplx(0));
+    for (int m=0; m<d; m++)
+        for (int n=0; n<d; n++)
+        {
+            for (int i2=1;i2<=D2;i2++)
+            for (int j2=1;j2<=D2;j2++)
+                for (int i1=1;i1<=D1;i1++)
+                for (int j1=1;j1<=D1;j1++)
+                    EDw(i2,j2)+=conj(itsA(m)(i1,i2))*W(Dw-1,Dw-1)(m,n)*E[Dw](i1,j1)*itsA(n)(j1,j2);
+        }
+//    cout << "E1=" << E1 << endl;
+    assert(Max(fabs(E[Dw]-EDw))<1e-12);
+
+//
+//  Now loop down from Dw-1=4 down to 2.  Only Row Dw in W is non-zero when column w>1.
+//
+    MatrixCT T; //Transfer matrix
+    for (int w1=Dw-1;w1>=2;w1--)
+    {
+        std::vector<int> diagonals;
+        MatrixCT C(D2,D2);
+        Fill(C,dcmplx(0));
+        for (int m=0; m<d; m++)
+            for (int n=0; n<d; n++)
+            {
+                if (W(w1-1,w1-1)(m,n)!=0.0) //Make sure there is nothing on the diagonal.
+                {
+//                    std::cerr << "diagonal W["<< m << "," << n << "](" << w1 << "," << w1 << ")=" << W(w1-1,w1-1)(m,n)<< std::endl;
+                    assert(m==n); //should be only unit ops on the diagonal
+//                    assert(Wmn(w1,w1)==1.0);
+                    diagonals.push_back(w1);
+                }
+                for (int w2=w1+1;w2<=Dw;w2++)
+                if (W(w2-1,w1-1)(m,n)!=0.0)
+                {
+                    for (int i2=1;i2<=D2;i2++)
+                    for (int j2=1;j2<=D2;j2++)
+                        for (int i1=1;i1<=D1;i1++)
+                        for (int j1=1;j1<=D1;j1++)
+                            C(i2,j2)+=conj(itsA(m)(i1,i2))*W(w2-1,w1-1)(m,n)*E[w2](i1,j1)*itsA(n)(j1,j2);
+                }
+            }
+
+        if (diagonals.size()==0)
+        {
+            E[w1]=C;
+//            cout << std::fixed << "E[" << w1 << "]=" << E[w1] << endl;
+        }
+        else
+        {
+
+        assert(false);
+
+           Fill(C,dcmplx(0.0));
+//            C(1,1)=C(2,2);
+//            C(2,2)=C(1,1);
+//            cout << std::fixed << "C[" << w1 << "]=" << C << endl;
+            dcmplx c=Sum(C.GetDiagonal())/static_cast<double>(D);
+            MatrixCT I(D,D);
+            Unit(I);
+            MatrixCT Cperp=C-c*I;
+//            cout << std::fixed << "Cperp[" << w1 << "]=" << Cperp << endl;
+            if (T.size()==0)
+            {
+                T=-GetTransferMatrix1(A).Flatten();
+                for (int i=1;i<=D;i++) T(i,i)+=1.0;
+//                cout << std::fixed << "1-T=" << T << endl;
+            }
+//            FillRandom(T);
+            LapackSVDSolver<dcmplx> solver;
+            auto [U,s,VT]=solver.SolveAll(T,1e-13);
+            SVCompressorC* comp =Factory::GetFactory()->MakeMPSCompressor(0,1e-13);
+            comp->Compress(U,s,VT);
+//            cout << std::fixed << "s=" << s.GetDiagonal() << endl;
+            DiagonalMatrixRT si=1.0/s;
+//            cout << std::fixed << "si=" << si.GetDiagonal() << endl;
+//            MatrixCT err2=U*s*VT-T;
+//            cout << "err2=" << std::fixed << err2 << endl;
+//            cout << std::scientific << Max(fabs(err2)) << endl;
+            MatrixCT V=conj(Transpose(VT));
+            MatrixCT UT=conj(Transpose(U));
+
+            MatrixCT Tinv=V*si*UT;
+//            MatrixCT err3=T*Tinv*T-T;
+//            cout << "err3=" << std::fixed << err3 << endl;
+//            cout << std::scientific << Max(fabs(err3)) << endl;
+
+
+//            cout << "T=" << std::fixed << T << endl;
+//            cout << "Tinv=" << std::fixed << Tinv << endl;
+            VectorCT Cf=Flatten(C);
+            VectorCT Ef=Tinv*Cf;
+//            cout << "Cf=" << std::fixed << Cf << endl;
+//            cout << "Ef=" << std::fixed << Ef << endl;
+//            cout << "T*Ef=" << std::fixed << T*Ef << endl;
+            VectorCT err1=T*Ef-Cf;
+//            cout << "err1=" << std::fixed << err1 << endl;
+//            cout << std::scientific << Max(fabs(err1)) << endl;
+            E[w1]=UnFlatten(Ef,D,D);
+//            cout << std::fixed << "E[" << w1 << "]=" << E[w1] << endl;
+            //
+            //  Check solution
+            //
+            MatrixCT Echeck(D,D);
+            Fill(Echeck,dcmplx(0.0));
+            for (int i2=1;i2<=D;i2++)
+            for (int j2=1;j2<=D;j2++)
+                for (int i1=1;i1<=D;i1++)
+                for (int j1=1;j1<=D;j1++)
+                    for (int m=0; m<d; m++)
+                        Echeck(i2,j2)+=conj(A[m](i1,i2))*E[w1](i1,j1)*A[m](j1,j2);
+             MatrixCT err=E[w1]-Echeck-C;
+//             cout << "err=" << std::fixed << err << endl;
+//             cout << std::scientific << Max(fabs(err)) << endl;
+
+
+        }
+    }
+//
+//  Now do the final contraction to get E[1]
+//
+    if (Dw>1)
+    {
+        E[1]=MatrixCT(D2,D2);
+        Fill(E[1],dcmplx(0));
+        for (int w=2;w<=Dw;w++)
+        {
+            for (int m=0; m<d; m++)
+                for (int n=0; n<d; n++)
+                {
+                    //cout << "W" << m << n << "=" << Wmn << endl;
+                    for (int i2=1;i2<=D2;i2++)
+                    for (int j2=1;j2<=D2;j2++)
+                        for (int i1=1;i1<=D1;i1++)
+                        for (int j1=1;j1<=D1;j1++)
+                            E[1](i2,j2)+=W(w-1,0)(m,n)*conj(itsA(m)(i1,i2))*E[w](i1,j1)*itsA(n)(j1,j2);
+                }
+        }
+
+    }
+
+//  E[1] should now be the same as C in the paper.
+//    cout << "E[" << 1 << "]=" << E[1] << endl;
+
+    const DiagonalMatrixRT& s=itsRightBond->GetSVs();
+//
+//  Take the trace of E1
+//
+    dcmplx E0=0.0;
+    DiagonalMatrixRT ro=s*s;
+    assert(fabs(Sum(ro)-1.0)<1e-13); //Make sure we are normalized
+//    MatrixCT CC=itsG*~itsG;
+//    MatrixCT CC=~itsG*itsG;
+//    for (int i1=1;i1<=D1;i1++)
+    for (int i2=1;i2<=D2;i2++)
+        E0+=E[1](i2,i2)*ro(i2,i2); //We only use the diagonal elements of E[1]
+    //E0/=2.0; //Convert from energy per unit cell to energy per site.
+
+    if (fabs(imag(E0))>=1e-10)
+        Logger->LogWarnV(0,"iTEBDStateImp::GetExpectation(iMPO) E0=(%.5f,%.1e) has large imaginary component",real(E0),imag(E0));
+    return real(E0);
+*/
 }
 
 

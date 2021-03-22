@@ -43,7 +43,7 @@ public:
 //
 // Find ground state
 //
-    virtual void FindVariationalGroundState(const iHamiltonian* H,const IterationSchedule&);
+    virtual double FindVariationalGroundState(const iHamiltonian* H,const IterationSchedule&);
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions
@@ -74,7 +74,7 @@ private:
 //
 //  For ground state search
 //
-        void FindVariationalGroundState(const iHamiltonian*,const IterationScheduleLine&);
+        double FindVariationalGroundState(const iHamiltonian*,const IterationScheduleLine&);
 //        void   Refine(Direction lr,const Hamiltonian*,const Epsilons&,int isite); //Minimize energy WRT the Ms in one site.
 //        void   Sweep (Direction lr,const Hamiltonian*,const Epsilons&);
 //        void   NormalizeSite             (Direction lr,int isite);

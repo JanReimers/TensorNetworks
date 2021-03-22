@@ -229,17 +229,23 @@ void iMPSImp::Normalize()
 
 double   iMPSImp::GetExpectation (const iMPO* o) const
 {
-    return 0.0;
+    assert(o);
+    double E=0.0;
+    for (int ia=1;ia<=itsL;ia++)
+        E+=itsSites[ia]->GetExpectation(o->GetSiteOperator(ia));
+    return E;
 }
 
-void iMPSImp::FindVariationalGroundState(const iHamiltonian* H,const IterationSchedule& is)
+double iMPSImp::FindVariationalGroundState(const iHamiltonian* H,const IterationSchedule& is)
 {
+    double E=0.0;
     Normalize(); //Sweep left and right storing A's and B's.
     for (is.begin(); !is.end(); is++)
-        FindVariationalGroundState(H,*is);
+        E=FindVariationalGroundState(H,*is);
+    return E;
 }
 
-void iMPSImp::FindVariationalGroundState(const iHamiltonian* H,const IterationScheduleLine& isl)
+double iMPSImp::FindVariationalGroundState(const iHamiltonian* H,const IterationScheduleLine& isl)
 {
     assert(Logger); //Make sure we have global logger.
     Logger->LogInfo(2,"iter      E        dE    Gauge eta");
@@ -261,7 +267,7 @@ void iMPSImp::FindVariationalGroundState(const iHamiltonian* H,const IterationSc
         if (eta<isl.itsEps.itsDeltaLambdaEpsilon && dE <isl.itsEps.itsDelatEnergy1Epsilon) break;
     }
     Logger->LogInfoV(0,"Variational iMPS GS D=%4d, %4d iterations, <E>=%.13f",GetMaxD(),in,E);
-
+    return E;
 }
 
 

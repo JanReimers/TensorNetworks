@@ -15,6 +15,7 @@ class Tensor3
 public:
     typedef std::tuple<int,int,int> DimT;
     typedef std::tuple<MatrixCT,MatrixCT> MMType;
+    typedef std::tuple<double,Tensor3> LRWType;
 
 
     Tensor3(int d, int D1, int D2, int mnlow=0);
@@ -41,6 +42,9 @@ public:
     MatrixCT  GetTransferMatrix(Direction) const;
     Matrix6CT GetTransferMatrix(Direction,const MatrixOR& W) const;
     VectorCT  GetTMEigenVector (Direction) const;
+    LRWType   GetLW            (const MatrixOR& W) const;
+    LRWType   GetRW            (const MatrixOR& W) const;
+    double    GetExpectation   (const MatrixOR& W) const;
 
     friend std::ostream& operator<<(std::ostream& os, const Tensor3& m)
     {

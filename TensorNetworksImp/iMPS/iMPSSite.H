@@ -37,25 +37,8 @@ public:
 //
 //  Required for ground state calculations
 //
-          double     Refine (const SiteOperator*,const Epsilons& eps);
-//        Matrix6CT GetHeff(const SiteOperator* so,const Vector3CT& L,const Vector3CT& R) const;
-//        const    Vector3CT& GetHeffCache(Direction lr) const
-//        {
-//            return lr==DLeft ? itsHLeft_Cache : itsHRightCache;
-//        }
-//        const    MatrixCT& GetRLCache(Direction lr) const
-//        {
-//            return lr==DLeft ? itsLeft_Cache : itsRightCache;
-//        }
-//        void     UpdateCache(const SiteOperator* so,const Vector3CT& HLeft,const Vector3CT& HRight); //update <Psi|H|Psi> L/R cahces
-//        void     UpdateCache(const MPSSite* Psi2   ,const MatrixCT&   Left,const MatrixCT&   Right); //update <Psi|Psi> L/R cahces
-//
-//        MatrixCT  IterateLeft_F(const MPSSite* Psi2   ,const MatrixCT&  Fam1,bool cache=false) const;
-//        MatrixCT  IterateRightF(const MPSSite* Psi2   ,const MatrixCT&  Fam1,bool cache=false) const;
-//        Vector3CT IterateLeft_F(const SiteOperator* so,const Vector3CT& Fam1,bool cache=false);
-//        Vector3CT IterateRightF(const SiteOperator* so,const Vector3CT& Fam1,bool cache=false);
-//        MatrixCT  IterateF     (Direction lr ,const MatrixCT& M) const;
-
+    double Refine (const SiteOperator*,const Epsilons& eps);
+    double GetExpectation(const SiteOperator*) const;
 //---------------------------------------------------------------------------------
 //
 // Normalization

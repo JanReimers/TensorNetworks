@@ -43,12 +43,12 @@ class Bond
         const DiagonalMatrixRT& GetSVs () const {return itsSingularValues;}
 
         void Report    (std::ostream&) const;
+        void SetSingularValues(const DiagonalMatrixRT& s, double compessionError);
 
     protected:
 
     private:
         friend class iTEBDStateImp;
-        void SetSingularValues(const DiagonalMatrixRT& s, double compessionError);
         void ClearSingularValues(Direction lr,const MatrixCT& R);
         void UpdateBondEntropy();
         static double GetNorm(const DiagonalMatrixRT&);

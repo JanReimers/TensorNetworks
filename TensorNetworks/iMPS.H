@@ -24,7 +24,7 @@ public:
 //
 // Find ground state.
 //
-    virtual void FindVariationalGroundState(const iHamiltonian* H,const IterationSchedule&)=0;
+    virtual double FindVariationalGroundState(const iHamiltonian* H,const IterationSchedule&)=0;
 //--------------------------------------------------------------------------------------
 //
 //    Overlap and expectation contractions

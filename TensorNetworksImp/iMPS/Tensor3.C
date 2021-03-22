@@ -2,7 +2,10 @@
 #include "TensorNetworksImp/Typedefs.H"
 #include "Operators/OperatorValuedMatrix.H"
 #include "NumericalMethods/LapackQRSolver.H"
+#include "NumericalMethods/LapackEigenSolver.H"
 #include "NumericalMethods/ArpackEigenSolver.H"
+#include "NumericalMethods/LapackSVDSolver.H"
+#include "NumericalMethods/LapackLinearSolver.H"
 #include "Containers/Matrix6.H"
 #include "oml/diagonalmatrix.h"
 #include "oml/random.h"
@@ -336,5 +339,175 @@ VectorCT Tensor3::GetTMEigenVector (Direction lr) const
     return V;
 }
 
+Tensor3::LRWType Tensor3::GetLW(const MatrixOR& W) const
+{
+    IsUnit(GetNorm(DLeft),1e-13);
+    auto [d,D1,D2]=GetDimensions();
+    auto [X1,X2]=W.GetChi12();
+    assert(X1==X2);
+    int Dw=X1+2;
+
+    Matrix6CT TWL=GetTransferMatrix(DLeft ,W);
+    MatrixCT  TL =GetTransferMatrix(DLeft );
+    VectorCT  R  =GetTMEigenVector(DLeft );
+    assert(Max(fabs(TL-TWL.SubMatrix(1 ,1 ).Flatten()))<1e-15);
+    assert(Max(fabs(TL-TWL.SubMatrix(Dw,Dw).Flatten()))<1e-15);
+    Tensor3 LW(Dw,D1,D2,1);
+    LW.Unit(Dw);
+    cout << std::setprecision(3);
+    for (int w=Dw-1;w>1;w--)
+    {
+        assert(Max(fabs(TWL.SubMatrix(w,w).Flatten()))==0.0);
+        for (int w1=w+1;w1<=Dw;w1++)
+            LW(w)+=LW(w1)*TWL.SubMatrix(w1,w);
+        assert(IsHermitian(LW(w),1e-15));
+    }
+    //
+    //  Now we need YL_1 and YR_Dw
+    //
+    MatrixCT YL(D1,D2),YR(D1,D2);
+    Fill(YL,dcmplx(0.0));
+    for (int w1=2;w1<=Dw;w1++)
+        YL+=LW(w1)*TWL.SubMatrix(w1,1);
+
+    assert(IsHermitian(YL,1e-15));
+    VectorCT YLf=TensorNetworks::Flatten(YL);
+
+    MatrixCT I(TL.GetLimits()),IL(D1,D1);
+    ::Unit(I);::Unit(IL);
+    VectorCT ILf=TensorNetworks::Flatten(IL);
+    MatrixCT PL=OuterProduct(R,ILf);
+    MatrixCT XL=I-TL+PL;
+    VectorCT vL=YLf-YLf*PL;
+    LapackSVDSolver<dcmplx> SVDsolver;
+    {
+        auto [U,s,VT]=SVDsolver.SolveAll(XL,1e-14);
+        //cout << std::scientific << "XL min s=" << Min(s.GetDiagonal()) << endl;
+        assert(Min(s.GetDiagonal())>1e-14);
+    }
+
+    LapackLinearSolver<dcmplx> solver;
+    VectorCT LW1f=solver.Solve(vL,XL);
+    LW(1 )=TensorNetworks::UnFlatten(LW1f);
+    for (int w=1;w<=Dw;w++)
+    {
+        //cout << "LW(" << w << ")=" << LW(w) << endl;
+//        cout << std::scientific << Max(fabs(LW(w)-~LW(w))) << endl;
+        LW(w)=0.5*(LW(w)+~LW(w));
+        assert(IsHermitian(LW(w),1e-13));
+    }
+    //
+    //  Site energy e = (YL_1|R) = (L|YR_Dw)
+    //
+    dcmplx el=YLf*R;
+    assert(fabs(std::imag(el))<1e-11);
+
+    return std::make_tuple(std::real(el),LW);
+}
+
+Tensor3::LRWType Tensor3::GetRW(const MatrixOR& W) const
+{
+    IsUnit(GetNorm(DRight),1e-13);
+    auto [d,D1,D2]=GetDimensions();
+    auto [X1,X2]=W.GetChi12();
+    assert(X1==X2);
+    int Dw=X1+2;
+
+    Matrix6CT TWR=GetTransferMatrix(DRight,W);
+    MatrixCT  TR =GetTransferMatrix(DRight);
+    VectorCT  L  =GetTMEigenVector(DRight);
+    assert(Max(fabs(TR-TWR.SubMatrix(1 ,1 ).Flatten()))<1e-15);
+    assert(Max(fabs(TR-TWR.SubMatrix(Dw,Dw).Flatten()))<1e-15);
+    Tensor3 RW(Dw,D1,D2,1);
+    RW.Unit(1);
+    cout << std::setprecision(3);
+    for (int w=Dw-1;w>1;w--)
+    {
+        assert(Max(fabs(TWR.SubMatrix(w,w).Flatten()))==0.0);
+        for (int w2=1;w2<w;w2++)
+            RW(w)+=TWR.SubMatrix(w,w2)*RW(w2);
+        assert(IsHermitian(RW(w),1e-15));
+    }
+    //
+    //  Now we need YL_1 and YR_Dw
+    //
+    MatrixCT YR(D1,D2);
+    Fill(YR,dcmplx(0.0));
+    for (int w2=1;w2< Dw;w2++)
+        YR+=TWR.SubMatrix(Dw,w2)*RW(w2);
+
+    assert(IsHermitian(YR,1e-15));
+    VectorCT YRf=TensorNetworks::Flatten(YR);
+
+    MatrixCT I(TR.GetLimits()),IR(D2,D2);
+    ::Unit(I);::Unit(IR);
+    VectorCT IRf=TensorNetworks::Flatten(IR);
+
+    MatrixCT PR=OuterProduct(IRf,L);
+    MatrixCT XR=I-TR+PR;
+    VectorCT vR=YRf-PR*YRf;
+
+    LapackSVDSolver<dcmplx> SVDsolver;
+    {
+        auto [U,s,VT]=SVDsolver.SolveAll(XR,1e-14);
+        //cout << std::scientific << "XR min s=" << Min(s.GetDiagonal()) << endl;
+        assert(Min(s.GetDiagonal())>1e-14);
+    }
+
+    LapackLinearSolver<dcmplx> solver;
+    VectorCT RWDf=solver.Solve(XR,vR);
+    RW(Dw)=TensorNetworks::UnFlatten(RWDf);
+    for (int w=1;w<=Dw;w++)
+    {
+        RW(w)=0.5*(RW(w)+~RW(w));
+        assert(IsHermitian(RW(w),1e-12));
+    }
+    //
+    //  Site energy e = (YL_1|R) = (L|YR_Dw)
+    //
+    dcmplx er=L*YRf;
+    assert(fabs(std::imag(er))<1e-12);
+
+    return std::make_tuple(std::real(er),RW);
+}
+
+double Tensor3::GetExpectation(const MatrixOR& W) const
+{
+    IsUnit(GetNorm(DLeft),1e-13);
+    auto [d,D1,D2]=GetDimensions();
+    auto [X1,X2]=W.GetChi12();
+    assert(X1==X2);
+    int Dw=X1+2;
+
+    Matrix6CT TWL=GetTransferMatrix(DLeft ,W);
+    MatrixCT  TL =GetTransferMatrix(DLeft );
+    VectorCT  R  =GetTMEigenVector(DLeft );
+    Tensor3 LW(Dw,D1,D2,1);
+    LW.Unit(Dw);
+    for (int w=Dw-1;w>1;w--)
+    {
+        assert(Max(fabs(TWL.SubMatrix(w,w).Flatten()))==0.0);
+        for (int w1=w+1;w1<=Dw;w1++)
+            LW(w)+=LW(w1)*TWL.SubMatrix(w1,w);
+        assert(IsHermitian(LW(w),1e-15));
+    }
+    //
+    //  Now we need YL_1 and YR_Dw
+    //
+    MatrixCT YL(D1,D2);
+    Fill(YL,dcmplx(0.0));
+    for (int w1=2;w1<=Dw;w1++)
+        YL+=LW(w1)*TWL.SubMatrix(w1,1);
+
+    assert(IsHermitian(YL,1e-15));
+    VectorCT YLf=TensorNetworks::Flatten(YL);
+    //
+    //  Site energy e = (YL_1|R) = (L|YR_Dw)
+    //
+    dcmplx el=YLf*R;
+    assert(fabs(std::imag(el))<1e-12);
+
+    return std::real(el);
+}
 
 } //namespace
