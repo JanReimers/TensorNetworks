@@ -76,6 +76,22 @@ void iMPSImp::InitializeWith(State state)
 
 }
 
+iMPSSite* iMPSImp::GetSite(Direction lr,int ia)
+{
+    switch (lr)
+    {
+    case DLeft:
+        ia--;
+        break;
+    case DRight:
+        ia++;
+        break;
+    }
+    int i=(ia-1+itsL)%itsL+1;
+    assert(i>=1);
+    assert(i<=itsL);
+    return itsSites[i];
+}
 
 //void MPSImp::IncreaseBondDimensions(int D)
 //{
@@ -254,10 +270,16 @@ double iMPSImp::FindVariationalGroundState(const iHamiltonian* H,const Iteration
     for (; in<isl.itsMaxGSSweepIterations; in++)
     {
         dE=E=0.0;
-        for (int ia=1;ia<=itsL;ia++)
+        if (itsL==1)
         {
-            eta=itsSites[ia]->Refine(H->GetSiteOperator(ia),isl.itsEps);
-            E+=itsSites[ia]->GetSiteEnergy();
+            eta=itsSites[1]->RefineOneSite(H->GetSiteOperator(1),isl.itsEps);
+            E+= itsSites[1]->GetSiteEnergy();
+            dE=std::max(dE,fabs(itsSites[1]->GetIterDE()));
+        }
+        else for (int ia=1;ia<=itsL;ia++)
+        {
+            eta=itsSites[ia]->Refine(H->GetSiteOperator(ia),GetSite(DLeft,ia),isl.itsEps);
+            E+= itsSites[ia]->GetSiteEnergy();
             dE=std::max(dE,fabs(itsSites[ia]->GetIterDE()));
         }
         E/=itsL;

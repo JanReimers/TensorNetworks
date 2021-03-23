@@ -20,6 +20,8 @@ VUMPS:
     -L>1 unit cell
     -Set up numerous unit tests for L=2,4}, D=1,2,8,32, S=0.5,1.0,1.5
     -Handle D=1.
+    -Possible performance enhancement, Tensor3::GetExpectation use R=Transpose(G*~G)
+      as an initial guess for the eigen solver.
 
 New Techniques:
     -Parker MPO compression

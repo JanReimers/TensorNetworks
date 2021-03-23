@@ -20,6 +20,7 @@ int main(int argc, char **argv)
 //    testing::GTEST_FLAG(filter) = "MPOTests.DoBuildMPO_Neel";
 //    testing::GTEST_FLAG(filter) = "VariationalGroundStateTests.*";
     testing::GTEST_FLAG(filter) = "iVUMPSTests.*";
+//    testing::GTEST_FLAG(filter) = "iVUMPSTests.TestFindFerroGS_S12_D2_L1_h01";
 //    testing::GTEST_FLAG(filter) = "ImaginaryTimeTests.*";
 //    testing::GTEST_FLAG(filter) = "iTEBDTests.TestRandomEnergy*";
 //    testing::GTEST_FLAG(filter) = "ITensorTests*";

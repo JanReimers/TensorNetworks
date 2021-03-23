@@ -37,7 +37,8 @@ public:
 //
 //  Required for ground state calculations
 //
-    double Refine (const SiteOperator*,const Epsilons& eps);
+    double RefineOneSite (const SiteOperator*,                         const Epsilons& eps);
+    double Refine        (const SiteOperator*,iMPSSite* left_neighbour,const Epsilons& eps);
     double GetExpectation(const SiteOperator*) const;
 //---------------------------------------------------------------------------------
 //

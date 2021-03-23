@@ -224,13 +224,26 @@ Matrix4CT ContractHC(const Tensor3& LW, const Tensor3& RW)
     return Hc;
 }
 
-double iMPSSite::Refine (const SiteOperator* h,const Epsilons& eps)
+double iMPSSite::RefineOneSite (const SiteOperator* h,const Epsilons& eps)
 {
     double epsHerm=5e-8;
-    const MatrixOR& W=h->GetW();
     auto [d,D1,D2]=itsA.GetDimensions();
-    auto [el,LW]=itsA.GetLW(W);
-    auto [er,RW]=itsB.GetRW(W);
+//
+//  Check gauge transform
+//
+//    double etaG1=0.0;
+//    for (int n=0;n<d;n++)
+//    {
+////        cout << itsA(n)*itsG-itsG*itsB(n) << endl;
+//        etaG1+=FrobeniusNorm(itsA(n)*itsG-itsG*itsB(n));
+//    }
+//    etaG1/=d;
+//    cout << std::scientific << "etaG=" << etaG1 << endl;
+//    assert(etaG1<1e-14);
+
+    const MatrixOR& W=h->GetW();
+    auto [el,LW]=itsA.GetLW(W,itsG);
+    auto [er,RW]=itsB.GetRW(W,itsG);
     double e=0.5*std::real(el+er);
     itsIterDE=e-itsEmin;
     itsEmin=e;
@@ -309,6 +322,113 @@ double iMPSSite::Refine (const SiteOperator* h,const Epsilons& eps)
     return std::max(etaL,etaR);
 }
 
+double iMPSSite::Refine(const SiteOperator* h,iMPSSite* left_neighbour,const Epsilons& eps)
+{
+    //left_neighbour=this;
+    double epsHerm=5e-8;
+    const MatrixOR& W=h->GetW();
+    auto [d,D1,D2]=itsA.GetDimensions();
+    auto [el,LW]=itsA.GetLW(W,itsG);
+    auto [er,RW]=itsB.GetRW(W,itsG);
+    auto [eln,LWn]=left_neighbour->itsA.GetLW(W,left_neighbour->itsG);
+    auto [ern,RWn]=left_neighbour->itsB.GetRW(W,left_neighbour->itsG);
+
+
+    double e=0.5*std::real(el+er);
+    itsIterDE=e-itsEmin;
+    itsEmin=e;
+
+    Matrix6CT Hac=ContractHAC(W,LW,RW);
+    MatrixCT  Hacf=Hac.Flatten();
+    assert(IsHermitian(Hacf,epsHerm));
+
+    Matrix4CT HcR=ContractHC(LW,RW);
+    MatrixCT  HcRf=HcR.Flatten();
+    assert(IsHermitian(HcRf,epsHerm));
+
+    Matrix4CT HcL=ContractHC(LWn,RWn);
+    MatrixCT  HcLf=HcL.Flatten();
+    assert(IsHermitian(HcLf,epsHerm));
+
+    Hacf=0.5*(Hacf + ~Hacf);
+    HcRf=0.5*(HcRf + ~HcRf );
+    HcLf=0.5*(HcLf + ~HcLf);
+    LapackEigenSolver<dcmplx> asolver;
+    auto [Acf,eAc]=asolver.Solve(Hacf,1e-12,1);
+    auto [CRf,eCR]=asolver.Solve(HcRf ,1e-12,1);
+    auto [CLf,eCL]=asolver.Solve(HcLf,1e-12,1);
+
+    dcmplx phase=CRf(1,1)/fabs(CRf(1,1));
+    assert(fabs(phase)-1.0<1e-14);
+    CRf(1,1)*=conj(phase); //Take out arbitrary phase angle
+    phase=CLf(1,1)/fabs(CLf(1,1));
+    assert(fabs(phase)-1.0<1e-14);
+    CLf(1,1)*=conj(phase); //Take out arbitrary phase angle
+    assert(CLf(1,1)/fabs(CLf(1,1))==1.0);
+    assert(CRf(1,1)/fabs(CRf(1,1))==1.0);
+
+    Tensor3 Ac(d,D1,D2);
+    Ac.UnFlatten(VectorCT(Acf.GetColumn(1)));
+    MatrixCT CR=UnFlatten(VectorCT(CRf.GetColumn(1)));
+    MatrixCT CL=UnFlatten(VectorCT(CLf.GetColumn(1)));
+    MatrixCT CRdagger=~CR;
+    MatrixCT CLdagger=~CL;
+    cout << std::fixed;
+    //cout << "Ac=" << Ac << endl;
+    //cout << "eAc=" << eAc << endl;
+    //cout << "C=" << C << endl;
+   // cout << "eC=" << eC << endl;
+
+    LapackSVDSolver<dcmplx> SVDsolver;
+    {
+        auto [U,s,VT]=SVDsolver.SolveAll(CR,1e-14);
+        //cout << std::scientific << "C svs=" << s.GetDiagonal() << endl;
+        //cout << std::scientific << "C min s=" << Min(s.GetDiagonal()) << endl;
+        assert(Min(s.GetDiagonal())>1e-14);
+        double s2=s.GetDiagonal()*s.GetDiagonal();
+        //cout << "s*s-1=" << s2-1.0 << endl;
+        assert(fabs(s2-1.0)<1e-13);
+        itsRightBond->SetSingularValues(s,0.0);
+    }
+
+    MatrixCT AcL=Ac.Flatten(DLeft);
+    MatrixCT AcR=Ac.Flatten(DRight);
+    MatrixCT AcCR=AcL*CRdagger;
+    MatrixCT CLAc=CLdagger*AcR;
+    double etaL,etaR;
+    Tensor3 Anew(d,D1,D2),Bnew(d,D1,D2);
+    {
+        auto [Ul,sl,VTl]=SVDsolver.SolveAll(AcCR,1e-14);
+        auto [Ur,sr,VTr]=SVDsolver.SolveAll(CLAc,1e-14);
+        //cout << "Ul*Vl=" << Ul*VTl << endl;
+        //cout << "Ur*Vr=" << Ur*VTr << endl;
+        Anew.UnFlatten(DLeft ,Ul*VTl);
+        Bnew.UnFlatten(DRight,Ur*VTr);
+        etaL=FrobeniusNorm(AcL-Ul*VTl*CR);
+        etaR=FrobeniusNorm(AcR-CL*Ur*VTr);
+    }
+    //cout << "Anew=" << Anew << endl;
+    //cout << "Bnew=" << Bnew << endl;
+
+    itsM=Ac;
+    itsA=Anew;
+    itsB=Bnew;
+    itsG=CR;
+    left_neighbour->itsG=CL;
+
+    double etaG=0.0;
+    for (int n=0;n<d;n++)
+        etaG+=FrobeniusNorm(itsA(n)*CR-CL*itsB(n));
+    etaG/=d;
+
+    //cout << std::fixed << std::setprecision(12) << "E=" << itsEmin;
+    cout << std::scientific << std::setprecision(1) << " DE=" << itsIterDE << "  etaL,etaR,etaG=" << etaL << " " << etaR << " " << etaG << endl;
+
+    //cout << "A.Norm=" << itsA.GetNorm(DLeft) << endl;
+    //cout << "B.Norm=" << itsB.GetNorm(DRight) << endl;
+    return std::max(etaL,etaR);
+}
+
 double iMPSSite::GetExpectation(const SiteOperator* so) const
 {
 
@@ -316,7 +436,7 @@ double iMPSSite::GetExpectation(const SiteOperator* so) const
     MatrixOR W=so->GetW();
     assert(W.GetForm()==RegularLower);
     assert(IsLowerTriangular(W));
-    return itsA.GetExpectation(W);
+    return itsA.GetExpectation(W,itsG);
 
     /*
 //    auto [d,D1,D2]=itsA.GetDimensions();

@@ -43,9 +43,9 @@ public:
     MatrixCT  GetTransferMatrix(Direction) const;
     Matrix6CT GetTransferMatrix(Direction,const MatrixOR& W) const;
     VectorCT  GetTMEigenVector (Direction) const;
-    LRWType   GetLW            (const MatrixOR& W) const;
-    LRWType   GetRW            (const MatrixOR& W) const;
-    double    GetExpectation   (const MatrixOR& W) const;
+    LRWType   GetLW            (const MatrixOR& W, const MatrixCT& G) const;
+    LRWType   GetRW            (const MatrixOR& W, const MatrixCT& G) const;
+    double    GetExpectation   (const MatrixOR& W, const MatrixCT& G) const;
 
     friend std::ostream& operator<<(std::ostream& os, const Tensor3& m)
     {
@@ -62,9 +62,10 @@ private:
     std::vector<MatrixCT> itsMs; //
 };
 
-template <class T> Vector<T> Flatten(const Matrix<T>& m)
+template <class T, class A, Data D> Vector<T> Flatten(const Indexable<T,A,Full,D,MatrixShape>& m)
 {
-    Vector<T> v(m.GetNumRows()*m.GetNumCols());
+    const MatLimits& l=m.GetLimits();
+    Vector<T> v(l.GetNumRows()*l.GetNumCols());
     int ij=1;
     for (index_t j:m.cols())
         for (index_t i:m.rows())

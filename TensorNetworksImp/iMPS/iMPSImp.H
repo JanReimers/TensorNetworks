@@ -74,11 +74,11 @@ private:
 //
 //  For ground state search
 //
-        double FindVariationalGroundState(const iHamiltonian*,const IterationScheduleLine&);
+    double FindVariationalGroundState(const iHamiltonian*,const IterationScheduleLine&);
 //        void   Refine(Direction lr,const Hamiltonian*,const Epsilons&,int isite); //Minimize energy WRT the Ms in one site.
 //        void   Sweep (Direction lr,const Hamiltonian*,const Epsilons&);
 //        void   NormalizeSite             (Direction lr,int isite);
-
+    iMPSSite* GetSite(Direction,int ia); //Mod L arithmetic to get one site to the left or right
 
 //--------------------------------------------------------------------------------------
 //

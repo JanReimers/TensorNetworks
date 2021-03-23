@@ -6,6 +6,7 @@
 #include "NumericalMethods/ArpackEigenSolver.H"
 #include "NumericalMethods/LapackSVDSolver.H"
 #include "NumericalMethods/LapackLinearSolver.H"
+#include "TensorNetworks/TNSLogger.H"
 #include "Containers/Matrix6.H"
 #include "oml/diagonalmatrix.h"
 #include "oml/random.h"
@@ -369,6 +370,7 @@ VectorCT Tensor3::GetTMEigenVector (Direction lr) const
     double   eigenValue =real(e(1));
     VectorCT V=U.GetColumn(1);
     assert(fabs(eigenValue-1.0)<1e-13);
+
     dcmplx phase=V(1)/fabs(V(1));
     assert(fabs(phase)-1.0<1e-14);
     V*=conj(phase); //Take out arbitrary phase angle
@@ -376,7 +378,7 @@ VectorCT Tensor3::GetTMEigenVector (Direction lr) const
     return V;
 }
 
-Tensor3::LRWType Tensor3::GetLW(const MatrixOR& W) const
+Tensor3::LRWType Tensor3::GetLW(const MatrixOR& W, const MatrixCT& G) const
 {
     IsUnit(GetNorm(DLeft),1e-13);
     auto [d,D1,D2]=GetDimensions();
@@ -386,7 +388,8 @@ Tensor3::LRWType Tensor3::GetLW(const MatrixOR& W) const
 
     Matrix6CT TWL=GetTransferMatrix(DLeft ,W);
     MatrixCT  TL =GetTransferMatrix(DLeft );
-    VectorCT  R  =GetTMEigenVector(DLeft );
+//    VectorCT  R  =GetTMEigenVector(DLeft );
+    VectorCT  R=TensorNetworks::Flatten(Transpose(G*~G));
     assert(Max(fabs(TL-TWL.SubMatrix(1 ,1 ).Flatten()))<1e-15);
     assert(Max(fabs(TL-TWL.SubMatrix(Dw,Dw).Flatten()))<1e-15);
     Tensor3 LW(Dw,D1,D2,1);
@@ -442,7 +445,7 @@ Tensor3::LRWType Tensor3::GetLW(const MatrixOR& W) const
     return std::make_tuple(std::real(el),LW);
 }
 
-Tensor3::LRWType Tensor3::GetRW(const MatrixOR& W) const
+Tensor3::LRWType Tensor3::GetRW(const MatrixOR& W, const MatrixCT& G) const
 {
     IsUnit(GetNorm(DRight),1e-13);
     auto [d,D1,D2]=GetDimensions();
@@ -452,7 +455,8 @@ Tensor3::LRWType Tensor3::GetRW(const MatrixOR& W) const
 
     Matrix6CT TWR=GetTransferMatrix(DRight,W);
     MatrixCT  TR =GetTransferMatrix(DRight);
-    VectorCT  L  =GetTMEigenVector(DRight);
+//    VectorCT  L  =GetTMEigenVector(DRight); //Slow accurate version.
+    VectorCT  L=TensorNetworks::Flatten(Transpose(~G*G));
     assert(Max(fabs(TR-TWR.SubMatrix(1 ,1 ).Flatten()))<1e-15);
     assert(Max(fabs(TR-TWR.SubMatrix(Dw,Dw).Flatten()))<1e-15);
     Tensor3 RW(Dw,D1,D2,1);
@@ -508,7 +512,7 @@ Tensor3::LRWType Tensor3::GetRW(const MatrixOR& W) const
     return std::make_tuple(std::real(er),RW);
 }
 
-double Tensor3::GetExpectation(const MatrixOR& W) const
+double Tensor3::GetExpectation(const MatrixOR& W, const MatrixCT& G) const
 {
     IsUnit(GetNorm(DLeft),1e-13);
     auto [d,D1,D2]=GetDimensions();
@@ -518,7 +522,9 @@ double Tensor3::GetExpectation(const MatrixOR& W) const
 
     Matrix6CT TWL=GetTransferMatrix(DLeft ,W);
     MatrixCT  TL =GetTransferMatrix(DLeft );
-    VectorCT  R  =GetTMEigenVector(DLeft );
+    VectorCT  R  =GetTMEigenVector(DLeft ); //More expensive
+//    MatrixCT  RG =Transpose(G*~G); //G * G_dagger don't this version, low precision.
+
     Tensor3 LW(Dw,D1,D2,1);
     LW.Unit(Dw);
     for (int w=Dw-1;w>1;w--)
@@ -542,7 +548,10 @@ double Tensor3::GetExpectation(const MatrixOR& W) const
     //  Site energy e = (YL_1|R) = (L|YR_Dw)
     //
     dcmplx el=YLf*R;
-    assert(fabs(std::imag(el))<1e-12);
+
+    if (fabs(std::imag(el))>1e-11)
+        Logger->LogWarnV(0,"Tensor3::GetExpectation expectation=(%.5f,%.1e) has large imaginary component",real(el),imag(el));
+
 
     return std::real(el);
 }
