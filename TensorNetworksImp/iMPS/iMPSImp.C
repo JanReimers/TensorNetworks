@@ -24,7 +24,7 @@ iMPSImp::iMPSImp(int L, double S, int D,double normEps,double epsSV)
     : itsL(L)
     , itsS(S)
     , itsd(2*S+1)
-    , itsNormEps(1e-14)
+    , itsNormEps(normEps)
 {
     assert(itsL>0);
     assert(isValidSpin(S));
