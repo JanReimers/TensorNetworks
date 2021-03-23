@@ -233,7 +233,7 @@ double   iMPSImp::GetExpectation (const iMPO* o) const
     double E=0.0;
     for (int ia=1;ia<=itsL;ia++)
         E+=itsSites[ia]->GetExpectation(o->GetSiteOperator(ia));
-    return E;
+    return E/itsL;
 }
 
 double iMPSImp::FindVariationalGroundState(const iHamiltonian* H,const IterationSchedule& is)
