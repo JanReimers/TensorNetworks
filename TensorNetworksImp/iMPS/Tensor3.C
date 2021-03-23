@@ -217,6 +217,20 @@ void Tensor3::UnFlatten(Direction lr,const MatrixCT& F)
     }
 }
 
+void Tensor3::Multiply(Direction lr,const MatrixCT& G)
+{
+    switch (lr)
+    {
+    case DLeft:
+        for (auto& M:itsMs)
+            M=G*M;
+        break;
+    case DRight:
+        for (auto& M:itsMs)
+            M=M*G;
+        break;
+    }
+}
 
 
 // Rank Revealing QL/LQ
@@ -226,18 +240,41 @@ MatrixCT Tensor3::QLRR(Direction lr,double eps)
     MatrixCT Mf=Flatten(lr);
     MatrixCT L,Q;
 
+    double neps=3*eps;
     switch (lr)
     {
         case DLeft:
             std::tie(Q,L)=solver.SolveRankRevealingQL(Mf,eps);
+            assert(Max(fabs(Mf-Q*L))<neps);
+            for (index_t i:L.rows())
+            {
+                dcmplx phase=L(i,i)/fabs(L(i,i));
+                L.GetRow(i)*=conj(phase);
+                Q.GetColumn(i)*=phase;
+            }
+            assert(Max(fabs(Mf-Q*L))<neps);
         break;
         case DRight:
             std::tie(L,Q)=solver.SolveRankRevealingLQ(Mf,eps);
+            {
+                double err=Max(fabs(Mf-L*Q));
+                if (err>=neps) cout << "Max(fabs(Mf-L*Q))=" << err << endl;
+                assert(err<neps);
+
+            }
+            for (index_t i:L.cols())
+            {
+                dcmplx phase=L(i,i)/fabs(L(i,i));
+                L.GetColumn(i)*=conj(phase);
+                Q.GetRow(i)*=phase;
+            }
+            assert(Max(fabs(Mf-L*Q))<neps);
         break;
     }
     assert(!isnan(L));
     assert(!isinf(L));
     assert(IsLowerTriangular(L));
+
     UnFlatten(lr,Q);
     return L;
 }

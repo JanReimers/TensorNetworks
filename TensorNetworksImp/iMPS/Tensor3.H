@@ -25,6 +25,7 @@ public:
     MatrixCT   Flatten(Direction) const;
     void     UnFlatten(Direction,const MatrixCT& F);
     void     UnFlatten(const VectorCT&);
+    void     Multiply(Direction,const MatrixCT& G);
 
     int       Getd     () const {return itsMs.size();}
     int       GetD1    () const {return itsMs[0].GetNumRows();}
@@ -79,6 +80,11 @@ template <class T> Matrix<T> UnFlatten(const Vector<T>& v)
         for (index_t i:m.rows())
             m(i,j)=v(ij++);
     return m;
+}
+
+template <class T> T Trace(const Matrix<T>& m)
+{
+    return Sum(m.GetDiagonal());
 }
 
 } //namespace

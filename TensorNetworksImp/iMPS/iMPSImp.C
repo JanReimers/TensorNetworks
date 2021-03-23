@@ -193,7 +193,7 @@ void iMPSImp::NormalizeQR (Direction lr)
 
     double eps=1e-13; //Cutoff for RR QR
     double eta=0.0;
-    int niter=0,maxIter=20;
+    int niter=0,maxIter=500;
     do
     {
         eta=0.0;
@@ -213,18 +213,16 @@ void iMPSImp::NormalizeQR (Direction lr)
     if (niter==maxIter)
         std::cout << "iMPSImp::NormalizeQR failed to converge, eta=" << eta << std::endl;
 
+    for (int ia=1;ia<=itsL;ia++)
+        itsSites[ia]->SaveAB_CalcLR(lr); //  for each site Save A=M, and calc the left dominant eigen vector of the left transfer matrix
 
 }
 
 void iMPSImp::Normalize()
 {
     NormalizeQR(DLeft);
-    for (int ia=1;ia<=itsL;ia++)
-        itsSites[ia]->SaveAB_CalcLR(DLeft); //  for each site Save A=M, and calc the left dominant eigen vector of the left transfer matrix
 
     NormalizeQR(DRight);
-    for (int ia=1;ia<=itsL;ia++)
-        itsSites[ia]->SaveAB_CalcLR(DRight); //  for each site Save B=M, and calc the right dominant eigen vector of the right transfer matrix
 }
 
 double   iMPSImp::GetExpectation (const iMPO* o) const

@@ -137,16 +137,17 @@ double iMPSSite::QRStep(Direction lr,double eps)
 {
     double eta=99.0;
     MatrixCT L=itsM.QLRR(lr,eps); //Solves M=Q*L, Q is stored in M
+    L*=1.0/L(1,1); //Force normalization as we go.
     if (L.IsSquare())
     {
         MatrixRT Id(L.GetLimits());
         Unit(Id);
         eta=Max(fabs(L-Id));
- //           cout << " L=" << L.GetLimits() << "eta=" << eta << endl;
+//        cout << " L=" << L << "eta=" << eta << endl;
     }
     else
     {
-//            cout << " L=" << L.GetLimits() << endl;
+            cout << "Changed L=" << L.GetLimits() << endl;
     }
 
     GetBond(lr)->TransferQR(lr,L); //  Do M->L*M
@@ -159,11 +160,15 @@ double iMPSSite::QRStep(Direction lr,double eps)
         itsG=itsG*L; //Update gauge transform
         break;
     }
+ //   cout << "G=" << itsG << endl;
     return eta;
 }
 
 void iMPSSite::SaveAB_CalcLR(Direction lr)
 {
+    dcmplx norm=Trace(itsG*~itsG);
+    assert(fabs(std::imag(norm))<1e-14);
+    itsG/=sqrt(std::real(norm));
     switch(lr)
     {
     case DLeft:
@@ -495,24 +500,27 @@ double iMPSSite::GetExpectation(const SiteOperator* so) const
 
 void iMPSSite::SVDTransfer(Direction lr,const DiagonalMatrixRT& s, const MatrixCT& UV)
 {
-
+    assert(false);
 }
 void iMPSSite::SVDTransfer(Direction lr,const MatrixCT& UV)
 {
+    assert(false);
 
 }
-void iMPSSite::TransferQR (Direction lr,const MatrixCT& R)
+void iMPSSite::TransferQR (Direction lr,const MatrixCT& G)
 {
-
+    itsM.Multiply(lr,G);
 }
 
 void iMPSSite::NormalizeQR  (Direction lr)
 {
+    assert(false);
 
 }
 
 void iMPSSite::NormalizeSVD (Direction lr,SVCompressorC*)
 {
+    assert(false);
 
 }
 
