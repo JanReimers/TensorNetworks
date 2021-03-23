@@ -123,7 +123,7 @@ private:
     Bond* itsRightBond;
     int itsd; //2*S+1
     int itsD1,itsD2;  //Bond dimensions
-    dVectorT itsMs;   //We need a separate matrix for each of the p basis states on one site.
+//    dVectorT itsMs;   //We need a separate matrix for each of the p basis states on one site.
     Tensor3  itsM,itsA,itsB; //M[n], and left and right versions A[n],B[n]
     MatrixCT itsG; //Gauge transform from the most recent normalization sweep.
     EigenSolver<dcmplx>* itsEigenSolver;

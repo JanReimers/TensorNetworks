@@ -35,12 +35,6 @@ iMPSSite::iMPSSite(Bond* leftBond, Bond* rightBond,int d, int D)
 {
     assert(itsRightBond);
     assert(itsLeft_Bond);
-
-    for (int n=0; n<itsd; n++)
-    {
-        itsMs.push_back(MatrixCT(D,D));
-        Fill(itsMs.back(),std::complex<double>(0.0));
-    }
 }
 
 iMPSSite::~iMPSSite()
@@ -51,52 +45,17 @@ iMPSSite::~iMPSSite()
 void iMPSSite::InitializeWith(State state,int sgn)
 {
     itsM.InitializeWith(state,sgn);
-    switch (state)
-    {
-    case Product :
-    {
-        int i=1;
-        for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++,i++)
-            if (i<=itsD2)
-                (*id)(1,i)=std::complex<double>(sgn); //Left normalized
-        break;
-    }
-    case Random :
-    {
-        for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++)
-        {
-            FillRandom(*id);
-            (*id)*=1.0/sqrt(itsd*itsD1*itsD2); //Try and keep <psi|psi>~O(1)
-        }
-        break;
-    }
-    case Neel :
-    {
-        for (dIterT id=itsMs.begin(); id!=itsMs.end(); id++)
-            Fill(*id,dcmplx(0.0));
-        if (sgn== 1)
-            itsMs[0     ](1,1)=1.0;
-        if (sgn==-1)
-            itsMs[itsd-1](1,1)=1.0;
-
-        break;
-    }
-    }
+    if (state==Random)
+        itsM.QLRR(DLeft,1e-14); //Make it left normalized.  The main goal here is to just get it normalized.
 }
 
 void iMPSSite::NewBondDimensions(int D1, int D2, bool saveData)
 {
+    assert(false);
     assert(D1>0);
     assert(D2>0);
     if (itsD1==D1 && itsD2==D2) return;
-    for (int in=0; in<itsd; in++)
-    {
-        itsMs[in].SetLimits(D1,D2,saveData);
-        for (int i1=itsD1;i1<=D1;i1++)
-            for (int i2=itsD2;i2<=D2;i2++)
-                itsMs[in](i1,i2)=dcmplx(0.0);
-//                itsMs[in](i1,i2)=OMLRand<dcmplx>()*0.001; //If you compress to remove zero SVs in the right placese you should not need this trick
-    }
+
     itsD1=D1;
     itsD2=D2;
 }
