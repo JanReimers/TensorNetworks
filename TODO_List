@@ -5,7 +5,7 @@ VUMPS:
     Done: -Calculate etaL = || AC-AL*C ||^2, etaR=||AC-C*AR||^2 and use for convergence
     Done: -Check or use L=C_dagger*C, R= C*C_dagger,
         Not working very well.
-    -Check  Tr[C*C_dagger]=1
+    Done: -Check  Tr[C*C_dagger]=1
     Done: -Break iteration on convergence of dE, etaL,etaR
     -SVD polar decomposition of AC and C
     -QR decomposition of AC and C
@@ -14,14 +14,18 @@ VUMPS:
     -Handle zero SVs in C, and shrink D accordingly.
     Done: -Start using logger to track iterations
     Done: -Support GetExpectation
-    -Set up numerous unit tests for L=1, D=1,2,8,32, S=0.5,1.0,1.5
+    Done: -Set up numerous unit tests for L=1, D=1,2,8,32, S=0.5,1.0,1.5
     -Refactor code ready for L>1
     -One more kick at the can for <H^2>
     -L>1 unit cell
+        Sequential algo: Not working well.
+        Parallel algo;
+        Make one site larger S unit cell and run one site algo.
     -Set up numerous unit tests for L=2,4}, D=1,2,8,32, S=0.5,1.0,1.5
     -Handle D=1.
     -Possible performance enhancement, Tensor3::GetExpectation use R=Transpose(G*~G)
       as an initial guess for the eigen solver.
+    -Laurens.Vanderstraeten@UGent.be ask for advice.
 
 New Techniques:
     -Parker MPO compression
