@@ -18,14 +18,15 @@ public:
     typedef std::tuple<double,Tensor3> LRWType;
 
 
-    Tensor3(int d, int D1, int D2, int mnlow=0);
+    Tensor3(int d, int D1, int D2, std::string label,int siteNumber,int mnLow=0);
     ~Tensor3() {}
     void InitializeWith(State,int sgn);
     void Unit(int n); //Make this(n,i,j)=delta_ij = unit matrix
-    MatrixCT   Flatten(Direction) const;
-    void     UnFlatten(Direction,const MatrixCT& F);
-    void     UnFlatten(const VectorCT&);
-    void     Multiply(Direction,const MatrixCT& G);
+    MatrixCT    Flatten(Direction) const;
+    void      UnFlatten(Direction,const MatrixCT& F);
+    void      UnFlatten(const VectorCT&);
+    void      Multiply(Direction,const MatrixCT& G);
+    void      SetLabel(std::string);
 
     int       Getd     () const {return itsMs.size();}
     int       GetD1    () const {return itsMs[0].GetNumRows();}
@@ -33,6 +34,7 @@ public:
     DimT GetDimensions() const {return std::make_tuple(Getd(),GetD1(),GetD2());}
     MatLimits GetLimits() const;
     bool      IsSquare () const;
+    std::string GetLabel() const {return itsLabel;}
 
     const MatrixCT& operator()(int n) const;
           MatrixCT& operator()(int n)      ;
@@ -43,9 +45,9 @@ public:
     MatrixCT  GetTransferMatrix(Direction) const;
     Matrix6CT GetTransferMatrix(Direction,const MatrixOR& W) const;
     VectorCT  GetTMEigenVector (Direction) const;
-    LRWType   GetLW            (const MatrixOR& W, const MatrixCT& G) const;
-    LRWType   GetRW            (const MatrixOR& W, const MatrixCT& G) const;
-    double    GetExpectation   (const MatrixOR& W, const MatrixCT& G) const;
+    LRWType   GetLW            (const MatrixOR& W, const VectorCT& R) const;
+    LRWType   GetRW            (const MatrixOR& W, const VectorCT& L) const;
+    double    GetExpectation   (const MatrixOR& W) const;
 
     friend std::ostream& operator<<(std::ostream& os, const Tensor3& m)
     {
@@ -59,8 +61,17 @@ private:
     MatrixCT InitNorm (Direction) const;
 
     int itsmnLow;
+    int itsSiteNumber;
+    std::string itsLabel;
     std::vector<MatrixCT> itsMs; //
 };
+
+//
+//  This is a regular matrix product in the internal space (D1,D2) and a tensor product in
+//  physical space d (n,m).
+//
+Tensor3 HorizontalProduct(const Tensor3& M1,const Tensor3& M2);
+
 
 template <class T, class A, Data D> Vector<T> Flatten(const Indexable<T,A,Full,D,MatrixShape>& m)
 {

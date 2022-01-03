@@ -17,14 +17,25 @@ using std::endl;
 namespace TensorNetworks
 {
 
-Tensor3::Tensor3(int d, int D1, int D2, int mnlow)
-: itsmnLow(mnlow)
+Tensor3::Tensor3(int d, int D1, int D2, std::string label,int siteNumber,int mnLow)
+: itsmnLow(mnLow)
+, itsSiteNumber(siteNumber)
 {
+    SetLabel(label);
     for (int n=0; n<d; n++)
     {
         itsMs.push_back(MatrixCT(D1,D2));
         Fill(itsMs.back(),std::complex<double>(0.0));
     }
+}
+
+void Tensor3::SetLabel(std::string newLabel)
+{
+    std::ostringstream os;
+    os << newLabel;
+    if (itsSiteNumber>0) os << "[" << itsSiteNumber << "]";
+    os << std::ends;
+    itsLabel=os.str();
 }
 
 
@@ -48,6 +59,12 @@ void Tensor3::InitializeWith(State state,int sgn)
             FillRandom(M);
             M*=1.0/sqrt(d*GetD1()*GetD2()); //Try and keep <psi|psi>~O(1)
         }
+        break;
+    }
+    case Constant :
+    {
+        for (auto& M:itsMs)
+            Fill(M,dcmplx(1.0/sqrt(d*GetD1()*GetD2())));
         break;
     }
     case Neel :
@@ -233,6 +250,19 @@ void Tensor3::Multiply(Direction lr,const MatrixCT& G)
     }
 }
 
+//Tensor products in d space. this=this*M or this=M*this
+Tensor3 HorizontalProduct(const Tensor3& M1,const Tensor3& M2)
+{
+    auto [d1,D11,D12]=M1.GetDimensions();
+    auto [d2,D21,D22]=M2.GetDimensions();
+    Tensor3 ret(d1*d2,D11,D22,M1.GetLabel()+M2.GetLabel(),0);
+    int n=0;
+    for (int n2=0;n2<d2;n2++)
+        for (int n1=0;n1<d1;n1++)
+            ret(n++)=M1(n1)*M2(n2);
+    return ret;
+}
+
 
 // Rank Revealing QL/LQ
 MatrixCT Tensor3::QLRR(Direction lr,double eps)
@@ -241,33 +271,54 @@ MatrixCT Tensor3::QLRR(Direction lr,double eps)
     MatrixCT Mf=Flatten(lr);
     MatrixCT L,Q;
 
-    double neps=3*eps;
+    double neps=100*eps;
     switch (lr)
     {
         case DLeft:
-            std::tie(Q,L)=solver.SolveRankRevealingQL(Mf,eps);
-            assert(Max(fabs(Mf-Q*L))<neps);
+//            std::tie(Q,L)=solver.SolveRankRevealingQL(Mf,eps);
+            std::tie(Q,L)=solver.SolveThinQL(Mf);
+            if(Max(fabs(Mf-Q*L))>neps)
+            {
+                cout << "Mf=" << Mf << endl;
+                cout << "Q=" << Q << endl;
+                cout << "L=" << L << endl;
+                cout << std::scientific<< "neps=" << neps << " " << Max(fabs(Mf-Q*L)) << endl;
+            }
             for (index_t i:L.rows())
             {
-                dcmplx phase=L(i,i)/fabs(L(i,i));
-                L.GetRow(i)*=conj(phase);
-                Q.GetColumn(i)*=phase;
+                if (fabs(L(i,i))>eps)
+                {
+                    dcmplx phase=L(i,i)/fabs(L(i,i));
+                    L.GetRow(i)*=conj(phase);
+                    Q.GetColumn(i)*=phase;
+                }
             }
             assert(Max(fabs(Mf-Q*L))<neps);
         break;
         case DRight:
-            std::tie(L,Q)=solver.SolveRankRevealingLQ(Mf,eps);
+//            std::tie(L,Q)=solver.SolveRankRevealingLQ(Mf,eps);
+            std::tie(L,Q)=solver.SolveThinLQ(Mf);
+            if(Max(fabs(Mf-L*Q))>neps)
             {
-                double err=Max(fabs(Mf-L*Q));
-                if (err>=neps) cout << "Max(fabs(Mf-L*Q))=" << err << endl;
-                assert(err<neps);
-
+                cout << "Mf=" << Mf << endl;
+                cout << "Q=" << Q << endl;
+                cout << "L=" << L << endl;
+                cout << std::scientific << "neps=" << neps << " " << Max(fabs(Mf-L*Q)) << endl;
             }
+//            {
+//                double err=Max(fabs(Mf-L*Q));
+//                if (err>=neps) cout << "Max(fabs(Mf-L*Q))=" << err << endl;
+//                assert(err<neps);
+//
+//            }
             for (index_t i:L.cols())
             {
-                dcmplx phase=L(i,i)/fabs(L(i,i));
-                L.GetColumn(i)*=conj(phase);
-                Q.GetRow(i)*=phase;
+                if (fabs(L(i,i))>eps)
+                {
+                    dcmplx phase=L(i,i)/fabs(L(i,i));
+                    L.GetColumn(i)*=conj(phase);
+                    Q.GetRow(i)*=phase;
+                }
             }
             assert(Max(fabs(Mf-L*Q))<neps);
         break;
@@ -378,7 +429,7 @@ VectorCT Tensor3::GetTMEigenVector (Direction lr) const
     return V;
 }
 
-Tensor3::LRWType Tensor3::GetLW(const MatrixOR& W, const MatrixCT& G) const
+Tensor3::LRWType Tensor3::GetLW(const MatrixOR& W, const VectorCT& R) const
 {
     IsUnit(GetNorm(DLeft),1e-13);
     auto [d,D1,D2]=GetDimensions();
@@ -389,10 +440,10 @@ Tensor3::LRWType Tensor3::GetLW(const MatrixOR& W, const MatrixCT& G) const
     Matrix6CT TWL=GetTransferMatrix(DLeft ,W);
     MatrixCT  TL =GetTransferMatrix(DLeft );
 //    VectorCT  R  =GetTMEigenVector(DLeft );
-    VectorCT  R=TensorNetworks::Flatten(Transpose(G*~G));
+//    VectorCT  R=TensorNetworks::Flatten(Transpose(G*~G));
     assert(Max(fabs(TL-TWL.SubMatrix(1 ,1 ).Flatten()))<1e-15);
     assert(Max(fabs(TL-TWL.SubMatrix(Dw,Dw).Flatten()))<1e-15);
-    Tensor3 LW(Dw,D1,D2,1);
+    Tensor3 LW(Dw,D1,D2,"LW("+itsLabel+")",itsSiteNumber,1);
     LW.Unit(Dw);
     cout << std::setprecision(3);
     for (int w=Dw-1;w>1;w--)
@@ -445,7 +496,7 @@ Tensor3::LRWType Tensor3::GetLW(const MatrixOR& W, const MatrixCT& G) const
     return std::make_tuple(std::real(el),LW);
 }
 
-Tensor3::LRWType Tensor3::GetRW(const MatrixOR& W, const MatrixCT& G) const
+Tensor3::LRWType Tensor3::GetRW(const MatrixOR& W, const VectorCT& L) const
 {
     IsUnit(GetNorm(DRight),1e-13);
     auto [d,D1,D2]=GetDimensions();
@@ -456,10 +507,10 @@ Tensor3::LRWType Tensor3::GetRW(const MatrixOR& W, const MatrixCT& G) const
     Matrix6CT TWR=GetTransferMatrix(DRight,W);
     MatrixCT  TR =GetTransferMatrix(DRight);
 //    VectorCT  L  =GetTMEigenVector(DRight); //Slow accurate version.
-    VectorCT  L=TensorNetworks::Flatten(Transpose(~G*G));
+//    VectorCT  L=TensorNetworks::Flatten(Transpose(~G*G));
     assert(Max(fabs(TR-TWR.SubMatrix(1 ,1 ).Flatten()))<1e-15);
     assert(Max(fabs(TR-TWR.SubMatrix(Dw,Dw).Flatten()))<1e-15);
-    Tensor3 RW(Dw,D1,D2,1);
+    Tensor3 RW(Dw,D1,D2,"RW("+itsLabel+")",itsSiteNumber,1);
     RW.Unit(1);
     cout << std::setprecision(3);
     for (int w=Dw-1;w>1;w--)
@@ -512,7 +563,7 @@ Tensor3::LRWType Tensor3::GetRW(const MatrixOR& W, const MatrixCT& G) const
     return std::make_tuple(std::real(er),RW);
 }
 
-double Tensor3::GetExpectation(const MatrixOR& W, const MatrixCT& G) const
+double Tensor3::GetExpectation(const MatrixOR& W) const
 {
     IsUnit(GetNorm(DLeft),1e-13);
     auto [d,D1,D2]=GetDimensions();
@@ -525,7 +576,7 @@ double Tensor3::GetExpectation(const MatrixOR& W, const MatrixCT& G) const
     VectorCT  R  =GetTMEigenVector(DLeft ); //More expensive
 //    MatrixCT  RG =Transpose(G*~G); //G * G_dagger don't this version, low precision.
 
-    Tensor3 LW(Dw,D1,D2,1);
+    Tensor3 LW(Dw,D1,D2,"LW("+itsLabel+")",itsSiteNumber,1);
     LW.Unit(Dw);
     for (int w=Dw-1;w>1;w--)
     {
