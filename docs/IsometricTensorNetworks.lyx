@@ -1,0 +1,2146 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2cm
+\topmargin 2cm
+\rightmargin 2cm
+\bottommargin 2cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Isometric Tensor Networks
+\end_layout
+
+\begin_layout Author
+Jan Reimers
+\end_layout
+
+\begin_layout Date
+Dec.
+ 2021
+\end_layout
+
+\begin_layout Section
+Background
+\end_layout
+
+\begin_layout Subsection
+Canonical MPS
+\end_layout
+
+\begin_layout Standard
+Matrix Product States (MPS) are and excellent way of representing entangled
+ 1D quantum states.
+ The secret sauce for making this work is the so called canonical representation
+ where in a generic product state
+\begin_inset Formula 
+\[
+\psi^{\left[\boldsymbol{n}\right]}=\ldots M^{n_{a-1}}M^{n_{a}}M^{n_{a+1}}\ldots
+\]
+
+\end_inset
+
+is gauge transformed into a left
+\begin_inset Formula 
+\[
+\psi^{\left[\boldsymbol{n}\right]}=\ldots A^{n_{a-1}}A^{n_{a}}A^{n_{a+1}}\ldots
+\]
+
+\end_inset
+
+or right
+\begin_inset Formula 
+\[
+\psi^{\left[\boldsymbol{n}\right]}=\ldots B^{n_{a-1}}B^{n_{a}}B^{n_{a+1}}\ldots
+\]
+
+\end_inset
+
+canonical form.
+ The left and right normalization conditions are
+\begin_inset Formula 
+\begin{equation}
+\sum_{n}A^{\dagger n}A^{n}=\mathbb{I},\quad\sum_{n}B^{n}B^{\dagger n}=\mathbb{I}.\label{eq:Normalization Conditions}
+\end{equation}
+
+\end_inset
+
+All three states above are physically equivalent, i.e.
+ they give the same coefficients for every possible set of quantum numbers
+ 
+\begin_inset Formula $\left[\boldsymbol{n}\right]$
+\end_inset
+
+.
+ The big win comes when you want to evaluate any expectation value for site
+ 
+\begin_inset Formula $a$
+\end_inset
+
+.
+ We first transform the wave function into mixed canonical form centered
+ about site 
+\begin_inset Formula $a$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\psi^{\left[\boldsymbol{n}\right]}=\ldots A^{n_{a-2}}A^{n_{a-1}}M^{n_{a}}B^{n_{a+1}}B^{n_{a+2}}\ldots\label{eq:MixedCanonical}
+\end{equation}
+
+\end_inset
+
+where all sites to the left of 
+\begin_inset Formula $a$
+\end_inset
+
+ are left normalized and all sites to right are right normalized.
+ The expectation value is now
+\begin_inset Formula 
+\[
+\left\langle \psi\left|\hat{O}^{m_{a}n_{a}}\right|\psi\right\rangle =\sum_{mn}\left(\ldots A^{m_{a-2}}A^{m_{a-1}}M^{m_{a}}B^{m_{a+1}}B^{m_{a+2}}\ldots\right)^{\dagger}\left|O^{m_{a}n_{a}}\right|\left(\ldots A^{n_{a-2}}A^{n_{a-1}}M^{n_{a}}B^{n_{a+1}}B^{n_{a+2}}\ldots\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{mn}\left(\ldots B^{\dagger m_{a+2}}B^{\dagger m_{a+1}}M^{\dagger m_{a}}A^{\dagger m_{a-1}}A^{\dagger m_{a-2}}\ldots\right)\left|O^{m_{a}n_{a}}\right|\left(\ldots A^{n_{a-2}}A^{n_{a-1}}M^{n_{a}}B^{n_{a+1}}B^{n_{a+2}}\ldots\right)\times\left(\ldots\delta_{m_{a-2}n_{a-2}}\ldots\right)
+\]
+
+\end_inset
+
+and re-arranging (non-trivial for 
+\begin_inset Formula $B$
+\end_inset
+
+s!)
+\begin_inset Formula 
+\[
+\left\langle \psi\left|\hat{O}^{m_{a}n_{a}}\right|\psi\right\rangle =\ldots\left(\sum_{n_{a-1}}A^{\dagger n_{a-1}}A^{n_{a-1}}\right)\left(\sum_{m_{a}n_{a}}M^{\dagger m_{a}}O^{m_{a}n_{a}}M^{n_{a}}\right)\left(\sum_{m_{a+1}}B^{m_{a+1}}B^{\dagger n_{a+1}}\right)\ldots
+\]
+
+\end_inset
+
+now we can use the normalization conditions 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Normalization Conditions"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to collapse all the summations away from site 
+\begin_inset Formula $a$
+\end_inset
+
+.
+\begin_inset Formula 
+\[
+=\ldots\mathbb{I}\left(\sum_{m_{a}n_{a}}M^{\dagger m_{a}}O^{m_{a}n_{a}}M^{n_{a}}\right)\mathbb{I}\ldots
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{m_{a}n_{a}}M^{\dagger m_{a}}O^{m_{a}n_{a}}M^{n_{a}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Procedures for converting a random un-normalized state to right or left
+ normalized and well established and simply involve sweeping through lattice
+ and doing QR or SVD decompositions
+\begin_inset CommandInset citation
+LatexCommand cite
+key "schollwoeck_density-matrix_2010"
+literal "false"
+
+\end_inset
+
+.
+ These canonical states also enable efficient and numerically stable ground
+ state searches.
+ Until recently there was no known way of extending these canonical forms
+ to two (or higher) dimensional lattices.
+ As a result contractions for higher dimensional lattices was much more
+ involved and it became a whole cottage industry in itself
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Fishman2018"
+literal "false"
+
+\end_inset
+
+.
+ This has now changed with introduction of Isometric Tensor Networks
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Zaletel2020,Haghshenas2019,Hyatt2019,Lin2021"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+What is an Isometry?
+\end_layout
+
+\begin_layout Standard
+If we transform a vector 
+\begin_inset Formula $v$
+\end_inset
+
+ with transformation 
+\begin_inset Formula $W$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\vec{v}^{\prime}=W\vec{v}\label{eq:IsoMap}
+\end{equation}
+
+\end_inset
+
+and we require that all distances are invariant under 
+\begin_inset Formula $W$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{equation}
+\left\langle \vec{v}|\vec{v}\right\rangle =\left\langle \vec{v}^{\prime}|\vec{v}^{\prime}\right\rangle =\left\langle W\vec{v}|W\vec{v}\right\rangle \label{eq:InvarientDistance}
+\end{equation}
+
+\end_inset
+
+then we must have
+\begin_inset Formula 
+\[
+W^{\dagger}W=\mathbb{I}.
+\]
+
+\end_inset
+
+
+\begin_inset Formula $W$
+\end_inset
+
+is then and isometry.
+ In general
+\begin_inset Formula 
+\[
+WW^{\dagger}=P\neq\mathbb{I}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $P$
+\end_inset
+
+ is a projection operator from the space of 
+\begin_inset Formula $\vec{v}^{\prime}$
+\end_inset
+
+ to 
+\begin_inset Formula $\vec{v}$
+\end_inset
+
+.
+ This distinguishes isometries from unitary transforms.
+ One can also see that isometries also preserve inner product (The two 
+\begin_inset Formula $v$
+\end_inset
+
+s in eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:InvarientDistance"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ do not need to be the same).
+\end_layout
+
+\begin_layout Standard
+In addition the vector spaces for 
+\begin_inset Formula $\vec{v}$
+\end_inset
+
+ and 
+\begin_inset Formula $\vec{v}^{\prime}$
+\end_inset
+
+ in eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:IsoMap"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ do not need to be of the same dimension.
+ In other words 
+\begin_inset Formula $W$
+\end_inset
+
+ can be rectangular.
+ since 
+\begin_inset Formula $\vec{v}$
+\end_inset
+
+ is arbitrary the dimension of 
+\begin_inset Formula $\vec{v}^{\prime}$
+\end_inset
+
+ must be equal to or larger than dimension of 
+\begin_inset Formula $\vec{v}$
+\end_inset
+
+, 
+\begin_inset Formula $W$
+\end_inset
+
+ must have at least as many rows and columns.
+ This further distinguishes an isometry from the unitary transform where
+ the matrix must be square.
+\end_layout
+
+\begin_layout Subsection
+Isometric Tensor
+\end_layout
+
+\begin_layout Standard
+In the above section 
+\begin_inset Formula $W$
+\end_inset
+
+ is a rank-2 tensor, i.e.
+ a matrix.
+ For higher rank tensors we can define an isometric tensor by grouping indices,
+ i.e.
+ reshaping into the matrix.
+ For example a rank 3 tensor 
+\begin_inset Formula $T_{ijk}$
+\end_inset
+
+ (
+\begin_inset Formula $ij:1\rightarrow D,k:1\rightarrow D^{\prime}$
+\end_inset
+
+) can obey an isometry condition
+\begin_inset Formula 
+\[
+\sum_{ij=1}^{D}T_{kij}^{\dagger}T_{ijl}=\sum_{ij=1}^{D}T_{k\left(ij\right)}^{\dagger}T_{\left(ij\right)l}=\sum_{g=1}^{D^{2}}T_{kg}^{\dagger}T_{gl}=\mathbb{I}_{kl}
+\]
+
+\end_inset
+
+This is expressed in the diagram shown in fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:IsoTenContraction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ From the same tensor we can also calculate the projection
+\begin_inset Formula 
+\[
+\sum_{kl=1}^{D^{\prime}}T_{mnl}T_{kij}^{\dagger}=P_{mnij}
+\]
+
+\end_inset
+
+which is also shown diagrammatically in fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:IsoTenContraction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ In the diagram we also adopt a convention where indices for the larger
+ dimensions 
+\begin_inset Formula $D^{\prime}$
+\end_inset
+
+ as incoming arrows, and indices for the smaller dimension, 
+\begin_inset Formula $D$
+\end_inset
+
+ as outgoing arrows.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename IsoTen1.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+The contraction of all incoming (outgoing) arrows of an isometric tensor
+ with its complex conjugate gives an identity (projection) operator
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Lin2021"
+literal "false"
+
+\end_inset
+
+.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:IsoTenContraction"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+For a unitary matrix all indices are bi directional as shown in fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:UniTenContraction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ for a general tensor (not isometric or unitary) the the indices are drawn
+ with no arrows.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename IsoTen2.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+For unitary, both contractions give an identity operator.
+ Notice that the direction of the arrow is not changed by complex conjugation.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:UniTenContraction"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Isometric tensor networks
+\end_layout
+
+\begin_layout Standard
+We are now in a position to define an isometric tensor network.
+\end_layout
+
+\begin_layout Quote
+
+\emph on
+isometric tensor networks are then tensor networks consisting of isometric
+ tensors whose edges can consistently be assigned arrows.
+\end_layout
+
+\begin_layout Standard
+Consistency here means that if the legs of two tensors are joined the arrows
+ must be consistent in their direction.
+ In other words an outgoing arrow from one tensor must be paired the an
+ incoming arrow of the second tensor.
+ Of course is goes without saying (OK I am saying it anyway) that the dimensions
+ of the joined indices must also match.
+\end_layout
+
+\begin_layout Standard
+Closed loops in an isometric tensor network can be contracted to form a
+ larger isometric tensor, as shown in fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:combine-isometric-tensors"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:SVD-general"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ shows that SVD of a general tensor will result in a sequence of unitary,
+ diagonal and isometric tensors.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename IsoTen3.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+combine isometric tensors of consistent isometric directions to form a larger
+ isometric tensor.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:combine-isometric-tensors"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename IsoTen4.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+SVD replaces a general tensor with the contraction of a unitary, a diagonal
+ matrix, and an isometry
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:SVD-general"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Orthogonality Centers
+\end_layout
+
+\begin_layout Subsubsection
+1D case
+\end_layout
+
+\begin_layout Standard
+Above (eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:MixedCanonical"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) we showed a mixed canonical form for an MPS wavefunction.
+ There are actually two ways to do this shown in fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Orthongonaslity-centers"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Fig 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Orthongonaslity-centers"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+a shows a four site MPS with the orthogonality center, 
+\begin_inset Formula $\Psi$
+\end_inset
+
+ on the bond between sites 2 and 3.
+ In this case the orthogonality center has no physical index.
+ Fig 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Orthongonaslity-centers"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+b shows a four site MPS with the orthogonality center, 
+\begin_inset Formula $\Psi^{n_{3}}$
+\end_inset
+
+ on sites 3.
+ In this case the orthogonality center has a physical index 
+\begin_inset Formula $n_{3}$
+\end_inset
+
+.
+ In general one can contract all 
+\begin_inset Formula $A$
+\end_inset
+
+s to the left of the orthogonal center into one tensor with multiple physical
+ indices
+\begin_inset Formula 
+\[
+A_{i_{l}}^{n_{1}n_{2}\ldots n_{l-1}}=\sum_{i_{1}i_{2}\ldots i_{l-1}}A_{i_{1}}^{n_{1}}A_{i_{1}i_{2}}^{n_{2}}\cdots A_{i_{l-1}i_{l}}^{n_{l-1}}
+\]
+
+\end_inset
+
+and similarly for the 
+\begin_inset Formula $B$
+\end_inset
+
+s to the right of the o-center.
+ As we know these centers can easily be moved around by QR (or SVD) decomposing
+ the center site tensor and transfer the 
+\begin_inset Formula $R$
+\end_inset
+
+ (or 
+\begin_inset Formula $L$
+\end_inset
+
+) matrix to the right (left) in the lattice.
+ Standard 1D techniques.
+ 
+\end_layout
+
+\begin_layout Standard
+In ref.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Lin2021"
+literal "false"
+
+\end_inset
+
+ they call the tensor set
+\begin_inset Formula 
+\[
+\left\{ A_{i_{l}}^{n_{1}n_{2}\ldots n_{l-1}},B_{i_{l+1}}^{n_{l+1}n_{l+2}\ldots n_{L}}\right\} =T^{V\leftarrow\partial V}
+\]
+
+\end_inset
+
+a boundary map.
+ They say it is a single isometry, but it sure looks like two isometries
+ to me! the boundary map 
+\begin_inset Formula $T^{V\leftarrow\partial V}$
+\end_inset
+
+ of the orthogonality center 
+\begin_inset Formula $\Psi_{l,l+1}^{n_{l}}$
+\end_inset
+
+ is an isometry mapping from the virtual space 
+\begin_inset Formula $∂V$
+\end_inset
+
+ (represented by the 
+\begin_inset Formula $i_{l}$
+\end_inset
+
+ and 
+\begin_inset Formula $i_{l+1}$
+\end_inset
+
+ indices) to physical Hilbert space 
+\begin_inset Formula $V$
+\end_inset
+
+ (represented by the 
+\begin_inset Formula $n_{a}$
+\end_inset
+
+ indices).
+ This is shown diagrammatically in fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Orthongonaslity-centers"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+c Also fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Orthongonaslity-centers"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+d shows the contraction over physical indices, or
+\begin_inset Formula 
+\begin{equation}
+N=\left(T^{V\leftarrow\partial V}\right)^{\dagger}T^{V\leftarrow\partial V}=\mathbb{I}_{\partial V}\label{eq:NormMatrix}
+\end{equation}
+
+\end_inset
+
+which is the identity operator 
+\begin_inset Formula $N$
+\end_inset
+
+ which shows up in variation optimization calculation of an MPS.
+ 
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Excersise: How many indices does 
+\begin_inset Formula $N$
+\end_inset
+
+ have and what are they?
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename IsoTen5.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Orthogonality centers in 1D (a,b,c,d) and their natural extension to 2D
+ (e,f,g,h)
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Orthongonaslity-centers"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+2D case
+\end_layout
+
+\begin_layout Standard
+2D analogs for everything described above are shown in fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Orthongonaslity-centers"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ e,f,g,h for a 
+\begin_inset Formula $4\times4$
+\end_inset
+
+ lattice of isometric tensors.
+ In fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Orthongonaslity-centers"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+e the Orthogonality center is on a column of bonds between columns 2 and
+ 3.
+ In fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Orthongonaslity-centers"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+f the Orthogonality center on a column (3) of sites.
+ Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Orthongonaslity-centers"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+g shows the boundary map about column 3.
+ In addition the top site 
+\begin_inset Formula $(1,3)$
+\end_inset
+
+ is shown in red indicating that we can then use standard 1D techniques
+ to chose an orthogonality center with column 3.
+ Notice all arrows point inwards towards column 3, and all arrows point
+ inwards towards site 
+\begin_inset Formula $(1,3)$
+\end_inset
+
+.
+ Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Orthongonaslity-centers"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+h shows the boundary map for site 
+\begin_inset Formula $(1,3)$
+\end_inset
+
+.
+ All of this can be readily extended to higher dimensional lattices 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Tepaske2021"
+literal "false"
+
+\end_inset
+
+, but lets focus on 2D for now.
+\end_layout
+
+\begin_layout Section
+Forming a 2D isometric Tensor Network.
+\end_layout
+
+\begin_layout Standard
+Everything up to this point is just a big steaming pile of abstract goo
+ because we don't know how to form an isometric tensor network about some
+ orthogonality center.
+ We need a practical algorithm.
+ We will use the labels and notation shown in fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:2D-ColumnShifting"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ where 
+\begin_inset Formula $\Psi^{[l]}$
+\end_inset
+
+ is the product of general tensors in the column with the o-center, 
+\begin_inset Formula $A^{\left[l\right]}$
+\end_inset
+
+ is a column of isometric tensors to the left of the o-center and 
+\begin_inset Formula $B^{\left[l+1\right]}$
+\end_inset
+
+ is a column of isometric tensors to the right of the o-center column.
+ 
+\begin_inset Formula $l$
+\end_inset
+
+ labels the column or bond with the o-center.
+ In fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:2D-ColumnShifting"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ we see a column shift very analogous to the 1D case
+\begin_inset Formula 
+\[
+\Psi^{\left[l\right]}B^{\left[l+1\right]}\rightarrow A^{\left[l\right]}\Psi B^{\left[l+1\right]}\longrightarrow A^{\left[l\right]}\Psi^{\left[l+1\right]}
+\]
+
+\end_inset
+
+where the intermediate step has orthogonal bond column with no physical
+ indices.
+ In the first step we need to find a way to decompose a whole column
+\begin_inset Formula 
+\[
+\Psi^{\left[l\right]}\rightarrow A^{\left[l\right]}\Psi
+\]
+
+\end_inset
+
+but we can't use brute force and try and QR decompose a whole column at
+ once because of the exponential explosion that occurs when we group so
+ many indices.
+ Also if we try and QR one site at a time zipping up or down along the column
+ we end up destroying the matching of vertical isometry directions (arrows).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename IsoTen6.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+2D analogue of shifting the orthogonality center.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:2D-ColumnShifting"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+Instead what we do is minimize the distance between 
+\begin_inset Formula $\Psi^{\left[l\right]}$
+\end_inset
+
+ and 
+\begin_inset Formula $A^{\left[l\right]}\Psi$
+\end_inset
+
+ by varying 
+\begin_inset Formula $A^{\left[l\right]}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Psi$
+\end_inset
+
+.
+ This can be expressed as
+\begin_inset Formula 
+\[
+\min_{A^{\left[l\right]},\Psi}\left\Vert \Psi^{\left[l\right]}-A^{\left[l\right]}\Psi\right\Vert ^{2}
+\]
+
+\end_inset
+
+where the variation of 
+\begin_inset Formula $A^{\left[l\right]}$
+\end_inset
+
+must be somehow constrained so that proper isometry arrows are maintained.
+ This is sort of like QR for columns of tensors in the 
+\begin_inset Formula $\Psi$
+\end_inset
+
+ column need not be triangular.
+ This decomposition has been named
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Zaletel2020"
+literal "false"
+
+\end_inset
+
+ the 
+\emph on
+variational Moses move
+\emph default
+.
+\end_layout
+
+\begin_layout Subsection
+Tripartite Decomposition
+\end_layout
+
+\begin_layout Standard
+Before chugging away on some algorithm we need a way initialize 
+\begin_inset Formula $A^{\left[l\right]}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Psi$
+\end_inset
+
+ and fortunately this is addressed in ref.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Lin2021"
+literal "false"
+
+\end_inset
+
+ where they indicate that random initialization results in slow convergence.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Hyatt
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Hyatt2019"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lin
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Lin2021"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Original column
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $M$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\Psi^{\left[l\right]}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Isometric column
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $Q$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $A^{\left[l\right]}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Remainder/bond column
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+R
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\Psi$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Hyatt Method 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Hyatt2019"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+They call 
+\begin_inset Formula $Q$
+\end_inset
+
+ unitary, but I think it is really just isometric.
+ They start by doing a polar decomposition of each site 
+\begin_inset Formula $M_{a}$
+\end_inset
+
+ in the 
+\begin_inset Formula $M$
+\end_inset
+
+ column, which is calculated from the SVD 
+\begin_inset Formula $M_{a}=W_{a}s_{a}V_{a}^{\dagger}$
+\end_inset
+
+ and the polar decomposition is
+\begin_inset Formula 
+\[
+M_{a}=U_{a}H_{a}
+\]
+
+\end_inset
+
+where.
+ 
+\begin_inset Formula 
+\[
+U_{a}=W_{a}V_{a}^{\dagger},\;H_{a}=V_{a}s_{a}V_{a}^{\dagger}
+\]
+
+\end_inset
+
+and they assign 
+\begin_inset Formula $Q_{a}=U_{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $R_{a}=H_{a}=V_{a}s_{a}V_{a}^{\dagger}$
+\end_inset
+
+.
+ So they loop through the column and get an intial guess for 
+\begin_inset Formula $QR$
+\end_inset
+
+ on each site.
+ Next is the refinement phase where they calculate
+\begin_inset Formula 
+\[
+Tr\left[M^{\dagger}QQ^{\dagger}M\right]_{x}=E_{x}
+\]
+
+\end_inset
+
+but with one 
+\begin_inset Formula $Q_{a}$
+\end_inset
+
+ matrix, 
+\begin_inset Formula $x$
+\end_inset
+
+, left out (giving dangling indeces).
+ They call this an environment tensor, 
+\begin_inset Formula $E_{x}$
+\end_inset
+
+.
+ They then do a polar decomposition on 
+\begin_inset Formula $E_{x}$
+\end_inset
+
+ and assign the unitary part to 
+\begin_inset Formula $Q_{a}$
+\end_inset
+
+.
+ After all 
+\begin_inset Formula $Q$
+\end_inset
+
+s in the column have been updates they calculate a new 
+\begin_inset Formula $R=Q^{\dagger}M$
+\end_inset
+
+.
+ They check convergence with the fidelity
+\begin_inset Formula 
+\[
+f=\frac{Tr\left[M^{\dagger}QR\right]}{Tr\left[M^{\dagger}M\right]}
+\]
+
+\end_inset
+
+which will approach 
+\begin_inset Formula $1.0$
+\end_inset
+
+at convergence.
+ In practice 
+\begin_inset Formula $f=0.99$
+\end_inset
+
+ is considered converged.
+\end_layout
+
+\begin_layout Subsubsection
+Lin Method 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Lin2021"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A general tensor in the lattice looks like
+\begin_inset Formula 
+\[
+\Psi_{lrdu}^{n}
+\]
+
+\end_inset
+
+where the 
+\begin_inset Formula $lrud$
+\end_inset
+
+ internal indices correspond to left, right, up and down respectively, and
+ 
+\begin_inset Formula $n$
+\end_inset
+
+ is the physical index or quantum number.
+ Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Tripartite-decomposition"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ shows the tripartite decomposition for the most general case in the middle
+ of the lattice AND where a tripartite decomposition has already been carried
+ out for the site below, resulting the extra incoming index labeled 
+\begin_inset Formula $d^{\prime}$
+\end_inset
+
+ at the bottom.
+ So we are really starting with a tensor that looks like
+\begin_inset Formula 
+\[
+\Psi_{lrdd^{\prime}u}^{n}=\Psi_{\left(nld\right)\left(d^{\prime}r\right)u}=\Psi_{abc}
+\]
+
+\end_inset
+
+where we have indicated how all 6 indices are then grouped into three indices
+ 
+\begin_inset Formula $abc$
+\end_inset
+
+.
+ In fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Tripartite-decomposition"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ the 
+\begin_inset Formula $a$
+\end_inset
+
+ group are shown in black, 
+\begin_inset Formula $b$
+\end_inset
+
+ in blue and 
+\begin_inset Formula $c$
+\end_inset
+
+ is red.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename IsoTen7.png
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Tripartite decomposition
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Tripartite-decomposition"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Step 1: Group 
+\begin_inset Formula $bc$
+\end_inset
+
+ together and SVD 
+\begin_inset Formula $\Psi_{a(bc)}$
+\end_inset
+
+ as
+\begin_inset Formula 
+\[
+\Psi_{a\left(bc\right)}=\sum_{s=1}^{D_{s}}A_{as}\Lambda_{ss}V_{s\left(bc\right)}^{\dagger}=\sum_{s}A_{as}\Theta_{s\left(bc\right)}=
+\]
+
+\end_inset
+
+where the singular values were absorbed to the right.
+ The reason we don't use QR for this step is that we may need to truncate
+ very small singular values.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Step 2: Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Tripartite-decomposition"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+b Split the index 
+\begin_inset Formula $s$
+\end_inset
+
+ into 
+\begin_inset Formula $s_{l}$
+\end_inset
+
+and 
+\begin_inset Formula $s_{r}$
+\end_inset
+
+ with 
+\begin_inset Formula $D_{l}\sim D_{r}\sim\sqrt{D_{s}}$
+\end_inset
+
+.
+ You might think we need carefully distribute the SVs so as not to bias
+ the weight in the SVs towards one side or the other.
+ But in fact this does not matter, because in the next step we will optimize
+ the distribution with a unitary transform.
+\begin_inset Formula 
+\[
+\sum_{s=1}^{D_{s}}A_{as}\Theta_{s\left(bc\right)}\rightarrow\sum_{s_{l}=1}^{D_{l}}\sum_{s_{r}=1}^{D_{r}}A_{as_{l}s_{r}}\Theta_{s_{l}s_{r}\left(bc\right)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Step3: 3: Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Tripartite-decomposition"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+c, insert a Unitary transform 
+\begin_inset Formula $U^{\dagger}U$
+\end_inset
+
+ between 
+\begin_inset Formula $A$
+\end_inset
+
+ and 
+\begin_inset Formula $\Theta$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+A\Theta\rightarrow AU^{\dagger}U\Theta=\sum_{s_{l}s_{r}}A_{as_{l}s_{r}}\sum_{lr}U_{\left(s_{l}s_{r}\right)\left(lr\right)}^{\dagger}\sum_{s_{l}^{\prime}s_{r}^{\prime}}U_{\left(lr\right)\left(s_{l}^{\prime}s_{r}^{\prime}\right)}\Theta_{s_{l}^{\prime}s_{r}^{\prime}\left(bc\right)}=A^{\prime}\Theta^{\prime}
+\]
+
+\end_inset
+
+Right now it is not clear why we must split the 
+\begin_inset Formula $s$
+\end_inset
+
+ index beofre this transform
+\end_layout
+
+\begin_layout Subsubsection
+Optimal 
+\begin_inset Formula $U$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The goal is to minize the truncation error in the SVD of 
+\begin_inset Formula $\Theta^{\prime}=U\Theta$
+\end_inset
+
+ in the moses move.
+ 
+\begin_inset Formula 
+\[
+\min_{U\in Unitary}\mathcal{L}\left(U\Theta\right)
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\mathcal{L}=\epsilon_{D}=\sum_{i=D+1}s_{i}^{2}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $s_{i}$
+\end_inset
+
+ are the singular values of 
+\begin_inset Formula $U\Theta=WsV^{\dagger}$
+\end_inset
+
+, or 
+\begin_inset Formula $s=W^{\dagger}U\Theta V$
+\end_inset
+
+ and
+\begin_inset Formula 
+\[
+s_{i}=\left(W^{\dagger}U\Theta V\right)_{ii}=\sum_{jkl}W_{ij}^{\dagger}U_{jk}\Theta_{kl}V_{li}=\sum_{jk}E_{i,jk}U_{jk}=Tr\left[E_{i}U\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\epsilon_{D}=\sum_{i=D+1}Tr\left[E_{i}U\right]^{2}
+\]
+
+\end_inset
+
+If this was a linear problem then we could calculate the optimal 
+\begin_inset Formula $U$
+\end_inset
+
+ from the a polar decomposition
+\begin_inset Formula 
+\[
+E=\sum_{i=D+1}E_{i}=U_{E}s_{E}V_{E}^{\dagger},\;U_{opt}=V_{E}U_{E}^{\dagger}
+\]
+
+\end_inset
+
+This is called the orthogonal Procrustes problem, and only works for linear
+ problems.
+ We can try and linearize as follwos
+\begin_inset Formula 
+\[
+\epsilon_{D}=\sum_{i=D+1}Tr\left[E_{i}U\right]^{2}\approx\sum_{i=D+1}Tr\left[E_{i}U_{0}\right]Tr\left[E_{i}U_{opt}\right]
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\sum_{i=D+1}s_{i}Tr\left[E_{i}U_{opt}\right]=Tr\left[\left(\sum_{i=D+1}s_{i}E_{i}\right)U_{opt}\right]=Tr\left[EU_{opt}\right]
+\]
+
+\end_inset
+
+So now we have linear problem with eniroment tensor
+\begin_inset Formula 
+\[
+E=\sum_{i=D+1}s_{i}E_{i}=U_{E}s_{E}V_{E}^{\dagger},\;U_{opt}=V_{E}U_{E}^{\dagger}
+\]
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Subsection
+The Moses Move
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename IsoTen8.png
+	scale 70
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+The Moses move
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Moses-move"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Variational optimization of 
+\begin_inset Formula $\Psi$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We need solve
+\begin_inset Formula 
+\[
+\min_{\Psi}\left\Vert \Psi^{\left[l\right]}-A^{\left[l\right]}\Psi\right\Vert ^{2}.
+\]
+
+\end_inset
+
+expanding
+\begin_inset Formula 
+\[
+\left\Vert \Psi^{\left[l\right]}-A^{\left[l\right]}\Psi\right\Vert ^{2}=\left\langle \Psi^{\left[l\right]}-A^{\left[l\right]}\Psi|\Psi^{\left[l\right]}-A^{\left[l\right]}\Psi\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\left\langle \Psi^{\left[l\right]}|\Psi^{\left[l\right]}\right\rangle -\left\langle \Psi^{\left[l\right]}|A^{\left[l\right]}\Psi\right\rangle -\left\langle A^{\left[l\right]}\Psi|\Psi^{\left[l\right]}\right\rangle +\left\langle A^{\left[l\right]}\Psi|A^{\left[l\right]}\Psi\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\left\langle \Psi^{\left[l\right]}|\Psi^{\left[l\right]}\right\rangle -\left\langle \Psi^{\left[l\right]}|A^{\left[l\right]}\Psi\right\rangle -\left\langle A^{\left[l\right]}\Psi|\Psi^{\left[l\right]}\right\rangle +\left\langle \Psi|\Psi\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula $\Psi$
+\end_inset
+
+ is a column of tensor, and we wnat to optimize WRT just one of them, 
+\begin_inset Formula $x$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+0=\frac{\partial}{\partial x^{\dagger}}\left\Vert \Psi^{\left[l\right]}-A^{\left[l\right]}\Psi\right\Vert ^{2}=\frac{\partial}{\partial x^{\dagger}}\left\{ \left\langle \Psi^{\left[l\right]}|A^{\left[l\right]}\Psi\left(x\right)\right\rangle -\left\langle A^{\left[l\right]}\Psi\left(x\right)|\Psi^{\left[l\right]}\right\rangle +\left\langle \Psi\left(x\right)|\Psi\left(x\right)\right\rangle \right\} 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+0=\left\langle \Psi^{\prime}\left(x\right)|\Psi\left(x\right)\right\rangle -\left\langle A^{\left[l\right]}\Psi^{\prime}\left(x\right)|\Psi^{\left[l\right]}\right\rangle 
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\Psi^{\prime}\left(x\right)$
+\end_inset
+
+ is the column of tensors with the tensor 
+\begin_inset Formula $x^{\dagger}$
+\end_inset
+
+ removed.
+ We can pull 
+\begin_inset Formula $x$
+\end_inset
+
+ out of the ket in the first term giving
+\begin_inset Formula 
+\[
+\left\langle \Psi^{\prime}\left(x\right)|\Psi^{\prime}\left(x\right)\right\rangle x-\left\langle A^{\left[l\right]}\Psi^{\prime}\left(x\right)|\Psi^{\left[l\right]}\right\rangle 
+\]
+
+\end_inset
+
+or 
+\begin_inset Formula 
+\[
+Nx=b
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $N$
+\end_inset
+
+ is the usual normal matrix from eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:NormMatrix"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ can be calculated directly.
+ If 
+\begin_inset Formula $x$
+\end_inset
+
+ is at the o-center then 
+\begin_inset Formula $N$
+\end_inset
+
+ is just the identity and 
+\begin_inset Formula $x=b$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Variational optimization of 
+\begin_inset Formula $A^{\left[l\right]}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We need solve
+\begin_inset Formula 
+\[
+\min_{x\in iso}\left\Vert \Psi^{\left[l\right]}-A^{\left[l\right]}\left(x\right)\Psi\right\Vert ^{2}=\min_{x\in iso}2-2Re\left\langle \Psi^{\left[l\right]}|A^{\left[l\right]}\left(x\right)\Psi\left(x\right)\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\max_{x\in iso}Re\left\langle \Psi^{\left[l\right]}|A^{\left[l\right]}\left(x\right)\Psi\left(x\right)\right\rangle 
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\max_{x\in iso}Re\left[Tr\left(xb\right)\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Bibliography
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintCited"
+bibfiles "MPS1"
+options "plain"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
