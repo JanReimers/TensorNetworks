@@ -19,7 +19,8 @@ public:
 //  Normalization members with and without SVD compression
 //
     virtual void NormalizeSvD(Direction LR)=0;
-    virtual void NormalizeQR (Direction LR)=0;
+    virtual void NormalizeQR (Direction LR,double eps)=0;
+    virtual double GetGaugeError() const=0; //Check ||A(k)*G(k)-G(k-1)B(k)||
 //--------------------------------------------------------------------------------------
 //
 // Find ground state.
