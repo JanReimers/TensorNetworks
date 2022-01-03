@@ -538,10 +538,14 @@ Gauge Transform
 \end_layout
 
 \begin_layout Standard
+\begin_inset Formula $G$
+\end_inset
+
+ (
 \begin_inset Formula $C$
 \end_inset
 
-is also the gauge transform between 
+in the figure) is also the gauge transform between 
 \begin_inset Formula $A$
 \end_inset
 
@@ -552,7 +556,7 @@ is also the gauge transform between
 
 \begin_inset Formula 
 \begin{equation}
-M^{n}=A_{C}^{n}=A^{n}C=CB^{n}\label{eq:Gauge Transform}
+M^{n}=A_{C}^{n}=A^{n}G=GB^{n}\label{eq:Gauge Transform}
 \end{equation}
 
 \end_inset
@@ -567,9 +571,9 @@ and is related to
 
  above
 \begin_inset Formula 
-\[
-L=C^{\dagger}C,\;R=CC^{\dagger}
-\]
+\begin{equation}
+L=G^{\dagger}G,\;R=GG^{\dagger}\label{eq:LRfromGG}
+\end{equation}
 
 \end_inset
 
@@ -599,7 +603,7 @@ noprefix "false"
  implies that
 \begin_inset Formula 
 \[
-Tr\left[CC^{\dagger}\right]=1
+Tr\left[GG^{\dagger}\right]=1
 \]
 
 \end_inset
@@ -632,6 +636,194 @@ from which we can define reduced basis states
 \begin_inset Formula 
 \[
 \left|\psi^{\left(ij\right)}\right\rangle =\left|\psi_{L}^{i}\right\rangle \left|\psi_{R}^{j}\right\rangle 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+QR Iteration
+\end_layout
+
+\begin_layout Standard
+Given 
+\begin_inset Formula $M$
+\end_inset
+
+ how do we determine 
+\begin_inset Formula $A$
+\end_inset
+
+, 
+\begin_inset Formula $B$
+\end_inset
+
+ and 
+\begin_inset Formula $G$
+\end_inset
+
+? We start with 
+\begin_inset Formula $G=𝕀$
+\end_inset
+
+ and QL decompose 
+\begin_inset Formula $M^{n}=Q^{n}L$
+\end_inset
+
+ and 
+\begin_inset Formula $Q^{n}$
+\end_inset
+
+ will automatically be left normalized 
+\begin_inset Formula $\sum_{n}Q^{\dagger n}Q^{n}=𝕀$
+\end_inset
+
+.
+ The wave function now looks like
+\begin_inset Formula 
+\[
+\cdots M^{n_{0}}M^{n_{1}}M^{n_{2}}\cdots=\cdots\left(Q^{n_{0}}L\right)\left(Q^{n_{1}}L\right)\left(Q^{n_{2}}L\right)\cdots
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\cdots\left(LQ^{n_{0}}\right)\left(LQ^{n_{1}}\right)\left(LQ^{n_{2}}\right)\cdots
+\]
+
+\end_inset
+
+So we assign 
+\begin_inset Formula $M^{n}\leftarrow LQ^{n}.$
+\end_inset
+
+ We also assign 
+\begin_inset Formula $G\leftarrow LG$
+\end_inset
+
+.
+ After many iteration 
+\begin_inset Formula $L\rightarrow𝕀$
+\end_inset
+
+ at which point we are done iterations and 
+\begin_inset Formula $M^{n}=A^{n}$
+\end_inset
+
+ is left normalized.
+ For right norm we just run things around:
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $M^{n}=LQ^{n}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $M^{n}\leftarrow Q^{n}L.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $G\leftarrow GL$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The high level procedure is then: Left normalize, throw away 
+\begin_inset Formula $G$
+\end_inset
+
+, and then right normalize and keep 
+\begin_inset Formula $G$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+With a unit cell of two site right norm would look like
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $M_{2}=L_{1}Q_{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $M_{2}\leftarrow Q_{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $M_{1}\leftarrow M_{1}L_{1}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $G_{1}\leftarrow G_{1}L_{1}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $M_{1}=L_{2}Q_{1}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $M_{1}\leftarrow Q_{1}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $M_{2}\leftarrow M_{2}L_{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $G_{2}\leftarrow G_{2}L_{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+At the end we get
+\begin_inset Formula 
+\[
+A_{1}G_{1}=G_{2}B_{1}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+A_{2}G_{2}=G_{1}B_{2}
 \]
 
 \end_inset
@@ -1067,6 +1259,67 @@ where
 \end_layout
 
 \begin_layout Subsection
+Multi-site unit cell
+\end_layout
+
+\begin_layout Standard
+In this context we are talking about 
+\begin_inset Formula $L>1$
+\end_inset
+
+ for the iMPS, but for the iMPO 
+\begin_inset Formula $L_{W}=1$
+\end_inset
+
+.
+ We can define a unit cell MPS centered at site 
+\begin_inset Formula $k$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathbb{A}^{\mathbb{N}}\left(k\right)=A^{n_{k+1}}A^{n_{k+2}}\cdots A^{n_{k-1}}A^{n_{k}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathbb{B}^{\mathbb{N}}\left(k\right)=B^{n_{k}}B^{n_{k+1}}\cdots B^{n_{k-2}}B^{n_{k-1}}
+\]
+
+\end_inset
+
+and define a unit cell MPO
+\begin_inset Formula 
+\[
+\mathbb{W}^{\mathbb{MN}}=\hat{W}^{m_{k}n_{k}}\hat{W}^{m_{k+1}n_{k+1}}\cdots\hat{W}^{m_{k-1}n_{k-1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+T_{L\left(kw_{1}w_{2}\right)}=\sum_{\mathbb{MN}}\mathbb{W}^{\mathbb{MN}}\mathbb{A}^{*\mathbb{M}}\left(k\right)\otimes\mathbb{A}^{\mathbb{N}}\left(k\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+T_{R\left(kw_{1}w_{2}\right)}=\sum_{\mathbb{MN}}\mathbb{W}^{\mathbb{MN}}\mathbb{B}^{\mathbb{M}}\left(k\right)\otimes\mathbb{B}^{*\mathbb{N}}\left(k\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
 Index Grouping
 \end_layout
 
@@ -1479,9 +1732,9 @@ where
 \begin_layout Enumerate
 The gauge transform now takes the form
 \begin_inset Formula 
-\[
-M^{n}\left(k\right)=A^{n}\left(k\right)C\left(k\right)=C\left(k-1\right)B^{n}\left(k\right)
-\]
+\begin{equation}
+M^{n}\left(k\right)=A^{n}\left(k\right)G\left(k\right)=G\left(k-1\right)B^{n}\left(k\right)\label{eq:Multisite guage condition}
+\end{equation}
 
 \end_inset
 
@@ -1490,6 +1743,15 @@ where
 \end_inset
 
  is the site indes within the unit cell.
+ They also write this as
+\begin_inset Formula 
+\[
+M^{n}\left(k\right)=A^{n}\left(k\right)G_{R}\left(k\right)=G_{L}B^{n}\left(k\right)
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Enumerate
@@ -1517,6 +1779,10 @@ literal "false"
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
 Because if #1 for each site 
 \begin_inset Formula $k$
 \end_inset
@@ -1588,9 +1854,349 @@ Is there some unitary transform that allows us to convert this into
 \begin_inset Formula $L$
 \end_inset
 
- decoupled eigen problems?
+ decoupled eigen problems? If we use eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:LRfromGG"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ then we probably don't need to worry about this.
 \end_layout
 
+\begin_layout Subsection
+Multsite VUMP algorithm
+\end_layout
+
+\begin_layout Standard
+For this algorithm while sweeping through lattice we need to solve the 
+\begin_inset Formula $H_{C}$
+\end_inset
+
+ eigen equation for lattice site 
+\begin_inset Formula $a$
+\end_inset
+
+ and lattice site 
+\begin_inset Formula $a-1$
+\end_inset
+
+ (to the left).
+\end_layout
+
+\begin_layout Enumerate
+Sweep of unit cell sites with index 
+\begin_inset Formula $k$
+\end_inset
+
+.
+ Use mod 
+\begin_inset Formula $L$
+\end_inset
+
+ arithmetic.
+\end_layout
+
+\begin_layout Enumerate
+Calculate terms required for 
+\begin_inset Formula $H_{M}\left(k\right)$
+\end_inset
+
+, 
+\begin_inset Formula $H_{C}\left(k\right)$
+\end_inset
+
+, 
+\begin_inset Formula $H_{C}\left(k-1\right)$
+\end_inset
+
+.
+ This requires a lot of un-packing
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+To calculate 
+\begin_inset Formula $H_{M}\left(k\right)$
+\end_inset
+
+ we need 
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+, 
+\begin_inset Formula $L_{W}\left(k\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $R_{W}(k)$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+To caluclate 
+\begin_inset Formula $L_{W}\left(k\right)$
+\end_inset
+
+ we need 
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+, 
+\begin_inset Formula $A^{n}\left(k\right)$
+\end_inset
+
+, 
+\begin_inset Formula $R\left(k\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+\begin_inset Formula $R\left(k\right)=G\left(k\right)*G^{\dagger}\left(k\right)$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+To calculate 
+\begin_inset Formula $R_{W}(k)$
+\end_inset
+
+ we need 
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+, 
+\begin_inset Formula $B^{n}\left(k\right)$
+\end_inset
+
+, 
+\begin_inset Formula $L\left(k-1\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+\begin_inset Formula $L\left(k-1\right)=G^{\dagger}\left(k-1\right)*G\left(k-1\right)$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Enumerate
+\begin_inset Formula $H_{C}\left(k\right)=H_{R}$
+\end_inset
+
+ requires 
+\begin_inset Formula $L_{W}\left(k\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $R_{W}(k)$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $H_{C}\left(k-1\right)-H_{L}$
+\end_inset
+
+ requires 
+\begin_inset Formula $L_{W}\left(k-1\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $R_{W}(k-1)$
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+To caluclate 
+\begin_inset Formula $L_{W}\left(k-1\right)$
+\end_inset
+
+ we need 
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+, 
+\begin_inset Formula $A^{n}\left(k-1\right)$
+\end_inset
+
+, 
+\begin_inset Formula $R\left(k-1\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+\begin_inset Formula $R\left(k-1\right)=G\left(k-1\right)*G^{\dagger}\left(k-1\right)$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+To calculate 
+\begin_inset Formula $R_{W}(k-1)$
+\end_inset
+
+ we need 
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+, 
+\begin_inset Formula $B^{n}\left(k-1\right)$
+\end_inset
+
+, 
+\begin_inset Formula $L\left(k-2\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+\begin_inset Formula $L\left(k-2\right)=G^{\dagger}\left(k-2\right)*G\left(k-2\right)$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Enumerate
+Solve eigen systems for ground states
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+\begin_inset Formula $H_{M}\left(k\right)M\left(k\right)=E_{M}\left(k\right)M\left(k\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $H_{C}\left(k\right)G\left(k\right)=E_{G}\left(k\right)G\left(k\right)$
+\end_inset
+
+ or 
+\begin_inset Formula $H_{R}G_{R}=E_{R}G_{R}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $H_{C}\left(k-1\right)G\left(k-1\right)=E_{G}\left(k-1\right)G\left(k-1\right)$
+\end_inset
+
+ or 
+\begin_inset Formula $H_{L}G_{L}=E_{L}G_{L}$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Ensure phase angles of 
+\begin_inset Formula $G_{R}$
+\end_inset
+
+ and 
+\begin_inset Formula $G_{L}$
+\end_inset
+
+ are consistent.
+\end_layout
+
+\begin_layout Enumerate
+Calculate 
+\begin_inset Formula $A\left(k\right)$
+\end_inset
+
+ from 
+\begin_inset Formula $M^{n}\left(k\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $C_{R}\left(k\right)$
+\end_inset
+
+: 
+\begin_inset Formula $M^{n}C_{R}^{\dagger}=U^{l}s^{l}V^{\dagger l}$
+\end_inset
+
+, calculate 
+\begin_inset Formula $A=U^{l}V^{\dagger l}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Calculate 
+\begin_inset Formula $B\left(k\right)$
+\end_inset
+
+ from 
+\begin_inset Formula $M^{n}\left(k\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $C_{L}\left(k\right)$
+\end_inset
+
+: 
+\begin_inset Formula $C_{L}^{\dagger}M^{n}=U^{r}s^{r}V^{\dagger r}$
+\end_inset
+
+, calculate 
+\begin_inset Formula $B=U^{r}V^{\dagger r}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Assign 
+\begin_inset Formula $G(k)=G_{R}$
+\end_inset
+
+, 
+\begin_inset Formula $G\left(k-1\right)=G_{L}$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Section
 References
 \end_layout

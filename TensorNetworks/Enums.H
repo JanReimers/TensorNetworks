@@ -7,7 +7,7 @@ namespace TensorNetworks
 {
     enum Position     {PLeft,PBulk,PRight};
     enum Direction    {DLeft,DRight};
-    enum State        {Product,Random,Neel};
+    enum State        {Product,Random,Neel,Constant};
     enum SpinOperator {Sx,Sy,Sz,Sp,Sm};
     enum Trotter      {Odd,Even,TrotterX,TrotterY,TrotterZ};
     enum TrotterOrder {TNone,FirstOrder,SecondOrder,FourthOrder};
