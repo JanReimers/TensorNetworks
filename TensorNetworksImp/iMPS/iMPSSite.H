@@ -12,14 +12,29 @@ template <class T> class EigenSolver;
 namespace TensorNetworks
 {
 
+struct RefineData
+{
+    RefineData();
+    double etaL , etaR ; //||M-A*Gr||, ||M-GL*B||
+    double etaLs, etaRs; //||sC-sGL|| ||sC-sGR||
+    double etaG1, etaG2; //||A(k)*GR-GL*B(k)|| ||A(k-1)*GL-GR*B(k-1)||
+    double dsL,dsR;      //Max change in bond SVs to the left and right.
+    double minsL,minsR;  //Min singular values for GL and GR
+    double eL ,eR ;      // (YL|R) (L|YR)
+    double eLp,eRm;      // (YLp|Rp) (Lm|YRm)
+    double eM,eGR,eGL;   // eigen values of H_M(k), H_G(k) H_G(k-1)
+};
+
 class iMPSSite : public virtual Site
 {
 public:
+    typedef std::tuple<Tensor3,Tensor3,Tensor3,Tensor3> UnitcellMPSType;
+
 //--------------------------------------------------------------------------------------
 //
 //  Construction and initialization zone
 //
-    iMPSSite(Bond* leftBond, Bond* rightBond, int d, int D);
+    iMPSSite(Bond* leftBond, Bond* rightBond, int d, int D,int siteNumber);
     virtual ~iMPSSite();
     void InitializeWith(State,int sgn);
     void NewBondDimensions(int D1, int D2, bool saveData=false);
@@ -37,9 +52,10 @@ public:
 //
 //  Required for ground state calculations
 //
-    double RefineOneSite (const SiteOperator*,                         const Epsilons& eps);
-    double Refine        (const SiteOperator*,iMPSSite* left_neighbour,const Epsilons& eps);
+    double RefineOneSite (const MatrixOR& W,const Epsilons& eps);
+    RefineData Refine        (const MatrixOR& W,const MatrixOR& Wcell,iMPSSite* left_neighbour,const UnitcellMPSType&,const Epsilons& eps);
     double GetExpectation(const SiteOperator*) const;
+    double GetExpectation(const MatrixOR& Wcell,const UnitcellMPSType&) const;
 //---------------------------------------------------------------------------------
 //
 // Normalization
@@ -56,6 +72,10 @@ public:
     virtual void   InitQRIter();
     virtual double QRStep(Direction lr,double eps);
     virtual void   SaveAB_CalcLR(Direction lr); //save {A,B}=M and {L,R}=Transfer matrix eigen vector.
+    virtual double GetGaugeError(const iMPSSite* left_neighbour) const;
+    virtual double GetANormError() const;
+    virtual double GetBNormError() const;
+
 //
 //  Statusreporting
 //
@@ -64,9 +84,11 @@ public:
     char GetNormStatus(double eps) const;
     void Report    (std::ostream&) const;
 
-    typedef std::vector<MatrixCT>     dVectorT;
+//    typedef std::vector<MatrixCT>     dVectorT;
 
 private:
+    friend class iMPSImp;
+
     MatrixCT  GetNorm         (Direction lr) const;
     MatrixCT  GetCanonicalNorm(Direction lr) const;
 //    MatrixCT  ReshapeBeforeSVD(Direction lr);
@@ -94,8 +116,8 @@ private:
     {
         return lr==DLeft ?  DRight : DLeft;
     }
-    typedef dVectorT::      iterator  dIterT;
-    typedef dVectorT::const_iterator cdIterT;
+ //   typedef dVectorT::      iterator  dIterT;
+ //   typedef dVectorT::const_iterator cdIterT;
 
 //-----------------------------------------------------------------------------------
 //
@@ -124,7 +146,7 @@ private:
     Bond* itsRightBond;
     int itsd; //2*S+1
     int itsD1,itsD2;  //Bond dimensions
-//    dVectorT itsMs;   //We need a separate matrix for each of the p basis states on one site.
+    int itsSiteNumber;
     Tensor3  itsM,itsA,itsB; //M[n], and left and right versions A[n],B[n]
     MatrixCT itsG; //Gauge transform from the most recent normalization sweep.
     EigenSolver<dcmplx>* itsEigenSolver;

@@ -37,8 +37,9 @@ public:
     virtual double  GetMaxDeltal() const {return 0.0;} //Max delta lambda on bonds
 
     virtual void NormalizeSvD(Direction LR);
-    virtual void NormalizeQR (Direction LR);
-    virtual void Normalize();
+    virtual void NormalizeQR (Direction LR,double eps);
+    virtual void Normalize(double eps);
+    virtual double GetGaugeError() const; //Check ||A(k)*G(k)-G(k-1)B(k)||
 //--------------------------------------------------------------------------------------
 //
 // Find ground state
@@ -74,12 +75,17 @@ private:
 //
 //  For ground state search
 //
-    double FindVariationalGroundState(const iHamiltonian*,const IterationScheduleLine&);
+    double FindVariationalGroundState(const iHamiltonian* H,const iMPO* Hcell,const IterationScheduleLine&);
 //        void   Refine(Direction lr,const Hamiltonian*,const Epsilons&,int isite); //Minimize energy WRT the Ms in one site.
 //        void   Sweep (Direction lr,const Hamiltonian*,const Epsilons&);
 //        void   NormalizeSite             (Direction lr,int isite);
-    iMPSSite* GetSite(Direction,int ia); //Mod L arithmetic to get one site to the left or right
+    const iMPSSite* GetSite(Direction,int ia) const; //Mod L arithmetic to get one site to the left or right
+          iMPSSite* GetSite(Direction,int ia); //Mod L arithmetic to get one site to the left or right
+    const iMPSSite* GetSite(int ia) const; //Mod L arithmetic to get one site
+          iMPSSite* GetSite(int ia); //Mod L arithmetic to get one site
 
+    typedef iMPSSite::UnitcellMPSType UnitcellMPSType;
+    UnitcellMPSType MakeUnitcelliMPS(int k) const;
 //--------------------------------------------------------------------------------------
 //
 //  Data members

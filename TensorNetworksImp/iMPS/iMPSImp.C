@@ -2,10 +2,12 @@
 #include "TensorNetworksImp/MPS/Bond.H"
 #include "TensorNetworks/iHamiltonian.H"
 #include "TensorNetworks/iMPO.H"
+#include "TensorNetworks/SiteOperator.H"
 #include "TensorNetworks/IterationSchedule.H"
 #include "TensorNetworks/TNSLogger.H"
 #include "TensorNetworks/CheckSpin.H"
 #include "TensorNetworks/TNSLogger.H"
+#include "Operators/OperatorValuedMatrix.H"
 #include "Containers/Matrix4.H"
 #include <iostream>
 #include <iomanip>
@@ -47,9 +49,9 @@ void iMPSImp::InitSitesAndBonds(int D,double epsSV)
     //  Create Sites
     //
     itsSites.push_back(0);  //Dummy space holder. We want this array to be 1 based.
-    itsSites.push_back(new iMPSSite(itsBonds[itsL],itsBonds[1],itsd,D));
+    itsSites.push_back(new iMPSSite(itsBonds[itsL],itsBonds[1],itsd,D,1));
     for (int i=2; i<=itsL; i++)
-        itsSites.push_back(new iMPSSite(itsBonds[i-1],itsBonds[i],itsd,D));
+        itsSites.push_back(new iMPSSite(itsBonds[i-1],itsBonds[i],itsd,D,i));
     //
     //  Tell each bond about its left and right sites.
     //
@@ -76,6 +78,11 @@ void iMPSImp::InitializeWith(State state)
 
 }
 
+const iMPSSite* iMPSImp::GetSite(Direction lr,int ia) const
+{
+    return const_cast<iMPSImp*>(this)->GetSite(lr,ia);
+}
+
 iMPSSite* iMPSImp::GetSite(Direction lr,int ia)
 {
     switch (lr)
@@ -87,6 +94,16 @@ iMPSSite* iMPSImp::GetSite(Direction lr,int ia)
         ia++;
         break;
     }
+    return GetSite(ia);
+}
+
+const iMPSSite* iMPSImp::GetSite(int ia) const
+{
+    return const_cast<iMPSImp*>(this)->GetSite(ia);
+}
+
+iMPSSite* iMPSImp::GetSite(int ia)
+{
     int i=(ia-1+itsL)%itsL+1;
     assert(i>=1);
     assert(i<=itsL);
@@ -201,13 +218,12 @@ public:
 };
 
 
-void iMPSImp::NormalizeQR (Direction lr)
+void iMPSImp::NormalizeQR (Direction lr,double eps)
 {
     int L=GetL();
     for (int ia=1;ia<=L;ia++)
         itsSites[ia]->InitQRIter(); //Reset all G's to unit
 
-    double eps=1e-13; //Cutoff for RR QR
     double eta=0.0;
     int niter=0,maxIter=500;
     do
@@ -225,7 +241,7 @@ void iMPSImp::NormalizeQR (Direction lr)
             break;
         }
         niter++;
-    } while (eta>1e-13 && niter <maxIter);
+    } while (eta>eps && niter <maxIter);
     if (niter==maxIter)
         std::cout << "iMPSImp::NormalizeQR failed to converge, eta=" << eta << std::endl;
 
@@ -234,61 +250,130 @@ void iMPSImp::NormalizeQR (Direction lr)
 
 }
 
-void iMPSImp::Normalize()
+void iMPSImp::Normalize(double eps)
 {
-    NormalizeQR(DLeft);
+    NormalizeQR(DLeft,eps);
 
-    NormalizeQR(DRight);
+    NormalizeQR(DRight,eps);
 }
+//
+//  Check ||A(k)*G(k)-G(k-1)B(k)||
+//
+double iMPSImp::GetGaugeError() const
+{
+    double etaG=0.0;
+    for (int ia=1;ia<=itsL;ia++)
+        etaG+=itsSites[ia]->GetGaugeError(GetSite(DLeft,ia));
+    return etaG/itsL;
+}
+
+
+//double   iMPSImp::GetExpectation (const iHamiltonian* H) const
+//{
+//    assert(o);
+//    double E=0.0;
+//    iMPO* Hcell=H->MakeUnitcelliMPO(itsL); //Product of Ws for the whole unit cell
+//    MatrixOR Wcell=Hcell->GetSiteOperator(1)->GetW();
+//    for (int ia=1;ia<=itsL;ia++)
+//        E+=itsSites[ia]->GetExpectation(Wcell,MakeUnitcelliMPS(ia));
+//    return E/itsL;
+//}
 
 double   iMPSImp::GetExpectation (const iMPO* o) const
 {
     assert(o);
     double E=0.0;
+    MatrixOR W=o->GetSiteOperator(1)->GetW();
+    const iHamiltonian* iH=dynamic_cast<const iHamiltonian*>(o);
+    if (iH)
+    {
+        iMPO* Hcell=iH->MakeUnitcelliMPO(itsL); //Product of Ws for the whole unit cell
+        W=Hcell->GetSiteOperator(1)->GetW();
+    }
     for (int ia=1;ia<=itsL;ia++)
-        E+=itsSites[ia]->GetExpectation(o->GetSiteOperator(ia));
+        E+=itsSites[ia]->GetExpectation(W,MakeUnitcelliMPS(ia))/itsL;
     return E/itsL;
 }
 
 double iMPSImp::FindVariationalGroundState(const iHamiltonian* H,const IterationSchedule& is)
 {
     double E=0.0;
-    Normalize(); //Sweep left and right storing A's and B's.
+    Normalize(1e-14); //Sweep left and right storing A's and B's.
+    iMPO* Hcell=H->MakeUnitcelliMPO(itsL); //Product of Ws for the whole unit cell
     for (is.begin(); !is.end(); is++)
-        E=FindVariationalGroundState(H,*is);
+        E=FindVariationalGroundState(H,Hcell,*is);
     return E;
 }
 
-double iMPSImp::FindVariationalGroundState(const iHamiltonian* H,const IterationScheduleLine& isl)
+double iMPSImp::FindVariationalGroundState(const iHamiltonian* H,const iMPO* Hcell,const IterationScheduleLine& isl)
 {
     assert(Logger); //Make sure we have global logger.
-    Logger->LogInfo(2,"iter      E        dE    Gauge eta");
+    Logger->LogInfo(2,"iter      E            dE     :        Energies             :   Eigen values        :                     eta                         : sing. Values");
+    Logger->LogInfo(2,"                              :   eL    eR     eLp    eRm   :   eM     eGR    eGL   :   L        R       Ls       Rs      G1      G2  : dL   dR  minL   minR");
 
+    MatrixOR Wcell=Hcell->GetSiteOperator(1)->GetW();
+    MatrixOR W    =H    ->GetSiteOperator(1)->GetW();
     int in=0;
     double eta=1.0;
     double dE=0.0,E=0.0;
+    RefineData rd;
     for (; in<isl.itsMaxGSSweepIterations; in++)
     {
         dE=E=0.0;
         if (itsL==1)
         {
-            eta=itsSites[1]->RefineOneSite(H->GetSiteOperator(1),isl.itsEps);
+            eta=itsSites[1]->RefineOneSite(W,isl.itsEps);
             E+= itsSites[1]->GetSiteEnergy();
             dE=std::max(dE,fabs(itsSites[1]->GetIterDE()));
         }
-        else for (int ia=1;ia<=itsL;ia++)
+        else for (int k=1;k<=itsL;k++)
         {
-            eta=itsSites[ia]->Refine(H->GetSiteOperator(ia),GetSite(DLeft,ia),isl.itsEps);
-            E+= itsSites[ia]->GetSiteEnergy();
-            dE=std::max(dE,fabs(itsSites[ia]->GetIterDE()));
+            iMPSSite* s =GetSite(k  );
+            iMPSSite* sm=GetSite(k-1);
+            rd=s->Refine(W,Wcell,sm,MakeUnitcelliMPS(k),isl.itsEps);
+            E+= s->GetSiteEnergy()/itsL;
+            dE=std::max(dE,fabs(s->GetIterDE()));
+//            cout << "Site k   etaG,etaA,etaB=" << s ->GetGaugeError(sm) << " " << s ->GetANormError() << " " << s ->GetBNormError() << endl;
+//            cout << "Site k-1 etaG,etaA,etaB=" << sm->GetGaugeError(s ) << " " << sm->GetANormError() << " " << sm->GetBNormError() << endl;
+            //Normalize(1e-14); //Sweep left and right storing A's and B's.
+            Logger->LogInfoV(2,"%4d %16.13f %.1e : %6.3f %6.3f %6.3f %6.3f : %6.3f %6.3f  %6.3f : %.1e %.1e %.1e %.1e %.1e %.1e : %.1e %.1e %.1e %.1e"
+                             ,in,E/itsL,dE,
+                             rd.eL,rd.eR,rd.eLp,rd.eRm,rd.eM,rd.eGR,rd.eGL,
+                             rd.etaL,rd.etaR,rd.etaLs,rd.etaRs,rd.etaG1,rd.etaG2,
+                             rd.dsL,rd.dsR,rd.minsL,rd.minsR);
         }
         E/=itsL;
-        Logger->LogInfoV(2,"%4d %.13f %.1e %.1e",in,E,dE,eta);
         if (eta<isl.itsEps.itsDeltaLambdaEpsilon && dE <isl.itsEps.itsDelatEnergy1Epsilon) break;
     }
     Logger->LogInfoV(0,"Variational iMPS GS D=%4d, %4d iterations, <E>=%.13f",GetMaxD(),in,E);
     return E;
 }
 
+//
+//  We actually need 2 version eachs of Acell,Bcell
+//      For H_M(k) (H_AC) we need Acell(k-1) and Bcell(k+1)
+//      For H_G(k) (H_C)  we need Acell(k) and Bcell(k+1)
+//      For H_G(k-1)      we need Acell(k-1) and Bcell(k)
+//
+
+iMPSImp::UnitcellMPSType iMPSImp::MakeUnitcelliMPS(int k) const
+{
+    int ka=k-1,kb=k+1;
+    Tensor3 A =GetSite(ka  )->itsA;
+    Tensor3 Ap=GetSite(ka+1)->itsA;
+    Tensor3 B =GetSite(kb  )->itsB;
+    Tensor3 Bm=GetSite(kb-1)->itsB;
+    for (int ia=1;ia<itsL;ia++)
+    {
+        ka--;
+        kb++;
+        A =HorizontalProduct(GetSite(ka  )->itsA,A );
+        Ap=HorizontalProduct(GetSite(ka+1)->itsA,Ap);
+        B =HorizontalProduct(B ,GetSite(kb  )->itsB);
+        Bm=HorizontalProduct(Bm,GetSite(kb-1)->itsB);
+    }
+//    cout << "MakeUnitcelliMPS A,Ap,B,Bm=" << A.GetLabel() << " " <<  Ap.GetLabel() << " " <<  B.GetLabel() << " " <<  Bm.GetLabel() << endl;
+    return std::make_tuple(A,Ap,B,Bm);
+}
 
 }; // namespace
